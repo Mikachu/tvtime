@@ -45,6 +45,12 @@ Restores the picture settings (brightness, contrast, hue, colour) to
 their default values.
 
 .TP
+.B AUTO_ADJUST_WINDOW
+Automatically resize the window to match the content inside it.  This
+is for when you resize tvtime into, say, a long rectangle, and want it
+to jump back to being a perfect 4:3 box around the content.
+
+.TP
 .B BRIGHTNESS_DOWN
 Lowers the brightness setting on the input.
 
@@ -279,6 +285,12 @@ field deinterlaced to a frame).
 .B TOGGLE_INPUT
 Switches the capture card input used.  Among the Inputs are: the
 tuner, composite, or S-Video connectors on the capture card.
+
+.TP
+.B TOGGLE_LETTERBOX
+Switches between the available letterbox modes.  This cuts off the top
+and bottom of the input picture to help fit the window to the image
+content.
 
 .TP
 .B TOGGLE_LUMA_CORRECTION

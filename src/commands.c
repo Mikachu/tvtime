@@ -120,6 +120,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_FULLSCREEN", TVTIME_TOGGLE_FULLSCREEN },
     { "TOGGLE_FRAMERATE", TVTIME_TOGGLE_FRAMERATE },
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
+    { "TOGGLE_LETTERBOX", TVTIME_TOGGLE_LETTERBOX },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_MODE", TVTIME_TOGGLE_MODE },
     { "TOGGLE_MUTE", TVTIME_TOGGLE_MUTE },
@@ -191,6 +192,7 @@ struct commands_s {
     int toggledeinterlacer;
     int togglepulldowndetection;
     int togglemode;
+    int toggleletterbox;
     int framerate;
     int scan_channels;
     int pause;
@@ -297,6 +299,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->toggledeinterlacer = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
+    in->toggleletterbox = 0;
     in->framerate = FRAMERATE_FULL;
     in->console_on = 0;
     in->scrollconsole = 0;
@@ -870,6 +873,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) tvtime_osd_show_message( in->osd, in->pause ? "Paused" : "Resumed" );
         break;
 
+    case TVTIME_TOGGLE_LETTERBOX:
+        in->toggleletterbox = 1;
+        break;
+
     case TVTIME_TOGGLE_MODE:
         in->togglemode = 1;
         break;
@@ -972,6 +979,7 @@ void commands_next_frame( commands_t *in )
     in->toggledeinterlacer = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
+    in->toggleletterbox = 0;
     in->update_luma = 0;
     in->resizewindow = 0;
 }
@@ -1024,6 +1032,11 @@ int commands_toggle_pulldown_detection( commands_t *in )
 int commands_toggle_mode( commands_t *in )
 {
     return in->togglemode;
+}
+
+int commands_toggle_letterbox( commands_t *in )
+{
+    return in->toggleletterbox;
 }
 
 void commands_set_console( commands_t *in, console_t *con )

@@ -1,5 +1,7 @@
 
 0.9.9 -
+  * vektor: Add a command to change the letterbox mode.
+  * vektor: Fixes for compilation with uclibc (thanks fihzy!)
   * vektor: Change channel if we type more digits than
       possible for the current number of channels in the
       station list.

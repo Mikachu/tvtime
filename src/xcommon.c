@@ -78,6 +78,8 @@ static int xcommon_exposed = 0;
 static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
 static int fullscreen_position = 0;
+static int letterbox_ystart = 0;
+static int letterbox_height = 0;
 
 static int has_focus = 0;
 
@@ -1333,6 +1335,7 @@ void xcommon_poll_events( input_t *in )
             case XK_Down:      arg |= I_DOWN; break;
             case XK_Page_Up:   arg |= I_PGUP; break;
             case XK_Page_Down: arg |= I_PGDN; break;
+            case XK_Insert:    arg |= I_INSERT; break;
 
             case XK_F1: arg |= I_F1; break;
             case XK_F2: arg |= I_F2; break;
@@ -1478,5 +1481,12 @@ area_t xcommon_get_window_area( void )
 void xcommon_set_fullscreen_position( int pos )
 {
     fullscreen_position = pos;
+}
+
+void xcommon_set_letterbox( int ystart, int height )
+{
+    letterbox_ystart = ystart;
+    letterbox_height = height;
+    fprintf( stderr, "xcommon: %d, %d\n", ystart, height );
 }
 

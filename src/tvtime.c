@@ -888,6 +888,9 @@ int main( int argc, char **argv )
     unsigned int output_driver = 0;
     deinterlace_method_t *curmethod;
     int curmethodid;
+    int letterbox_y = 0;
+    int letterbox_h = 0;
+    int letterbox_mode = 0;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1401,8 +1404,13 @@ int main( int argc, char **argv )
 
         output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
         output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
-        output_y = (int) ((((double) height) * commands_get_overscan( commands )) + 0.5);
-        output_h = (int) ((((double) height) - (((double) height) * commands_get_overscan( commands ) * 2.0)) + 0.5);
+        if( letterbox_mode ) {
+            output_y = letterbox_y;
+            output_h = letterbox_h;
+        } else {
+            output_y = (int) ((((double) height) * commands_get_overscan( commands )) + 0.5);
+            output_h = (int) ((((double) height) - (((double) height) * commands_get_overscan( commands ) * 2.0)) + 0.5);
+        }
 
         if( fifo ) {
             int cmd;
@@ -1534,6 +1542,17 @@ int main( int argc, char **argv )
             if( osd ) {
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
+        }
+        if( commands_toggle_letterbox( commands ) ) {
+            double letterbox = 4.0 / 3.0;
+
+            letterbox_mode = (letterbox_mode + 1) % 2;
+            if( letterbox_mode == 1 ) {
+                letterbox = 2.35;
+            }
+            letterbox_h = (int) ((((((double) height) * 4.0)/3.0)/letterbox) + 0.5);
+            letterbox_y = (height - letterbox_h) / 2;
+            output->set_letterbox( letterbox_y, letterbox_h );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
             tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;

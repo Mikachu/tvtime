@@ -473,6 +473,10 @@ static void dfb_set_fullscreen_position( int pos )
 {
 }
 
+static void dfb_set_letterbox( int ystart, int height )
+{
+}
+
 static output_api_t dfboutput =
 {
     dfb_init,
@@ -502,6 +506,7 @@ static output_api_t dfboutput =
     dfb_set_window_position,
     dfb_set_window_height,
     dfb_set_fullscreen_position,
+    dfb_set_letterbox,
 
     dfb_poll_events,
     dfb_shutdown

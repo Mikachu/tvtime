@@ -61,6 +61,7 @@ typedef struct output_api_s
     void (* set_window_position)( int x, int y );
     void (* set_window_height)( int window_height );
     void (* set_fullscreen_position)( int pos );
+    void (* set_letterbox)( int ystart, int height );
 
     void (* poll_events)( input_t *in );
     void (* shutdown)( void );
