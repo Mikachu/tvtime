@@ -20,7 +20,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include "osd.h"
+#include "osdtools.h"
 #include "tvtimeosd.h"
 
 struct tvtime_osd_s

@@ -34,7 +34,6 @@
 #include "sdloutput.h"
 #include "videotools.h"
 #include "mixer.h"
-#include "osd.h"
 #include "tvtimeosd.h"
 #include "tvtimeconf.h"
 #include "input.h"

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "speedy.h"
 #include "pnginput.h"
 #include "efs.h"
-#include "osd.h"
+#include "osdtools.h"
 
 
 int aspect_adjust_packed4444_scanline( unsigned char *output,

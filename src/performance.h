@@ -53,6 +53,8 @@ int performance_get_usecs_since_frame_aquired( performance_t *perf );
 int performance_get_usecs_since_last_field( performance_t *perf );
 int performance_get_usecs_of_last_blit( performance_t *perf );
 
+double performance_get_percentage_dropped( performance_t *perf );
+
 #ifdef __cplusplus
 };
 #endif

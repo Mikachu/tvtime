@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef OSD_H_INCLUDED
-#define OSD_H_INCLUDED
+#ifndef OSDTOOLS_H_INCLUDED
+#define OSDTOOLS_H_INCLUDED
 
 /**
  * This file defines some simple primitives needed for the on screen
@@ -102,4 +102,4 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                int width, int xpos,
                                                int scanline );
 
-#endif /* OSD_H_INCLUDED */
+#endif /* OSDTOOLS_H_INCLUDED */

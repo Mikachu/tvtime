@@ -4,12 +4,13 @@
 #include <sys/time.h>
 #include "performance.h"
 
+#define DROP_HISTORY_SIZE	10
+
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
-
 
 struct performance_s
 {
@@ -35,6 +36,9 @@ struct performance_s
 
     int time_bot_to_top;
     int time_top_to_bot;
+
+    int drop_history[ DROP_HISTORY_SIZE ];
+    int drop_pos;
 };
 
 performance_t *performance_new( int fieldtimeus )
@@ -58,6 +62,8 @@ performance_t *performance_new( int fieldtimeus )
     gettimeofday( &perf->delay_blit_bot, 0 );
     gettimeofday( &perf->blit_bot_start, 0 );
     gettimeofday( &perf->blit_bot_end, 0 );
+    memset( perf->drop_history, 0, sizeof( perf->drop_history ) );
+    perf->drop_pos = 0;
     return perf;
 }
 
@@ -68,8 +74,18 @@ void performance_delete( performance_t *perf )
 
 void performance_checkpoint_aquired_input_frame( performance_t *perf )
 {
+    int dropdiff;
+
     perf->lastframetime = perf->aquired_input;
     gettimeofday( &perf->aquired_input, 0 );
+
+    dropdiff = timediff( &perf->aquired_input, &perf->lastframetime ) - (perf->fieldtime * 3);
+    if( dropdiff >= 0 ) {
+        perf->drop_history[ perf->drop_pos ] = ( dropdiff / (perf->fieldtime*2) ) + 2;
+    } else {
+        perf->drop_history[ perf->drop_pos ] = 0;
+    }
+    perf->drop_pos = ( perf->drop_pos + 1 ) % DROP_HISTORY_SIZE;
 }
 
 void performance_checkpoint_constructed_top_field( performance_t *perf )
@@ -159,5 +175,17 @@ void performance_print_frame_drops( performance_t *perf )
         fprintf( stderr, "tvtime: Frame drop detected (% 2.2fms between consecutive frames.\n",
             ((double) timediff( &perf->aquired_input, &perf->lastframetime)) / 1000.0 );
     }
+}
+
+double performance_get_percentage_dropped( performance_t *perf )
+{
+    int cur = 0;
+    int i;
+
+    for( i = 0; i < DROP_HISTORY_SIZE; i++ ) {
+        cur += perf->drop_history[ i ];
+    }
+
+    return ( ( (double) cur ) / ( (double) DROP_HISTORY_SIZE ) );
 }
 

@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "osd.h"
+#include "osdtools.h"
 #include "input.h"
 #include "menu.h"
 
