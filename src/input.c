@@ -30,7 +30,7 @@
 #define CHANNEL_DELAY 100
 
 /* Number of frames to pause during channel change. */
-#define CHANNEL_HOLD 2
+#define CHANNEL_HOLD 0
 
 
 struct input_s {
@@ -57,10 +57,107 @@ struct input_s {
     menu_t *menu;
 };
 
+static int cur_channel = 0;
+static int cur_freq_table = 1;
+
+static int frequencies_find_current_index( videoinput_t *vidin )
+{
+    int curfreq = videoinput_get_tuner_freq( vidin );
+    int i;
+
+    if( curfreq == 0 ) {
+        /* Probably no tuner present */
+        return 0;
+    }
+
+    for( i = 0; i < CHAN_ENTRIES; i++ ) {
+        if( curfreq < (tvtuner[ i ].freq[ cur_freq_table ] + 500) &&
+            curfreq > (tvtuner[ i ].freq[ cur_freq_table ] - 500) ) {
+            cur_channel = i;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static void frequencies_choose_first_frequency( void )
+{
+    int i;
+    cur_channel = 0;
+
+    for( i = 0; i < CHAN_ENTRIES; i++ ) {
+        if( tvtuner[ i ].freq[ cur_freq_table ] ) {
+            cur_channel = i;
+            break;
+        }
+    }
+}
+
+static int frequencies_find_named_channel( const char *str )
+{
+    int i;
+    const char *instr;
+    
+    if( !str ) return 0;
+
+    while( *str == '0' ) {
+        str++;
+    }
+    instr = str;
+    if( !(*str) ) {
+        instr = "0";
+    }
+
+    for( i = 0; i < CHAN_ENTRIES; i++ ) {
+        char *curstr = tvtuner[ i ].name;
+        while( *curstr == ' ' ) curstr++;
+
+        if( !strcasecmp( curstr, instr ) ) {
+            cur_channel = i;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static void reinit_tuner( input_t *in )
+{
+    /* Setup the tuner if available. */
+    if( videoinput_has_tuner( in->vidin ) ) {
+        /**
+         * Set to the current channel, or the first channel in our
+         * frequency list.
+         */
+        if( !frequencies_find_current_index( in->vidin ) ) {
+            /* set to a known frequency */
+            frequencies_choose_first_frequency();
+            videoinput_set_tuner_freq( in->vidin, tvtuner[ cur_channel ].freq[ cur_freq_table ] +
+                                       config_get_finetune( in->cfg ) );
+        }
+
+        if( config_get_verbose( in->cfg ) ) {
+            fprintf( stderr, "tvtime: Changing to channel %s.\n", 
+                     tvtuner[ cur_channel ].name );
+        }
+
+        if( in->osd ) {
+            tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
+            tvtime_osd_show_info( in->osd );
+        }
+    } else if( in->osd ) {
+        tvtime_osd_set_channel_number( in->osd, "" );
+        tvtime_osd_show_info( in->osd );
+    }
+}
+
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
                     tvtime_osd_t *osd, video_correction_t *vc )
 {
     input_t *in = (input_t *) malloc( sizeof( input_t ) );
+    const char *chanlist_name;
+
     if( !in ) {
         fprintf( stderr, "input: Could not create new input object.\n" );
         return NULL;
@@ -85,6 +182,35 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->togglemenumode = 0;
     in->muted = 0;
 
+    /**
+     * Set the current channel list.
+     */
+    chanlist_name = config_get_v4l_freq( in->cfg );
+    if( !strcasecmp( "us-bcast", chanlist_name ) ) {
+        cur_freq_table = NTSC_BROADCAST;
+    } else if( !strcasecmp( "japan-bcast", chanlist_name ) ) {
+        cur_freq_table = NTSC_JP_BCAST;
+    } else if( !strcasecmp( "japan-cable", chanlist_name ) ) {
+        cur_freq_table = NTSC_JP_CABLE;
+    } else if( !strcasecmp( "europe", chanlist_name ) ) {
+        cur_freq_table = PAL_EUROPE;
+    } else if( !strcasecmp( "italy", chanlist_name ) ) {
+        cur_freq_table = PAL_ITALY;
+    } else if( !strcasecmp( "newzealand", chanlist_name ) ) {
+        cur_freq_table = PAL_NEWZEALAND;
+    } else if( !strcasecmp( "australia", chanlist_name ) ) {
+        cur_freq_table = PAL_AUSTRALIA;
+    } else if( !strcasecmp( "ireland", chanlist_name ) ) {
+        cur_freq_table = PAL_IRELAND;
+    } else if( !strcasecmp( "pal-cable-bg", chanlist_name ) ) {
+        cur_freq_table = PAL_CABLE_BG;
+    } else {
+        cur_freq_table = NTSC_CABLE;
+    }
+
+    reinit_tuner( in );
+
+
     return in;
 }
 
@@ -98,20 +224,21 @@ void input_set_menu( input_t *in, menu_t *m )
     in->menu = m;
 }
 
-void input_channel_change_relative( input_t *in, int offset )
+static void input_channel_change_relative( input_t *in, int offset )
 {
     int verbose = config_get_verbose( in->cfg );
 
     if( !videoinput_has_tuner( in->vidin ) ) {
         if( verbose )
-            fprintf( stderr, 
-                     "tvtime: Can't change channel, "
+            fprintf( stderr, "tvtime: Can't change channel, "
                      "no tuner available on this input!\n" );
     } else {
-        chanindex = (chanindex + offset + chancount) % chancount;
+        for(;;) {
+            cur_channel = (cur_channel + offset + CHAN_ENTRIES) % CHAN_ENTRIES;
+            if( tvtuner[ cur_channel ].freq[ cur_freq_table ] ) break;
+        }
 
-        videoinput_set_tuner_freq( in->vidin, 
-                                   chanlist[ chanindex ].freq +
+        videoinput_set_tuner_freq( in->vidin, tvtuner[ cur_channel ].freq[ cur_freq_table ] +
                                    config_get_finetune( in->cfg ) );
 
         if( config_get_mutetvcard( in->cfg ) && in->muted ) {
@@ -121,11 +248,12 @@ void input_channel_change_relative( input_t *in, int offset )
 
         in->videohold = CHANNEL_HOLD;
 
-        if( verbose ) fprintf( stderr, "tvtime: Changing to "
-                               "channel %s\n", 
-                               chanlist[ chanindex ].name );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Changing to channel %s\n", 
+                     tvtuner[ cur_channel ].name );
+        }
         if( in->osd ) {
-            tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+            tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
             tvtime_osd_show_info( in->osd );
         }
     }
@@ -310,34 +438,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
         case TVTIME_TV_VIDEO:
             videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
             tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
-            /* Setup the tuner if available. */
-            if( videoinput_has_tuner( in->vidin ) ) {
-                /**
-                 * Set to the current channel, or the first channel in our
-                 * frequency list.
-                 */
-                int rc = frequencies_find_current_index( in->vidin );
-                if( rc == -1 ) {
-                    /* set to a known frequency */
-                    videoinput_set_tuner_freq( in->vidin, chanlist[ chanindex ].freq +
-                                               config_get_finetune( in->cfg ) );
-
-                    if( verbose ) fprintf( stderr, 
-                                           "tvtime: Changing to channel %s.\n", 
-                                           chanlist[ chanindex ].name );
-                } else if( rc > 0 ) {
-                    if( verbose ) fprintf( stderr, 
-                                           "tvtime: Changing to channel %s.\n",
-                                           chanlist[ chanindex ].name );
-                }
-                if( in->osd ) {
-                    tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
-                    tvtime_osd_show_info( in->osd );
-                }
-            } else if( in->osd ) {
-                tvtime_osd_set_channel_number( in->osd, "" );
-                tvtime_osd_show_info( in->osd );
-            }
+            reinit_tuner( in );
             break;
 
         case TVTIME_HUE_UP:
@@ -384,16 +485,16 @@ void input_callback( input_t *in, InputEvent command, int arg )
         case TVTIME_ENTER:
             if( in->frame_counter ) {
                 if( *in->next_chan_buffer ) {
-                    int found;
 
-                    /* this sets chanindex accordingly */
-                    found = frequencies_find_named_channel( 
-                        in->next_chan_buffer );
-
-                    if( found > -1 ) {
-                        videoinput_set_tuner_freq( 
-                            in->vidin, 
-                            chanlist[ chanindex ].freq +
+                    /* this sets the current channel accordingly */
+                    if( frequencies_find_named_channel( in->next_chan_buffer ) ) {
+                        /* go to the next valid channel instead */
+                        for(;;) {
+                            if( tvtuner[ cur_channel ].freq[ cur_freq_table ] ) break;
+                            cur_channel = (cur_channel + 1 + CHAN_ENTRIES) % CHAN_ENTRIES;
+                        }
+                        videoinput_set_tuner_freq( in->vidin, 
+                            tvtuner[ cur_channel ].freq[ cur_freq_table ] +
                             config_get_finetune( in->cfg ) );
 
                         if( config_get_mutetvcard( in->cfg ) && in->muted ) {
@@ -404,18 +505,21 @@ void input_callback( input_t *in, InputEvent command, int arg )
                         in->videohold = CHANNEL_HOLD;
 
                         if( verbose ) {
-                            fprintf( stderr, 
-                                     "tvtime: Changing to channel %s\n", 
-                                     chanlist[ chanindex ].name );
+                            fprintf( stderr, "tvtime: Changing to channel %s\n", 
+                                     tvtuner[ cur_channel ].name );
                         }
 
                         if( in->osd ) {
-                            tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+                            tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
                             tvtime_osd_show_info( in->osd );
                         }
                         in->frame_counter = 0;
                     } else {
-                        /* no valid channel */
+                        /* No valid channel found. */
+                        if( in->osd ) {
+                            tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
+                            tvtime_osd_show_info( in->osd );
+                        }
                         in->frame_counter = 0;
                     }
                 }

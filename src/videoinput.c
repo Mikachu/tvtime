@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <linux/videodev.h>
 #include "videoinput.h"
-#include "frequencies.h"
 #include "mixer.h"
 
 
@@ -709,6 +708,19 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
 
 int videoinput_freq_present( videoinput_t *vidin )
 {
+    if( vidin->tuner.tuner > -1 ) {
+        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+            perror( "ioctl VIDIOCGTUNER" );
+            return 0;
+        }
+        if( vidin->tuner.signal ) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    return 1;
+/*
     if (vidin->tuner.tuner > -1) {
 
         usleep( 100000 );
@@ -726,6 +738,7 @@ int videoinput_freq_present( videoinput_t *vidin )
     }
 
     return 0;
+*/
 }
 
 int videoinput_get_input_num( videoinput_t *vidin )

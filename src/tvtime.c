@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include "pngoutput.h"
 #include "pnginput.h"
-#include "frequencies.h"
 #include "videoinput.h"
 #include "rtctimer.h"
 #include "sdloutput.h"
@@ -467,44 +466,6 @@ int main( int argc, char **argv )
         tvtime_osd_set_deinterlace_method( osd, curmethod->name );
     }
 
-    /**
-     * Set to the current channel, or the first channel in our
-     * frequency list.
-     */
-    if( !frequencies_set_chanlist( config_get_v4l_freq( ct ) ) ) {
-        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s, "
-                         "using us-cable.\n", 
-                 config_get_v4l_freq( ct ) );
-        frequencies_set_chanlist( "us-cable" );
-    }
-
-    /* Setup the tuner if available. */
-    if( videoinput_has_tuner( vidin ) ) {
-        /**
-         * Set to the current channel, or the first channel in our
-         * frequency list.
-         */
-        int rc = frequencies_find_current_index( vidin );
-        if( rc == -1 ) {
-            /* set to a known frequency */
-            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq +
-                                       config_get_finetune( ct ) );
-        }
-
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Changing to channel %s.\n", 
-                     chanlist[ chanindex ].name );
-        }
-
-        if( osd ) {
-            tvtime_osd_set_channel_number( osd, chanlist[ chanindex ].name );
-            tvtime_osd_show_info( osd );
-        }
-    } else if( osd ) {
-        tvtime_osd_set_channel_number( osd, "" );
-        tvtime_osd_show_info( osd );
-    }
-
     /* Setup the video correction tables. */
     if( verbose ) {
         if( config_get_apply_luma_correction( ct ) ) {
@@ -540,7 +501,6 @@ int main( int argc, char **argv )
         return 1;
     }
 
-/* Billy - menu code disabled for now. */
     menu = menu_new( in, ct, vidin, osd, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
@@ -619,6 +579,7 @@ int main( int argc, char **argv )
         int curframeid;
         int printdebug = 0;
         int showbars, videohold, screenshot;
+        int aquired = 0;
 
         output->poll_events( in );
 
@@ -657,7 +618,15 @@ int main( int argc, char **argv )
 
 
         /* Aquire the next frame. */
-        curframe = videoinput_next_frame( vidin, &curframeid );
+        if( !videohold && videoinput_freq_present( vidin ) ) {
+            curframe = videoinput_next_frame( vidin, &curframeid );
+            aquired = 1;
+        } else {
+            curframe = colourbars;
+            lastframe = colourbars;
+            secondlastframe = colourbars;
+            usleep( 20 );
+        }
         performance_checkpoint_aquired_input_frame( perf );
 
         if( screenshot ) {
@@ -779,18 +748,20 @@ int main( int argc, char **argv )
         }
 
         /* We're done with the input now. */
-        if( fieldsavailable == 3 ) {
-            videoinput_free_frame( vidin, lastframeid );
-            lastframeid = curframeid;
-            lastframe = curframe;
-        } else if( fieldsavailable == 5 ) {
-            videoinput_free_frame( vidin, secondlastframeid );
-            secondlastframeid = lastframeid;
-            lastframeid = curframeid;
-            secondlastframe = lastframe;
-            lastframe = curframe;
-        } else {
-            videoinput_free_frame( vidin, curframeid );
+        if( aquired ) {
+            if( fieldsavailable == 3 ) {
+                videoinput_free_frame( vidin, lastframeid );
+                lastframeid = curframeid;
+                lastframe = curframe;
+            } else if( fieldsavailable == 5 ) {
+                videoinput_free_frame( vidin, secondlastframeid );
+                secondlastframeid = lastframeid;
+                lastframeid = curframeid;
+                secondlastframe = lastframe;
+                lastframe = curframe;
+            } else {
+                videoinput_free_frame( vidin, curframeid );
+            }
         }
 
 

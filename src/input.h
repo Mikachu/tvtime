@@ -93,8 +93,6 @@ int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );
 int input_toggle_menu( input_t *in );
 
-void input_channel_change_relative( input_t *in, int offset );
-
 void input_set_menu( input_t *in, menu_t *m );
 
 void input_next_frame( input_t *in );

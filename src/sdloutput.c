@@ -23,7 +23,6 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <SDL/SDL.h>
-#include "frequencies.h"
 #include "videoinput.h"
 #include "sdloutput.h"
 #include "input.h"

@@ -47,6 +47,17 @@ static int output_aspect = 0;
 static Cursor nocursor;
 static int output_fullscreen = 0;
 static int screen;
+static int found_colorkey = 0;
+static int colorkey = 0;
+
+typedef struct {
+  int x;
+  int y;
+  unsigned int width;
+  unsigned int height;
+} area_t;
+
+area_t video_area;
 
 int HandleXError( Display *display, XErrorEvent *xevent )
 {
@@ -126,7 +137,6 @@ static int open_display( void )
     int major;
     int minor;
     Bool pixmaps;
-    unsigned int fg, bg;
     char *hello = "tvtime";
     XSizeHints hint;
     XColor curs_col;
@@ -148,8 +158,6 @@ static int open_display( void )
     completion_type = XShmGetEventBase( display ) + ShmCompletion;
 
     screen = DefaultScreen( display );
-    bg = BlackPixel( display, screen );
-    fg = BlackPixel( display, screen );
     XGetWindowAttributes( display, DefaultRootWindow( display ), &attribs );
 
     xswa.override_redirect = False;
@@ -162,7 +170,7 @@ static int open_display( void )
     window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
                             output_width, output_height, 0,
                             CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
-    gc = DefaultGC(display, screen);
+    gc = DefaultGC( display, screen );
 
     hint.x = 0;
     hint.y = 0;
@@ -191,7 +199,7 @@ static int open_display( void )
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
 
     DpyInfoInit( display, screen );
-    fprintf( stderr, "setupdate: %d\n", DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode ) );
+    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode );
     DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
 
     DpyInfoUpdateResolution( display, screen, 0, 0 );
@@ -252,6 +260,64 @@ static void xv_alloc_frame( void )
     }
 }
 
+static void calculate_video_area( void )
+{
+    int curwidth, curheight;
+    int widthratio = output_aspect ? 16 : 4;
+    int heightratio = output_aspect ? 9 : 3;
+
+    curwidth = output_width;
+    curheight = ( output_width / widthratio ) * heightratio;
+    if( curheight > output_height ) {
+        curheight = output_height;
+        curwidth = ( output_height / heightratio ) * widthratio;
+    }
+
+    video_area.x = ( output_width - curwidth ) / 2;
+    video_area.y = ( output_height - curheight ) / 2;
+    video_area.width = curwidth;
+    video_area.height = curheight;
+}
+
+static int get_colorkey( void )
+{
+    Atom atom;
+    XvAttribute *attr;
+    int value;
+    int nattr;
+
+    if( found_colorkey ) return colorkey;
+
+    attr = XvQueryPortAttributes( display, xv_port, &nattr );
+    if( attr && nattr ) {
+        int k;
+
+        for( k = 0; k < nattr; k++ ) {
+            if( (attr[ k ].flags & XvSettable) && (attr[ k ].flags & XvGettable)) {
+                if( !strcmp( attr[ k ].name, "XV_COLORKEY" ) ) {
+                    atom = XInternAtom( display, "XV_COLORKEY", False );
+                    XvGetPortAttribute( display, xv_port, atom, &value );
+                    XFree( attr );
+                    colorkey = value;
+                    found_colorkey = 1;
+                    return value;
+                }
+            }
+        }
+    }
+    XFree( attr );
+    return 0;
+}
+
+static void xv_clear_screen( void )
+{
+    XSetForeground( display, gc, BlackPixel( display, screen ) );
+    XClearWindow( display, window );
+    XSetForeground( display, gc, get_colorkey() );
+    XFillRectangle( display, window, gc, video_area.x, video_area.y,
+                    video_area.width, video_area.height );
+}
+
 int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
 {
     output_aspect = aspect;
@@ -259,9 +325,11 @@ int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     input_height = inputheight;
     output_width = inputwidth;
     output_height = inputheight;
+    calculate_video_area();
     open_display();
     xv_check_extension();
     xv_alloc_frame();
+    xv_clear_screen();
     return 1;
 }
 
@@ -317,26 +385,10 @@ int xv_toggle_aspect( void )
 
 void xv_show_frame( void )
 {
-    int x, y, w, h;
-    int curwidth, curheight;
-    int widthratio = output_aspect ? 16 : 4;
-    int heightratio = output_aspect ? 9 : 3;
-
-    curwidth = output_width;
-    curheight = ( output_width / widthratio ) * heightratio;
-    if( curheight > output_height ) {
-        curheight = output_height;
-        curwidth = ( output_height / heightratio ) * widthratio;
-    }
-
-    x = ( output_width - curwidth ) / 2;
-    y = ( output_height - curheight ) / 2;
-    w = curwidth;
-    h = curheight;
-
     XvShmPutImage( display, xv_port, window, gc, image,
                    0, 0, input_width, input_height,
-                   x, y, w, h, False );
+                   video_area.x, video_area.y,
+                   video_area.width, video_area.height, False );
     XFlush( display );
 }
 
@@ -352,7 +404,6 @@ void xv_poll_events( input_t *in )
         XNextEvent(display, &event);
         switch( event.type ) {
         case Expose:
-            XClearWindow( display, window );
             break;
         case ConfigureNotify:
             XTranslateCoordinates( display, window, DefaultRootWindow( display ), 0, 0,
@@ -361,8 +412,11 @@ void xv_poll_events( input_t *in )
             if( event.xconfigure.width != output_width || event.xconfigure.height != output_height ) {
                 output_width = event.xconfigure.width;
                 output_height = event.xconfigure.height;
-                XClearWindow( display, window );
+                // XClearWindow( display, window );
+                calculate_video_area();
+                xv_clear_screen();
             }
+            XSync( display, False );
             break;
         case KeyPress:
             mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
