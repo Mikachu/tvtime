@@ -47,7 +47,6 @@ const unsigned int numruns = 2*60;
 
 static const char *tests[] = {
    "blit_colour_packed422_scanline_c 720x480 frame",
-   "blit_colour_packed422_scanline_mmx 720x480 frame",
    "blit_colour_packed422_scanline_mmxext 720x480 frame",
    "blit_packed422_scanline_c 720x480 frame",
    "blit_packed422_scanline_i386_linux 720x480 frame",
@@ -133,12 +132,6 @@ int main( int argc, char **argv )
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_colour_packed422_scanline_c( dest422packed + (stride*j), width, 128, 128, 128 );
-            }
-            rdtscll( after );
-        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_mmx( dest422packed + (stride*j), width, 128, 128, 128 );
             }
             rdtscll( after );
         } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
