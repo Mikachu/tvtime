@@ -838,6 +838,9 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    /* Default to a width specified on the command line. */
+    width = config_get_inputwidth( ct );
+
     if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
