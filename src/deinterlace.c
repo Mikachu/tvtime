@@ -42,7 +42,6 @@ void register_deinterlace_method( deinterlace_method_t *method )
         while( cur->next ) cur = cur->next;
         dest = &(cur->next);
     }
-    fprintf( stderr, "deinterlace: Loading %s...\n", method->name );
 
     *dest = (methodlist_item_t *) malloc( sizeof( methodlist_item_t ) );
     if( *dest ) {
