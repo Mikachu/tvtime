@@ -30,6 +30,14 @@ struct tvtime_osd_s
     int channel_number_xpos;
     int channel_number_ypos;
 
+    osd_string_t *tuner_info;
+    int tuner_info_xpos;
+    int tuner_info_ypos;
+
+    osd_string_t *signal_info;
+    int signal_info_xpos;
+    int signal_info_ypos;
+
     osd_string_t *volume_bar;
     int volume_bar_xpos;
     int volume_bar_ypos;
@@ -51,6 +59,7 @@ struct tvtime_osd_s
     int channel_logo_ypos;
 
     int ismuted;
+    int hassignal;
 
     char channel_number_text[ 20 ];
     char tv_norm_text[ 20 ];
@@ -77,6 +86,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd->volume_bar = 0;
     osd->data_bar = 0;
     osd->muted = 0;
+    osd->hassignal = 0;
     osd->channel_logo = 0;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
@@ -99,22 +109,38 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
         osd->channel_number = osd_string_new( fontfile, 80, width, height, frameaspect );
     }
     osd->channel_info = osd_string_new( fontfile, 30, width, height, frameaspect );
+    osd->tuner_info = osd_string_new( fontfile, 20, width, height, frameaspect );
+    osd->signal_info = osd_string_new( fontfile, 20, width, height, frameaspect );
     osd->volume_bar = osd_string_new( fontfile, 15, width, height, frameaspect );
     osd->data_bar = osd_string_new( fontfile, 15, width, height, frameaspect );
     osd->muted = osd_string_new( fontfile, 15, width, height, frameaspect );
     osd->channel_logo = osd_graphic_new( logofile, width, height, frameaspect, 256 );
 
-    if( !osd->channel_number || !osd->channel_info || !osd->volume_bar ||
-        !osd->data_bar || !osd->muted || !osd->channel_logo ) {
+    if( !osd->channel_number || !osd->channel_info || !osd->tuner_info ||
+        !osd->signal_info || !osd->volume_bar || !osd->data_bar ||
+        !osd->muted || !osd->channel_logo ) {
         fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
         tvtime_osd_delete( osd );
         return 0;
     }
 
+    osd_string_set_colour_rgb( osd->tuner_info, 245, 222, 179 );
+    osd_string_show_text( osd->tuner_info, "0", 1 );
+    osd_string_show_border( osd->tuner_info, 1 );
+    osd->tuner_info_xpos = ( width * 5 ) / 100;
+    osd->tuner_info_ypos = ( height * 5 ) / 100;
+
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
+    osd_string_show_text( osd->channel_number, "0", 1 );
     osd_string_show_border( osd->channel_number, 1 );
-    osd->channel_number_xpos = ( width * 5 ) / 100;
-    osd->channel_number_ypos = ( height * 5 ) / 100;
+    osd->channel_number_xpos = osd->tuner_info_xpos;
+    osd->channel_number_ypos = osd->tuner_info_ypos + osd_string_get_height( osd->tuner_info );
+
+    osd_string_set_colour_rgb( osd->signal_info, 245, 222, 179 );
+    osd_string_show_text( osd->signal_info, "No signal", 100 );
+    osd_string_show_border( osd->signal_info, 1 );
+    osd->signal_info_xpos = osd->tuner_info_xpos;
+    osd->signal_info_ypos = osd->channel_number_ypos + osd_string_get_height( osd->channel_number );
 
     osd_string_set_colour( osd->channel_info, 220, 12, 155 );
     osd_string_set_colour_rgb( osd->channel_info, 245, 222, 179 );
@@ -146,6 +172,8 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
 {
     if( osd->channel_number ) osd_string_delete( osd->channel_number );
     if( osd->channel_info ) osd_string_delete( osd->channel_info );
+    if( osd->tuner_info ) osd_string_delete( osd->channel_info );
+    if( osd->signal_info ) osd_string_delete( osd->channel_info );
     if( osd->volume_bar ) osd_string_delete( osd->volume_bar );
     if( osd->data_bar ) osd_string_delete( osd->data_bar );
     if( osd->muted ) osd_string_delete( osd->muted );
@@ -183,6 +211,11 @@ void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
     snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, format );
 }
 
+void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
+{
+    osd->hassignal = signal;
+}
+
 void tvtime_osd_show_info( tvtime_osd_t *osd )
 {
     char timestamp[ 50 ];
@@ -192,9 +225,13 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
     osd_string_show_text( osd->channel_number, osd->channel_number_text, 80 );
     osd_string_show_text( osd->channel_info, timestamp, 80 );
-    sprintf( text, "[%s, %s] %s - %s", osd->tv_norm_text, osd->freqtable_text,
-             osd->input_text, osd->deinterlace_text );
+
+    sprintf( text, "%s: %s", osd->tv_norm_text, osd->freqtable_text );
+    osd_string_show_text( osd->tuner_info, text, 80 );
+
+    sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
     osd_string_show_text( osd->data_bar, text, 80 );
+
     osd_graphic_show_graphic( osd->channel_logo, 80 );
     osd_string_set_timeout( osd->volume_bar, 0 );
 }
@@ -249,6 +286,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 
     osd_string_advance_frame( osd->channel_number );
     osd_string_advance_frame( osd->channel_info );
+    osd_string_advance_frame( osd->tuner_info );
 
     if( (chinfo_left = osd_string_get_frames_left( osd->channel_info)) ) {
         strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
@@ -370,6 +408,50 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->channel_info_ypos );
+            }
+        }
+    }
+
+    if( osd_string_visible( osd->tuner_info ) ) {
+        if( scanline >= osd->tuner_info_ypos &&
+            scanline < osd->tuner_info_ypos + osd_string_get_height( osd->tuner_info ) ) {
+
+            int startx = osd->tuner_info_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->tuner_info,
+                                                         output + (startx*2),
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->tuner_info_ypos );
+            }
+        }
+    }
+
+    if( !osd->hassignal ) {
+        if( osd_string_visible( osd->signal_info ) ) {
+            if( scanline >= osd->signal_info_ypos &&
+                scanline < osd->signal_info_ypos + osd_string_get_height( osd->signal_info ) ) {
+
+                int startx = osd->signal_info_xpos - xpos;
+                int strx = 0;
+                if( startx < 0 ) {
+                    strx = -startx;
+                    startx = 0;
+                }
+                if( startx < width ) {
+                    osd_string_composite_packed422_scanline( osd->signal_info,
+                                                             output + (startx*2),
+                                                             output + (startx*2),
+                                                             width - startx,
+                                                             strx,
+                                                             scanline - osd->signal_info_ypos );
+                }
             }
         }
     }

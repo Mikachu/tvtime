@@ -2,7 +2,7 @@
  * Worldwide channel/frequency list
  *
  * Nathan Laredo (laredo@gnu.org)
- * Modified 10 November 2002, Billy Biggs
+ * Modified 11 November 2002, Billy Biggs
  *     Added S04, S05 and E2A to BG-CATV
  *     Added macros for IRC and HRC NTSC cable
  *     Added the rest of the western europe broadcast frequencies
@@ -125,17 +125,17 @@ struct table_info {
 
 struct table_info freq_table_names[NUM_FREQ_TABLES] = {
    /* NTSC_BCAST      */ { "US broadcast", "us-broadcast" },
-   /* NTSC_CABLE      */ { "US cable frequencies",     "us-cable"     },
+   /* NTSC_CABLE      */ { "US cable frequencies", "us-cable" },
    /* NTSC_JP_BCAST   */ { "Japan broadcast", "japan-broadcast" },
    /* NTSC_JP_CABLE   */ { "Japan cable", "japan-cable" },
-   /* PAL_EUROPE      */ { "Western europe broadcast", "europe-broadcast" },
-   /* PAL_ITALY       */ { "Italy",  "italy" },
-   /* PAL_NEWZEALAND  */ { "New Zealand",  "newzealand" },
+   /* PAL_EUROPE      */ { "Western europe broadcast", "europe-west" },
+   /* PAL_ITALY       */ { "Italy", "italy" },
+   /* PAL_NEWZEALAND  */ { "New Zealand", "newzealand" },
    /* PAL_AUSTRALIA   */ { "Australia", "australia" },
    /* PAL_UHF_GHI     */ { "UK broadcast", "uk-broadcast" },
    /* PAL_CABLE_BG    */ { "Europe cable", "europe-cable" },
    /* PAL_CABLE_NC    */ { "Argentina cable", "argentina-cable" },
-   /* PAL_EAST_EUROPE */ { "Eastern europe cable", "europe-east-cable" },
+   /* PAL_EAST_EUROPE */ { "Eastern europe", "europe-east" },
    /* SECAM_FRANCE    */ { "France", "secam-france" }
 };
 

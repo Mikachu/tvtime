@@ -690,6 +690,7 @@ int main( int argc, char **argv )
                 } else {
                     cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
                     videoinput_mute( vidin, input_get_muted( in ) );
+                    tvtime_osd_signal_present( osd, 1 );
                 }
             default: break;
             }
@@ -707,7 +708,7 @@ int main( int argc, char **argv )
                     break;
                 } else {
                     cur_tuner_state = TUNER_STATE_NO_SIGNAL;
-                    tvtime_osd_show_message( osd, "No signal" );
+                    tvtime_osd_signal_present( osd, 0 );
                 }
             default:
                 if( fadepos < 256 ) {
