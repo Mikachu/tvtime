@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include "videotools.h"
 
+#define APPLY_CORRECTION
+
 struct video_correction_s
 {
     int source_black_level;
@@ -178,26 +180,42 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
         output += width * 2;
 
         /* Copy a scanline. */
+#ifdef APPLY_CORRECTION
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
         copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+#else
+        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+#endif
         output += width * 2;
     }
 
     for( i = 0; i < (height / 2) - 1; i++ ) {
+#ifdef APPLY_CORRECTION
         /* Correct top scanline. */
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
+#endif
 
         if( !bottom_field ) {
             /* Copy a scanline. */
+#ifdef APPLY_CORRECTION
             copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+#else
+            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+#endif
             output += width * 2;
         }
 
         /* Interpolate a scanline. */
+#ifdef APPLY_CORRECTION
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data + width, fieldluma + lstride, width );
         interpolate_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr,
                                          vc->temp_scanline_data + width, fieldcb + cstride, fieldcr + cstride,
                                          width );
+#else
+        interpolate_scanline_packed_422( output, fieldluma, fieldcb, fieldcr,
+                                         fieldluma + lstride, fieldcb + cstride, fieldcr + cstride,
+                                         width );
+#endif
         output += width * 2;
 
         fieldluma += lstride;
@@ -206,15 +224,23 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
 
         if( bottom_field ) {
             /* Copy a scanline. */
+#ifdef APPLY_CORRECTION
             copy_scanline_packed_422( output, vc->temp_scanline_data + width, fieldcb, fieldcr, width );
+#else
+            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+#endif
             output += width * 2;
         }
     }
 
     if( !bottom_field ) {
         /* Copy a scanline. */
+#ifdef APPLY_CORRECTION
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
         copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+#else
+        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+#endif
         output += width * 2;
 
         /* Clear a scanline. */

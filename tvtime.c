@@ -36,7 +36,7 @@
 /**
  * Warning tolerance, just for debugging.
  */
-static int tolerance = 4000;
+static int tolerance = 2000;
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -356,7 +356,7 @@ int main( int argc, char **argv )
         curcr422 = curcb422 + ( width/2 * height );
 
         gettimeofday( &curframetime, 0 );
-        if( debug && ((timediff( &curframetime, &lastframetime ) + tolerance) > (fieldtime*2)) ) {
+        if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, fieldtime %dus\n",
                      skipped++, timediff( &curframetime, &lastframetime ),
                      (fieldtime*2) );
@@ -382,6 +382,7 @@ int main( int argc, char **argv )
 
         /* Wait for the next field time and display. */
         gettimeofday( &curfieldtime, 0 );
+        /* I'm commenting this out for now, tvtime takes too much CPU here -Billy
         while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
             if( rtctimer ) {
                 rtctimer_next_tick( rtctimer );
@@ -390,6 +391,7 @@ int main( int argc, char **argv )
             }
             gettimeofday( &curfieldtime, 0 );
         }
+        */
         gettimeofday( &blitstart, 0 );
         sdl_show_frame();
         gettimeofday( &blitend, 0 );
