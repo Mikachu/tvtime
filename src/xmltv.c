@@ -51,6 +51,52 @@ struct program_s {
 };
 
 /**
+ * Support the Date::Manip timezone names.  This code will hopefully
+ * go away when all XMLTV providers drop these names.  Using names
+ * is a bad idea since there is no unified standard for them, and the
+ * XMLTV DTD does not define a set of standard names to use.
+ */
+typedef struct tz_map_s {
+    const char *name;
+    int offset;
+} tz_map_t;
+
+tz_map_t date_manip_timezones[] = {
+    { "IDLW",    -1200, }, { "NT",      -1100, }, { "HST",     -1000, },
+    { "CAT",     -1000, }, { "AHST",    -1000, }, { "AKST",     -900, },
+    { "YST",      -900, }, { "HDT",      -900, }, { "AKDT",     -800, },
+    { "YDT",      -800, }, { "PST",      -800, }, { "PDT",      -700, },
+    { "MST",      -700, }, { "MDT",      -600, }, { "CST",      -600, },
+    { "CDT",      -500, }, { "EST",      -500, }, { "ACT",      -500, },
+    { "SAT",      -400, }, { "BOT",      -400, }, { "EDT",      -400, },
+    { "AST",      -400, }, { "AMT",      -400, }, { "ACST",     -400, },
+    { "NFT",      -330, }, { "BRST",     -300, }, { "BRT",      -300, },
+    { "AMST",     -300, }, { "ADT",      -300, }, { "ART",      -300, },
+    { "NDT",      -230, }, { "AT",       -200, }, { "BRST",     -200, },
+    { "FNT",      -200, }, { "WAT",      -100, }, { "FNST",     -100, },
+    { "GMT",         0, }, { "UT",          0, }, { "UTC",         0, },
+    { "WET",         0, }, { "CET",       100, }, { "FWT",       100, },
+    { "MET",       100, }, { "MEZ",       100, }, { "MEWT",      100, },
+    { "SWT",       100, }, { "BST",       100, }, { "GB",        100, },
+    { "WEST",        0, }, { "CEST",      200, }, { "EET",       200, },
+    { "FST",       200, }, { "MEST",      200, }, { "MESZ",      200, },
+    { "METDST",    200, }, { "SAST",      200, }, { "SST",       200, },
+    { "EEST",      300, }, { "BT",        300, }, { "MSK",       300, },
+    { "EAT",       300, }, { "IT",        330, }, { "ZP4",       400, },
+    { "MSD",       300, }, { "ZP5",       500, }, { "IST",       530, },
+    { "ZP6",       600, }, { "NOVST",     600, }, { "NST",       630, },
+    { "JAVT",      700, }, { "CCT",       800, }, { "AWST",      800, },
+    { "WST",       800, }, { "PHT",       800, }, { "JST",       900, },
+    { "ROK",       900, }, { "ACST",      930, }, { "CAST",      930, },
+    { "AEST",     1000, }, { "EAST",     1000, }, { "GST",      1000, },
+    { "ACDT",     1030, }, { "CADT",     1030, }, { "AEDT",     1100, },
+    { "EADT",     1100, }, { "IDLE",     1200, }, { "NZST",     1200, },
+    { "NZT",      1200, }, { "NZDT",     1300, } };
+
+const int num_timezones = sizeof( date_manip_timezones ) / sizeof( tz_map_t );
+
+
+/**
  * Timezone parsing code based loosely on the algorithm in
  * filldata.cpp of MythTV.
  */
@@ -75,6 +121,14 @@ static int parse_xmltv_timezone( const char *tzstring )
 
         if( tzstring[ 0 ] == '-' ) {
             result *= -1;
+        }
+    } else {
+        int i;
+
+        for( i = 0; i < num_timezones; i++ ) {
+            if( !strcasecmp( tzstring, date_manip_timezones[ i ].name ) ) {
+                return date_manip_timezones[ i ].offset;
+            }
         }
     }
 
