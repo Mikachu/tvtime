@@ -73,6 +73,7 @@ typedef enum InputEvent_e {
 #define I_F15                   296
 
 /* Misc. */
+#define I_BACKSPACE             8
 #define I_ESCAPE                27
 #define I_ENTER                 13
 #define I_PRINT                 316
