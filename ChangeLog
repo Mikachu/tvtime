@@ -1,5 +1,8 @@
 
 0.9.8.3 -
+  * rmj/vektor: Merged in the latest DirectFB code, and enabled
+      the code to switch output drivers, but the DirectFB output
+      driver itself is still disabled.
   * vektor: We now switch out of mute mode if the user hits the
       volume control.
   * mrallen: Save overscan setting to the config file on exit.

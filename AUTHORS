@@ -58,6 +58,10 @@ Authors and contributors
   Per von Zweigbergk <pvz@e.kth.se>
     - Work on making tvtime fully UTF-8 aware.
 
+  Richard Jones <richard@earthmen.com>
+    - Work on the DirectFB output driver for the Matrox G400 style
+      TV output drivers.
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
