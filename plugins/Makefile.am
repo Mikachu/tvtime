@@ -23,5 +23,5 @@ EXTRA_DIST = tomsmocomp/SearchLoop0A.inc tomsmocomp/SearchLoopBottom.inc \
 	tomsmocomp/SearchLoopVA.inc tomsmocomp/SearchLoopVAH.inc \
 	tomsmocomp/StrangeBob.inc tomsmocomp/TomsMoCompAll.inc \
 	tomsmocomp/TomsMoCompAll2.inc tomsmocomp/WierdBob.inc \
-	tomsmocomp/tomsmocompmacros.h pointer.inc greedyh.asm
+	tomsmocomp/tomsmocompmacros.h x86-64_macros.inc greedyh.asm
 
