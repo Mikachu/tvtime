@@ -2117,6 +2117,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_SET_AUDIO_BOOST:
         cmd->boost = atoi( arg );
+        if( cmd->vidin ) {
+            videoinput_set_capture_volume( cmd->vidin, cmd->boost );
+        }
         if( cmd->osd ) {
             menu_t *boostmenu = commands_get_menu( cmd, "audioboost" );
             char message[ 128 ];

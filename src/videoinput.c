@@ -189,6 +189,7 @@ struct videoinput_s
     int width;
     int height;
     int norm;
+    int volume;
     int dkmode;
 
     int isbttv;
@@ -419,7 +420,7 @@ int videoinput_buffer_invalid( videoinput_t *vidin, int frameid )
 }
 
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
-                              int norm, int verbose )
+                              int volume, int norm, int verbose )
 {
     videoinput_t *vidin = malloc( sizeof( videoinput_t ) );
     struct video_capability caps_v4l1;
@@ -446,6 +447,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curframe = 0;
     vidin->verbose = verbose;
     vidin->norm = norm;
+    vidin->volume = volume;
     vidin->dkmode = 0;
     vidin->height = videoinput_get_norm_height( norm );
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
@@ -1100,8 +1102,8 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                 fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
 
-            if( !mute ) {
-                videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, 0.9155 );
+            if( !mute && vidin->volume > 0 ) {
+                videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, ((double) vidin->volume) / 100.0 );
             }
         } else {
             struct video_audio audio;
@@ -1115,7 +1117,9 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                 } else {
                     audio.flags &= ~VIDEO_AUDIO_MUTE;
                 }
-                audio.volume = 60000;
+                if( vidin->volume > 0 ) {
+                    audio.volume = (vidin->volume * 65535) / 100;
+                }
 
                 if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
                     fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
@@ -1679,5 +1683,34 @@ const char *videoinput_get_input_name( videoinput_t *vidin )
 const char *videoinput_get_driver_name( videoinput_t *vidin )
 {
     return vidin->drivername;
+}
+
+void videoinput_set_capture_volume( videoinput_t *vidin, int volume )
+{
+    vidin->volume = volume;
+    if( vidin->volume >= 0 ) {
+        if( vidin->isv4l2 ) {
+            videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME,
+                                         ((double) vidin->volume) / 100.0 );
+        } else {
+            struct video_audio audio;
+
+            if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
+                fprintf( stderr, "videoinput: Audio state query failed (got '%s').\n",
+                         strerror( errno ) );
+            } else {
+                if( vidin->volume > 0 ) {
+                    audio.volume = (vidin->volume * 65535) / 100;
+                }
+
+                if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
+                    fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
+                             "might cause this.  Post a bug report with your driver info to "
+                             PACKAGE_BUGREPORT "\n" );
+                    fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+                }
+            }
+        }
+    }
 }
 

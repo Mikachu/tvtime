@@ -102,7 +102,7 @@ const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode );
  * bad, and maybe for some helpful information messages.
  */
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
-                              int norm, int verbose );
+                              int volume, int norm, int verbose );
 
 /**
  * Shut down the capture device.
@@ -258,6 +258,12 @@ int videoinput_get_pal_audio_mode( videoinput_t *vidin );
  * Returns the name of the capture card driver.
  */
 const char *videoinput_get_driver_name( videoinput_t *vidin );
+
+/**
+ * Sets the capture card volume to use as a percentage from 0-100.
+ * If the value is negative, the capture card volume will remain unset.
+ */
+void videoinput_set_capture_volume( videoinput_t *vidin, int volume );
 
 #ifdef __cplusplus
 };

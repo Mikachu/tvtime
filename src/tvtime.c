@@ -1296,6 +1296,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputwidth( ct ), 
+                            config_get_audio_boost( ct ), 
                             norm, verbose );
     if( !vidin ) {
         if( asprintf( &error_string,

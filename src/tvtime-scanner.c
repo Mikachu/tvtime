@@ -101,6 +101,7 @@ int main( int argc, char **argv )
 
     vidin = videoinput_new( config_get_v4l_device( cfg ), 
                             config_get_inputwidth( cfg ), 
+                            config_get_audio_boost( cfg ), 
                             norm, verbose );
     if( !vidin ) {
         station_delete( stationmgr );
