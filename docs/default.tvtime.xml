@@ -170,6 +170,11 @@
   -->
   <option name="FramerateMode" value="0"/>
 
+  <!--
+    This option indicates whether tvtime should enable its own saving and
+    restoring of picture settings, both on startup and per channel change.
+  -->
+  <option name="SaveAndRestorePictureSettings" value="1"/>
 
   <!--
     This indicates whether the luma correction option should be enabled by

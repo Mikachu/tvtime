@@ -61,6 +61,7 @@ struct config_s
     int fspos;
     int x;
     int y;
+    int picsaverestore;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     int keymapmenu[ 8 * MAX_KEYSYMS ];
@@ -218,6 +219,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "Verbose" ) ) {
             ct->verbose = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "SaveAndRestorePictureSettings" ) ) {
+            ct->picsaverestore = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
@@ -705,6 +710,7 @@ config_t *config_new( void )
     ct->ssdir = strdup( getenv( "HOME" ) );
     ct->timeformat = strdup( "%X" );
     ct->mixerdev = strdup( "/dev/mixer:line" );
+    ct->picsaverestore = 1;
 
     /* We set these to 0 so we can delete safely if necessary. */
     ct->rvr_filename = 0;
@@ -1514,5 +1520,10 @@ const char *config_get_mixer_device( config_t *ct )
 int config_get_fullscreen_position( config_t *ct )
 {
     return ct->fspos;
+}
+
+int config_get_save_restore_picture( config_t *ct )
+{
+    return ct->picsaverestore;
 }
 
