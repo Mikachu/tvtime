@@ -60,6 +60,7 @@ struct deinterlace_scanline_data_s
     unsigned char *tt1, *t1, *m1, *b1, *bb1;
     unsigned char *tt2, *t2, *m2, *b2, *bb2;
     unsigned char *tt3, *t3, *m3, *b3, *bb3;
+    int bottom_field;
 };
 
 /**

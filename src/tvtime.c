@@ -518,6 +518,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         for( i = loop_size; i; --i ) {
             deinterlace_scanline_data_t data;
 
+            data.bottom_field = bottom_field;
+
             data.t0 = curframe;
             data.b0 = curframe + (instride*2);
 
@@ -539,13 +541,13 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             data.b2 = lastframe + (instride*2);
 
             if( bottom_field ) {
-                data.tt3 = 0;
+                data.tt3 = (i < loop_size) ? (lastframe - instride) : (lastframe + instride);
                 data.m3  = lastframe + instride;
-                data.bb3 = 0;
+                data.bb3 = i ? (lastframe + (instride*3)) : (lastframe + instride);
             } else {
-                data.tt3 = 0;
+                data.tt3 = (i < loop_size) ? (secondlastframe - instride) : (secondlastframe + instride);
                 data.m3  = secondlastframe + instride;
-                data.bb3 = 0;
+                data.bb3 = i ? (secondlastframe + (instride*3)) : (secondlastframe + instride);
             }
 
             curmethod->interpolate_scanline( output, &data, width );
@@ -568,9 +570,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                 data.b1 = lastframe + (instride*3);
             }
 
-            data.tt2 = 0;
+            data.tt2 = lastframe;
             data.m2  = lastframe + (instride*2);
-            data.bb2 = 0;
+            data.bb2 = i ? (lastframe + (instride*4)) : (lastframe + (instride*2));
 
             if( bottom_field ) {
                 data.t2 = lastframe + instride;
