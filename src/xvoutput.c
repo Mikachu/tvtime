@@ -51,7 +51,7 @@
 #endif
 
 #include "display.h"
-#include "wm_state.h"
+#include "vroot.h"
 
 #define FOURCC_YUY2 0x32595559
 
@@ -61,7 +61,10 @@
 static XvImage *image;
 static uint8_t *image_data;
 static XShmSegmentInfo shminfo;
-static Window window;
+static Window windowed_output_window;
+static Window wm_window;
+static Window fs_window;
+static Window output_window;
 static Display *display;
 static GC gc;
 static XvPortID xv_port;
@@ -77,6 +80,7 @@ static int input_width, input_height;
 static int output_aspect = 0;
 static Cursor nocursor;
 static int output_fullscreen = 0;
+static int output_on_root = 0;
 static int screen;
 static int found_colorkey = 0;
 static int colorkey = 0;
@@ -84,10 +88,14 @@ static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
 static int motion_timeout = 0;
 
+static int kicked_out_of_fullscreen = 0;
+
 static int xvoutput_verbose = 0;
 static int xvoutput_exposed = 0;
 
 static int xvoutput_error = 0;
+
+static int has_ewmh_state_fullscreen = 0;
 
 static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
 
@@ -100,7 +108,7 @@ typedef struct {
 
 static area_t video_area;
 
-int HandleXError( Display *display, XErrorEvent *xevent )
+static int HandleXError( Display *display, XErrorEvent *xevent )
 {
     char str[ 1024 ];
 
@@ -194,7 +202,7 @@ static int xv_check_extension( void )
         return 0;
     }
 
-    XvQueryAdaptors( display, window, &adaptors, &adaptorInfo );
+    XvQueryAdaptors( display, output_window, &adaptors, &adaptorInfo );
 
     for( i = 0; i < adaptors; i++ ) {
         if( adaptorInfo[ i ].type & XvImageMask ) {
@@ -251,6 +259,109 @@ static int xv_get_width_for_height( int window_height )
     return ( window_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
 }
 
+static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int aspect_height )
+{
+/* This code is causing problems for some WMs, and breaks in fullscreen modes -Billy */
+    XSizeHints hints;
+
+    hints.flags = PAspect;
+    hints.min_aspect.x = aspect_width;
+    hints.min_aspect.y = aspect_height;
+    hints.max_aspect.x = aspect_width;
+    hints.max_aspect.y = aspect_height;
+
+    XSetWMNormalHints( dpy, win, &hints );
+}
+
+/**
+ * returns 1 if a window manager compliant to the
+ * Extended Window Manager Hints (EWMH) spec.
+ * supports the _NET_WM_STATE_FULLSCREEN window state
+ * Oterhwise returns 0.
+ */
+static int check_for_state_fullscreen( Display *dpy )
+{
+    Atom net_supported, net_wm_state, net_wm_state_fullscreen;
+    Atom type_return;
+    int format_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    unsigned char *prop_return = 0;
+    int nr_items = 40;
+    int item_offset = 0;
+    int supports_net_wm_state = 0;
+    int supports_net_wm_state_fullscreen = 0;
+
+    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
+    if( net_supported == None ) {
+        return 0;
+    }
+
+    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
+    if( net_wm_state == None ) {
+        return 0;
+    }
+
+    net_wm_state_fullscreen = XInternAtom( dpy, "_NET_WM_STATE_FULLSCREEN", False );
+    if( net_wm_state_fullscreen == None ) {
+        return 0;
+    }
+
+    do {
+        if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
+                                item_offset, nr_items, False, XA_ATOM,
+                                &type_return, &format_return, &nitems_return,
+                                &bytes_after_return, &prop_return) != Success ) {
+            if( xvoutput_verbose ) {
+                fprintf( stderr, "xvoutput: XGetWindowProperty failed in check_for_state_fullscreen\n" );
+            }
+            return 0;
+        }
+    
+        if( type_return == None ) {
+            if( xvoutput_verbose ) {
+                fprintf( stderr, "xvoutput: check_for_state_fullscreen: property does not exist\n" );
+            }
+            return 0;
+        }
+
+        if( type_return != XA_ATOM ) {
+            if( xvoutput_verbose ) {
+                fprintf( stderr, "xvoutput: check_for_state_fullscreen: XA_ATOM property has wrong type\n");
+            }
+            if( prop_return ) XFree( prop_return );
+            return 0;
+        } else {
+            if( format_return == 32 ) {
+                int n;
+
+                for( n = 0; n < nitems_return; n++ ) {
+                    if( ((long *) prop_return)[n] == net_wm_state ) {
+                        supports_net_wm_state = 1;
+                    } else if( ((long *) prop_return)[n] == net_wm_state_fullscreen ) {
+                        supports_net_wm_state_fullscreen = 1;
+                    }
+
+                    if( supports_net_wm_state && supports_net_wm_state_fullscreen ) {
+                        XFree( prop_return );
+                        return 1;
+                    }
+                }
+
+                XFree( prop_return );
+            } else {
+                XFree( prop_return );
+                return 0;
+            }
+        }
+
+        item_offset += nr_items;
+    } while( bytes_after_return > 0 );
+
+    return 0;
+}
+
+
 static int open_display( void )
 {
     Pixmap curs_pix;
@@ -258,10 +369,10 @@ static int open_display( void )
     int major;
     int minor;
     Bool pixmaps;
-    char *hello = "tvtime";
     XSizeHints hint;
     XColor curs_col;
     XSetWindowAttributes xswa;
+    const char *hello = "tvtime";
     unsigned long mask;
     int displaywidthratio;
     int displayheightratio;
@@ -361,28 +472,63 @@ static int open_display( void )
     xswa.event_mask = ButtonPressMask | StructureNotifyMask | KeyPressMask | PointerMotionMask |
                       VisibilityChangeMask | PropertyChangeMask;
 
-    mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWOverrideRedirect | CWEventMask);
+    mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWEventMask);
 
-    window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
-                            output_width, output_height, 0,
-                            CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
+    wm_window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
+                               output_width, output_height, 0,
+                               CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
+
+    output_window = XCreateWindow( display, wm_window, 0, 0,
+                                   output_width, output_height, 0,
+                                   CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
+
+    xswa.override_redirect = True;
+    xswa.border_pixel = 0;
+
+    mask = (CWBackPixel | CWOverrideRedirect | CWEventMask);
+
+    fs_window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
+                               output_width, output_height, 0,
+                               CopyFromParent, InputOutput, CopyFromParent,
+                               mask, &xswa );
+
+    /* Tell KDE to keep the fullscreen window on top */
+    {
+        XEvent ev;
+        long mask;
+
+        memset(&ev, 0, sizeof(ev));
+        ev.xclient.type = ClientMessage;
+        ev.xclient.window = DefaultRootWindow( display );
+        ev.xclient.message_type = XInternAtom( display, "KWM_KEEP_ON_TOP", False );
+        ev.xclient.format = 32;
+        ev.xclient.data.l[0] = fs_window;
+        ev.xclient.data.l[1] = CurrentTime;
+        mask = SubstructureRedirectMask;
+        XSendEvent( display, DefaultRootWindow( display ), False, mask, &ev );
+    }
+
+    has_ewmh_state_fullscreen = check_for_state_fullscreen( display );
+    if( has_ewmh_state_fullscreen && xvoutput_verbose ) {
+        fprintf( stderr, "xvoutput: Using EWMH state fullscreen property.\n" );
+    }
+
     gc = DefaultGC( display, screen );
 
-    hint.x = 0;
-    hint.y = 0;
     hint.width = output_width;
     hint.height = output_height;
-    hint.flags = PPosition | PSize;
+    hint.flags = PSize;
 
-    XSetStandardProperties( display, window, hello, hello, None, 0, 0, &hint );
+    XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
 
-    XMapWindow( display, window );
+    XMapWindow( display, output_window );
+    XMapWindow( display, wm_window );
 
     /* Wait for map. */
     XMaskEvent( display, StructureNotifyMask, &xev );
 
     /* Create a 1 pixel cursor to use in full screen mode */
-    curs_pix = XCreatePixmap( display, window, 1, 1, 1 );
+    curs_pix = XCreatePixmap( display, output_window, 1, 1, 1 );
     curs_col.pixel = 0;
     curs_col.red = 0;
     curs_col.green = 0;
@@ -394,9 +540,9 @@ static int open_display( void )
     XInternAtoms( display, atomNames, 2, False, &wmProtocolsAtom );
 
     /* collaborate with the window manager for close requests */
-    XSetWMProtocols( display, window, &wmDeleteAtom, 1 );
+    XSetWMProtocols( display, wm_window, &wmDeleteAtom, 1 );
 
-    XDefineCursor( display, window, nocursor );
+    XDefineCursor( display, output_window, nocursor );
 
     return 1;
 }
@@ -504,7 +650,8 @@ static void calculate_video_area( void )
     video_area.height = curheight;
 
     if( xvoutput_verbose ) {
-        fprintf( stderr, "xvoutput: Displaying in a %dx%d window inside %dx%d space.\n", curwidth, curheight, output_width, output_height );
+        fprintf( stderr, "xvoutput: Displaying in a %dx%d window inside %dx%d space.\n",
+                 curwidth, curheight, output_width, output_height );
     }
 }
 
@@ -545,14 +692,14 @@ static int get_colorkey( void )
 static void xv_clear_screen( void )
 {
     XSetForeground( display, gc, BlackPixel( display, screen ) );
-    XClearWindow( display, window );
+    XClearWindow( display, output_window );
     XSetForeground( display, gc, get_colorkey() );
-    XFillRectangle( display, window, gc, video_area.x, video_area.y,
+    XFillRectangle( display, output_window, gc, video_area.x, video_area.y,
                     video_area.width, video_area.height );
     XSync( display, False );
 }
 
-int xv_init( int outputheight, int aspect, int verbose )
+static int xv_init( int outputheight, int aspect, int verbose )
 {
     output_aspect = aspect;
     output_height = outputheight;
@@ -563,10 +710,11 @@ int xv_init( int outputheight, int aspect, int verbose )
     if( !xv_check_extension() ) return 0;
 
     calculate_video_area();
+    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
     return 1;
 }
 
-void xv_set_input_size( int inputwidth, int inputheight )
+static void xv_set_input_size( int inputwidth, int inputheight )
 {
     input_width = inputwidth;
     input_height = inputheight;
@@ -575,61 +723,194 @@ void xv_set_input_size( int inputwidth, int inputheight )
     xv_clear_screen();
 }
 
-void sizehint( int x, int y, int width, int height, int max )
+/**
+ * Called after mapping a window - waits until the window is mapped.
+ */
+static void x11_wait_mapped( Display *dpy, Window win )
 {
-    XSizeHints hints;
-    hints.flags = PPosition | PSize | PWinGravity | PBaseSize;
-    hints.x = x; hints.y = y; hints.width = width; hints.height = height;
-    if( max ) {
-        hints.max_width = width; hints.max_height=height;
-        hints.flags |= PMaxSize;
-    } else {
-        hints.max_width = 0; hints.max_height = 0; 
-    }
-    hints.base_width = width; hints.base_height = height;
-    hints.win_gravity = StaticGravity;
-    XSetWMNormalHints( display, window, &hints );
+    XEvent event;
+    do {
+        XMaskEvent( dpy, StructureNotifyMask, &event );
+    } while ( (event.type != MapNotify) || (event.xmap.event != win) );
 }
 
-int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
+/**
+ * Called after unmapping a window - waits until the window is unmapped.
+ */
+static void x11_wait_unmapped( Display *dpy, Window win )
 {
-    int root_x, root_y;
-    Window dummy_win;
-  
-    XTranslateCoordinates( display, window, DefaultRootWindow( display ), 
-                           0, 0, &root_x, &root_y, &dummy_win );
+    XEvent event;
+    do {
+        XMaskEvent( dpy, StructureNotifyMask, &event );
+    } while ( (event.type != UnmapNotify) || (event.xunmap.event != win) );
+}
+
+static int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
+{
+    XWindowAttributes attrs;
+    XGetWindowAttributes( display, wm_window, &attrs );
+
     output_fullscreen = !output_fullscreen;
-    DpyInfoUpdateResolution( display, screen, root_x, root_y );
-
     if( output_fullscreen ) {
-        ChangeWindowState( display, window, WINDOW_STATE_FULLSCREEN );
-    } else {
-        ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
-    }
-    /* When we go fullscreen or windowed, the wm_state code explicitly
-     * waits for a map event, so we have no choice at this point but
-     * to assume that we are mapped.
-     */
-    xvoutput_exposed = 1;
+        if( has_ewmh_state_fullscreen ) {
+            XEvent ev;
 
+            ev.type = ClientMessage;
+            ev.xclient.window = wm_window;
+            ev.xclient.message_type = XInternAtom( display, "_NET_WM_STATE", False );
+            ev.xclient.format = 32;
+            ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD not an atom just a define
+            ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
+            ev.xclient.data.l[2] = 0;
+
+            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask, &ev );
+        } else {
+            int x, y, w, h;
+            double refresh;
+
+            DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
+            DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
+
+            /* Show our fullscreen window. */
+            XMoveResizeWindow( display, fs_window, x, y, w, h );
+
+            XMapWindow( display, fs_window );
+            {   /* stack the window on top or below the four windows 
+                   used to change desktops, if detected. */
+                Window root;
+                Window parent;
+                Window *children;
+                Window stacking[2];
+                unsigned int nchildren;
+                int x1, y1;
+                unsigned int width, height;
+                unsigned int border;
+                unsigned int depth;
+                int i, score= 0;
+                
+                XQueryTree(display, wm_window, &root, &parent, &children, &nchildren);
+                XFree( children );
+                XQueryTree(display, root, &root, &parent, &children, &nchildren);
+                if( nchildren > 4 ) {
+                    for( i= 1; i <= 4; ++i ) {
+                        XGetGeometry( display, children[nchildren-i], &root, &x1, &y1, 
+                                &width, &height, &border, &depth);
+                        if( ( ( width == w ) && ( height < 10 ) && ( x1 == 0 ) ) 
+                                || ( ( height == h ) && ( width < 10 ) && ( y1 == 0 ) ) ) {
+                            ++score;
+                        }
+                    }
+                } 
+
+                if( score == 4 ) {
+                    stacking[0]= children[nchildren-4];
+                    stacking[1]= fs_window;
+                    XRestackWindows( display, stacking, 2 );
+                } else {
+                    XRaiseWindow( display, fs_window );
+                }
+                XFree( children );
+            }
+            x11_wait_mapped( display, fs_window );
+
+            /* Since we just mapped the window and got our
+             * Map event, we mark this here. */
+            xvoutput_exposed = 1;
+
+            XReparentWindow( display, output_window, fs_window, 0, 0);
+            XMoveWindow( display, fs_window, x, y );
+            XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
+            output_width = w;
+            output_height = h;
+        }
+    } else {
+        if( has_ewmh_state_fullscreen ) {
+            XEvent ev;
+
+            ev.type = ClientMessage;
+            ev.xclient.window = wm_window;
+            ev.xclient.message_type = XInternAtom( display, "_NET_WM_STATE", False );
+            ev.xclient.format = 32;
+            ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE not an atom just a define
+            ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
+            ev.xclient.data.l[2] = 0;
+
+            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask, &ev );
+        } else {
+            XReparentWindow( display, output_window, wm_window, 0, 0);
+            XUnmapWindow( display, fs_window );
+            x11_wait_unmapped( display, fs_window );
+            output_width = attrs.width;
+            output_height = attrs.height;
+        }
+    }
+    XResizeWindow( display, output_window, output_width, output_height );
+    calculate_video_area();
+    xv_clear_screen();
+    XFlush( display );
+    XSync( display, False );
+
+    return output_fullscreen;
+}
+
+static int xv_toggle_root( int fullscreen_width, int fullscreen_height )
+{
+    XWindowAttributes attrs;
+    XGetWindowAttributes( display, wm_window, &attrs );
+
+    output_fullscreen = !output_fullscreen;
+    if( output_fullscreen ) {
+        int x, y, w, h;
+        double refresh;
+
+        DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
+        DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
+
+        windowed_output_window = output_window;
+        output_window = RootWindow( display, screen );
+
+        /* Set up our satellite window. */
+        XResizeWindow( display, wm_window, 100, 100 );
+        XSetForeground( display, gc, BlackPixel( display, screen ) );
+        XClearWindow( display, wm_window );
+
+        output_on_root = 1;
+        output_width = w;
+        output_height = h;
+        xvoutput_exposed = 1;
+    } else {
+        /* Clear the root window. */
+        XSetForeground( display, gc, BlackPixel( display, screen ) );
+        XClearWindow( display, output_window );
+
+        /* Back to normal. */
+        output_window = windowed_output_window;
+        output_on_root = 0;
+        output_width = attrs.width;
+        output_height = attrs.height;
+    }
+    XResizeWindow( display, output_window, output_width, output_height );
+    calculate_video_area();
+    xv_clear_screen();
     XFlush( display );
     XSync( display, False );
     return output_fullscreen;
 }
 
-int xv_toggle_aspect( void )
+static int xv_toggle_aspect( void )
 {
     output_aspect = !output_aspect;
     calculate_video_area();
+    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
     xv_clear_screen();
     return output_aspect;
 }
 
-int xv_show_frame( int x, int y, int width, int height )
+static int xv_show_frame( int x, int y, int width, int height )
 {
     XLockDisplay( display );
     ping_screensaver();
-    XvShmPutImage( display, xv_port, window, gc, image,
+    XvShmPutImage( display, xv_port, output_window, gc, image,
                    x, y, width, height,
                    video_area.x, video_area.y,
                    video_area.width, video_area.height, False );
@@ -639,14 +920,14 @@ int xv_show_frame( int x, int y, int width, int height )
     if( motion_timeout ) {
         motion_timeout--;
         if( !motion_timeout ) {
-            XDefineCursor( display, window, nocursor );
+            XDefineCursor( display, output_window, nocursor );
         }
     }
     if( xvoutput_error ) return 0;
     return 1;
 }
 
-void xv_poll_events( input_t *in )
+static void xv_poll_events( input_t *in )
 {
     XEvent event;
     int reconfigure = 0;
@@ -670,44 +951,52 @@ void xv_poll_events( input_t *in )
             break;
 
         case DestroyNotify:
-            if( event.xdestroywindow.window != window ) {
+            if( event.xdestroywindow.window != wm_window ) {
                 break;
             }
             input_callback( in, I_QUIT, 0 );
             break;
         case MotionNotify:
-            XUndefineCursor( display, window );
+            XUndefineCursor( display, output_window );
             motion_timeout = 30;
             break;
         case EnterNotify:
-            XSetInputFocus( display, window, RevertToPointerRoot, CurrentTime );
+            XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
             break;
         case MapNotify:
-            xvoutput_exposed = 1;
-            if( xvoutput_verbose ) {
-                fprintf( stderr, "xvoutput: Received a map, marking window as visible (%lu).\n",
-                         event.xany.serial );
+            if( !output_on_root ) {
+                xvoutput_exposed = 1;
+                if( xvoutput_verbose ) {
+                    fprintf( stderr, "xvoutput: Received a map, marking window as visible (%lu).\n",
+                             event.xany.serial );
+                }
             }
             break;
         case UnmapNotify:
-            xvoutput_exposed = 0;
-            if( xvoutput_verbose ) {
-                fprintf( stderr, "xvoutput: Received an unmap, marking window as hidden (%lu).\n",
-                         event.xany.serial );
+            if( !output_on_root ) {
+                xvoutput_exposed = 0;
+                if( xvoutput_verbose ) {
+                    fprintf( stderr, "xvoutput: Received an unmap, marking window as hidden (%lu).\n",
+                             event.xany.serial );
+                }
             }
             break;
         case VisibilityNotify:
-            if( event.xvisibility.state == VisibilityFullyObscured && xvoutput_exposed ) {
-                xvoutput_exposed = 0;
-                if( xvoutput_verbose ) {
-                    fprintf( stderr, "xvoutput: Window fully obscured, marking window as hidden (%lu).\n",
-                             event.xany.serial );
-                }
-            } else if( !xvoutput_exposed ) {
-                xvoutput_exposed = 1;
-                if( xvoutput_verbose ) {
-                    fprintf( stderr, "xvoutput: Window made visible, marking window as visible (%lu).\n",
-                             event.xany.serial );
+            if( !output_on_root ) {
+                if( event.xvisibility.state == VisibilityFullyObscured ) {
+                    if( !xvoutput_exposed ) {
+                        xvoutput_exposed = 0;
+                        if( xvoutput_verbose ) {
+                            fprintf( stderr, "xvoutput: Window fully obscured, marking window as hidden (%lu).\n",
+                                     event.xany.serial );
+                        }
+                    }
+                } else if( !xvoutput_exposed ) {
+                    xvoutput_exposed = 1;
+                    if( xvoutput_verbose ) {
+                        fprintf( stderr, "xvoutput: Window made visible, marking window as visible (%lu).\n",
+                                 event.xany.serial );
+                    }
                 }
             }
             break;
@@ -803,77 +1092,99 @@ void xv_poll_events( input_t *in )
         }
     }
 
-    if( reconfigure ) {
+    if( !has_ewmh_state_fullscreen ) {
+        Window focus_win;
+        int focus_revert;
+
+        XGetInputFocus( display, &focus_win, &focus_revert );
+        if( output_fullscreen ) {
+            if( reconfigure || !xvoutput_exposed || focus_win != wm_window ) {
+                /* Switch back to windowed mode if we've lost focus or visibility. */
+                xv_toggle_fullscreen( 0, 0 );
+                kicked_out_of_fullscreen = 1;
+            }
+        } else if( kicked_out_of_fullscreen && ( xvoutput_exposed && focus_win == wm_window ) ) {
+            /* Switch back to fullscreen mode if we regain visibility
+             * after being kicked out of fullscreen mode. */
+            xv_toggle_fullscreen( 0, 0 );
+            kicked_out_of_fullscreen = 0;
+        }
+    }
+
+    if( !output_on_root && reconfigure ) {
         output_width = reconfwidth;
         output_height = reconfheight;
+        XResizeWindow( display, output_window, output_width, output_height );
         calculate_video_area();
         xv_clear_screen();
         XSync( display, False );
     }
 }
 
-void xv_quit( void )
+static void xv_quit( void )
 {
     XShmDetach( display, &shminfo );
     shmdt( shminfo.shmaddr );
-    XDestroyWindow( display, window );
+    XDestroyWindow( display, output_window );
+    XDestroyWindow( display, wm_window );
+    XDestroyWindow( display, fs_window );
     XCloseDisplay( display );
 }
 
-int xv_get_stride( void )
+static int xv_get_stride( void )
 {
     return image->pitches[ 0 ];
 }
 
-int xv_is_interlaced( void )
+static int xv_is_interlaced( void )
 {
     return 0;
 }
 
-void xv_wait_for_sync( int field )
+static void xv_wait_for_sync( int field )
 {
 }
 
-void xv_lock_output( void )
+static void xv_lock_output( void )
 {
 }
 
-void xv_unlock_output( void )
+static void xv_unlock_output( void )
 {
 }
 
-void xv_set_window_caption( const char *caption )
+static void xv_set_window_caption( const char *caption )
 {
-    XStoreName( display, window, caption );
-    XSetIconName( display, window, caption );
+    XStoreName( display, wm_window, caption );
+    XSetIconName( display, wm_window, caption );
 }
 
-uint8_t *xv_get_output( void )
+static uint8_t *xv_get_output( void )
 {
     return image_data;
 }
 
-int xv_is_exposed( void )
+static int xv_is_exposed( void )
 {
     return xvoutput_exposed;
 }
 
-int xv_get_visible_width( void )
+static int xv_get_visible_width( void )
 {
     return video_area.width;
 }
 
-int xv_get_visible_height( void )
+static int xv_get_visible_height( void )
 {
     return video_area.height;
 }
 
-int xv_is_fullscreen( void )
+static int xv_is_fullscreen( void )
 {
     return output_fullscreen;
 }
 
-void xv_set_window_height( int window_height )
+static void xv_set_window_height( int window_height )
 {
     XWindowChanges win_changes;
     int window_width;
@@ -891,7 +1202,8 @@ void xv_set_window_height( int window_height )
     win_changes.width = window_width;
     win_changes.height = window_height;
 
-    XReconfigureWMWindow( display, window, 0, CWWidth | CWHeight, &win_changes );
+    XResizeWindow( display, wm_window, window_width, window_height );
+    XReconfigureWMWindow( display, wm_window, 0, CWWidth | CWHeight, &win_changes );
 }
 
 static output_api_t xvoutput =
