@@ -337,7 +337,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* On initialization, set to input 0.  This is just to start things up. */
     videoinput_set_input_num( vidin, 0 );
 
-
     /* Test for audio support. */
     memset( &(vidin->audio), 0, sizeof( struct video_audio ) );
     if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
@@ -677,7 +676,7 @@ int videoinput_is_muted( videoinput_t *vidin )
     return ( ( vidin->audio.flags & VIDEO_AUDIO_MUTE ) == VIDEO_AUDIO_MUTE );
 }
 
-void videoinput_do_mute( videoinput_t *vidin, int mute )
+static void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
     if( vidin->has_audio && mute != videoinput_is_muted( vidin ) ) {
 
@@ -987,20 +986,8 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
 
 void videoinput_delete( videoinput_t *vidin )
 {
-    if( vidin->has_audio ) {
-        if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
-                     strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-        } else {
-            vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-                fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
-                         strerror( errno ) );
-                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-            }
-        }
-    }
+    /* Mute audio on exit. */
+    videoinput_do_mute( vidin, 1 );
 
     if( vidin->have_mmap ) {
         munmap( vidin->map, vidin->gb_buffers.size );
