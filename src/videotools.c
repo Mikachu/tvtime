@@ -344,6 +344,67 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output,
     }
 }
 
+/**
+ * Sub-pixel data bar renderer.  There are 128 bars.
+ */
+void composite_bars_packed4444_scanline( unsigned char *output,
+                                         unsigned char *background, int width,
+                                         int a, int luma, int cb, int cr,
+                                         int percentage )
+{
+    /**
+     * This is the size of both the bar and the spacing in between in subpixel
+     * units out of 256.  Yes, as it so happens, that puts it equal to 'width'.
+     */
+    int barsize = ( width * 256 ) / 256;
+    int cursize = barsize;
+    int inbar = 1;
+    int i;
+
+    /* We only need to composite the bar on the pixels that matter. */
+    for( i = 0; i < percentage; i++ ) {
+        int barstart = i * barsize * 2;
+        int barend = barstart + barsize;
+        int pixstart = barstart / 256;
+        int pixend = barend / 256;
+        int j;
+
+        for( j = pixstart; j <= pixend; j++ ) {
+            unsigned char *curout = output + (j*4);
+            unsigned char *curin = background + (j*4);
+            int curstart = j * 256;
+            int curend = curstart + 256;
+            int tmp1, tmp2;
+            int alpha;
+
+            if( barstart > curstart ) curstart = barstart;
+            if( barend < curend ) curend = barend;
+            if( curend - curstart < 256 ) {
+                alpha = ( ( curend - curstart ) * a ) / 256;
+            } else {
+                alpha = a;
+            }
+
+            tmp1 = ( alpha - curin[ 0 ] ) * alpha;
+            tmp2 = curin[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            curout[ 0 ] = tmp2 & 0xff;
+
+            tmp1 = ( luma - curin[ 1 ] ) * alpha;
+            tmp2 = curin[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            curout[ 1 ] = tmp2 & 0xff;
+
+            tmp1 = ( cb - curin[ 2 ] ) * alpha;
+            tmp2 = curin[ 2 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            curout[ 2 ] = tmp2 & 0xff;
+
+            tmp1 = ( cr - curin[ 3 ] ) * alpha;
+            tmp2 = curin[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            curout[ 3 ] = tmp2 & 0xff;
+        }
+    }
+}
+
+
 const int filterkernel[] = { -1, 3, -6, 12, -24, 80, 80, -24, 12, -6, 3, -1 };
 const int kernelsize = sizeof( filterkernel ) / sizeof( int );
 

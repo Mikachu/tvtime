@@ -69,6 +69,16 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output,
                                                  unsigned char *background,
                                                  unsigned char *foreground,
                                                  int width );
+
+/**
+ * Sub-pixel data bar renderer.  There are 128 bars.
+ */
+void composite_bars_packed4444_scanline( unsigned char *output,
+                                         unsigned char *background, int width,
+                                         int a, int luma, int cb, int cr,
+                                         int percentage );
+
+
 /* Alpha provided is from 0-256 not 0-255. */
 void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
                                                        unsigned char *background,

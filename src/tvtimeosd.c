@@ -319,7 +319,6 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     }
 
-
     if( osd_string_visible( osd->channel_info ) ) {
         if( scanline >= osd->channel_info_ypos &&
             scanline < osd->channel_info_ypos + osd_string_get_height( osd->channel_info ) ) {

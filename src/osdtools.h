@@ -26,6 +26,7 @@
  */
 
 typedef struct osd_string_s osd_string_t;
+typedef struct osd_databars_s osd_databars_t;
 typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_shape_s osd_shape_t;
 
@@ -69,6 +70,21 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               unsigned char *background,
                                               int width, int xpos,
                                               int scanline );
+
+/**
+ * databars, values are out of 128.
+ */
+osd_databars_t *osd_databars_new( int width );
+void osd_databars_delete( osd_databars_t *osdd );
+void osd_databars_set_colour( osd_databars_t *osdd, int alpha, int luma,
+                              int cb, int cr );
+void osd_databars_advance_frame( osd_databars_t *osdd );
+int osd_databars_get_frames_left( osd_databars_t *osdd );
+void osd_databars_prerender( osd_databars_t *osdd, int num_filled );
+void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
+                                                unsigned char *output,
+                                                unsigned char *background,
+                                                int width );
 
 osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
                             int video_height, int shape_width,

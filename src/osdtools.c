@@ -245,6 +245,88 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
     }
 }
 
+/* databars */
+struct osd_databars_s
+{
+    unsigned char *data;
+    int width;
+    int alpha;
+    int luma;
+    int cb;
+    int cr;
+    int frames_left;
+    int scanline;
+};
+
+osd_databars_t *osd_databars_new( int width )
+{
+    osd_databars_t *osdd = (osd_databars_t *) malloc( sizeof( osd_databars_t ) );
+    if( !osdd ) {
+        return 0;
+    }
+
+    osdd->data = (unsigned char *) malloc( width * 4 );
+    if( !osdd->data ) {
+        free( osdd );
+        return 0;
+    }
+    osdd->width = width;
+
+    return osdd;
+}
+
+void osd_databars_delete( osd_databars_t *osdd )
+{
+    free( osdd->data );
+    free( osdd );
+}
+
+void osd_databars_set_colour( osd_databars_t *osdd, int alpha, int luma,
+                              int cb, int cr )
+{
+    osdd->alpha = alpha;
+    osdd->luma = luma;
+    osdd->cb = cb;
+    osdd->cr = cr;
+}
+
+void osd_databars_advance_frame( osd_databars_t *osdd )
+{
+    if( osdd->frames_left > 0 ) {
+        osdd->frames_left--;
+    }
+}
+
+int osd_databars_get_frames_left( osd_databars_t *osdd )
+{
+    return osdd->frames_left;
+}
+
+void osd_databars_prerender( osd_databars_t *osdd, int num_filled )
+{
+    composite_bars_packed4444_scanline( osdd->data, osdd->data, osdd->width,
+                                        osdd->alpha, osdd->luma, osdd->cb,
+                                        osdd->cr, num_filled );
+}
+
+void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
+                                                unsigned char *output,
+                                                unsigned char *background,
+                                                int width )
+{
+    if( !osdd->frames_left ) return;
+
+    if( osdd->frames_left < 50 ) {
+        int alpha;
+        alpha = (int) (((((double) osdd->frames_left) / 50.0) * 256.0) + 0.5);
+        composite_packed4444_alpha_to_packed422_scanline( output, background,
+            osdd->data, width, alpha );
+    } else {
+        composite_packed4444_to_packed422_scanline( output, background,
+            osdd->data, width );
+    }
+}
+
 /* Shape functions */
 void osd_shape_render_image4444( osd_shape_t *osds );
 struct osd_shape_s
