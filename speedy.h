@@ -44,7 +44,8 @@ void blit_colour_packed4444_scanline_mmx( unsigned char *output, int width,
                                           int cb, int cr );
 void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
                                         int alpha, int luma, int cb, int cr );
-void blit_packed422_scanline_mmxext( unsigned char *dest, const unsigned char *src, int width );
+void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned char *src, int width );
+void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width );
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width );
 void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *output,
                                                      unsigned char *t1,

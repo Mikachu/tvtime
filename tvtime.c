@@ -125,7 +125,7 @@ int main( int argc, char **argv )
     int secam = 0;
     int fieldtime;
     int blittime = 0;
-    int curframeid, lastframeid;
+    int curframeid;
     int skipped = 0;
     int verbose;
     tvtime_osd_t *osd;
@@ -392,9 +392,9 @@ int main( int argc, char **argv )
 
         /* Build the output from the top field. */
         if( showbars ) {
-            memcpy( sdl_get_output(), colourbars, width*height*2 );
+            blit_packed422_scanline( sdl_get_output(), colourbars, width*height );
         } else if( showtest ) {
-            memcpy( sdl_get_output(), testframe_even, width*height*2 );
+            blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
             if( config_get_apply_luma_correction( ct ) ) {
                 video_correction_packed422_field_to_frame_top( vc, 
@@ -462,9 +462,9 @@ int main( int argc, char **argv )
 
         /* Build the output from the bottom field. */
         if( showbars ) {
-            memcpy( sdl_get_output(), colourbars, width*height*2 );
+            blit_packed422_scanline( sdl_get_output(), colourbars, width*height );
         } else if( showtest ) {
-            memcpy( sdl_get_output(), testframe_odd, width*height*2 );
+            blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
             if( config_get_apply_luma_correction( ct ) ) {
                 video_correction_packed422_field_to_frame_bot( vc, 
@@ -474,7 +474,7 @@ int main( int argc, char **argv )
                                                                width, height/2,
                                                                width*4 );
             } else {
-                packed422_field_to_frame_bot_twoframe( sdl_get_output(),
+                packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
                                                        width*2, curframe,
                                                        lastframe, width,
                                                        height, width*2 );
@@ -502,7 +502,7 @@ int main( int argc, char **argv )
 
 
         /* We're done with the input now. */
-        // blit_packed422_scanline( lastframe, curframe, width * height );
+        //blit_packed422_scanline( lastframe, curframe, width * height );
         videoinput_free_frame( vidin, curframeid );
 
 

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "attributes.h"
 #include "mmx.h"
+#include "sse.h"
 #include "mm_accel.h"
 #include "speedy.h"
 
@@ -143,69 +144,8 @@ void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
     emms();
 }
 
-/* Original comments from mplayer (file: aclib.c)
- This part of code was taken by me from Linux-2.4.3 and slightly modified
-for MMX, MMX2, SSE instruction set. I have done it since linux uses page aligned
-blocks but mplayer uses weakly ordered data and original sources can not
-speedup them. Only using PREFETCHNTA and MOVNTQ together have effect!
 
-From IA-32 Intel Architecture Software Developer's Manual Volume 1,
-
-Order Number 245470:
-"10.4.6. Cacheability Control, Prefetch, and Memory Ordering Instructions"
-
-Data referenced by a program can be temporal (data will be used again) or
-non-temporal (data will be referenced once and not reused in the immediate
-future). To make efficient use of the processor's caches, it is generally
-desirable to cache temporal data and not cache non-temporal data. Overloading
-the processor's caches with non-temporal data is sometimes referred to as
-"polluting the caches".
-The non-temporal data is written to memory with Write-Combining semantics.
-
-The PREFETCHh instructions permits a program to load data into the processor
-at a suggested cache level, so that it is closer to the processors load and
-store unit when it is needed. If the data is already present in a level of
-the cache hierarchy that is closer to the processor, the PREFETCHh instruction
-will not result in any data movement.
-But we should you PREFETCHNTA: Non-temporal data fetch data into location
-close to the processor, minimizing cache pollution.
-
-The MOVNTQ (store quadword using non-temporal hint) instruction stores
-packed integer data from an MMX register to memory, using a non-temporal hint.
-The MOVNTPS (store packed single-precision floating-point values using
-non-temporal hint) instruction stores packed floating-point data from an
-XMM register to memory, using a non-temporal hint.
-
-The SFENCE (Store Fence) instruction controls write ordering by creating a
-fence for memory store operations. This instruction guarantees that the results
-of every store instruction that precedes the store fence in program order is
-globally visible before any store instruction that follows the fence. The
-SFENCE instruction provides an efficient way of ensuring ordering between
-procedures that produce weakly-ordered data and procedures that consume that
-data.
-
-If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
-*/
-
-/*  mmx v.1 Note: Since we added alignment of destinition it speedups
-    of memory copying on PentMMX, Celeron-1 and P2 upto 12% versus
-    standard (non MMX-optimized) version.
-    Note: on K6-2+ it speedups memory copying upto 25% and
-          on K7 and P3 about 500% (5 times). 
-*/
-
-/* Additional notes on gcc assembly and processors: [MF]
-prefetch is specific for AMD processors, the intel ones should be
-prefetch0, prefetch1, prefetch2 which are not recognized by my gcc.
-prefetchnta is supported both on athlon and pentium 3.
-
-therefore i will take off prefetchnta instructions from the mmx1 version
-to avoid problems on pentium mmx and k6-2.  
-
-quote of the day:
-"Using prefetches efficiently is more of an art than a science"
-*/
-
+/* Some memcpy code from xine which originally came from mplayer. */
 
 /* for small memory blocks (<256 bytes) this version is faster */
 #define small_memcpy(to,from,n)\
@@ -243,146 +183,8 @@ int d0, d1, d2;
   return (to);
 }
 
-#define SSE_MMREG_SIZE 16
 #define MMX_MMREG_SIZE 8
-
-#define MMX1_MIN_LEN 0x800  /* 2K blocks */
 #define MIN_LEN 0x40  /* 64-byte blocks */
-
-/* SSE note: i tried to move 128 bytes a time instead of 64 but it
-didn't make any measureable difference. i'm using 64 for the sake of
-simplicity. [MF] */
-static void * sse_memcpy(void * to, const void * from, size_t len)
-{
-  void *retval;
-  size_t i;
-  retval = to;
-    
-  /* PREFETCH has effect even for MOVSB instruction ;) */
-  __asm__ __volatile__ (
-    "   prefetchnta (%0)\n"
-    "   prefetchnta 64(%0)\n"
-    "   prefetchnta 128(%0)\n"
-    "   prefetchnta 192(%0)\n"
-    "   prefetchnta 256(%0)\n"
-    : : "r" (from) );
-    
-  if(len >= MIN_LEN)
-  {
-    register unsigned long int delta;
-    /* Align destinition to MMREG_SIZE -boundary */
-    delta = ((unsigned long int)to)&(SSE_MMREG_SIZE-1);
-    if(delta)
-    {
-      delta=SSE_MMREG_SIZE-delta;
-      len -= delta;
-      small_memcpy(to, from, delta);
-    }
-    i = len >> 6; /* len/64 */
-    len&=63;
-    if(((unsigned long)from) & 15)
-      /* if SRC is misaligned */
-      for(; i>0; i--)
-      {
-        __asm__ __volatile__ (
-        "prefetchnta 320(%0)\n"
-        "movups (%0), %%xmm0\n"
-        "movups 16(%0), %%xmm1\n"
-        "movups 32(%0), %%xmm2\n"
-        "movups 48(%0), %%xmm3\n"
-        "movntps %%xmm0, (%1)\n"
-        "movntps %%xmm1, 16(%1)\n"
-        "movntps %%xmm2, 32(%1)\n"
-        "movntps %%xmm3, 48(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
-        ((const unsigned char *)from)+=64;
-        ((unsigned char *)to)+=64;
-      }
-    else 
-      /*
-         Only if SRC is aligned on 16-byte boundary.
-         It allows to use movaps instead of movups, which required data
-         to be aligned or a general-protection exception (#GP) is generated.
-      */
-      for(; i>0; i--)
-      {
-        __asm__ __volatile__ (
-        "prefetchnta 320(%0)\n"
-        "movaps (%0), %%xmm0\n"
-        "movaps 16(%0), %%xmm1\n"
-        "movaps 32(%0), %%xmm2\n"
-        "movaps 48(%0), %%xmm3\n"
-        "movntps %%xmm0, (%1)\n"
-        "movntps %%xmm1, 16(%1)\n"
-        "movntps %%xmm2, 32(%1)\n"
-        "movntps %%xmm3, 48(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
-        ((const unsigned char *)from)+=64;
-        ((unsigned char *)to)+=64;
-      }
-    /* since movntq is weakly-ordered, a "sfence"
-     * is needed to become ordered again. */
-    __asm__ __volatile__ ("sfence":::"memory");
-    /* enables to use FPU */
-    __asm__ __volatile__ ("emms":::"memory");
-  }
-  /*
-   *	Now do the tail of the block
-   */
-  if(len) __memcpy(to, from, len);
-  return retval;
-}
-
-static void * mmx_memcpy(void * to, const void * from, size_t len)
-{
-  void *retval;
-  size_t i;
-  retval = to;
-
-  if(len >= MMX1_MIN_LEN)
-  {
-    register unsigned long int delta;
-    /* Align destinition to MMREG_SIZE -boundary */
-    delta = ((unsigned long int)to)&(MMX_MMREG_SIZE-1);
-    if(delta)
-    {
-      delta=MMX_MMREG_SIZE-delta;
-      len -= delta;
-      small_memcpy(to, from, delta);
-    }
-    i = len >> 6; /* len/64 */
-    len&=63;
-    for(; i>0; i--)
-    {
-      __asm__ __volatile__ (
-      "movq (%0), %%mm0\n"
-      "movq 8(%0), %%mm1\n"
-      "movq 16(%0), %%mm2\n"
-      "movq 24(%0), %%mm3\n"
-      "movq 32(%0), %%mm4\n"
-      "movq 40(%0), %%mm5\n"
-      "movq 48(%0), %%mm6\n"
-      "movq 56(%0), %%mm7\n"
-      "movq %%mm0, (%1)\n"
-      "movq %%mm1, 8(%1)\n"
-      "movq %%mm2, 16(%1)\n"
-      "movq %%mm3, 24(%1)\n"
-      "movq %%mm4, 32(%1)\n"
-      "movq %%mm5, 40(%1)\n"
-      "movq %%mm6, 48(%1)\n"
-      "movq %%mm7, 56(%1)\n"
-      :: "r" (from), "r" (to) : "memory");
-      ((const unsigned char *)from)+=64;
-      ((unsigned char *)to)+=64;
-    }
-    __asm__ __volatile__ ("emms":::"memory");
-  }
-  /*
-   *	Now do the tail of the block
-   */
-  if(len) __memcpy(to, from, len);
-  return retval;
-}
 
 static void * mmx2_memcpy(void * to, const void * from, size_t len)
 {
@@ -444,17 +246,18 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
   /*
    *	Now do the tail of the block
    */
-  if(len) __memcpy(to, from, len);
+  if( len ) __memcpy(to, from, len);
   return retval;
 }
 
-static void *linux_kernel_memcpy(void *to, const void *from, size_t len) {
-  return __memcpy(to,from,len);
-}
-
-void blit_packed422_scanline_mmxext( unsigned char *dest, const unsigned char *src, int width )
+void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned char *src, int width )
 {
     mmx2_memcpy( dest, src, width*2 );
+}
+
+void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width )
+{
+    __memcpy( dest, src, width*2 );
 }
 
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width )
@@ -801,7 +604,7 @@ void setup_speedy_calls( void )
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
-        blit_packed422_scanline = blit_packed422_scanline_mmxext;
+        blit_packed422_scanline = blit_packed422_scanline_mmxext_xine;
         deinterlace_twoframe_packed422_scanline = deinterlace_twoframe_packed422_scanline_mmxext;
     } else if( accel & MM_ACCEL_X86_MMX ) {
         fprintf( stderr, "tvtime: Using MMX optimized functions.\n" );

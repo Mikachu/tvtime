@@ -198,13 +198,13 @@ void packed422_field_to_frame_bot( unsigned char *output, int outstride,
     output += outstride;
 
     /* Copy a scanline. */
-    memcpy( output, field, fieldwidth*2 );
+    blit_packed422_scanline( output, field, fieldwidth );
     field += fieldstride;
     output += outstride;
 
     for( i = 0; i < fieldheight - 1; i++ ) {
         /* Copy a scanline. */
-        memcpy( output + outstride, field, fieldwidth*2 );
+        blit_packed422_scanline( output + outstride, field, fieldwidth );
 
         /* Interpolate a scanline. */
         interpolate_packed422_scanline( output, output - outstride,
@@ -222,13 +222,13 @@ void packed422_field_to_frame_top( unsigned char *output, int outstride,
     int i;
 
     /* Copy a scanline. */
-    memcpy( output, field, fieldwidth*2 );
+    blit_packed422_scanline( output, field, fieldwidth );
     output += outstride;
     field += fieldstride;
 
     for( i = 0; i < fieldheight - 1; i++ ) {
         /* Copy a scanline. */
-        memcpy( output + outstride, field, fieldwidth*2 );
+        blit_packed422_scanline( output + outstride, field, fieldwidth );
 
         /* Interpolate a scanline. */
         interpolate_packed422_scanline( output, output - outstride,
@@ -257,7 +257,7 @@ void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride
     output += outstride;
 
     /* Copy a scanline. */
-    memcpy( output, curframe, width*2 );
+    blit_packed422_scanline( output, curframe, width );
     output += outstride;
 
     for( i = 0; i < (height/2) - 1; i++ ) {
@@ -277,7 +277,7 @@ void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride
         lastframe += (linestride*2);
 
         /* Copy a scanline. */
-        memcpy( output, curframe, width*2 );
+        blit_packed422_scanline( output, curframe, width );
         output += outstride;
     }
 }
@@ -290,7 +290,7 @@ void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride
     int i;
 
     /* Copy a scanline. */
-    memcpy( output, curframe, width*2 );
+    blit_packed422_scanline( output, curframe, width );
     output += outstride;
 
     for( i = 0; i < (height/2) - 1; i++ ) {
@@ -310,13 +310,55 @@ void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride
         lastframe += (linestride*2);
 
         /* Copy a scanline. */
-        memcpy( output, curframe, width*2 );
+        blit_packed422_scanline( output, curframe, width );
         output += outstride;
     }
 
     /* Clear a scanline. */
     blit_colour_packed422_scanline( output, width, 16, 128, 128 );
     output += outstride;
+}
+
+void packed422_field_to_frame_bot_twoframe_copy( unsigned char *output, int outstride,
+                                                 unsigned char *curframe,
+                                                 unsigned char *lastframe,
+                                                 int width, int height, int linestride )
+{
+    int i;
+
+    curframe += linestride;
+    lastframe += linestride;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    blit_packed422_scanline( output, curframe, width );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
+        output += outstride;
+
+        blit_packed422_scanline( lastframe, curframe, linestride );
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        blit_packed422_scanline( output, curframe, width );
+        output += outstride;
+    }
+    blit_packed422_scanline( lastframe, curframe, width );
 }
 
 

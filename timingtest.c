@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <sys/time.h>
+#include "rtctimer.h"
 #include "videotools.h"
 
 static inline void get_time( int64_t *const ptime )
@@ -29,6 +30,11 @@ int main( int argc, char **argv )
     int64_t after;
     video_correction_t *vc = video_correction_new();
 
+    if( !set_realtime_priority( 0 ) ) {
+        fprintf( stderr, "timingtest: Can't set realtime priority (need root).\n" );
+    }
+
+/*
     width = 720;
     height = 480;
 
@@ -69,6 +75,7 @@ int main( int argc, char **argv )
 
     free( source422planar );
     free( dest422packed );
+*/
     return 0;
 }
 

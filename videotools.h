@@ -80,6 +80,10 @@ void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride
                                             unsigned char *curframe,
                                             unsigned char *lastframe,
                                             int width, int height, int linestride );
+void packed422_field_to_frame_bot_twoframe_copy( unsigned char *output, int outstride,
+                                                 unsigned char *curframe,
+                                                 unsigned char *lastframe,
+                                                 int width, int height, int linestride );
 
 /**
  * Scanline functions.
