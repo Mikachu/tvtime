@@ -127,7 +127,17 @@ static deinterlace_method_t greedymethod =
     0,
     0,
     0,
-    deinterlace_frame_di_greedyh
+    deinterlace_frame_di_greedyh,
+    { "Uses heuristics to detect motion in the input",
+      "frames and reconstruct image detail where",
+      "possible.  Use this for high quality output",
+      "even on monitors set to an arbitrary refresh",
+      "rate.",
+      "",
+      "Advanced detection uses linear interpolation",
+      "where motion is detected, using a four-field",
+      "buffer.  This is the Greedy: High Motion",
+      "deinterlacer from DScaler." }
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

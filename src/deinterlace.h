@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#define DEINTERLACE_PLUGIN_API_VERSION 0x00000004
+#define DEINTERLACE_PLUGIN_API_VERSION 0x00000005
 
 /**
  * Our deinterlacer plugin API is modeled after DScaler's.  This module
@@ -169,6 +169,7 @@ struct deinterlace_method_s
     deinterlace_interp_scanline_t interpolate_scanline;
     deinterlace_copy_scanline_t copy_scanline;
     deinterlace_frame_t deinterlace_frame;
+    const char *description[ 10 ];
 };
 
 /**

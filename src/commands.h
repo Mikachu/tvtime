@@ -32,8 +32,6 @@ typedef struct commands_s commands_t;
 #include "vbidata.h"
 #include "station.h"
 
-#define MAX_CMD_NAMELEN 64
-
 /**
  * Input commands for keymap
  */
@@ -69,6 +67,7 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_BARS,
     TVTIME_SHOW_STATS,
+    TVTIME_SHOW_DEINTERLACER_INFO,
 
     TVTIME_TOGGLE_FULLSCREEN,
     TVTIME_TOGGLE_ASPECT,
@@ -162,6 +161,7 @@ void commands_set_framerate( commands_t *in, int framerate );
 int commands_scan_channels( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
+int commands_show_deinterlacer_info( commands_t *in );
 
 int commands_console_on( commands_t *in );
 

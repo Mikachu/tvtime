@@ -58,7 +58,17 @@ static deinterlace_method_t weavemethod =
     1,
     deinterlace_scanline_weave,
     copy_scanline,
-    0
+    0,
+    { "Constructs frames from pairs of fields.  Use",
+      "this if you are watching a film broadcast or",
+      "DVD in a PAL area, or if you are using a",
+      "video game console system which sends a",
+      "progressive signal.",
+      "",
+      "Depending on the content, it may be top- or",
+      "bottom-field first.  Until we have full",
+      "detection in tvtime, this must be determined",
+      "experimentally." }
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -764,13 +764,34 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     tvtime->filtered_curframe = 1;
 }
 
-static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
+static void osd_list_deinterlacer_info( tvtime_osd_t *osd, int curmethod )
 {
-    int nummethods = get_num_deinterlace_methods();
     int i;
 
+    tvtime_osd_list_set_lines( osd, 11 );
+    tvtime_osd_list_set_text( osd, 0, get_deinterlace_method( curmethod )->name );
+    for( i = 0; i < 10; i++ ) {
+        tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+    }
+    tvtime_osd_list_set_hilight( osd, -1 );
+    tvtime_osd_show_list( osd, 1 );
+}
+
+static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod, int helpkey )
+{
+    const char *special = input_special_key_to_string( helpkey );
+    int nummethods = get_num_deinterlace_methods();
+    char text[ 200 ];
+    int i;
+
+    if( special ) {
+        snprintf( text, sizeof( text ), "Deinterlacer mode (press %s for a description)", special );
+    } else {
+        snprintf( text, sizeof( text ), "Deinterlacer mode (press %c for a description)", helpkey );
+    }
+
     tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
-    tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
+    tvtime_osd_list_set_text( osd, 0, text );
     for( i = 0; i < nummethods; i++ ) {
         tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
     }
@@ -1650,12 +1671,16 @@ int main( int argc, char **argv )
                 tvtime_osd_show_message( osd, "Pulldown detection not available for your TV norm." );
             }
         }
+        if( commands_show_deinterlacer_info( commands ) ) {
+            osd_list_deinterlacer_info( osd, curmethodid );
+        }
         if( !output->is_interlaced() && commands_toggle_deinterlacer( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
-                osd_list_deinterlacers( osd, curmethodid );
+                osd_list_deinterlacers( osd, curmethodid,
+                                        config_command_to_key( ct, TVTIME_SHOW_DEINTERLACER_INFO ) );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }

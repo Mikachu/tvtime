@@ -158,7 +158,17 @@ static deinterlace_method_t vfirmethod =
     1,
     deinterlace_scanline_vfir,
     copy_scanline,
-    0
+    0,
+    { "Avoids flicker by blurring consecutive frames",
+      "of input.  Use this if you want to run your",
+      "monitor at an arbitrary refresh rate and not",
+      "use much CPU, and are willing to sacrifice",
+      "detail.",
+      "",
+      "Vertical mode blurs favouring the most recent",
+      "field for less visible trails.  From the",
+      "deinterlacer filter in ffmpeg.",
+      "" }
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

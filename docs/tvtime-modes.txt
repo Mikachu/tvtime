@@ -13,7 +13,7 @@
 
          What does it do?
          - tvtime expands each field to full resolution,
-           without ever bluring in time or copying in time.
+           without ever blurring in time or copying in time.
            this effectively simulates a television.
          When do I use it?
          - You want TV-quality with low CPU, and you have

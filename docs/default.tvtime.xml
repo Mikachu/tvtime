@@ -555,4 +555,8 @@
     <keyboard key="v"/>
   </bind>
 
+  <bind command="show_deinterlacer_info">
+    <keyboard key="y"/>
+  </bind>
+
 </tvtime>

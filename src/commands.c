@@ -40,7 +40,7 @@
 #define CHANNEL_STEREO_DELAY 30
 
 typedef struct {
-    char name[MAX_CMD_NAMELEN];
+    const char *name;
     int command;
 } Cmd_Names;
 
@@ -107,6 +107,7 @@ static Cmd_Names cmd_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
+    { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
     { "SHOW_STATS", TVTIME_SHOW_STATS },
 
     { "TOGGLE_ALWAYSONTOP", TVTIME_TOGGLE_ALWAYSONTOP },
@@ -190,6 +191,7 @@ struct commands_s {
     int screenshot;
     int printdebug;
     int showbars;
+    int showdeinterlacerinfo;
     int togglefullscreen;
     int toggleaspect;
     int togglealwaysontop;
@@ -293,6 +295,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     in->quit = 0;
     in->showbars = 0;
+    in->showdeinterlacerinfo = 0;
     in->printdebug = 0;
     in->screenshot = 0;
     in->togglefullscreen = 0;
@@ -374,6 +377,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     switch( tvtime_cmd ) {
     case TVTIME_QUIT:
         in->quit = 1;
+        break;
+
+    case TVTIME_SHOW_DEINTERLACER_INFO:
+        in->showdeinterlacerinfo = 1;
         break;
 
     case TVTIME_SHOW_STATS:
@@ -1002,6 +1009,7 @@ void commands_next_frame( commands_t *in )
     }
 
     in->printdebug = 0;
+    in->showdeinterlacerinfo = 0;
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
@@ -1127,5 +1135,10 @@ int commands_resize_window( commands_t *in )
 void commands_set_framerate( commands_t *in, int framerate )
 {
     in->framerate = framerate % FRAMERATE_MAX;
+}
+
+int commands_show_deinterlacer_info( commands_t *in )
+{
+    return in->showdeinterlacerinfo;
 }
 
