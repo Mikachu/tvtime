@@ -2108,9 +2108,9 @@ void composite_bars_packed4444_scanline( uint8_t *output,
 
 static uint32_t speedy_accel;
 
-void setup_speedy_calls( int verbose )
+void setup_speedy_calls( uint32_t accel, int verbose )
 {
-    speedy_accel = mm_accel();
+    speedy_accel = accel;
 
     interpolate_packed422_scanline = interpolate_packed422_scanline_c;
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
@@ -2176,7 +2176,7 @@ void setup_speedy_calls( int verbose )
 #endif
 }
 
-int speedy_get_accel( void )
+uint32_t speedy_get_accel( void )
 {
     return speedy_accel;
 }

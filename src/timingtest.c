@@ -25,6 +25,8 @@
 #include "rtctimer.h"
 #include "speedy.h"
 #include "leetft.h"
+#include "cpuinfo.h"
+#include "mm_accel.h"
 
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
@@ -90,7 +92,7 @@ int main( int argc, char **argv )
     double mhz;
     int i;
 
-    setup_speedy_calls( 1 );
+    setup_speedy_calls( mm_accel(), 1 );
 
     if( argc < 2 ) {
         for( i = 0; i < numtests; i++ ) {
@@ -127,7 +129,7 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    mhz = speedy_measure_cpu_mhz();
+    mhz = cpuinfo_get_speed();
     fprintf( stderr, "timingtest: Using CPU MHz %.3f for calculations.\n", mhz );
 
     /* Always use the same random seed. */

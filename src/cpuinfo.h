@@ -29,6 +29,11 @@ extern "C" {
  */
 void cpuinfo_print_info( void );
 
+/**
+ * Returns the empirically measured CPU speed in MHz.
+ */
+double cpuinfo_get_speed( void );
+
 #ifdef __cplusplus
 };
 #endif

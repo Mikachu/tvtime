@@ -43,7 +43,7 @@
 
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
-static double measure_cpu_mhz( void )
+double cpuinfo_get_speed( void )
 {
     uint64_t tsc_start, tsc_end;
     struct timeval tv_start, tv_end;
@@ -234,7 +234,7 @@ void cpuinfo_print_info( void )
     while( isspace( *model_name ) ) model_name++;
 
     fprintf( stderr, "cpuinfo: CPU %s, family %d, model %d, stepping %d.\n", model_name, family, model, stepping );
-    fprintf( stderr, "cpuinfo: CPU measured at %.3fMHz.\n", measure_cpu_mhz() );
+    fprintf( stderr, "cpuinfo: CPU measured at %.3fMHz.\n", cpuinfo_get_speed() );
 }
 
 #else
@@ -242,6 +242,12 @@ void cpuinfo_print_info( void )
 void cpuinfo_print_info( void )
 {
     fprintf( stderr, "cpuinfo: Unknown architecture (non-x86).\n" );
+}
+
+double cpuinfo_get_speed( void )
+{
+    /* This is bogus, but what else to do for now? */
+    return 1000.0;
 }
 
 #endif

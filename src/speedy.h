@@ -335,14 +335,16 @@ extern void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t
                                                         uint8_t *bot, int subpixpos, int width );
 
 /**
- * Sets up the function pointers to point at the fastest function available.
+ * Sets up the function pointers to point at the fastest function
+ * available.  Requires accelleration settings (see mm_accel.h).
  */
-void setup_speedy_calls( int verbose );
+void setup_speedy_calls( uint32_t accel, int verbose );
 
 /**
- * Returns a bitfield of what accellerations are available.  See mm_accel.h.
+ * Returns a bitfield of what accellerations were used when speedy was
+ * initialized.  See mm_accel.h.
  */
-int speedy_get_accel( void );
+uint32_t speedy_get_accel( void );
 
 #ifdef __cplusplus
 };

@@ -67,6 +67,8 @@
 # include "config.h"
 #endif
 
+#include "mm_accel.h"
+
 /**
  * Michael Niedermayer's magic FIRs
  *
@@ -890,7 +892,7 @@ int main( int argc, char **argv )
     }
 
     /* Setup the speedy calls. */
-    setup_speedy_calls( verbose );
+    setup_speedy_calls( mm_accel(), verbose );
 
     if( !output->is_interlaced() ) {
         dscaler_greedyh_plugin_init();
