@@ -754,7 +754,20 @@ void commands_set_console( commands_t *in, console_t *con ) {
     if( !in ) return;
     in->console = con;
 }
+
 void commands_set_menu( commands_t *in, menu_t *m ) {
     if( !in ) return;
     in->menu = m;
+}
+
+int commands_console_on( commands_t *in )
+{
+    if( !in ) return 0;
+    return in->console_on;
+}
+
+int commands_menu_on( commands_t *in )
+{
+    if( !in ) return 0;
+    return in->menu_on;
 }

@@ -51,6 +51,9 @@ int commands_toggle_menu( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
 
+int commands_console_on( commands_t *in );
+int commands_menu_on( commands_t *in );
+
 void commands_set_menu( commands_t *in, menu_t *m );
 
 void commands_next_frame( commands_t *in );

@@ -57,31 +57,39 @@ int parser_openfile( parser_file_t *pf, const char *filename )
     return 1;
 }
 
-const char *parser_get( parser_file_t *pf, const char *name, int k )
+void parser_update( parser_file_t *pf, const char *name, int k,
+                    void **value, int update )
 {
     int i;
 
     if( !pf ) {
         fprintf( stderr, "parser: No parser_file_t* given.\n" );
-        return NULL;
+        if( !update ) *value = NULL;
+        return;
     }
 
     for( i=0; i < pf->num_pairs && pf->nv_pairs[i].name; i++ ) {
         if( !strcasecmp( name, pf->nv_pairs[i].name ) ) {
             if ( --k <= 0 ) {
-                    return pf->nv_pairs[i].value;
+                if( !update ) {
+                    *value = ( void * ) pf->nv_pairs[i].value;
+                    return;
+                } else {
+                    pf->nv_pairs[i].value = ( char * ) *value;
+                    return;
+                }
             }
         }
     }
 
-    return NULL;
+    if( !update ) *value = NULL;
 }
 
-/*
+
 void parser_set( parser_file_t *pf, const char *name, int k, 
                  const char * value )
 {
-    parser_fetch( pf, name, k, (void**)value, 1 );
+    parser_update( pf, name, k, (void**)&value, 1 );
 }
 
 
@@ -89,11 +97,11 @@ const char *parser_get( parser_file_t *pf, const char *name, int k )
 {
     char *value;
 
-    parser_fetch( pf, name, k, (void**)&value, 0 );
+    parser_update( pf, name, k, (void**)&value, 0 );
 
     return value;
 }
-*/
+
 
 int parser_readfile( parser_file_t *pf )
 {

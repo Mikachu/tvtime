@@ -517,6 +517,7 @@ void xv_poll_events( input_t *in )
             case XK_KP_Add: arg |= '+'; break;
             case XK_KP_Divide: arg |= '/'; break;
 
+            case XK_KP_Insert: arg |= '0'; break;
             case XK_KP_End: arg |= '1'; break;
             case XK_KP_Down: arg |= '2'; break;
             case XK_KP_Next: arg |= '3'; break;

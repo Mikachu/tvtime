@@ -108,7 +108,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
     verbose = config_get_verbose( in->cfg );
 
-    if( in->menu_on && in->menu ) {
+    if( commands_menu_on( in->com ) && in->menu ) {
         if( menu_callback( in->menu, command, arg ) ) {
             return;
         }
@@ -132,27 +132,15 @@ void input_callback( input_t *in, InputEvent command, int arg )
             tvtime_cmd = config_key_to_command( in->cfg, arg );
         }
 
-        switch( tvtime_cmd ) {
-        case TVTIME_TOGGLE_CONSOLE:
-            in->console_on = in->console_on ^ 1;
-            break;
-        case TVTIME_MENUMODE:
-            in->menu_on = in->menu_on ^ 1;
-            break;
-        default:
-            break;
-        }
-
-        if( command == I_KEYDOWN && in->console_on && in->console &&
-            !in->menu_on ) {
+        if( command == I_KEYDOWN && commands_console_on( in->com ) && 
+            in->console ) {
 
             char blah[2];
             blah[1] = '\0';
 
-            if( tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
-                tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN ||
-                tvtime_cmd == TVTIME_TOGGLE_CONSOLE ||
-                tvtime_cmd == TVTIME_MENUMODE )
+            if( tvtime_cmd == TVTIME_TOGGLE_CONSOLE ||
+                tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
+                tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN )
                 break;
 
             blah[0] = arg & 0xFF;

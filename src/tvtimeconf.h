@@ -134,4 +134,7 @@ void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *c
 
 int string_to_command( const char *str );
 
+int config_get_usevbi( config_t *ct );
+char *config_get_vbidev( config_t *ct );
+
 #endif /* TVTIMECONF_H_INCLUDED */
