@@ -502,6 +502,15 @@ bound to the command as well as a mouse button
       <mouse button="4"/>
     </bind>
 
+Some commands can take arguments, for example, the
+.IT SCREENSHOT
+command can take an argument for the filename.  Arguments can be given
+to a key binding as follows:
+
+    <bind command="screenshot" argument="/tmp/last-screenshot.png">
+      <keyboard key="s"/>
+    </bind>
+
 .SH AUTHOR
 
 Billy Biggs.
