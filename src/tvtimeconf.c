@@ -492,9 +492,6 @@ static void print_usage( char **argv )
 
     fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
 
-    fprintf( stderr, "\t-c\tApply luma correction.\n" );
-    fprintf( stderr, "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n" );
-
     fprintf( stderr, "\t-r\tRVR recorded file to play.\n" );
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
@@ -702,21 +699,18 @@ config_t *config_new( int argc, char **argv )
         conf_xml_parse(ct, configFile);
     }
 
-    while( (c = getopt( argc, argv, "hH:I:avcsmd:i:l:n:f:t:F:D:Ib:r:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hH:I:avsmd:i:n:f:t:F:D:Ib:r:" )) != -1 ) {
         switch( c ) {
         case 'H': ct->outputheight = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'v': ct->verbose = 1; break;
         case 'a': ct->aspect = 1; break;
         case 's': ct->debug = 1; break;
-        case 'c': ct->apply_luma_correction = 1; break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
         case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
                   ct->rvr_filename = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
-        case 'l': ct->luma_correction = atof( optarg );
-                  ct->apply_luma_correction = 1; break;
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
         case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
