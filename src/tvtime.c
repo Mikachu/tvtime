@@ -912,7 +912,7 @@ int main( int argc, char **argv )
         if( fifo ) {
             int cmd;
             cmd = fifo_next_command( fifo );
-            commands_handle( commands, cmd, 0 );
+            if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, 0 );
         }
 
         output->poll_events( in );
