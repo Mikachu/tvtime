@@ -153,3 +153,90 @@ Rendering
     Filter input scanline to temporary memory
 
 
+
+Buffering
+---------
+
+
+ 20  InputBot
+ 20  BufferedTop
+
+ 20  LastBot
+ 20  LastTop
+
+ 20  DrawnBot
+ 20  DrawnTop
+
+ 20  QueuedBot
+ 20  DisplayedTop
+---
+180ms
+
+
+ Current frame based processing pipe
+
+    Input    WaitQueue Processing  Displaying
+    -------  --------- ----------  ----------
+    Top                                        bttv gets Top field
+    Bot Top                                    bttv gets Bot field
+    Top      Bot       Top                     bttv sends frame, Top deinterlaced
+    Bot Top            Bot         Top         Bot gets deinterlaced while Top shown
+    Top      Bot       Top         Bot
+    Bot Top            Bot         Top
+    Top      Bot       Top         Bot
+    Bot Top            Bot         Top
+    Top      Bot       Top         Bot
+
+  Lag = 60ms
+
+
+ V4L2 gives us field buffers, no more wait queue needed
+
+    Input    Processing  Displaying
+    -------  ----------  ----------
+    Top                              bttv gets Top field
+    Bot      Top                     bttv gets Bot field, Top deinterlaced
+    Top      Bot         Top
+    Bot      Top         Bot
+    Top      Bot         Top
+    Bot      Top         Bot
+
+  Lag = 40ms
+
+  In both of these methods though, we assume that we're kinda clocked
+by our input, or do we?   Well, in the bottom case it's totally viable
+for deinterlacing on each field to not take the same time, so we don't
+necessarily have a constant output clock.  This is necessary if our
+output is at field rate.
+
+    Input    Processing  Queued  Displaying
+    -------  ----------  ------  ----------
+    Top
+    Bot      Top
+    Top      Bot         Top
+    Bot      Top         Bot     Top
+    Top      Bot         Top     Bot
+    Bot      Top         Bot     Top
+
+  Lag = 60ms
+
+--
+menusystem
+
+
+menu:
+
+  - screens
+  - each screen has a background png
+  - each menu button is two images
+
+
+Screen Foobar
+  Background = backdrop.png
+
+  Button
+    Position x, y
+    Image foo.png
+    Hilighted bar.png
+
+

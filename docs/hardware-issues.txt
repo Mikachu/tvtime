@@ -1,3 +1,0 @@
-[05:31pm] <krux-> yeah, with my ati radeon 7000 card, xv is always in front of every window in x11 .. not sure if that's a tvtime issue though
-
-
