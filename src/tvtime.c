@@ -39,7 +39,6 @@
 #include "input.h"
 #include "speedy.h"
 #include "deinterlace.h"
-#include "menu.h"
 #include "videocorrection.h"
 #include "plugins.h"
 #include "performance.h"
@@ -277,7 +276,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              unsigned char *secondlastframe,
                                              video_correction_t *vc,
                                              tvtime_osd_t *osd,
-                                             menu_t *menu,
                                              console_t *con,
                                              vbiscreen_t *vs,
                                              int bottom_field,
@@ -300,7 +298,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         blit_packed422_scanline( output, curframe, width );
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
@@ -315,7 +312,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     }
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
     if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
     output += outstride;
@@ -350,7 +346,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
 
@@ -368,7 +363,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
@@ -384,7 +378,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
 
@@ -398,7 +391,6 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            unsigned char *curframe,
                                            video_correction_t *vc,
                                            tvtime_osd_t *osd,
-                                           menu_t *menu,
                                            console_t *con,
                                            vbiscreen_t *vs,
                                            int bottom_field,
@@ -460,7 +452,6 @@ static void tvtime_build_copied_field( unsigned char *output,
                                        unsigned char *secondlastframe,
                                        video_correction_t *vc,
                                        tvtime_osd_t *osd,
-                                       menu_t *menu,
                                        console_t *con,
                                        vbiscreen_t *vs,
                                        int bottom_field,
@@ -488,7 +479,6 @@ static void tvtime_build_copied_field( unsigned char *output,
     }
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
     if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
     output += outstride;
@@ -506,7 +496,6 @@ static void tvtime_build_copied_field( unsigned char *output,
         }
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
@@ -539,7 +528,6 @@ int main( int argc, char **argv )
     int secondlastframeid;
     config_t *ct = 0;
     input_t *in = 0;
-    menu_t *menu = 0;
     output_api_t *output = 0;
     performance_t *perf = 0;
     console_t *con = 0;
@@ -742,13 +730,14 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    /*
     menu = menu_new( commands, ct, vidin, osd, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
     }
-
     commands_set_menu( commands, menu );
+    */
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
@@ -819,7 +808,7 @@ int main( int argc, char **argv )
         commands_set_console( commands, con );
     }
 
-    in = input_new( ct, commands, con, menu );
+    in = input_new( ct, commands, con, 0 );
     if( !in ) {
         fprintf( stderr, "tvtime: Can't create input handler.\n" );
         return 1;
@@ -1029,7 +1018,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, con, vs, 0,
+                       curframe, vc, osd, con, vs, 0,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -1047,13 +1036,13 @@ int main( int argc, char **argv )
                 if( curmethod->doscalerbob ) {
                     tvtime_build_copied_field( output->get_output_buffer(),
                                        curframe, lastframe, secondlastframe,
-                                       vc, osd, menu, con, vs, 0,
+                                       vc, osd, con, vs, 0,
                                        vc && config_get_apply_luma_correction( ct ),
                                        width, height, width * 2, output->get_output_stride() );
                 } else {
                     tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                        curframe, lastframe, secondlastframe,
-                                       vc, osd, menu, con, vs, 0,
+                                       vc, osd, con, vs, 0,
                                        vc && config_get_apply_luma_correction( ct ),
                                        width, height, width * 2, output->get_output_stride() );
                 }
@@ -1111,7 +1100,7 @@ int main( int argc, char **argv )
 
                 output->lock_output_buffer();
                 tvtime_build_interlaced_frame( output->get_output_buffer(),
-                           curframe, vc, osd, menu, con, vs, 1,
+                           curframe, vc, osd, con, vs, 1,
                            vc && config_get_apply_luma_correction( ct ),
                            width, height, width * 2, output->get_output_stride() );
                 output->unlock_output_buffer();
@@ -1125,13 +1114,13 @@ int main( int argc, char **argv )
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( output->get_output_buffer(),
                                           curframe, lastframe,
-                                          secondlastframe, vc, osd, menu, con, vs, 1,
+                                          secondlastframe, vc, osd, con, vs, 1,
                                           vc && config_get_apply_luma_correction( ct ),
                                           width, height, width * 2, output->get_output_stride() );
                     } else {
                         tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                           curframe, lastframe,
-                                          secondlastframe, vc, osd, menu, con, vs, 1,
+                                          secondlastframe, vc, osd, con, vs, 1,
                                           vc && config_get_apply_luma_correction( ct ),
                                           width, height, width * 2, output->get_output_stride() );
                     }
@@ -1222,9 +1211,6 @@ int main( int argc, char **argv )
     }
     if( rtctimer ) {
         rtctimer_delete( rtctimer );
-    }
-    if( menu ) {
-        menu_delete( menu );
     }
     if( con ) {
         console_delete( con );

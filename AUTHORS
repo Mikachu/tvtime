@@ -35,6 +35,9 @@ Authors and contributors
   Mark Trolley <mtrolley@scs.carleton.ca>
     - Added the numeric channel commands for better lirc support
 
+  Joachim Koenig <Joachim.Koenig@tecnomen.fi>
+    - Wrote the dscaler plugin loader using the wine code
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
