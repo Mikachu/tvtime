@@ -362,7 +362,7 @@ video_correction_t *video_correction_new( void )
     vc->luma_correction = 1.0;
     vc->luma_table = (unsigned char *) malloc( 256 );
     vc->chroma_table = (unsigned char *) malloc( 256 );
-    vc->temp_scanline_data = (unsigned char *) malloc( 720 * 2 );
+    vc->temp_scanline_data = (unsigned char *) malloc( 2048 * 2 );
     if( !vc->luma_table || !vc->chroma_table ) {
         if( vc->luma_table ) free( vc->luma_table );
         if( vc->chroma_table ) free( vc->chroma_table );
@@ -570,8 +570,10 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output, unsigned
                 } else {
                     //int cb = (( foreground[ 2 + 4 ] << 1 ) + foreground[ 2 - 0 ] + foreground[ 2 + 8 ])>>2;
                     //int cr = (( foreground[ 3 + 4 ] << 1 ) + foreground[ 3 - 0 ] + foreground[ 3 + 8 ])>>2;
-                    int cb = foreground[ 2 + 4 - (720*4)];
-                    int cr = foreground[ 3 + 4 - (720*4)];
+                    //int cb = foreground[ 2 + 4 - (720*4)];
+                    //int cr = foreground[ 3 + 4 - (720*4)];
+                    int cb = foreground[ 2 ];
+                    int cr = foreground[ 3 ];
 
                     tmp1 = (cb - input[ 1 ]) * a;
                     tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
@@ -658,8 +660,10 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, un
                 } else {
                     //int cb = (( foreground[ 2 + 4 ] << 1 ) + foreground[ 2 - 0 ] + foreground[ 2 + 8 ])>>2;
                     //int cr = (( foreground[ 3 + 4 ] << 1 ) + foreground[ 3 - 0 ] + foreground[ 3 + 8 ])>>2;
-                    int cb = foreground[ 2 + 4 - (720*4) ];
-                    int cr = foreground[ 3 + 4 - (720*4) ];
+                    //int cb = foreground[ 2 + 4 - (720*4) ];
+                    //int cr = foreground[ 3 + 4 - (720*4) ];
+                    int cb = foreground[ 2 ];
+                    int cr = foreground[ 3 ];
 
                     tmp1 = (cb - input[ 1 ]) * a;
                     tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);

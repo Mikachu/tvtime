@@ -54,12 +54,13 @@ static int timediff( struct timeval *large, struct timeval *small )
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-o <mode>] "
+    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-I <sampling>] [-o <mode>] "
                      "[-d <device> [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-v\tShow verbose messages.\n"
                      "\t-a\t16:9 mode.\n"
                      "\t-s\tPrint frame skip information (for debugging).\n"
+                     "\t-I\tV4L input scanline sampling, defaults to 720.\n"
                      "\t-w\tOutput window width, defaults to 800.\n"
                      "\t-o\tOutput mode: '422' (default) or '420'.\n"
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
@@ -131,6 +132,7 @@ int main( int argc, char **argv )
     int inputnum = 0;
     int aspect = 0;
     int outputwidth = 800;
+    int inputwidth = 720;
     int fieldtime;
     int tuner_number = 0;
     int blittime = 0;
@@ -159,9 +161,10 @@ int main( int argc, char **argv )
     
     memset( next_chan_buffer, 0, 5 );
 
-    while( (c = getopt( argc, argv, "hw:avcso:d:i:l:n:f:t:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcso:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
         case 'w': outputwidth = atoi( optarg ); break;
+        case 'I': inputwidth = atoi( optarg ); break;
         case 'v': verbose = 1; break;
         case 'a': aspect = 1; break;
         case 's': debug = 1; break;
@@ -196,7 +199,10 @@ int main( int argc, char **argv )
         fieldtime = 16683;
     }
 
-    vidin = videoinput_new( v4ldev, inputnum, 720, palmode ? 576 : 480, palmode );
+    if( inputwidth != 720 && verbose ) {
+        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", inputwidth );
+    }
+    vidin = videoinput_new( v4ldev, inputnum, inputwidth, palmode ? 576 : 480, palmode );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );

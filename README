@@ -29,10 +29,11 @@ reasonably documented, so please take a look if you're curious.
 
   Using tvtime
 
-usage: ./tvtime [-as] [-w <width>] [-o <mode>] [-d <device>
+usage: ./tvtime [-as] [-I <sampling>] [-w <width>] [-o <mode>] [-d <device>
                 [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]
         -a        16:9 mode.
         -s        Print frame skip information (for debugging).
+        -I        V4L input scanline sampling, defaults to 720.
         -w        Output window width, defaults to 800.
         -o        Output mode: '422' (default) or '420'.
         -d        video4linux device (defaults to /dev/video0).
@@ -129,6 +130,10 @@ framerate on machines with capable video cards.  However, tvtime will
 also need alot of CPU to generate the fully deinterlaced video stream.
 I run happily on a P3-733 with a G400, and Doug runs even more happily
 on a P3-900 with a Geforce 2 and nVidia's binary drivers.
+
+  To run tvtime on a slower machine, try using a smaller sampling per
+scanline from V4L.  -I 400 or -I 480 should save alot of time and still
+give reasonable viewing quality.
 
 
 Authors and contributors

@@ -4,7 +4,6 @@ Stuff to do
 
 1.  OSD code.
 2.  Dynamic resizing of the window maybe?
-3.  Manual adjustment of PICT settings. (brightness, contrast, etc)
 4.  Config file, name = value pairs
 5.  Screenshot taker to png.
 6.  Ability to change inputs on the fly.
@@ -91,3 +90,4 @@ Other Stuff
         - log on selectable events 
             - (channel switch, input switch, start/quit etc)
         - can do a lot with this
+
