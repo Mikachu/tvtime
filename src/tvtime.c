@@ -1212,6 +1212,8 @@ int main( int argc, char **argv )
         if( error_string ) {
             tvtime_osd_set_hold_message( osd, error_string );
             tvtime_osd_hold( osd, 1 );
+            free( error_string );
+            error_string = 0;
         }
     }
 
