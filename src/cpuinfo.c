@@ -35,6 +35,12 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#ifdef ARCH_X86
+
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
 static double measure_cpu_mhz( void )
@@ -230,4 +236,13 @@ void cpuinfo_print_info( void )
     fprintf( stderr, "cpuinfo: CPU %s, family %d, model %d, stepping %d.\n", model_name, family, model, stepping );
     fprintf( stderr, "cpuinfo: CPU measured at %.3fMHz.\n", measure_cpu_mhz() );
 }
+
+#else
+
+void cpuinfo_print_info( void )
+{
+    fprintf( stderr, "cpuinfo: Unknown architecture (non-x86).\n" );
+}
+
+#endif
 
