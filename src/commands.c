@@ -173,6 +173,7 @@ typedef struct menu_names_s {
 static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
     { "input", MENU_REDIRECT, "input-ntsc" },
+    { "stations", MENU_REDIRECT, "stations-general" },
     { "favorites", MENU_FAVORITES, 0 },
     { "color", MENU_REDIRECT, "colour" }
 };
@@ -708,6 +709,15 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         set_redirect( "input", "input-pal" );
     }
 
+    if( vidin && (videoinput_get_norm( vidin ) == VIDEOINPUT_PAL ||
+                  videoinput_get_norm( vidin ) == VIDEOINPUT_SECAM) ) {
+        set_redirect( "stations", "stations-palsecam" );
+    } else if( vidin && videoinput_get_norm( vidin ) == VIDEOINPUT_NTSC &&
+               (!strcasecmp( config_get_v4l_freq( cfg ), "us-cable" ) ||
+                !strcasecmp( config_get_v4l_freq( cfg ), "us-cable100" )) ) {
+        set_redirect( "stations", "stations-ntsccable" );
+    }
+
     if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
         fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
         cmd->luma_power = 1.0;
@@ -792,7 +802,48 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "stations" );
+    menu = menu_new( "stations-ntsccable" );
+    menu_set_text( menu, 0, "Setup - Station management" );
+    sprintf( string, "%c%c%c  Renumber current channel", 0xee, 0x80, 0xaf );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_right_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    /*
+    sprintf( string, "%c%c%c  Station favorites", 0xee, 0x80, 0xaa );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    */
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
+    menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
+    menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Toggle NTSC cable mode", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
+    menu_set_right_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "stations-general" );
     menu_set_text( menu, 0, "Setup - Station management" );
     sprintf( string, "%c%c%c  Renumber current channel", 0xee, 0x80, 0xaf );
     menu_set_text( menu, 1, string );
@@ -826,6 +877,47 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "stations-palsecam" );
+    menu_set_text( menu, 0, "Setup - Station management" );
+    sprintf( string, "%c%c%c  Renumber current channel", 0xee, 0x80, 0xaf );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_right_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    /*
+    sprintf( string, "%c%c%c  Station favorites", 0xee, 0x80, 0xaa );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    */
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
+    menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Toggle current channel colour SECAM/PAL", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_PAL_SECAM, "" );
+    menu_set_right_command( menu, 4, TVTIME_TOGGLE_PAL_SECAM, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
+    menu_set_right_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
@@ -1727,8 +1819,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             station_writeconfig( cmd->stationmgr );
         }
         if( cmd->osd ) {
+            char message[ 128 ];
             tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
             tvtime_osd_show_info( cmd->osd );
+            sprintf( message, "Colour decoding for this channel set to %s.", videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            tvtime_osd_show_message( cmd->osd, message );
         }
         break;
 
