@@ -83,7 +83,7 @@ void performance_checkpoint_aquired_input_frame( performance_t *perf )
     if( dropdiff >= 0 ) {
         perf->drop_history[ perf->drop_pos ] = ( dropdiff / (perf->fieldtime*2) ) + 2;
     } else {
-        perf->drop_history[ perf->drop_pos ] = 0;
+        perf->drop_history[ perf->drop_pos ] = 1;
     }
     perf->drop_pos = ( perf->drop_pos + 1 ) % DROP_HISTORY_SIZE;
 }
@@ -186,6 +186,6 @@ double performance_get_percentage_dropped( performance_t *perf )
         cur += perf->drop_history[ i ];
     }
 
-    return ( ( (double) cur ) / ( (double) DROP_HISTORY_SIZE ) );
+    return 1.0 - ( ( (double) DROP_HISTORY_SIZE ) / ( (double) cur ) );
 }
 

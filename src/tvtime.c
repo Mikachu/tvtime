@@ -45,6 +45,7 @@
 #include "performance.h"
 #include "dfboutput.h"
 #include "vidmode.h"
+#include "taglines.h"
 
 /**
  * Current deinterlacing method.
@@ -332,6 +333,7 @@ int main( int argc, char **argv )
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
+    const char *tagline;
     int lastframeid;
     int secondlastframeid;
     config_t *ct;
@@ -589,6 +591,9 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    srand( time( 0 ) );
+    tagline = taglines[ rand() % numtaglines ];
+
     /* Start up our vidmode object. */
     vidmode = vidmode_new();
 
@@ -605,10 +610,16 @@ int main( int argc, char **argv )
 
     /* Initialize our timestamps. */
     for(;;) {
+        char caption[ 255 ];
         unsigned char *curframe;
         int curframeid;
         int printdebug = 0;
         int showbars, videohold, screenshot;
+
+        sprintf( caption, "[%3.0f%% dropped] %s",
+                 performance_get_percentage_dropped( perf ) * 100.0,
+                 tagline );
+        output->set_window_caption( caption );
 
         output->poll_events( in );
 

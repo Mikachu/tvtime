@@ -23,12 +23,10 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <SDL/SDL.h>
-#include <time.h>
 #include "frequencies.h"
 #include "videoinput.h"
 #include "sdloutput.h"
 #include "input.h"
-#include "taglines.h"
 
 const int resize_frame_delay = 10;
 
@@ -57,11 +55,7 @@ static void sdl_reset_display( void )
 int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
 {
     SDL_Rect **modes;
-    const char *tagline;
     int ret, i;
-
-    srand( time( 0 ) );
-    tagline = taglines[ rand() % numtaglines ];
 
     sdlaspect = aspect;
     outwidth = outputwidth;
@@ -114,7 +108,6 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
         return 0;
     }
 
-    SDL_WM_SetCaption( tagline, 0 );
     SDL_ShowCursor( 0 );
     SDL_EnableKeyRepeat( SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL );
     return 1;
@@ -285,6 +278,7 @@ void sdl_unlock_output( void )
 }
 void sdl_set_window_caption( const char *caption )
 {
+    SDL_WM_SetCaption( caption, 0 );
 }
 
 static output_api_t sdloutput =
