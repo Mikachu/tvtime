@@ -34,12 +34,12 @@ TableOrder: GSUB 3
 LangName: 1033 "" "" "" "PfaEdit 1.0 : Free Sans Bold : 11-8-2072" "" "" "" "" "" "" "" "" "" "The use of this font is granted subject to GNU General Public License." "http://www.gnu.org/copyleft/gpl.html" "" "" "" "" "The quick brown fox jumps over the lazy dog." 
 LangName: 1060 "" "" "polkrepko" "" "" "" "" "" "" "" "" "" "" "Dovoljena je uporaba v skladu z licenco GNU General Public License." "http://www.gnu.org/copyleft/gpl.html" "" "" "" "" "+AWAA-erif bo za vajo spet kuhal doma+AQ0A-e +AX4A-gance." 
 Encoding: unicode
-DisplaySize: -24
+DisplaySize: -96
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57350 10 10
+WinInfo: 57368 4 5
 TeXData: 1 10485760 0 291504 145752 97168 566231 1048576 97168 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 65537 787
+BeginChars: 65537 788
 StartChar: .notdef
 Encoding: 0 -1 0
 Width: 432
@@ -15745,7 +15745,7 @@ EndChar
 StartChar: uniE022
 Encoding: 57378 57378 727
 Width: 1000
-Flags: HO
+Flags: H
 Fore
 600.307 509.693 m 9
  755.557 451.043 l 25
@@ -15854,6 +15854,68 @@ Fore
  303 524.328 471.672 693 679.5 693 c 0
  887.328 693 1056 524.328 1056 316.5 c 1
  1056 243 1056 243 1044 150 c 1
+EndSplineSet
+EndChar
+StartChar: uniE026
+Encoding: 57382 57382 65535
+Width: 1000
+Flags: H
+Fore
+543.9 165.3 m 1
+ 543.9 87 l 1
+ 1035.3 87 l 1
+ 1035.3 165.3 l 1
+ 543.9 165.3 l 1
+371.101 573 m 1
+ 371.101 335.399 l 1
+ 749.101 335.399 l 1
+ 749.101 573 l 1
+ 371.101 573 l 1
+514.2 195 m 1
+ 1067.7 195 l 1
+ 1067.7 51.8994 l 1
+ 514.2 51.8994 l 1
+ 514.2 195 l 1
+336 608.1 m 1
+ 781.5 608.1 l 1
+ 781.5 305.7 l 1
+ 336 305.7 l 1
+ 336 608.1 l 1
+271.2 744.899 m 25
+ 176.7 744.899 l 25
+ 176.7 -150.601 l 25
+ 122.7 -150.601 l 25
+ 122.7 797.1 l 25
+ 271.2 797.1 l 25
+ 271.2 744.899 l 25
+870.601 -66.9004 m 1
+ 870.601 -134.4 l 1
+ 1070.4 -134.4 l 1
+ 1070.4 -66.9004 l 1
+ 870.601 -66.9004 l 1
+506.101 -64.2002 m 1
+ 506.101 -131.7 l 1
+ 732.9 -131.7 l 1
+ 732.9 -64.2002 l 1
+ 506.101 -64.2002 l 1
+257.7 670.2 m 1
+ 257.7 -21 l 1
+ 1162.2 -21 l 1
+ 1162.2 670.2 l 1
+ 257.7 670.2 l 1
+1092 -65.1006 m 0
+ 1092 -65.1006 1092 -120.55 1092 -156 c 25
+ 853.5 -156 l 25
+ 853.5 -65.1006 l 25
+ 759.9 -65.1006 l 25
+ 759.9 -156 l 25
+ 479.101 -156 l 25
+ 479.101 -120.55 479.101 -65.1006 479.101 -65.1006 c 0
+ 222.601 -65.1006 l 1
+ 222.601 710.7 l 1
+ 1202.7 710.7 l 1
+ 1202.7 -65.1006 l 1
+ 1092 -65.1006 l 0
 EndSplineSet
 EndChar
 StartChar: commaaccent
