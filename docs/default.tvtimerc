@@ -70,7 +70,7 @@ OutputWidth = 800
 # cards cannot sample higher than 768 pixels per scanline.
 InputWidth = 720
 
-# This option enables 16:9 mode by default on startup.
+# This option enables 16:9 aspect ratio mode by default on startup.
 WideScreen = 0
 
 # This indicates whether the luma correction option should be enabled by
