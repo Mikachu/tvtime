@@ -2,7 +2,11 @@
  * Worldwide channel/frequency list
  *
  * Nathan Laredo (laredo@gnu.org)
- * Last modified 19 August 1998
+ * Modified 10 November 2002, Billy Biggs
+ *     Added S04, S05 and E2A to BG-CATV
+ *     Added NC-CATV for argentina
+ *     Added macros for IRC and HRC NTSC cable
+ * Modified 19 August 1998, Nathan Laredo
  *     Removed NTSC UHF broadcast 70-83 per FCC request
  *
  * All frequencies are given in kHz 
@@ -33,14 +37,15 @@
 	Ecuador, El Salvador, Guam Guatemala, Honduras, Jamaica, Japan,
 	South Korea, Mexico, Montserrat, Myanmar, Nicaragua, Panama, Peru,
 	Philippines, Puerto Rico, St Christopher and Nevis, Samoa, Suriname,
-	Taiwan, Trinidad/Tobago, United States, Venezuela, Virgin Islands
+	Taiwan, Trinidad/Tobago, United States, Venezuela, Virgin Islands,
+        Soviet Canuckistan
    (B) PAL used in:
 	Albania, Algeria, Australia, Austria, Bahrain, Bangladesh, Belgium,
 	Bosnia-Herzegovinia, Brunei Darussalam, Cambodia, Cameroon, Croatia,
 	Cyprus, Denmark, Egypt, Ethiopia, Equatorial Guinea, Finland, Germany,
 	Ghana, Gibraltar, Greenland, Iceland, India, Indonesia, Israel, Italy,
 	Jordan, Kenya, Kuwait, Liberia, Libya, Luxembourg, Malaysa, Maldives,
-	Malta, Nepal, Netherlands, New Zeland, Nigeria, Norway, Oman, Pakistan,
+	Malta, Nepal, Netherlands, New Zealand, Nigeria, Norway, Oman, Pakistan,
 	Papua New Guinea, Portugal, Qatar, Sao Tome and Principe, Saudi Arabia,
 	Seychelles, Sierra Leone, Singapore, Slovenia, Somali, Spain,
 	Sri Lanka, Sudan, Swaziland, Sweden, Switzeland, Syria, Thailand,
@@ -72,7 +77,7 @@
 	Morocco
    (D) SECAM used in:
 	Afghanistan, Armenia, Azerbaijan, Belarus, Bulgaria, Czech Republic,
-	Estonia, Georgia, Hungary, Zazakhstan, Lithuania, Mongolia, Moldova,
+	Estonia, Georgia, Hungary, Kazakhstan, Lithuania, Mongolia, Moldova,
 	Poland, Russia, Slovak Republic, Ukraine, Vietnam
    (G) SECAM used in:
 	Greecem Iran, Iraq, Mali, Mauritus, Morocco, Saudi Arabia
@@ -83,7 +88,7 @@
    (K1) SECAM used in:
 	Benin, Burkina Faso, Burundi, Chad, Cape Verde, Central African
 	Republic, Comoros, Congo, Gabon, Madagascar, Niger, Rwanda, Senegal,
-	Togo, Zaire
+	Togo, Democratic Republic of Congo (formerly Zaire)
    (L) SECAM used in:
 	France
 */
@@ -91,6 +96,26 @@ struct freqlist {
   char name[4];
   int freq[11];
 };
+
+#define FORMAT_NTSC_M   (1<<0)
+#define FORMAT_NTSC_JP  (1<<1)
+#define FORMAT_PAL_B    (1<<2)
+#define FORMAT_PAL_D    (1<<3)
+#define FORMAT_PAL_G    (1<<4)
+#define FORMAT_PAL_H    (1<<5)
+#define FORMAT_PAL_I    (1<<6)
+#define FORMAT_PAL_M    (1<<7)
+#define FORMAT_PAL_N    (1<<8)
+#define FORMAT_PAL_NC   (1<<9)
+#define FORMAT_SECAM_B  (1<<10)
+#define FORMAT_SECAM_D  (1<<11)
+#define FORMAT_SECAM_G  (1<<12)
+#define FORMAT_SECAM_H  (1<<13)
+#define FORMAT_SECAM_K  (1<<14)
+#define FORMAT_SECAM_K1 (1<<15)
+#define FORMAT_SECAM_L  (1<<16)
+#define FORMAT_SECAM_L1 (1<<17)
+#define FORMAT_PAL_BG   (FORMAT_PAL_B|FORMAT_PAL_G)
 
 #define NTSC_BROADCAST	0
 #define NTSC_CABLE	1
@@ -103,14 +128,32 @@ struct freqlist {
 #define PAL_UHF_GHI	8
 #define PAL_IRELAND	8
 #define PAL_CABLE_BG	9
-#define PAL_NC_CABLE   10
+#define PAL_CABLE_NC   10
+
+int formats_supported[] = {
+   FORMAT_NTSC_M,   /* NTSC_BROADCAST */
+   FORMAT_NTSC_M,   /* NTSC_CABLE */
+   FORMAT_NTSC_JP,  /* NTSC_JP_BCAST */
+   FORMAT_NTSC_JP,  /* NTSC_JP_CABLE */
+   0,               /* PAL_EUROPE */
+   FORMAT_PAL_BG,   /* PAL_ITALY */
+   FORMAT_PAL_BG,   /* PAL_NEWZEALAND */
+   FORMAT_PAL_B,    /* PAL_AUSTRALIA */
+   0,               /* PAL_UHF_GHI */
+   FORMAT_PAL_I,    /* PAL_IRELAND */
+   FORMAT_PAL_BG,   /* PAL_CABLE_BG */
+   FORMAT_PAL_NC,   /* PAL_CABLE_NC */
+};
 
 struct freqlist tvtuner[] = {
 /* CH  US-TV  US-CATV JP-TV JP-CATV EUROPE  ITALY  NZ     AU   UHF_GHI BGCATV NCCATV*/
 {"S01",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 69250,     0}},
 {"S02",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 76250,     0}},
 {"S03",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 83250,     0}},
+{"S04",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 90250,     0}},
+{"S05",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 97250,     0}},
 {" E2",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 48250,     0}},
+{"E2A",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 49750,     0}},
 {" E3",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 55250,     0}},
 {" E4",{     0,     0,     0,     0,     0,     0,     0,     0,     0, 62250,     0}},
 {" E5",{     0,     0,     0,     0,     0,     0,     0,     0,     0,175250,     0}},
@@ -256,7 +299,7 @@ struct freqlist tvtuner[] = {
 {"T12",{     0, 38250,     0,     0,     0,     0,     0,     0,     0,     0,     0}},
 {"T13",{     0, 44250,     0,     0,     0,     0,     0,     0,     0,     0,     0}}
 /* if CHAN_ENTRIES is changed, /usr/share/tv/tvset.rc will be invalid */
-#define CHAN_ENTRIES 148
+#define CHAN_ENTRIES 151
 };
 
 #define NTSC_CABLE_HRC(x) ((x == 77250) ? 78000 : ((x == 83250) ? 84000 : (x - 1250)))

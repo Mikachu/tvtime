@@ -1,5 +1,7 @@
 
 0.9.6
+  * (vektor) We now use XF86VidModeExtension, if available, to choose our
+    fullscreen mode (bug 628290)
   * (bitstream) Added support for muting of the TV card instead of muting
     the master mixer volume: MuteTVCard option in the tvtimerc (bug 633222)
   * (rascasse) Added a man page for the tvtimerc file to the docs directory

@@ -402,6 +402,7 @@ int main( int argc, char **argv )
     linear_plugin_init();
     weave_plugin_init();
     double_plugin_init();
+    linearblend_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {

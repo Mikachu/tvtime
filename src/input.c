@@ -199,6 +199,8 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
         cur_freq_table = PAL_IRELAND;
     } else if( !strcasecmp( "pal-cable-bg", chanlist_name ) ) {
         cur_freq_table = PAL_CABLE_BG;
+    } else if( !strcasecmp( "argentina-cable", chanlist_name ) ) {
+        cur_freq_table = PAL_CABLE_NC;
     } else {
         cur_freq_table = NTSC_CABLE;
     }
