@@ -22,7 +22,7 @@
 
 #include "dfboutput.h"
 
-#ifdef HAVE_DIRECTFB
+#if defined(HAVE_DIRECTFB) && (((DIRECTFB_MINOR*100)+DIRECTFB_MICRO) >= 918)
 /* directfb includes */
 #include <directfb.h>
 #define DIRECTFB_RUNTIME_VERSION (directfb_major_version*100+directfb_minor_version)*100+directfb_micro_version

@@ -19,7 +19,7 @@
 #include "config.h"
 #include "dfboutput.h"
 
-#ifdef HAVE_DIRECTFB
+#if defined(HAVE_DIRECTFB) && (((DIRECTFB_MINOR*100)+DIRECTFB_MICRO) >= 918)
 
 #include <stdio.h>
 #include <directfb.h>
