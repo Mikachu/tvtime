@@ -125,6 +125,13 @@ Code we stole (well, used under the GPL)
   Screen saver disabling routines from mplayer, 
     http://www.mplayerhq.hu/
 
+  wine direcory for win32 DLL loading support from libw32 in xine.
+    http://xine.sf.net/
+  win32 codec support in xine is based on work from:
+    avifile http://avifile.sf.net
+    MPlayer http://www.mplayerhq.hu/
+    wine    http://www.winehq.com
+
   Taglines courtesy of
     James Dewar, Adam Letts, Andrew Lewycky, Håkan Hjort, Billy Biggs,
     Jason Rouse, Alison Biggs, David Lehn, Tero Auvinen
