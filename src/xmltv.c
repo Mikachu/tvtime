@@ -31,6 +31,7 @@ struct xmltv_s
     char curchannel[ 256 ];
     int refresh;
     xmlChar *curchan;
+    xmlChar *display_chan;
     program_t *pro;
     program_t *next_pro;
 };
@@ -313,6 +314,7 @@ xmltv_t *xmltv_new( const char *filename )
     xmltv->pro = program_new();
     xmltv->next_pro = program_new();
     xmltv->curchan = 0;
+    xmltv->display_chan = 0;
     xmltv->refresh = 1;
 
     return xmltv;
@@ -331,6 +333,7 @@ void xmltv_delete( xmltv_t *xmltv )
     program_delete( xmltv->pro );
     program_delete( xmltv->next_pro );
     if( xmltv->curchan ) xmlFree( xmltv->curchan );
+    if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
     xmlFreeDoc( xmltv->doc );
     free( xmltv );
 }
@@ -404,6 +407,11 @@ const char *xmltv_get_next_title( xmltv_t *xmltv )
     return (char *) xmltv->next_pro->title;
 }
 
+const char *xmltv_get_channel( xmltv_t *xmltv )
+{
+    return (char *) xmltv->curchannel;
+}
+
 int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
                          int hour, int min )
 {
@@ -443,3 +451,33 @@ const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )
     return 0;
 }
 
+const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
+{
+    xmlNodePtr cur = xmltv->root->xmlChildrenNode;
+
+    if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
+    xmltv->display_chan = 0;
+
+    while( cur ) {
+        if( !xmlStrcasecmp( cur->name, BAD_CAST "channel" ) ) {
+            xmlChar *curid = xmlGetProp( cur, BAD_CAST "id" );
+            if ( curid ) {
+                if ( !xmlStrcasecmp( curid, BAD_CAST id ) ) {
+                    xmlNodePtr sub = cur->xmlChildrenNode;
+                    while( sub && xmlStrcasecmp( sub->name, BAD_CAST "display-name" ) ) {
+                        sub = sub->next;
+                    }
+                    if ( sub ) {
+                        xmltv->display_chan = xmlNodeGetContent( sub );
+                        xmlFree( curid );
+                        return ( char * ) xmltv->display_chan;
+                    }
+                }
+                xmlFree( curid );
+            }
+        }
+        cur = cur->next;
+    }
+
+    return 0;
+}

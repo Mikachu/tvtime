@@ -72,6 +72,11 @@ const char *xmltv_get_times( xmltv_t *xmltv );
 const char *xmltv_get_next_title( xmltv_t *xmltv );
 
 /**
+ * Returns the xmltvid of the current channel.
+*/
+const char *xmltv_get_channel( xmltv_t *xmltv );
+
+/**
  * Returns true if the show information must be updated (the current
  * program has ended.
  */
@@ -79,9 +84,14 @@ int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
                          int hour, int min );
 
 /**
- * Looks up the id of a channel given its name.
+ * Looks up the xmltv id of a channel given a corresponding xmltv display name.
  */
 const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name );
+
+/**
+ * Looks up the xmltv user display name of a channel given its xmltv id.
+*/
+const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id );
 
 #ifdef __cplusplus
 };

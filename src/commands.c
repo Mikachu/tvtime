@@ -192,7 +192,8 @@ static void update_xmltv_channel( commands_t *cmd )
         if( station_get_current_xmltv_id( cmd->stationmgr ) ) {
             xmltv_set_channel( cmd->xmltv, station_get_current_xmltv_id( cmd->stationmgr ) );
         } else {
-            xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv, station_get_current_channel_name( cmd->stationmgr ) ) );
+            xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv,
+                               station_get_current_channel_name( cmd->stationmgr ) ) );
         }
     } else if( cmd->osd ) {
         tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
@@ -207,13 +208,9 @@ static void update_xmltv_listings( commands_t *cmd )
         int year = 1900 + curtime->tm_year;
         int month = 1 + curtime->tm_mon;
         int day = curtime->tm_mday;
-
         int hour = curtime->tm_hour;
         int min = curtime->tm_min;
-        /*
-        int hour = 23;
-        int min = 33;
-        */
+
         if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
             const char *desc;
             char title[ 128 ];
@@ -432,14 +429,24 @@ static void reinit_tuner( commands_t *cmd )
 
         if( cmd->osd ) {
             char channel_display[ 20 ];
+            char *xmltv_name = 0;
 
             snprintf( channel_display, sizeof( channel_display ), "%d",
                       station_get_current_id( cmd->stationmgr ) );
-            tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            update_xmltv_channel( cmd );
+            if ( cmd->xmltv && !strcmp( station_get_current_channel_name( cmd->stationmgr ), channel_display ) ) {
+                xmltv_name = xmltv_lookup_channel_name( cmd->xmltv, xmltv_get_channel( cmd->xmltv ) );
+                if ( xmltv_name ) {
+                    tvtime_osd_set_channel_name( cmd->osd, xmltv_name );
+                }
+            }
+            if ( !xmltv_name ) {
+                tvtime_osd_set_channel_name( cmd->osd, station_get_current_channel_name( cmd->stationmgr ) );
+            }
+            tvtime_osd_set_norm( cmmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
             tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
             tvtime_osd_set_freq_table( cmd->osd, station_get_current_band( cmd->stationmgr ) );
             tvtime_osd_set_channel_number( cmd->osd, channel_display );
-            tvtime_osd_set_channel_name( cmd->osd, station_get_current_channel_name( cmd->stationmgr ) );
             tvtime_osd_set_network_call( cmd->osd, station_get_current_network_call_letters( cmd->stationmgr ) );
             tvtime_osd_set_network_name( cmd->osd, station_get_current_network_name( cmd->stationmgr ) );
             tvtime_osd_set_show_name( cmd->osd, "" );
@@ -447,7 +454,6 @@ static void reinit_tuner( commands_t *cmd )
             tvtime_osd_set_show_start( cmd->osd, "" );
             tvtime_osd_set_show_length( cmd->osd, "" );
             tvtime_osd_show_info( cmd->osd );
-            update_xmltv_channel( cmd );
 
             reset_stations_menu( commands_get_menu( cmd, "stations" ),
                                  (videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC ||
