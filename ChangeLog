@@ -1,5 +1,8 @@
 
 0.9.11 -
+  * vektor: Bring back lirc support, but using dlopen() to find the
+      lirc_client library instead of explicitly linking against it.  This
+      avoids any ugly dependency problems with packaging tvtime.
   * vektor: Disabling the wine DScaler module loader on non-x86 architectures.
       This should let tvtime compile for some users.  Thanks to Helge
       Kreutzmann.
