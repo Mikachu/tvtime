@@ -57,6 +57,18 @@ if [ "$action" = "configure" ]; then
 
     db_get tvtime/setuid
     if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
+        if [ ! -x /usr/sbin/dpkg-statoverride ] || \
+           ! /usr/sbin/dpkg-statoverride --list /usr/bin/tvtime >/dev/null; then
+            chmod u-s /usr/bin/tvtime
+        fi
+    else
+        if [ ! -x /usr/sbin/dpkg-statoverride ] || \
+           ! /usr/sbin/dpkg-statoverride --list /usr/bin/tvtime >/dev/null; then
+            chmod u+s /usr/bin/tvtime
+        fi
+    fi
+
+    if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
         chmod u-s /usr/bin/tvtime
     else
         chmod u+s /usr/bin/tvtime
