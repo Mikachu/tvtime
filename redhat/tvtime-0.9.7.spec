@@ -1,7 +1,7 @@
 # Some useful constants
 %define ver 0.9.7
 %define beta beta
-%define rpm_ver 2
+%define rpm_ver 3
 %define docsdir docs
 %define rhdocsdir redhat
 %define icon %{docsdir}/tvtime-icon-black.png
@@ -50,7 +50,7 @@ desktop-file-install --vendor custom --delete-original --dir %{buildroot}%{_data
 # Add man pages
 mkdir -p %{_mandir}/man1
 mkdir -p %{_mandir}/man5
-install -D -m 644 %{docsdir}/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
+install -D -m 644 %{docsdir}/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1i
 install -D -m 644 %{docsdir}/%{name}rc.5 %{buildroot}%{_mandir}/man5/%{name}rc.5
 
 %clean
@@ -58,9 +58,9 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README docs/DESIGN docs/TODO
+%doc AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README docs/DESIGN docs/TODO docs/default.tvtimerc
 %{_bindir}/%{name}
-%{_bindir}/tvscanner
+%{_bindir}/timingtest
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/%{name}-logo.png
 %{_datadir}/applications/*%{name}.desktop
@@ -68,6 +68,10 @@ rm -rf %{buildroot}
 %{_mandir}/man5/%{name}rc.5*
 
 %changelog
+* Mon Feb 24 2003 Paul Jara <rascasse at sourceforge.net>
+- Added default.tvtimerc to docs directory
+- Sync'd with latest CVS version
+- tvscanner replaced with timingtest
 * Mon Feb 24 2003 Paul Jara <rascasse at sourceforge.net>
 - Added man pages for tvtime and tvtimerc
 - Macro-ized some common shell commands
