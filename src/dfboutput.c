@@ -233,6 +233,8 @@ int dfb_init( int outputheight, int aspect, int verbose )
 
     c2frame->GetPixelFormat( c2frame, &frame_format );
 
+    /* Disabled, seems like some of these aren't in older
+     * versions of DirectFB, and we don't really care.
     fprintf( stderr, "DirectFB: Frame format = " );
     switch (frame_format) {
     case DSPF_ARGB:
@@ -265,6 +267,7 @@ int dfb_init( int outputheight, int aspect, int verbose )
     default:
          fprintf( stderr, "unknown\n" );
     }
+     */
 
     crtc2->SetOpacity( crtc2, 0xff );
     return 1;
