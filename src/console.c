@@ -521,7 +521,7 @@ void console_printf( console_t *con, char *format, ... )
 
 void console_gotoxy( console_t *con, int x, int y )
 {
-    return; /*NOWARN*/
+    return;
     if( !con ) return;
     if( x < 0 ) x *= -1;
     if( y < 0 ) y *= -1;

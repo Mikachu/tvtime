@@ -101,7 +101,9 @@ int fifo_next_command( fifo_t *fifo )
     if( !fifo ) return TVTIME_NOCOMMAND;
     str = fifo_next_line( fifo );
     if( !str ) return TVTIME_NOCOMMAND;
+
     cmd = string_to_command( str );
+
     memset( fifo->buf, 0, sizeof( fifo->buf ) );
     fifo->bufpos = 0;
     

@@ -1,17 +1,15 @@
 
+** This file is somewhat out-of-date and quite incomplete **
+
 Stuff to do
 -----------
 
 1.  Eventually make up/down channel use a definable list of channels
     with extended channel data (string eg "CNN", volume, PICT settings,
     fine tune adjustment etc)
-2.  Pong?
-3.  Temporary fine tune adjustment per channel ie. lost when you change
-    channels
-4.  Menu system like a real tv.
-5.  Display of stereo/mono etc (maybe time/date) when changing
+2.  Menu system like a real tv.
+3.  Display of stereo/mono etc (maybe time/date) when changing
     channels or requested by keystroke.
-6.  break apart main
 
 Longer term TODO stuff
 ----------------------
@@ -69,19 +67,10 @@ Other Stuff
 -----------
 
     - PIP for each card.
-    - Config file
-        - channels
-        - set all options menu has  
-        - all keybindings
-        - PAL/NTSC etc
-    - display time/date + channel text on channel change
-        - can use xmltv data to display more about programme
-    - render OSD stuff to overlay buffer rather than every object
-        every frame
-    - separate input when in menu mode
     - ability to log tv watching habits
         - all program info
         - log on selectable events 
             - (channel switch, input switch, start/quit etc)
         - can do a lot with this
 
+    - update the TODO list :)
