@@ -108,6 +108,7 @@ struct tvtime_osd_s
     int pulldown_mode;
     int mutestate;
     int hold;
+    int chinfo;
 
     int margin_left;
     int margin_right;
@@ -156,6 +157,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->pulldown_mode = 0;
     osd->mutestate = 0;
     osd->hold = 0;
+    osd->chinfo = 0;
     osd->show_rating = "";
 
     osd->margin_left = ((width * left_size) / 100) & ~1;
@@ -516,6 +518,10 @@ void tvtime_osd_clear( tvtime_osd_t *osd )
     }
     if( osd->backdrop ) osd_graphic_set_timeout( osd->backdrop, 0 );
     if( osd->film_logo ) osd_animation_set_timeout( osd->film_logo, 0 );
+    if( osd->chinfo ) {
+        osd_list_set_timeout( osd->list, 0 );
+        osd->chinfo = 0;
+    }
 }
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
@@ -758,12 +764,19 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
     }
 }
 
-void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
+void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist, int chinfo )
 {
+    osd->chinfo = chinfo;
     if( showlist ) {
         osd_list_set_timeout( osd->list, osd->menudelay );
+        if( chinfo ) {
+            osd_list_set_hold( osd->list, 1 );
+        } else {
+            osd_list_set_hold( osd->list, 0 );
+        }
     } else {
         osd_list_set_timeout( osd->list, 0 );
+        osd_list_set_hold( osd->list, 0 );
     }
 }
 

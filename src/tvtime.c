@@ -780,7 +780,7 @@ static void osd_list_deinterlacer_info( tvtime_osd_t *osd, int curmethod )
             tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
         }
         tvtime_osd_list_set_hilight( osd, -1 );
-        tvtime_osd_show_list( osd, 1 );
+        tvtime_osd_show_list( osd, 1, 0 );
     }
 }
 
@@ -796,7 +796,7 @@ static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
             tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
         }
         tvtime_osd_list_set_hilight( osd, curmethod + 1 );
-        tvtime_osd_show_list( osd, 1 );
+        tvtime_osd_show_list( osd, 1, 0 );
     }
 }
 
@@ -992,7 +992,7 @@ static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     tvtime_osd_list_set_text( osd, 3, text );
 
     tvtime_osd_list_set_hilight( osd, mode + 1 );
-    tvtime_osd_show_list( osd, 1 );
+    tvtime_osd_show_list( osd, 1, 0 );
 }
 
 static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
@@ -1039,7 +1039,7 @@ static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     }
 
     tvtime_osd_list_set_hilight( osd, -1 );
-    tvtime_osd_show_list( osd, 1 );
+    tvtime_osd_show_list( osd, 1, 0 );
 }
 
 static void build_matte_menu( menu_t *menu, int mode, int sixteennine )
@@ -1115,7 +1115,7 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
         tvtime_osd_list_set_text( osd, 4, "2.35:1" );
     }
     tvtime_osd_list_set_hilight( osd, mode + 1 );
-    tvtime_osd_show_list( osd, 1 );
+    tvtime_osd_show_list( osd, 1, 0 );
 }
 
 /*
@@ -1910,7 +1910,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
             }
             if( osd ) {
-                tvtime_osd_show_list( osd, 0 );
+                tvtime_osd_show_list( osd, 0, 0 );
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
             build_output_menu( commands_get_menu( commands, "output" ),

@@ -233,12 +233,12 @@ static void display_xmltv_description( commands_t *cmd, const char *title,
     }
     tvtime_osd_list_set_lines( cmd->osd, cur );
     tvtime_osd_list_set_hilight( cmd->osd, -1 );
-    tvtime_osd_show_list( cmd->osd, 1 );
+    tvtime_osd_show_list( cmd->osd, 1, 1 );
 }
 
-static void update_xmltv_listings( commands_t *cmd )
+static void update_xmltv_display( commands_t *cmd )
 {
-    if( cmd->xmltv && cmd->osd && xmltv_needs_refresh( cmd->xmltv ) ) {
+    if( cmd->xmltv && cmd->osd ) {
         const int maxlinelen = 64;
         const char *desc;
         char title[ 128 ];
@@ -248,9 +248,6 @@ static void update_xmltv_listings( commands_t *cmd )
         char *line1 = 0;
         char *line2 = 0;
         char next_title[64];
-
-        xmltv_refresh( cmd->xmltv );
-
         desc = xmltv_get_description( cmd->xmltv );
         if( desc ) {
             line1 = descdata;
@@ -297,13 +294,21 @@ static void update_xmltv_listings( commands_t *cmd )
         // tvtime_osd_show_program_info( cmd->osd, title, subtitle,
         //                              0, 0, next_title );
 
-        if( 0 || cmd->menuactive ) {
+        if( !cmd->displayinfo || cmd->menuactive ) {
             tvtime_osd_show_program_info( cmd->osd, title, subtitle, 0, 0, next_title );
         } else {
             tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
             display_xmltv_description( cmd, title, subtitle, line1,
                                        line2, next_title );
         }
+    }
+}
+
+static void update_xmltv_listings( commands_t *cmd )
+{
+    if( cmd->xmltv && cmd->osd && xmltv_needs_refresh( cmd->xmltv ) ) {
+        xmltv_refresh( cmd->xmltv );
+        update_xmltv_display( cmd );
     }
 }
 
@@ -1660,7 +1665,7 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
     } else if( curmode == VIDEOINPUT_LANG2 ) {
         tvtime_osd_list_set_hilight( osd, 4 );
     }
-    tvtime_osd_show_list( osd, 1 );
+    tvtime_osd_show_list( osd, 1, 0 );
 }
 
 /**
@@ -1670,7 +1675,7 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
 static void menu_off( commands_t *cmd )
 {
     tvtime_osd_list_hold( cmd->osd, 0 );
-    tvtime_osd_show_list( cmd->osd, 0 );
+    tvtime_osd_show_list( cmd->osd, 0, 0 );
     cmd->menuactive = 0;
 }
 
@@ -1741,7 +1746,7 @@ static void display_current_menu( commands_t *cmd )
 
     tvtime_osd_list_set_hilight( cmd->osd, cmd->curmenupos + 1 );
     tvtime_osd_list_hold( cmd->osd, 1 );
-    tvtime_osd_show_list( cmd->osd, 1 );
+    tvtime_osd_show_list( cmd->osd, 1, 0 );
 }
 
 menu_t *commands_get_menu( commands_t *cmd, const char *menuname )
@@ -2292,6 +2297,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_DISPLAY_INFO:
         cmd->displayinfo = !cmd->displayinfo;
         if( cmd->osd ) {
+            update_xmltv_display( cmd );
             if( cmd->displayinfo ) {
                 tvtime_osd_hold( cmd->osd, 1 );
                 tvtime_osd_show_info( cmd->osd );
