@@ -57,12 +57,14 @@ static int mga_init( int outputheight, int aspect, int verbose )
 
     mga_fd = open( "/dev/mga_vid", O_RDWR );
     if( mga_fd < 0 ) {
-        fprintf( stderr, "mgaoutput: Can't open /dev/mga_vid: %s\n", strerror( errno ) );
+        fprintf( stderr, "mgaoutput: Can't open /dev/mga_vid: %s\n",
+                 strerror( errno ) );
         xcommon_close_display();
         return 0;
     }
 
     mga_config.version = MGA_VID_VERSION;
+    mga_height = 0;
 
     return 1;
 }
@@ -77,16 +79,17 @@ static void mga_reconfigure( void )
     mga_config.y_org = window_area.y + video_area.y;
 
     mga_config.colkey_on = 1;
-    mga_config.colkey_red = 255;
+    mga_config.colkey_red = 0;
     mga_config.colkey_green = 0;
-    mga_config.colkey_blue = 255;
+    mga_config.colkey_blue = 0;
 
     mga_config.format = MGA_VID_FORMAT_YUY2;
     mga_config.frame_size = mga_frame_size;
     mga_config.num_frames = 3;
 
     if( ioctl( mga_fd, MGA_VID_CONFIG, &mga_config ) ) {
-        fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n", strerror( errno ) );
+        fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n",
+                 strerror( errno ) );
     }
 }
 
@@ -100,7 +103,8 @@ static int mga_set_input_size( int inputwidth, int inputheight )
 
     mga_reconfigure();
 
-    xcommon_set_colourkey( 255 << 16 | 255 );
+    //xcommon_set_colourkey( 255 << 16 | 255 );
+    xcommon_set_colourkey( 0 );
 
     curframe = 0;
 
@@ -146,6 +150,13 @@ static int mga_show_frame( int x, int y, int width, int height )
 {
     area_t newvidarea = xcommon_get_video_area();
     area_t newwinarea = xcommon_get_window_area();
+    area_t scale_area;
+
+    scale_area.x = 0;
+    scale_area.y = 0;
+    scale_area.width = mga_width;
+    scale_area.height = mga_height;
+    xcommon_set_video_scale( scale_area );
 
     if( height != mga_height ) {
         mga_height = height;
@@ -159,9 +170,11 @@ static int mga_show_frame( int x, int y, int width, int height )
     XSync( xcommon_get_display(), False );
 
     if( newvidarea.x != video_area.x || newvidarea.y != video_area.y ||
-            newvidarea.width != video_area.width || newvidarea.height != video_area.height ||
+            newvidarea.width != video_area.width ||
+            newvidarea.height != video_area.height ||
             newwinarea.x != window_area.x || newwinarea.y != window_area.y ||
-            newwinarea.width != window_area.width || newwinarea.height != window_area.height ) {
+            newwinarea.width != window_area.width ||
+            newwinarea.height != window_area.height ) {
         video_area = newvidarea;
         window_area = newwinarea;
         mga_reconfigure();
