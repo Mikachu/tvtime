@@ -44,21 +44,21 @@ struct ft_font_s
     int max_height;
 };
 
+typedef struct ft_glyph_data_s ft_glyph_data_t;
 struct ft_glyph_data_s
 {
     FT_Glyph glyph;
     FT_Glyph bitmap;
 };
 
-typedef struct ft_glyph_data_s ft_glyph_data_t;
-
-static int ft_cache_glyph (ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox)
+static int ft_cache_glyph( ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox )
 {
     FT_Error error;
     FT_UInt glyph_index;
 
-    if (hashtable_lookup (font->glyphdata, wchar))
+    if( hashtable_lookup( font->glyphdata, wchar ) ) {
         return 1; // The glyph already is cached, no need to re-cache it.
+    }
 
     glyph_index = FT_Get_Char_Index( font->face, wchar );
 
@@ -108,16 +108,18 @@ static int ft_cache_glyph (ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox)
         return 0;
     }
     
-    if (glyph_bbox != NULL) // Allow caller not to accept the BBox.
+    if( glyph_bbox ) { // Allow caller not to accept the BBox.
         FT_Glyph_Get_CBox( cur->glyph, ft_glyph_bbox_subpixels, glyph_bbox );
+    }
+
     return 1;
 }
 
 ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 {
     ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
-    FT_BBox glyph_bbox;
     FT_BBox bbox;
+    int i;
 
     if( !font ) return 0;
 
@@ -163,8 +165,10 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     bbox.yMin = INT_MAX;
     bbox.yMax = -INT_MAX;
 
-    for (int i = 0; i < 128; i++) {
-        if (ft_cache_glyph (font, i, &glyph_bbox)) {
+    for( i = 0; i < 128; i++ ) {
+        FT_BBox glyph_bbox;
+
+        if( ft_cache_glyph( font, i, &glyph_bbox ) ) {
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
             if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
         }
@@ -234,11 +238,11 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
 
     for( i = 0; i < len; i++ ) {
         int cur = text[ i ];
-        FT_Glyph curglyph;
+        ft_glyph_data *curdata;
 
-        curglyph = ((ft_glyph_data_t *) hashtable_lookup( glyphdata, cur ))
-            ->glyph;
-        if( curglyph ) {
+        curdata = hashtable_lookup( glyphdata, cur );
+        if( curdata ) {
+            FT_Glyph curglyph = curdata->glyph;
             FT_BBox glyph_bbox;
 
             glyphindex[ i ] = FT_Get_Char_Index( face, cur );
@@ -361,13 +365,13 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
     memset( output, 0, *width * *height );
 
     for( i = 0; i < len; i++ ) {
-        FT_BitmapGlyph curglyph;
+        ft_glyph_data_t *curdata;
         int cur = text[ i ];
 
-        curglyph = (FT_BitmapGlyph)
-            ((ft_glyph_data_t *) hashtable_lookup( font->glyphdata, cur ))
-            ->bitmap;
-        if( curglyph ) {
+        curdata = hashtable_lookup( font->glyphdata, cur );
+        if( curdata ) {
+            FT_BitmapGlyph curglyph = curdata->bitmap;
+
             blit_glyph_subpix( output, *width, *height, *width,
                                curglyph->bitmap.buffer, curglyph->bitmap.width,
                                curglyph->bitmap.rows, curglyph->bitmap.pitch,
