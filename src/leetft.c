@@ -368,7 +368,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
         int charbytes = inbytesleft;
         uint32_t next = utf8_to_unicode( inbuf, &charbytes );
         if( charbytes == 0 ) {
-            fprintf( stderr, "leetft: Can't convert UTF-8 to wide string, invalid character?" );
+            fprintf( stderr, "leetft: Can't convert UTF-8 to wide string, invalid character?\n" );
             return;
         }
         inbuf += charbytes;
