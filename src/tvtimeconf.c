@@ -20,7 +20,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "videotools.h"
 #include "parser.h"
 #include "tvtimeconf.h"
@@ -189,10 +193,25 @@ static void print_usage( char **argv )
                      "\t  \t(defaults to 0)\n");
 }
 
+/**
+ * This should be moved elsewhere.
+ */
+int file_is_openable_for_read( const char *filename )
+{
+    int fd;
+    fd = open( filename, O_RDONLY );
+    if( fd < 0 ) {
+        return 0;
+    } else {
+        close( fd );
+        return 1;
+    }
+}
 
 config_t *config_new( int argc, char **argv )
 {
-    char base[255];
+    char temp_dirname[ 1024 ];
+    char base[ 256 ];
     char *configFile = 0;
     char c;
 
@@ -303,24 +322,38 @@ config_t *config_new( int argc, char **argv )
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
 
-    if( !configFile ) {
-        strncpy( base, getenv( "HOME" ), 235 );
-        strcat( base, "/.tvtime/tvtimerc" );
-        configFile = base;
-    }
+    /* Make the ~/.tvtime directory every time on startup, to be safe. */
+    snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
+    mkdir( temp_dirname, 0777 );
 
-    if( parser_new( &(ct->pf), configFile ) ) {
-        config_init( ct );
-    } else {
+    /* Warning for 0.9.7. */
+    strncpy( base, getenv( "HOME" ), 235 );
+    strcat( base, "/.tvtimerc" );
+    if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "\n*** Notice: tvtime user config file has changed!\n"
                            "*** Old ~/.tvtimerc now belongs at ~/.tvtime/tvtimerc\n"
                            "*** Many of the options have also changed, so please check\n"
-                           "*** out the new default config file!\n\n" );
+                           "*** out the new default config file!  Old config file ignored.\n\n" );
+    }
 
-        strncpy( base, CONFDIR, 245 );
-        strcat( base, "/tvtimerc" );
+    /* First read in global settings. */
+    strncpy( base, CONFDIR, 245 );
+    strcat( base, "/tvtimerc" );
+    if( file_is_openable_for_read( base ) ) {
+        fprintf( stderr, "config: Reading configuration from %s\n", base );
         configFile = base;
-        parser_delete( &(ct->pf) );
+        if( parser_new( &(ct->pf), configFile ) ) {
+            config_init( ct );
+        }
+    }
+
+    /* Then read in local settings. */
+    strncpy( base, getenv( "HOME" ), 235 );
+    strcat( base, "/.tvtime/tvtimerc" );
+    if( file_is_openable_for_read( base ) ) {
+        fprintf( stderr, "config: Reading configuration from %s\n", base );
+        if( configFile ) parser_delete( &(ct->pf) );
+        configFile = base;
         if( parser_new( &(ct->pf), configFile ) ) {
             config_init( ct );
         }
@@ -350,18 +383,18 @@ config_t *config_new( int argc, char **argv )
         }
     }
 
-    if( configFile != base ) {
+    /* Then read in additional settings. */
+    if( configFile && configFile != base ) {
+        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
         parser_delete( &(ct->pf) );
         
         if( !parser_new( &(ct->pf), configFile ) ) {
-            fprintf( stderr, "config: Could not read configuration from %s\n", 
-                     configFile );
+            fprintf( stderr, "config: Could not read configuration from %s\n", configFile );
         } else {
             config_init( ct );
         }
+        free( configFile );
     }
-
-    if( configFile && configFile != base ) free( configFile );
 
     /* Sanity check parameters into reasonable ranges here. */
     if( ct->inputwidth & 1 ) {
