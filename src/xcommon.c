@@ -1094,8 +1094,13 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
         } else {
             int x, y, w, h;
             double refresh;
+            int root_x, root_y;
+            Window dummy_win;
+  
+            XTranslateCoordinates( display, wm_window, DefaultRootWindow( display ), 
+			           0, 0, &root_x, &root_y, &dummy_win );
 
-            DpyInfoUpdateResolution( display, XScreenNumberOfScreen( attrs.screen ), attrs.x, attrs.y );
+            DpyInfoUpdateResolution( display, XScreenNumberOfScreen( attrs.screen ), root_x, root_y );
             DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
             DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
 
