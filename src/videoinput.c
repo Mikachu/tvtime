@@ -263,20 +263,32 @@ void videoinput_find_and_set_tuner( videoinput_t *vidin )
     }
 
     if( found ) {
+        int mustchange = 0;
+
         vidin->tuner.tuner = vidin->tuner_number;
 
         if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_M || vidin->norm == VIDEOINPUT_PAL_N ) {
-            vidin->tuner.mode = VIDEO_MODE_PAL;
+            if( vidin->tuner.mode != VIDEO_MODE_PAL ) {
+                mustchange = 1;
+                vidin->tuner.mode = VIDEO_MODE_PAL;
+            }
         } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-            vidin->tuner.mode = VIDEO_MODE_SECAM;
+            if( vidin->tuner.mode != VIDEO_MODE_SECAM ) {
+                mustchange = 1;
+                vidin->tuner.mode = VIDEO_MODE_SECAM;
+            }
         } else {
-            vidin->tuner.mode = VIDEO_MODE_NTSC;
+            if( vidin->tuner.mode != VIDEO_MODE_NTSC ) {
+                mustchange = 1;
+                vidin->tuner.mode = VIDEO_MODE_NTSC;
+            }
         }
 
-        if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't set tuner mode.  Please file a bug report "
-                     "at http://www.sourceforge.net/projects/tvtime/ indicating your card, "
-                     "driver and this error message: %s.\n", strerror( errno ) );
+        if( mustchange && ( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) ) {
+            fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
+                     "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
+                     "            indicating your card, driver and this error message: %s.\n",
+                     strerror( errno ) );
         }
     }
 
