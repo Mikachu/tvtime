@@ -1311,37 +1311,35 @@ void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
 }
 
 void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
-                                                   unsigned char *input,
-                                                   unsigned char *mask,
-                                                   int width,
-                                                   int textluma, int textcb,
-                                                   int textcr )
+                                                        unsigned char *input,
+                                                        unsigned char *mask,
+                                                        int width,
+                                                        int textluma, int textcb,
+                                                        int textcr )
 {
     unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     const mmx_t round = { 0x0080008000800080ULL };
     const mmx_t fullalpha = { 0x00000000000000ffULL };
+    mmx_t colour;
 
     SPEEDY_START();
 
-    movd_m2r( textluma, mm1 );
-    movd_m2r( textcb, mm2 );
-    movd_m2r( textcr, mm3 );
+    colour.w[ 0 ] = 0x00;
+    colour.w[ 1 ] = textluma;
+    colour.w[ 2 ] = textcb;
+    colour.w[ 3 ] = textcr;
 
-    /* mm1 = [  0 ][  0 ][ y ][ 0 ] == 11110011 == 243 */
-    pshufw_r2r( mm1, mm1, 243 );
-    /* mm2 = [  0 ][ cb ][ 0 ][ 0 ] == 11001111 == 207 */
-    pshufw_r2r( mm2, mm2, 207 );
-    /* mm3 = [ cr ][  0 ][ 0 ][ 0 ] == 00111111 == 63 */
-    pshufw_r2r( mm3, mm3, 63 );
-
-    /* mm1 = [ cr ][ cb ][ y ][ 0 ] */
-    por_r2r( mm2, mm1 );
-    por_r2r( mm3, mm1 );
+    movq_m2r( colour, mm1 );
     movq_r2r( mm1, mm0 );
+
     /* mm0 = [ cr ][ cb ][ y ][ 0xff ] */
     paddw_m2r( fullalpha, mm0 );
 
+    /* mm7 = 0 */
     pxor_r2r( mm7, mm7 );
+
+    /* mm6 = round */
+    movq_m2r( round, mm6 );
 
     while( width-- ) {
         int a = *mask;
@@ -1349,17 +1347,28 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
         if( a == 0xff ) {
             *((unsigned int *) output) = opaque;
         } else if( (input[ 0 ] == 0x00) ) {
+            /* We just need to multiply our colour by the alpha value. */
+
+            /* mm2 = [ a ][ a ][ a ][ a ] */
             movd_m2r( a, mm2 );
             movq_r2r( mm2, mm3 );
             pshufw_r2r( mm2, mm2, 0 );
+
+            /* mm5 = [ cr ][ cb ][ y ][ 0 ] */
             movq_r2r( mm1, mm5 );
+
+            /* Multiply by alpha. */
             pmullw_r2r( mm2, mm5 );
             paddw_m2r( round, mm5 );
             movq_r2r( mm5, mm6 );
             psrlw_i2r( 8, mm6 );
             paddw_r2r( mm6, mm5 );
             psrlw_i2r( 8, mm5 );
+
+            /* Set alpha to a. */
             por_r2r( mm3, mm5 );
+
+            /* Pack and write our result. */
             packuswb_r2r( mm5, mm5 );
             movd_r2m( mm5, *output );
         } else if( a ) {
@@ -1370,20 +1379,23 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
             /* mm3 = [ cr ][ cb ][ y ][ 0xff ] */
             movq_r2r( mm0, mm3 );
 
-            /*  mm4 = [ i_cr ][ i_cb ][ i_y ][ i_a ] */
+            /* mm4 = [ i_cr ][ i_cb ][ i_y ][ i_a ] */
             movd_m2r( *input, mm4 );
             punpcklbw_r2r( mm7, mm4 );
-            movq_r2r( mm4, mm5 );
+
+            /* Subtract input and colour. */
+            psubw_r2r( mm4, mm3 );  /* mm3 = mm3 - mm4 */
 
             /* Multiply alpha. */
-            psubusw_r2r( mm4, mm3 );
             pmullw_r2r( mm2, mm3 );
-            paddw_m2r( round, mm3 );
+            paddw_r2r( mm6, mm3 );
             movq_r2r( mm3, mm2 );
-            psrlw_i2r( 8, mm2 );
+            psrlw_i2r( 8, mm3 );
             paddw_r2r( mm2, mm3 );
             psrlw_i2r( 8, mm3 );
-            paddw_r2r( mm3, mm4 );
+
+            /* Add back in the input. */
+            paddb_r2r( mm3, mm4 );
 
             /* Write result. */
             packuswb_r2r( mm4, mm4 );

@@ -263,37 +263,37 @@ static void osd_string_render_bordered_image4444( osd_string_t *osds, const char
                             osds->image_textheight, osds->image_width * 4,
                             0, 0, 0, 0 );
 
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
-                                             osds->image_height, osds->image_width * 4,
-                                             ft_string_get_buffer( osds->fts ),
-                                             stringwidth, stringheight,
-                                             ft_string_get_stride( osds->fts ),
-                                             osds->border_luma, osds->border_cb,
-                                             osds->border_cr, 256, 0, 0 );
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
-                                             osds->image_height, osds->image_width * 4,
-                                             ft_string_get_buffer( osds->fts ),
-                                             stringwidth, stringheight,
-                                             ft_string_get_stride( osds->fts ),
-                                             osds->border_luma, osds->border_cb,
-                                             osds->border_cr, 256, 0, bottom_y );
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
+                                       osds->image_height, osds->image_width * 4,
+                                       ft_string_get_buffer( osds->fts ),
+                                       stringwidth, stringheight,
+                                       ft_string_get_stride( osds->fts ),
+                                       osds->border_luma, osds->border_cb,
+                                       osds->border_cr, 0, 0 );
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
+                                       osds->image_height, osds->image_width * 4,
+                                       ft_string_get_buffer( osds->fts ),
+                                       stringwidth, stringheight,
+                                       ft_string_get_stride( osds->fts ),
+                                       osds->border_luma, osds->border_cb,
+                                       osds->border_cr, 0, bottom_y );
     ft_string_set_text( osds->fts, text, right_x );
     stringwidth = ft_string_get_width( osds->fts );
     stringheight = ft_string_get_height( osds->fts );
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
-                                             osds->image_height, osds->image_width * 4,
-                                             ft_string_get_buffer( osds->fts ),
-                                             stringwidth, stringheight,
-                                             ft_string_get_stride( osds->fts ),
-                                             osds->border_luma, osds->border_cb,
-                                             osds->border_cr, 256, 0, 0 );
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
-                                             osds->image_height, osds->image_width * 4,
-                                             ft_string_get_buffer( osds->fts ),
-                                             stringwidth, stringheight,
-                                             ft_string_get_stride( osds->fts ),
-                                             osds->border_luma, osds->border_cb,
-                                             osds->border_cr, 256, 0, bottom_y );
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
+                                       osds->image_height, osds->image_width * 4,
+                                       ft_string_get_buffer( osds->fts ),
+                                       stringwidth, stringheight,
+                                       ft_string_get_stride( osds->fts ),
+                                       osds->border_luma, osds->border_cb,
+                                       osds->border_cr, 0, 0 );
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
+                                       osds->image_height, osds->image_width * 4,
+                                       ft_string_get_buffer( osds->fts ),
+                                       stringwidth, stringheight,
+                                       ft_string_get_stride( osds->fts ),
+                                       osds->border_luma, osds->border_cb,
+                                       osds->border_cr, 0, bottom_y );
 
     ft_string_set_text( osds->fts, text, textpos_x );
     stringwidth = ft_string_get_width( osds->fts );
