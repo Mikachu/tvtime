@@ -190,7 +190,7 @@ void saver_off(Display *mDisplay) {
          * often. */
         errno = 0;
         result = getpriority( PRIO_PROCESS, 0 );
-        assert( errno != 0 );
+        assert( errno == 0 );
         if( result < 0 ) {
           /* Ensure that we are at least 0 nice. */
           setpriority( PRIO_PROCESS, 0, 0 );
