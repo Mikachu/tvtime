@@ -1281,6 +1281,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 #endif
         greedy_plugin_init();
 
+        weave_plugin_init();
         weavetff_plugin_init();
         weavebff_plugin_init();
     }

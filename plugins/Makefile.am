@@ -29,6 +29,6 @@ endif
 noinst_LTLIBRARIES = libtvtimeplugins.la
 libtvtimeplugins_la_SOURCES = plugins.h linear.c weavetff.c \
 	weavebff.c double.c linearblend.c scalerbob.c greedy.c \
-	vfir.c $(DSCALER_SRCS)
+	vfir.c weave.c $(DSCALER_SRCS)
 libtvtimeplugins_la_LDFLAGS = -static
 
