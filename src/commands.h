@@ -150,6 +150,7 @@ double commands_get_luma_power( commands_t *in );
 double commands_get_horizontal_overscan( commands_t *in );
 double commands_get_vertical_overscan( commands_t *in );
 int commands_get_framerate( commands_t *in );
+void commands_set_framerate( commands_t *in, int framerate );
 int commands_scan_channels( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );

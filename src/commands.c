@@ -982,3 +982,8 @@ double commands_get_vertical_overscan( commands_t *in )
     return in->voverscan;
 }
 
+void commands_set_framerate( commands_t *in, int framerate )
+{
+    in->framerate = framerate % FRAMERATE_MAX;
+}
+
