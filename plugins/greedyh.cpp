@@ -45,12 +45,12 @@ public:
 #undef IS_3DNOW
 #undef FUNCT_NAME
 
-#define IS_3DNOW
+#define IS_MMX
 #define SSE_TYPE MMX
 #define FUNCT_NAME filterDScaler_MMX
 #include "greedyh.asm"
 #undef SSE_TYPE
-#undef IS_3DNOW
+#undef IS_MMX
 #undef FUNCT_NAME
 
     unsigned int GreedyMaxComb;
