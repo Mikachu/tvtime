@@ -866,7 +866,13 @@ osd_list_t *osd_list_new( double pixel_aspect )
             return 0;
         }
         osd_string_show_text( osdl->lines[ i ], "Blank", 100 );
-        osd_string_set_colour( osdl->lines[ i ], 200, 128, 128 );
+        if( !i ) {
+            /* white */
+            osd_string_set_colour( osdl->lines[ i ], 255, 128, 128 );
+        } else {
+            /* wheat */
+            osd_string_set_colour_rgb( osdl->lines[ i ], 0xf5, 0xde, 0xb3 );
+        }
         osd_string_show_border( osdl->lines[ i ], 1 );
     }
 
@@ -887,7 +893,15 @@ void osd_list_set_text( osd_list_t *osdl, int line, const char *text )
 {
     if( line < OSD_LIST_MAX_LINES ) {
         osd_string_show_text( osdl->lines[ line ], text, 100 );
+        if( osd_string_get_width( osdl->lines[ line ] ) > osdl->width ) {
+            osdl->width = osd_string_get_width( osdl->lines[ line ] );
+        }
     }
+}
+
+int osd_list_get_width( osd_list_t *osdl )
+{
+    return osdl->width;
 }
 
 void osd_list_set_lines( osd_list_t *osdl, int numlines )
@@ -900,8 +914,7 @@ void osd_list_set_hilight( osd_list_t *osdl, int pos )
 {
     if( pos < OSD_LIST_MAX_LINES ) {
         if( osdl->hilight >= 0 ) {
-            osd_string_set_colour( osdl->lines[ osdl->hilight ],
-                                   200, 128, 128 );
+            osd_string_set_colour_rgb( osdl->lines[ osdl->hilight ], 0xf5, 0xde, 0xb3 );
             osd_string_rerender( osdl->lines[ osdl->hilight ] );
         }
         osdl->hilight = pos;
@@ -953,17 +966,26 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
     int i;
 
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
-        if( scanline < osd_string_get_height( osdl->lines[ i ] ) ) {
+        if( scanline < (osd_string_get_height( osdl->lines[ i ] ) + 2) ) {
+            int bgwidth = osdl->width - xpos;
+            if( bgwidth > width ) bgwidth = width;
+
             if( !i ) {
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, width, 80 );
+                /* tvtime blue */
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, 150 );
+            } else if( i == osdl->hilight ) {
+                /* white */
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, 80 );
             } else {
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, width, 80 );
+                /* gray */
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, 80 );
             }
+
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
                                                      output, background,
                                                      width, xpos, scanline );
         }
-        scanline -= osd_string_get_height( osdl->lines[ i ] );
+        scanline -= osd_string_get_height( osdl->lines[ i ] ) + 2;
     }
 }
 

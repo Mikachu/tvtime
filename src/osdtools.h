@@ -143,6 +143,7 @@ void osd_list_set_hilight( osd_list_t *osdl, int pos );
 void osd_list_set_text( osd_list_t *osdl, int line, const char *text );
 void osd_list_set_lines( osd_list_t *osdl, int numlines );
 void osd_list_set_timeout( osd_list_t *osdl, int timeout );
+int osd_list_get_width( osd_list_t *osdl );
 int osd_list_visible( osd_list_t *osdl );
 void osd_list_advance_frame( osd_list_t *osdl );
 void osd_list_composite_packed422_scanline( osd_list_t *osdl,

@@ -118,7 +118,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->film_mode = -1;
     osd->mutestate = 0;
     osd->hold = 0;
-    osd->listpos_x = (width * 30) / 100;
+    osd->listpos_x = width / 2;
     osd->listpos_y = (height * 30) / 100;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
@@ -695,10 +695,11 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
     }
 
     if( osd_list_visible( osd->list ) && scanline >= osd->listpos_y ) {
-        int startx;
+        int listpos_x, startx;
         int strx = 0;
 
-        startx = osd->listpos_x - xpos;
+        listpos_x = osd->listpos_x - (osd_list_get_width( osd->list ) / 2);
+        startx = listpos_x - xpos;
 
         if( startx < 0 ) {
             strx = -startx;

@@ -758,11 +758,12 @@ void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
     int nummethods = get_num_deinterlace_methods();
     int i;
 
-    tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() );
+    tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
+    tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
     for( i = 0; i < nummethods; i++ ) {
-        tvtime_osd_list_set_text( osd, i, get_deinterlace_method( i )->name );
+        tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
     }
-    tvtime_osd_list_set_hilight( osd, curmethod );
+    tvtime_osd_list_set_hilight( osd, curmethod + 1 );
     tvtime_osd_show_list( osd, 1 );
 }
 
@@ -770,18 +771,20 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
 
-    tvtime_osd_list_set_lines( osd, 3 );
+    tvtime_osd_list_set_lines( osd, 4 );
 
-    sprintf( text, "Full framerate (%.2ffps)", maxrate );
-    tvtime_osd_list_set_text( osd, 0, text );
+    tvtime_osd_list_set_text( osd, 0, "Frame drop setting" );
 
-    sprintf( text, "Half framerate, top field first (%.2ffps)", maxrate / 2 );
+    sprintf( text, "Full rate: %.2ffps", maxrate );
     tvtime_osd_list_set_text( osd, 1, text );
 
-    sprintf( text, "Half framerate, bottom field first (%.2ffps)", maxrate / 2 );
+    sprintf( text, "Half rate, deinterlace top fields: %.2ffps", maxrate / 2 );
     tvtime_osd_list_set_text( osd, 2, text );
 
-    tvtime_osd_list_set_hilight( osd, mode );
+    sprintf( text, "Half rate, deinterlace bottom fields: %.2ffps", maxrate / 2 );
+    tvtime_osd_list_set_text( osd, 3, text );
+
+    tvtime_osd_list_set_hilight( osd, mode + 1 );
     tvtime_osd_show_list( osd, 1 );
 }
 
