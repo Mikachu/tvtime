@@ -44,8 +44,6 @@ void dscaler_greedyh_plugin_init( void );
 void dscaler_greedy_plugin_init( void );
 void dscaler_videobob_plugin_init( void );
 void dscaler_videoweave_plugin_init( void );
-void dscaler_bob_plugin_init( void );
-void dscaler_weave_plugin_init( void );
 void dscaler_oldgame_plugin_init( void );
 void dscaler_tomsmocomp_plugin_init( void );
 
