@@ -783,11 +783,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
+    menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
