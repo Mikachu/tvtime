@@ -357,9 +357,9 @@ static void wait_for_frame_v4l2( videoinput_t * vidin )
     timeout.tv_usec = 0;
 
     n = select( vidin->grab_fd + 1, &rdset, 0, 0, &timeout );
-
     if( n == -1 ) {
-        fprintf (stderr, "select error.\n");
+        fprintf( stderr, "videoinput: Error waiting for frame: %s\n",
+                 strerror( errno ) );
     } else if( n == 0 ) {
         sigalarm( 0 );
     }
@@ -433,7 +433,7 @@ static void videoinput_start_capture_v4l2( videoinput_t *vidin )
 {
     if( !vidin->is_streaming ) {
         if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
+            fprintf( stderr, "videoinput: Driver refuses to start streaming: %s.\n",
                      strerror( errno ) );
         }
         vidin->is_streaming = 1;
@@ -444,7 +444,7 @@ static void videoinput_stop_capture_v4l2( videoinput_t *vidin )
 {
     if( vidin->is_streaming ) {
         if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver refuses to halt streaming: %s.\n",
+            fprintf( stderr, "videoinput: Driver refuses to stop streaming: %s.\n",
                      strerror( errno ) );
         }
         vidin->is_streaming = 0;
@@ -588,6 +588,14 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             return 0;
         }
 #undef BTTV_VERSION
+
+        if( norm > VIDEOINPUT_NTSC_JP ) {
+            fprintf( stderr, "videoinput: Detected only a V4L1 driver.  The PAL-60 norm\n"
+                             "videoinput: is only available if driver supports V4L2.\n" );
+            close( vidin->grab_fd );
+            free( vidin );
+            return 0;
+        }
     }
 
     /* On initialization, set to input 0.  This is just to start things up. */
@@ -643,8 +651,9 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                 fprintf( stderr, "videoinput: video4linux device '%s' refuses "
                          "to provide YUYV or UYVY format video: %s.\n",
                          v4l_device, strerror( errno ) );
-                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
-                         " indicating your capture card, driver, and the error message above.\n" );
+                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT "\n"
+                                 "videoinput: indicating your capture card, driver, and the\n"
+                                 "videoinput: error message above.\n" );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -654,7 +663,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: Field %d, colorspace %d.\n",
-                 imgformat.fmt.pix.field, imgformat.fmt.pix.colorspace );
+                     imgformat.fmt.pix.field, imgformat.fmt.pix.colorspace );
         }
 
         if( vidin->height != imgformat.fmt.pix.height ) {
@@ -1345,11 +1354,11 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
 
         tuner.index = vidin->tunerid;
         if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
-            fprintf( stderr, "can't get tuner info: %s\n", strerror( errno ) );
+            fprintf( stderr, "videoinput: Can't get tuner info: %s\n",
+                     strerror( errno ) );
         } else {
             vidin->tunerlow = (tuner.capability & V4L2_TUNER_CAP_LOW) ? 1 : 0;
         }
-
     } else {
         struct video_tuner tuner;
         int tuner_number = -1;
@@ -1488,14 +1497,18 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
             struct v4l2_input input;
 
             if( ioctl( vidin->grab_fd, VIDIOC_G_INPUT, &input.index ) < 0 ) {
-                fprintf( stderr, "won't tell us its input: %s\n", strerror( errno ) );
+                fprintf( stderr, "videoinput: Driver won't tell us its input: %s\n",
+                         strerror( errno ) );
             } else if( input.index != inputnum ) {
-                fprintf( stderr, "input is wrong\n" );
+                fprintf( stderr, "videoinput: Driver refuses to switch to input %d.\n",
+                         inputnum );
+                inputnum = input.index;
             }
             vidin->curinput = inputnum;
 
             if( ioctl( vidin->grab_fd, VIDIOC_ENUMINPUT, &input ) < 0 ) {
-                fprintf( stderr, "won't tell us input info: %s\n", strerror( errno ) );
+                fprintf( stderr, "videoinput: Driver won't tell us input info: %s\n",
+                         strerror( errno ) );
             } else {
                 snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", input.name );
                 vidin->hastuner = input.type == V4L2_INPUT_TYPE_TUNER;
@@ -1504,13 +1517,12 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
         }
 
         if( ioctl( vidin->grab_fd, VIDIOC_G_STD, &std ) < 0 ) {
-            fprintf( stderr, "can't get the current standard: %s\n",
+            fprintf( stderr, "videoinput: Driver won't tell us its norm: %s\n",
                      strerror( errno ) );
         } else {
-            fprintf( stderr, "standard is %llx\n", std );
             std = videoinput_get_v4l2_norm( vidin->norm );
             if( ioctl( vidin->grab_fd, VIDIOC_S_STD, &std ) < 0 ) {
-                fprintf( stderr, "can't set the current standard: %s\n",
+                fprintf( stderr, "videoinput: Driver refuses to set norm: %s\n",
                          strerror( errno ) );
             }
         }
