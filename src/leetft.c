@@ -34,6 +34,8 @@ static int ft_lib_refcount = 0;
 static FT_Library ft_lib = 0;
 
 #define MAX_STRING_LENGTH 1024
+#define NUM_GLYPHS 256
+#define HASHTABLE_SIZE 303 /* is a prime number. */
 
 struct ft_font_s
 {
@@ -44,6 +46,7 @@ struct ft_font_s
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
     int max_height;
+    iconv_t cd;
 };
 
 typedef struct ft_glyph_data_s ft_glyph_data_t;
@@ -127,8 +130,15 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     if( !font ) return 0;
 
-    font->glyphdata = hashtable_init( 1789 ); /* 1789 is a prime number. */
+    font->cd = iconv_open ("WCHAR_T", "UTF-8");
+    if ( font->cd == (iconv_t) -1) {
+	free (font);
+	return 0;
+    }
+
+    font->glyphdata = hashtable_init( HASHTABLE_SIZE );
     if( !font->glyphdata ) {
+	iconv_close (font->cd);
         free( font );
         return 0;
     }
@@ -137,6 +147,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         if( FT_Init_FreeType( &ft_lib ) ) {
             fprintf( stderr, "ftfont: Can't load freetype library.\n" );
             hashtable_destroy( font->glyphdata );
+	    iconv_close (font->cd);
             free( font );
             return 0;
         }
@@ -150,6 +161,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
             FT_Done_FreeType( ft_lib );
         }
         hashtable_destroy( font->glyphdata );
+	iconv_close (font->cd);
         free( font );
         return 0;
     }
@@ -169,7 +181,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     bbox.yMin = INT_MAX;
     bbox.yMax = -INT_MAX;
 
-    for( i = 0; i < 256; i++ ) {
+    for( i = 0; i < NUM_GLYPHS; i++ ) {
         FT_BBox glyph_bbox;
 
         if( ft_cache_glyph( font, i, &glyph_bbox ) ) {
@@ -179,7 +191,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     }
 
     font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
-
+    
     return font;
 }
 
@@ -187,7 +199,7 @@ void ft_font_delete( ft_font_t *font )
 {
     int i;
 
-    for( i = 0; i < 256; i++ ) {
+    for( i = 0; i < NUM_GLYPHS; i++ ) {
         ft_glyph_data_t *cur;
 
         cur = hashtable_lookup( font->glyphdata, i );
@@ -200,6 +212,7 @@ void ft_font_delete( ft_font_t *font )
 
     FT_Done_Face( font->face );
     hashtable_destroy( font->glyphdata );
+    iconv_close (font->cd);
     free( font );
 
     ft_lib_refcount--;
@@ -341,7 +354,6 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
 {
     FT_BBox string_bbox;
     int push_x, i;
-    iconv_t cd;
     const char *inbuf = ntext;
     size_t inbytesleft;
     wchar_t wtext[100];
@@ -354,16 +366,12 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
         return;
     }
 
-    cd = iconv_open ("WCHAR_T", "UTF-8");
     
-    if (cd == (iconv_t) -1)
-        return; // How do we report errors here?
-
     // Yes, strlen. I want to know how many bytes, not how many characters:
     inbytesleft = strlen (ntext);
     
     while (inbytesleft > 0) {
-        int ret = iconv (cd,
+        int ret = iconv (font->cd,
                          (char**)&inbuf, &inbytesleft,
                          (char**)&outbuf, &outbytesleft);
         if (ret == -1) {
