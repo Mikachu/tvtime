@@ -142,10 +142,6 @@ enum menu_type
     MENU_REDIRECT,
     MENU_FAVORITES,
     MENU_DEINTERLACER,
-    MENU_BRIGHTNESS,
-    MENU_CONTRAST,
-    MENU_COLOUR,
-    MENU_HUE,
     MENU_USER
 };
 
@@ -159,11 +155,7 @@ static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
     { "favorites", MENU_FAVORITES, 0 },
     { "deinterlacer", MENU_DEINTERLACER, 0 },
-    { "brightness", MENU_BRIGHTNESS, 0 },
-    { "contrast", MENU_CONTRAST, 0 },
-    { "colour", MENU_COLOUR, 0 },
-    { "color", MENU_COLOUR, 0 },
-    { "hue", MENU_HUE, 0 }
+    { "color", MENU_REDIRECT, "colour" }
 };
 
 static int tvtime_num_builtin_menus( void )
@@ -429,82 +421,177 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu = menu_new( "root-tuner" );
     menu_set_text( menu, 0, "Setup" );
     menu_set_text( menu, 1, "Station management" );
-    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 2, "Input configuration" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 3, "Picture settings" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 4, "Video processing" );
-    menu_set_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 5, "Exit" );
-    menu_set_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    menu_set_command( menu, 0, TVTIME_MENU_EXIT, 0 );
+    menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "root-notuner" );
     menu_set_text( menu, 0, "Setup" );
     menu_set_text( menu, 1, "Input configuration" );
-    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 2, "Picture settings" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 3, "Video processing" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 4, "Exit" );
-    menu_set_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    menu_set_command( menu, 0, TVTIME_MENU_EXIT, 0 );
+    menu_set_enter_command( menu, 4, TVTIME_MENU_EXIT, 0 );
+    menu_set_right_command( menu, 4, TVTIME_MENU_EXIT, 0 );
+    menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations" );
     menu_set_text( menu, 0, "Setup - Station management" );
     menu_set_text( menu, 1, "Renumber current channel" );
-    menu_set_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_enter_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_right_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 2, "Rename current channel" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "rename" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "rename" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "rename" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 3, "Station favorites" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
-    menu_set_text( menu, 4, "Scan channels for frequency" );
-    menu_set_text( menu, 4, "Back" );
-    menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 4, "Scan channels for signal" );
+    menu_set_enter_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_right_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 5, "Back" );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
     menu_set_text( menu, 1, "Device setup" );
-    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 2, "Data services" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 3, "Back" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
     menu_set_text( menu, 0, "Setup - Video processing" );
     menu_set_text( menu, 1, "Deinterlacer configuration" );
-    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 2, "Attempted framerate" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 3, "Input filters" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 4, "Back" );
-    menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "picture" );
     menu_set_text( menu, 0, "Setup - Picture" );
     menu_set_text( menu, 1, "Brightness" );
-    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 2, "Contrast" );
-    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 3, "Colour" );
-    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 4, "Hue" );
-    menu_set_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_text( menu, 5, "Back" );
-    menu_set_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "brightness" );
+    menu_set_text( menu, 0, "Setup - Picture - Brightness" );
+    menu_set_text( menu, 1, "< Adjust >" );
+    menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
+    menu_set_right_command( menu, 1, TVTIME_BRIGHTNESS_UP, "" );
+    menu_set_left_command( menu, 1, TVTIME_BRIGHTNESS_DOWN, "" );
+    menu_set_text( menu, 2, "Back" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "contrast" );
+    menu_set_text( menu, 0, "Setup - Picture - Contrast" );
+    menu_set_text( menu, 1, "< Adjust >" );
+    menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
+    menu_set_right_command( menu, 1, TVTIME_CONTRAST_UP, "" );
+    menu_set_left_command( menu, 1, TVTIME_CONTRAST_DOWN, "" );
+    menu_set_text( menu, 2, "Back" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "colour" );
+    menu_set_text( menu, 0, "Setup - Picture - Colour" );
+    menu_set_text( menu, 1, "< Adjust >" );
+    menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
+    menu_set_right_command( menu, 1, TVTIME_COLOUR_UP, "" );
+    menu_set_left_command( menu, 1, TVTIME_COLOUR_DOWN, "" );
+    menu_set_text( menu, 2, "Back" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "hue" );
+    menu_set_text( menu, 0, "Setup - Picture - Hue" );
+    menu_set_text( menu, 1, "< Adjust >" );
+    menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
+    menu_set_right_command( menu, 1, TVTIME_HUE_UP, "" );
+    menu_set_left_command( menu, 1, TVTIME_HUE_DOWN, "" );
+    menu_set_text( menu, 2, "Back" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     reinit_tuner( cmd );
@@ -582,14 +669,9 @@ static void menu_enter( commands_t *cmd )
             }
         }
         menu_off( cmd );
-    } else if( cmd->curmenu == MENU_BRIGHTNESS || cmd->curmenu == MENU_CONTRAST ||
-               cmd->curmenu == MENU_COLOUR || cmd->curmenu == MENU_HUE ) {
-        if( cmd->curmenupos == 1 ) {
-            commands_handle( cmd, TVTIME_SHOW_MENU, "picture" );
-        }
     } else if( cmd->curmenu == MENU_USER ) {
-        int command = menu_get_command( cmd->curusermenu, cmd->curmenupos + 1 );
-        const char *argument = menu_get_argument( cmd->curusermenu, cmd->curmenupos + 1 );
+        int command = menu_get_enter_command( cmd->curusermenu, cmd->curmenupos + 1 );
+        const char *argument = menu_get_enter_argument( cmd->curusermenu, cmd->curmenupos + 1 );
 
         /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
         if( command != TVTIME_MENU_ENTER ) {
@@ -602,33 +684,9 @@ static void menu_left( commands_t *cmd )
 {
     if( cmd->curmenu == MENU_FAVORITES ) {
         commands_handle( cmd, TVTIME_SHOW_MENU, "stations" );
-    } else if( cmd->curmenu == MENU_BRIGHTNESS ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_BRIGHTNESS_DOWN, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_CONTRAST ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_CONTRAST_DOWN, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_COLOUR ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_COLOUR_DOWN, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_HUE ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_HUE_DOWN, "" );
-        } else {
-            menu_enter( cmd );
-        }
     } else if( cmd->curmenu == MENU_USER ) {
-        int command = menu_get_command( cmd->curusermenu, 0 );
-        const char *argument = menu_get_argument( cmd->curusermenu, 0 );
+        int command = menu_get_left_command( cmd->curusermenu, cmd->curmenupos + 1 );
+        const char *argument = menu_get_left_argument( cmd->curusermenu, cmd->curmenupos + 1 );
 
         /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
         if( command != TVTIME_MENU_ENTER ) {
@@ -639,32 +697,16 @@ static void menu_left( commands_t *cmd )
 
 static void menu_right( commands_t *cmd )
 {
-    if( cmd->curmenu == MENU_BRIGHTNESS ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_BRIGHTNESS_UP, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_CONTRAST ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_CONTRAST_UP, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_COLOUR ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_COLOUR_UP, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_HUE ) {
-        if( cmd->curmenupos == 0 ) {
-            commands_handle( cmd, TVTIME_HUE_UP, "" );
-        } else {
-            menu_enter( cmd );
-        }
-    } else if( cmd->curmenu == MENU_FAVORITES || cmd->curmenu == MENU_USER ) {
+    if( cmd->curmenu == MENU_FAVORITES ) {
         menu_enter( cmd );
+    } else if( cmd->curmenu == MENU_USER ) {
+        int command = menu_get_right_command( cmd->curusermenu, cmd->curmenupos + 1 );
+        const char *argument = menu_get_right_argument( cmd->curusermenu, cmd->curmenupos + 1 );
+
+        /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
+        if( command != TVTIME_MENU_ENTER ) {
+            commands_handle( cmd, command, argument );
+        }
     }
 }
 
@@ -683,21 +725,6 @@ static void display_current_menu( commands_t *cmd )
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, "Add current station" );
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, "Exit" );
         cmd->curmenusize = cmd->numfavorites + 2;
-    } else if( cmd->curmenu == MENU_BRIGHTNESS || cmd->curmenu == MENU_CONTRAST ||
-               cmd->curmenu == MENU_COLOUR || cmd->curmenu == MENU_HUE ) {
-        tvtime_osd_list_set_lines( cmd->osd, 3 );
-        if( cmd->curmenu == MENU_BRIGHTNESS ) {
-            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Brightness" );
-        } else if( cmd->curmenu == MENU_CONTRAST ) {
-            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Contrast" );
-        } else if( cmd->curmenu == MENU_COLOUR ) {
-            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Colour" );
-        } else if( cmd->curmenu == MENU_HUE ) {
-            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Hue" );
-        }
-        tvtime_osd_list_set_text( cmd->osd, 1, "< Adjust >" );
-        tvtime_osd_list_set_text( cmd->osd, 2, "Back" );
-        cmd->curmenusize = 2;
     } else if( cmd->curmenu == MENU_USER && cmd->curusermenu ) {
         tvtime_osd_list_set_lines( cmd->osd, menu_get_num_lines( cmd->curusermenu ) );
         for( i = 0; i < menu_get_num_lines( cmd->curusermenu ); i++ ) {
@@ -796,9 +823,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     if( tvtime_cmd == TVTIME_NOCOMMAND ) return;
 
+    /*
     if( cmd->menuactive && !tvtime_is_menu_command( tvtime_cmd ) && cmd->curusermenu ) {
         menu_off( cmd );
     }
+    */
 
     if( cmd->menuactive && tvtime_is_menu_command( tvtime_cmd ) ) {
         int x, y, line;
