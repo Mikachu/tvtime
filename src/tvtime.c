@@ -1856,6 +1856,8 @@ int main( int argc, char **argv )
     free( saveframe );
     free( fadeframe );
     free( blueframe );
+
+    fprintf( stderr, "tvtime: Thank you for using tvtime.\n" );
     return 0;
 }
 
