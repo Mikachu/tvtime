@@ -1005,6 +1005,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
+    int filename_specified = 0;
     char c;
 
     if( argc == 1 ) {
@@ -1019,6 +1020,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         case 'm': ct->fullscreen = 1; break;
         case 'M': ct->fullscreen = 0; break;
         case 'F': if( ct->config_filename ) free( ct->config_filename );
+                  filename_specified = 1;
                   ct->config_filename = expand_user_path( optarg );
                   if( ct->config_filename ) {
                       lfprintf( stderr,
@@ -1099,6 +1101,24 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
             print_config_usage( argv );
             return 0;
         }
+    }
+
+    if( !filename_specified ) {
+        char *fifofile = get_tvtime_fifo_filename( config_get_uid( ct ) );
+        int fifofd;
+
+        if( !fifofile ) {
+            lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
+            return 0;
+        }
+
+        fifofd = open( fifofile, O_WRONLY | O_NONBLOCK );
+        if( fifofd >= 0 ) {
+            lfprintf( stderr,
+                      _("Cannot update configuration while tvtime running.\n") );
+            return 0;
+        }
+        close( fifofd );
     }
 
     ct->doc = configsave_open( ct->config_filename );
