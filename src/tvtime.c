@@ -755,7 +755,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Attempting to aquire "
                          "performance-enhancing features.\n" );
     }
-    if( vgasync_init( verbose ) && verbose ) {
+    if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
         fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
         use_vgasync = 1;
     } else if( verbose ) {

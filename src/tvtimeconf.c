@@ -312,8 +312,10 @@ config_t *config_new( int argc, char **argv )
     if( parser_new( &(ct->pf), configFile ) ) {
         config_init( ct );
     } else {
-        fprintf( stderr, "\n*** Notice: tvtime user config file "
-                         "has changed from ~/.tvtimerc to ~/.tvtime/tvtimerc\n\n" );
+        fprintf( stderr, "\n*** Notice: tvtime user config file has changed!\n"
+                           "*** Old ~/.tvtimerc now belongs at ~/.tvtime/tvtimerc\n"
+                           "*** Many of the options have also changed, so please check\n"
+                           "*** out the new default config file!\n\n" );
 
         strncpy( base, CONFDIR, 245 );
         strcat( base, "/tvtimerc" );
