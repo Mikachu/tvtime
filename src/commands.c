@@ -245,7 +245,7 @@ static void reinit_tuner( commands_t *in )
             snprintf( channel_display, sizeof( channel_display ), "%d",
                       station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_norm( in->osd, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
-            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
             tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
@@ -528,7 +528,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             in->audio_counter = -1;
             videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
             if( in->osd ) {
-                tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+                tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
                 tvtime_osd_show_info( in->osd );
             }
         }
@@ -905,7 +905,7 @@ void commands_next_frame( commands_t *in )
     if( in->audio_counter == 0 ) {
         videoinput_set_audio_mode( in->vidin, VIDEOINPUT_STEREO );
         if( in->osd ) {
-            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_show_info( in->osd );
         }
         in->audio_counter = -1;

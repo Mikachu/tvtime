@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -151,6 +152,34 @@ static int videoinput_get_v4l1_norm( int norm )
     }
 }
 
+static int videoinput_get_audmode_v4l2( int mode )
+{
+    if( mode == VIDEOINPUT_MONO ) {
+        return V4L2_TUNER_MODE_MONO;
+    } else if( mode == VIDEOINPUT_STEREO ) {
+        return V4L2_TUNER_MODE_STEREO;
+    } else if( mode == VIDEOINPUT_LANG1 ) {
+        return V4L2_TUNER_MODE_LANG1;
+    } else if( mode == VIDEOINPUT_LANG2 ) {
+        return V4L2_TUNER_MODE_LANG2;
+    }
+    return V4L2_TUNER_MODE_MONO;
+}
+
+static int videoinput_is_audmode_supported_v4l2( uint32_t rxchans, int mode )
+{
+    if( mode == VIDEOINPUT_MONO ) {
+        return (rxchans & V4L2_TUNER_SUB_MONO) ? 1 : 0;
+    } else if( mode == VIDEOINPUT_STEREO ) {
+        return (rxchans & V4L2_TUNER_SUB_STEREO) ? 1 : 0;
+    } else if( mode == VIDEOINPUT_LANG1 ) {
+        return (rxchans & V4L2_TUNER_SUB_LANG1) ? 1 : 0;
+    } else if( mode == VIDEOINPUT_LANG2 ) {
+        return (rxchans & V4L2_TUNER_SUB_LANG2) ? 1 : 0;
+    }
+    return 1;
+}
+
 int videoinput_get_norm_number( const char *name )
 {
     int i;
@@ -189,23 +218,6 @@ static int videoinput_next_compatible_norm( int norm, int isbttv )
     return norm;
 }
 
-const char *videoinput_get_audio_mode_name( int mode )
-{
-    if( mode == VIDEO_SOUND_MONO ) {
-        return "Mono";
-    } else if( mode == VIDEO_SOUND_STEREO ) {
-        return "Stereo";
-    } else if( mode == VIDEO_SOUND_LANG1 ) {
-        return "Language 1";
-    } else if( mode == VIDEO_SOUND_LANG2 ) {
-        return "Language 2";
-    } else if( mode == 0 ) {
-        return "Unset";
-    } else {
-        return "ERROR";
-    }
-}
-
 typedef struct capture_buffer_s
 {
     struct v4l2_buffer vidbuf;
@@ -235,7 +247,7 @@ struct videoinput_s
     int curframe;
     int numframes;
 
-    int has_audio;
+    int hasaudio;
     int audiomode;
     int change_muted;
     int user_muted;
@@ -263,6 +275,28 @@ struct videoinput_s
     int grab_size;
     uint8_t *grab_data;
 };
+
+const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode )
+{
+    if( mode == VIDEO_SOUND_MONO ) {
+        return "Mono";
+    } else if( mode == VIDEO_SOUND_STEREO ) {
+        return "Stereo";
+    } else if( vidin->norm == VIDEOINPUT_NTSC ) {
+        if( mode == VIDEO_SOUND_LANG2 ) {
+            return "SAP";
+        }
+    } else {
+        if( mode == VIDEO_SOUND_LANG1 ) {
+            return "Language 1";
+        } else if( mode == VIDEO_SOUND_LANG2 ) {
+            return "Language 2";
+        }
+    }
+
+    return "ERROR";
+}
+
 
 static int alarms;
 
@@ -459,7 +493,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->signal_acquire_wait = 0;
     vidin->change_muted = 1;
     vidin->user_muted = 0;
-    vidin->has_audio = 1;
+    vidin->hasaudio = 1;
+    vidin->audiomode = 0;
     vidin->curinput = 0;
     vidin->have_mmap = 0;
     vidin->is_streaming = 0;
@@ -563,7 +598,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         struct video_audio audio;
 
         if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) && vidin->verbose ) {
-            vidin->has_audio = 0;
+            vidin->hasaudio = 0;
             fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
                      strerror( errno ) );
         } else if( verbose ) {
@@ -1032,7 +1067,7 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
         }
     }
 
-    if( vidin->has_audio && mute != is_muted ) {
+    if( vidin->hasaudio && mute != is_muted ) {
         if( vidin->isv4l2 ) {
             struct v4l2_control control;
 
@@ -1075,47 +1110,70 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
 
 void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 {
-    if( !vidin->isv4l2 ) {
-        struct video_audio audio;
+    if( vidin->audiomode != mode ) {
+        if( vidin->isv4l2 ) {
+            if( vidin->hastuner ) {
+                struct v4l2_tuner tuner;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
-            vidin->has_audio = 0;
-            if( vidin->verbose ) {
-                fprintf( stderr, "videoinput: Audio state query failed (got '%s').\n",
-                         strerror( errno ) );
-            }
-        } else if( mode != audio.mode ) {
-            int was_muted = (audio.flags & VIDEO_AUDIO_MUTE);
-
-            /* Set the mode. */
-            audio.mode = mode;
-            // vidin->audio.volume = 65535;
-            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
-                fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
-                         "might cause this.  Post a bug report with your driver info to "
-                         PACKAGE_BUGREPORT "\n" );
-                fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-            }
-            if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) && vidin->verbose ) {
-                vidin->has_audio = 0;
-                fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
-                         strerror( errno ) );
-            }
-            if( audio.mode & mode ) {
-                vidin->audiomode = mode;
-            } else if( audio.mode > mode ) {
-                while( !(audio.mode & mode) && audio.mode > mode ) mode <<= 1;
-                videoinput_set_audio_mode( vidin, mode );
-            } else {
-                if( mode != VIDEO_SOUND_MONO ) {
-                    videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
+                tuner.index = vidin->tunerid;
+                if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
+                    if( vidin->verbose ) {
+                        fprintf( stderr, "videoinput: Can't get tuner audio mode: %s\n",
+                                 strerror( errno ) );
+                    }
                 } else {
-                    vidin->audiomode = VIDEO_SOUND_MONO;
+                    while( mode <= VIDEOINPUT_LANG2 && ((mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC) || !videoinput_is_audmode_supported_v4l2( tuner.rxsubchans, mode )) ) {
+                        mode <<= 1;
+                    }
+                    if( mode > VIDEOINPUT_LANG2 ) {
+                        mode = VIDEOINPUT_MONO;
+                    }
+
+                    memset( &tuner, 0, sizeof( struct v4l2_tuner ) );
+                    tuner.index = vidin->tunerid;
+                    tuner.audmode = videoinput_get_audmode_v4l2( mode );
+                    if( ioctl( vidin->grab_fd, VIDIOC_S_TUNER, &tuner ) < 0 ) {
+                        fprintf( stderr, "videoinput: Can't set tuner audio mode: %s\n",
+                                 strerror( errno ) );
+                    } else {
+                        vidin->audiomode = mode;
+                    }
                 }
             }
-            if( was_muted & !(audio.flags & VIDEO_AUDIO_MUTE) ) {
-                /* Stupid card dropped the mute state, have to go back to being muted. */
-                videoinput_do_mute( vidin, 1 );
+        } else {
+            struct video_audio audio;
+
+            if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
+                if( vidin->verbose ) {
+                    fprintf( stderr, "videoinput: Audio state query failed (got '%s').\n",
+                             strerror( errno ) );
+                }
+            } else {
+                int was_muted = (audio.flags & VIDEO_AUDIO_MUTE);
+
+                while( mode <= VIDEOINPUT_LANG2 && ((mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC) || !(audio.mode & mode)) ) {
+                    mode <<= 1;
+                }
+                if( mode > VIDEOINPUT_LANG2 ) {
+                    mode = VIDEOINPUT_MONO;
+                }
+
+                /* Set the mode. */
+                audio.mode = mode;
+                // vidin->audio.volume = 65535;
+                if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
+                    fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
+                             "might cause this.  Post a bug report with your driver info to "
+                             PACKAGE_BUGREPORT "\n" );
+                    fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+                } else {
+                    vidin->audiomode = mode;
+                }
+
+                if( was_muted & !(audio.flags & VIDEO_AUDIO_MUTE) ) {
+                    /* Stupid card dropped the mute state, have to go back to being muted. */
+                    videoinput_do_mute( vidin, 1 );
+                }
             }
         }
     }

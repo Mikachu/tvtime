@@ -68,6 +68,8 @@ typedef struct videoinput_s videoinput_t;
  */
 #define VIDEOINPUT_MONO    1
 #define VIDEOINPUT_STEREO  2
+#define VIDEOINPUT_LANG1   4
+#define VIDEOINPUT_LANG2   8
 
 /**
  * Returns a text version of the norm.
@@ -82,7 +84,7 @@ int videoinput_get_norm_number( const char *name );
 /**
  * Returns a text version of the audio mode.
  */
-const char *videoinput_get_audio_mode_name( int mode );
+const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode );
 
 /**
  * Create a new input device from the given device name and which input
