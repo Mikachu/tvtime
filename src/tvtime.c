@@ -1027,11 +1027,11 @@ int main( int argc, char **argv )
 
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
-            performance_print_last_frame_stats( perf );
+            performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
             fprintf( stderr, "Speedy time last frame: %dus\n", speedy_get_usecs() );
         }
         if( config_get_debug( ct ) ) {
-            performance_print_frame_drops( perf );
+            performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
         }
         speedy_reset_timer();
 

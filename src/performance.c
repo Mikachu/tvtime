@@ -174,7 +174,7 @@ int performance_get_usecs_of_last_blit( performance_t *perf )
     return perf->last_blit_time;
 }
 
-void performance_print_last_frame_stats( performance_t *perf )
+void performance_print_last_frame_stats( performance_t *perf, int framesize )
 {
     double aquire = ((double) timediff( &perf->aquired_input, &perf->blit_bot_end )) / 1000.0;
     double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
@@ -187,12 +187,14 @@ void performance_print_last_frame_stats( performance_t *perf )
     fprintf( stderr, "tvtime: aquire % 2.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
                      "tvtime:                 build bot % 2.2fms, wait bot % 2.2fms, blit bot % 2.2fms\n",
              aquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
+    fprintf( stderr, "tvtime: system->video memory speed approximately %.3fMB/sec\n",
+             ( ( (double) framesize ) / ( wait_top / 1000.0 ) ) / ( 1024.0 * 1024.0 ) );
     fprintf( stderr, "tvtime: top-to-bot: % 2.2f, bot-to-top: % 2.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
              (double) perf->time_bot_to_top / 1000.0 );
 }
 
-void performance_print_frame_drops( performance_t *perf )
+void performance_print_frame_drops( performance_t *perf, int framesize )
 {
     /* Ignore the first frame drop after a reset. */
     if( !perf->drop_reset ) {
@@ -208,7 +210,7 @@ void performance_print_frame_drops( performance_t *perf )
 
         fprintf( stderr, "tvtime: Frame drop detected (%2.2fms between consecutive frames.\n",
             ((double) timediff( &perf->aquired_input, &perf->lastframetime)) / 1000.0 );
-        performance_print_last_frame_stats( perf );
+        performance_print_last_frame_stats( perf, framesize );
 
         if( build_top >= blit_top && build_top >= build_bot && build_top >= blit_bot ) {
             fprintf( stderr, "tvtime: Took %2.2fms to build a field.\n",
