@@ -24,7 +24,7 @@ AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS)
 AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) -lm
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	parser.c tvtimeconf.c pngoutput.c tvtimeosd.c input.c cpu_accel.c \
