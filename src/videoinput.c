@@ -233,25 +233,6 @@ const char *videoinput_norm_name( int norm )
     }
 }
 
-static const char *get_norm_name( int norm )
-{
-    if( norm == VIDEOINPUT_PAL ) {
-        return "pal";
-    } else if( norm == VIDEOINPUT_SECAM ) {
-        return "secam";
-    } else if( norm == VIDEOINPUT_PAL_NC ) {
-        return "pal-nc";
-    } else if( norm == VIDEOINPUT_PAL_M ) {
-        return "pal-m";
-    } else if( norm == VIDEOINPUT_PAL_N ) {
-        return "pal-n";
-    } else if( norm == VIDEOINPUT_NTSC_JP ) {
-        return "ntsc-jp";
-    }
-
-    return "ntsc";
-}
-
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                               int norm, int verbose )
 {
@@ -321,7 +302,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     } else if( norm > VIDEOINPUT_SECAM ) {
         fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
                  "videoinput: The norm you requested, %s, is only supported for bttv-based cards.\n",
-                 v4l_device, get_norm_name( norm ) );
+                 v4l_device, videoinput_norm_name( norm ) );
         close( vidin->grab_fd );
         free( vidin );
         return 0;
@@ -664,7 +645,9 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
     if (vidin->tuner.tuner > -1) {
 
         if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
-            perror( "ioctl VIDIOCSFREQ" );
+            fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
+                     strerror( errno ) );
+            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
             return 0;
         }
 
@@ -860,7 +843,9 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
     struct video_picture grab_pict;
 
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCGPICT" );
+        fprintf( stderr, "videoinput: Driver won't tell us picture settings: %s\n",
+                 strerror( errno ) );
+        fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
         return;
     }
 
@@ -883,7 +868,9 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
         grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
     }
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCSPICT" );
+        fprintf( stderr, "videoinput: Driver won't let us set picture settings: %s\n",
+                 strerror( errno ) );
+        fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
         return;
     }
 
@@ -898,17 +885,17 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
 
 void videoinput_delete( videoinput_t *vidin )
 {
-
     if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-        perror( "VIDIOCGAUDIO" );
-        return;
-    }
-
-    vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-
-    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-        perror( "VIDIOCSAUDIO" );
-        return;
+        fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
+                 strerror( errno ) );
+        fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+    } else {
+        vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
+                     strerror( errno ) );
+            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+        }
     }
 
     if( vidin->have_mmap ) {
