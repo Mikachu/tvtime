@@ -39,7 +39,7 @@
 #define HAVE_XDPMS
 
 int stop_xscreensaver = 1;
-int stop_kscreensaver = 1;
+int stop_kscreensaver = 0;
 
 static int dpms_disabled=0;
 static int timeout_save=0;
