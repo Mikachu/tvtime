@@ -75,10 +75,43 @@ void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src,
                                 int width );
 
 /* Alpha provided is from 0-256 not 0-255. */
+void blend_packed422_scanline_c( unsigned char *output, unsigned char *src1,
+                                 unsigned char *src2, int width, int pos );
+void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1,
+                                      unsigned char *src2, int width, int pos );
 void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
                                                          unsigned char *input,
                                                          unsigned char *foreground,
                                                          int width, int alpha );
+void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *output,
+                                                              unsigned char *input,
+                                                              unsigned char *foreground,
+                                                              int width, int alpha );
+void composite_packed4444_to_packed422_scanline_c( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *foreground, int width );
+void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
+                                                        unsigned char *input,
+                                                        unsigned char *foreground, int width );
+void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *mask,
+                                                   int width,
+                                                   int textluma, int textcb,
+                                                   int textcr );
+void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
+                                                       unsigned char *input,
+                                                       unsigned char *mask, int width,
+                                                       int textluma, int textcb,
+                                                       int textcr, int alpha );
+void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *mask,
+                                                   int width,
+                                                   int textluma, int textcb,
+                                                   int textcr );
+void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width );
+void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width );
 
 /**
  * Here are the function pointers which will be initialized to point at the
@@ -112,6 +145,8 @@ extern void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
 extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
+extern void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
+                                         unsigned char *src2, int width, int pos );
 
 /**
  * Sets up the function pointers to point at the fastest function available.

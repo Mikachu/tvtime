@@ -36,6 +36,8 @@ void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
 void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
+void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
+                                  unsigned char *src2, int width, int pos );
 
 
 static unsigned int speedy_time = 0;
@@ -960,6 +962,66 @@ void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned cha
     SPEEDY_END();
 }
 
+void blend_packed422_scanline_c( unsigned char *output, unsigned char *src1,
+                                 unsigned char *src2, int width, int pos )
+{
+    if( pos == 0 ) {
+        blit_packed422_scanline( output, src1, width );
+    } else if( pos == 256 ) {
+        blit_packed422_scanline( output, src2, width );
+    } else {
+        width *= 2;
+        while( width-- ) {
+            *output++ = ( (*src1++ * ( 256 - pos )) + (*src2++ * pos) + 0x80 ) >> 8;
+        }
+    }
+}
+
+void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1,
+                                      unsigned char *src2, int width, int pos )
+{
+    if( pos <= 0 ) {
+        blit_packed422_scanline( output, src1, width );
+    } else if( pos >= 256 ) {
+        blit_packed422_scanline( output, src2, width );
+    } else {
+        const int64_t all256 = 0x0100010001000100;
+        const int64_t round  = 0x0080008000800080;
+
+        SPEEDY_START();
+
+        movd_m2r( pos, mm0 );
+        pshufw_r2r( mm0, mm0, 0 );
+        movq_m2r( all256, mm1 );
+        psubw_r2r( mm0, mm1 );
+        pxor_r2r( mm7, mm7 );
+
+        for( width /= 2; width; width-- ) {
+            movd_m2r( *src1, mm3 );
+            movd_m2r( *src2, mm4 );
+            punpcklbw_r2r( mm7, mm3 );
+            punpcklbw_r2r( mm7, mm4 );
+
+            pmullw_r2r( mm1, mm3 );
+            pmullw_r2r( mm0, mm4 );
+            paddw_r2r( mm4, mm3 );
+            paddw_m2r( round, mm3 );
+            psrlw_i2r( 8, mm3 );
+
+            packuswb_r2r( mm3, mm3 );
+            movd_r2m( mm3, *output );
+
+            output += 4;
+            src1 += 4;
+            src2 += 4;
+        }
+        emms();
+
+        SPEEDY_END();
+    }
+}
+
+
 static uint32_t speedy_accel;
 
 void setup_speedy_calls( void )
@@ -975,6 +1037,7 @@ void setup_speedy_calls( void )
     composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_c;
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
+    blend_packed422_scanline = blend_packed422_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
@@ -986,6 +1049,7 @@ void setup_speedy_calls( void )
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
         premultiply_packed4444_scanline = premultiply_packed4444_scanline_mmxext;
+        blend_packed422_scanline = blend_packed422_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;

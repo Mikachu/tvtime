@@ -39,9 +39,6 @@ void composite_bars_packed4444_scanline( unsigned char *output,
                                          int percentage );
 
 
-/* Alpha/pos provided is from 0-256 not 0-255. */
-void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
-                                   unsigned char *src2, int width, int pos );
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );
 void cheap_packed422_to_packed444_scanline( unsigned char *output,

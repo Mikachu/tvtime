@@ -120,7 +120,7 @@ static void crossfade_frame( unsigned char *output,
                              int src1stride, int src2stride, int pos )
 {
     while( height-- ) {
-        crossfade_packed422_scanline( output, src1, src2, width, pos );
+        blend_packed422_scanline( output, src1, src2, width, pos );
         output += outstride;
         src1 += src1stride;
         src2 += src2stride;
