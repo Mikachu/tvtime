@@ -6,9 +6,9 @@
 # improvements.
 msgid ""
 msgstr ""
-"Project-Id-Version: tvtime 0.9.11\n"
+"Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-11-04 14:34-0400\n"
+"POT-Creation-Date: 2003-11-13 23:54-0400\n"
 "PO-Revision-Date: 2003-11-20 00:24+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
@@ -936,7 +936,8 @@ msgstr "  -c, --channel=KANAL        Välj kanal vid uppstart.\n"
 #: src/tvtimeconf.c:646 src/tvtimeconf.c:699 src/tvtimeconf.c:746
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-msgstr "  -d, --device=ENHET         video4linux-enhet (/dev/video0 om ej vald)\n"
+msgstr ""
+"  -d, --device=ENHET         video4linux-enhet (/dev/video0 om ej vald)\n"
 
 #: src/tvtimeconf.c:647 src/tvtimeconf.c:700
 msgid ""
@@ -1006,7 +1007,8 @@ msgstr ""
 #: src/tvtimeconf.c:668 src/tvtimeconf.c:721 src/tvtimeconf.c:749
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-msgstr "  -i, --input=SIGNALNUMMER   video4linux signalnummer (0 om ej vald).\n"
+msgstr ""
+"  -i, --input=SIGNALNUMMER   video4linux signalnummer (0 om ej vald).\n"
 
 #: src/tvtimeconf.c:669 src/tvtimeconf.c:722
 msgid ""
@@ -1097,9 +1099,12 @@ msgstr ""
 "                             (/dev/mixer:line om ej vald)\n"
 "\n"
 "                             Giltiga kanaler:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
 "                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:731
@@ -1146,7 +1151,7 @@ msgstr ""
 "Kan ej initiera teckenkonverterare (från UTF-8 till %s):\n"
 "fel vid iconv_open (%s).\n"
 
-#: src/utils.c:621
+#: src/utils.c:623
 #, c-format
 msgid ""
 "\n"

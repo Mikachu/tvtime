@@ -1,4 +1,8 @@
 
+0.9.12 - Fri Nov 21 23:29:32 AST 2003
+  * vektor: Updated with the xmltv memset fix, aspect ratio fix, and
+      cs and sv translation updates.
+
 0.9.11 - Thu Nov 13 09:39:14 AST 2003
   * vektor: Added a NOOP command for helping to kill our default key
       bindings.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-11-04 14:34-0400\n"
+"POT-Creation-Date: 2003-11-13 23:54-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -845,7 +845,7 @@ msgstr ""
 msgid "Error creating configuration file.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:622 src/utils.c:131
+#: src/tvtimeconf.c:622 src/utils.c:133
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr ""
@@ -1032,22 +1032,22 @@ msgstr ""
 msgid "Mute"
 msgstr ""
 
-#: src/utils.c:115
+#: src/utils.c:117
 #, c-format
 msgid "Cannot create %s: %s\n"
 msgstr ""
 
-#: src/utils.c:121
+#: src/utils.c:123
 #, c-format
 msgid "Cannot open %s: %s\n"
 msgstr ""
 
-#: src/utils.c:610
+#: src/utils.c:612
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 
-#: src/utils.c:621
+#: src/utils.c:623
 #, c-format
 msgid ""
 "\n"
