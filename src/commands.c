@@ -1131,11 +1131,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Toggle XDS decoding", 0xee, 0x80, 0xb6 );
     menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
+    menu_set_right_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );

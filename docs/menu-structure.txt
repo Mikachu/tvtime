@@ -44,6 +44,7 @@ Setup
       Restart with new settings
       Back
     Toggle closed captions [NTSC only]
+    Toggle XDS decoding [NTSC only]
     Back
   Picture
     Brightness
