@@ -120,6 +120,11 @@ int videoinput_get_width( videoinput_t *vidin );
 int videoinput_get_height( videoinput_t *vidin );
 
 /**
+ * Returns the maximum horizontal resolution for input images.
+ */
+int videoinput_get_maxwidth( videoinput_t *vidin );
+
+/**
  * Returns the current TV norm.
  */
 int videoinput_get_norm( videoinput_t *vidin );

@@ -12,6 +12,8 @@
       a library.
   * vektor: Increase the max number of mouse buttons to 15 (Mikachu has
       a mouse with 11 buttons).
+  * inguin: Offer a "Maximum" item in the horizontal resolution menu in case
+      the capture card can do more then 768 pixels per scanline.
 
 0.9.13 - Sat Sep 25 13:51:13 EDT 2004
   * inguin: German translation of man pages.

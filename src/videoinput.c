@@ -188,6 +188,7 @@ struct videoinput_s
 
     int width;
     int height;
+    int maxwidth;
     int norm;
     int volume;
     int dkmode;
@@ -664,10 +665,27 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
         if( capwidth != imgformat.fmt.pix.width && verbose ) {
             fprintf( stderr, "videoinput: Width %d too high, using %d "
-                             "instead as suggested by the driver.",
+                             "instead as suggested by the driver.\n",
                      capwidth, imgformat.fmt.pix.width );
         }
         vidin->width = imgformat.fmt.pix.width;
+
+        /* Query the maximum input width - I wish there was a nicer way */
+        imgformat.fmt.pix.width = 10000;
+        if( ioctl( vidin->grab_fd, VIDIOC_TRY_FMT, &imgformat ) < 0 ) {
+            vidin->maxwidth = 768;
+            if( verbose ) {
+                fprintf( stderr, "videoinput: Your capture card driver does "
+                                 "not implement the TRY_FMT query.\n"
+                                 "Setting maximum input width to 768.\n" );
+            }
+        } else {
+            vidin->maxwidth = imgformat.fmt.pix.width;
+            if( verbose ) {
+                fprintf( stderr, "videoinput: Maximum input width: %d "
+                                 "pixels.\n", vidin->maxwidth );
+            }
+        }
 
     } else {
         if( ioctl( vidin->grab_fd, VIDIOCGCAP, &caps_v4l1 ) < 0 ) {
@@ -678,10 +696,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             free( vidin );
             return 0;
         }
+        vidin->maxwidth = caps_v4l1.maxwidth;
+        if( verbose ) {
+            fprintf( stderr, "videoinput: Maximum input width: %d pixels.\n",
+                     vidin->maxwidth );
+        }
         if( capwidth > caps_v4l1.maxwidth ) {
             if( verbose ) {
                 fprintf( stderr, "videoinput: Width %d too high, using %d "
-                                 "instead as suggested by the driver.",
+                                 "instead as suggested by the driver.\n",
                          capwidth, caps_v4l1.maxwidth );
             }
             capwidth = caps_v4l1.maxwidth;
@@ -689,7 +712,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( capwidth < caps_v4l1.minwidth ) {
             if( verbose ) {
                 fprintf( stderr, "videoinput: Width %d too low, using %d "
-                                 "instead as suggested by the driver.",
+                                 "instead as suggested by the driver.\n",
                          capwidth, caps_v4l1.minwidth );
             }
             capwidth = caps_v4l1.minwidth;
@@ -1659,6 +1682,11 @@ int videoinput_get_width( videoinput_t *vidin )
 int videoinput_get_height( videoinput_t *vidin )
 {
     return vidin->height;
+}
+
+int videoinput_get_maxwidth( videoinput_t *vidin )
+{
+    return vidin->maxwidth;
 }
 
 int videoinput_get_norm( videoinput_t *vidin )

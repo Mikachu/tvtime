@@ -798,9 +798,10 @@ static void reset_audio_boost_menu( menu_t *menu, int curvol )
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "input" );
 }
 
-static void reset_inputwidth_menu( menu_t *menu, int inputwidth )
+static void reset_inputwidth_menu( menu_t *menu, int inputwidth, int maxwidth )
 {
     char string[ 128 ];
+    int entry_num;
 
     snprintf( string, sizeof( string ),
               _("%s  Current: %d pixels"), TVTIME_ICON_INPUTWIDTH, inputwidth );
@@ -832,15 +833,27 @@ static void reset_inputwidth_menu( menu_t *menu, int inputwidth )
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SET_INPUT_WIDTH, "768" );
 
+    entry_num = 6;
+    if( maxwidth > 768 ) {
+        snprintf( string, sizeof( string ), _("%s  Maximum (%d pixels)"),
+                  (inputwidth == maxwidth) ?
+                      TVTIME_ICON_RADIOON : TVTIME_ICON_RADIOOFF, maxwidth );
+        menu_set_text( menu, entry_num, string );
+        snprintf( string, sizeof( string ), "%d", maxwidth );
+        menu_set_enter_command( menu, entry_num,
+                                TVTIME_SET_INPUT_WIDTH, string );
+        entry_num++;
+    }
     snprintf( string, sizeof( string ), TVTIME_ICON_RESTART "  %s",
               _("Restart with new settings") );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_RESTART, "" );
+    menu_set_text( menu, entry_num, string );
+    menu_set_enter_command( menu, entry_num, TVTIME_RESTART, "" );
+    entry_num++;
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
-    menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "input" );
+    menu_set_text( menu, entry_num, string );
+    menu_set_enter_command( menu, entry_num, TVTIME_SHOW_MENU, "input" );
 }
 
 static void reset_norm_menu( menu_t *menu, const char *norm )
@@ -1018,6 +1031,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_t *cmd = malloc( sizeof( struct commands_s ) );
     char string[ 128 ];
     menu_t *menu;
+    int maxwidth;
 
     if( !cmd ) {
         return 0;
@@ -1339,8 +1353,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, string );
     menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
+    maxwidth = cmd->vidin? videoinput_get_maxwidth( cmd->vidin ) : 0;
     reset_inputwidth_menu( commands_get_menu( cmd, "hres" ),
-                           config_get_inputwidth( cfg ) );
+                           config_get_inputwidth( cfg ), maxwidth);
 
     menu = menu_new( "audiomode" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
@@ -2339,7 +2354,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             const char *curname = menu_get_name( cmd->curusermenu );
             menu_t *sharpmenu = commands_get_menu( cmd, "hres" );
             char message[ 128 ];
-            reset_inputwidth_menu( sharpmenu, cmd->newinputwidth );
+            int maxw = cmd->vidin? videoinput_get_maxwidth( cmd->vidin ) : 0;
+            reset_inputwidth_menu( sharpmenu, cmd->newinputwidth, maxw );
             curname = menu_get_name( cmd->curusermenu );
             commands_refresh_menu( cmd );
             snprintf( message, sizeof( message ),
