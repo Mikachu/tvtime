@@ -449,10 +449,11 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
    valid = true;
 }
 
-void TTFFont::RenderString( unsigned char *output, const char *text, int *width, int *height, int maxx, int maxy )
+void TTFFont::RenderString( unsigned char *output, const char *text,
+                            int *width, int *height, int maxx, int maxy )
 {
    int w, h, inx, iny, i;
-   Raster_Map *rmap;
+   Raster_Map rmap;
 
    calc_size( &w, &h, text );
    if( w <= 0 || h <= 0 ) {
@@ -465,19 +466,15 @@ void TTFFont::RenderString( unsigned char *output, const char *text, int *width,
    *height = h;
    if( *height > maxy ) *height = maxy;
 
-   rmap = create_font_raster( w, h );
+   rmap.width = w;
+   rmap.rows = h;
+   rmap.cols = w;
+   rmap.size = w * h;
+   rmap.bitmap = output;
 
    inx = 0;
    iny = 0;
-   render_text( rmap, text, &inx, &iny );
-
-   for( i = 0; i < *height; i++ ) {
-       unsigned char *curin = ((unsigned char *) rmap->bitmap) + (i * rmap->cols);
-       unsigned char *curout = output + (i * (*width));
-       memcpy( curout, curin, *width );
-   }
-
-   destroy_font_raster( rmap );
+   render_text( &rmap, text, &inx, &iny );
 }
 
 void TTFFont::CalcWidth(const char *text, int *width_return)
