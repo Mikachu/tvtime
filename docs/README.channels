@@ -1,0 +1,73 @@
+
+  Setting up your channel list in tvtime
+  --------------------------------------
+
+  Command reference:
+
+  CHANNEL_SAVE_TUNING (F9)
+    - Saves the current fine tuning settings as a custom channel in the
+      station list.
+
+  CHANNEL_SCAN (F10)
+    - Walks from the current position through the channel list,
+      disabling any channels for which no signal is detected.  This
+      command is only available if signal checking is enabled.
+
+  CHANNEL_ACTIVATE_ALL (F11)
+    - Re-activates all channels in the list.  Use this to re-initialize
+      the channel list before running the scanner if you believe some
+      channels are missing, or if new channels have become available.
+
+  CHANNEL_SKIP (r)
+    - Toggles the current channel as being active or disabled in the
+      station list.  You can use this to manually scan your channels and
+      enable those with signal or disable duplicate stations.
+
+  CHANNEL_RENUMBER (b)
+    - Renumbers the current channel.  This will swap the current channel
+      with the number you type in.  Use this to configure your station
+      list to suit preference or locality.
+
+  stationlist.xml
+  ---------------
+
+  The station listing is read in from the ~/.tvtime/stationlist.xml.
+Channel settings are saved specific to norm and frequency table.
+Entries in a list are in the following form:
+
+       <station name="CNN" active="1" position="18"
+                band="US Cable" channel="18"/>
+       <station name="DSF" active="1" position="12"
+                band="VHF E2-E12" channel="E12"/>
+
+  The possible bands and frequencies available in tvtime are:
+
+    Band name           Stations provided
+    ---------           -----------------
+    US Cable            1 - 125
+    US Two-Way          T7, T8, T9, T10, T11, T12 T13, T14
+    US Broadcast        2 - 83
+    Japan Broadcast     1 - 62
+    Japan Cable         13 - 63
+    VHF E2-E12          E1 - E12
+    VHF S1-S41          S1 - S41
+    VHF Misc            X, Y, Z, Z+1, Z+2
+    VHF France          K01 - K10, KB - KQ, H01 - H19
+    VHF Russia          R1 - R12, SR1 - SR19
+    VHF Australia       AS1 - AS12, AS5A, AS9A
+    VHF Italy           A - H, H1, H2
+    VHF Ireland         I1 - I9
+    UHF                 U21 - U69
+
+  Custom frequencies can be included manually as follows:
+
+       <station name="2" active="1" position="0"
+                band="Custom" channel="55.69MHz"/>
+
+  Future enhancements
+  -------------------
+
+  tvtime still needs a method of editing channel names at runtime
+(should not be hard), a full frequency band scanner, native support for
+the weird frequencies used by some cable providers such as UPC.
+
