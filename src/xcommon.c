@@ -1,3 +1,26 @@
+/**
+ * Copyright (C) 2001, 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
+ *
+ * Common routines for X output drivers.  Uses EWMH code and lots of
+ * help from:
+ *
+ * Ogle - A video player
+ * Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,6 +76,8 @@ static int kicked_out_of_fullscreen = 0;
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
 
+static int wm_is_metacity = 0;
+
 #ifdef HAVE_XTESTEXTENSION
 static KeyCode kc_shift_l; /* Fake key to send. */
 #endif
@@ -95,13 +120,13 @@ static int xv_get_width_for_height( int window_height )
 
     if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
         if( xcommon_verbose ) {
-            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
+            fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
                      sar_frac_n, sar_frac_d );
         }
     } else {
         /* Assume 4:3 aspect ? */
         if( xcommon_verbose ) {
-            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
+            fprintf( stderr, "xcommon: Assuming square pixel display.\n" );
         }
         sar_frac_n = 1;
         sar_frac_d = 1;
@@ -127,6 +152,196 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
 
     XSetWMNormalHints( dpy, win, &hints );
 }
+
+static unsigned long req_serial;        /* used for error handling */
+static int (*prev_xerrhandler)( Display *dpy, XErrorEvent *ev );
+
+static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
+{
+    if( ev->serial == req_serial ) {
+        /* this is an error to the XGetWindowProperty request
+         * most probable the window specified by the property
+         * _WIN_SUPPORTING_WM_CHECK on the root window no longer exists
+         */
+        fprintf( stderr, "xprop_errhandler: error in XGetWindowProperty\n" );
+        return 0;
+    } else {
+        /* if we get another error we should handle it,
+         * so we give it to the previous errorhandler
+         */
+        fprintf( stderr, "xprop_errhandler: unexpected error\n" );
+        return prev_xerrhandler( dpy, ev );
+    }
+}
+
+/**
+ * returns 1 if a window manager compliant to the
+ * Extended Window Manager Hints (EWMH) spec is running.
+ * (version 1.2)
+ * Oterhwise returns 0.
+ */
+static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
+{
+    Atom atom;
+    Atom type_return;
+    Atom type_utf8;
+    int format_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    unsigned char *prop_return = NULL;
+    Window win_id;
+    int status;
+
+    atom = XInternAtom( dpy, "_NET_SUPPORTING_WM_CHECK", True );
+    if( atom == None ) {
+        return 0;
+    }
+
+    if( XGetWindowProperty( dpy, DefaultRootWindow(dpy), atom, 0,
+                            1, False, XA_WINDOW,
+                            &type_return, &format_return, &nitems_return,
+                            &bytes_after_return, &prop_return) != Success ) {
+        fprintf( stderr, "check_for_EWMH: XGetWindowProperty failed\n" );
+        return 0;
+    }
+  
+    if( type_return == None ) {
+        fprintf( stderr, "check_for_EWMH: property does not exist\n" );
+        return 0;
+    }
+
+    if( type_return != XA_WINDOW ) {
+        fprintf( stderr, "check_for_EWMH: XA_WINDOW property has wrong type\n" );
+        if( prop_return != NULL ) {
+            XFree(prop_return);
+        }
+        return 0;
+    } else {
+
+        if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
+
+            win_id = *( (long *) prop_return );
+
+            XFree( prop_return );
+            prop_return = NULL;
+      
+            /* make sure we don't have any unhandled errors */
+            XSync( dpy, False );
+
+            /* set error handler so we can check if XGetWindowProperty failed */
+            prev_xerrhandler = XSetErrorHandler( xprop_errorhandler );
+
+            /* get the serial of the XGetWindowProperty request */
+            req_serial = NextRequest( dpy );
+
+            /* try to get property
+             * this can fail if we have a property with the win_id on the
+             * root window, but the win_id is no longer valid.
+             * This is to check for a stale window manager
+             */
+            status = XGetWindowProperty( dpy, win_id, atom, 0,
+                                         1, False, XA_WINDOW,
+                                         &type_return, &format_return, &nitems_return,
+                                         &bytes_after_return, &prop_return );
+      
+            /* make sure XGetWindowProperty has been processed and any errors
+               have been returned to us */
+            XSync( dpy, False );
+      
+            /* revert to the previous xerrorhandler */
+            XSetErrorHandler( prev_xerrhandler );
+      
+            if( status != Success ) {
+                fprintf( stderr, "check_for_EWMH: XGetWindowProperty failed\n" );
+                return 0;
+            }
+      
+            if( type_return == None ) {
+                fprintf( stderr, "check_for_EWMH: property does not exist\n" );
+                return 0;
+            }
+      
+            if( type_return != XA_WINDOW ) {
+                fprintf( stderr, "check_for_EWMH: property has wrong type (%ld)\n", type_return );
+                if( prop_return != NULL ) {
+                    XFree( prop_return );
+                }
+                return 0;
+            }
+      
+            if( type_return == XA_WINDOW ) {
+
+                if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
+
+                    if( win_id == *( (long *) prop_return ) ) {
+                        // We have successfully detected a EWMH compliant Window Manager
+                        XFree( prop_return );
+
+                        /* check the name of the wm */
+                        atom = XInternAtom(dpy, "_NET_WM_NAME", True);
+                        if( atom != None ) {
+
+                            if( XGetWindowProperty( dpy, win_id, atom, 0,
+                                                    4, False, XA_STRING,
+                                                    &type_return, &format_return,
+                                                    &nitems_return,
+                                                    &bytes_after_return,
+                                                    &prop_return ) != Success ) {
+                                fprintf( stderr, "XGetWindowProperty failed in wm_name\n" );
+                                return 0;
+                            }
+    
+                            if( type_return == None ) {
+                                fprintf( stderr, "wm_name: property does not exist\n" );
+                                return 0;
+                            }
+
+                            if( type_return != XA_STRING ) {
+                                type_utf8 = XInternAtom( dpy, "UTF8_STRING", True );
+                                if( type_utf8 == None ) {
+                                    fprintf( stderr, "wm_name: not UTF8_STRING either\n" );
+                                    return 0;
+                                }
+
+                                if( type_return == type_utf8 ) {
+                                    if( XGetWindowProperty( dpy, win_id, atom, 0,
+                                                            4, False, type_utf8,
+                                                            &type_return, &format_return,
+                                                            &nitems_return,
+                                                            &bytes_after_return,
+                                                            &prop_return ) != Success ) {
+                                        fprintf( stderr, "wm_name: XGetWindowProperty failed\n" );
+                                        return 0;
+                                    }
+
+                                    if(format_return == 8) {
+                                        *wm_name_return = strdup( (char *) prop_return );
+                                    }
+                                }
+                                if(prop_return != NULL) {
+                                    XFree( prop_return );
+                                }
+                            } else {
+                                if(format_return == 8) {
+                                    *wm_name_return = strdup( (char *) prop_return );
+                                }
+                                XFree( prop_return );
+                                /* end name check */
+                            }
+                        }
+                        return 1;
+                    }
+                }
+                XFree( prop_return );
+                return 0;
+            }
+        }
+        XFree( prop_return );
+        return 0;
+    }
+    return 0;
+}
+
 
 /**
  * returns 1 if a window manager compliant to the
@@ -175,14 +390,14 @@ static int check_for_state_fullscreen( Display *dpy )
     
         if( type_return == None ) {
             if( xcommon_verbose ) {
-                fprintf( stderr, "xvoutput: check_for_state_fullscreen: property does not exist\n" );
+                fprintf( stderr, "xcommon: check_for_state_fullscreen: property does not exist\n" );
             }
             return 0;
         }
 
         if( type_return != XA_ATOM ) {
             if( xcommon_verbose ) {
-                fprintf( stderr, "xvoutput: check_for_state_fullscreen: XA_ATOM property has wrong type\n");
+                fprintf( stderr, "xcommon: check_for_state_fullscreen: XA_ATOM property has wrong type\n");
             }
             if( prop_return ) XFree( prop_return );
             return 0;
@@ -236,13 +451,13 @@ static void calculate_video_area( void )
 
     if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
         if( xcommon_verbose ) {
-            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
+            fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
                      sar_frac_n, sar_frac_d );
         }
     } else {
         /* Assume 4:3 aspect ? */
         if( xcommon_verbose ) {
-            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
+            fprintf( stderr, "xcommon: Assuming square pixel display.\n" );
         }
         sar_frac_n = 1;
         sar_frac_d = 1;
@@ -262,7 +477,7 @@ static void calculate_video_area( void )
     video_area.height = curheight;
 
     if( xcommon_verbose ) {
-        fprintf( stderr, "xvoutput: Displaying in a %dx%d window inside %dx%d space.\n",
+        fprintf( stderr, "xcommon: Displaying in a %dx%d window inside %dx%d space.\n",
                  curwidth, curheight, output_width, output_height );
     }
 }
@@ -280,6 +495,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     unsigned long mask;
     int displaywidthratio;
     int displayheightratio;
+    char *wmname;
 
     output_aspect = aspect;
     output_height = init_height;
@@ -288,15 +504,15 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     display = XOpenDisplay( 0 );
     if( !display ) {
         if( getenv( "DISPLAY" ) ) {
-            fprintf( stderr, "xvoutput: Cannot open display '%s'.\n", getenv( "DISPLAY" ) );
+            fprintf( stderr, "xcommon: Cannot open display '%s'.\n", getenv( "DISPLAY" ) );
         } else {
-            fprintf( stderr, "xvoutput: No DISPLAY set, so no output possible!\n" );
+            fprintf( stderr, "xcommon: No DISPLAY set, so no output possible!\n" );
         }
         return 0;
     }
 
     if( xcommon_verbose ) {
-        fprintf( stderr, "xvoutput: Display %s, vendor %s, ",
+        fprintf( stderr, "xcommon: Display %s, vendor %s, ",
         DisplayString( display ), ServerVendor( display ) );
 
         if( strstr( ServerVendor( display ), "XFree86" ) ) {
@@ -347,7 +563,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     DpyInfoUpdateGeometry( display, screen );
 
     if( xcommon_verbose && DpyInfoGetGeometry( display, screen, &displaywidthratio, &displayheightratio ) ) {
-        fprintf( stderr, "xvoutput: Geometry %dx%d, display aspect ratio %.2f\n",
+        fprintf( stderr, "xcommon: Geometry %dx%d, display aspect ratio %.2f\n",
                  displaywidthratio, displayheightratio,
                  (double) displaywidthratio / (double) displayheightratio );
     }
@@ -357,7 +573,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 #endif
     have_xtest = have_xtestextention();
     if( have_xtest && xcommon_verbose ) {
-        fprintf( stderr, "xvoutput: Have XTest, will use it to ping the screensaver.\n" );
+        fprintf( stderr, "xcommon: Have XTest, will use it to ping the screensaver.\n" );
     }
 
     /* Initially, get the best width for our height. */
@@ -411,9 +627,22 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
         XSendEvent( display, DefaultRootWindow( display ), False, mask, &ev );
     }
 
+    if( check_for_EWMH_wm( display, &wmname ) ) {
+        if( xcommon_verbose ) {
+            fprintf( stderr, "xcommon: Window manager is %s.\n", wmname );
+        }
+
+        if( !strcasecmp( wmname, "metacity" ) ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: You are using metacity.  Disabling aspect ratio hints\n"
+                                 "xcommon: since most deployed versions of metacity are still broken.\n" );
+            }
+            wm_is_metacity = 1;
+        }
+    }
     has_ewmh_state_fullscreen = check_for_state_fullscreen( display );
     if( has_ewmh_state_fullscreen && xcommon_verbose ) {
-        fprintf( stderr, "xvoutput: Using EWMH state fullscreen property.\n" );
+        fprintf( stderr, "xcommon: Using EWMH state fullscreen property.\n" );
     }
 
     gc = DefaultGC( display, screen );
@@ -510,7 +739,7 @@ void xcommon_set_window_height( int window_height )
     window_width = xv_get_width_for_height( window_height );
 
     if( xcommon_verbose ) {
-        fprintf( stderr, "xvoutput: Target window size %dx%d.\n", window_width, window_height );
+        fprintf( stderr, "xcommon: Target window size %dx%d.\n", window_width, window_height );
     }
 
     win_changes.width = window_width;
@@ -743,7 +972,7 @@ void xcommon_poll_events( input_t *in )
                 xcommon_exposed = 1;
                 xcommon_clear_screen();
                 if( xcommon_verbose ) {
-                    fprintf( stderr, "xvoutput: Received a map, marking window as visible (%lu).\n",
+                    fprintf( stderr, "xcommon: Received a map, marking window as visible (%lu).\n",
                              event.xany.serial );
                 }
             }
@@ -752,7 +981,7 @@ void xcommon_poll_events( input_t *in )
             if( !output_on_root ) {
                 xcommon_exposed = 0;
                 if( xcommon_verbose ) {
-                    fprintf( stderr, "xvoutput: Received an unmap, marking window as hidden (%lu).\n",
+                    fprintf( stderr, "xcommon: Received an unmap, marking window as hidden (%lu).\n",
                              event.xany.serial );
                 }
             }
@@ -763,7 +992,7 @@ void xcommon_poll_events( input_t *in )
                     if( xcommon_exposed ) {
                         xcommon_exposed = 0;
                         if( xcommon_verbose ) {
-                            fprintf( stderr, "xvoutput: Window fully obscured, marking window as hidden (%lu).\n",
+                            fprintf( stderr, "xcommon: Window fully obscured, marking window as hidden (%lu).\n",
                                      event.xany.serial );
                         }
                     }
@@ -771,7 +1000,7 @@ void xcommon_poll_events( input_t *in )
                     xcommon_exposed = 1;
                     xcommon_clear_screen();
                     if( xcommon_verbose ) {
-                        fprintf( stderr, "xvoutput: Window made visible, marking window as visible (%lu).\n",
+                        fprintf( stderr, "xcommon: Window made visible, marking window as visible (%lu).\n",
                                  event.xany.serial );
                     }
                 }
