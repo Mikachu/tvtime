@@ -302,7 +302,7 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
         dest[ (i*6) + 2 ] = src[ (i*4) + 3 ];
 
         dest[ (i*6) + 3 ] = src[ (i*4) + 2 ];
-        if( i > 3 && i < ((width/2) - 4) ) {
+        if( i > (5*2) && i < ((width/2) - (6*2)) ) {
             dest[ (i*6) + 4 ] = ((  (80*(src[ (i*4) + 1 ] + src[ (i*4) + 5 ]))
                                   - (24*(src[ (i*4) - 3 ] + src[ (i*4) + 9 ]))
                                   + (12*(src[ (i*4) - 7 ] + src[ (i*4) + 13]))
