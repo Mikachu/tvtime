@@ -12,9 +12,9 @@ Setup
     Start scan
     Back
   Input configuration
-    Input sampling   [720]
-    VBI processing   [on | off]
-    Save settings
+    Device setup
+      Sharpness
+    Data services
     Restart with new settings
     Back
   Picture
@@ -34,7 +34,23 @@ Setup
   Video processing
     Deinterlacer configuration
     Attempted framerate
+      Full rate: %.2ffps
+      Half rate, deinterlace top fields: %.2ffps
+      Half rate, deinterlace bottom field, %.2ffps
     Input filters
+      BT8x8 luma correction
+        Enable
+        Disable
+        Back
+      Colour invert
+        Enable
+        Disable
+        Back
+      Mirror
+        Enable
+        Disable
+        Back
+      Back
     Back
   Exit
 
