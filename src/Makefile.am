@@ -47,7 +47,5 @@ tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 
-tvscanner_SOURCES = $(COMMON_SRCS) tvscanner.c
-
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 
