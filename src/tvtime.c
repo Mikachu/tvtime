@@ -600,7 +600,8 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         output += outstride;
         scanline++;
 
-        loop_size = ((frame_height - 2) / 2);
+        /* Something is wrong here. -Billy */
+        loop_size = ((frame_height - 2) / 2) - bottom_field;
         for( i = loop_size; i; --i ) {
             deinterlace_scanline_data_t data;
 
