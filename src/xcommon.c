@@ -1108,10 +1108,16 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
         int x, y, w, h;
   
         xfullscreen_update( xf );
-        xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
+        xfullscreen_get_position( xf, window_area.x, window_area.y,
+                                  &x, &y, &w, &h );
 
         output_width = w;
         output_height = h;
+
+        window_area.x = x;
+        window_area.y = y;
+        window_area.width = w;
+        window_area.height = h;
 
         if( has_ewmh_state_fullscreen ) {
             XEvent ev;
@@ -1145,10 +1151,13 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
         }
     } else {
         XWindowAttributes attrs;
+
         XGetWindowAttributes( display, wm_window, &attrs );
 
         output_width = attrs.width;
         output_height = attrs.height;
+        window_area.width = attrs.width;
+        window_area.height = attrs.height;
 
         if( has_ewmh_state_fullscreen ) {
             XEvent ev;
