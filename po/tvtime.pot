@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-31 01:22+0100\n"
+"POT-Creation-Date: 2003-11-01 19:46-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,8 +79,8 @@ msgstr ""
 msgid "Bottom"
 msgstr ""
 
-#: src/tvtime.c:987
-msgid "Frame drop setting"
+#: src/tvtime.c:987 src/commands.c:1305 src/commands.c:1335
+msgid "Attempted framerate"
 msgstr ""
 
 #: src/tvtime.c:1014
@@ -268,12 +268,12 @@ msgstr ""
 msgid "Thank you for using tvtime.\n"
 msgstr ""
 
-#: src/tvtime.c:2683
+#: src/tvtime.c:2688
 #, c-format
 msgid "Running %s.\n"
 msgstr ""
 
-#: src/tvtime.c:2699
+#: src/tvtime.c:2706
 #, c-format
 msgid ""
 "\n"
@@ -285,7 +285,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:2714
+#: src/tvtime.c:2721
 #, c-format
 msgid ""
 "\n"
@@ -299,7 +299,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:2734
+#: src/tvtime.c:2741
 #, c-format
 msgid ""
 "\n"
@@ -581,10 +581,6 @@ msgstr ""
 
 #: src/commands.c:1301
 msgid "Current deinterlacer description"
-msgstr ""
-
-#: src/commands.c:1305 src/commands.c:1335
-msgid "Attempted framerate"
 msgstr ""
 
 #: src/commands.c:1309 src/commands.c:1341
@@ -1046,12 +1042,12 @@ msgstr ""
 msgid "Cannot open %s: %s\n"
 msgstr ""
 
-#: src/utils.c:603
+#: src/utils.c:607
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 
-#: src/utils.c:614
+#: src/utils.c:618
 #, c-format
 msgid ""
 "\n"
