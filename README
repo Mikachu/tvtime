@@ -37,7 +37,8 @@ usage: ./tvtime [-as] [-w <width>] [-o <mode>] [-d <device>
         -o        Output mode: '422' (default) or '420'.
         -d        video4linux device (defaults to /dev/video0).
         -i        video4linux input number (defaults to 0).
-        -l        Luma correction value (defaults to 1.0).
+        -c        Enable luma correction.
+        -l        Luma correction value (defaults to 1.0).  Use of this implies -c.
         -n        The mode to set the tuner to: PAL, NTSC or SECAM.
                   (defaults to NTSC)
         -f        The channels you are receiving with the tuner
@@ -95,7 +96,7 @@ way that you find improves your mood. :)
 
 4.  Key bindings
 
-  Luma correction
+  Luma correction  (must be enabled with the -c option)
   ---------------
   k              : decrease correction value by 0.1
   l              : increase correction value by 0.1
