@@ -56,7 +56,7 @@ static void build_test_frames( unsigned char *oddframe,
 {
     osd_string_t *test_string;
 
-    test_string = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
+    test_string = osd_string_new( "FreeSansBold.ttf", 80, width, height, 4.0 / 3.0 );
     blit_colour_packed422( oddframe, width, height, width*2, 16, 128, 128 );
     blit_colour_packed422( evenframe, width, height, width*2, 80, 128, 128 );
 

@@ -1,7 +1,7 @@
 
 # you know it, baby
-CC = gcc -Wall -pedantic -O3 -funroll-loops -fomit-frame-pointer
-#CC = gcc -g -Wall -pedantic
+#CC = gcc -Wall -pedantic -O3 -funroll-loops -fomit-frame-pointer
+CC = gcc -g -Wall -pedantic
 
 # libsdl because i'm too cheap to do it myself
 SDLFLAGS = `sdl-config --cflags`

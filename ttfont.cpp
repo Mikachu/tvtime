@@ -179,10 +179,9 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, const char *text,
        xmax = (bbox.xMax + 63) & -64;
        ymax = (bbox.yMax + 63) & -64;
 
-       if (glyphs_cached[j])
+       if (glyphs_cached[j]) {
            rtmp = glyphs_cached[j];
-       else
-       {
+       } else {
            FT_Vector origin;
            FT_BitmapGlyph bmap;
 
