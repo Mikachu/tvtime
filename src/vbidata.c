@@ -448,9 +448,11 @@ static int xds_decode( vbidata_t *vbi, int b1, int b2 )
         vbi->xds_cursor = 0;
     }
 
-    vbi->xds_packet[ vbi->xds_cursor ] = b1;
-    vbi->xds_packet[ vbi->xds_cursor + 1 ] = b2;
-    vbi->xds_cursor += 2;
+    if( vbi->usexds ) {
+        vbi->xds_packet[ vbi->xds_cursor ] = b1;
+        vbi->xds_packet[ vbi->xds_cursor + 1 ] = b2;
+        vbi->xds_cursor += 2;
+    }
 
     if( b1 == 0xf ) {
         parse_xds_packet( vbi, vbi->xds_packet, vbi->xds_cursor );
@@ -817,14 +819,11 @@ int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
         return 1;
     }
 
-    if( !vbi->usexds ) return 1;
-
     if( bottom && xds_decode( vbi, b1, b2 ) ) {
         return 1;
     }
 
     if( !vbi->vs ) return 0;
-
     if( !vbi->enabled ) return 0;
 
     vbi->lastcode = 0;
@@ -1052,7 +1051,7 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
         vbidata_open_device( vbi );
     }
 
-    if( !vbi->enabled && !vbi->usexds ) {
+    if( !vbi->enabled && !vbi->usexds && vbi->open ) {
         vbidata_reset( vbi );
         vbidata_close_device( vbi );
     }
@@ -1066,7 +1065,7 @@ void vbidata_capture_xds( vbidata_t *vbi, int xds )
         vbidata_open_device( vbi );
     }
 
-    if( !vbi->usexds && !vbi->enabled ) {
+    if( !vbi->usexds && !vbi->enabled && vbi->open ) {
         vbidata_reset( vbi );
         vbidata_close_device( vbi );
     }
