@@ -434,14 +434,18 @@ int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
     if( output_fullscreen ) {
         ChangeWindowState( display, window, WINDOW_STATE_FULLSCREEN );
+        /* Disabled for now: this hurts EWMH and multi-head displays.
         XGrabPointer( display, window, True, 0, GrabModeAsync, GrabModeAsync,
                       window, None, CurrentTime );
         XGrabKeyboard( display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime );
+        */
         XDefineCursor( display, window, nocursor );
     } else {
         ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
+        /*
         XUngrabPointer( display, CurrentTime );
         XUngrabKeyboard( display, CurrentTime );
+        */
         XUndefineCursor( display, window );
     }
 
