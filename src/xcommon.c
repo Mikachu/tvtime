@@ -1123,14 +1123,19 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             XEvent ev;
 
             ev.type = ClientMessage;
+            ev.xclient.display = display;
             ev.xclient.window = wm_window;
             ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[ 0 ] = 1; /* _NET_WM_STATE_ADD not an atom just a define. */
+            ev.xclient.data.l[ 0 ] = 1;
             ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
             ev.xclient.data.l[ 2 ] = 0;
+            ev.xclient.data.l[ 3 ] = 0;
+            ev.xclient.data.l[ 4 ] = 0;
 
-            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
+            XSendEvent( display, DefaultRootWindow( display ), False,
+                        SubstructureNotifyMask | SubstructureRedirectMask,
+                        &ev );
         } else {
             /* Show our fullscreen window. */
             XMoveResizeWindow( display, fs_window, x, y, w, h );
@@ -1163,14 +1168,19 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             XEvent ev;
 
             ev.type = ClientMessage;
+            ev.xclient.display = display;
             ev.xclient.window = wm_window;
             ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[ 0 ] = 0; /* _NET_WM_STATE_REMOVE not an atom just a define. */
+            ev.xclient.data.l[ 0 ] = 0;
             ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
             ev.xclient.data.l[ 2 ] = 0;
+            ev.xclient.data.l[ 3 ] = 0;
+            ev.xclient.data.l[ 4 ] = 0;
 
-            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
+            XSendEvent( display, DefaultRootWindow( display ), False,
+                        SubstructureNotifyMask | SubstructureRedirectMask,
+                        &ev );
         } else {
             XReparentWindow( display, output_window, wm_window, 0, 0 );
             XUnmapWindow( display, fs_window );
