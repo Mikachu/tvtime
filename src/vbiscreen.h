@@ -22,6 +22,15 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * The VBI screen object is the closed caption renderer line 21 closed
+ * captions in NTSC video streams.
+ */
+
 typedef struct vbiscreen_s vbiscreen_t;
 
 vbiscreen_t *vbiscreen_new( int video_width, int video_height, 
@@ -46,4 +55,7 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 void vbiscreen_dump_screen_text( vbiscreen_t *vs );
 void vbiscreen_reset( vbiscreen_t *vs );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VBISCREEN_H_INCLUDED */
