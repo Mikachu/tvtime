@@ -163,7 +163,23 @@ static int match_special_key( const char *str )
     return 0;
 }
 
-static void parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
+static void parse_option( config_t *ct, xmlNodePtr node )
+{
+    xmlChar *name;
+    xmlChar *value;
+
+    name = xmlGetProp( node, BAD_CAST "name" );
+    value = xmlGetProp( node, BAD_CAST "value" );
+
+    if( name && value ) {
+        fprintf( stderr, "name is %s, value is %s\n", (char *) name, (char *) value );
+    }
+
+    if( name ) xmlFree( name );
+    if( value ) xmlFree( value );
+}
+
+static void parse_global( config_t *ct, xmlNodePtr node )
 {
     xmlChar *buf;
 
@@ -245,7 +261,7 @@ static void parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
     }
 }
 
-static void parse_keys( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
+static void parse_keys( config_t *ct, xmlNodePtr node )
 {
     xmlChar *buf;
     int key;
@@ -262,7 +278,7 @@ static void parse_keys( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
     }
 }
 
-static void parse_mouse( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
+static void parse_mouse( config_t *ct, xmlNodePtr node )
 {
     xmlChar *buf;
     int button;
@@ -307,12 +323,14 @@ static int conf_xml_parse( config_t *ct, char *configFile )
     node = top->xmlChildrenNode;
     while( node ) {
         if( !xmlIsBlankNode( node ) ) {
-            if( !xmlStrcasecmp(node->name, BAD_CAST "global" ) ) {
-                parse_global( ct, doc, node->xmlChildrenNode );
+            if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
+                parse_option( ct, node );
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "global" ) ) {
+                parse_global( ct, node->xmlChildrenNode );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "keybindings" ) ) {
-                parse_keys( ct, doc, node->xmlChildrenNode );
+                parse_keys( ct, node->xmlChildrenNode );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "mousebindings" ) ) {
-                parse_mouse(ct, doc,node->xmlChildrenNode);
+                parse_mouse(ct, node->xmlChildrenNode);
             }
         }
         node = node->next;
