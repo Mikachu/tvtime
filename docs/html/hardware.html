@@ -10,57 +10,104 @@
 </head>
 <body>
 
-<table border="0" width="100%">
-<tr><td rowspan="2"><img src="tvtime_logo_vertical.png" alt="tvtime logo">
-    <td class="center"><h1>tvtime: tv worth watching</h1>
-<tr><td class="center">
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/">tvtime homepage</a> ]</span>
-<span class="nowrap">[ <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">download tvtime</a> ]</span>
-<span class="nowrap">[ <a href="http://www.sourceforge.net/projects/tvtime/">development page</a> ]</span>
-<span class="nowrap">[ <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a> ]</span>
-<span class="nowrap">[ <a href="help.html">help and faq</a> ]</span>
-<span class="nowrap">[ <a href="usage.html">using tvtime</a> ]</span>
-<span class="nowrap">[ <a href="hardware.html">hardware and driver support</a> ]</span>
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/screenshots.html">fancy screenshot page</a> ]</span>
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/links.html">related websites</a> ]</span>
-</table>
-<hr>
+<table width="728px" class="centered" border="0" cellpadding="0" cellspacing="0">
+<colgroup>
+    <col width="24px">
+    <col width="125px">
+    <col width="579px">
+</colgroup>
 
-<h1>Hardware and driver support page</h1>
+<tr><td align="center" colspan="3"><img src="tvtime-logo-banner.png" alt="tvtime"/></td></tr>
 
-<h3>Contents</h3>
-<table width="100%" border="0">
-<tr><td align="left" valign="top">
-    <a href="#resources">1. Support resources</a><br>
-    <a href="#tested">2. Summary of tested hardware by release</a><br>
-    <a href="#tvwonder">3. Tuner problems with ATI TV Wonder (and other!) cards</a><br>
-    <a href="#canadacable">4. No "canada-cable" frequency table?</a><br>
-    <a href="#bttvinfo">5. Information for users of the bttv driver</a><br>
-    &nbsp;&nbsp;5.1. Optimal driver configuration: The gbuffers setting<br>
-    &nbsp;&nbsp;5.2. Special bttv luma correction mode<br>
-    &nbsp;&nbsp;5.3. bttv takes a long time to load!<br>
-    <a href="#saa7134">6. Known SAA7134 driver issues</a><br>
-    &nbsp;&nbsp;6.1. Frames all green<br>
-    &nbsp;&nbsp;6.2. Window setup failures<br>
-    &nbsp;&nbsp;6.3. Field parity swapped (jerky motion)<br>
-    &nbsp;&nbsp;6.4. Timeouts/invalid argument errors<br>
-    <a href="#aiw">7. ATI All-In-Wonder video/capture cards: The GATOS driver</a><br>
-    <a href="#zoran">8. Cards which use the Zoran driver (including the DC10)</a><br>
-    <a href="#marvel">9. Matrox Marvel capture cards</a><br>
-<td align="left" valign="top">
-    <a href="#rivatv">10. Information for users of the rivatv capture driver</a><br>
-    <a href="#voodoo3500">11. Unusable drivers for the Voodoo 3500 TV card</a><br>
-    <a href="#sis">12. Poor performance with SiS driver in XFree86 4.2.1 and earlier</a><br>
-    <a href="#radeon">13. XVideo always-on-top with some Radeon cards</a><br>
-    <a href="#nvidia-overscan">14. Corrupted image borders on nVidia cards in overscan modes</a><br>
-    <a href="#nvidia-xvideo">15. No XVideo support in open-source nVidia driver for older cards</a><br>
-    <a href="#nvidia-tnt">16. Problems with nVidia TNT and TNT2 cards</a><br>
-    <a href="#prolink-audio">17. Audio problems with Prolink PixelView cards</a><br>
-    <a href="#linux-dvb">18. Driver problems with SAA7146/linux-dvb supported cards</a><br>
-    <a href="#savage">19. XVideo initialization problem with the savage driver</a><br>
-    <a href="#overlay">20. Using 'overlay' mode in xawtv/zapping causes system instabilities</a><br>
+<tr><td class="hangspace"></td>
+    <td class="navbar">
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="box">
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">get tvtime!</a></td></tr>
+    <tr><td class="box">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    <tr><td class="box">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="box">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="box">
+        <a href="hardware.html">hardware and driver support</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
+    </table>
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="center">
+        <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+           width="88" height="31" alt="SourceForge Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://www.libpng.org/pub/png/"><img src="http://www.libpng.org/pub/png/img_png/pngnow.png"
+           width="88" height="31" alt="libpng Logo"></a></td></tr>
+    <!--
+    <tr><td class="center">
+        <a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+           alt="Valid HTML 4.01!" height="31" width="88"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+           src="http://jigsaw.w3.org/css-validator/images/vcss" 
+           height="31px" width="88px" alt="Valid CSS!" /></a></td></tr>
+    -->
+    <tr><td class="center">
+        <a href="http://tvtime.net/"><img src="http://tvtime.sourceforge.net/tvtime1.png"
+           width="88px" height="31px" alt="tvtime Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="mailto:vektor@dumbterm.net">email the webmaster</a></td></tr>
+    </table>
+    </td>
+
     <td>
-</table>
+
+    <table width="90%" class="centered">
+    <tr><td>
+
+        <h2 class="center">Hardware and driver support page</h2>
+
+        <table class="centered">
+        <tr><td>
+            <ol>
+            <li><a href="#resources">Support resources</a><br>
+            <li><a href="#tested">Summary of tested hardware by release</a><br>
+            <li><a href="#tvwonder">NTSC tuner problems (including the ATI TV Wonder cards)</a><br>
+            <li><a href="#canadacable">No "canada-cable" frequency table?</a><br>
+            <li><a href="#bttvinfo">Information for users of the bttv driver</a><br>
+                <ol>
+                <li>Optimal driver configuration: The gbuffers setting<br>
+                <li>Special bttv luma correction mode<br>
+                <li>bttv takes a long time to load!<br>
+                </ol>
+            <li><a href="#saa7134">Known SAA7134 driver issues</a><br>
+                <ol>
+                <li>Frames all green<br>
+                <li>Window setup failures<br>
+                <li>Field parity swapped (jerky motion)<br>
+                <li>Timeouts/invalid argument errors<br>
+                </ol>
+            <li><a href="#aiw">ATI All-In-Wonder video/capture cards: The GATOS driver</a><br>
+            <li><a href="#zoran">Cards which use the Zoran driver (including the DC10)</a><br>
+            <li><a href="#marvel">Matrox Marvel capture cards</a><br>
+            <li><a href="#rivatv">Information for users of the rivatv capture driver</a><br>
+            <li><a href="#voodoo3500">Unusable drivers for the Voodoo 3500 TV card</a><br>
+            <li><a href="#sis">Poor performance with SiS driver in XFree86 4.2.1 and earlier</a><br>
+            <li><a href="#radeon">XVideo always-on-top with some Radeon cards</a><br>
+            <li><a href="#nvidia-overscan">Corrupted image borders on nVidia cards in overscan modes</a><br>
+            <li><a href="#nvidia-xvideo">No XVideo support in open-source nVidia driver for older cards</a><br>
+            <li><a href="#nvidia-tnt">Problems with nVidia TNT and TNT2 cards</a><br>
+            <li><a href="#prolink-audio">Audio problems with Prolink PixelView cards</a><br>
+            <li><a href="#linux-dvb">Driver problems with SAA7146/linux-dvb supported cards</a><br>
+            <li><a href="#savage">XVideo initialization problem with the savage driver</a><br>
+            <li><a href="#overlay">Using 'overlay' mode in xawtv/zapping causes system instabilities</a><br>
+            </ol>
+        </td></tr></table>
 
 <hr>
 <h3><a name="resources">1. Support resources</a></h3>
@@ -91,7 +138,7 @@ can add it to the list.</p>
 <li>ATI TV Wonder [<b>bttv</b> / debian sid 2.4.20-686 2.4.20-5]
 <li>ATI TV Wonder VE [<b>bttv</b> / Gentoo linux-2.4.20-gentoo-r1]
 <li>Haupage WinTV Primio [<b>bttv</b> / mandrake 9.0 2.4.19-24]
-<li>Terratec Cinergy 600 [<b>saa7134</b> / 2.5.65 - <a href="http://bytesex.org/patches/2.5/patch-2.5.65-kraxel.gz">http://bytesex.org/patches/2.5/patch-2.5.65-kraxel.gz</a>]
+<li>Terratec Cinergy 600 [<b>saa7134</b> / 2.5.65 - <a href="http://bytesex.org/patches/2.5/patch-2.5.65-kraxel.gz">patch-2.5.65-kraxel</a>]
 <li>Winfast TV2000 Deluxe [<b>bttv</b> / kernel.org 2.4.19]
 <li>AVerMedia AVer TV Studio [<b>bttv</b> / ALT Linux 2.4.18]
 <li>Pinnacle PCTV Pro [<b>bttv</b> - 2.4.20 + bttv 0.9.6]
@@ -290,72 +337,74 @@ the driver authors:</p>
 <pre>
 From: Serguei Miridonov &lt;mirsev@cicese.mx&gt;
 
-&gt;   A user of your driver and I were trying to figure out why tvtime
-&gt; wasn't working.  tvtime operates by grabbing interlaced frames at full 
-&gt; rate (29.97/25fps), 4:2:2 Y'CbCr sampling, and deinterlacing them to
-&gt; give an output at field rate (but increased to frame size) of 59.94fps/
-&gt; 50fps progressive.  The zoran driver, when capturing at 640x480 4:2:2, 
-&gt; was providing nasty green frames/colourbars instead of providing any 
-&gt; reasonable video content.
+&gt;   A user of your driver and I were trying to figure out why
+&gt; tvtime wasn't working.  tvtime operates by grabbing interlaced
+&gt; frames at full rate (29.97/25fps), 4:2:2 Y'CbCr sampling, and
+&gt; deinterlacing them to give an output at field rate (but increased
+&gt; to frame size) of 59.94fps/50fps progressive.  The zoran driver,
+&gt; when capturing at 640x480 4:2:2, was providing nasty green
+&gt; frames/colourbars instead of providing any reasonable video
+&gt; content.
 &gt;
-&gt;   The user determined that this is because of some memory limitations
-&gt; of the card, it can't handle this data rate,
+&gt;   The user determined that this is because of some memory
+&gt; limitations of the card, it can't handle this data rate,
 
 It depends on the Zoran PCI controller (new versions work better than
-the old one), and on the motherboard. Intel is much better than VIA, for
-example...
+the old one), and on the motherboard. Intel is much better than VIA,
+for example...
 
-&gt; and so only lower resolutions like 320x240 or something can be provided
-&gt; when asking for raw 4:2:2 images, and that some sort of bigphysmem
-&gt; thing is required to get it to work, if at all.
+&gt; and so only lower resolutions like 320x240 or something can be
+&gt; provided when asking for raw 4:2:2 images, and that some sort of
+&gt; bigphysmem thing is required to get it to work, if at all.
 &gt;
-&gt;   This restriction seems pretty reasonable given the hardware involved,
-&gt; so that is not my concern.  My concern is simply that the driver did not
-&gt; fail or anything, but fooled tvtime into thinking everything was 'ok'.
-&gt; I would very much appreciate it if the driver could return some error
-&gt; when it is set in a mode that will not work.  Is this at all possible?
+&gt;   This restriction seems pretty reasonable given the hardware
+&gt; involved, so that is not my concern.  My concern is simply that
+&gt; the driver did not fail or anything, but fooled tvtime into
+&gt; thinking everything was 'ok'.  I would very much appreciate it if
+&gt; the driver could return some error when it is set in a mode that
+&gt; will not work.  Is this at all possible?
 
 It's not so simple. I can only guess which hardware combination will
-work and which will not (see above). And the hardware provides no means
-to detect any buffer overflow for uncompressed video capture. Perhaps,
-this is because the card was primarily designed for MJPEG capture (low
-bandwidth) and to provide video monitoring on the computer display (no
-RAM access,  just the PCI-PCI transfer from Zoran to any graphics
-adapter. It can capture uncompressed video into memory even at full
-frame rate but not on every system. My old system with Pentium MMX
-266MHz with Intel 430TX works better than newer Athlon XP 1800+ at VIA
-KT266A and DDR memory. Pentium MMX system can capture uncompressed video
-to memory but can do nothing with it due to CPU and disk I/O
-limitations. Athlon system can do anything (even encode into MPEG-4 in
-real time) but some uncompressed frames are dropped due to PCI
-limitations on VIA chipset...
+work and which will not (see above). And the hardware provides no
+means to detect any buffer overflow for uncompressed video capture.
+Perhaps, this is because the card was primarily designed for MJPEG
+capture (low bandwidth) and to provide video monitoring on the
+computer display (no RAM access,  just the PCI-PCI transfer from Zoran
+to any graphics adapter. It can capture uncompressed video into memory
+even at full frame rate but not on every system. My old system with
+Pentium MMX 266MHz with Intel 430TX works better than newer Athlon XP
+1800+ at VIA KT266A and DDR memory. Pentium MMX system can capture
+uncompressed video to memory but can do nothing with it due to CPU and
+disk I/O limitations. Athlon system can do anything (even encode into
+MPEG-4 in real time) but some uncompressed frames are dropped due to
+PCI limitations on VIA chipset...
 
 Marcel Birthelmer wrote:
 
-&gt; Sorry for the misunderstanding, i wasn't complaining about a bug. I
-&gt; looked through zoran.c and i realized that the reason for grabdisplay
-&gt; not working was the 128 limit,
+&gt; Sorry for the misunderstanding, i wasn't complaining about a bug.
+&gt; I looked through zoran.c and i realized that the reason for
+&gt; grabdisplay not working was the 128 limit,
 
 This is a limit from Linux kernel: it will not give you contiguous
-memory  
-longer than 128Kbytes without some special tricks: bigphysmem patch or
-reserving memory at system boot using mem=XXX line in LILO or GRUB
-configs.
+memory  longer than 128Kbytes without some special tricks: bigphysmem
+patch or reserving memory at system boot using mem=XXX line in LILO or
+GRUB configs.
 
 &gt; so i tested it, and grabdisplay does work with very small picture
 &gt; sizes. So my question is, what are my options for increasing this
 &gt; memory amount?
 
-Bigphysmem patch or reserving memory at boot time. I suggest you to read  
-README file: it has notes about this.
+Bigphysmem patch or reserving memory at boot time.  I suggest you to
+read  README file: it has notes about this.
 
 &gt; just changing 128 to 1024 doesn't seem to work, but also i don't
-&gt; really want to patch my kernel unless i have to.  Any suggestions?
+&gt; really want to patch my kernel unless i have to.  Any
+&gt; suggestions?
 
 If you need help, please, describe your system: motherboard chipset,
 processor, memory size and type, etc. Also please note that older
-ZR36057 chip may not work properly on some motherboards. Newer ZR36067
-is better but it also may have problems with VIA chipsets.
+ZR36057 chip may not work properly on some motherboards.  Newer
+ZR36067 is better but it also may have problems with VIA chipsets.
 </pre><p>
 
 <hr>
@@ -529,9 +578,12 @@ five Prolink cards listed in CARDLIST for the bttv driver:</p>
 <pre>
   card=16 - Prolink Pixelview PlayTV (bt878)
   card=37 - Prolink PixelView PlayTV pro
-  card=50 - Prolink PV-BT878P+4E / PixelView PlayTV PAK / Lenco MXTV-9578 CP
+  card=50 - Prolink PV-BT878P+4E /
+            PixelView PlayTV PAK /
+            Lenco MXTV-9578 CP
   card=70 - Prolink Pixelview PV-BT878P+ (Rev.4C)
-  card=72 - Prolink Pixelview PV-BT878P+9B (PlayTV Pro rev.9B FM+NICAM)
+  card=72 - Prolink Pixelview PV-BT878P+9B
+            (PlayTV Pro rev.9B FM+NICAM)
 </pre>
 
 <p>The bttv driver cannot seem to autodetect these cards correctly.  We've
@@ -575,7 +627,7 @@ href="http://www.gdv.uni-hannover.de/~hunold1/linux/saa7146/index.html">http://w
 and and an explanation of the current DVB driver situation is at
 <a href="http://linuxtv.org/dvb/drivers.xml">http://linuxtv.org/dvb/drivers.xml</a>.
 As well, the thread on this issue on the linux-dvb mailing list can be found here:
-<a href="http://www.linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html">http://www.linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html</a> and the tvtime
+<a href="http://linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html">http://linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html</a> and the tvtime
 bug report is <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694544&amp;group_id=64301&amp;atid=506987">bug 694544</a>.</p>
 
 <hr>
@@ -611,23 +663,11 @@ tvtime does not support using this mode, nor do we have plans to, as we
 would not be able to composite our OSD on top of the video signal or
 provide any processing features on the video.</p>
 
-<hr>
-<table border="0" width="100%">
-<tr>
-<td>
-Bugs in this page?<br/>
-<a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>
-<td align="right">
-<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
- width="88" height="31" alt="SourceForge Logo"></a>
-<a href="http://www.libpng.org/pub/png/"><img src="pngnow.png" width="88"
- height="31" alt="libpng Logo"></a>
-<a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
-   alt="Valid HTML 4.01!" height="31" width="88"></a>
-<a href="http://jigsaw.w3.org/css-validator/check/referer"><img
-    height="31px" width="88px"
-    src="http://jigsaw.w3.org/css-validator/images/vcss" 
-    alt="Valid CSS!" /></a>
+        </td></tr>
+    </table>
+
+    </td></tr>
 </table>
+
 </body>
 </html>

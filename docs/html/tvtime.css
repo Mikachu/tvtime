@@ -9,6 +9,15 @@ th.doctable {
   background: #7777aa;
   color: #ffffff;
 }
+td.navbar {
+  width: 125px;
+  background: #ddddee;
+  vertical-align: top;
+  text-align: center;
+}
+td.hangspace {
+  width: 24px;
+}
 .center { text-align: center }
 img { border: 0 }
 A:link { text-decoration: none }

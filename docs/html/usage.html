@@ -9,45 +9,93 @@
 </head>
 <body>
 
-<table border="0" width="100%">
-<tr><td rowspan="2"><img src="tvtime_logo_vertical.png" alt="tvtime logo">
-    <td class="center"><h1>tvtime: tv worth watching</h1>
-<tr><td class="center">
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/">tvtime homepage</a> ]</span>
-<span class="nowrap">[ <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">download tvtime</a> ]</span>
-<span class="nowrap">[ <a href="http://www.sourceforge.net/projects/tvtime/">development page</a> ]</span>
-<span class="nowrap">[ <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a> ]</span>
-<span class="nowrap">[ <a href="help.html">help and faq</a> ]</span>
-<span class="nowrap">[ <a href="usage.html">using tvtime</a> ]</span>
-<span class="nowrap">[ <a href="hardware.html">hardware and driver support</a> ]</span>
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/screenshots.html">fancy screenshot page</a> ]</span>
-<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/links.html">related websites</a> ]</span>
-</table>
-<hr>
+<table width="728px" class="centered" border="0" cellpadding="0" cellspacing="0">
+<colgroup>
+    <col width="24px">
+    <col width="125px">
+    <col width="579px">
+</colgroup>
 
-<h1>Using tvtime</h1>
+<tr><td align="center" colspan="3"><img src="tvtime-logo-banner.png" alt="tvtime"/></td></tr>
 
-<h3>Contents</h3>
-<table width="100%" border="0">
-<tr><td align=left valign="top">
-    <a href="#resources">1. Support resources</a><br>
-    <a href="#keybindings">4. Key bindings</a><br>
-    <a href="#features">5. tvtime features</a><br>
-    &nbsp;&nbsp;5.1. Deinterlacing modes<br>
-    &nbsp;&nbsp;5.2. Using 16:9 mode<br>
-    &nbsp;&nbsp;5.3. What is luma correction?<br>
-    <a href="#channels">6. Setting up your channel list in tvtime</a><br>
-    &nbsp;&nbsp;6.1. Channel list management<br>
-    &nbsp;&nbsp;6.2. stationlist.xml<br>
-    &nbsp;&nbsp;6.2.1. Non-English characters in channel names<br>
-    &nbsp;&nbsp;6.3. Future enhancements<br>
-    <td align="left" valign="top">
-    <a href="#configfile">7. tvtime.xml config file reference</a><br>
-    <a href="#tvtimecommand">8. Controlling tvtime via the tvtime-command</a><br>
-    <a href="#lirc">9. Configuring LIRC for tvtime</a><br>
-    <a href="#savetuning">10. Case study: How to save fine tuning settings on a channel</a><br>
-    <a href="#progressivedv">11. Case study: Progressive content from a DV camera</a><br>
-</table>
+<tr><td class="hangspace"></td>
+    <td class="navbar">
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="box">
+        <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">get tvtime!</a></td></tr>
+    <tr><td class="box">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    <tr><td class="box">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="box">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="box">
+        <a href="hardware.html">hardware and driver support</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
+    <tr><td class="box">
+        <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
+    </table>
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="center">
+        <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+           width="88" height="31" alt="SourceForge Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://www.libpng.org/pub/png/"><img src="http://www.libpng.org/pub/png/img_png/pngnow.png"
+           width="88" height="31" alt="libpng Logo"></a></td></tr>
+    <!--
+    <tr><td class="center">
+        <a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+           alt="Valid HTML 4.01!" height="31" width="88"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+           src="http://jigsaw.w3.org/css-validator/images/vcss" 
+           height="31px" width="88px" alt="Valid CSS!" /></a></td></tr>
+    -->
+    <tr><td class="center">
+        <a href="http://tvtime.net/"><img src="http://tvtime.sourceforge.net/tvtime1.png"
+           width="88px" height="31px" alt="tvtime Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="mailto:vektor@dumbterm.net">email the webmaster</a></td></tr>
+    </table>
+    </td>
+
+    <td>
+
+    <table width="90%" class="centered">
+    <tr><td>
+
+        <h2 class="center">Using tvtime</h2>
+
+        <table class="centered">
+        <tr><td>
+            <ol>
+            <li><a href="#resources">Support resources</a><br>
+            <li><a href="#features">tvtime features</a><br>
+                <ol>
+                <li>Deinterlacing modes<br>
+                <li>Using 16:9 mode<br>
+                <li>What is luma correction?<br>
+                </ol>
+            <li><a href="#keybindings">Key bindings</a><br>
+            <li><a href="#channels">Setting up your channel list in tvtime</a><br>
+                <ol>
+                <li>Channel list management<br>
+                <li>stationlist.xml<br>
+                <li>Non-English characters in channel names<br>
+                <li>Future enhancements<br>
+                </ol>
+            <li><a href="#configfile">tvtime.xml config file reference</a><br>
+            <li><a href="#tvtimecommand">Controlling tvtime via the tvtime-command</a><br>
+            <li><a href="#lirc">Configuring LIRC for tvtime</a><br>
+            <li><a href="#savetuning">Case study: How to save fine tuning settings on a channel</a><br>
+            <li><a href="#progressivedv">Case study: Progressive content from a DV camera</a><br>
+            </ol>
+        </td></tr></table>
 
 <hr>
 <h3><a name="resources">1. Support resources</a></h3>
@@ -62,7 +110,51 @@ out with us on <b>IRC</b> at
 which you can subscribe to, or read on the web.</p>
 
 <hr>
-<h3><a name="keybindings">4. Key bindings</a></h3>
+<h3><a name="features">2. tvtime features</a></h3>
+
+<h3>2.1. Deinterlacing modes</h3>
+
+<p>The following deinterlacing modes are currently available in <b>tvtime</b>:</p>
+
+<table border="0" width="70%" class="box">
+<tr><th class="doctable">Short name
+    <th class="doctable">Long name
+<tr><td>LineDoubler
+    <td>Line Doubler
+<tr><td>Greedy       <td>Dscaler: Greedy - Low Motion
+<tr><td>Greedy2Frame <td>DScaler: Greedy - 2-frame
+<tr><td>GreedyH      <td>DScaler: Greedy - High Motion
+<tr><td>TomsMoComp   <td>DScaler: TomsMoComp
+<tr><td>TwoFrame     <td>DScaler: TwoFrame
+<tr><td>VideoBob     <td>DScaler: Video Bob
+<tr><td>VideoWeave   <td>DScaler: Video Weave
+<tr><td>Linear       <td>Linear Interpolation
+<tr><td>LinearBlend  <td>mplayer: Linear Blend
+<tr><td>OverlayBob   <td>Overlay Bob
+<tr><td>Vertical     <td>ffmpeg: Vertical Deinterlace Filter
+<tr><td>Weave        <td>Weave Last Field
+</table>
+
+<h3>2.2. Using 16:9 mode</h3>
+
+<p>In 16:9 mode we stretch the output (for full resolution from
+widescreen DVDs), simulating a 16:9 TV.  If you're using a hardware DVD
+player, you should tell it that you have a 16:9 TV.  The output width
+parameter is for the output window, the height is determined by the
+aspect ratio (yeah, we assume square pixels for now).</p>
+
+<h3>2.3. What is luma correction?</h3>
+
+<p>The luma correction applies a non-linear correction function to the luma
+signal of the incoming video.  This allows the user to attempt to increase
+the brightness of the signal in a way which preserves the low as well as the
+high end of the brightness scale.  This feature also allows to correct
+for odd values from capture cards, such as those based on the popular
+<b>bt8x8</b> chip.</p>
+
+
+<hr>
+<h3><a name="keybindings">3. Key bindings</a></h3>
 
 <p>Below is a table of the default key bindings in tvtime.  Listed in
 the right hand column is the name of the setting in the
@@ -125,52 +217,9 @@ included with the tvtime distribution.</p>
 </table>
 
 <hr>
-<h3><a name="features">5. tvtime features</a></h3>
+<h3><a name="channels">4. Setting up your channel list in tvtime</a></h3>
 
-<h3>5.1. Deinterlacing modes</h3>
-
-<p>The following deinterlacing modes are currently available in <b>tvtime</b>:</p>
-
-<table border="0" width="70%" class="box">
-<tr><th class="doctable">Short name
-    <th class="doctable">Long name
-<tr><td>LineDoubler
-    <td>Line Doubler
-<tr><td>Greedy       <td>Dscaler: Greedy - Low Motion
-<tr><td>Greedy2Frame <td>DScaler: Greedy - 2-frame
-<tr><td>GreedyH      <td>DScaler: Greedy - High Motion
-<tr><td>TomsMoComp   <td>DScaler: TomsMoComp
-<tr><td>TwoFrame     <td>DScaler: TwoFrame
-<tr><td>VideoBob     <td>DScaler: Video Bob
-<tr><td>VideoWeave   <td>DScaler: Video Weave
-<tr><td>Linear       <td>Linear Interpolation
-<tr><td>LinearBlend  <td>mplayer: Linear Blend
-<tr><td>OverlayBob   <td>Overlay Bob
-<tr><td>Vertical     <td>ffmpeg: Vertical Deinterlace Filter
-<tr><td>Weave        <td>Weave Last Field
-</table>
-
-<h3>5.2. Using 16:9 mode</h3>
-
-<p>In 16:9 mode we stretch the output (for full resolution from
-widescreen DVDs), simulating a 16:9 TV.  If you're using a hardware DVD
-player, you should tell it that you have a 16:9 TV.  The output width
-parameter is for the output window, the height is determined by the
-aspect ratio (yeah, we assume square pixels for now).</p>
-
-<h3>5.3. What is luma correction?</h3>
-
-<p>The luma correction applies a non-linear correction function to the luma
-signal of the incoming video.  This allows the user to attempt to increase
-the brightness of the signal in a way which preserves the low as well as the
-high end of the brightness scale.  This feature also allows to correct
-for odd values from capture cards, such as those based on the popular
-<b>bt8x8</b> chip.</p>
-
-<hr>
-<h3><a name="channels">6. Setting up your channel list in tvtime</a></h3>
-
-<h3>6.1. Channel list management</h3>
+<h3>4.1. Channel list management</h3>
 
 <p>tvtime supports a channel scanner, channel renumbering, channel names,
 and a list of active channels for browsing.  Below are the commands
@@ -207,7 +256,7 @@ their default key bindings.</p>
 </table>
 
 
-<h3>6.2. stationlist.xml</h3>
+<h3>4.2. stationlist.xml</h3>
 
 <p>The station listing is read in from the ~/.tvtime/stationlist.xml.
 Channel settings are saved specific to norm and frequency table.
@@ -249,7 +298,7 @@ Entries in a list are in the following form:</p>
                 band="Custom" channel="55.69MHz"/&gt;
 </pre>
 
-<h4>6.2.1. Non-English characters in channel names</h4>
+<h4>4.3. Non-English characters in channel names</h4>
 
 <p>
 Since 0.9.8.2 it is possible to use non-English characters in channel
@@ -275,14 +324,14 @@ with accents and Cyrillic (Greek should work, but is untested).
 In 0.9.8.2, only glyphs that are also in ISO-8859-1 are supported!
 </p>
 
-<h3>6.3. Future enhancements</h3>
+<h3>4.4. Future enhancements</h3>
 
 <p>tvtime still needs a method of editing channel names at runtime
 (should not be hard), a full frequency band scanner, native support for
 the weird frequencies used by some cable providers such as UPC.</p>
 
 <hr>
-<h3><a name="configfile">7. tvtime.xml config file reference</a></h3>
+<h3><a name="configfile">5. tvtime.xml config file reference</a></h3>
 
 <p>The <a href="default.tvtime.xml">default <b>tvtime.xml</b></a> file is installed
 to /etc/tvtime/tvtime.xml and documents each of the parameters.  As well, there is
@@ -290,7 +339,7 @@ a man page installed (<b>man tvtime.xml</b>) which also gives help for each of
 the parameters.  We will reproduce it here soon.</p>
 
 <hr>
-<h3><a name="tvtimecommand">8. Controlling tvtime via tvtime-command</a></h3>
+<h3><a name="tvtimecommand">6. Controlling tvtime via tvtime-command</a></h3>
 
 <p>With the advent of custom input devices for PCs (i.e. remotes, keyboards
 with multimedia keys, voice recognition microphones) people have started to
@@ -508,7 +557,7 @@ following is a list of commands known to tvtime:</p>
 </table><p>
 
 <hr>
-<h3><a name="lirc">9. Configuring LIRC for tvtime</a></h3>
+<h3><a name="lirc">7. Configuring LIRC for tvtime</a></h3>
 
 <p>If you have lirc (Linux Infrared Remote Control) installed on your system 
 you can control tvtime with your remote control. Everything you can do 
@@ -530,7 +579,7 @@ end
 </pre>
 
 <hr>
-<h3><a name="savetuning">10. Case study: How to save fine tuning settings on a channel</a></h3>
+<h3><a name="savetuning">8. Case study: How to save fine tuning settings on a channel</a></h3>
 
 <p><b>Problem:</b> <i>Channel 13 has poor reception, but if I fine tune it up by
 three notches, the picture is much clearer.  How do I save this setting?</i></p>
@@ -544,7 +593,7 @@ have to map this new channel back to <b>13</b>.  To do this, hit
 This will renumber the new tuned channel as if it were <b>13</b>.</p>
 
 <hr>
-<h3><a name="progressivedv">11. Case study: Progressive content from a DV camera</a></h3>
+<h3><a name="progressivedv">9. Case study: Progressive content from a DV camera</a></h3>
 
 <p><b>Problem:</b> <i>I have a Canon GL-1 DV camera with a
 progressive-scan mode (called frame movie mode).  How do I get the best
@@ -558,23 +607,10 @@ framerate using '<b>=</b>' (<b>TOGGLE_FRAMERATE</b>) to either half-rate
 this mode, you will see the progressive frames as captured by the DV
 camera.</p>
 
-<hr>
-<table border="0" width="100%">
-<tr>
-<td>
-Bugs in this page?<br/>
-<a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>
-<td align="right">
-<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
- width="88" height="31" alt="SourceForge Logo"></a>
-<a href="http://www.libpng.org/pub/png/"><img src="pngnow.png" width="88"
- height="31" alt="libpng Logo"></a>
-<a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
-   alt="Valid HTML 4.01!" height="31" width="88"></a>
-<a href="http://jigsaw.w3.org/css-validator/check/referer"><img
-    height="31px" width="88px"
-    src="http://jigsaw.w3.org/css-validator/images/vcss" 
-    alt="Valid CSS!" /></a>
+        </td></tr>
+    </table>
+
+    </td></tr>
 </table>
 </body>
 </html>
