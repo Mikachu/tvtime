@@ -32,9 +32,11 @@ dist_tvtimedata_DATA = FreeSansBold.ttf FreeMonoBold.ttf DI_GreedyH.dll \
 	tvtimelogo_0027.png tvtimelogo_0028.png tvtimelogo_0029.png \
 	tvtimelogo_0030.png tvtimelogo_0031.png \
 	filmstrip_0000.png filmstrip_0001.png filmstrip_0002.png \
-	filmstrip_0003.png filmstrip_0004.png
+	filmstrip_0003.png filmstrip_0004.png \
+	tvtimeSansBold.ttf
 
-EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip COPYING.DScaler
+EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip COPYING.DScaler \
+	tvtimeSansBold.sfd
 
 .PHONY: uninstall-hook
 uninstall-hook:
