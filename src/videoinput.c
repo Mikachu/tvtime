@@ -330,7 +330,6 @@ static void wait_for_frame_v4l1( videoinput_t *vidin, int frameid )
         fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n",
                  frameid, strerror( errno ) );
     }
-    sleep( 3 );
     if( alarms ) {
         fprintf( stderr, "\n"
       "    Your capture card driver: %s\n"
