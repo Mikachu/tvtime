@@ -35,6 +35,7 @@ static FT_Library ft_lib = 0;
 struct ft_font_s
 {
     int fontsize;
+    int xdpi;
     FT_Face face;
     FT_Glyph glyphs[ 256 ];
     FT_Glyph bitmaps[ 256 ];
@@ -48,7 +49,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
     FT_Error error;
     FT_BBox bbox;
-    int xdpi, i;
+    int i;
 
     if( !font ) return 0;
 
@@ -78,8 +79,8 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     }
     */
 
-    xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
-    FT_Set_Char_Size( font->face, 0, font->fontsize * 64, xdpi, 72 );
+    font->xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
+    FT_Set_Char_Size( font->face, 0, font->fontsize * 64, font->xdpi, 72 );
 
     FT_Select_Charmap( font->face, ft_encoding_unicode );
 
@@ -157,6 +158,11 @@ int ft_font_get_size( ft_font_t *font )
 int ft_font_get_height( ft_font_t *font )
 {
     return font->max_height;
+}
+
+int ft_font_points_to_subpix_width( ft_font_t *font, int points )
+{
+    return ( font->xdpi * points * 65536 ) / 72;
 }
 
 static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos,

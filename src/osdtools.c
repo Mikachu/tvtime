@@ -192,11 +192,25 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
     osds->border_cr = cr;
 }
 
-void osd_string_render_image4444( osd_string_t *osds )
+static void osd_string_render_image4444( osd_string_t *osds, const char *text )
 {
-    int stringwidth = ft_string_get_width( osds->fts );
-    int stringheight = ft_string_get_height( osds->fts );
-    int bordersize = 4;
+    int stringwidth, stringheight, bordersize;
+    ft_font_t *font = osd_font_get_font( osds->font );
+    int fontsize = ft_font_get_size( font );
+    int pushsize_y = 2;
+    int pushsize_x = ft_font_points_to_subpix_width( font, pushsize_y );
+
+    ft_string_set_text( osds->fts, text, pushsize_x );
+
+    stringwidth = ft_string_get_width( osds->fts );
+    stringheight = ft_string_get_height( osds->fts );
+
+    /* Hack for now for image size.  I should fix this. -Billy */
+    if( pushsize_x / 65536 > pushsize_y ) {
+        bordersize = (pushsize_x * 2) / 65536;
+    } else {
+        bordersize = (pushsize_y * 2);
+    }
 
     if( stringheight > ( osds->image_height - bordersize) ) {
         stringheight = ( osds->image_height - bordersize);
@@ -220,8 +234,12 @@ void osd_string_render_image4444( osd_string_t *osds )
                                                  stringwidth, stringheight,
                                                  ft_string_get_stride( osds->fts ),
                                                  osds->border_luma, osds->border_cb,
-                                                 osds->border_cr, 128, 3, 2 );
+                                                 osds->border_cr, 128, 0, pushsize_y );
     }
+
+    ft_string_set_text( osds->fts, text, 0 );
+    stringwidth = ft_string_get_width( osds->fts );
+    stringheight = ft_string_get_height( osds->fts );
 
     composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
                                        osds->image_height, osds->image_width * 4,
@@ -233,8 +251,7 @@ void osd_string_render_image4444( osd_string_t *osds )
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
-    ft_string_set_text( osds->fts, text, 0 );
-    osd_string_render_image4444( osds );
+    osd_string_render_image4444( osds, text );
     osds->frames_left = timeout;
 }
 

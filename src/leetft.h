@@ -56,6 +56,11 @@ int ft_font_get_size( ft_font_t *font );
 int ft_font_get_height( ft_font_t *font );
 
 /**
+ * Returns subpixel width for points.
+ */
+int ft_font_points_to_subpix_width( ft_font_t *font, int points );
+
+/**
  * Renders a given string with this font to the given buffer.
  */
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
