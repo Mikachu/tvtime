@@ -34,5 +34,4 @@ Deinterlacer Desc.    0xEE 0x80 0xAB  U+E02B
 Attempted Framerate   0xEE 0x80 0xAC  U+E02C
 Television Standard   0xEE 0x80 0xAD  U+E02D
 Input Filters         0xEE 0x80 0xAE  U+E02E
-Rename channel        ????
-Renumber channel      ????
+Renumber channel      0xEE 0x80 0xAF  U+E02F
