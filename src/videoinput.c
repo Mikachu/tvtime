@@ -473,7 +473,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
     if( vidin->grab_fd < 0 ) {
-        fprintf( stderr, "videoinput: Can't open '%s': %s\n",
+        fprintf( stderr, "videoinput: Cannot open capture device %s: %s\n",
                  v4l_device, strerror( errno ) );
         free( vidin );
         return 0;

@@ -103,8 +103,6 @@ int main( int argc, char **argv )
                             config_get_inputwidth( cfg ), 
                             norm, verbose );
     if( !vidin ) {
-        fprintf( stderr, _("Can't open capture device '%s'.\n"),
-                 config_get_v4l_device( cfg ) );
         station_delete( stationmgr );
         config_delete( cfg );
         return 1;

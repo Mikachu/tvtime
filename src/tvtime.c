@@ -1332,7 +1332,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( config_get_mpeg_filename( ct ) ) {
         mpegin = mpeg2input_new( config_get_mpeg_filename( ct ), 0, mm_accel() );
         if( !mpegin ) {
-            if( asprintf( &error_string, _("Cannot open MPEG file '%s'."),
+            if( asprintf( &error_string, _("Cannot open MPEG file %s."),
                           config_get_mpeg_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
@@ -1343,7 +1343,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     } else if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
-            if( asprintf( &error_string, _("Can't open RVR file '%s'."),
+            if( asprintf( &error_string, _("Can't open RVR file %s."),
                           config_get_rvr_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
@@ -1357,7 +1357,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                 norm, verbose );
         if( !vidin ) {
             if( asprintf( &error_string,
-                          _("Can't open capture device '%s'."),
+                          _("Cannot open capture device %s."),
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }

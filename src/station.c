@@ -253,7 +253,7 @@ int station_readconfig( station_mgr_t *mgr )
 
     list = find_list( cur->xmlChildrenNode, mgr->norm, mgr->table );
     if( !list ) {
-        fprintf( stderr, "station: %s: No station list for norm '%s' and frequencies '%s'.\n",
+        fprintf( stderr, "%s: No existing %s station list \"%s\".\n",
                  mgr->stationrc, mgr->norm, mgr->table );
         xmlFreeDoc( doc );
         return 0;
