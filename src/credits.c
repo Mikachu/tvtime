@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "pnginput.h"
 #include "videotools.h"
+#include "speedy.h"
 #include "credits.h"
 
 struct credits_s

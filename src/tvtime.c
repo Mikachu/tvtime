@@ -418,6 +418,7 @@ int main( int argc, char **argv )
     performance_t *perf;
     console_t *con;
     int has_signal = 0;
+    int framecount = 0;
 
     setup_speedy_calls();
 
@@ -729,6 +730,13 @@ Public License instead of this License.
 
         input_next_frame( in );
 
+/*
+        framecount++;
+        if( framecount % 10 == 0 ) {
+            fprintf( stderr, "speedy: %dus\n", speedy_get_usecs() );
+            speedy_reset_timer();
+        }
+*/
 
         /* Aquire the next frame. */
         tuner_state = videoinput_check_for_signal( vidin );

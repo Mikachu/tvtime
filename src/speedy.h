@@ -112,6 +112,16 @@ void setup_speedy_calls( void );
  */
 int speedy_get_accel( void );
 
+/**
+ * Returns the current speedy time.
+ */
+unsigned int speedy_get_usecs( void );
+
+/**
+ * Resets the speedy timer.
+ */
+void speedy_reset_timer( void );
+
 #ifdef __cplusplus
 };
 #endif
