@@ -164,7 +164,7 @@ int main( int argc, char **argv )
         }
         fprintf( stderr, "\r" );
         fprintf( stderr, _("Found a channel at %6.2f MHz (%.2f - %.2f MHz), "
-                           "adding to stationlist.\n"),
+                           "adding to channel list.\n"),
                  ((double) fc) / 16.0, ((double) f1) / 16.0,
                  ((double) f2) / 16.0 );
 
