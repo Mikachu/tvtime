@@ -3,11 +3,12 @@ Section: x11
 Priority: optional
 Maintainer: Simon Law <sfllaw@debian.org>
 Build-Depends: debhelper (>> 3.0.0), libc6-dev, zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev
-Standards-Version: 3.5.9
+Standards-Version: 3.6.1
 
 Package: tvtime
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ttf-freefont
+Architecture: i386
+Depends: ${shlibs:Depends}, ${misc:Depends}, ttf-freefont, ucf
+Recommends: xmltv-util
 Suggests: lirc-x
 Description: A high quality television application
  tvtime is a high quality television application for use with video 

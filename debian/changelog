@@ -1,6 +1,36 @@
-tvtime (0.9.10-0.1) experimental; urgency=low
-
+tvtime (0.9.10-4.1) experimental; urgency=low
+ 
   * Unofficial build from CVS.
+ 
+ -- J. Random Hacker <jrhacker@example.com>  Wed, 17 Sep 2003 01:30:32 -0400
 
- -- J. Random Hacker <jrhacker@example.com>  Wed, 30 Apr 2003 11:21:39 -0400
+tvtime (0.9.10-4) unstable; urgency=low
+
+  * Depend: ucf so that the postinst works.  (Closes: Bug#211330)
+
+ -- Simon Law <sfllaw@debian.org>  Wed, 17 Sep 2003 01:19:33 -0400
+
+tvtime (0.9.10-3) unstable; urgency=low
+
+  * Bump standards version to 3.5.10.
+  * Recommend xmltv-util, since people might want to take advantage of
+    the TV listings integration.
+  * Switch to Architecture: i386, since Wine only builds on i386.
+
+ -- Simon Law <sfllaw@debian.org>  Tue, 16 Sep 2003 11:23:30 -0400
+
+tvtime (0.9.10-2) unstable; urgency=low
+
+  * Fix the "download tvtime!" link in the HTML documentation.
+
+ -- Simon Law <sfllaw@debian.org>  Mon, 15 Sep 2003 20:59:04 -0400
+
+tvtime (0.9.10-1) unstable; urgency=low
+
+  * Initial upload.  (Closes: Bug#171480)
+  * Patched to support DESTDIR.
+  * Patched to add an XPM icon for the X11 menu.
+  * Add more recent HTML documentation.
+
+ -- Simon Law <sfllaw@debian.org>  Mon, 15 Sep 2003 14:47:58 -0400
 
