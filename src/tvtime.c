@@ -872,11 +872,17 @@ int main( int argc, char **argv )
     fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
                        "*** based on released versions only!!\n\n" );
 
-    ct = config_new( argc, argv );
+    ct = config_new();
     if( !ct ) {
         fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
         return 1;
     }
+
+    /* Parse command line arguments. */
+    if( !config_parse_tvtime_command_line( ct, argc, argv ) ) {
+        return 1;
+    }
+
     verbose = config_get_verbose( ct );
     if( verbose ) {
         dlevel = 5;

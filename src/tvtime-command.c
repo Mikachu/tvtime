@@ -27,7 +27,7 @@
 
 int main( int argc, char **argv )
 {
-    config_t *cfg = config_new( 0, 0 );
+    config_t *cfg = config_new();
     FILE *fifo;
     int i;
     int nc = tvtime_num_commands();
