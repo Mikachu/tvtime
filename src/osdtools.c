@@ -948,25 +948,25 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
         if( scanline < osdl->height ) {
             int bgwidth = osdl->width - xpos;
-            int alpha150, alpha80;
+            int alpha240, alpha200;
 
             if( bgwidth > width ) bgwidth = width;
 
-            alpha150 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 150.0) + 0.5);
-            alpha80 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 80.0) + 0.5);
+            alpha240 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 240.0) + 0.5);
+            alpha200 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 200.0) + 0.5);
 
-            if( alpha150 > 150 ) alpha150 = 150;
-            if( alpha80 > 80 ) alpha80 = 80;
+            if( alpha240 > 240 ) alpha240 = 240;
+            if( alpha200 > 200 ) alpha200 = 200;
 
             if( !i ) {
                 /* tvtime blue */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, alpha150 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, alpha240 );
             } else if( i == osdl->hilight ) {
                 /* white */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, alpha80 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, alpha200 );
             } else {
                 /* gray */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, alpha80 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, alpha200 );
             }
 
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
