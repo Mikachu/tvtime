@@ -81,7 +81,7 @@ int main( int argc, char **argv )
                             config_get_inputwidth( cfg ), 
                             norm, verbose );
     if( !vidin ) {
-        fprintf( stderr, "tvtime-scanner: Can't open video4linux device '%s'.",
+        fprintf( stderr, "tvtime-scanner: Can't open video4linux device '%s'.\n",
                 config_get_v4l_device( cfg ) );
         station_delete( stationmgr );
         config_delete( cfg );
@@ -113,36 +113,37 @@ int main( int argc, char **argv )
         char stationmhz[ 128 ];
 
         videoinput_set_tuner_freq( vidin, (f * 1000) / 16 );
-        fprintf( stderr, "tvtime-scanner: Checking %6.2fMHz: ", ((double) f) / 16.0 );
+        fprintf( stderr, "tvtime-scanner: Checking %6.2fMHz:", ((double) f) / 16.0 );
         usleep( 200000 ); /* 0.2 sec */
         tuned = videoinput_freq_present( vidin );
 
         /* state machine */
         if( 0 == on && 0 == tuned ) {
-            fprintf( stderr, "|   no\r" );
+            fprintf( stderr, "  - No signal      \r" );
             continue;
         }
         if( 0 == on && 0 != tuned ) {
-            fprintf( stderr, " \\  raise\r" );
+            fprintf( stderr, "  + Signal detected\r" );
             f1 = f;
             /* if( i != chancount ) { fi = i; fc = f; } */
             on = 1;
             continue;
         }
         if( 0 != on && 0 != tuned ) {
-            fprintf( stderr, "  | yes\r" );
+            fprintf( stderr, "  * Signal detected\r" );
             /* if( i != chancount ) { fi = i; fc = f; } */
             continue;
         }
         /* if (on != 0 && 0 == tuned)  --  found one, read name from vbi */
-        fprintf( stderr," /  fall\r" );
         f2 = f;
         if( 0 == fc ) {
-            fc = (f1+f2)/2;
+            fc = (f1 + f2) / 2;
+            /* Round to the nearest .25MHz */
+            fc = ((fc + 2)/4)*4;
         }
 
-        fprintf( stderr, "tvtime-scanner: Found a channel at %6.2fMHz, addint to stationlist.\n",
-                 ((double) fc) / 16.0 );
+        fprintf( stderr, "\rtvtime-scanner: Found a channel at %6.2fMHz (%.2f-%.2fMHz), adding to stationlist.\n",
+                 ((double) fc) / 16.0, ((double) f1) / 16.0, ((double) f2) / 16.0 );
 
         sprintf( stationmhz, "%.2fMHz", ((double) fc) / 16.0 );
         station_add( stationmgr, curstation, "Custom", stationmhz, stationmhz );
