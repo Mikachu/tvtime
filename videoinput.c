@@ -177,7 +177,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     /* I don't actually know what these numbers mean, I stole this from someone
      * else's code. */
-    vidin->gb_buffers = (struct video_mbuf) { 2*0x151000, 0, { 0, 0x151000 } };
+    /* vidin->gb_buffers = (struct video_mbuf) { 2*0x151000, 0, { 0, 0x151000 } }; */
 
     vidin->width = capwidth;
     vidin->height = palmode ? 576 : 480;

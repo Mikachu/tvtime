@@ -33,6 +33,7 @@ static SDL_Overlay *frame = 0;
 static int sdlaspect = 0;
 static int outwidth = 0;
 static int fs = 0;
+static int sdlflags = SDL_HWSURFACE | SDL_RESIZABLE;
 
 unsigned char *sdl_get_output( void )
 {
@@ -56,7 +57,7 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
 
     if( !outputwidth ) {
         /* Get available fullscreen/hardware modes, choose largest. */
-        modes = SDL_ListModes( 0, SDL_FULLSCREEN | SDL_HWSURFACE );
+        modes = SDL_ListModes( 0, sdlflags );
 
         if( modes == (SDL_Rect **) 0 || modes == (SDL_Rect **) -1 ) {
             fprintf( stderr, "sdloutput: No mode information available. "
@@ -73,9 +74,9 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
     /* Unfortunately, we always assume square pixels for now. */
     if( sdlaspect ) {
         /* Run in 16:9 mode. */
-        screen = SDL_SetVideoMode( outputwidth, outputwidth / 16 * 9, 0, 0 );
+        screen = SDL_SetVideoMode( outputwidth, outputwidth / 16 * 9, 0, sdlflags );
     } else {
-        screen = SDL_SetVideoMode( outputwidth, outputwidth / 4 * 3, 0, 0 );
+        screen = SDL_SetVideoMode( outputwidth, outputwidth / 4 * 3, 0, sdlflags );
     }
     if( !screen ) {
         fprintf( stderr, "sdloutput: Can't open output!\n" );
@@ -103,17 +104,22 @@ void sdl_toggle_fullscreen( void )
     fs = !fs;
 }
 
-void sdl_toggle_aspect( void )
+static void sdl_reset_display( void )
 {
-    sdlaspect = !sdlaspect;
     SDL_UnlockYUVOverlay( frame );
     if( sdlaspect ) {
         /* Run in 16:9 mode. */
-        screen = SDL_SetVideoMode( outwidth, outwidth / 16 * 9, 0, 0 );
+        screen = SDL_SetVideoMode( outwidth, outwidth / 16 * 9, 0, sdlflags );
     } else {
-        screen = SDL_SetVideoMode( outwidth, outwidth / 4 * 3, 0, 0 );
+        screen = SDL_SetVideoMode( outwidth, outwidth / 4 * 3, 0, sdlflags );
     }
     SDL_LockYUVOverlay( frame );
+}
+
+void sdl_toggle_aspect( void )
+{
+    sdlaspect = !sdlaspect;
+    sdl_reset_display();
 }
 
 
@@ -142,6 +148,11 @@ void sdl_poll_events( input_t *in )
         if( event.type == SDL_QUIT ) {
             curcommand = I_QUIT;
             input_callback( in, curcommand, arg );
+        }
+
+        if( event.type == SDL_VIDEORESIZE ) {
+            outwidth = event.resize.w;
+            sdl_reset_display();
         }
 
         if( event.type == SDL_KEYDOWN ) {
