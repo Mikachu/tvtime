@@ -135,6 +135,11 @@ const char *station_get_current_network_name( station_mgr_t *mgr );
 const char *station_get_current_network_call_letters( station_mgr_t *mgr );
 
 /**
+ * Returns the norm set for this channel.
+ */
+const char *station_get_current_norm( station_mgr_t *mgr );
+
+/**
  * The last channel we were at, before the current one.
  */
 int station_get_prev_id( station_mgr_t *mgr );
@@ -178,6 +183,11 @@ void station_set_current_network_name( station_mgr_t *mgr, const char *network_n
  * Sets the network call letters of this channel.
  */
 void station_set_current_network_call_letters( station_mgr_t *mgr, const char *call_letters );
+
+/**
+ * Sets the norm for this channel.
+ */
+void station_set_current_norm( station_mgr_t *mgr, const char *norm );
 
 /**
  * Writes out the current station config.

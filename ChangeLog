@@ -1,5 +1,6 @@
 
 0.9.8.3 -
+  * vektor: Added compatible norm switching (fixes 731813)
   * vektor: Brought back the tvtime logo (fixes 720432)
   * vektor: Mute tag on the OSD now fades out, improving usefulness
       when using closed captions (fixes 732487)

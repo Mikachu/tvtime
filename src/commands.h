@@ -114,7 +114,8 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_PAUSE,
 
-    TVTIME_TOGGLE_MODE
+    TVTIME_TOGGLE_MODE,
+    TVTIME_TOGGLE_COMPATIBLE_NORM
 };
 
 enum framerate_mode

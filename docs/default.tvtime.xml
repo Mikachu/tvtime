@@ -497,4 +497,8 @@
     <keyboard key="/"/>
   </bind>
 
+  <bind command="toggle_compatible_norm">
+    <keyboard key="o"/>
+  </bind>
+
 </tvtime>

@@ -112,6 +112,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_AUDIO_MODE", TVTIME_TOGGLE_AUDIO_MODE },
     { "TOGGLE_BARS", TVTIME_TOGGLE_BARS },
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
+    { "TOGGLE_COMPATIBLE_NORM", TVTIME_TOGGLE_COMPATIBLE_NORM },
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
     /* { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS }, Disabled for 0.9.8 */
     { "TOGGLE_DEINTERLACER", TVTIME_TOGGLE_DEINTERLACER },
@@ -220,6 +221,7 @@ static void reinit_tuner( commands_t *in )
 {
     /* Setup the tuner if available. */
     if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        int norm;
 
         videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
         if( in->vbi ) {
@@ -235,10 +237,16 @@ static void reinit_tuner( commands_t *in )
         videoinput_set_audio_mode( in->vidin, VIDEOINPUT_MONO );
         in->audio_counter = CHANNEL_STEREO_DELAY;
 
+        norm = videoinput_get_norm_number( station_get_current_norm( in->stationmgr ) );
+        if( norm >= 0 ) {
+            videoinput_switch_to_compatible_norm( in->vidin, norm );
+        }
+
         if( in->osd ) {
             char channel_display[ 20 ];
             snprintf( channel_display, sizeof( channel_display ), "%d",
                       station_get_current_id( in->stationmgr ) );
+            tvtime_osd_set_norm( in->osd, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
@@ -494,6 +502,18 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             }
         } else {
             if( in->osd ) tvtime_osd_show_message( in->osd, "No VBI device configured for CC decoding." );
+        }
+        break;
+
+    case TVTIME_TOGGLE_COMPATIBLE_NORM:
+        videoinput_switch_to_next_compatible_norm( in->vidin );
+        if( videoinput_has_tuner( in->vidin ) ) {
+            station_set_current_norm( in->stationmgr, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
+            station_writeconfig( in->stationmgr );
+        }
+        if( in->osd ) {
+            tvtime_osd_set_norm( in->osd, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
+            tvtime_osd_show_info( in->osd );
         }
         break;
 

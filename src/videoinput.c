@@ -97,6 +97,19 @@ const char *videoinput_get_norm_name( int norm )
     }
 }
 
+int videoinput_get_norm_number( const char *name )
+{
+    int i;
+
+    for( i = 0; i < VIDEOINPUT_NTSC_JP + 1; i++ ) {
+        if( !strcasecmp( name, videoinput_get_norm_name( i ) ) ) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 static int videoinput_get_norm_height( int norm )
 {
     if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
@@ -113,7 +126,7 @@ static int videoinput_next_compatible_norm( int norm, int isbttv )
     do {
         norm = norm + 1;
         if( isbttv ) {
-            norm %= VIDEOINPUT_NTSC_JP;
+            norm %= VIDEOINPUT_NTSC_JP + 1;
         } else {
             norm %= VIDEOINPUT_PAL_NC;
         }
@@ -1099,5 +1112,19 @@ int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
     }
 
     return vidin->cur_tuner_state;
+}
+
+void videoinput_switch_to_next_compatible_norm( videoinput_t *vidin )
+{
+    vidin->norm = videoinput_next_compatible_norm( vidin->norm, vidin->isbttv );
+    videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
+}
+
+void videoinput_switch_to_compatible_norm( videoinput_t *vidin, int norm )
+{
+    if( norm != vidin->norm && (videoinput_get_norm_height( norm ) == videoinput_get_norm_height( vidin->norm )) ) {
+        vidin->norm = norm;
+        videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
+    }
 }
 

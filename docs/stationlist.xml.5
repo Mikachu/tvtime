@@ -135,6 +135,34 @@ in megahertz:
     <station name="2" active="1" position="0"
              band="Custom" channel="55.69MHz"/>
 
+.TP
+.B norm
+A per-channel norm can be specified in the stationlist, so long as the
+norm is compatible with the list norm.  This is useful for regions
+which receive both PAL and SECAM stations.  Compatible norms are:
+
+.TS
+nokeep tab (@);
+lb lb
+l l.
+525/59.94 Compatible@625/50 Compatible
+NTSC@PAL
+NTSC-JP@SECAM
+PAL-M@PAL-N
+@PAL-NC
+.TE
+
+.TP
+.B network
+Sets the name of the network for the OSD display.  In NTSC regions, this
+is set from the XDS information in the VBI if VBI decoding is enabled.
+
+.TP
+.B call
+Sets the call letters of the network for the OSD display.  In NTSC
+regions, this is set from the XDS information in the VBI if VBI decoding
+is enabled.
+
 .SH AUTHORS
 
 Achim Schneider,

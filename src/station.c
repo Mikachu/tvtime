@@ -38,6 +38,7 @@ struct station_info_s
     char name[ 32 ];
     char network_name[ 33 ];
     char network_call_letters[ 7 ];
+    char norm[ 10 ];
     const band_t *band;
     const band_entry_t *channel;
 
@@ -105,6 +106,7 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
         i->band = band;
         memset( i->network_name, 0, sizeof( i->network_name ) );
         memset( i->network_call_letters, 0, sizeof( i->network_call_letters ) );
+        memset( i->norm, 0, sizeof( i->norm ) );
 
         if( name ) {
             snprintf( i->name, sizeof( i->name ), "%s", name );
@@ -244,6 +246,7 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *channel = xmlGetProp( station, BAD_CAST "channel" );
             xmlChar *network = xmlGetProp( station, BAD_CAST "network" );
             xmlChar *call = xmlGetProp( station, BAD_CAST "call" );
+            xmlChar *norm = xmlGetProp( station, BAD_CAST "norm" );
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -262,8 +265,14 @@ int station_readconfig( station_mgr_t *mgr )
                 station_set_current_active( mgr, active );
                 if( network ) station_set_current_network_name( mgr, (char *) network );
                 if( call ) station_set_current_network_call_letters( mgr, (char *) call );
+                if( norm ) {
+                    station_set_current_norm( mgr, (char *) norm );
+                } else {
+                    station_set_current_norm( mgr, mgr->norm );
+                }
             }
 
+            if( norm ) xmlFree( norm );
             if( network ) xmlFree( network );
             if( call ) xmlFree( call );
             if( name ) xmlFree( name );
@@ -624,6 +633,22 @@ void station_set_current_network_call_letters( station_mgr_t *mgr, const char *c
     }
 }
 
+const char *station_get_current_norm( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->norm;
+    } else {
+        return "";
+    }
+}
+
+void station_set_current_norm( station_mgr_t *mgr, const char *norm )
+{
+    if( mgr->current ) {
+        snprintf( mgr->current->norm, sizeof( mgr->current->norm ), "%s", norm );
+    }
+}
+
 void station_activate_all_channels( station_mgr_t *mgr )
 {
     station_info_t *rp = mgr->first;
@@ -693,7 +718,6 @@ station_info_t *ripout( station_mgr_t *mgr, int pos )
 
     return rp;
 }
-
 
 int station_remap( station_mgr_t *mgr, int pos )
 {
@@ -824,6 +848,9 @@ int station_writeconfig( station_mgr_t *mgr )
         }
         if( *(rp->network_call_letters) ) {
             xmlSetProp( node, BAD_CAST "call", BAD_CAST rp->network_call_letters );
+        }
+        if( *(rp->norm) ) {
+            xmlSetProp( node, BAD_CAST "norm", BAD_CAST rp->norm );
         }
 
         rp = rp->next;

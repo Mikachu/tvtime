@@ -70,6 +70,11 @@ typedef struct videoinput_s videoinput_t;
 const char *videoinput_get_norm_name( int norm );
 
 /**
+ * Returns the integer version of the norm from its name.
+ */
+int videoinput_get_norm_number( const char *name );
+
+/**
  * Returns a text version of the audio mode.
  */
 const char *videoinput_get_audio_mode_name( int mode );
@@ -210,6 +215,16 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum );
  * Returns the current tuner state.
  */
 int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present );
+
+/**
+ * Switches to the next 'compatible' norm.
+ */
+void videoinput_switch_to_next_compatible_norm( videoinput_t *vidin );
+
+/**
+ * Switches to a specific norm.
+ */
+void videoinput_switch_to_compatible_norm( videoinput_t *vidin, int norm );
 
 #ifdef __cplusplus
 };
