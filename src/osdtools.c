@@ -424,9 +424,12 @@ struct osd_graphic_s
     int image_height;
     int frames_left;
     int alpha;
+    int hold;
+    int *active;
 };
 
-static int load_png_to_packed4444( uint8_t *buffer, int width, int height, int stride,
+static int load_png_to_packed4444( uint8_t *buffer, int *active,
+                                   int width, int height, int stride,
                                    double pixel_aspect, pnginput_t *pngin )
 {
     int has_alpha = pnginput_has_alpha( pngin );
@@ -460,6 +463,17 @@ static int load_png_to_packed4444( uint8_t *buffer, int width, int height, int s
         }
 
         aspect_adjust_packed4444_scanline( outputscanline, curout, pngwidth, pixel_aspect );
+        if( active ) {
+            int x;
+
+            active[ i ] = 0;
+            for( x = 0; x < width; x++ ) {
+                if( outputscanline[ (x * 4) ] ) {
+                    active[ i ] = 1;
+                    break;
+                }
+            }
+        }
     }
 
     free( curout );
@@ -478,6 +492,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int a
         return 0;
     }
 
+    osdg->hold = 0;
     fullfilename = get_tvtime_file( filename );
     if( !fullfilename ) {
         fprintf( stderr, "osd_graphic: Can't find '%s'.  Checked: %s\n",
@@ -504,11 +519,20 @@ osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int a
         return 0;
     }
 
-    if( !load_png_to_packed4444( osdg->image4444, osdg->image_width,
+    osdg->active = malloc( osdg->image_height * sizeof( int ) );
+    if( !osdg->active ) {
+        pnginput_delete( pngin );
+        free( osdg->image4444 );
+        free( osdg );
+        return 0;
+    }
+
+    if( !load_png_to_packed4444( osdg->image4444, osdg->active, osdg->image_width,
                                  osdg->image_height, osdg->image_width*4,
                                  pixel_aspect, pngin ) ) {
         fprintf( stderr, "osd_graphic: Can't render image '%s'.\n", filename );
         pnginput_delete( pngin );
+        free( osdg->active );
         free( osdg->image4444 );
         free( osdg );
         return 0;
@@ -520,6 +544,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int a
 
 void osd_graphic_delete( osd_graphic_t *osdg )
 {
+    free( osdg->active );
     free( osdg->image4444 );
     free( osdg );
 }
@@ -539,6 +564,11 @@ void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout )
     osdg->frames_left = timeout;
 }
 
+void osd_graphic_set_hold( osd_graphic_t *osdg, int hold )
+{
+    osdg->hold = hold;
+}
+
 int osd_graphic_visible( osd_graphic_t *osdg )
 {
     return (osdg->frames_left > 0);
@@ -547,8 +577,16 @@ int osd_graphic_visible( osd_graphic_t *osdg )
 void osd_graphic_advance_frame( osd_graphic_t *osdg )
 {
     if( osdg->frames_left > 0) {
-        osdg->frames_left--;
+        if( !osdg->hold ) osdg->frames_left--;
     }
+}
+
+int osd_graphic_active_on_scanline( osd_graphic_t *osdg, int scanline )
+{
+    if( scanline < osdg->image_height ) {
+        return osdg->active[ scanline ];
+    }
+    return 0;
 }
 
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
@@ -669,7 +707,7 @@ osd_animation_t *osd_animation_new( const char *filename_base,
         pngin = pnginput_new( fullfilename );
         free( fullfilename );
 
-        if( !load_png_to_packed4444( osda->frames4444 + (i * osda->image_size),
+        if( !load_png_to_packed4444( osda->frames4444 + (i * osda->image_size), 0,
                                      osda->image_width, osda->image_height, osda->image_width * 4,
                                      pixel_aspect, pngin ) ) {
             fprintf( stderr, "osd_animation: Can't render image '%s'.\n", curfilename );

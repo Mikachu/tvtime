@@ -109,7 +109,9 @@ osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int a
 void osd_graphic_delete( osd_graphic_t *osdg );
 int osd_graphic_get_width( osd_graphic_t *osdg );
 int osd_graphic_get_height( osd_graphic_t *osdg );
+int osd_graphic_active_on_scanline( osd_graphic_t *osdg, int scanline );
 void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
+void osd_graphic_set_hold( osd_graphic_t *osdg, int hold );
 int osd_graphic_visible( osd_graphic_t *osdg );
 void osd_graphic_advance_frame( osd_graphic_t *osdg );
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
