@@ -85,12 +85,12 @@ void input_callback( input_t *in, int command, int arg )
         commands_handle( in->com, TVTIME_MOUSE_MOVE, temp );
         return;
 
-    case I_BUTTONPRESS:
+    case I_BUTTONRELEASE:
     case I_REMOTE:
     case I_KEYDOWN:
         if( command == I_REMOTE ) {
             tvtime_cmd = arg;
-        } else if( command == I_BUTTONPRESS ) {
+        } else if( command == I_BUTTONRELEASE ) {
             if( commands_in_menu( in->com ) ) {
                 tvtime_cmd = config_button_to_menu_command( in->cfg, arg );
                 if( config_button_to_menu_command_argument( in->cfg, arg ) ) {

@@ -838,8 +838,8 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     xswa.backing_store = NotUseful;
     xswa.save_under = False;
     xswa.background_pixel = BlackPixel( display, screen );
-    xswa.event_mask = ButtonPressMask | StructureNotifyMask | KeyPressMask |
-                      PointerMotionMask | VisibilityChangeMask |
+    xswa.event_mask = ButtonPressMask | ButtonReleaseMask | StructureNotifyMask |
+                      KeyPressMask | PointerMotionMask | VisibilityChangeMask |
                       FocusChangeMask | PropertyChangeMask;
 
     mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWEventMask);
@@ -1162,7 +1162,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
-            XReparentWindow( display, output_window, wm_window, 0, 0);
+            XReparentWindow( display, output_window, wm_window, 0, 0 );
             XUnmapWindow( display, fs_window );
             x11_wait_unmapped( display, fs_window );
         }
@@ -1382,6 +1382,10 @@ void xcommon_poll_events( input_t *in )
             break;
         case ButtonPress:
             input_callback( in, I_BUTTONPRESS, event.xbutton.button );
+            getfocus = 1;
+            break;
+        case ButtonRelease:
+            input_callback( in, I_BUTTONRELEASE, event.xbutton.button );
             getfocus = 1;
             break;
         default: break;
