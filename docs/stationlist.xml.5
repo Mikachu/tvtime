@@ -12,6 +12,60 @@ information for capture cards with tuners.  It contains a list of active
 channels along with their frequencies, renumbering information, and
 channel name.
 
+The stationlist.xml file is created or updated whenever channel
+information is changed in tvtime.  This can be done by renumbering a
+channel, using the channel scanner, or manually activating or
+unactivating a specific channel from the list.
+
+Channel settings are saved specific to norm and frequency table.
+
+       <?xml version="1.0"?>
+       <stationlist xmlns="http://tvtime.sourceforge.net/DTD/">
+         <list norm="NTSC" frequencies="US-Cable">
+         ... station list
+         </list>
+       </stationlist>
+
+That is, each norm/frequency combination will get its own section in the
+configuration file.  The frequencies name is not special, you can have
+frequencies=foobar and running
+.B 'tvtime -f foobar'
+will do the right thing.  The norm, however, must match the norm being
+used.
+
+Entries in a list are in the following form:
+
+       <station name="CNN" active="1" position="18"
+                band="US Cable" channel="18"/>
+       <station name="DSF" active="1" position="12"
+                band="VHF E2-E12" channel="E12"/>
+
+  The possible bands and frequencies available in tvtime are:
+
+    Band name           Stations provided
+    ---------           -----------------
+    US Cable            1 - 125
+    US Two-Way          T7, T8, T9, T10, T11, T12 T13, T14
+    US Broadcast        2 - 83
+    Japan Broadcast     1 - 62
+    Japan Cable         13 - 63
+    VHF E2-E12          E1 - E12
+    VHF S1-S41          S1 - S41
+    VHF Misc            X, Y, Z, Z+1, Z+2
+    VHF France          K01 - K10, KB - KQ, H01 - H19
+    VHF Russia          R1 - R12, SR1 - SR19
+    VHF Australia       AS1 - AS12, AS5A, AS9A
+    VHF Italy           A - H, H1, H2
+    VHF Ireland         I1 - I9
+    UHF                 U21 - U69
+    Australia Optus     01 - 058
+
+  Custom frequencies can be included manually as follows:
+
+       <station name="2" active="1" position="0"
+                band="Custom" channel="55.69MHz"/>
+
+
 .SH "AUTHORS"
 .LP 
 Achim Schneider, Billy Biggs
