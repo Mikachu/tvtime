@@ -428,12 +428,14 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     if( capwidth & 1 ) {
         capwidth -= 1;
-        fprintf( stderr, "videoinput: Odd values for input width not allowed, "
-                         "using %d instead.\n", capwidth );
+        if( verbose ) {
+            fprintf( stderr, "videoinput: Odd values for input width not allowed, "
+                             "using %d instead.\n", capwidth );
+        }
     }
 
     if( !vidin ) {
-        fprintf( stderr, "videoinput: Can't allocate memory.\n" );
+        fprintf( stderr, "videoinput: Cannot allocate memory.\n" );
         return 0;
     }
 
@@ -484,9 +486,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     if( ioctl( vidin->grab_fd, VIDIOC_QUERYCAP, &caps_v4l2 ) < 0 ) {
         /* Can't get V4L2 capabilities, maybe this is a V4L1 device? */
         if( ioctl( vidin->grab_fd, VIDIOCGCAP, &caps_v4l1 ) < 0 ) {
-            fprintf( stderr, "videoinput: video4linux device '%s' refuses "
-                     "to provide capability information, giving up.\n"
-                     "videoinput: Is '%s' a video4linux device?\n", v4l_device, v4l_device );
+            fprintf( stderr, "videoinput: %s is not a video4linux device.\n",
+                     v4l_device );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -653,7 +654,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             return 0;
         }
 
-        if( capwidth != imgformat.fmt.pix.width ) {
+        if( capwidth != imgformat.fmt.pix.width && verbose ) {
             fprintf( stderr, "videoinput: Width %d too high, using %d "
                              "instead as suggested by the driver.",
                      capwidth, imgformat.fmt.pix.width );
@@ -663,21 +664,26 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     } else {
         if( ioctl( vidin->grab_fd, VIDIOCGCAP, &caps_v4l1 ) < 0 ) {
             fprintf( stderr, "videoinput: video4linux device '%s' refuses "
-                     "to provide set capability information, giving up.\n", v4l_device );
+                     "to provide set capability information, giving up.\n",
+                     v4l_device );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
         }
         if( capwidth > caps_v4l1.maxwidth ) {
-            fprintf( stderr, "videoinput: Width %d too high, using %d "
-                             "instead as suggested by the driver.",
-                     capwidth, caps_v4l1.maxwidth );
+            if( verbose ) {
+                fprintf( stderr, "videoinput: Width %d too high, using %d "
+                                 "instead as suggested by the driver.",
+                         capwidth, caps_v4l1.maxwidth );
+            }
             capwidth = caps_v4l1.maxwidth;
         }
         if( capwidth < caps_v4l1.minwidth ) {
-            fprintf( stderr, "videoinput: Width %d too low, using %d "
-                             "instead as suggested by the driver.",
-                     capwidth, caps_v4l1.minwidth );
+            if( verbose ) {
+                fprintf( stderr, "videoinput: Width %d too low, using %d "
+                                 "instead as suggested by the driver.",
+                         capwidth, caps_v4l1.minwidth );
+            }
             capwidth = caps_v4l1.minwidth;
         }
         vidin->width = capwidth;

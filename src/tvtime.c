@@ -1252,8 +1252,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     if( !output || !output->init( config_get_outputheight( ct ),
                                   sixteennine, verbose ) ) {
-        fputs( _("tvtime: Output driver failed to initialize: "
-                 "no video output available.\n"), stderr );
+        lfputs( _("tvtime: Output driver failed to initialize: "
+                  "no video output available.\n"), stderr );
         /* FIXME: Delete everything here! */
         return 1;
     }
@@ -1597,13 +1597,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( success ) {
             /* Setup the FIFO */
             if( !get_tvtime_fifo( config_get_uid( ct ) ) ) {
-                fputs( _("tvtime: Cannot find FIFO file.  "
-                         "Failed to create FIFO object.\n"), stderr );
+                lfputs( _("tvtime: Cannot find FIFO file.  "
+                          "Failed to create FIFO object.\n"), stderr );
             } else {
                 fifo = fifo_new( get_tvtime_fifo( config_get_uid( ct ) ) );
                 if( !fifo && verbose ) {
-                    fputs( _("tvtime: Not reading input from FIFO."
-                             "  Failed to create FIFO object.\n"), stderr );
+                    lfputs( _("tvtime: Not reading input from FIFO."
+                              "  Failed to create FIFO object.\n"), stderr );
                 }
             }
         }
