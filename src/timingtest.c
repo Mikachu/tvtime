@@ -66,6 +66,8 @@ int main( int argc, char **argv )
     double mhz;
     int i;
 
+    setup_speedy_calls();
+
     if( argc < 2 ) {
         for( i = 0; i < numtests; i++ ) {
             fprintf( stderr, "timingtest: %2d: %s\n", i, tests[ i ] );

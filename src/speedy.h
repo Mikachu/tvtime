@@ -174,6 +174,11 @@ void speedy_reset_timer( void );
  */
 double speedy_measure_cpu_mhz( void );
 
+/**
+ * Prints info about the CPU.
+ */
+void speedy_print_cpu_info( void );
+
 #ifdef __cplusplus
 };
 #endif
