@@ -693,7 +693,7 @@ void setup_i18n( void )
                    "*** Please report this as a bug at %s.\n\n");
 
         codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
-        if( !codeset || !strcmp( codeset, "UTF-8" ) != 0 ) {
+        if( !codeset || strcmp( codeset, "UTF-8" ) ) {
             /**
              * We do not die here, since if the user has an improperly set up
              * locale but still wants to display messages in English, this will
