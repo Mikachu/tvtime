@@ -162,14 +162,32 @@ station_mgr_t *station_init( config_t *ct )
 
     frequencies = config_get_v4l_freq( ct );
 
-    // this is a config file parser  (no it isn't!) ;-)
-/*
-    station_add( 1, "vhf E2-E12", "e4", "ard" );
-    station_add( 2, "VHF E2-E12", "E8", "zdf" );
-    station_add( 3, "VHF E2-E12", "E6", "ndr" );
-*/
-
-    station_add_band( mgr, "us cable" );
+    if( !strcasecmp( frequencies, "us-cable" ) ) {
+        station_add_band( mgr, "us cable" );
+    } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
+        station_add_band( mgr, "us broadcast" );
+    } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
+        station_add_band( mgr, "japan cable" );
+    } else if( !strcasecmp( frequencies, "japan-broadcast" ) ) {
+        station_add_band( mgr, "japan broadcast" );
+    } else if( !strcasecmp( frequencies, "europe" ) ) {
+        station_add_band( mgr, "vhf e2-e12" );
+        station_add_band( mgr, "vhf s1-s41" );
+        station_add_band( mgr, "vhf misc" );
+        station_add_band( mgr, "vhf russia" );
+        station_add_band( mgr, "vhf italy" );
+        station_add_band( mgr, "vhf ireland" );
+        station_add_band( mgr, "uhf" );
+    } else if( !strcasecmp( frequencies, "france" ) ) {
+        station_add_band( mgr, "vhf france" );
+        station_add_band( mgr, "vhf e2-e12" );
+        station_add_band( mgr, "vhf s1-s41" );
+        station_add_band( mgr, "uhf" );
+    } else if( !strcasecmp( frequencies, "australia" ) ) {
+        station_add_band( mgr, "vhf australia" );
+        station_add_band( mgr, "vhf e2-e12" );
+        station_add_band( mgr, "uhf" );
+    }
 
     mgr->current = mgr->first;
     if( mgr->verbose ) {
