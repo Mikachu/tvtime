@@ -55,7 +55,17 @@ static deinterlace_method_t weavemethod =
     1,
     deinterlace_scanline_weave,
     copy_scanline,
-    0
+    0,
+    { "Only updates the most recent field",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "" }
 };
 
 #ifdef BUILD_TVTIME_PLUGINS
