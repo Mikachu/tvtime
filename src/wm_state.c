@@ -1078,6 +1078,14 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     if(gnome_wm) {
       gnome_wm_layers = check_for_gnome_wm_layers(dpy);
     }
+
+    if( wm_name && ( strcmp( wm_name, "KWin" ) == 0 ) ) {
+        fprintf( stderr, "\n*** You are using KDE's window manager.  We have been experiencing\n"
+                           "*** ANNOYING and TIMING DEPENDENT bugs with fullscreen support, and\n"
+                           "*** are working with the kwin maintainers to track them down.  Please\n"
+                           "*** check for updates at http://tvtime.sourceforge.net/\n"
+                           "*** Apologies for any inconvenience this may cause.\n\n" );
+    }
     
     switch(state) {
     case WINDOW_STATE_FULLSCREEN:
