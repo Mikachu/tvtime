@@ -48,15 +48,15 @@ void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned ch
 void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width );
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width );
 
-void (*interpolate_packed422_scanline)( unsigned char *output,
-                                        unsigned char *top,
-                                        unsigned char *bot, int width );
-void (*blit_colour_packed422_scanline)( unsigned char *output,
-                                        int width, int y, int cb, int cr );
-void (*blit_colour_packed4444_scanline)( unsigned char *output,
-                                         int width, int alpha, int luma,
-                                         int cb, int cr );
-void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
+extern void (*interpolate_packed422_scanline)( unsigned char *output,
+                                               unsigned char *top,
+                                               unsigned char *bot, int width );
+extern void (*blit_colour_packed422_scanline)( unsigned char *output,
+                                               int width, int y, int cb, int cr );
+extern void (*blit_colour_packed4444_scanline)( unsigned char *output,
+                                                int width, int alpha, int luma,
+                                                int cb, int cr );
+extern void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
 
 const char *speedy_get_deinterlacing_mode( void );
 const char *speedy_next_deinterlacing_mode( void );

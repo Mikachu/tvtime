@@ -256,8 +256,6 @@ static void tvtime_build_frame( unsigned char *output,
     menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
 
-
-
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
