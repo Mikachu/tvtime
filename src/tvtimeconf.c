@@ -43,7 +43,7 @@ struct key_name_s {
     int key;
 };
 
-key_name_t key_names[] = {
+static key_name_t key_names[] = {
     { "up", I_UP },
     { "down", I_DOWN },
     { "left", I_LEFT },
@@ -150,7 +150,7 @@ static unsigned int parse_colour( const char *str )
     return 0;
 }
 
-int match_special_key(const char *str)
+static int match_special_key( const char *str )
 {
     int count;
 
@@ -163,7 +163,7 @@ int match_special_key(const char *str)
     return 0;
 }
 
-int parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node)
+static void parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
 {
     xmlChar *buf;
 
@@ -243,10 +243,9 @@ int parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node)
         }
         node = node->next;
     }
-    return 1;
 }
 
-int parse_keys(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
+static void parse_keys( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
 {
     xmlChar *buf;
     int key;
@@ -261,11 +260,9 @@ int parse_keys(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
         }
         node = node->next;
     }
-
-    return 1;
 }
 
-int parse_mouse(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
+static void parse_mouse( config_t *ct, xmlDocPtr doc, xmlNodePtr node )
 {
     xmlChar *buf;
     int button;
@@ -281,11 +278,9 @@ int parse_mouse(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
 
         node = node->next;
     }
-
-    return 1;
 }
 
-int conf_xml_parse( config_t *ct, char *configFile)
+static int conf_xml_parse( config_t *ct, char *configFile )
 {
     xmlDocPtr doc;
     xmlNodePtr top, node;
