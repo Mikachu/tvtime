@@ -73,7 +73,7 @@
            "jb      1b\n\t"                    // y
 #endif
 
-    //        ""POPX" %%"XBX"\n\t"
+            ""POPX" %%"XBX"\n\t"
 
         : /* no outputs */
         : "m"(pBob),
@@ -95,7 +95,7 @@
           "m"(Max_Mov),
           "m"(YMask)
 
-        : ""XAX"", ""XBX"", ""XCX"", ""XDX"", ""XSI"", ""XDI"",
+        : ""XAX"", ""XCX"", ""XDX"", ""XSI"", ""XDI"",
           "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",
           "mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7",
           "memory", "cc"

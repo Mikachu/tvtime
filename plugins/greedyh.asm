@@ -108,7 +108,7 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
 #endif
 
              // save XBX (-fPIC)
-       //      ""PUSHX" %%"XBX"\n\t"
+             ""PUSHX" %%"XBX"\n\t"
 
              ""MOVX"  "_L1",          %%"XAX"\n\t"
              ""LEAX"  8(%%"XAX"),       %%"XBX"\n\t"      // next qword needed by DJR
@@ -257,7 +257,7 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
              "jmp     1b\n\t"
              
              "1:\n\t"
-         //    ""POPX" %%"XBX"\n\t"
+             ""POPX" %%"XBX"\n\t"
 
              : /* no outputs */
 
@@ -277,7 +277,7 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
                "m"(LoopCtr),
                "m"(QW256)
 
-             : ""XAX"", ""XBX"", ""XCX"", ""XDX"", ""XSI"", ""XDI"",
+             : ""XAX"", ""XCX"", ""XDX"", ""XSI"", ""XDI"",
 #ifdef ARCH_386
 // is this really necessary?
                "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",

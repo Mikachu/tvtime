@@ -104,7 +104,7 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
              // XSI - next weave pixels, 1 line up
 
              // Save "XBX" (-fPIC)
-            // ""PUSHX" %%"XBX"\n\t"
+             ""PUSHX" %%"XBX"\n\t"
              
 #ifdef IS_SSE2
              
