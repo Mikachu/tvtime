@@ -435,7 +435,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
-    x11_wait_mapped( display, wm_window );
+    // x11_wait_mapped( display, wm_window );
 
     /* Wait for map. */
     XMaskEvent( display, StructureNotifyMask, &xev );
