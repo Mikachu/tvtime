@@ -356,53 +356,58 @@
 
     Commands known to tvtime:
 
-      AUTO_ADJUST_PICT           MIXER_TOGGLE_MUTE        
-      AUTO_ADJUST_WINDOW         MIXER_UP                 
-      BRIGHTNESS_DOWN            OVERSCAN_DOWN            
-      BRIGHTNESS_UP              OVERSCAN_UP              
-      CHANNEL_1                  PICTURE                  
-      CHANNEL_2                  PICTURE_UP               
-      CHANNEL_3                  PICTURE_DOWN             
-      CHANNEL_4                  RESTART                  
-      CHANNEL_5                  RUN_COMMAND              
-      CHANNEL_6                  SAVE_PICTURE_GLOBAL      
-      CHANNEL_7                  SAVE_PICTURE_CHANNEL     
-      CHANNEL_8                  SCREENSHOT               
-      CHANNEL_9                  SCROLL_CONSOLE_DOWN      
-      CHANNEL_0                  SCROLL_CONSOLE_UP        
-      CHANNEL_ACTIVATE_ALL       SET_AUDIO_MODE           
-      CHANNEL_DEC                SET_DEINTERLACER         
-      CHANNEL_DOWN               SET_FRAMERATE            
-      CHANNEL_INC                SET_FREQUENCY_TABLE      
-      CHANNEL_PREV               SET_NORM                 
-      CHANNEL_RENUMBER           SET_SHARPNESS            
+      AUTO_ADJUST_PICT           OVERSCAN_DOWN            
+      AUTO_ADJUST_WINDOW         OVERSCAN_UP              
+      BRIGHTNESS_DOWN            PICTURE                  
+      BRIGHTNESS_UP              PICTURE_UP               
+      CHANNEL_1                  PICTURE_DOWN             
+      CHANNEL_2                  RESTART                  
+      CHANNEL_3                  RIGHT                    
+      CHANNEL_4                  RUN_COMMAND              
+      CHANNEL_5                  SAVE_PICTURE_GLOBAL      
+      CHANNEL_6                  SAVE_PICTURE_CHANNEL     
+      CHANNEL_7                  SCREENSHOT               
+      CHANNEL_8                  SCROLL_CONSOLE_DOWN      
+      CHANNEL_9                  SCROLL_CONSOLE_UP        
+      CHANNEL_0                  SET_AUDIO_MODE           
+      CHANNEL_ACTIVATE_ALL       SET_DEINTERLACER         
+      CHANNEL_DEC                SET_FRAMERATE            
+      CHANNEL_DOWN               SET_FREQUENCY_TABLE      
+      CHANNEL_INC                SET_FULLSCREEN_POSITION  
+      CHANNEL_JUMP               SET_INPUT_WIDTH          
+      CHANNEL_PREV               SET_MATTE                
+      CHANNEL_RENUMBER           SET_NORM                 
       CHANNEL_SAVE_TUNING        SHOW_DEINTERLACER_INFO   
       CHANNEL_SCAN               SHOW_MENU                
       CHANNEL_SKIP               SHOW_STATS               
-      CHANNEL_UP                 TOGGLE_ALWAYSONTOP       
-      COLOR_DOWN                 TOGGLE_ASPECT            
-      COLOR_UP                   TOGGLE_AUDIO_MODE        
-      COLOUR_DOWN                TOGGLE_BARS              
-      COLOUR_UP                  TOGGLE_CC                
-      CONTRAST_DOWN              TOGGLE_CHROMA_KILL       
-      CONTRAST_UP                TOGGLE_COLOR_INVERT      
-      DISPLAY_INFO               TOGGLE_COLOUR_INVERT     
-      DISPLAY_MESSAGE            TOGGLE_CONSOLE           
+      CHANNEL_UP                 SLEEP                    
+      COLOR_DOWN                 TOGGLE_ALWAYSONTOP       
+      COLOR_UP                   TOGGLE_ASPECT            
+      COLOUR_DOWN                TOGGLE_AUDIO_MODE        
+      COLOUR_UP                  TOGGLE_BARS              
+      CONTRAST_DOWN              TOGGLE_CC                
+      CONTRAST_UP                TOGGLE_CHROMA_KILL       
+      DISPLAY_INFO               TOGGLE_COLOR_INVERT      
+      DISPLAY_MESSAGE            TOGGLE_COLOUR_INVERT     
+      DOWN                       TOGGLE_CONSOLE           
       ENTER                      TOGGLE_DEINTERLACER      
       FINETUNE_DOWN              TOGGLE_FULLSCREEN        
       FINETUNE_UP                TOGGLE_FRAMERATE         
       HUE_DOWN                   TOGGLE_INPUT             
       HUE_UP                     TOGGLE_LUMA_CORRECTION   
       KEY_EVENT                  TOGGLE_MATTE             
-      LUMA_DOWN                  TOGGLE_MIRROR            
-      LUMA_UP                    TOGGLE_MODE              
-      MENU_DOWN                  TOGGLE_MUTE              
-      MENU_ENTER                 TOGGLE_NTSC_CABLE_MODE   
-      MENU_EXIT                  TOGGLE_PAL_SECAM         
-      MENU_LEFT                  TOGGLE_PAUSE             
-      MENU_RIGHT                 TOGGLE_PULLDOWN_DETECTION
+      LEFT                       TOGGLE_MIRROR            
+      LUMA_DOWN                  TOGGLE_MODE              
+      LUMA_UP                    TOGGLE_MUTE              
+      MENU_DOWN                  TOGGLE_NTSC_CABLE_MODE   
+      MENU_ENTER                 TOGGLE_PAL_SECAM         
+      MENU_EXIT                  TOGGLE_PAUSE             
+      MENU_BACK                  TOGGLE_PULLDOWN_DETECTION
       MENU_UP                    TOGGLE_SIGNAL_DETECTION  
-      MIXER_DOWN                 QUIT                     
+      MIXER_DOWN                 TOGGLE_XDS               
+      MIXER_TOGGLE_MUTE          UP                       
+      MIXER_UP                   QUIT                     
+      NOOP                                                
 
     Special keys known by tvtime:
 

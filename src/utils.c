@@ -448,6 +448,8 @@ static command_names_t command_table[] = {
     { "MIXER_TOGGLE_MUTE", TVTIME_MIXER_TOGGLE_MUTE },
     { "MIXER_UP", TVTIME_MIXER_UP },
 
+    { "NOOP", TVTIME_NOCOMMAND },
+
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
 
