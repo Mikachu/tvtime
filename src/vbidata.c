@@ -448,14 +448,14 @@ static int xds_decode( vbidata_t *vbi, int b1, int b2 )
         vbi->xds_cursor = 0;
     }
 
-    if( vbi->usexds ) {
-        vbi->xds_packet[ vbi->xds_cursor ] = b1;
-        vbi->xds_packet[ vbi->xds_cursor + 1 ] = b2;
-        vbi->xds_cursor += 2;
-    }
+    vbi->xds_packet[ vbi->xds_cursor ] = b1;
+    vbi->xds_packet[ vbi->xds_cursor + 1 ] = b2;
+    vbi->xds_cursor += 2;
 
     if( b1 == 0xf ) {
-        parse_xds_packet( vbi, vbi->xds_packet, vbi->xds_cursor );
+        if( vbi->usexds ) {
+            parse_xds_packet( vbi, vbi->xds_packet, vbi->xds_cursor );
+        }
         vbi->xds_cursor = 0;
     }
 
