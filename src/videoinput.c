@@ -347,6 +347,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                      strerror( errno ) );
         }
     } else {
+        if( vidin->verbose ) {
+            fprintf( stderr, "videoinput: Framebuffer settings are base 0x%p, %xx%d, depth %d, and %d bpl.\n",
+                     fbuf.base, fbuf.width, fbuf.height, fbuf.depth, fbuf.bytesperline );
+        }
         if( ioctl( vidin->grab_fd, VIDIOCSFBUF, &fbuf ) < 0 ) {
             if( vidin->verbose ) {
                 fprintf( stderr, "videoinput: Can't get framebuffer settings, which I don't need anyway: %s\n",
