@@ -42,28 +42,28 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	outputfilter.h outputfilter.c xmltv.h xmltv.c gettext.h tvtimeglyphs.h
 
 if ARCH_X86
-DSCALER_SRCS = $(top_builddir)/plugins/dscalerapi.h \
-	$(top_builddir)/plugins/greedyhmacros.h \
-	$(top_builddir)/plugins/kdetv_greedyh.c \
-	$(top_builddir)/plugins/kdetv_tomsmocomp.c \
-	$(top_builddir)/plugins/greedyh.h \
-	$(top_builddir)/plugins/greedyh.cpp \
-	$(top_builddir)/plugins/tomsmocomp.h \
-	$(top_builddir)/plugins/tomsmocomp.cpp
+DSCALER_SRCS = $(top_srcdir)/plugins/dscalerapi.h \
+	$(top_srcdir)/plugins/greedyhmacros.h \
+	$(top_srcdir)/plugins/kdetv_greedyh.c \
+	$(top_srcdir)/plugins/kdetv_tomsmocomp.c \
+	$(top_srcdir)/plugins/greedyh.h \
+	$(top_srcdir)/plugins/greedyh.cpp \
+	$(top_srcdir)/plugins/tomsmocomp.h \
+	$(top_srcdir)/plugins/tomsmocomp.cpp
 else
 DSCALER_SRCS = 
 endif
 
-PLUGIN_CFLAGS = -I$(top_builddir)/plugins
-PLUGIN_SRCS =  $(top_builddir)/plugins/plugins.h \
-	$(top_builddir)/plugins/linear.c \
-	$(top_builddir)/plugins/scalerbob.c \
-	$(top_builddir)/plugins/linearblend.c \
-	$(top_builddir)/plugins/vfir.c \
-	$(top_builddir)/plugins/greedy.c \
-	$(top_builddir)/plugins/weave.c \
-	$(top_builddir)/plugins/weavetff.c \
-	$(top_builddir)/plugins/weavebff.c \
+PLUGIN_CFLAGS = -I$(top_srcdir)/plugins
+PLUGIN_SRCS =  $(top_srcdir)/plugins/plugins.h \
+	$(top_srcdir)/plugins/linear.c \
+	$(top_srcdir)/plugins/scalerbob.c \
+	$(top_srcdir)/plugins/linearblend.c \
+	$(top_srcdir)/plugins/vfir.c \
+	$(top_srcdir)/plugins/greedy.c \
+	$(top_srcdir)/plugins/weave.c \
+	$(top_srcdir)/plugins/weavetff.c \
+	$(top_srcdir)/plugins/weavebff.c \
 	$(DSCALER_SRCS)
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \

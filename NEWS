@@ -6,6 +6,10 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.14
 
+  *  Improved the usability of the menu system when using a mouse.
+  *  Fixed some problems with Xinerama and fullscreen.
+  *  Streamlined the default set of key bindings.
+  *  Show an icon in modern window list applications.
   *  Fixed colour problems for DVB driver users.
   *  Changed the default process priority to -10 instead of -19.
   *  Fixed compile problems with new gcc versions.

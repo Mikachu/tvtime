@@ -1,5 +1,5 @@
 
-0.9.14 -
+0.9.14 - Thu Oct 28 14:10:03 EDT 2004
   * vektor: Improve usability of the menu system when using a mouse.
   * inguin: Xinerama: Go to fullscreen on the head that contains the largest
       part of the tvtime window.
