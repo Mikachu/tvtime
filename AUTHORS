@@ -63,7 +63,6 @@ Authors and contributors
   Per von Zweigbergk <pvz@e.kth.se>
     - Work on making tvtime fully UTF-8 aware.
     - Much work on the gettext() code.
-    - Swedish translation.
 
   Richard Jones <richard@earthmen.com>
     - Work on the DirectFB output driver for the Matrox G400-style
@@ -90,8 +89,19 @@ Authors and contributors
   Michael Lawrence <lawremi@iastate.edu>
     - Extended XMLTV info to list the upcoming show.
 
+Translators
+
+  Per von Zweigbergk <pvz@e.kth.se>
+    - Swedish translation.
+
   Vincent van Adrighem <adrighem@gnome.org>
     - Dutch translation.
+
+  Alexander S. Belov <asbel@sice.ru>
+    - Russian translation.
+
+  Lukas Slansky <lukas@schnauzer.cz>
+    - Czech translation.
 
 Code we stole (well, used under the GPL)
 
