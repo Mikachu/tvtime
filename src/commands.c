@@ -22,6 +22,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <time.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -30,6 +31,7 @@
 #include "input.h"
 #include "commands.h"
 #include "console.h"
+#include "xmltv.h"
 
 #define NUM_FAVORITES 9
 #define MAX_USER_MENUS 64
@@ -267,6 +269,8 @@ struct commands_s {
     int quit;
     int inputnum;
 
+    xmltv_t *xmltv;
+
     int picturemode;
     int brightness;
     int contrast;
@@ -345,6 +349,60 @@ static void menu_set_value( menu_t *menu, int newval, int a, int b, int c )
     menu_set_text( menu, 1, string );
 }
 
+static void update_xmltv_channel( commands_t *cmd )
+{
+    if( cmd->xmltv && cmd->osd ) {
+        xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv, station_get_current_channel_name( cmd->stationmgr ) ) );
+    } else if( cmd->osd ) {
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0 );
+    }
+}
+
+static void update_xmltv_listings( commands_t *cmd )
+{
+    if( cmd->xmltv && cmd->osd ) {
+        time_t tm = time( 0 );
+        struct tm *curtime = localtime( &tm );
+        int year = 1900 + curtime->tm_year;
+        int month = 1 + curtime->tm_mon;
+        int day = curtime->tm_mday;
+        int hour = curtime->tm_hour;
+        int min = curtime->tm_min;
+
+        if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
+            const char *desc;
+            char descdata[ 1024 ];
+            char *line1 = 0;
+            char *line2 = 0;
+
+            xmltv_refresh( cmd->xmltv, year, month, day, hour, min );
+
+            desc = xmltv_get_description( cmd->xmltv );
+            if( desc ) {
+                snprintf( descdata, sizeof( descdata ), "%s", desc );
+                line1 = descdata;
+                line2 = 0;
+
+                if( strlen( descdata ) > 45 ) {
+                    int desc_i = strlen( descdata ) / 2;
+
+                    /* find nearest white space */
+                    while( desc_i ) {
+                        if( descdata[ desc_i ] == ' ') break; else desc_i--;
+                    }
+                    if( desc_i ) {
+                        line2 = descdata + desc_i + 1; /* +1 for the space */
+                        descdata[ desc_i ] = '\0';
+                    }
+                }
+            }
+
+            tvtime_osd_show_program_info( cmd->osd, xmltv_get_title( cmd->xmltv ),
+                                          xmltv_get_sub_title( cmd->xmltv ), line1, line2 );
+        }
+    }
+}
+
 static void reinit_tuner( commands_t *cmd )
 {
     /* Setup the tuner if available. */
@@ -418,6 +476,7 @@ static void reinit_tuner( commands_t *cmd )
             tvtime_osd_set_show_start( cmd->osd, "" );
             tvtime_osd_set_show_length( cmd->osd, "" );
             tvtime_osd_show_info( cmd->osd );
+            update_xmltv_channel( cmd );
 
             if( station_get_current_active( cmd->stationmgr ) ) {
                 sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb7 );
@@ -440,6 +499,7 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_rating( cmd->osd, "" );
         tvtime_osd_set_show_start( cmd->osd, "" );
         tvtime_osd_set_show_length( cmd->osd, "" );
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0 );
         tvtime_osd_show_info( cmd->osd );
     }
 
@@ -914,6 +974,12 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
     cmd->update_luma = 0;
     cmd->luma_power = config_get_luma_correction( cfg );
+
+    if( config_get_xmltv_file( cfg ) && strcasecmp( config_get_xmltv_file( cfg ), "none" ) ) {
+        cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ) );
+    } else {
+        cmd->xmltv = 0;
+    }
 
     if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
         cmd->apply_luma = 0;
@@ -2900,6 +2966,7 @@ void commands_next_frame( commands_t *cmd )
         cmd->change_channel = 0;
     }
 
+    update_xmltv_listings( cmd );
     if( cmd->vbi ) {
         if( *(vbidata_get_network_name( cmd->vbi )) ) {
             /* If the network name has changed, save it to the config file. */

@@ -86,6 +86,7 @@ int config_get_global_contrast( config_t *ct );
 int config_get_global_colour( config_t *ct );
 int config_get_global_hue( config_t *ct );
 const char *config_get_audio_mode( config_t *ct );
+const char *config_get_xmltv_file( config_t *ct );
 
 double config_get_overscan( config_t *ct );
 

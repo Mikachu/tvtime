@@ -84,6 +84,7 @@ struct config_s
     char *ssdir;
     char *timeformat;
     char *audiomode;
+    char *xmltvfile;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
 
@@ -136,6 +137,7 @@ static void copy_config( config_t *dest, config_t *src )
     dest->doc = 0;
     dest->output_driver = 0;
     dest->audiomode = 0;
+    dest->xmltvfile = 0;
 
     /* Useful strings must be copied. */
     dest->norm = strdup( src->norm );
@@ -263,6 +265,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "AudioMode" ) ) {
             if( ct->audiomode ) free( ct->audiomode );
             ct->audiomode = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "XMLTVFile" ) ) {
+            if( ct->xmltvfile ) free( ct->xmltvfile );
+            ct->xmltvfile = expand_user_path( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "OutputDriver" ) ) {
@@ -633,6 +640,7 @@ static void print_usage( char **argv )
              "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
              "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
              "  -S, --saveoptions          Save command line options to the config file.\n"
+             "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
              "  -v, --verbose              Print debugging messages to stderr.\n"
              "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
              "                             (defaults to /dev/mixer:line)\n\n"
@@ -682,6 +690,7 @@ static void print_config_usage( char **argv )
              "                             PAL-N or PAL-60 (defaults to NTSC).\n"
              "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
              "                             centre (default).\n"
+             "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
              "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
              "                             (defaults to /dev/mixer:line)\n\n"
              "                             Valid channels are:\n"
@@ -752,7 +761,8 @@ config_t *config_new( void )
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
     ct->ssdir = strdup( getenv( "HOME" ) );
-    ct->ssdir = strdup( "stereo" );
+    ct->audiomode = strdup( "stereo" );
+    ct->xmltvfile = strdup( "none" );
     ct->timeformat = strdup( "%X" );
     ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
     ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
@@ -916,6 +926,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "widescreen", 0, 0, 'a' },
         { "rvr", 1, 0, 'r' },
         { "fspos", 1, 0, 'p' },
+        { "xmltv", 1, 0, 't' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -933,6 +944,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         case 's': ct->debug = 1; break;
         case 'S': saveoptions = 1; break;
         case 'v': ct->verbose = 1; break;
+        case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
+                  ct->xmltvfile = expand_user_path( optarg ); break;
         case 'F': if( configFile ) { free( configFile ); }
                   configFile = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
@@ -1058,6 +1071,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "window", 0, 0, 'M' },
         { "widescreen", 0, 0, 'a' },
         { "fspos", 1, 0, 'p' },
+        { "xmltv", 2, 0, 't' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -1069,7 +1083,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:",
+    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -1102,6 +1116,13 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   break;
         case 'c': ct->prev_channel = ct->start_channel;
                   ct->start_channel = atoi( optarg ); break;
+        case 't': if( !optarg ) {
+                      fprintf( stdout, "XMLTVFile:%s\n", config_get_xmltv_file( ct ) );
+                  } else {
+                      if( ct->xmltvfile ) free( ct->xmltvfile );
+                      ct->xmltvfile = expand_user_path( optarg );
+                  }
+                  break;
         case 'n': if( !optarg ) {
                       fprintf( stdout, "Norm:%s\n", config_get_v4l_norm( ct ) );
                   } else {
@@ -1259,6 +1280,7 @@ void config_free_data( config_t *ct )
     if( ct->freq ) free( ct->freq );
     if( ct->ssdir ) free( ct->ssdir );
     if( ct->audiomode ) free( ct->audiomode );
+    if( ct->xmltvfile ) free( ct->xmltvfile );
     if( ct->timeformat ) free( ct->timeformat );
     if( ct->output_driver ) free( ct->output_driver );
     if( ct->rvr_filename ) free( ct->rvr_filename );
@@ -1664,5 +1686,10 @@ int config_get_global_hue( config_t *ct )
 const char *config_get_audio_mode( config_t *ct )
 {
     return ct->audiomode;
+}
+
+const char *config_get_xmltv_file( config_t *ct )
+{
+    return ct->xmltvfile;
 }
 

@@ -88,6 +88,11 @@
   -->
   <option name="InputWidth" value="720"/>
 
+  <!--
+    Set this to a filename to get show listings from an xmltv file.
+    Set to "none" if you do not wish to use xmltv.
+  -->
+  <option name="XMLTVFile" value="none"/>
 
   <!--
     Set this to 1 to enable VBI decoding.  tvtime supports decoding of

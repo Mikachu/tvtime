@@ -1,5 +1,7 @@
 
 0.9.9.1
+  * vektor: Added XMLTV listings support.  Use --xmltv to specify the
+      name.
   * vektor: We now search /usr/lib/win32 for DLLs to be more compatible
       with applications like mplayer and xine.
   * vektor: Only print frame drop information if signal detection
