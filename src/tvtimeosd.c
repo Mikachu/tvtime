@@ -21,8 +21,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "osdtools.h"
+#include "tvtimeconf.h"
 #include "tvtimeosd.h"
 #include "credits.h"
+
 
 struct tvtime_osd_s
 {
@@ -70,12 +72,16 @@ struct tvtime_osd_s
 
     credits_t *credits;
     int show_credits;
+    config_t *cfg;
 };
 
-tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
+tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frameaspect )
 {
     char *fontfile;
     char *logofile;
+    const char *rgb;
+    unsigned char channel_rgb[3], other_rgb[3];
+
     tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
     if( !osd ) {
         return 0;
@@ -88,6 +94,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd->muted = 0;
     osd->hassignal = 0;
     osd->channel_logo = 0;
+    osd->cfg = cfg;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
@@ -124,39 +131,44 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
         return 0;
     }
 
-    osd_string_set_colour_rgb( osd->tuner_info, 245, 222, 179 );
+    if( cfg ) {
+        rgb = config_get_other_text_rgb( cfg );
+        config_rgb_to_ycbcr( rgb, &other_rgb[0], &other_rgb[1], &other_rgb[2] );
+        rgb = config_get_channel_text_rgb( cfg );
+        config_rgb_to_ycbcr( rgb, &channel_rgb[0], &channel_rgb[1], &channel_rgb[2] );
+    }
+    osd_string_set_colour( osd->tuner_info, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd_string_show_text( osd->tuner_info, "0", 1 );
     osd_string_show_border( osd->tuner_info, 1 );
     osd->tuner_info_xpos = ( width * 5 ) / 100;
     osd->tuner_info_ypos = ( height * 5 ) / 100;
 
-    osd_string_set_colour( osd->channel_number, 220, 12, 155 );
+    osd_string_set_colour( osd->channel_number, (int)channel_rgb[0], (int)channel_rgb[1], (int)channel_rgb[2] );
     osd_string_show_text( osd->channel_number, "0", 1 );
     osd_string_show_border( osd->channel_number, 1 );
     osd->channel_number_xpos = osd->tuner_info_xpos;
     osd->channel_number_ypos = osd->tuner_info_ypos + osd_string_get_height( osd->tuner_info );
 
-    osd_string_set_colour_rgb( osd->signal_info, 245, 222, 179 );
+    osd_string_set_colour( osd->signal_info, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd_string_show_text( osd->signal_info, "No signal", 100 );
     osd_string_show_border( osd->signal_info, 1 );
     osd->signal_info_xpos = osd->tuner_info_xpos;
     osd->signal_info_ypos = osd->channel_number_ypos + osd_string_get_height( osd->channel_number );
 
-    osd_string_set_colour( osd->channel_info, 220, 12, 155 );
-    osd_string_set_colour_rgb( osd->channel_info, 245, 222, 179 );
+    osd_string_set_colour( osd->channel_info, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd_string_show_border( osd->channel_info, 1 );
     osd->channel_info_xpos = ( width * 60 ) / 100;
     osd->channel_info_ypos = ( height * 5 ) / 100;
 
-    osd_string_set_colour_rgb( osd->volume_bar, 245, 222, 179 );
+    osd_string_set_colour( osd->volume_bar, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd->volume_bar_xpos = ( width * 5 ) / 100;
     osd->volume_bar_ypos = ( height * 90 ) / 100;
 
-    osd_string_set_colour_rgb( osd->data_bar, 245, 222, 179 );
+    osd_string_set_colour( osd->data_bar, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd->data_bar_xpos = ( width * 5 ) / 100;
     osd->data_bar_ypos = ( height * 90 ) / 100;
 
-    osd_string_set_colour_rgb( osd->muted, 245, 222, 179 );
+    osd_string_set_colour( osd->muted, (int)other_rgb[0], (int)other_rgb[1], (int)other_rgb[2] );
     osd_string_show_text( osd->muted, "Mute", 100 );
     osd->muted_xpos = ( width * 5 ) / 100;
     osd->muted_ypos = osd->volume_bar_ypos - osd_string_get_height( osd->muted );

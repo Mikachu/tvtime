@@ -81,6 +81,14 @@ LumaCorrection = 1.0
 # by the capture card, we will print frame drop information to stderr.
 DebugMode = 0
 
+# This option is the RGB colour used for the Channel Number in the OSD.
+# The default is yellow. It must be in hex and exactly 6 characters long.
+# First pair is Red, second is Green, third is Blue.
+ChannelTextFG = FFFF00
+
+# This sets the colour for all other OSD text. Default is "wheat".
+OtherTextFG = F5DEB3
+
 ########################################
 #
 #  Keybindings

@@ -519,7 +519,7 @@ int main( int argc, char **argv )
 
 
     /* Setup OSD stuff. */
-    osd = tvtime_osd_new( width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+    osd = tvtime_osd_new( ct, width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !osd ) {
         fprintf( stderr, "Can't initialize OSD object.\n" );
     } else {

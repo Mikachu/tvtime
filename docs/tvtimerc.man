@@ -48,6 +48,14 @@ This sets the magnitude of the luma correction.  A value of 1.0 does nothing exc
 .TP
 .B DebugMode = 0 | 1
 This option enables a special debug mode.  In debug mode, frame drop information is printed to stderr if tvtime cannot keep up with the number of frames provided by the capture card.
+.TP
+.B ChannelTextFG = rrggbb
+This option is the RGB colour used for the Channel Number in the OSD. The default is yellow. It must be in hex and exactly 6 characters long. First pair is Red, second is Green, third is Blue.
+
+.TP
+.B OtherTextFG = rrggbb
+This option is the RGB colour used for all other OSD text. The default is wheat. It must be in hex and exactly 6 characters long. First pair is Red, second is Green, third is Blue.
+
 .SH KEYBINDINGS
 The keybindings for controlling tvtime can be altered by explicitly declaring the preferred keybindings in the tvtimerc file.  These keybinding declarations take the form: key_<name> = <key(s)>.  Listed below, is a key value reference chart, example keybindings, and the tvtime default keybindings.
 .P

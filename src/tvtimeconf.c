@@ -106,6 +106,8 @@ struct config_s
     char *timeformat;
     int *buttonmap;
     char *menu_bg_rgb;
+    char *channel_text_rgb;
+    char *other_text_rgb;
 };
 
 void config_init( config_t *ct );
@@ -174,6 +176,8 @@ config_t *config_new( int argc, char **argv )
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
     ct->menu_bg_rgb = strdup( "000000" );
+    ct->channel_text_rgb = strdup( "FFFF00" );
+    ct->other_text_rgb = strdup( "F5DEB3" );
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -362,6 +366,17 @@ void config_init( config_t *ct )
         free( ct->menu_bg_rgb );
         ct->menu_bg_rgb = strdup( tmp );
     }
+
+    if( (tmp = parser_get( &(ct->pf), "ChannelTextFG", 1 )) ) {
+        free( ct->channel_text_rgb );
+        ct->channel_text_rgb = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "OtherTextFG", 1 )) ) {
+        free( ct->other_text_rgb );
+        ct->other_text_rgb = strdup( tmp );
+    }
+
 
     if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
         ct->finetune = atoi( tmp );
@@ -669,6 +684,16 @@ int config_get_finetune( config_t *ct )
 const char *config_get_menu_bg_rgb( config_t *ct )
 {
     return ct->menu_bg_rgb;
+}
+
+const char *config_get_channel_text_rgb( config_t *ct )
+{
+    return ct->channel_text_rgb;
+}
+
+const char *config_get_other_text_rgb( config_t *ct )
+{
+    return ct->other_text_rgb;
 }
 
 void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr )

@@ -19,6 +19,8 @@
 #ifndef TVTIMEOSD_H_INCLUDED
 #define TVTIMEOSD_H_INCLUDED
 
+#include "tvtimeconf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,9 +47,7 @@ extern "C" {
 
 typedef struct tvtime_osd_s tvtime_osd_t;
 
-/**
- */
-tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect );
+tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frameaspect );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 
 void tvtime_osd_show_info( tvtime_osd_t *osd );
