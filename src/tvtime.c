@@ -850,6 +850,7 @@ int main( int argc, char **argv )
     char kbd_cmd[ 1024 ];
     int kbd_pos = 0;
     int kbd_available;
+    char *error_string = 0;
     int i;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
@@ -941,6 +942,10 @@ int main( int argc, char **argv )
     if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
+            if( asprintf( &error_string, "Can't open rvr file '%s'.",
+                          config_get_rvr_filename( ct ) ) < 0 ) {
+                error_string = 0;
+            }
             fprintf( stderr, "tvtime: Can't open rvr file '%s'.\n",
                      config_get_rvr_filename( ct ) );
         } else {
@@ -955,6 +960,10 @@ int main( int argc, char **argv )
                                 config_get_inputwidth( ct ), 
                                 norm, verbose );
         if( !vidin ) {
+            if( asprintf( &error_string, "Can't open V4L device '%s'.",
+                          config_get_v4l_device( ct ) ) < 0 ) {
+                error_string = 0;
+            }
             fprintf( stderr, "tvtime: Can't open video input, "
                              "maybe try a different device?\n" );
         } else {
@@ -1053,6 +1062,11 @@ int main( int argc, char **argv )
         } else {
             tvtime_osd_set_input( osd, "No video source" );
             tvtime_osd_set_norm( osd, "" );
+        }
+
+        if( error_string ) {
+            tvtime_osd_set_hold_message( osd, error_string );
+            tvtime_osd_hold( osd, 1 );
         }
     }
 
