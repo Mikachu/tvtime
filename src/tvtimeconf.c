@@ -42,7 +42,6 @@
 
 /* Mode list. */
 typedef struct tvtime_modelist_s tvtime_modelist_t;
-static void copy_config( config_t *dest, config_t *src );
 
 /* Key names. */
 typedef struct key_name_s key_name_t;
@@ -153,6 +152,29 @@ struct tvtime_modelist_s
     tvtime_modelist_t *next;
 };
 
+static void copy_config( config_t *dest, config_t *src )
+{
+    (*dest) = (*src);
+
+    /* Some of these I am keeping invalid for now. */
+    dest->keymap = 0;
+    dest->buttonmap = 0;
+    dest->v4ldev = 0;
+    dest->vbidev = 0;
+    dest->command_pipe_dir = 0;
+    dest->command_pipe = 0;
+    dest->rvr_filename = 0;
+    dest->config_filename = 0;
+    dest->modelist = 0;
+    dest->nummodes = 0;
+
+    /* Useful strings must be copied. */
+    dest->norm = strdup( src->norm );
+    dest->freq = strdup( src->freq );
+    dest->ssdir = strdup( src->ssdir );
+    dest->timeformat = strdup( src->timeformat );
+    dest->deinterlace_method = strdup( src->timeformat );
+}
 
 static unsigned int parse_colour( const char *str )
 {
@@ -769,30 +791,6 @@ void config_delete( config_t *ct )
     if( ct->configsave ) configsave_close( ct->configsave );
     /* TODO: Free modelist. */
     free( ct );
-}
-
-static void copy_config( config_t *dest, config_t *src )
-{
-    (*dest) = (*src);
-
-    /* Some of these I am keeping invalid for now. */
-    dest->keymap = 0;
-    dest->buttonmap = 0;
-    dest->v4ldev = 0;
-    dest->vbidev = 0;
-    dest->command_pipe_dir = 0;
-    dest->command_pipe = 0;
-    dest->rvr_filename = 0;
-    dest->config_filename = 0;
-    dest->modelist = 0;
-    dest->nummodes = 0;
-
-    /* Useful strings must be copied. */
-    dest->norm = strdup( src->norm );
-    dest->freq = strdup( src->freq );
-    dest->ssdir = strdup( src->ssdir );
-    dest->timeformat = strdup( src->timeformat );
-    dest->deinterlace_method = strdup( src->timeformat );
 }
 
 int config_key_to_command( config_t *ct, int key )
