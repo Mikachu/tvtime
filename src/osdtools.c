@@ -25,6 +25,7 @@
 #include "leetft.h"
 #include "osdtools.h"
 
+#define OSD_FADEOUT_TIME 15
 
 int aspect_adjust_packed4444_scanline( unsigned char *output,
                                        unsigned char *input, 
@@ -231,9 +232,9 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
             width = osds->image_textwidth - xpos;
         }
 
-        if( osds->frames_left < 50 ) {
+        if( osds->frames_left < OSD_FADEOUT_TIME ) {
             int alpha;
-            alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
+            alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
             composite_packed4444_alpha_to_packed422_scanline( output, background,
                 osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
                 width, alpha );
@@ -323,9 +324,9 @@ void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
 {
     if( !osdd->frames_left ) return;
 
-    if( osdd->frames_left < 50 ) {
+    if( osdd->frames_left < OSD_FADEOUT_TIME ) {
         int alpha;
-        alpha = (int) (((((double) osdd->frames_left) / 50.0) * 256.0) + 0.5);
+        alpha = (int) (((((double) osdd->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
         composite_packed4444_alpha_to_packed422_scanline( output, background,
             osdd->data, width, alpha );
     } else {
@@ -477,8 +478,8 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
 
     if( !osds->frames_left ) return;
 
-    if( osds->frames_left < 50 ) {
-        alpha = (int) ( ( ( ( (double) osds->frames_left ) / 50.0 ) * osds->alpha ) + 0.5 );
+    if( osds->frames_left < OSD_FADEOUT_TIME ) {
+        alpha = (int) ( ( ( ( (double) osds->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osds->alpha ) + 0.5 );
     } else {
         alpha = osds->alpha;
     }
@@ -506,9 +507,9 @@ void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
             width = osds->shape_adjusted_width - xpos;
         }
 
-        if( osds->frames_left < 50 ) {
+        if( osds->frames_left < OSD_FADEOUT_TIME ) {
             int alpha;
-            alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
+            alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
             composite_packed4444_alpha_to_packed422_scanline( output, background,
                 osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
                 width, alpha );
@@ -731,8 +732,8 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
             width = osdg->image_adjusted_width - xpos;
         }
 
-        if( osdg->frames_left < 50 ) {
-            alpha = (int) ( ( ( ( (double) osdg->frames_left ) / 50.0 ) * osdg->alpha ) + 0.5 );
+        if( osdg->frames_left < OSD_FADEOUT_TIME ) {
+            alpha = (int) ( ( ( ( (double) osdg->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osdg->alpha ) + 0.5 );
         } else {
             alpha = osdg->alpha;
         }
