@@ -59,11 +59,7 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
 /**
  * These are the compositing routines we use in tvtime.
  */
-void composite_alphamask_packed422_scanline( unsigned char *output,
-                                             unsigned char *input,
-                                             unsigned char *mask, int width,
-                                             int textluma, int textcb,
-                                             int textcr, double textalpha );
+
 void composite_alphamask_packed4444_scanline( unsigned char *output,
                                               unsigned char *input,
                                               unsigned char *mask, int width,

@@ -49,7 +49,8 @@ void blit_colour_packed4444( unsigned char *output, int width, int height,
     }
 }
 
-void blit_colour_packed422( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr )
+void blit_colour_packed422( unsigned char *output, int width, int height,
+                            int stride, int luma, int cb, int cr )
 {
     int i;
 
