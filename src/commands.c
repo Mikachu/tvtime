@@ -210,6 +210,7 @@ static void update_xmltv_listings( commands_t *cmd )
 
         if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
             const char *desc;
+            char title[ 128 ];
             char subtitle[ 1024 ];
             char descdata[ 1024 ];
             char *line1 = 0;
@@ -222,6 +223,10 @@ static void update_xmltv_listings( commands_t *cmd )
                 snprintf( descdata, sizeof( descdata ), "%s", desc );
                 line1 = descdata;
                 line2 = 0;
+
+                if( strlen( descdata ) > 128 ) {
+                    sprintf( descdata + 128, "..." );
+                }
 
                 if( strlen( descdata ) > 45 ) {
                     int desc_i = strlen( descdata ) / 2;
@@ -244,7 +249,16 @@ static void update_xmltv_listings( commands_t *cmd )
                sprintf( subtitle, "%s", xmltv_get_times( cmd->xmltv ) );
             }
 
-            tvtime_osd_show_program_info( cmd->osd, xmltv_get_title( cmd->xmltv ), subtitle, line1, line2 );
+            if( xmltv_get_title( cmd->xmltv ) ) {
+                snprintf( title, sizeof( title ), "%s", xmltv_get_title( cmd->xmltv ) );
+                if( strlen( title ) > 40 ) {
+                    sprintf( title + 40, "..." );
+                }
+            } else {
+                *title = '\0';
+            }
+
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2 );
         }
     }
 }
