@@ -203,7 +203,7 @@ static void osd_string_render_dropshadow_image4444( osd_string_t *osds, const ch
     osds->image_textheight = stringheight + pushsize_y;
 
     if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
-        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+        osds->image_textwidth = (((osds->image_size/4) / osds->image_textheight) | 0xf) - 0xf;
     }
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
@@ -252,7 +252,7 @@ static void osd_string_render_bordered_image4444( osd_string_t *osds, const char
     osds->image_textheight = ft_string_get_height( osds->fts ) + bottom_y;
 
     if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
-        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+        osds->image_textwidth = (((osds->image_size/4) / osds->image_textheight) | 0xf) - 0xf;
     }
 
     /* TODO: Only blit size of data if < full text size. */
@@ -316,7 +316,7 @@ static void osd_string_render_plain_image4444( osd_string_t *osds, const char *t
     osds->image_textheight = ft_string_get_height( osds->fts );
 
     if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
-        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+        osds->image_textwidth = (((osds->image_size/4) / osds->image_textheight) | 0xf) - 0xf;
     }
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
