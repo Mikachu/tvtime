@@ -44,19 +44,19 @@ bin_PROGRAMS = tvtime
 EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.a -lpthread
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
-timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.a -lpthread
+timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 CLEANFILES = expandpng timingtest
 
-.PHONY: ../plugins/libtvtimeplugins.la wine/libwine.a
+.PHONY: ../plugins/libtvtimeplugins.la wine/libwine.la
 ../plugins/libtvtimeplugins.la:
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
-wine/libwine.a:
+wine/libwine.la:
 	( $(MAKE) $(AM_MAKEFLAGS) -C wine )
 
