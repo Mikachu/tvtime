@@ -288,7 +288,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 
     osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NAME ].string,
                                (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "0", 0 );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "gY", 0 );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NAME ].string, 1 );
     osd->strings[ OSD_CHANNEL_NAME ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
     osd->strings[ OSD_CHANNEL_NAME ].ypos = osd->strings[ OSD_TUNER_INFO ].ypos
