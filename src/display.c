@@ -205,40 +205,6 @@ static int update_resolution_x11(dpy_info_t *info, Display *dpy, int screen_nr)
 }
   
 
-#ifdef HAVE_XF86VIDMODE
-    
-static int update_resolution_xf86vidmode(dpy_info_t *info, Display *dpy,
-					 int screen_nr)
-{
-  int dotclk;
-  int x, y;
-  XF86VidModeModeLine modeline;
-
-  if(XF86VidModeGetModeLine(dpy, screen_nr, &dotclk, &modeline)) {
-    if(modeline.privsize != 0) {
-      XFree(modeline.private);
-    }
-    info->resolution.horizontal_pixels = modeline.hdisplay;
-    info->resolution.vertical_pixels = modeline.vdisplay;
-    info->resolution.refresh_rate = (double) ( (double) dotclk * 1000.0 ) /
-                                    (double) ( modeline.htotal * modeline.vtotal );
-
-    if(XF86VidModeGetViewPort(dpy, screen_nr, &x, &y)) {
-      info->screen_offset.x = x;
-      info->screen_offset.y = y;
-    }
-    
-    update_sar(info);
-    
-    return 1;
-  } 
-  
-  return 0;
-}
-
-#endif
-
-
 #ifdef HAVE_XINERAMA
     
 static int update_resolution_xinerama(dpy_info_t *info, Display *dpy,
@@ -298,11 +264,6 @@ int DpyInfoUpdateResolution(Display *dpy, int screen_nr, int x, int y)
   case DpyInfoOriginX11:
     ret = update_resolution_x11(&dpyinfo, dpy, screen_nr);
     break;
-#ifdef HAVE_XF86VIDMODE
-  case DpyInfoOriginXF86VidMode:
-    ret = update_resolution_xf86vidmode(&dpyinfo, dpy, screen_nr);
-    break;
-#endif
   case DpyInfoOriginUser:
     ret = update_resolution_user(&dpyinfo, dpy, screen_nr);
     break;
@@ -462,15 +423,6 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
        XineramaIsActive(dpy)) {
       if(update_resolution_xinerama(&dpyinfo, dpy, 0, 0)) {
 	dpyinfo.resolution_origin = DpyInfoOriginXinerama;
-	return dpyinfo.resolution_origin;
-      }
-    }
-#endif
-  case DpyInfoOriginXF86VidMode:
-#ifdef HAVE_XF86VIDMODE
-    if(XF86VidModeQueryExtension(dpy, &event_base, &error_base)) {
-      if(update_resolution_xf86vidmode(&dpyinfo, dpy, screen_nr)) {
-	dpyinfo.resolution_origin = DpyInfoOriginXF86VidMode;
 	return dpyinfo.resolution_origin;
       }
     }
