@@ -471,7 +471,6 @@ int station_writeconfig( station_mgr_t *mgr)
     if( mgr->first ) {
         do {
             if( !rp->active ) fprintf( f, "%d\n", rp->pos );
-            if( !rp->active ) fprintf( stderr, "%d\n", rp->pos );
             rp= rp->next;
         } while ( rp != mgr->first );
     }
