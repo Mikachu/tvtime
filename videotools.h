@@ -12,19 +12,41 @@ typedef struct video_correction_s video_correction_t;
 video_correction_t *video_correction_new( void );
 void video_correction_delete( video_correction_t *vc );
 void video_correction_set_luma_power( video_correction_t *vc, double power );
-void video_correction_correct_luma_plane( video_correction_t *vc, unsigned char *luma, int width, int height, int stride );
-void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned char *output, unsigned char *luma, int width );
-void video_correction_correct_cb_plane( video_correction_t *vc, unsigned char *cb, int width, int height, int stride );
-void video_correction_correct_cr_plane( video_correction_t *vc, unsigned char *cr, int width, int height, int stride );
+void video_correction_correct_luma_scanline( video_correction_t *vc,
+                                             unsigned char *output,
+                                             unsigned char *luma, int width );
+
+/**
+ * Builds a packed 4:2:2 frame from a field interpolating to frame size by
+ * linear interpolation.
+ */
+void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
+                                                          unsigned char *output,
+                                                          unsigned char *fieldluma,
+                                                          unsigned char *fieldcb,
+                                                          unsigned char *fieldcr,
+                                                          int bottom_field,
+                                                          int lstride, int cstride,
+                                                          int width, int height );
 
 
-void build_plane( unsigned char *output, unsigned char *field,
-                  int fieldstride, int width, int height,
-                  int bottom_field, int chroma );
-void build_packed_422_frame( unsigned char *output, unsigned char *fieldluma,
-                             unsigned char *fieldcb, unsigned char *fieldcr,
-                             int bottom_field, int lstride, int cstride,
-                             int width, int height, video_correction_t *vc );
+/**
+ * Builds a plane from a field interpolating to frame size by linear
+ * interpolation.
+ */
+void luma_plane_field_to_frame( unsigned char *output, unsigned char *input,
+                                int width, int height, int stride, int bottom_field );
+void chroma_plane_field_to_frame( unsigned char *output, unsigned char *input,
+                                  int width, int height, int stride, int bottom_field );
+
+/**
+ * Text masks are arrays of unsigned chars with values 0-4 for
+ * transparent to full alpha.  This will probably change when I can do
+ * a better renderer from ttfs.
+ */
+void composite_textmask_packed422_scanline( unsigned char *output, unsigned char *bottom422,
+                                            unsigned char *textmask, int width,
+                                            int textluma, int textcb, int textcr, double textalpha );
 
 /**
  * This filter actually does not meet the spec so I'm not

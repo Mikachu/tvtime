@@ -349,16 +349,19 @@ int main( int argc, char **argv )
 
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
-            build_plane( sdl_get_output(), curluma,
-                         width * 2, width, height, 0, 0 );
-            build_plane( sdl_get_cb(), curcb422,
-                         width * 2, width/2, height/2, 0, 1 );
-            build_plane( sdl_get_cr(), curcr422,
-                         width * 2, width/2, height/2, 0, 1 );
+            luma_plane_field_to_frame( sdl_get_output(), curluma,
+                                       width, height, width*2, 0 );
+            chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
+                                         width/2, height/2, width*2, 0 );
+            chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
+                                         width/2, height/2, width*2, 0 );
         } else {
-            build_packed_422_frame( sdl_get_output(), curluma,
-                                    curcb422, curcr422, 0,
-                                    width * 2, width, width, height, vc );
+            video_correction_planar422_field_to_packed422_frame( vc,
+                                                                 sdl_get_output(),
+                                                                 curluma,
+                                                                 curcb422,
+                                                                 curcr422,
+                                                                 0, width * 2, width, width, height );
         }
 
         /* Display. */
@@ -367,17 +370,19 @@ int main( int argc, char **argv )
 
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
-            build_plane( sdl_get_output(), curluma + width,
-                         width * 2, width, height, 1, 0 );
-            build_plane( sdl_get_cb(), curcb422,
-                         width*2, width / 2, height / 4, 1, 1 );
-            build_plane( sdl_get_cr(), curcr422,
-                         width*2, width / 2, height / 4, 1, 1 );
+            luma_plane_field_to_frame( sdl_get_output(), curluma + width,
+                                       width, height, width*2, 1 );
+            chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
+                                         width/2, height/2, width*2, 1 );
+            chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
+                                         width/2, height/2, width*2, 1 );
         } else {
-            build_packed_422_frame( sdl_get_output(), curluma + width,
-                                    curcb422 + (width / 2),
-                                    curcr422 + (width / 2), 1,
-                                    width * 2, width, width, height, vc );
+            video_correction_planar422_field_to_packed422_frame( vc,
+                                                                 sdl_get_output(),
+                                                                 curluma + width,
+                                                                 curcb422 + (width / 2),
+                                                                 curcr422 + (width / 2),
+                                                                 1, width * 2, width, width, height );
         }
 
         /* We're done with the input now. */
