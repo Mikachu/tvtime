@@ -212,8 +212,6 @@ struct commands_s {
 
     double overscan;
 
-    int audio_counter;
-    
     int console_on;
     int scrollconsole;
     console_t *console;
@@ -235,9 +233,6 @@ static void reinit_tuner( commands_t *in )
             vbidata_reset( in->vbi );
             vbidata_capture_mode( in->vbi, in->capturemode );
         }
-
-        videoinput_set_audio_mode( in->vidin, VIDEOINPUT_MONO );
-        in->audio_counter = CHANNEL_STEREO_DELAY;
 
         norm = videoinput_get_norm_number( station_get_current_norm( in->stationmgr ) );
         if( norm >= 0 ) {
@@ -312,7 +307,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->scrollconsole = 0;
     in->scan_channels = 0;
     in->pause = 0;
-    in->audio_counter = -1;
     in->change_channel = 0;
     in->renumbering = 0;
     in->resizewindow = 0;
@@ -351,6 +345,26 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 void commands_delete( commands_t *in )
 {
     free( in );
+}
+
+static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
+{
+    tvtime_osd_list_set_lines( osd, ntsc ? 4 : 5 );
+    tvtime_osd_list_set_text( osd, 0, "Preferred audio channel" );
+    tvtime_osd_list_set_text( osd, 1, "Mono" );
+    tvtime_osd_list_set_text( osd, 2, "Stereo" );
+    tvtime_osd_list_set_text( osd, 3, ntsc ? "SAP" : "Primary Language" );
+    if( !ntsc ) tvtime_osd_list_set_text( osd, 4, "Secondary Language" );
+    if( curmode == VIDEOINPUT_MONO ) {
+        tvtime_osd_list_set_hilight( osd, 1 );
+    } else if( curmode == VIDEOINPUT_STEREO ) {
+        tvtime_osd_list_set_hilight( osd, 2 );
+    } else if( curmode == VIDEOINPUT_LANG1 || (ntsc && curmode == VIDEOINPUT_LANG2) ) {
+        tvtime_osd_list_set_hilight( osd, 3 );
+    } else if( curmode == VIDEOINPUT_LANG2 ) {
+        tvtime_osd_list_set_hilight( osd, 4 );
+    }
+    tvtime_osd_show_list( osd, 1 );
 }
 
 void commands_handle( commands_t *in, int tvtime_cmd, int arg )
@@ -543,9 +557,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_TOGGLE_AUDIO_MODE:
         if( in->vidin ) {
-            in->audio_counter = -1;
             videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
             if( in->osd ) {
+                osd_list_audio_modes( in->osd, videoinput_get_norm( in->vidin ) == VIDEOINPUT_NTSC,
+                                      videoinput_get_audio_mode( in->vidin ) );
                 tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
                 tvtime_osd_show_info( in->osd );
             }
@@ -927,18 +942,6 @@ void commands_next_frame( commands_t *in )
             if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
             in->renumbering = 0;
         }
-    }
-
-    /* Decrement the stereo wait counter. */
-    if( in->audio_counter > 0 ) in->audio_counter--;
-
-    if( in->audio_counter == 0 ) {
-        videoinput_set_audio_mode( in->vidin, VIDEOINPUT_STEREO );
-        if( in->osd ) {
-            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_show_info( in->osd );
-        }
-        in->audio_counter = -1;
     }
 
     if( in->frame_counter > 0 && !(in->frame_counter % 5)) {

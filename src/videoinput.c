@@ -1167,34 +1167,27 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
 
 void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 {
+    if( mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC ) {
+        mode = VIDEOINPUT_LANG2;
+    }
+
+    if( mode > VIDEOINPUT_LANG2 ) {
+        mode = VIDEOINPUT_MONO;
+    }
+
     if( vidin->audiomode != mode ) {
         if( vidin->isv4l2 ) {
             if( vidin->hastuner ) {
                 struct v4l2_tuner tuner;
 
+                memset( &tuner, 0, sizeof( struct v4l2_tuner ) );
                 tuner.index = vidin->tunerid;
-                if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
-                    if( vidin->verbose ) {
-                        fprintf( stderr, "videoinput: Can't get tuner audio mode: %s\n",
-                                 strerror( errno ) );
-                    }
+                tuner.audmode = videoinput_get_audmode_v4l2( mode );
+                if( ioctl( vidin->grab_fd, VIDIOC_S_TUNER, &tuner ) < 0 ) {
+                    fprintf( stderr, "videoinput: Can't set tuner audio mode: %s\n",
+                             strerror( errno ) );
                 } else {
-                    while( mode <= VIDEOINPUT_LANG2 && ((mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC) || !videoinput_is_audmode_supported_v4l2( tuner.rxsubchans, mode )) ) {
-                        mode <<= 1;
-                    }
-                    if( mode > VIDEOINPUT_LANG2 ) {
-                        mode = VIDEOINPUT_MONO;
-                    }
-
-                    memset( &tuner, 0, sizeof( struct v4l2_tuner ) );
-                    tuner.index = vidin->tunerid;
-                    tuner.audmode = videoinput_get_audmode_v4l2( mode );
-                    if( ioctl( vidin->grab_fd, VIDIOC_S_TUNER, &tuner ) < 0 ) {
-                        fprintf( stderr, "videoinput: Can't set tuner audio mode: %s\n",
-                                 strerror( errno ) );
-                    } else {
-                        vidin->audiomode = mode;
-                    }
+                    vidin->audiomode = mode;
                 }
             }
         } else {
@@ -1207,13 +1200,6 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
                 }
             } else {
                 int was_muted = (audio.flags & VIDEO_AUDIO_MUTE);
-
-                while( mode <= VIDEOINPUT_LANG2 && ((mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC) || !(audio.mode & mode)) ) {
-                    mode <<= 1;
-                }
-                if( mode > VIDEOINPUT_LANG2 ) {
-                    mode = VIDEOINPUT_MONO;
-                }
 
                 /* Set the mode. */
                 audio.mode = mode;

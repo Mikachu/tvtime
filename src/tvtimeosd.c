@@ -558,8 +558,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
 
     if( strlen( osd->freqtable_text ) ) {
-        snprintf( text, sizeof( text ), "%s: %s [%s]",
-                  osd->input_text, osd->freqtable_text, osd->audiomode_text );
+        snprintf( text, sizeof( text ), "%s: %s",
+                  osd->input_text, osd->freqtable_text );
     } else {
         snprintf( text, sizeof( text ), "%s", osd->input_text );
     }
