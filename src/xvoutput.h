@@ -19,7 +19,6 @@
 #ifndef XVOUTPUT_H_INCLUDED
 #define XVOUTPUT_H_INCLUDED
 
-#include "input.h"
 #include "outputapi.h"
 
 #ifdef __cplusplus
