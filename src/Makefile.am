@@ -81,7 +81,7 @@ expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-rvr_SOURCES = $(COMMON_SRCS) reepktq.c rvrmain.c
+rvr_SOURCES = $(COMMON_SRCS) reepktq.h reepktq.c rvrmain.c
 rvr_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 CLEANFILES = expandpng timingtest rvr
