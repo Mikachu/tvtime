@@ -38,19 +38,6 @@ struct configsave_s
     xmlDocPtr Doc;
 };
 
-static xmlNodePtr find_node( const char *str, xmlNodePtr node )
-{
-    while( node ) {
-        if( !xmlStrcasecmp( node->name, BAD_CAST str ) ) {
-            return node;
-        }
-
-        node = node->next;
-    }
-
-    return 0;
-}
-
 static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
 {
     while( node ) {
@@ -120,22 +107,6 @@ configsave_t *configsave_open( const char *filename )
         return 0;
     }
 
-    node = find_node( "mousebindings", top->xmlChildrenNode );
-    if( !node ) {
-        node = xmlNewTextChild( top, 0, BAD_CAST "mousebindings", 0 );
-        if( !node ) {
-            fprintf( stderr, "configsave: Could not create element 'mousebindings'.\n" );
-        }
-    }
-
-    node = find_node( "keybindings", top->xmlChildrenNode );
-    if( !node ) {
-        node = xmlNewTextChild( top, 0, BAD_CAST "keybindings", 0 );
-        if( !node ) {
-            fprintf( stderr, "configsave: Could not create element 'keybindings'.\n" );
-        }
-    }
-
     xmlKeepBlanksDefault( 0 );
     xmlSaveFormatFile( cs->configFile, cs->Doc, 1 );
     return cs;
@@ -154,32 +125,13 @@ int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, c
     xmlAttrPtr attr;
 
     top = xmlDocGetRootElement( cs->Doc );
-
-    if( !xmlStrcasecmp( BAD_CAST INIT_name, BAD_CAST "keybindings" ) ) {
-        section = find_node( "keybindings", top->xmlChildrenNode );
-        if( !section ) {
-            fprintf( stderr, "configsave: No 'keybindings' section in %s. KeyBindings not saved.\n",
-                     cs->configFile );
-            return 0;
-        }
-
-    } else if( !xmlStrcasecmp( BAD_CAST INIT_name, BAD_CAST "mousebindings" ) ) {
-        section = find_node( "mousebindings", top->xmlChildrenNode );
-        if( !section ) {
-            fprintf( stderr, "configsave: No 'mousebindings' section in %s. MouseBindings not saved.\n",
-                     cs->configFile );
-            return 0;
-        }
-
+    node = find_option( top->xmlChildrenNode, INIT_name );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
+        attr = xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
+        attr = xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
     } else {
-        node = find_option( top->xmlChildrenNode, INIT_name );
-        if( !node ) {
-            node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
-            attr = xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
-            attr = xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
-        } else {
-            xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );
-        }
+        xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );
     }
 
     xmlKeepBlanksDefault( 0 );
