@@ -1,7 +1,7 @@
 SplineFontDB: 1.0
-FontName: FreeSansBold
-FullName: Free Sans Bold
-FamilyName: FreeSans
+FontName: TVTimeSansBold
+FullName: TVTime Sans Bold
+FamilyName: TVTimeSans
 Weight: Bold
 Copyright: Copyright 2002 Free Software Foundation.
 Version: $Revision$
@@ -15667,7 +15667,7 @@ Comment: "video processing"
 Colour: ffffff
 EndChar
 StartChar: uniE020
-Encoding: 57376 57376 65535
+Encoding: 57376 57376 725
 Width: 1000
 Flags: HW
 Fore
@@ -15699,7 +15699,7 @@ Comment: "exit"
 Colour: ffffff
 EndChar
 StartChar: uniE021
-Encoding: 57377 57377 65535
+Encoding: 57377 57377 726
 Width: 1000
 Flags: HW
 Fore
