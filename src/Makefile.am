@@ -107,5 +107,6 @@ install-exec-hook:
 	       '`INSTALL'"' file."); fi
 
 uninstall-hook:
-	rm -rf $(pkgrundir)
+	-rm -rf $(pkgrundir)
+	-rmdir -p $(rundir)
 

@@ -15,6 +15,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+pkgsysconfdir = $(sysconfdir)/@PACKAGE@
+
 man_MANS = tvtime.1
 EXTRA_DIST = default.tvtime.xml quotes.txt $(man_MANS)
 
+.PHONY: install-data-hook
+install-data-hook:
+	-$(INSTALL) -d -m 'u=rwx,go=rx' '$(pkgsysconfdir)' || touch noconfdir
+	@if [ -f noconfdir ]; then (\
+	  echo 'Warning: I could not create the directory'                   \
+	       '`$(pkgsysconfdir)'"'"                                       ;\
+	  echo '         because you do not have the required permissions.' ;\
+	); fi
+	-if [ -f noconfdir ]; then rm -f noconfdir; else $(INSTALL) -m 'u=rw,go=r' 'default.tvtime.xml' '$(pkgsysconfdir)/tvtime.xml' || touch noconfdir; fi
+	@if [ -f noconfdir ]; then rm -f noconfdir; (\
+	  echo 'Warning: I could not create the default tvtime'              \
+	       'configuration file'                                         ;\
+	  echo '         because you do not have the required permissions.' ;\
+	); fi
+
+uninstall-hook:
+	-rmdir -p $(pkgsysconfdir)

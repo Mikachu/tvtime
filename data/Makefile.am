@@ -22,3 +22,6 @@ dist_tvtimedata_DATA = FreeSansBold.ttf FreeMono.ttf FreeMonoBold.ttf \
 
 EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip
 
+.PHONY: uninstall-hook
+uninstall-hook:
+	-rmdir -p $(tvtimedatadir)
