@@ -95,6 +95,8 @@ static Cmd_Names cmd_table[] = {
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
 
+    { "RENUMBER_CHANNEL", TVTIME_RENUMBER_CHANNEL },
+
     { "SCREENSHOT", TVTIME_SCREENSHOT },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
@@ -420,11 +422,14 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         in->toggleaspect = 1;
         break;
 
+    case TVTIME_RENUMBER_CHANNEL:
+        break;
+
     case TVTIME_CHANNEL_SCAN:
         in->scan_channels = !in->scan_channels;
         if( in->osd ) {
             if( in->scan_channels ) {
-                tvtime_osd_set_scan_channels( in->osd, "Scanning (hit scan again to stop)." );
+                tvtime_osd_set_scan_channels( in->osd, "Scanning (hit F10 to stop)." );
                 tvtime_osd_show_info( in->osd );
             } else {
                 tvtime_osd_set_scan_channels( in->osd, "" );
@@ -481,7 +486,13 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_CHANNEL_CHAR:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            /* decode the input char from commands  */
+
+            /* If we're scanning and the user hits a key, stop scanning. */
+            if( in->scan_channels ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
+            /* Decode the input char from commands.  */
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
             in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
             in->digit_counter++;
@@ -590,12 +601,27 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_CHANNEL_UP: 
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+
+            /**
+             * If we're scanning and the user hits a key, stop scanning.
+             * arg will be 0 if the scanner has called us.
+             */
+            if( in->scan_channels && arg ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
             station_next( in->stationmgr );
             in->change_channel = 1;
         }
         break;
     case TVTIME_CHANNEL_DOWN:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+
+            /* If we're scanning and the user hits a key, stop scanning. */
+            if( in->scan_channels ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
             station_prev( in->stationmgr );
             in->change_channel = 1;
         }
@@ -603,6 +629,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_CHANNEL_PREV:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+
+            /* If we're scanning and the user hits a key, stop scanning. */
+            if( in->scan_channels ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
             station_last( in->stationmgr );
             in->change_channel = 1;
         }
