@@ -144,10 +144,31 @@ int DpyInfoSetUserGeometry(Display *dpy, int screen_nr,
   return 0;
 }
 
+int calculate_gcd( int x, int y )
+{
+  if( y > x ) return calculate_gcd( y, x );
+  if( y < 0 ) return calculate_gcd( -y, 0 );
 
-static void update_sar(dpy_info_t *info) {
+  while( y ) {
+    int tmp = y;
+    y = x % y;
+    x = tmp;
+  }
+
+  return x;
+}
+
+
+static void update_sar(dpy_info_t *info)
+{
+  int gcd;
   info->sar_frac_n = info->geometry.height*info->resolution.horizontal_pixels;
   info->sar_frac_d = info->geometry.width*info->resolution.vertical_pixels;
+  gcd = calculate_gcd( info->sar_frac_n, info->sar_frac_d );
+  if( gcd ) {
+    info->sar_frac_n /= gcd;
+    info->sar_frac_d /= gcd;
+  }
 }
 
 static int update_resolution_user(dpy_info_t *info,
