@@ -74,7 +74,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         return 0;
     }
 
-    if( asprintf( &fontfilename, "%s%s", DATADIR, fontfile ) < 0 ) {
+    if( asprintf( &fontfilename, "%s%s", DATADIR "/", fontfile ) < 0 ) {
         fontfilename = 0;
     } else if( !file_is_openable_for_read( fontfilename ) ) {
         free( fontfilename );
