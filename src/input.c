@@ -138,7 +138,7 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
 
     if( !in ) {
         fprintf( stderr, "input: Could not create new input object.\n" );
-        return NULL;
+        return 0;
     }
 
     in->cfg = cfg;
@@ -177,11 +177,10 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
     return in;
 }
 
-void input_callback( input_t *in, InputEvent command, int arg )
+void input_callback( input_t *in, int command, int arg )
 {
     int tvtime_cmd, verbose;
 
-    if( !in ) return;
     if( in->quit ) return;
 
     verbose = config_get_verbose( in->cfg );
