@@ -39,13 +39,9 @@ DIRECTFB_CFLAGS =
 DIRECTFB_LIBS = 
 endif
 
-OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" -DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" -D_LARGEFILE64_SOURCE
-
-AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
-	$(FONT_CFLAGS)
-AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
+OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
+	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" \
+	-D_LARGEFILE64_SOURCE
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
@@ -71,11 +67,23 @@ bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
 EXTRA_PROGRAMS = expandpng timingtest rvr
 
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
+tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
+	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+	$(FONT_CFLAGS) $(AM_CFLAGS)
+tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 tvtime_command_SOURCES = utils.c tvtimeconf.c tvtime-command.c
+tvtime_command_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
+tvtime_command_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 tvtime_configure_SOURCES = utils.c tvtimeconf.c tvtime-configure.c
+tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
+tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.c station.c tvtime-scanner.c
+tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
+tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
+
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 
