@@ -180,6 +180,8 @@ struct commands_s {
     int scan_channels;
     int pause;
 
+    int change_channel;
+
     int apply_luma;
     int update_luma;
     double luma_power;
@@ -275,6 +277,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->scan_channels = 0;
     in->pause = 0;
     in->audio_counter = -1;
+    in->change_channel = 0;
 
     in->apply_luma = config_get_apply_luma_correction( cfg );
     in->update_luma = 0;
@@ -553,7 +556,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_toggle_us_cable_mode( in->stationmgr );
-            commands_station_change( in );
+            in->change_channel = 1;
         }
         break;
 
@@ -584,20 +587,20 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_CHANNEL_UP: 
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_next( in->stationmgr );
-            commands_station_change( in );
+            in->change_channel = 1;
         }
         break;
     case TVTIME_CHANNEL_DOWN:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_prev( in->stationmgr );
-            commands_station_change( in );
+            in->change_channel = 1;
         }
         break;
 
     case TVTIME_CHANNEL_PREV:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_last( in->stationmgr );
-            commands_station_change( in );
+            in->change_channel = 1;
         }
         break;
 
@@ -680,7 +683,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_ENTER:
         if( in->next_chan_buffer[ 0 ] ) {
             station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
-            commands_station_change( in );
+            in->change_channel = 1;
         }
         in->frame_counter = 0;
         break;
@@ -816,6 +819,11 @@ void commands_next_frame( commands_t *in )
             tvtime_osd_set_channel_number( in->osd, input_text );
             tvtime_osd_show_info( in->osd );
         }
+    }
+
+    if( in->change_channel ) {
+        commands_station_change( in );
+        in->change_channel = 0;
     }
 
     in->printdebug = 0;
