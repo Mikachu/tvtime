@@ -248,6 +248,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         } else {
             tvtime_osd_show_message( in->osd, "Channel disabled from list." );
         }
+        station_writeconfig( in->stationmgr );
 	break;
             
     case TVTIME_ASPECT:

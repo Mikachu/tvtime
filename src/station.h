@@ -67,6 +67,9 @@ int station_toggle_curr( station_mgr_t *mgr );
 // scans all stations and (de)activates
 int station_scan( station_mgr_t *mgr );
 
+
+int station_writeconfig( station_mgr_t *mgr );
+
 #ifdef __cplusplus
 };
 #endif

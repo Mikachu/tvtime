@@ -192,6 +192,29 @@ station_mgr_t *station_init( config_t *ct )
         station_add_band( mgr, "uhf" );
     }
 
+    {
+        char name[256];
+        FILE *f;
+        int pos;
+        
+        strncpy( name, getenv( "HOME" ), 235 );
+        strncat( name, "/.tvtime/stations", 255 );
+        
+        f= fopen( name, "r");
+        if( !f ) { 
+            fprintf( stderr, "station: Couldn't open %s for reading\n", name );
+            return 0;
+        }
+    
+        if( f ) {
+            while ( EOF != fscanf( f, "%d\n", &pos ) ) {
+                station_set( mgr, pos );
+                station_toggle_curr( mgr );
+            }
+        }
+    }
+        
+    
     mgr->current = mgr->first;
     if( mgr->verbose ) {
         station_dump( mgr );
@@ -428,8 +451,34 @@ int station_remap( station_mgr_t *mgr, int pos )
     }
 }
 
-int station_writeConfig( config_t *ct, station_mgr_t *mgr )
-{
-    return 0;
+int station_writeconfig( station_mgr_t *mgr)
+{ // FIXME: this is a damn ugly hack. I should write a bug report for it...
+    
+    char name[256];
+    FILE *f;
+    station_info_t *rp;
+    
+    strncpy( name, getenv( "HOME" ), 235 );
+    strncat( name, "/.tvtime/stations", 255 );
+    
+    f= fopen( name, "w");
+    if( !f ) { 
+        fprintf( stderr, "station: Couldn't open %s for writing\n", name );
+        return 0;
+    }
+    
+    rp= mgr->first;
+    if( mgr->first ) {
+        do {
+            if( !rp->active ) fprintf( f, "%d\n", rp->pos );
+            if( !rp->active ) fprintf( stderr, "%d\n", rp->pos );
+            rp= rp->next;
+        } while ( rp != mgr->first );
+    }
+
+    fclose( f );
+
+    return 1;
 }
 
+// vim: expandtab
