@@ -76,6 +76,70 @@
  */
 #define SYNC_TIMEOUT 3
 
+const char *videoinput_get_norm_name( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC ) {
+        return "NTSC";
+    } else if( norm == VIDEOINPUT_PAL ) {
+        return "PAL";
+    } else if( norm == VIDEOINPUT_SECAM ) {
+        return "SECAM";
+    } else if( norm == VIDEOINPUT_PAL_NC ) {
+        return "PAL-NC";
+    } else if( norm == VIDEOINPUT_PAL_M ) {
+        return "PAL-M";
+    } else if( norm == VIDEOINPUT_PAL_N ) {
+        return "PAL-N";
+    } else if( norm == VIDEOINPUT_NTSC_JP ) {
+        return "NTSC-JP";
+    } else {
+        return "ERROR";
+    }
+}
+
+static int videoinput_get_norm_height( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
+        return 480;
+    } else {
+        return 576;
+    }
+}
+
+static int videoinput_next_compatible_norm( int norm, int isbttv )
+{
+    int height = videoinput_get_norm_height( norm );
+
+    do {
+        norm = norm + 1;
+        if( isbttv ) {
+            norm %= VIDEOINPUT_NTSC_JP;
+        } else {
+            norm %= VIDEOINPUT_PAL_NC;
+        }
+    } while( videoinput_get_norm_height( norm ) != height );
+
+    return norm;
+}
+
+const char *videoinput_audio_mode_name( int mode )
+{
+    if( mode == VIDEO_SOUND_MONO ) {
+        return "Mono";
+    } else if( mode == VIDEO_SOUND_STEREO ) {
+        return "Stereo";
+    } else if( mode == VIDEO_SOUND_LANG1 ) {
+        return "Language 1";
+    } else if( mode == VIDEO_SOUND_LANG2 ) {
+        return "Language 2";
+    } else if( mode == 0 ) {
+        return "Unset";
+    } else {
+        fprintf( stderr, "error: %d\n", mode );
+        return "ERROR";
+    }
+}
+
 struct videoinput_s
 {
     int grab_fd;
@@ -123,7 +187,7 @@ static int alarms;
 static void sigalarm( int signal )
 {
     alarms++;
-    fprintf( stderr, "videoinput: Frame capture timed out (got SIGALRM), hardware/driver problems?\n" );
+    fprintf( stderr, "videoinput: Frame capture timed out, hardware/driver problems?\n" );
     fprintf( stderr, "videoinput: Please report this on our bugs page: http://tvtime.sourceforge.net/\n" );
 }
 
@@ -190,95 +254,6 @@ static void videoinput_free_all_frames( videoinput_t *vidin )
         free_frame( vidin, i );
     }
     vidin->curframe = 0;
-}
-
-int videoinput_get_width( videoinput_t *vidin )
-{
-    return vidin->width;
-}
-
-int videoinput_get_height( videoinput_t *vidin )
-{
-    return vidin->height;
-}
-
-int videoinput_get_norm( videoinput_t *vidin )
-{
-    return vidin->norm;
-}
-
-int videoinput_get_numframes( videoinput_t *vidin )
-{
-    return vidin->numframes;
-}
-
-int videoinput_get_num_inputs( videoinput_t *vidin )
-{
-    return vidin->numinputs;
-}
-
-const char *videoinput_get_norm_name( int norm )
-{
-    if( norm == VIDEOINPUT_NTSC ) {
-        return "NTSC";
-    } else if( norm == VIDEOINPUT_PAL ) {
-        return "PAL";
-    } else if( norm == VIDEOINPUT_SECAM ) {
-        return "SECAM";
-    } else if( norm == VIDEOINPUT_PAL_NC ) {
-        return "PAL-NC";
-    } else if( norm == VIDEOINPUT_PAL_M ) {
-        return "PAL-M";
-    } else if( norm == VIDEOINPUT_PAL_N ) {
-        return "PAL-N";
-    } else if( norm == VIDEOINPUT_NTSC_JP ) {
-        return "NTSC-JP";
-    } else {
-        return "ERROR";
-    }
-}
-
-static int videoinput_get_norm_height( int norm )
-{
-    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
-        return 480;
-    } else {
-        return 576;
-    }
-}
-
-static int videoinput_next_compatible_norm( int norm, int isbttv )
-{
-    int height = videoinput_get_norm_height( norm );
-
-    do {
-        norm = norm + 1;
-        if( isbttv ) {
-            norm %= VIDEOINPUT_NTSC_JP;
-        } else {
-            norm %= VIDEOINPUT_PAL_NC;
-        }
-    } while( videoinput_get_norm_height( norm ) != height );
-
-    return norm;
-}
-
-const char *videoinput_audio_mode_name( int mode )
-{
-    if( mode == VIDEO_SOUND_MONO ) {
-        return "Mono";
-    } else if( mode == VIDEO_SOUND_STEREO ) {
-        return "Stereo";
-    } else if( mode == VIDEO_SOUND_LANG1 ) {
-        return "Language 1";
-    } else if( mode == VIDEO_SOUND_LANG2 ) {
-        return "Language 2";
-    } else if( mode == 0 ) {
-        return "Unset";
-    } else {
-        fprintf( stderr, "error: %d\n", mode );
-        return "ERROR";
-    }
 }
 
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
@@ -529,6 +504,50 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->numframes = 2;
 
     return vidin;
+}
+
+void videoinput_delete( videoinput_t *vidin )
+{
+    /* Mute audio on exit. */
+    videoinput_mute( vidin, 1 );
+
+    if( vidin->have_mmap ) {
+        munmap( vidin->map, vidin->gb_buffers.size );
+    }
+
+    close( vidin->grab_fd );
+
+    if( !vidin->have_mmap ) {
+        free( vidin->grab_data );
+    }
+
+    free( vidin->grab_buf );
+    free( vidin );
+}
+
+int videoinput_get_width( videoinput_t *vidin )
+{
+    return vidin->width;
+}
+
+int videoinput_get_height( videoinput_t *vidin )
+{
+    return vidin->height;
+}
+
+int videoinput_get_norm( videoinput_t *vidin )
+{
+    return vidin->norm;
+}
+
+int videoinput_get_numframes( videoinput_t *vidin )
+{
+    return vidin->numframes;
+}
+
+int videoinput_get_num_inputs( videoinput_t *vidin )
+{
+    return vidin->numinputs;
 }
 
 int videoinput_get_hue( videoinput_t *vidin )
@@ -1023,25 +1042,6 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
                 grab_pict.contrast );
     }
 
-}
-
-void videoinput_delete( videoinput_t *vidin )
-{
-    /* Mute audio on exit. */
-    videoinput_do_mute( vidin, 1 );
-
-    if( vidin->have_mmap ) {
-        munmap( vidin->map, vidin->gb_buffers.size );
-    }
-
-    close( vidin->grab_fd );
-
-    if( !vidin->have_mmap ) {
-        free( vidin->grab_data );
-    }
-
-    free( vidin->grab_buf );
-    free( vidin );
 }
 
 int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
