@@ -262,7 +262,6 @@ void frequencies_disable_freqs( config_t *ct )
 
 static void reinit_tuner( commands_t *in )
 {
-    fprintf( stderr, "reinit tuner.\n" );
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( in->vidin ) ) {
         /**
