@@ -48,7 +48,7 @@ int main( int argc, char **argv )
     /* check if fifo can be written (tvtime running) */
     if( !get_tvtime_fifo( config_get_uid( cfg ) ) ) {
         fprintf( stderr, "tvtime-command: fifo cannot be found. tvtime not running?\n" );
-	return 1;
+        return 1;
     }
 
     i = open( get_tvtime_fifo( config_get_uid( cfg ) ), O_WRONLY | O_NONBLOCK);

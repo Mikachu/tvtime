@@ -198,7 +198,7 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
 
     fprintf( stderr, "tvtime: acquire %5.2fms, show bot %5.2fms, build top %5.2fms\n"
                      "tvtime: waitbot %5.2fms, show top %5.2fms, build bot %5.2fms\n"
-		     "tvtime: average blit time: %.2fms, average render time: %.2fms\n",
+                     "tvtime: average blit time: %.2fms, average render time: %.2fms\n",
              acquire, show_bot, constructed_top, wait_for_bot, show_top, constructed_bot,
              performance_get_estimated_blit_time( perf ), performance_get_estimated_rendering_time( perf ) );
     fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2fms, bot-to-top: %5.2fms\n",

@@ -193,7 +193,7 @@ const char *get_tvtime_fifo( uid_t uid )
         char *hostname = 0;
         size_t hostenv_size = 256; 
         char *hostenv = 0;
-	char *hostenv_realloc = 0;
+        char *hostenv_realloc = 0;
 
         /* Get the FIFO directory. */
         fifodir = get_tvtime_fifodir( uid );

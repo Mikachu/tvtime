@@ -418,25 +418,11 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             predicted = tvtime->pdoffset << 1;
             if( predicted > PULLDOWN_SEQ_DD ) predicted = PULLDOWN_SEQ_AA;
 
-            calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
-
+            calculate_pulldown_score_vektor( tvtime, curframe, lastframe,
+                                             instride, frame_height, width );
             tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
-                                                                            tvtime->last_botdiff, 1, predicted );
-            // fprintf( stderr, "last topdiff %d, last botdiff %d, predicted %d, pdoffset %d\n",
-            //          tvtime->last_topdiff, tvtime->last_botdiff, predicted, tvtime->pdoffset );
-
-            /**
-             * Old algorithm:
-            pdoffset = determine_pulldown_offset_history( last_topdiff, last_botdiff, 1, &realbest );
-            if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
-             */
-
-            //tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
-            //                                                                tvtime->last_botdiff, 1, predicted );
-            //calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
-
-            // tvtime->pdoffset = determine_pulldown_offset_history_new( tvtime->last_topdiff, tvtime->last_botdiff, 1, predicted );
-            // calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
+                                                                            tvtime->last_botdiff,
+                                                                            1, predicted );
 
             /* 3:2 pulldown state machine. */
             if( !tvtime->pdoffset ) {

@@ -146,7 +146,7 @@ static int dfb_init( int outputheight, int aspect, int verbose )
 
     if( verbose ) {
         fprintf( stderr, "Using directfb version: %d\n", DIRECTFB_VERSION );
- 	fprintf( stderr, "Compiled with directfb version: %d\n", DIRECTFB_COMPILE_VERSION );
+        fprintf( stderr, "Compiled with directfb version: %d\n", DIRECTFB_COMPILE_VERSION );
     }
     if( DIRECTFB_VERSION < 918 ) {
         fprintf( stderr, "\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
