@@ -984,7 +984,7 @@ static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     char text[ 200 ];
 
     tvtime_osd_list_set_lines( osd, 4 );
-    tvtime_osd_list_set_text( osd, 0, _("Frame drop setting") );
+    tvtime_osd_list_set_text( osd, 0, _("Attempted framerate") );
 
     snprintf( text, sizeof( text ), _("Full rate: %.2f fps"), maxrate );
     tvtime_osd_list_set_text( osd, 1, text );
