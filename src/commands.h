@@ -150,7 +150,8 @@ int tvtime_get_command_id( int pos );
 int tvtime_is_menu_command( int command );
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
-                          station_mgr_t *mgr, tvtime_osd_t *osd );
+                          station_mgr_t *mgr, tvtime_osd_t *osd,
+                          int fieldtime );
 void commands_delete( commands_t *in );
 void commands_handle( commands_t *in, int command, const char *arg );
 
