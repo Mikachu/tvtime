@@ -339,11 +339,6 @@ void commands_delete( commands_t *in )
     free( in );
 }
 
-void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
-{
-    in->vbi = vbi;
-}
-
 void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 {
     int verbose, volume;
@@ -866,62 +861,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     }
 }
 
-int commands_quit( commands_t *in )
-{
-    return in->quit;
-}
-
-int commands_print_debug( commands_t *in )
-{
-    return in->printdebug;
-}
-
-int commands_show_bars( commands_t *in )
-{
-    return in->showbars;
-}
-
-int commands_take_screenshot( commands_t *in )
-{
-    return in->screenshot;
-}
-
-int commands_toggle_fullscreen( commands_t *in )
-{
-    return in->togglefullscreen;
-}
-
-int commands_get_framerate( commands_t *in )
-{
-    return in->framerate;
-}
-
-int commands_toggle_aspect( commands_t *in )
-{
-    return in->toggleaspect;
-}
-
-int commands_toggle_deinterlacing_mode( commands_t *in )
-{
-    return in->toggledeinterlacingmode;
-}
-
-int commands_toggle_pulldown_detection( commands_t *in )
-{
-    return in->togglepulldowndetection;
-}
-
-int commands_toggle_mode( commands_t *in )
-{
-    return in->togglemode;
-}
-
-int commands_toggle_menu( commands_t *in )
-{
-    in->menu_on = !in->menu_on;
-    return in->menu_on;
-}
-
 void commands_next_frame( commands_t *in )
 {
     /* Decrement the frame counter if user is typing digits */
@@ -1014,6 +953,61 @@ void commands_next_frame( commands_t *in )
     in->update_luma = 0;
 }
 
+int commands_quit( commands_t *in )
+{
+    return in->quit;
+}
+
+int commands_print_debug( commands_t *in )
+{
+    return in->printdebug;
+}
+
+int commands_show_bars( commands_t *in )
+{
+    return in->showbars;
+}
+
+int commands_take_screenshot( commands_t *in )
+{
+    return in->screenshot;
+}
+
+int commands_toggle_fullscreen( commands_t *in )
+{
+    return in->togglefullscreen;
+}
+
+int commands_get_framerate( commands_t *in )
+{
+    return in->framerate;
+}
+
+int commands_toggle_aspect( commands_t *in )
+{
+    return in->toggleaspect;
+}
+
+int commands_toggle_deinterlacing_mode( commands_t *in )
+{
+    return in->toggledeinterlacingmode;
+}
+
+int commands_toggle_pulldown_detection( commands_t *in )
+{
+    return in->togglepulldowndetection;
+}
+
+int commands_toggle_mode( commands_t *in )
+{
+    return in->togglemode;
+}
+
+int commands_toggle_menu( commands_t *in )
+{
+    in->menu_on = !in->menu_on;
+    return in->menu_on;
+}
 
 void commands_set_console( commands_t *in, console_t *con )
 {
@@ -1023,6 +1017,11 @@ void commands_set_console( commands_t *in, console_t *con )
 void commands_set_menu( commands_t *in, menu_t *m )
 {
     in->menu = m;
+}
+
+void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
+{
+    in->vbi = vbi;
 }
 
 int commands_console_on( commands_t *in )
