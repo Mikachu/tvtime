@@ -453,7 +453,6 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             if( !tvtime->pderror ) {
                 /* We're in pulldown, reverse it. */
                 if( !tvtime->filmmode ) {
-                    fprintf( stderr, "Film mode enabled.\n" );
                     tvtime->filmmode = 1;
                 }
 
@@ -468,7 +467,6 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                 return;
             } else {
                 if( tvtime->filmmode ) {
-                    fprintf( stderr, "Film mode disabled.\n" );
                     tvtime->filmmode = 0;
                 }
             }
@@ -1201,20 +1199,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0
         && verbose ) {
-        fprintf( stderr, _("tvtime: Can't renice to %d.\n"),
-                 config_get_priority( ct ) );
+        fprintf( stderr, _("tvtime: Cannot set priority to %d: %s.\n"),
+                 config_get_priority( ct ), strerror( errno ) );
     }
 
     send_fields = config_get_send_fields( ct );
-    if( verbose ) {
-        if( send_fields ) {
-            fputs( _("tvtime: Sending fields to interlaced output devices.\n"),
-                   stderr );
-        } else {
-            fputs( _("tvtime: Sending frames to interlaced output devices.\n"),
-                   stderr );
-        }
-    }
 
     if( config_get_output_driver( ct ) ) {
         if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
@@ -1355,10 +1344,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         } else {
             width = rvrreader_get_width( rvrreader );
             height = rvrreader_get_height( rvrreader );
-            if( verbose ) {
-                fprintf( stderr, _("tvtime: RVR frame sampling "
-                                   "%d pixels per scanline.\n"), width );
-            }
         }
     } else {
         vidin = videoinput_new( config_get_v4l_device( ct ), 
@@ -1389,9 +1374,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             width = videoinput_get_width( vidin );
             height = videoinput_get_height( vidin );
             if( verbose ) {
-                fprintf( stderr,
-                         _("tvtime: V4L sampling %d pixels per scanline.\n"),
-                         width );
+                fprintf( stderr, _("tvtime: Sampling input at %d pixels "
+                                   "per scanline.\n"), width );
             }
         }
     }
@@ -1528,7 +1512,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
-        fprintf( stderr, _("tvtime: Can't create command handler.\n") );
+        fprintf( stderr, _("tvtime: Out of memory.\n") );
         return 1;
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),

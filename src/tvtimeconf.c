@@ -516,19 +516,22 @@ static int conf_xml_parse( config_t *ct, char *configFile )
 
     doc = xmlParseFile( configFile );
     if( !doc ) {
-        fprintf( stderr, "config: Error parsing configuration file %s.\n", configFile );
+        fprintf( stderr, "config: Error parsing configuration file %s.\n",
+                 configFile );
         return 0;
     }
 
     top = xmlDocGetRootElement( doc );
     if( !top ) {
-        fprintf( stderr, "config: No XML root element found in %s.\n", configFile );
+        fprintf( stderr, "config: No XML root element found in %s.\n",
+                 configFile );
         xmlFreeDoc( doc );
         return 0;
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        fprintf( stderr, "config: Root node in configuration file %s should be 'tvtime'.\n", configFile );
+        fprintf( stderr, "config: %s is not a tvtime configuration file.  "
+                         "Root node is not 'tvtime'.\n", configFile );
         xmlFreeDoc( doc );
         return 0;
     }
@@ -604,16 +607,17 @@ static xmlDocPtr configsave_open( const char *config_filename )
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        fprintf( stderr, "config: Root node in file %s should be 'tvtime'.\n", config_filename );
+        fprintf( stderr, "config: %s is not a tvtime configuration file.  "
+                         "Root node is not 'tvtime'.\n", config_filename );
         xmlFreeDoc( doc );
         return 0;
     }
 
     xmlKeepBlanksDefault( 0 );
     xmlSaveFormatFile( config_filename, doc, 1 );
-    if (create_file) {
+    if( create_file ) {
         if( chown( config_filename, getuid(), getgid() ) < 0 ) {
-            fprintf( stderr, "config: Cannot chown %s.\n        %s.",
+            fprintf( stderr, "config: Cannot change owner of %s: %s.",
                     config_filename, strerror( errno ) );
         }
     }
@@ -887,12 +891,13 @@ config_t *config_new( void )
     asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) );
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
-            fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
+            fprintf( stderr, "config: Cannot create %s: %s.\n",
+                     temp_dirname, strerror( errno ) );
         } else {
             DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
                 fprintf( stderr, "config: %s is not a directory.\n", 
-                        temp_dirname );
+                         temp_dirname );
             } else {
                 closedir( temp_dir );
             }
@@ -901,8 +906,7 @@ config_t *config_new( void )
     } else {
         /* We created the directory, now force it to be owned by the user. */
         if( chown( temp_dirname, getuid(), getgid() ) < 0 ) {
-            fprintf( stderr, "config: Cannot chown %s.\n"
-                             "        %s",
+            fprintf( stderr, "config: Cannot change owner of %s: %s.\n",
                      temp_dirname, strerror( errno ) );
         }
     }
