@@ -1593,6 +1593,7 @@ void commands_delete( commands_t *cmd )
             menu_delete( cmd->menus[ i ] );
         }
     }
+    if( cmd->xmltv ) xmltv_delete( cmd->xmltv );
     free( cmd );
 }
 
