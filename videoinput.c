@@ -162,8 +162,7 @@ int videoinput_get_numframes( videoinput_t *vidin )
  * max_buffers : 16
  */
 videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
-                              int capwidth, int capheight, int palmode,
-                              int verbose )
+                              int capwidth, int palmode, int verbose )
 {
     videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
@@ -172,7 +171,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     if( !vidin ) return 0;
 
-    vidin->maxbufs = 3;
+    vidin->maxbufs = 4;
     vidin->curframe = 0;
     vidin->verbose = verbose;
 
@@ -181,11 +180,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     vidin->gb_buffers = (struct video_mbuf) { 2*0x151000, 0, { 0, 0x151000 } };
 
     vidin->width = capwidth;
-    vidin->height = capheight;
+    vidin->height = palmode ? 576 : 480;
 
     vidin->grab_fd = open( v4l_device, O_RDWR );
     if( vidin->grab_fd < 0 ) {
-        fprintf( stderr, "videoinput: Can't open %s: %s\n", v4l_device, strerror( errno ) );
+        fprintf( stderr, "videoinput: Can't open %s: %s\n",
+                 v4l_device, strerror( errno ) );
         free( vidin );
         return 0;
     }
@@ -264,7 +264,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     } else {
         vidin->tuner.tuner = -1;
         if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Channel %d has no tuner.\n", vidin->grab_chan.channel );
+            fprintf( stderr, "videoinput: Channel %d has no tuner.\n",
+                     vidin->grab_chan.channel );
         }
     }
 
@@ -274,7 +275,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     }
 
     if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Current brightness %d, hue %d, colour %d, contrast %d.\n",
+        fprintf( stderr, "videoinput: Current brightness %d, hue %d, "
+                         "colour %d, contrast %d.\n",
                  grab_pict.brightness, grab_pict.hue, grab_pict.colour,
                  grab_pict.contrast );
     }
@@ -296,7 +298,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     }
 
     if( vidin->verbose ) {
-       fprintf( stderr, "videoinput: Set to brightness %d, hue %d, colour %d, contrast %d.\n",
+       fprintf( stderr, "videoinput: Set to brightness %d, hue %d, "
+                        "colour %d, contrast %d.\n",
                 grab_pict.brightness, grab_pict.hue, grab_pict.colour,
                 grab_pict.contrast );
     }

@@ -183,15 +183,20 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
 
     if( rightjustified ) xpos -= osds->image_textwidth;
     if( osds->frames_left < 50 ) {
-        int alpha = (int) ( ( ( ( (double) osds->frames_left ) / 50.0 ) * 256.0 ) + 0.5 );
+        int alpha;
+        alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
         composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                                 osds->image4444, osds->image_textwidth,
-                                                 osds->image_textheight, osds->image_width*4,
+                                                 osds->image4444,
+                                                 osds->image_textwidth,
+                                                 osds->image_textheight,
+                                                 osds->image_width*4,
                                                  xpos, ypos, alpha );
     } else {
         composite_packed4444_to_packed422( output, width, height, stride,
-                                           osds->image4444, osds->image_textwidth,
-                                           osds->image_textheight, osds->image_width*4,
+                                           osds->image4444,
+                                           osds->image_textwidth,
+                                           osds->image_textheight,
+                                           osds->image_width*4,
                                            xpos, ypos );
     }
 }

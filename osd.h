@@ -47,8 +47,13 @@ int osd_string_visible( osd_string_t *osds );
 void osd_string_set_timeout( osd_string_t *osds, int timeout );
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
 void osd_string_show_border( osd_string_t *osds, int show_border );
-void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr );
+void osd_string_set_border_colour( osd_string_t *osds, int luma,
+                                   int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
+void osd_string_composite_packed444_scanline( osd_string_t *osds,
+                                              unsigned char *output,
+                                              int width, int scanline );
+
 void osd_string_composite_packed444( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,
                                      int xpos, int ypos );

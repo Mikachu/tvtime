@@ -347,8 +347,10 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output,
     }
 }
 
-void composite_packed4444_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
-                                        unsigned char *foreground, int fwidth, int fheight, int fstride,
+void composite_packed4444_to_packed422( unsigned char *output, int owidth,
+                                        int oheight, int ostride,
+                                        unsigned char *foreground, int fwidth,
+                                        int fheight, int fstride,
                                         int xpos, int ypos )
 {
     int dest_x, dest_y, src_x, src_y, blit_w, blit_h;

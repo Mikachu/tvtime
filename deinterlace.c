@@ -2,7 +2,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "speedy.h"
 #include "deinterlace.h"
 
 typedef struct methodlist_item_s methodlist_item_t;
@@ -10,13 +9,12 @@ typedef struct methodlist_item_s methodlist_item_t;
 struct methodlist_item_s
 {
     deinterlace_method_t *method;
-    void *dlhandle;
     methodlist_item_t *next;
 };
 
 static methodlist_item_t *methodlist = 0;
 
-void register_deinterlace_method_handle( deinterlace_method_t *method, void *dlhandle )
+void register_deinterlace_method( deinterlace_method_t *method )
 {
     methodlist_item_t **dest;
 
@@ -32,15 +30,9 @@ void register_deinterlace_method_handle( deinterlace_method_t *method, void *dlh
     if( *dest ) {
         (*dest)->method = method;
         (*dest)->next = 0;
-        (*dest)->dlhandle = dlhandle;
     } else {
         fprintf( stderr, "deinterlace: Can't allocate memory.\n" );
     }
-}
-
-void register_deinterlace_method( deinterlace_method_t *method )
-{
-    register_deinterlace_method_handle( method, 0 );
 }
 
 int get_num_deinterlace_methods( void )
@@ -78,11 +70,48 @@ void register_deinterlace_plugin( const char *filename )
         deinterlace_plugin_init_t plugin_init;
         plugin_init = dlsym( handle, "deinterlace_plugin_init" );
         if( plugin_init ) {
-            deinterlace_method_t *method = plugin_init( speedy_get_accel() );
-            if( method ) {
-                register_deinterlace_method_handle( method, handle );
-            }
+            plugin_init();
         }
+    }
+}
+
+void filter_deinterlace_methods( int accel, int fields_available )
+{
+    methodlist_item_t *prev = 0;
+    methodlist_item_t *cur = methodlist;
+
+    while( cur ) {
+        methodlist_item_t *next = cur->next;
+        int drop = 0;
+
+        if( (cur->method->accelrequired & accel) != cur->method->accelrequired ) {
+            /* This method is no good, drop it from the list. */
+            fprintf( stderr, "deinterlace: Removing '%s': required "
+                     "accelleration features unavailable.\n",
+                     cur->method->name );
+            drop = 1;
+        }
+        if( cur->method->fields_required > fields_available ) {
+            /* This method is no good, drop it from the list. */
+            fprintf( stderr, "deinterlace: Removing '%s': requires "
+                     "%d field buffers, only %d available.\n",
+                     cur->method->name, cur->method->fields_required,
+                     fields_available );
+            drop = 1;
+        }
+
+        if( drop ) {
+            methodlist_item_t *next = cur->next;
+            if( prev ) {
+                prev->next = next;
+            } else {
+                methodlist = next;
+            }
+            free( cur );
+        } else {
+            prev = cur;
+        }
+        cur = next;
     }
 }
 

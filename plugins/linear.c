@@ -5,10 +5,10 @@
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline( unsigned char *output, unsigned char *t1,
-                                  unsigned char *m1, unsigned char *b1,
-                                  unsigned char *t0, unsigned char *m0,
-                                  unsigned char *b0, int width )
+static void deinterlace_scanline_linear( unsigned char *output, unsigned char *t1,
+                                         unsigned char *m1, unsigned char *b1,
+                                         unsigned char *t0, unsigned char *m0,
+                                         unsigned char *b0, int width )
 {
     interpolate_packed422_scanline( output, t1, b1, width );
 }
@@ -20,12 +20,13 @@ static deinterlace_method_t linearmethod =
     1,
     0,
     0,
-    deinterlace_scanline
+    0,
+    deinterlace_scanline_linear
 };
 
-deinterlace_method_t *deinterlace_plugin_init( void )
+void deinterlace_plugin_init( void )
 {
     fprintf( stderr, "linear: Registering linear interpolation deinterlacing algorithm.\n" );
-    return &linearmethod;
+    register_deinterlace_method( &linearmethod );
 }
 

@@ -232,19 +232,15 @@ static deinterlace_method_t twoframe =
     "TwoFrame (DScaler)",
     "2-Frame",
     4,
+    MM_ACCEL_X86_MMXEXT,
     2,
     settings,
     deinterlace_twoframe_packed422_scanline_mmxext
 };
 
-deinterlace_method_t *deinterlace_plugin_init( int accel )
+void deinterlace_plugin_init( void )
 {
-    if( accel & MM_ACCEL_X86_MMXEXT ) {
-        fprintf( stderr, "twoframe: Registering 2-Frame deinterlacing algorithm (DScaler).\n" );
-        return &twoframe;
-    } else {
-        fprintf( stderr, "twoframe: MMXEXT not available, plugin not being registered.\n" );
-        return 0;
-    }
+    fprintf( stderr, "twoframe: Registering 2-Frame deinterlacing algorithm (DScaler).\n" );
+    register_deinterlace_method( &twoframe );
 }
 

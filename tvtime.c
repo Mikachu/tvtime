@@ -115,27 +115,17 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
-static deinterlace_method_t *curmethod = 0;
-int curmethodid = 0;
-deinterlace_scanline_t deinterlace_scanline;
-
-const char *next_deinterlacing_method( void )
-{
-    if( !curmethod ) {
-        curmethod = get_deinterlace_method( 0 );
-    } else {
-        curmethodid = ( curmethodid + 1 ) % get_num_deinterlace_methods();
-        curmethod = get_deinterlace_method( curmethodid );
-    }
-    if( curmethod ) {
-        deinterlace_scanline = curmethod->function;
-        return curmethod->name;
-    } else {
-        return 0;
-    }
-}
+/**
+ * Current deinterlacing method.
+ */
+static deinterlace_method_t *curmethod;
+static int curmethodid;
+static deinterlace_scanline_t deinterlace_scanline;
 
 /**
+ * Explination of the loop:
+ *
+ * We want to build frames so that they look like this:
  *  Top field:      Bot field:
  *     Copy            Blank
  *     Interp          Copy
@@ -148,10 +138,44 @@ const char *next_deinterlacing_method( void )
  *
  *  So, say a frame is n high.
  *  For the bottom field, the first scanline is blank (special case).
- *  Each of top and bottom handles the first line of their field as a special case.
- *  For the top field, the final scanline is a special case.
+ *  For the top field, the final scanline is blank (special case).
+ *  For the rest of the scanlines, we alternate between Copy then Interpolate.
+ *
+ *  To do the loop, I go 'Interp then Copy', and handle the first copy
+ *  outside the loop for both top and bottom.
  *  The top field therefore handles n-2 scanlines in the loop.
  *  The bot field handles n-2 scanlines in the loop.
+ *
+ * What we pass to the deinterlacing routines:
+ *
+ * Each deinterlacing routine can require data from up to four fields.
+ * The current field is being output is Field 4:
+ *
+ * | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |         |   T0    |         |   T1    |
+ * |   M0    |         |    M1   |         |
+ * |         |   B0    |         |   B1    |
+ *
+ * So, since we currently get frames not individual fields from V4L, there
+ * are two possibilities for where these come from:
+ *
+ * CASE 1: Deinterlacing the top field:
+ * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |   T-1   |         |   T0    |         |   T1    |
+ * |         |   M0    |         |    M1   |         |
+ * |   B-1   |         |   B0    |         |   B1    |
+ *  [--  secondlast --] [--  lastframe  --] [--  curframe   --]
+ *
+ * CASE 2: Deinterlacing the bottom field:
+ * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |   T-1   |         |   T0    |         |   T1    |
+ * |         |   M0    |         |    M1   |         |
+ * |   B-1   |         |   B0    |         |   B1    |
+ * ndlast --] [--  lastframe  --] [--  curframe   --]
+ *
+ * So, in case 1, we need the previous 2 frames as well as the current
+ * frame, and in case 2, we only need the previous frame, since the
+ * current frame contains both Field 3 and Field 4.
  */
 static void tvtime_build_frame( unsigned char *output,
                                 unsigned char *curframe,
@@ -160,7 +184,6 @@ static void tvtime_build_frame( unsigned char *output,
                                 video_correction_t *vc,
                                 tvtime_osd_t *osd,
                                 menu_t *menu,
-                                int copy_to_lastframe,
                                 int bottom_field,
                                 int correct_input,
                                 int width,
@@ -173,11 +196,9 @@ static void tvtime_build_frame( unsigned char *output,
 
     if( bottom_field ) {
         /* Advance frame pointers to the next input line. */
-        if( copy_to_lastframe ) {
-            blit_packed422_scanline( lastframe, curframe, instride );
-        }
         curframe += instride;
         lastframe += instride;
+        secondlastframe += instride;
 
         /* Clear a scanline. */
         blit_colour_packed422_scanline( output, width, 16, 128, 128 );
@@ -200,6 +221,11 @@ static void tvtime_build_frame( unsigned char *output,
         unsigned char *mid0 = lastframe + instride;
         unsigned char *bot0 = lastframe + (instride*2);
 
+        if( !bottom_field ) {
+            mid1 = mid0;
+            mid0 = secondlastframe + instride;
+        }
+
         if( curmethod ) {
             deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
         } else {
@@ -207,16 +233,9 @@ static void tvtime_build_frame( unsigned char *output,
         }
         output += outstride;
 
-        if( copy_to_lastframe ) {
-            blit_packed422_scanline( lastframe, curframe, width );
-        }
-        curframe += instride;
-        lastframe += instride;
-        if( copy_to_lastframe ) {
-            blit_packed422_scanline( lastframe, curframe, width );
-        }
-        curframe += instride;
-        lastframe += instride;
+        curframe += instride * 2;
+        lastframe += instride * 2;
+        secondlastframe += instride * 2;
 
         /* Copy a scanline. */
         if( correct_input ) {
@@ -250,19 +269,18 @@ int main( int argc, char **argv )
     int secam = 0;
     int fieldtime;
     int blittime = 0;
-    int curframeid;
-    int lastframeid;
-    int secondlastframeid;
     int skipped = 0;
-    int copymode = 1;
+    int fieldsavailable = 0;
     int verbose;
     tvtime_osd_t *osd;
     int i;
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
     unsigned char *colourbars;
-    unsigned char *lastframe;
-    unsigned char *secondlastframe;
+    unsigned char *lastframe = 0;
+    unsigned char *secondlastframe = 0;
+    int lastframeid;
+    int secondlastframeid;
     config_t *ct;
     input_t *in;
     menu_t *menu;
@@ -271,7 +289,6 @@ int main( int argc, char **argv )
     register_deinterlace_plugin( "plugins/linear.so" );
     register_deinterlace_plugin( "plugins/twoframe.so" );
     register_deinterlace_plugin( "plugins/greedy2frame.so" );
-    next_deinterlacing_method();
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -304,8 +321,7 @@ int main( int argc, char **argv )
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputnum( ct ), 
                             config_get_inputwidth( ct ), 
-                            palmode ? 576 : 480, palmode, 
-                            verbose );
+                            palmode, verbose );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
@@ -314,15 +330,43 @@ int main( int argc, char **argv )
 
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
-    if( videoinput_get_numframes( vidin ) > 2 ) {
-        copymode = 0;
-        fprintf( stderr, "tvtime: Not in copy mode.\n" );
+
+    /**
+     * 1 buffer : 0 fields available.  [t][b]
+     * 2 buffers: 1 field  available.  [t][b][-][-]
+     * 3 buffers: 3 fields available.  [t][b][t][b][-][-]
+     * 4 buffers: 5 fields available.  [t][b][t][b][t][b][-][-]
+     */
+    if( videoinput_get_numframes( vidin ) < 2 ) {
+        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
+                 "Not enough to continue.  Exiting.\n",
+                 videoinput_get_numframes( vidin ) );
+        return 1;
+    } else if( videoinput_get_numframes( vidin ) == 2 ) {
+        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
+                 "Limiting deinterlace plugins to those which only need 1 field.\n"
+                 "tvtime: If you are using the bttv driver, do 'modprobe bttv "
+                 "gbuffers=4' next time.\n",
+                 videoinput_get_numframes( vidin ) );
+        fieldsavailable = 1;
+    } else if( videoinput_get_numframes( vidin ) == 3 ) {
+        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
+                 "Limiting deinterlace plugins to those which only need 3 fields.\n"
+                 "tvtime: If you are using the bttv driver, do 'modprobe bttv "
+                 "gbuffers=4' next time.\n",
+                 videoinput_get_numframes( vidin ) );
+        fieldsavailable = 3;
     } else {
-        fprintf( stderr, "tvtime: Can't get 3 buffers from V4L: forced to "
-                "keep our own copy of previous frames.\n"
-                "tvtime: If you are using the bttv driver, do 'modprobe bttv "
-                "gbuffers=3' next time.\n" );
+        fieldsavailable = 5;
     }
+    filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
+    if( !get_num_deinterlace_methods() ) {
+        fprintf( stderr, "tvtime: No deinterlacing methods available, exiting.\n" );
+        return 1;
+    }
+    curmethodid = 0;
+    curmethod = get_deinterlace_method( curmethodid );
+    deinterlace_scanline = curmethod->function;
 
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
@@ -477,7 +521,10 @@ int main( int argc, char **argv )
     /* Begin capturing frames. */
     videoinput_free_all_frames( vidin );
 
-    if( !copymode ) {
+    if( fieldsavailable == 3 ) {
+        lastframe = videoinput_next_frame( vidin, &lastframeid );
+    } else if( fieldsavailable == 5 ) {
+        secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
         lastframe = videoinput_next_frame( vidin, &lastframeid );
     }
 
@@ -487,6 +534,7 @@ int main( int argc, char **argv )
     gettimeofday( &lastfieldtime, 0 );
     for(;;) {
         unsigned char *curframe;
+        int curframeid;
         struct timeval curframetime;
         struct timeval curfieldtime;
         struct timeval blitstart;
@@ -509,8 +557,10 @@ int main( int argc, char **argv )
             sdl_toggle_aspect();
         }
         if( input_toggle_deinterlacing_mode( in ) ) {
-            const char *mode = next_deinterlacing_method();
-            tvtime_osd_show_message( osd, mode );
+            curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+            curmethod = get_deinterlace_method( curmethodid );
+            deinterlace_scanline = curmethod->function;
+            tvtime_osd_show_message( osd, curmethod->name );
         }
         tvtime_osd_volume_muted( osd, mixer_ismute() );
         input_next_frame( in );
@@ -562,8 +612,7 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
             tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, copymode, 0,
-                                config_get_apply_luma_correction( ct ),
+                                osd, menu, 0, config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
         }
         if( screenshot ) {
@@ -614,8 +663,7 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
             tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, copymode, 1,
-                                config_get_apply_luma_correction( ct ),
+                                osd, menu, 1, config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
         }
         if( screenshot ) {
@@ -632,18 +680,22 @@ int main( int argc, char **argv )
 
 
         /* We're done with the input now. */
-        if( copymode ) {
-            videoinput_free_frame( vidin, curframeid );
-        } else {
+        if( fieldsavailable == 3 ) {
             videoinput_free_frame( vidin, lastframeid );
             lastframeid = curframeid;
             lastframe = curframe;
+        } else if( fieldsavailable == 5 ) {
+            videoinput_free_frame( vidin, secondlastframeid );
+            secondlastframeid = lastframeid;
+            lastframeid = curframeid;
+            secondlastframe = lastframe;
+            lastframe = curframe;
+        } else {
+            videoinput_free_frame( vidin, curframeid );
         }
-
 
         /* CHECKPOINT6 : Released a frame to V4L. */
         gettimeofday( &(checkpoint[ 5 ]), 0 );
-
 
         /* Wait for the next field time. */
         gettimeofday( &curfieldtime, 0 );

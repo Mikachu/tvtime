@@ -20,7 +20,7 @@ typedef void (*deinterlace_scanline_t)( unsigned char *output,
                                         unsigned char *b0,
                                         int width );
 
-typedef deinterlace_method_t *(*deinterlace_plugin_init_t)( int accel );
+typedef void (*deinterlace_plugin_init_t)( void );
 
 typedef enum
 {
@@ -48,6 +48,7 @@ struct deinterlace_method_s
     const char *name;
     const char *short_name;
     int fields_required;
+    int accelrequired;
     int numsettings;
     deinterlace_setting_t *settings;
     deinterlace_scanline_t function;
@@ -72,5 +73,10 @@ deinterlace_method_t *get_deinterlace_method( int i );
  * Loads a deinterlace plugin from the given file.
  */
 void register_deinterlace_plugin( const char *filename );
+
+/**
+ * Builds the usable method list.
+ */
+void filter_deinterlace_methods( int accel, int fieldsavailable );
 
 #endif /* DEINTERLACE_H_INCLUDED */

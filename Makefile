@@ -25,7 +25,7 @@ OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
 
 PLUGINS = plugins/greedy2frame.so plugins/twoframe.so plugins/linear.so
 
-all: tvtime
+all: tvtime plugins
 
 %.so: %.c
 	$(CC) -shared $(CFLAGS) -o $@ $<

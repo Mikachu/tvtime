@@ -23,20 +23,33 @@
 extern "C" {
 #endif
 
+/**
+ * This object represents a video4linux capture device.  Frames are
+ * returned as packed Y'CbCr image maps with 4:2:2 encoding.  The scheme
+ * used is also known as 'YUY2'.  Currently we only deal in frames and
+ * assume that they are interlaced, and we only deal with sources that
+ * can provide full frame height: 480 scanlines for NTSC, 576 for PAL.
+ *
+ * Note: it's arguable that we should try and get 486 scanlines for
+ * NTSC.  However, since the bt8x8 only gives 480 scanlines, and this is
+ * standard sampling for standards like MPEG-2 etc, I'll stick with 480
+ * for now.  As long as I get an interlaced frame, everything is happy.
+ */
 typedef struct videoinput_s videoinput_t;
 
-/**
- * This object represents a video4linux capture device.  Frames are returned as
- * packed Y'CbCr image maps with 4:2:2 encoding: luma first, then cb, then cr.
- */
 
 /**
- * Create a new input device from the given device name and which input number
- * (cable, composite1, composite2, etc) to use.
+ * Create a new input device from the given device name and which input
+ * number (cable, composite1, composite2, etc) to use.
+ *
+ * The capwidth provided is how many samples to ask for per scanline.
+ * The height will always be full frame of 480 or 576.
+ *
+ * The verbose flag indicates we should print to stderr when things go
+ * bad, and maybe for some helpful information messages.
  */
 videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
-                              int capwidth, int capheight, int palmode,
-                              int verbose );
+                              int capwidth, int palmode, int verbose );
 
 /**
  * Shut down the capture device.
