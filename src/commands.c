@@ -1974,7 +1974,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
 
         if( cmd->osd ) {
-            char message[ 25 ];
+            char message[ 256 ];
 
             if( cmd->sleeptimer ) {
                 snprintf( message, sizeof (message), _("Sleep in %d minutes."),
