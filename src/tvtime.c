@@ -1309,6 +1309,7 @@ int main( int argc, char **argv )
 
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
+            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", curmethod->name, width, height );
             performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
             fprintf( stderr, "tvtime: Speedy time last frame: %d cycles.\n", speedy_get_cycles() );
         }
