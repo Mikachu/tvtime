@@ -19,6 +19,9 @@ tvtime: $(OBJS) tvtime.o
 
 osdtest: $(OSDOBJS)
 
+timingtest: $(OBJS) timingtest.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 clean: 
 	rm -f *.o *.png tvtime
 
