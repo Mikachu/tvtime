@@ -159,7 +159,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                 console_printf( in->console, blah );
                 return;
             } else if( in->slave_mode ) {
-                fprintf( stderr, "Keypress: %c\n", arg & 0xff );
+                fprintf( stdout, "%c\n", arg & 0xff );
                 return;
             }
         }
