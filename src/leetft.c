@@ -68,9 +68,10 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         return 0;
     }
 
-    /*
+    /**
+     * Use this to load postscript font metrics for kerning information.
     if( FT_Attach_File( font->face, "../data/cmss17.afm" ) ) {
-        fprintf( stderr, "attach failed.\n" );
+        fprintf( stderr, "ftfont: AFM attach failed.\n" );
     }
     */
 
@@ -179,44 +180,12 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
     return bbox;
 }
 
-/*
-static void blit_stuff( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
-                        unsigned char *src, int src_width, int src_height, int src_stride,
-                        int dst_xpos, int dst_ypos, int src_xpos, int src_ypos )
-{
-    int blit_width = (dst_width - dst_xpos);
-    int blit_height = (dst_height - dst_ypos);
-
-    if( blit_width > src_width ) blit_width = src_width;
-    if( blit_height > src_height ) blit_height = src_height;
-
-    blit_width -= src_xpos;
-    blit_height -= src_ypos;
-
-    if( blit_width >= 0 && blit_height >= 0 ) {
-        int y;
-
-        for( y = 0; y < blit_height; y++ ) {
-            unsigned char *curdst = dst + ((dst_ypos + y)*dst_stride) + dst_xpos;
-            unsigned char *cursrc = src + ((src_ypos + y)*src_stride) + src_xpos;
-            int x;
-
-            for( x = 0; x < blit_width; x++ ) {
-                if( *cursrc ) *curdst = *cursrc;
-                curdst++;
-                cursrc++;
-            }
-        }
-    }
-}
-*/
-
-static void blit_stuff_subpix( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
+static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
                                unsigned char *src, int src_width, int src_height, int src_stride,
                                int dst_xpos_subpix, int dst_ypos )
 {
-    int blit_width = src_width; // (dst_width - dst_xpos);
-    int blit_height = (dst_height - dst_ypos);
+    int blit_width = dst_width - ( dst_xpos_subpix >> 16 );
+    int blit_height = dst_height - dst_ypos;
 
     if( blit_width > src_width ) blit_width = src_width;
     if( blit_height > src_height ) blit_height = src_height;
@@ -268,7 +237,8 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
     push_x = 0;
     *width = string_bbox.xMax;
     if( string_bbox.xMin < 0 ) {
-        fprintf( stderr, "leetft: Negative xmin?  Sigh..\n" );
+        /* I should figure out if this is a bug. */
+        /* fprintf( stderr, "leetft: Negative xmin?  Sigh..\n" ); */
         *width += -string_bbox.xMin;
         push_x = -string_bbox.xMin;
     }
@@ -298,7 +268,7 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
                 if( !error ) {
                     FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
 
-                    blit_stuff_subpix( output, *width, *height, *width,
+                    blit_glyph_subpix( output, *width, *height, *width,
                                        bit->bitmap.buffer, bit->bitmap.width,
                                        bit->bitmap.rows, bit->bitmap.pitch,
                                        (push_x*0xffff) + font->glyphpos[ i ] + (bit->left*65536),
