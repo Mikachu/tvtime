@@ -20,7 +20,7 @@ V4LDevice = /dev/video0
 VBIDevice = /dev/vbi0
 
 # This enables the usage of VBI data (XDS, Closed Captioning)
-UseVBI = 1
+UseVBI = 0
 
 # This sets the default TV norm.  Valid options are "ntsc", "pal",
 # "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
@@ -58,7 +58,7 @@ NTSCCableMode = Nominal
 FineTuneOffset = 0
 
 # Toggle whether tvtime should check if there is a signal present when
-# changing channels etc.  If your card doesn't such, you shouldn't need
+# changing channels etc.  If your card doesn't suck, you shouldn't need
 # to shut this off
 CheckForSignal = 1
 
