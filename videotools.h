@@ -35,6 +35,9 @@ void video_correction_set_luma_power( video_correction_t *vc, double power );
 void video_correction_correct_luma_scanline( video_correction_t *vc,
                                              unsigned char *output,
                                              unsigned char *luma, int width );
+void video_correction_correct_packed422_scanline( video_correction_t *vc,
+                                                  unsigned char *output,
+                                                  unsigned char *input, int width );
 
 /**
  * Builds a packed 4:2:2 frame from a field interpolating to frame size by
@@ -50,6 +53,22 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
                                                           int lstride, int cstride,
                                                           int width, int height );
 
+
+void video_correction_packed422_field_to_frame_top( video_correction_t *vc,
+                                                    unsigned char *output,
+                                                    int outstride,
+                                                    unsigned char *field,
+                                                    int fieldwidth,
+                                                    int fieldheight,
+                                                    int fieldstride );
+void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
+                                                    unsigned char *output,
+                                                    int outstride,
+                                                    unsigned char *field,
+                                                    int fieldwidth,
+                                                    int fieldheight,
+                                                    int fieldstride );
+
 /**
  * Builds a packed 4:2:2 frame from a field interpolating to frame size by
  * linear interpolation.
@@ -61,6 +80,12 @@ void planar422_field_to_packed422_frame( unsigned char *output,
                                          int bottom_field,
                                          int lstride, int cstride,
                                          int width, int height );
+void packed422_field_to_frame_top( unsigned char *output, int outstride,
+                                   unsigned char *field, int fieldwidth,
+                                   int fieldheight, int fieldstride );
+void packed422_field_to_frame_bot( unsigned char *output, int outstride,
+                                   unsigned char *field, int fieldwidth,
+                                   int fieldheight, int fieldstride );
 
 void blit_colour_4444_scanline( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
 void blit_colour_packed422_scanline( unsigned char *output, int width, int luma, int cb, int cr );

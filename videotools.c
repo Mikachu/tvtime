@@ -158,7 +158,7 @@ void blit_colour_packed422_scanline( unsigned char *output, int width, int y, in
     int colour = cr << 24 | y << 16 | cb << 8 | y;
     unsigned int *o = (unsigned int *) output;
 
-    for( width /= 4; width; --width ) {
+    for( width /= 2; width; --width ) {
         *o++ = colour;
     }
 }
@@ -190,6 +190,145 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
         output[ (i*2) + 3 ] = ((topcr[ i/2 ] + botcr[ i/2 ] - 256) >> 1) + 128;
     }
 }
+
+void interpolate_packed422_scanline( unsigned char *output, unsigned char *top,
+                                     unsigned char *bot, int width )
+{
+    int i;
+
+    //for( i = width; i; --i ) {
+    //    *output++ = ((*top++) + (*bot++)) >> 1;
+    //}
+    for( i = 0; i < width*2; i++ ) {
+        //output[ i*2 ] = (top[ i*2 ] + bot[ i*2 ]) >> 1;
+        output[ i ] = (top[ i ] + bot[ i ]) >> 1;
+    }
+}
+
+void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
+                                                    unsigned char *output,
+                                                    int outstride,
+                                                    unsigned char *field,
+                                                    int fieldwidth,
+                                                    int fieldheight,
+                                                    int fieldstride )
+{
+    int i;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    video_correction_correct_packed422_scanline( vc, output, field,
+                                                 fieldwidth );
+    field += fieldstride;
+    output += outstride;
+
+    for( i = 0; i < fieldheight - 1; i++ ) {
+        /* Copy a scanline. */
+        video_correction_correct_packed422_scanline( vc, output + outstride,
+                                                     field, fieldwidth );
+
+        /* Interpolate a scanline. */
+        interpolate_packed422_scanline( output, output - outstride,
+                                        output + outstride, fieldwidth );
+
+        output += outstride * 2;
+        field += fieldstride;
+    }
+}
+
+void video_correction_packed422_field_to_frame_top( video_correction_t *vc,
+                                                    unsigned char *output,
+                                                    int outstride,
+                                                    unsigned char *field,
+                                                    int fieldwidth,
+                                                    int fieldheight,
+                                                    int fieldstride )
+{
+    int i;
+
+    /* Copy a scanline. */
+    video_correction_correct_packed422_scanline( vc, output,
+                                                 field, fieldwidth );
+    output += outstride;
+    field += fieldstride;
+
+    for( i = 0; i < fieldheight - 1; i++ ) {
+        /* Copy a scanline. */
+        video_correction_correct_packed422_scanline( vc, output + outstride,
+                                                     field, fieldwidth );
+
+        /* Interpolate a scanline. */
+        interpolate_packed422_scanline( output, output - outstride,
+                                        output + outstride, fieldwidth );
+
+        output += outstride * 2;
+        field += fieldstride;
+    }
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
+}
+
+void packed422_field_to_frame_bot( unsigned char *output, int outstride,
+                                   unsigned char *field, int fieldwidth,
+                                   int fieldheight, int fieldstride )
+{
+    int i;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    memcpy( output, field, fieldwidth*2 );
+    field += fieldstride;
+    output += outstride;
+
+    for( i = 0; i < fieldheight - 1; i++ ) {
+        /* Copy a scanline. */
+        memcpy( output + outstride, field, fieldwidth*2 );
+
+        /* Interpolate a scanline. */
+        interpolate_packed422_scanline( output, output - outstride,
+                                        output + outstride, fieldwidth );
+
+        output += outstride * 2;
+        field += fieldstride;
+    }
+}
+
+void packed422_field_to_frame_top( unsigned char *output, int outstride,
+                                   unsigned char *field, int fieldwidth,
+                                   int fieldheight, int fieldstride )
+{
+    int i;
+
+    /* Copy a scanline. */
+    memcpy( output, field, fieldwidth*2 );
+    output += outstride;
+    field += fieldstride;
+
+    for( i = 0; i < fieldheight - 1; i++ ) {
+        /* Copy a scanline. */
+        memcpy( output + outstride, field, fieldwidth*2 );
+
+        /* Interpolate a scanline. */
+        interpolate_packed422_scanline( output, output - outstride,
+                                        output + outstride, fieldwidth );
+
+        output += outstride * 2;
+        field += fieldstride;
+    }
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
+}
+
+
+
 
 void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
                                                           unsigned char *output,
@@ -379,6 +518,16 @@ void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned ch
 {
     while( width-- ) {
         *output++ = vc->luma_table[ *luma++ ];
+    }
+}
+
+void video_correction_correct_packed422_scanline( video_correction_t *vc,
+                                                  unsigned char *output,
+                                                  unsigned char *input, int width )
+{
+    while( width-- ) {
+        *output++ = vc->luma_table[ *input++ ];
+        *output++ = *input++;
     }
 }
 

@@ -307,7 +307,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     /* Try to setup mmap-based capture. */
     for( i = 0; i < vidin->numframes; i++ ) {
-        vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422P; /* Y'CbCr 4:2:2 Planar */
+        vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422; /* Y'CbCr 4:2:2 Packed. */
         vidin->grab_buf[ i ].frame = i;
         vidin->grab_buf[ i ].width = vidin->width;
         vidin->grab_buf[ i ].height = vidin->height;
@@ -329,7 +329,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     /* Set the format using the SPICT ioctl. */
     grab_pict.depth = 16;
-    grab_pict.palette = VIDEO_PALETTE_YUV422P;
+    grab_pict.palette = VIDEO_PALETTE_YUV422;
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;

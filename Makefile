@@ -1,6 +1,7 @@
 
 # you know it, baby
 CC = gcc -O3 -funroll-loops -fomit-frame-pointer
+#CC = gcc -g
 
 # libsdl because i'm too cheap to do it myself
 SDLFLAGS = `sdl-config --cflags`

@@ -54,7 +54,7 @@ static int timediff( struct timeval *large, struct timeval *small )
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-I <sampling>] [-o <mode>] "
+    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-I <sampling>] "
                      "[-d <device> [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-v\tShow verbose messages.\n"
@@ -62,7 +62,6 @@ static void print_usage( char **argv )
                      "\t-s\tPrint frame skip information (for debugging).\n"
                      "\t-I\tV4L input scanline sampling, defaults to 720.\n"
                      "\t-w\tOutput window width, defaults to 800.\n"
-                     "\t-o\tOutput mode: '422' (default) or '420'.\n"
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
                      "\t-i\tvideo4linux input number (defaults to 0).\n"
                      "\t-c\tApply luma correction.\n"
@@ -126,7 +125,6 @@ int main( int argc, char **argv )
     char norm[ 7 ];
     char freq[ 20 ];
     int width, height;
-    int output420 = 0;
     int palmode = 0;
     int secam = 0;
     int inputnum = 0;
@@ -147,7 +145,7 @@ int main( int argc, char **argv )
     char next_chan_buffer[5];
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
-    int showtest = 0;
+    int showtest = 1;
 
 
     /* Default device. */
@@ -161,7 +159,7 @@ int main( int argc, char **argv )
     
     memset( next_chan_buffer, 0, 5 );
 
-    while( (c = getopt( argc, argv, "hw:I:avcso:d:i:l:n:f:t:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcs:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
         case 'w': outputwidth = atoi( optarg ); break;
         case 'I': inputwidth = atoi( optarg ); break;
@@ -169,7 +167,6 @@ int main( int argc, char **argv )
         case 'a': aspect = 1; break;
         case 's': debug = 1; break;
         case 'c': apply_luma_correction = 1; break;
-        case 'o': if( strcmp( "420", optarg ) == 0 ) output420 = 1; break;
         case 'd': strncpy( v4ldev, optarg, 250 ); break;
         case 'i': inputnum = atoi( optarg ); break;
         case 'l': luma_correction = atof( optarg ); apply_luma_correction = 1; break;
@@ -307,11 +304,10 @@ int main( int argc, char **argv )
     if( verbose ) fprintf( stderr, "tvtime: Done stealing resources.\n" );
 
     /* Setup the output. */
-    if( !sdl_init( width, height, output420, outputwidth, aspect ) ) {
+    if( !sdl_init( width, height, outputwidth, aspect ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: no video output available.\n" );
         return 1;
     }
-    if( verbose ) fprintf( stderr, "tvtime: Output is Y'CbCr at %s sampling.\n", output420 ? "4:2:0" : "4:2:2" );
 
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
@@ -491,8 +487,6 @@ int main( int argc, char **argv )
                                   input_text, CHANNEL_DELAY );
         }
 
-        // osd_shape_show_shape( osd_rect, 51 );
-
         /* CHECKPOINT1 : Blit the second field */
         gettimeofday( &(checkpoint[ 0 ]), 0 );
 
@@ -531,34 +525,22 @@ int main( int argc, char **argv )
         if( showtest ) {
             memcpy( sdl_get_output(), testframe_even, width*height*2 );
         } else {
-            if( output420 ) {
-                luma_plane_field_to_frame( sdl_get_output(), curluma,
-                                           width, height, width*2, 0 );
-                chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
-                                             width/2, height/2, width*2, 0 );
-                chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
-                                             width/2, height/2, width*2, 0 );
+            if( apply_luma_correction ) {
+                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(), width*2, curluma,
+                                                               width, height/2, width*4 );
             } else {
-                if( apply_luma_correction ) {
-                    video_correction_planar422_field_to_packed422_frame( vc,
-                                                                         sdl_get_output(),
-                                                                         curluma,
-                                                                         curcb422,
-                                                                         curcr422,
-                                                                         0, width * 2, width, width, height );
-                } else {
-                    planar422_field_to_packed422_frame( sdl_get_output(), curluma,
-                                                        curcb422, curcr422, 0, width * 2,
-                                                        width, width, height );
-                }
-                osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
-                // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
-                if( mixer_ismute() ) {
-                    osd_string_show_text( muted_osd, "Mute", 100 );
-                    osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-                } else {
-                    osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-                }
+                packed422_field_to_frame_top( sdl_get_output(), width*2, curluma,
+                                              width, height/2, width*4 );
+            }
+            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
+                                            width*2, 50, 50, 0 );
+            if( mixer_ismute() ) {
+                osd_string_show_text( muted_osd, "Mute", 100 );
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height,
+                                                width*2, 20, height-40, 0 );
+            } else {
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height,
+                                                width*2, 20, height-40, 0 );
             }
         }
 
@@ -594,36 +576,24 @@ int main( int argc, char **argv )
         if( showtest ) {
             memcpy( sdl_get_output(), testframe_odd, width*height*2 );
         } else {
-            if( output420 ) {
-                luma_plane_field_to_frame( sdl_get_output(), curluma + width,
-                                           width, height, width*2, 1 );
-                chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
-                                             width/2, height/2, width*2, 1 );
-                chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
-                                             width/2, height/2, width*2, 1 );
+            if( apply_luma_correction ) {
+                video_correction_packed422_field_to_frame_bot( vc, sdl_get_output(), width*2,
+                                                               curluma + (width*2),
+                                                               width, height/2, width*4 );
             } else {
-                if( apply_luma_correction ) {
-                    video_correction_planar422_field_to_packed422_frame( vc,
-                                                                         sdl_get_output(),
-                                                                         curluma + width,
-                                                                         curcb422 + (width/2),
-                                                                         curcr422 + (width/2),
-                                                                         1, width * 2, width, width, height );
-                } else {
-                    planar422_field_to_packed422_frame( sdl_get_output(), curluma + width,
-                                                        curcb422 + (width / 2),
-                                                        curcr422 + (width / 2),
-                                                        1, width * 2, width, width, height );
-                }
-                osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
-                // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
+                packed422_field_to_frame_bot( sdl_get_output(), width*2, curluma,
+                                              width, height/2, width*4 );
+            }
+            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
+                                            width*2, 50, 50, 0 );
 
-                if( mixer_ismute() ) {
-                    osd_string_show_text( muted_osd, "Mute", 51 );
-                    osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-                } else {
-                    osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-                }
+            if( mixer_ismute() ) {
+                osd_string_show_text( muted_osd, "Mute", 51 );
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height,
+                                                width*2, 20, height-40, 0 );
+            } else {
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height,
+                                                width*2, 20, height-40, 0 );
             }
         }
 

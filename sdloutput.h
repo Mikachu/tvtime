@@ -68,12 +68,6 @@ enum tvtime_commands
 unsigned char *sdl_get_output( void );
 
 /**
- * For planar (4:2:0) output, here are the two chroma planes.
- */
-unsigned char *sdl_get_cb( void );
-unsigned char *sdl_get_cr( void );
-
-/**
  * Functions to handle SDL output.
  *
  * We have to make sure all our calls to SDL occur in the same thread,
@@ -87,11 +81,10 @@ unsigned char *sdl_get_cr( void );
  * course, having nothing to do with the output width and height, which
  * will be decided internally.
  *
- * If use420 is true then we'll open in 4:2:0 mode instead of 4:2:2 mode.
- * Function also gets the width to scale to.
+ * Function gets the width to scale to.
  * If aspect is 1 we run in 16:9 mode.
  */
-int sdl_init( int width, int height, int use420, int outputwidth, int aspect );
+int sdl_init( int width, int height, int outputwidth, int aspect );
 
 /**
  * Display the given frame immediately.

@@ -29,13 +29,12 @@ reasonably documented, so please take a look if you're curious.
 
   Using tvtime
 
-usage: ./tvtime [-as] [-I <sampling>] [-w <width>] [-o <mode>] [-d <device>
+usage: ./tvtime [-as] [-I <sampling>] [-w <width>] [-d <device>
                 [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]
         -a        16:9 mode.
         -s        Print frame skip information (for debugging).
         -I        V4L input scanline sampling, defaults to 720.
         -w        Output window width, defaults to 800.
-        -o        Output mode: '422' (default) or '420'.
         -d        video4linux device (defaults to /dev/video0).
         -i        video4linux input number (defaults to 0).
         -c        Enable luma correction.
