@@ -98,7 +98,6 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
     DEINTERLACE_METHOD *pMethod;
     HMODULE hPlugInMod;
     long CpuFeatureFlags = 0;
-    int i;
 
     hPlugInMod = LoadLibrary( filename );
     if( !hPlugInMod ) {
@@ -127,6 +126,7 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
 
             pMethod->hModule = hPlugInMod;
 
+            /*
             fprintf( stderr, "\n======\n" );
             fprintf( stderr, "Name:       %s\n", pMethod->szName );
             fprintf( stderr, "ShortName:  %s\n", pMethod->szShortName );
@@ -137,16 +137,15 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
 
             fprintf( stderr, "Settings:   %ld\n", pMethod->nSettings );
 
-            /* Read in settings. */
+            int i;
             for( i = 0; i < pMethod->nSettings; i++) {
-                fprintf( stderr, "[%d] %s\n", i, pMethod->pSettings[i].szDisplayName );
-                /*
+                // fprintf( stderr, "[%d] %s\n", i, pMethod->pSettings[i].szDisplayName );
                 Setting_ReadFromIni(&(pMethod->pSettings[i]));
                 printf("Parameter %s: %ld\n",
                        pMethod->pSettings[i].szDisplayName,
                        *(pMethod->pSettings[i].pValue));
-                */
             }
+            */
 
             if( pMethod->pfnPluginInit ) {
                 pMethod->pfnPluginInit();
