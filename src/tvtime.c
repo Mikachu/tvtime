@@ -64,6 +64,13 @@
 #include "pulldown.h"
 
 /**
+ * Michael Niedermayer's magic FIRs
+ *
+ * [-1 14 3]
+ * [-9 111 29 -3]
+ */
+
+/**
  * Set this to 1 to enable startup time profiling.
  */
 const unsigned int profile_startup = 0;
