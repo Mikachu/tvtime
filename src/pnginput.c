@@ -30,7 +30,7 @@ pnginput_t *pnginput_new( const char *filename )
 
     pnginput->f = fopen( filename, "rb" );
     if( !pnginput->f ) {
-        fprintf( stderr, "pnginput: Can't open output file %s\n", filename );
+        fprintf( stderr, "pnginput: Can't open input file %s\n", filename );
         pnginput_delete( pnginput );
         return 0;
     }
