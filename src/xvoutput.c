@@ -275,7 +275,7 @@ static int open_display( void )
     screen = DefaultScreen( display );
 
     DpyInfoInit( display, screen );
-    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode );
+    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXinerama );
     DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
 
     DpyInfoUpdateResolution( display, screen, 0, 0 );
