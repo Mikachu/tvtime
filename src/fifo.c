@@ -57,13 +57,7 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
 
     fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
     if( fifo->fd == -1 ) {
-        /* char temp_dirname[ 1024 ]; */
-
         /* attempt to create it */
-        /* Should we do something like this somewhere?
-        snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
-        mkdir( temp_dirname, 0777 );
-         */
         if( mkfifo( filename, S_IREAD | S_IWRITE ) == -1 ) {
             /* failed */
             fprintf( stderr, "fifo: Couldn't create %s as a fifo: %s\n",
