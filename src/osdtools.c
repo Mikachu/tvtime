@@ -16,7 +16,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -62,7 +61,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
     double pixel_aspect;
-    char *fontfilename = 0;
+    char *fontfilename;
 
     if( !osds ) {
         return 0;
@@ -74,23 +73,10 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         return 0;
     }
 
-    if( asprintf( &fontfilename, "%s/%s", DATADIR , fontfile ) < 0 ) {
-        fontfilename = 0;
-    } else if( !file_is_openable_for_read( fontfilename ) ) {
-        free( fontfilename );
-
-        if( asprintf( &fontfilename, "../data/%s", fontfile ) < 0 ) {
-            fontfilename = 0;
-        } else if( !file_is_openable_for_read( fontfilename ) ) {
-            fprintf( stderr, "osd_string: Can't find font '%s' in path '%s' "
-			     "or path '../data/'.\n",
-                     fontfile, DATADIR );
-            free( fontfilename );
-            fontfilename = 0;
-        }
-    }
-
+    fontfilename = get_tvtime_file( fontfile );
     if( !fontfilename ) {
+        fprintf( stderr, "osd_string: Can't find font '%s'.  Checked: %s\n",
+                 fontfile, get_tvtime_paths() );
         free( osds->image4444 );
         free( osds );
         return 0;
@@ -571,11 +557,22 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int alpha )
 {
     osd_graphic_t *osdg = (osd_graphic_t *) malloc( sizeof( struct osd_graphic_s ) );
+    char *fullfilename;
+
     if( !osdg ) {
         return 0;
     }
 
-    osdg->png = pnginput_new( filename );
+    fullfilename = get_tvtime_file( filename );
+    if( !fullfilename ) {
+        fprintf( stderr, "osd_graphic: Can't find '%s'.  Checked: %s\n",
+                 filename, get_tvtime_paths() );
+        free( osdg );
+        return 0;
+    }
+    osdg->png = pnginput_new( fullfilename );
+    free( fullfilename );
+
     if( !osdg->png ) {
         free( osdg );
         return 0;
