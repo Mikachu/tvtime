@@ -69,6 +69,9 @@ osd_string_t *osd_string_new( osd_font_t *font )
     osds->font = font;
     osds->efs = 0;
     osds->frames_left = 0;
+    osds->text_luma = 16;
+    osds->text_cb = 128;
+    osds->text_cr = 128;
     return osds;
 }
 
@@ -78,6 +81,13 @@ void osd_string_delete( osd_string_t *osds )
         efs_delete( osds->efs );
     }
     free( osds );
+}
+
+void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr )
+{
+    osds->text_luma = luma;
+    osds->text_cb = cb;
+    osds->text_cr = cr;
 }
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )

@@ -26,6 +26,7 @@ osd_string_t *osd_string_new( osd_font_t *font );
 void osd_string_delete( osd_string_t *osds );
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );
+void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
 void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,

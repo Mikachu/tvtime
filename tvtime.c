@@ -122,6 +122,7 @@ int main( int argc, char **argv )
 
     osdf = osd_font_new( "helr.ttf" );
     osds = osd_string_new( osdf );
+    osd_string_set_colour( osds, 235, 128, 128 );
     osd_string_show_text( osds, "this sucks", -1 );
 
 
