@@ -93,6 +93,10 @@ static void print_usage( char **argv )
                      argv[ 0 ] );
 }
 
+static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
+{
+}
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
