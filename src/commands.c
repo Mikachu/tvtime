@@ -242,9 +242,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_SKIP_CHANNEL:
-        // to be removed
-        // Billy: um, why??  This should toggle the active bit.
-        break;
+        station_toggle_curr( in->stationmgr );
+	break;
             
     case TVTIME_ASPECT:
         in->toggleaspect = 1;

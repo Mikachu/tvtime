@@ -218,14 +218,18 @@ int station_set( station_mgr_t *mgr, int pos )
 void station_next( station_mgr_t *mgr )
 {
     if( mgr->current ) {
-        mgr->current = mgr->current->next;
+        do {
+            mgr->current = mgr->current->next;
+	} while ( !mgr->current->active ); 
     }
 }
 
 void station_prev( station_mgr_t *mgr )
 {
     if( mgr->current ) {
+        do {
         mgr->current = mgr->current->prev;
+        } while ( !mgr->current->active );
     }
 }
 
@@ -324,23 +328,20 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
     return 1;
 }
 
-int station_scan( station_mgr_t *mgr )
+int station_scan_band( station_mgr_t *mgr, const char *band )
 {
-    /* Billy:
-     * I think the scanner should go through the current list of
-     * stations and just mark the 'active' bit if there is signal
-     * on the channel.
-     */
-    /* Achim:
-     * I think it should work like add_band, but only add if there
-     * is a signal...
-     */
-    /* Billy:
-     * I disagree.  I want to start with a list of all the US cable
-     * frequencies, then use scan to disable all of the ones from
-     * the active list that don't have signal, but still let me switch
-     * to them manually.
-     */
+    return 0;
+}
+
+int station_toggle_curr( station_mgr_t *mgr ) {
+    if ( mgr->current ) {
+        mgr->current->active= !mgr->current->active;
+    } else {
+        return 0;
+    }
+}
+
+int station_scan( station_mgr_t *mgr ) {
     return 0;
 }
 
