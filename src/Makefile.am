@@ -31,14 +31,13 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins
 # Set the following if you want to specify an additional font directory
 # FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
-# directfb output currently disabled
-# if HAVE_DIRECTFB
-# DIRECTFB_CFLAGS = `directfb-config --cflags`
-# DIRECTFB_LIBS = `directfb-config --libs`
-# else
-# DIRECTFB_CFLAGS = 
-# DIRECTFB_LIBS = 
-# endif
+if HAVE_DIRECTFB
+DIRECTFB_CFLAGS = `directfb-config --cflags`
+DIRECTFB_LIBS = `directfb-config --libs`
+else
+DIRECTFB_CFLAGS = 
+DIRECTFB_LIBS = 
+endif
 
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" -DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" -D_LARGEFILE64_SOURCE
 
@@ -62,7 +61,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	rvrreader.h rvrreader.c ree.h ree.c pulldown.h pulldown.c hashtable.h \
 	hashtable.c
 
-OUTPUT_SRCS = display.c display.h outputapi.h vroot.h xvoutput.h xvoutput.c
+OUTPUT_SRCS = display.c display.h outputapi.h vroot.h xvoutput.h xvoutput.c \
+	dfboutput.h dfboutput.c
 
 bin_PROGRAMS = tvtime tvtime-command
 EXTRA_PROGRAMS = expandpng timingtest rvr

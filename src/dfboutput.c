@@ -22,8 +22,9 @@
 
 #include "dfboutput.h"
 
-#ifdef HAVE_DIRECTFB
-
+#if 0
+// #ifdef HAVE_DIRECTFB
+#define DIRECTFB_HAS_TRIPLE
 /* directfb includes */
 #include <directfb.h>
 
@@ -44,23 +45,30 @@
 static IDirectFB             *dfb;
 static IDirectFBDisplayLayer *crtc2;
 static IDirectFBSurface      *c2frame;
+static IDirectFBSurface      *current_frame;
 static DFBSurfacePixelFormat  frame_format;
 static IDirectFBInputDevice  *keyboard;
 static IDirectFBEventBuffer  *buffer = NULL;
 
-static unsigned int screen_width = 0;
-static unsigned int screen_height = 0;
+static int output_width = 0;
+static int output_height = 0;
+static int input_width = 0;
+static int input_height = 0;
+
+static int parity = 0;
+
 static void *screen_framebuffer = 0;
 static int screen_pitch = 0;
 
 void dfb_lock_output_buffer( void )
 {
-    c2frame->Lock( c2frame, DSLF_WRITE, &screen_framebuffer, &screen_pitch );
+    current_frame->Lock( current_frame, DSLF_WRITE|DSLF_READ, 
+			 &screen_framebuffer, &screen_pitch );
 }
 
 void dfb_unlock_output_buffer( void )
 {
-    c2frame->Unlock( c2frame );
+    current_frame->Unlock( current_frame );
 }
 
 unsigned char *dfb_get_output_buffer( void )
@@ -89,6 +97,9 @@ void dfb_shutdown( void )
         keyboard->Release( keyboard );
     }
 
+    if (current_frame)
+	current_frame->Release( current_frame );
+    
     if( c2frame ) {
         c2frame->Release( c2frame );
     }
@@ -103,7 +114,28 @@ void dfb_shutdown( void )
 
 const char *fb_dev_name = "/dev/fb0";
 
-int dfb_init( int inputwidth, int inputheight, int outputwidth, int aspect )
+int dfb_setup_temp_buffer()
+{
+
+  /* Draw to a temporary surface */
+  DFBSurfaceDescription dsc;
+
+  dsc.flags       = DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT;
+  dsc.width       = input_width;
+  dsc.height      = input_height;
+  dsc.pixelformat = DSPF_YUY2;
+  int res;
+  
+  if ((res = dfb->CreateSurface( dfb, &dsc, &current_frame )) != DFB_OK) {
+      fprintf(stderr,"dgboutput: Can't create surfaces - %s!\n",
+	      DirectFBErrorString( res ) );
+      return -1;
+  }
+
+  return 0;
+}
+
+int dfb_init( int outputheight, int aspect, int verbose )
 {
     DFBDisplayLayerConfig dlc;
     DFBDisplayLayerConfigFlags failed;
@@ -114,40 +146,57 @@ int dfb_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     DirectFBSetOption( "no-cursor", "" );
     DirectFBSetOption( "bg-color", "00000000" );
     DirectFBSetOption( "matrox-crtc2", "" );
-    DirectFBSetOption( "matrox-tv-standard", (inputheight == 576) ? "pal" : "ntsc" );
+    DirectFBSetOption( "matrox-tv-standard", 
+		       (outputheight == 576) ? "pal" : "ntsc" );
 
     DirectFBCreate( &dfb );
     dfb->GetDisplayLayer( dfb, 2, &crtc2 );
-
     if( !crtc2 ) {
         fprintf( stderr, "damnit! failure, exiting\n" );
         dfb_shutdown();
         return 0;
     }
-
     crtc2->SetCooperativeLevel( crtc2, DLSCL_EXCLUSIVE );
-
     dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard );
+
     keyboard->CreateEventBuffer( keyboard, &buffer );
     buffer->Reset( buffer );
 
-    dlc.flags      = DLCONF_PIXELFORMAT; /* | DLCONF_BUFFERMODE; */
-    dlc.buffermode = 0; /* DLBM_BACKVIDEO; */
-    dlc.pixelformat = DSPF_YUY2;
+    dlc.flags      = DLCONF_PIXELFORMAT | DLCONF_BUFFERMODE | DLCONF_OPTIONS;
+
+#ifdef DIRECTFB_HAS_TRIPLE
+    dlc.buffermode = DLBM_TRIPLE;/*DLBM_BACKVIDEO;DLBM_FRONTONLY;*/
+#else
+    dlc.buffermode = DLBM_BACKVIDEO;
+#endif
+
+    dlc.pixelformat = DSPF_YUY2; 
+    dlc.options = DLOP_FLICKER_FILTERING;
+    dlc.options |=  DLOP_FIELD_PARITY;
 
     if( crtc2->TestConfiguration( crtc2, &dlc, &failed ) != DFB_OK ) {
         fprintf( stderr, "config tested and failed.\n" );
         dfb_shutdown();
         return 0;
     }
-
     crtc2->SetConfiguration( crtc2, &dlc );
+    crtc2->SetFieldParity( crtc2, 1 );
     crtc2->GetSurface( crtc2, &c2frame );
 
-    c2frame->GetSize( c2frame, &screen_width, &screen_height );
-    fprintf( stderr, "DirectFB: Screen is %d x %d\n", screen_width, screen_height );
+    c2frame->SetBlittingFlags( c2frame, DSBLIT_NOFX );
+    c2frame->GetSize( c2frame, &output_width, &output_height );
+   
+    fprintf( stderr, "DirectFB: Screen is %d x %d\n", 
+	     output_width, output_height );
 
-    if( screen_width < inputwidth ) {
+    /* Make sure we clear all buffers */
+    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
+    c2frame->Flip( c2frame, NULL, 0 );
+    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
+    c2frame->Flip( c2frame, NULL, 0 );
+    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
+
+    if( output_width < input_width ) {
         fprintf( stderr, "dfboutput: Screen width not big enough!\n" );
         return 0;
     }
@@ -191,11 +240,6 @@ int dfb_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     return 1;
 }
 
-void dfb_waitforsync( void )
-{
-    dfb->WaitForSync( dfb );
-}
-
 int dfb_is_interlaced( void )
 {
     return 1;
@@ -205,22 +249,32 @@ void dfb_wait_for_sync( int field )
 {
     while( dfb_get_current_output_field() != field ) {
     /*do { */
-        dfb->WaitForSync( dfb );
+        crtc2->WaitForSync( crtc2 );
     /*} while( dfb_get_current_output_field() != field ); */
     }
 }
 
-void dfb_show_frame( void )
+int dfb_show_frame( int x, int y, int width, int height )
 {
+
+   IDirectFBSurface *blitsrc = current_frame;
+   /* Allow for input versus output height here later FIX */
+   /* c2frame->StretchBlit( c2frame, blitsrc, NULL, NULL); */
+   c2frame->Blit( c2frame, blitsrc, NULL, 0,0);
+   c2frame->Flip( c2frame, NULL,0);/* DSFLIP_WAITFORSYNC ); */
+
+   return 1;
 }
 
 int dfb_toggle_aspect( void )
 {
+    /* Not supported yet */
     return 0;
 }
 
 int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
+    /* Doesn't make sense for tv-output */
     return 1;
 }
 
@@ -279,6 +333,14 @@ void dfb_poll_events( input_t *in )
                 case DIKI_DOWN:  arg |= I_DOWN; break;
                 case DIKI_RIGHT: arg |= I_RIGHT; break;
 
+
+                case DIKI_INSERT: 
+		  if (parity == 0)
+		    parity = 1;
+		  else
+		    parity = 0;
+		  crtc2->SetFieldParity( crtc2, parity );
+                break;
                 default:
                     cur = 'a' + ( event.key_id - DIKI_A );
                     arg |= cur;
@@ -290,7 +352,8 @@ void dfb_poll_events( input_t *in )
 
     /*
      * empty buffer, because of repeating
-     * keyboard repeat is faster than key handling and this causes problems during seek
+     * keyboard repeat is faster than key handling and this 
+     * causes problems during seek
      * temporary workabout. should be solved in the future
      */
     buffer->Reset( buffer );
@@ -299,24 +362,74 @@ void dfb_poll_events( input_t *in )
 
 void dfb_set_window_caption( const char *caption )
 {
+    /* Doesn't make sense for tv-out */
+}
+
+int dfb_is_exposed( void ) 
+{ 
+    /* Always exposed for tv-out */
+    return 1; 
+} 
+ 
+int dfb_get_visible_width( void ) 
+{ 
+    return output_width; 
+} 
+ 
+int dfb_get_visible_height( void ) 
+{ 
+    return output_height; 
+} 
+
+void dfb_set_input_size( int inputwidth, int inputheight )
+{
+    int need_input_resize = (current_frame == NULL || 
+			     (input_width != inputwidth) || 
+			     (input_height != inputheight));
+
+    input_width = inputwidth;
+    input_height = inputheight;
+    fprintf(stderr,"Set input size: %dx%d\n",inputwidth,inputheight);
+    if (need_input_resize)
+	dfb_setup_temp_buffer();
+}
+
+int dfb_is_fullscreen( void )
+{
+    /* Tv-out is always full screen */
+    return 1;
+}
+
+void dfb_set_window_height( int window_height )
+{
+    /* Dfb Tv-out does not support height modifications */
 }
 
 output_api_t dfboutput =
 {
     dfb_init,
+
+    dfb_set_input_size,
+
     dfb_lock_output_buffer,
     dfb_get_output_buffer,
     dfb_get_output_stride,
     dfb_unlock_output_buffer,
 
+    dfb_is_exposed, 
+    dfb_get_visible_width, 
+    dfb_get_visible_height, 
+    dfb_is_fullscreen,
+
     dfb_is_interlaced,
     dfb_wait_for_sync,
-
     dfb_show_frame,
 
     dfb_toggle_aspect,
     dfb_toggle_fullscreen,
     dfb_set_window_caption,
+
+    dfb_set_window_height,
 
     dfb_poll_events,
     dfb_shutdown

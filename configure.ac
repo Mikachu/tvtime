@@ -130,16 +130,15 @@ AC_SUBST(XML2_FLAG)
 
 
 dnl ---------------------------------------------
-dnl directfb - currently disabled
+dnl directfb
 dnl ---------------------------------------------
 dnl Test for directfb
-dnl AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
-dnl AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
-dnl if test "$DIRECTFB_CONFIG" != "no" ; then
-dnl AM_CONDITIONAL(HAVE_DIRECTFB, 0)
-dnl if 0; then
-dnl   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
-dnl fi
+
+AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
+AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
+if test "$DIRECTFB_CONFIG" != "no" ; then
+   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
+fi
 
 dnl ---------------------------------------------
 dnl LIRC
