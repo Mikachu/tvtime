@@ -61,18 +61,18 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
  */
 
 void composite_alphamask_packed4444_scanline( unsigned char *output,
-                                              unsigned char *input,
-                                              unsigned char *mask, int width,
+                                              unsigned char *background,
+                                              unsigned char *foreground, int width,
                                               int textluma, int textcb,
                                               int textcr );
 void composite_packed4444_to_packed422_scanline( unsigned char *output,
-                                                 unsigned char *input,
+                                                 unsigned char *background,
                                                  unsigned char *foreground,
                                                  int width );
 /* Alpha provided is from 0-256 not 0-255. */
 void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
-                                                       unsigned char *input,
-                                                       unsigned char *fg,
+                                                       unsigned char *background,
+                                                       unsigned char *foreground,
                                                        int width, int alpha );
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );

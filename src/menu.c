@@ -290,6 +290,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
     return 1;
 }
 
+/*
 void menu_composite_packed422( menu_t *m, unsigned char *output,
                                int width, int height, int stride )
 {
@@ -314,6 +315,7 @@ void menu_composite_packed422( menu_t *m, unsigned char *output,
                                        m->circle_x, m->circle_y );
     }
 }
+*/
 
 void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
                                         int width, int xpos, int scanline )

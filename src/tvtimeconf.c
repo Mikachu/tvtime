@@ -164,7 +164,7 @@ config_t *config_new( int argc, char **argv )
         config_init( ct );
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcs:d:i:l:n:f:t:F:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcsd:i:l:n:f:t:F:" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;

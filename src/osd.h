@@ -57,8 +57,15 @@ void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma,
                                    int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
+
+/**
+ * Composites a scanline of the string on top of the background and writes to
+ * the output buffer.  The output and background pointers are allowed to be
+ * the same.
+ */
 void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               unsigned char *output,
+                                              unsigned char *background,
                                               int width, int xpos,
                                               int scanline );
 
@@ -76,6 +83,8 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
                                     unsigned char *output,
                                     int width, int height, int stride,
                                     int xpos, int ypos );
+void osd_shape_composite_packed422_scanline( osd_shape_t *osd, unsigned char *output,
+                                             int width, int xpos, int scanline );
 
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int video_height, double aspect, int alpha );
@@ -86,12 +95,9 @@ void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout );
 void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
 int osd_graphic_visible( osd_graphic_t *osdg );
 void osd_graphic_advance_frame( osd_graphic_t *osdg );
-void osd_graphic_composite_packed422( osd_graphic_t *osdg, 
-                                      unsigned char *output,
-                                      int width, int height, int stride,
-                                      int xpos, int ypos );
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                unsigned char *output,
+                                               unsigned char *background,
                                                int width, int xpos,
                                                int scanline );
 

@@ -40,7 +40,9 @@ static const char *taglines[] = {
 "tvtime: a tvtime a day helps you work, rest and play",
 "tvtime: I liked the deinterlacer so much... I bought the company",
 "tvtime: top breeders recommend it",
-"tvtime: the best part of waking up", };
+"tvtime: the best part of waking up",
+"tvtime: smooth like butter",
+"tvtime: those who like it, like it alot", };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 

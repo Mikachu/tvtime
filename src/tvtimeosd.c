@@ -256,6 +256,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( startx < width ) {
                 osd_string_composite_packed422_scanline( osd->channel_number,
                                                          output + (startx*2),
+                                                         output + (startx*2),
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->channel_number_ypos );
@@ -277,6 +278,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( startx < width ) {
                 osd_string_composite_packed422_scanline( osd->channel_info,
                                                          output + (startx*2),
+                                                         output + (startx*2),
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->channel_info_ypos );
@@ -296,6 +298,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             }
             if( startx < width ) {
                 osd_graphic_composite_packed422_scanline( osd->channel_logo,
+                                                          output + (startx*2),
                                                           output + (startx*2),
                                                           width - startx,
                                                           strx,
@@ -321,6 +324,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( startx < width ) {
                 osd_string_composite_packed422_scanline( osd->data_bar,
                                                          output + (startx*2),
+                                                         output + (startx*2),
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->data_bar_ypos );
@@ -339,6 +343,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( startx < width ) {
                 osd_string_composite_packed422_scanline( osd->muted,
                                                          output + (startx*2),
+                                                         output + (startx*2),
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->muted_ypos );
@@ -356,6 +361,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             }
             if( startx < width ) {
                 osd_string_composite_packed422_scanline( osd->volume_bar,
+                                                         output + (startx*2),
                                                          output + (startx*2),
                                                          width - startx,
                                                          strx,

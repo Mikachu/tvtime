@@ -214,6 +214,7 @@ void osd_string_advance_frame( osd_string_t *osds )
 
 void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               unsigned char *output,
+                                              unsigned char *background,
                                               int width, int xpos,
                                               int scanline )
 {
@@ -228,11 +229,11 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
         if( osds->frames_left < 50 ) {
             int alpha;
             alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
-            composite_packed4444_alpha_to_packed422_scanline( output, output,
+            composite_packed4444_alpha_to_packed422_scanline( output, background,
                 osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
                 width, alpha );
         } else {
-            composite_packed4444_to_packed422_scanline( output, output,
+            composite_packed4444_to_packed422_scanline( output, background,
                 osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
                 width );
         }
@@ -592,6 +593,7 @@ void osd_graphic_advance_frame( osd_graphic_t *osdg )
 
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                unsigned char *output,
+                                               unsigned char *background,
                                                int width, int xpos,
                                                int scanline )
 {
@@ -610,33 +612,9 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
             alpha = osdg->alpha;
         }
 
-        composite_packed4444_alpha_to_packed422_scanline( output, output,
+        composite_packed4444_alpha_to_packed422_scanline( output, background,
             osdg->image4444 + (osdg->image_width*4*scanline) + (xpos*4),
             width, alpha );
     }
-}
-
-void osd_graphic_composite_packed422( osd_graphic_t *osdg, 
-                                      unsigned char *output,
-                                      int width, int height, int stride,
-                                      int xpos, int ypos )
-{
-    int alpha;
-
-    if( !osdg->png ) return;
-    if( !osdg->frames_left ) return;
-
-    if( osdg->frames_left < 50 ) {
-        alpha = (int) ( ( ( ( (double) osdg->frames_left ) / 50.0 ) * osdg->alpha ) + 0.5 );
-    } else {
-        alpha = osdg->alpha;
-    }
-
-    composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                             osdg->image4444, 
-                                             osdg->image_adjusted_width,
-                                             osdg->image_graphic_height,
-                                             osdg->image_width*4,
-                                             xpos, ypos, alpha );
 }
 

@@ -176,7 +176,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              int outstride )
 {
     int scanline = 0;
-    unsigned char *out = output;
     int i;
 
     if( bottom_field ) {
@@ -257,7 +256,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         scanline++;
     }
 
+    /* Billy- Disabled the menu for now.
     if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
+    */
 }
 
 
@@ -648,7 +649,6 @@ int main( int argc, char **argv )
         /* Aquire the next frame. */
         curframe = videoinput_next_frame( vidin, &curframeid );
 
-/*
         if( screenshot ) {
             char filename[ 256 ];
             sprintf( filename, "tvtime-shot-input-%d-%d.png",
@@ -656,7 +656,6 @@ int main( int argc, char **argv )
                      (int) checkpoint[ 0 ].tv_usec );
             pngscreenshot( filename, curframe, width, height, width * 2 );
         }
-*/
 
         /* CHECKPOINT2 : Got the frame */
         gettimeofday( &(checkpoint[ 1 ]), 0 );
@@ -684,7 +683,7 @@ int main( int argc, char **argv )
         lastframetime = curframetime;
 
 
-        if( output->is_interlaced ) {
+        if( output->is_interlaced() ) {
             /* Wait until we can draw the even field. */
             output->wait_for_sync( 0 );
 
@@ -747,7 +746,7 @@ int main( int argc, char **argv )
         gettimeofday( &(checkpoint[ 3 ]), 0 );
 
 
-        if( output->is_interlaced ) {
+        if( output->is_interlaced() ) {
             /* Wait until we can draw the odd field. */
             output->wait_for_sync( 1 );
 
