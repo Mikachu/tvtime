@@ -660,6 +660,9 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
     }
     if( vidin->audio.mode & mode ) {
         vidin->audiomode = mode;
+    } else if( vidin->audio.mode > mode ) {
+        while( !(vidin->audio.mode & mode) && vidin->audio.mode > mode ) mode <<= 1;
+        videoinput_set_audio_mode( vidin, mode );
     } else {
         if( mode != VIDEO_SOUND_MONO ) {
             videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
