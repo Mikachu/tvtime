@@ -64,7 +64,7 @@ const band_entry_t band_data_vhf_s1_s41[] = {
     { "S37", 431250 }, { "S38", 439250 }, { "S39", 447250 },
     { "S40", 455250 }, { "S41", 463250 }
 };
-band_entry_t band_data_vhf_france[] = {
+const band_entry_t band_data_vhf_france[] = {
     { "K01",  47750 }, { "K02",  55750 }, { "K03",  60500 },
     { "K04",  63750 }, { "K05", 176000 }, { "K06", 184000 },
     { "K07", 192000 }, { "K08", 200000 }, { "K09", 208000 },
@@ -85,7 +85,7 @@ band_entry_t band_data_vhf_france[] = {
     { "H16", 423250 }, { "H17", 431250 }, { "H18", 439250 },
     { "H19", 447250 }
 };
-band_entry_t band_data_vhf_russia[] = {
+const band_entry_t band_data_vhf_russia[] = {
     { "R1",   49750 }, { "R2",   59250 }, { "R3",   77250 },
     { "R4",   85250 }, { "R5",   93250 }, { "R6",  175250 },
     { "R7",  183250 }, { "R8",  191250 }, { "R9",  199250 },
@@ -99,7 +99,7 @@ band_entry_t band_data_vhf_russia[] = {
     { "SR18", 287250 }, { "SR19", 295250 },
 };
 
-band_entry_t band_data_uhf[] = {
+const band_entry_t band_data_uhf[] = {
     { "21", 471250 }, { "22", 479250 }, { "23", 487250 },
     { "24", 495250 }, { "25", 503250 }, { "26", 511250 },
     { "27", 519250 }, { "28", 527250 }, { "29", 535250 },
@@ -119,7 +119,7 @@ band_entry_t band_data_uhf[] = {
     { "69", 855250 }
 };
 
-band_entry_t band_data_us_catv[] = {
+const band_entry_t band_data_us_catv[] = {
     { "1",    73250 }, { "2",    55250 }, { "3",    61250 },
     { "4",    67250 }, { "5",    77250 }, { "6",    83250 },
     { "7",   175250 }, { "8",   181250 }, { "9",   187250 },
@@ -164,13 +164,13 @@ band_entry_t band_data_us_catv[] = {
     { "124", 793250 }, { "125", 799250 }
 };
 
-band_entry_t band_data_us_twoway[] = {
+const band_entry_t band_data_us_twoway[] = {
     { "T7",   8250 }, { "T8",  14250 }, { "T9",  20250 },
     { "T10", 26250 }, { "T11", 32250 }, { "T12", 38250 },
     { "T13", 44250 }, { "T14", 50250 }
 };
 
-band_entry_t band_data_us_bcast[] = {
+const band_entry_t band_data_us_bcast[] = {
     { "2",   55250 }, { "3",   61250 }, { "4",   67250 },
     { "5",   77250 }, { "6",   83250 }, { "7",  175250 },
     { "8",  181250 }, { "9",  187250 }, { "10", 193250 },
@@ -201,7 +201,7 @@ band_entry_t band_data_us_bcast[] = {
     { "83", 885250 }
 };
 
-band_entry_t band_data_japan_bcast[] = {
+const band_entry_t band_data_japan_bcast[] = {
     { "1",   91250 }, { "2",   97250 }, { "3",  103250 },
     { "4",  171250 }, { "5",  177250 }, { "6",  183250 },
     { "7",  189250 }, { "8",  193250 }, { "9",  199250 },
@@ -225,7 +225,7 @@ band_entry_t band_data_japan_bcast[] = {
     { "61", 759250 }, { "62", 765250 }
 };
 
-band_entry_t band_data_japan_catv[] = {
+const band_entry_t band_data_japan_catv[] = {
     { "13", 109250 }, { "14", 115250 }, { "15", 121250 },
     { "16", 127250 }, { "17", 133250 }, { "18", 139250 },
     { "19", 145250 }, { "20", 151250 }, { "21", 157250 },
@@ -245,7 +245,7 @@ band_entry_t band_data_japan_catv[] = {
     { "61", 451250 }, { "62", 457250 }, { "63", 463250 }
 };
 
-band_t bands[] = {
+const band_t bands[] = {
     { "VHF E2-E12", band_data_vhf_e2_e12, sizeof( band_data_vhf_e2_e12 ) / sizeof( band_entry_t ) },
     { "VHF S1-S41", band_data_vhf_s1_s41, sizeof( band_data_vhf_s1_s41 ) / sizeof( band_entry_t ) },
     { "VHF Misc", band_data_vhf_misc, sizeof( band_data_vhf_misc ) / sizeof( band_entry_t ) },
