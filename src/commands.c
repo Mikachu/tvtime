@@ -175,7 +175,7 @@ struct commands_s {
     int togglepulldowndetection;
     int halfrate;
     int scan_channels;
-	int pause;
+    int pause;
     
     int menu_on;
     menu_t *menu;
@@ -683,13 +683,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_PAUSE:
-		if( in->pause ) {
-			if( in->osd ) tvtime_osd_show_message( in->osd, "Resumed" );
-			in->pause = 0;
-		} else {
-			if( in->osd ) tvtime_osd_show_message( in->osd, "Paused" );
-			in->pause = 1;
-		}
+        in->pause = !(in->pause);
+        if( in->osd ) tvtime_osd_show_message( in->osd, in->pause ? "Paused" : "Resumed" );
         break;
 
     }

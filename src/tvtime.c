@@ -862,7 +862,9 @@ int main( int argc, char **argv )
     unsigned char *saveframe = 0;
     unsigned char *fadeframe = 0;
     unsigned char *blueframe = 0;
+    unsigned char *curframe = 0;
     const char *tagline;
+    int curframeid;
     int lastframeid;
     int secondlastframeid;
     config_t *ct = 0;
@@ -882,6 +884,7 @@ int main( int argc, char **argv )
     int scanning = 0;
     int firstscan = 0;
     int use_vgasync = 0;
+    int was_paused = 0;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -1227,14 +1230,12 @@ int main( int argc, char **argv )
     /* Initialize our timestamps. */
     for(;;) {
         const char *fifo_args = 0;
-        unsigned char *curframe = 0;
-        int curframeid;
         int printdebug = 0;
         int showbars, screenshot;
         int aquired = 0;
         int tuner_state;
         int we_were_late = 0;
-		int paused = 0;
+        int paused = 0;
         int output_x, output_y, output_w, output_h;
 
         output_x = (int) ((((double) width) * config_get_horizontal_overscan( ct )) + 0.5);
@@ -1255,7 +1256,7 @@ int main( int argc, char **argv )
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
-		paused = commands_pause( commands );
+        paused = commands_pause( commands );
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 configsave( "FullScreen", "1", 1 );
@@ -1318,7 +1319,8 @@ int main( int argc, char **argv )
             }
         }
 
-        if( tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED ) {
+        if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
+            if( was_paused ) videoinput_free_frame( vidin, curframeid );
             curframe = videoinput_next_frame( vidin, &curframeid );
             aquired = 1;
         }
@@ -1554,6 +1556,7 @@ int main( int argc, char **argv )
         if( osd ) {
             tvtime_osd_advance_frame( osd );
         }
+        was_paused = paused;
     }
 
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
