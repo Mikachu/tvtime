@@ -90,16 +90,24 @@ $(external_dependencies):
 # FIFO directories.
 .PHONY: install-exec-hook uninstall-hook
 install-exec-hook:
-	-$(INSTALL) -d -m 'ug=rwx,o=rx' $(pkgrundir) || touch nofifodir
-	@if [ -f nofifodir ]; then (\
-	  echo 'Warning: I could not create the directory `$(pkgrundir)'"'" ;\
+	-$(INSTALL) -d -m 'ug=rwx,o=rx' '$(DESTDIR)$(pkgrundir)'             \
+	   || touch nofifodir
+	@if [ -f nofifodir ]; then (                                         \
+	  echo 'Warning: I could not create the directory'                   \
+	       '`$(DESTDIR)$(pkgrundir)'"'"                                 ;\
 	  echo '         You do not have permission to create the'           \
 	       'directory.  See the'                                        ;\
           echo '         `Quirks when Compiling tvtime'"' section of the"    \
 	       '`INSTALL'"' file."); fi
-	-if [ -f nofifodir ]; then rm -f nofifodir; else $(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir) || touch nofifodir; fi
-	@if [ -f nofifodir ]; then rm -f nofifodir; (\
-	  echo 'Warning: I could not create the directory `$(pkgrundir)'"'" ;\
+	-if [ -f nofifodir ]; then                                           \
+	   rm -f nofifodir;                                                  \
+	 else                                                                \
+	   $(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@'              \
+	     '$(DESTDIR)$(pkgrundir)' || touch nofifodir;                    \
+	 fi
+	@if [ -f nofifodir ]; then rm -f nofifodir; (                        \
+	  echo 'Warning: I could not create the directory'                   \
+	       '`$(DESTDIR)$(pkgrundir)'"'"                                 ;\
 	  echo '         with group owner `@PKGRUNDIRGROUP@'"'."            ;\
           echo '         You are not a member of the `@PKGRUNDIRGROUP@'"'"   \
 	       'group.  See the'                                            ;\
@@ -107,6 +115,6 @@ install-exec-hook:
 	       '`INSTALL'"' file."); fi
 
 uninstall-hook:
-	-rm -rf $(pkgrundir)
-	-rmdir -p $(rundir)
+	-rm -rf '$(DESTDIR)$(pkgrundir)'
+	-rmdir -p '$(DESTDIR)$(rundir)'
 
