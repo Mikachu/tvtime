@@ -60,7 +60,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	utils.c diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c \
 	pulldown.h pulldown.c hashtable.h hashtable.c cpuinfo.h cpuinfo.c \
 	videodev.h videodev2.h menu.c menu.h outputfilter.h outputfilter.c \
-	dfbmatroxtv.c
+	dfbmatroxtv.c xmltv.h xmltv.c
 
 OUTPUT_SRCS = display.c display.h outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
@@ -72,7 +72,6 @@ EXTRA_PROGRAMS = expandpng timingtest rvr
 
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
-# -lmysqlclient
 
 tvtime_command_SOURCES = $(COMMON_SRCS) tvtime-command.c
 tvtime_command_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
