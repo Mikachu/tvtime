@@ -17,6 +17,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <inttypes.h>
+#include <unistd.h>
 #include "config.h"
 #include "attributes.h"
 #include "mmx.h"
@@ -1089,4 +1090,87 @@ double speedy_measure_cpu_mhz( void )
 
     return (((double) (tsc_end - tsc_start)) / ((double) usec_delay));
 }
+
+#if 0
+typedef struct cpuid_regs {
+	unsigned int eax;
+	unsigned int ebx;
+	unsigned int ecx;
+	unsigned int edx;
+} cpuid_regs_t;
+
+static cpuid_regs_t
+cpuid(int func) {
+	cpuid_regs_t regs;
+#define	CPUID	".byte 0x0f, 0xa2; "
+	asm("movl %4,%%eax; " CPUID
+	    "movl %%eax,%0; movl %%ebx,%1; movl %%ecx,%2; movl %%edx,%3"
+		: "=m" (regs.eax), "=m" (regs.ebx), "=m" (regs.ecx), "=m" (regs.edx)
+		: "g" (func)
+		: "%eax", "%ebx", "%ecx", "%edx");
+	return regs;
+}
+
+/* Naming convention should be: <Name> [(<Codename>)] */
+/* This table only is used unless init_<vendor>() below doesn't set it; */
+/* in particular, if CPUID levels 0x80000002..4 are supported, this isn't used */
+static struct cpu_model_info cpu_models[] __initdata = {
+	{ X86_VENDOR_INTEL,	4,
+	  { "486 DX-25/33", "486 DX-50", "486 SX", "486 DX/2", "486 SL", 
+	    "486 SX/2", NULL, "486 DX/2-WB", "486 DX/4", "486 DX/4-WB", NULL, 
+	    NULL, NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_INTEL,	5,
+	  { "Pentium 60/66 A-step", "Pentium 60/66", "Pentium 75 - 200",
+	    "OverDrive PODP5V83", "Pentium MMX", NULL, NULL,
+	    "Mobile Pentium 75 - 200", "Mobile Pentium MMX", NULL, NULL, NULL,
+	    NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_INTEL,	6,
+	  { "Pentium Pro A-step", "Pentium Pro", NULL, "Pentium II (Klamath)", 
+	    NULL, "Pentium II (Deschutes)", "Mobile Pentium II",
+	    "Pentium III (Katmai)", "Pentium III (Coppermine)", NULL,
+	    "Pentium III (Cascades)", NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_AMD,	4,
+	  { NULL, NULL, NULL, "486 DX/2", NULL, NULL, NULL, "486 DX/2-WB",
+	    "486 DX/4", "486 DX/4-WB", NULL, NULL, NULL, NULL, "Am5x86-WT",
+	    "Am5x86-WB" }},
+	{ X86_VENDOR_AMD,	5, /* Is this this really necessary?? */
+	  { "K5/SSA5", "K5",
+	    "K5", "K5", NULL, NULL,
+	    "K6", "K6", "K6-2",
+	    "K6-3", NULL, NULL, NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_AMD,	6, /* Is this this really necessary?? */
+	  { "Athlon", "Athlon",
+	    "Athlon", NULL, "Athlon", NULL,
+	    NULL, NULL, NULL,
+	    NULL, NULL, NULL, NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_UMC,	4,
+	  { NULL, "U5D", "U5S", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	    NULL, NULL, NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_NEXGEN,	5,
+	  { "Nx586", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	    NULL, NULL, NULL, NULL, NULL, NULL, NULL }},
+	{ X86_VENDOR_RISE,	5,
+	  { "iDragon", NULL, "iDragon", NULL, NULL, NULL, NULL,
+	    NULL, "iDragon II", "iDragon II", NULL, NULL, NULL, NULL, NULL, NULL }},
+};
+
+/* Look up CPU names by table lookup. */
+static char __init *table_lookup_model(struct cpuinfo_x86 *c)
+{
+	struct cpu_model_info *info = cpu_models;
+	int i;
+
+	if ( c->x86_model >= 16 )
+		return NULL;	/* Range check */
+
+	for ( i = 0 ; i < sizeof(cpu_models)/sizeof(struct cpu_model_info) ; i++ ) {
+		if ( info->vendor == c->x86_vendor &&
+		     info->family == c->x86 ) {
+			return info->model_names[c->x86_model];
+		}
+		info++;
+	}
+	return NULL;		/* Not found */
+}
+#endif
 

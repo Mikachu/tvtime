@@ -550,7 +550,7 @@ int main( int argc, char **argv )
     int firstscan = 0;
     int use_vgasync = 0;
 
-    fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
+    fprintf( stderr, "tvtime: Running %s on a %.3fMHz CPU.\n", PACKAGE_STRING, speedy_measure_cpu_mhz() );
 
     setup_speedy_calls();
 
