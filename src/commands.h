@@ -25,7 +25,6 @@ extern "C" {
 
 typedef struct commands_s commands_t;
 
-#include "input.h"
 #include "tvtimeosd.h"
 #include "videoinput.h"
 #include "tvtimeconf.h"

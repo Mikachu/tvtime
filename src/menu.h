@@ -19,18 +19,18 @@
 #ifndef MENU_H_INCLUDED
 #define MENU_H_INCLUDED
 
+typedef struct menu_s menu_t;
+
 #include "input.h"
 #include "tvtimeconf.h"
 #include "videoinput.h"
 #include "tvtimeosd.h"
+#include "commands.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct menu_s menu_t;
-
-#include "commands.h"
 menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin, 
                   tvtime_osd_t *osd, int width, 
                   int height, double aspect );
