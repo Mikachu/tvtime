@@ -168,7 +168,7 @@ static const char *taglines[] = {
 "tvtime: i'd walk a mile for tvtime",
 "tvtime: the pause that refreshes",
 "tvtime: good to the last drop",
-"tvtime: where's the beef?"
+"tvtime: where's the beef?",
 "tvtime: what do you want to watch today?",
 "tvtime: himmelskt gott!",
 "with almost 10 programmers around the globe, tvtime is next.",
