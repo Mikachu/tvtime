@@ -491,11 +491,9 @@ static void xv_clear_screen( void )
     XSync( display, False );
 }
 
-int xv_init( int inputwidth, int inputheight, int outputheight, int aspect, int verbose )
+int xv_init( int outputheight, int aspect, int verbose )
 {
     output_aspect = aspect;
-    input_width = inputwidth;
-    input_height = inputheight;
     output_height = outputheight;
     output_width = ( output_height * 4 ) / 3;
     xvoutput_verbose = verbose;
@@ -504,11 +502,18 @@ int xv_init( int inputwidth, int inputheight, int outputheight, int aspect, int 
     if( !xv_check_extension() ) return 0;
 
     calculate_video_area();
-    xv_alloc_frame();
-    xv_clear_screen();
     saver_off( display );
     x11_InstallXErrorHandler();
     return 1;
+}
+
+void xv_set_input_size( int inputwidth, int inputheight )
+{
+    input_width = inputwidth;
+    input_height = inputheight;
+
+    xv_alloc_frame();
+    xv_clear_screen();
 }
 
 void sizehint( int x, int y, int width, int height, int max )
@@ -833,6 +838,8 @@ void xv_set_window_height( int window_height )
 static output_api_t xvoutput =
 {
     xv_init,
+
+    xv_set_input_size,
 
     xv_lock_output,
     xv_get_output,

@@ -23,7 +23,9 @@
 
 typedef struct output_api_s
 {
-    int (* init)( int inputwidth, int inputheight, int outputheight, int aspect, int verbose );
+    int (* init)( int outputheight, int aspect, int verbose );
+
+    void (* set_input_size)( int inputwidth, int inputheight );
 
     /* Returns pointers to the next output buffer. */
     void (* lock_output_buffer)( void );

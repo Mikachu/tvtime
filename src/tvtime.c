@@ -898,6 +898,7 @@ int main( int argc, char **argv )
         struct timeval profiletime;
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Parsed config.\n", timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     verbose = config_get_verbose( ct );
@@ -952,7 +953,27 @@ int main( int argc, char **argv )
         struct timeval profiletime;
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Stole resources.\n", timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
+
+
+    /* Setup the output. */
+    output = get_xv_output();
+    if( !output->init( config_get_outputheight( ct ), config_get_aspect( ct ), verbose ) ) {
+        fprintf( stderr, "tvtime: XVideo output failed to initialize: "
+                         "no video output available.\n" );
+        /* FIXME: Delete everything here! */
+        return 1;
+    }
+
+    if( profile_startup ) {
+        struct timeval profiletime;
+        gettimeofday( &profiletime, 0 );
+        fprintf( stderr, "tvtime: [%8dms] Created our output.\n",
+                 timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
+    }
+
 
     /* Setup the speedy calls. */
     setup_speedy_calls( verbose );
@@ -981,6 +1002,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup deinterlacers.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
@@ -1028,6 +1050,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup stations.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
 
@@ -1069,11 +1092,15 @@ int main( int argc, char **argv )
         }
     }
 
+    /* Set input size. */
+    output->set_input_size( width, height );
+
     if( profile_startup ) {
         struct timeval profiletime;
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup input.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
 
@@ -1150,6 +1177,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Allocated and built temp frames.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
 
@@ -1184,6 +1212,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Created the OSD.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     commands = commands_new( ct, vidin, stationmgr, osd );
@@ -1197,6 +1226,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Created the command parser.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     /* Setup the video correction tables. */
@@ -1214,6 +1244,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup the filter tables.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     /**
@@ -1287,6 +1318,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup the FIFO, console and input.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     usevbi = config_get_usevbi( ct );
@@ -1315,24 +1347,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Setup the VBI.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
-    }
-
-    /* Setup the output. */
-    output = get_xv_output();
-    if( !output->init( width, height, config_get_outputheight( ct ), 
-                       config_get_aspect( ct ), verbose ) ) {
-        fprintf( stderr, "tvtime: XVideo output failed to initialize: "
-                         "no video output available.\n" );
-        /* FIXME: Delete everything here! */
-        if( vidin ) videoinput_delete( vidin );
-        return 1;
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Created our output.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     /* Randomly assign a tagline as the window caption. */
@@ -1361,6 +1376,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Did startup work.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     /* Begin capturing frames. */
@@ -1378,6 +1394,7 @@ int main( int argc, char **argv )
         gettimeofday( &profiletime, 0 );
         fprintf( stderr, "tvtime: [%8dms] Pre-rolled capture.\n",
                  timediff( &profiletime, &startup_time ) / 1000 );
+        fflush( stderr );
     }
 
     /* Initialize our timestamps. */
