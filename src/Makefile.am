@@ -50,7 +50,7 @@ expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
-timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
+timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.a -lpthread
 
 CLEANFILES = expandpng timingtest
 

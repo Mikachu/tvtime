@@ -74,7 +74,7 @@ int main( int argc, char **argv )
     double mhz;
     int i;
 
-    setup_speedy_calls();
+    setup_speedy_calls( 1 );
 
     if( argc < 2 ) {
         for( i = 0; i < numtests; i++ ) {
