@@ -569,6 +569,14 @@ void vbiscreen_reset( vbiscreen_t *vs )
     vs->style = 0;
 }
 
+int vbiscreen_active_on_scanline( vbiscreen_t *vs, int scanline )
+{
+    if( scanline >= vs->y && scanline < vs->y + vs->height ) {
+        return 1;
+    }
+    return 0;
+}
+
 void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                                              unsigned char *output,
                                              int width, int xpos, 
@@ -576,7 +584,6 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 {
     int x=0, y=0, row=0, index=0;
 
-    if( !output ) return;
     if( scanline >= vs->y && scanline < vs->y + vs->height ) {
 
         if( 0 && !vs->captions )

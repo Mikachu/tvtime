@@ -36,6 +36,7 @@ void vbiscreen_erase_non_displayed( vbiscreen_t *vs );
 void vbiscreen_carriage_return( vbiscreen_t *vs );
 void vbiscreen_end_of_caption( vbiscreen_t *vs );
 void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 );
+int vbiscreen_active_on_scanline( vbiscreen_t *vs, int scanline );
 void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                                              unsigned char *output,
                                              int width, int xpos, 
