@@ -245,6 +245,16 @@ void videoinput_toggle_pal_secam( videoinput_t *vidin );
 void videoinput_switch_pal_secam( videoinput_t *vidin, int norm );
 
 /**
+ * Whether or not to use PAL_DK mode. Only applies to V4L2.
+ */
+void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode );
+
+/**
+ * Get pal_dk mode current value.
+ */
+int videoinput_get_pal_audio_mode( videoinput_t *vidin );
+
+/**
  * Returns the name of the capture card driver.
  */
 const char *videoinput_get_driver_name( videoinput_t *vidin );

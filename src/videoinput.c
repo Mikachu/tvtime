@@ -189,6 +189,7 @@ struct videoinput_s
     int width;
     int height;
     int norm;
+    int dkmode;
 
     int isbttv;
     int isv4l2;
@@ -445,6 +446,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curframe = 0;
     vidin->verbose = verbose;
     vidin->norm = norm;
+    vidin->dkmode = 0;
     vidin->height = videoinput_get_norm_height( norm );
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
 
@@ -1473,6 +1475,9 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                      strerror( errno ) );
         } else {
             std = videoinput_get_v4l2_norm( vidin->norm );
+            if( std == V4L2_STD_PAL && vidin->dkmode ) {
+                std = V4L2_STD_PAL_DK;
+            } 
             if( ioctl( vidin->grab_fd, VIDIOC_S_STD, &std ) < 0 ) {
                 fprintf( stderr, "videoinput: Driver refuses to set norm: %s\n",
                          strerror( errno ) );
@@ -1606,6 +1611,19 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
     } else {
         return vidin->audiomode;
     }
+}
+
+void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode )
+{
+    if( !vidin ) return; 
+    vidin->dkmode = dkmode;
+    videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
+}
+
+int videoinput_get_pal_audio_mode( videoinput_t *vidin )
+{
+    if( !vidin ) return 0;
+    return vidin->dkmode;
 }
 
 int videoinput_has_tuner( videoinput_t *vidin )
