@@ -910,9 +910,6 @@ int main( int argc, char **argv )
     }
 
     verbose = config_get_verbose( ct );
-    if( verbose ) {
-        dlevel = 5;
-    }
 
     /* Steal system resources in the name of performance. */
     if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
