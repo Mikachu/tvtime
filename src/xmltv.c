@@ -132,9 +132,10 @@ static time_t parse_xmltv_date( const char *date )
     char shour[ 3 ];
     char smin[ 3 ];
     char ssec[ 3 ];
-    int len = strlen( date );
+    int len;
     struct tm tm_obj;
-    time_t tz = 0;
+    time_t tz;
+    const char *tzstring;
     /*
      * For some reason, mktime() accepts broken-time arguments as localtime,
      * and there is no corresponding UTC function. *Sigh*.
@@ -152,18 +153,45 @@ static time_t parse_xmltv_date( const char *date )
     memset( ssec, 0, sizeof( ssec ) );
 
     /*
+     * according to the xmltv dtd:
+     *
+     * All dates and times in this [the xmltv] DTD follow the same format,
+     * loosely based on ISO 8601.  They can be 'YYYYMMDDhhmmss' or some
+     * initial substring, for example if you only know the year and month you
+     * can have 'YYYYMM'.  You can also append a timezone to the end; if no
+     * explicit timezone is given, UT is assumed.  Examples:
+     * '200007281733 BST', '200209', '19880523083000 +0300'.  (BST == +0100.)
+     *
+     * thus:
      * example *date = "20031022220000 +0200"
      * type:            YYYYMMDDhhmmss ZZzzz"
      * position:        0         1         2          
      *                  012345678901234567890
+     *
+     * note: since part of the time specification can be omitted, we cannot
+     *       hard-code the offset to the timezone!
      */
+
+    /* Find where the timezone starts */
+    tzstring = strchr( date, ' ' );
+    if( tzstring ) {
+        /* Calculate the length of the date */
+        len = tzstring - date;
+        /* Parse the timezone, skipping the initial space */
+        tz = parse_xmltv_timezone( tzstring + 1 );
+    } else {
+        /* No timezone present */
+        len = strlen( date );
+        /* Assume UT */
+        tz = 0;
+    }
+
     if( len >= 4 ) memcpy( syear, date, 4 );
     if( len >= 6 ) memcpy( smonth, date + 4, 2 );
     if( len >= 8 ) memcpy( sday, date + 6, 2 );
     if( len >= 10 ) memcpy( shour, date + 8, 2 );
     if( len >= 12 ) memcpy( smin, date + 10, 2 );
     if( len >= 14 ) memcpy( ssec, date + 12, 2 );
-    if( len >= 15 ) tz = parse_xmltv_timezone( date + 15 ); else tz = 0;
 
     tm_obj.tm_sec = atoi( ssec ) - tz + gmtoff;
     tm_obj.tm_min = atoi( smin );
