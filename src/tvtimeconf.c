@@ -684,8 +684,6 @@ static void print_scanner_usage( char **argv )
              "                             PAL-N or PAL-60 (defaults to NTSC).\n" );
 }
 
-
-
 config_t *config_new( void )
 {
     char *temp_dirname;
@@ -696,59 +694,69 @@ config_t *config_new( void )
         return 0;
     }
 
+    /* Default settings. */
     ct->outputheight = 576;
-    ct->useposition = 0;
-    ct->x = 320;
-    ct->y = 240;
-    ct->inputwidth = 720;
     ct->verbose = 0;
-    ct->slave_mode = 0;
-    ct->send_fields = 0;
-    ct->output_driver = strdup( "xv" );
-    ct->fspos = 0;
     ct->aspect = 0;
     ct->debug = 0;
-    ct->ntsc_mode = 0;
+    ct->fullscreen = 0;
     ct->priority = -19;
+    ct->ntsc_mode = 0;
+    ct->send_fields = 0;
+    ct->output_driver = strdup( "xv" );
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
-    ct->inputnum = 0;
-    ct->v4ldev = strdup( "/dev/video0" );
-    ct->vbidev = strdup( "/dev/vbi0" );
-    ct->norm = strdup( "ntsc" );
-    ct->freq = strdup( "us-cable" );
-    ct->nummodes = 0;
-    ct->modelist = 0;
-    ct->fullscreen = 0;
-    ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
-    ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
-    ct->deinterlace_method = strdup( "GreedyH" );
-    ct->check_freq_present = 1;
-    ct->use_vbi = 0;
-    ct->start_channel = 1;
-    ct->prev_channel = 1;
-    ct->overscan = 0.0;
-    ct->framerate = FRAMERATE_FULL;
-    ct->ssdir = strdup( getenv( "HOME" ) );
-    ct->timeformat = strdup( "%X" );
-    ct->mixerdev = strdup( "/dev/mixer:line" );
+    ct->useposition = 0;
+    ct->fspos = 0;
+    ct->x = 320;
+    ct->y = 240;
     ct->picsaverestore = 1;
     ct->brightness = -1;
     ct->contrast = -1;
     ct->colour = -1;
     ct->hue = -1;
 
-    /* We set these to 0 so we can delete safely if necessary. */
-    ct->rvr_filename = 0;
-    ct->config_filename = 0;
-    ct->doc = 0;
+    memset( ct->keymap, 0, sizeof( ct->keymap ) );
+    memset( ct->keymapmenu, 0, sizeof( ct->keymapmenu ) );
+    memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
+    memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
+
+    ct->inputwidth = 720;
+    ct->inputnum = 0;
+    ct->v4ldev = strdup( "/dev/video0" );
+    ct->norm = strdup( "ntsc" );
+    ct->freq = strdup( "us-cable" );
+    ct->ssdir = strdup( getenv( "HOME" ) );
+    ct->timeformat = strdup( "%X" );
+    ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
+    ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
 
     ct->uid = getuid();
 
-    memset( ct->keymapmenu, 0, sizeof( ct->keymapmenu ) );
-    memset( ct->keymap, 0, sizeof( ct->keymap ) );
-    ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
+    ct->rvr_filename = 0;
+    ct->mixerdev = strdup( "/dev/mixer:line" );
 
+    ct->deinterlace_method = strdup( "GreedyH" );
+    ct->check_freq_present = 1;
+
+    ct->use_vbi = 0;
+    ct->vbidev = strdup( "/dev/vbi0" );
+
+    ct->start_channel = 1;
+    ct->prev_channel = 1;
+    ct->framerate = FRAMERATE_FULL;
+    ct->slave_mode = 0;
+
+    ct->overscan = 0.0;
+
+    ct->config_filename = 0;
+    ct->doc = 0;
+
+    ct->nummodes = 0;
+    ct->modelist = 0;
+
+    /* Default key bindings. */
+    ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
     ct->keymap[ 'q' ] = TVTIME_QUIT;
     ct->keymap[ I_UP ] = TVTIME_CHANNEL_INC;
@@ -792,8 +800,6 @@ config_t *config_new( void )
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
     ct->keymap[ 'o' ] = TVTIME_TOGGLE_COLOUR_INVERT;
 
-    memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
-    memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
     ct->buttonmap[ 3 ] = TVTIME_SHOW_MENU;
