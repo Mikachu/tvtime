@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-11-13 23:54-0400\n"
-"PO-Revision-Date: 2003-12-06 19:28+0200\n"
+"PO-Revision-Date: 2003-12-12 05:45+0200\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
 "MIME-Version: 1.0\n"
@@ -244,7 +244,7 @@ msgstr "Ei voitu luoda FIFO:a, tvtimen kauko-ohjaus pois käytöstä.\n"
 
 #: src/tvtime.c:1589
 msgid "Closed caption display failed to initialize, disabled.\n"
-msgstr "Closed Caption -näytön valmistelu epäonnistui; pois käytöstä.\n"
+msgstr "Closed caption -näytön valmistelu epäonnistui; pois käytöstä.\n"
 
 #: src/tvtime.c:1845
 msgid "Always-on-top enabled."
@@ -401,7 +401,7 @@ msgstr "Aseta kanavan normiksi PAL"
 
 #: src/commands.c:366
 msgid "Change frequency table"
-msgstr "Vaihda taajuus- ja kanavataulukkoa"
+msgstr "Vaihda kanavataulukkoa"
 
 #: src/commands.c:372
 msgid "Disable signal detection"
@@ -555,7 +555,7 @@ msgstr "Signaalitulon asetukset"
 
 #: src/commands.c:1015 src/commands.c:1046
 msgid "Picture settings"
-msgstr "Kuvan väriasetukset"
+msgstr "Värisäädöt"
 
 #: src/commands.c:1020 src/commands.c:1051 src/commands.c:1292
 #: src/commands.c:1321 src/commands.c:1327 src/commands.c:1335
@@ -574,7 +574,7 @@ msgstr "Sulje valikko"
 
 #: src/commands.c:1087
 msgid "Frequency table"
-msgstr "Taajuusalueet"
+msgstr "Kanavataulukko"
 
 #: src/commands.c:1099 src/commands.c:2685
 msgid "Finetune"
@@ -633,7 +633,7 @@ msgstr "Lomituksen poistosuodattimen kuvaus"
 #: src/commands.c:1352 src/commands.c:1401 src/commands.c:1464
 #: src/commands.c:1497 src/commands.c:1530 src/commands.c:1563
 msgid "Picture"
-msgstr "Väriasetukset"
+msgstr "Värisäädöt"
 
 #: src/commands.c:1356 src/commands.c:1406 src/commands.c:1464
 #: src/commands.c:2821 src/commands.c:2862
@@ -648,7 +648,7 @@ msgstr "Kontrasti"
 #: src/commands.c:1365 src/commands.c:1415 src/commands.c:1530
 #: src/commands.c:2849 src/commands.c:2868
 msgid "Colour"
-msgstr "Väri"
+msgstr "Värikylläisyys"
 
 #: src/commands.c:1369 src/commands.c:1419 src/commands.c:1563
 #: src/commands.c:2807 src/commands.c:2871
@@ -657,20 +657,20 @@ msgstr "Värisävy"
 
 #: src/commands.c:1376
 msgid "Save current settings as defaults"
-msgstr "Tallenna asetukset oletuksiksi"
+msgstr "Tallenna värisäädöt oletusarvoiksi"
 
 #: src/commands.c:1380 src/commands.c:1390 src/commands.c:1437
 #: src/commands.c:1449
 msgid "Reset to global defaults"
-msgstr "Palauta oletusasetukset"
+msgstr "Palauta oletusarvot"
 
 #: src/commands.c:1426
 msgid "Save current settings as global defaults"
-msgstr "Tallenna asetukset oletuksiksi"
+msgstr "Tallenna värisäädöt oletusarvoiksi"
 
 #: src/commands.c:1432
 msgid "Save current settings as channel defaults"
-msgstr "Tallenna asetukset kanavalle"
+msgstr "Tallenna värisäädöt kanavalle"
 
 #: src/commands.c:1703
 msgid "Favorites"
@@ -822,7 +822,7 @@ msgstr "Luminanssikorjauksen kerroin: %.1f"
 
 #: src/commands.c:2620
 msgid "Picture settings reset to defaults."
-msgstr "Väriasetusten oletusarvot palautettu."
+msgstr "Värisäätöjen oletusarvot palautettu."
 
 #: src/commands.c:2648
 msgid "Using nominal NTSC cable frequencies."
@@ -842,12 +842,12 @@ msgstr "Äänenvoimakkuus"
 
 #: src/commands.c:2908
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Väriasetukset tallennettu oletusarvoiksi.\n"
+msgstr "Värisäädöt tallennettu oletusarvoiksi.\n"
 
 #: src/commands.c:2921
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
-msgstr "Väriasetukset tallennettu kanavalle %d.\n"
+msgstr "Värisäädöt tallennettu kanavalle %d.\n"
 
 #: src/commands.c:3005
 msgid "Paused."
@@ -961,8 +961,8 @@ msgid ""
 "                                 custom (first run tvtime-scanner)\n"
 "\n"
 msgstr ""
-"  -f, --frequencies=NIMI     Käytettävä virittimen taajuus- ja\n"
-"                             kanavataulukko. (oletuksena us-cable).\n"
+"  -f, --frequencies=NIMI     Käytettävä virittimen kanavataulukko.\n"
+"                             (oletuksena us-cable).\n"
 "\n"
 "                             Hyväksytyt vaihtoehdot:\n"
 "                                 us-cable \n"
