@@ -46,6 +46,7 @@
 #include "dfboutput.h"
 #include "vidmode.h"
 #include "taglines.h"
+#include "xvoutput.h"
 
 /**
  * Current deinterlacing method.
@@ -584,7 +585,8 @@ int main( int argc, char **argv )
 
     /* Setup the output. */
     //output = get_dfb_output();
-    output = get_sdl_output();
+    //output = get_sdl_output();
+    output = get_xv_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
                        config_get_aspect( ct ) ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: "
@@ -706,7 +708,7 @@ int main( int argc, char **argv )
                                    curframe, lastframe, secondlastframe,
                                    vc, osd, menu, 0,
                                    vc && config_get_apply_luma_correction( ct ),
-                                   width, height, width * 2, width * 2 );
+                                   width, height, width * 2, output->get_output_stride() );
             }
             if( screenshot ) {
                 char filename[ 256 ];
@@ -760,7 +762,7 @@ int main( int argc, char **argv )
                                   curframe, lastframe,
                                   secondlastframe, vc, osd, menu, 1,
                                   vc && config_get_apply_luma_correction( ct ),
-                                  width, height, width * 2, width * 2 );
+                                  width, height, width * 2, output->get_output_stride() );
             }
             if( screenshot ) {
                 char filename[ 256 ];
