@@ -62,7 +62,7 @@ struct tvtime_osd_s
     osd_font_t *smallfont;
     osd_font_t *medfont;
     osd_font_t *bigfont;
-    string_object_t *strings;
+    string_object_t strings[ OSD_MAX_STRING_OBJECTS ];
 
     osd_graphic_t *channel_logo;
     int channel_logo_xpos;
@@ -141,15 +141,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     if( !osd->bigfont ) {
         osd_font_delete( osd->smallfont );
         osd_font_delete( osd->medfont );
-        free( osd );
-        return 0;
-    }
-
-    osd->strings = malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
-    if( !osd->strings ) {
-        osd_font_delete( osd->smallfont );
-        osd_font_delete( osd->medfont );
-        osd_font_delete( osd->bigfont );
         free( osd );
         return 0;
     }
@@ -323,7 +314,6 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
             osd_string_delete( osd->strings[ i ].string );
         }
     }
-    free( osd->strings );
     if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
     osd_font_delete( osd->smallfont );
     osd_font_delete( osd->medfont );
