@@ -22,24 +22,6 @@
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void copy_scanline_1( unsigned char *output,
-                                        unsigned char *t1, unsigned char *m1,
-                                        unsigned char *b1,
-                                        unsigned char *t0, unsigned char *m0,
-                                        unsigned char *b0, int width )
-{
-    blit_packed422_scanline( output, m1, width );
-}
-
-static void copy_scanline_2( unsigned char *output, unsigned char *m2,
-                           unsigned char *t1, unsigned char *m1,
-                           unsigned char *b1, unsigned char *t0,
-                           unsigned char *b0, int width )
-{
-    blit_packed422_scanline( output, m2, width );
-}
-
-
 static deinterlace_method_t scalerbobmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
@@ -50,8 +32,10 @@ static deinterlace_method_t scalerbobmethod =
     1,
     0,
     0,
-    copy_scanline_1,
-    copy_scanline_2
+    1,
+    0,
+    0,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

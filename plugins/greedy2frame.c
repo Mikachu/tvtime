@@ -30,18 +30,19 @@ static int GreedyTwoFrameThreshold = 4;
 static int GreedyTwoFrameThreshold2 = 8;
 
 static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char *output,
-                                                                  unsigned char *m2,
-                                                                  unsigned char *t1,
-                                                                  unsigned char *m1,
-                                                                  unsigned char *b1,
-                                                                  unsigned char *t0,
-                                                                  unsigned char *b0,
+                                                                  deinterlace_scanline_data_t *data,
                                                                   int width )
 {
     const mmx_t Mask = { 0x7f7f7f7f7f7f7f7fULL };
     const mmx_t DwordOne = { 0x0000000100000001ULL };    
     const mmx_t DwordTwo = { 0x0000000200000002ULL };    
     mmx_t qwGreedyTwoFrameThreshold;
+    unsigned char *m0 = data->m0;
+    unsigned char *t1 = data->t1;
+    unsigned char *b1 = data->b1;
+    unsigned char *m2 = data->m2;
+    unsigned char *t3 = data->t1;
+    unsigned char *b3 = data->b1;
 
     qwGreedyTwoFrameThreshold.b[ 0 ] = GreedyTwoFrameThreshold;
     qwGreedyTwoFrameThreshold.b[ 1 ] = GreedyTwoFrameThreshold2;
@@ -49,17 +50,12 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
     qwGreedyTwoFrameThreshold.b[ 4 ] = GreedyTwoFrameThreshold;
     qwGreedyTwoFrameThreshold.b[ 6 ] = GreedyTwoFrameThreshold;
 
-    READ_PREFETCH_2048( t1 );
-    READ_PREFETCH_2048( m2 );
-    READ_PREFETCH_2048( b1 );
-    READ_PREFETCH_2048( m1 );
-
     width /= 4;
     while( width-- ) {
+        movq_m2r( *m0, mm0 );
         movq_m2r( *t1, mm1 );
-        movq_m2r( *m2, mm0 );
         movq_m2r( *b1, mm3 );
-        movq_m2r( *m1, mm2 );
+        movq_m2r( *m2, mm2 );
 
         // Average T1 and B1 so we can do interpolated bobbing if we bob onto T1.
         movq_r2r( mm3, mm7 );                 // mm7 = B1
@@ -84,7 +80,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
         pcmpgtd_m2r( DwordOne, mm4 );   // do we want to bob
         pandn_m2r( DwordTwo, mm4 );
 
-        movq_m2r( *t0, mm2 );           // mm2 = T0
+        movq_m2r( *t3, mm2 );           // mm2 = T0
 
         // calculate |T1-T0| put result in mm5
         movq_r2r( mm2, mm5 );
@@ -101,7 +97,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
         pandn_m2r( DwordOne, mm5 );
         paddd_r2r( mm5, mm4 );
 
-        movq_m2r( *b0, mm2 ); // B0
+        movq_m2r( *b3, mm2 ); // B0
 
         // calculate |B1-B0| put result in mm5
         movq_r2r( mm2, mm5 );
@@ -130,23 +126,22 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
 
         // Advance to the next set of pixels.
         output += 8;
-        t0 += 8;
-        b0 += 8;
+        m0 += 8;
         t1 += 8;
-        m1 += 8;
         b1 += 8;
         m2 += 8;
+        t3 += 8;
+        b3 += 8;
     }
     sfence();
     emms();
 }
 
-static void copy_scanline( unsigned char *output, unsigned char *t1,
-                           unsigned char *m1, unsigned char *b1,
-                           unsigned char *t0, unsigned char *m0,
-                           unsigned char *b0, int width )
+static void copy_scanline( unsigned char *output,
+                           deinterlace_scanline_data_t *data,
+                           int width )
 {
-    blit_packed422_scanline( output, m1, width );
+    blit_packed422_scanline( output, data->m1, width );
 }
 
 
@@ -178,8 +173,10 @@ static deinterlace_method_t greedymethod =
     0,
     2,
     settings,
+    1,
     copy_scanline,
-    deinterlace_greedytwoframe_packed422_scanline_mmxext
+    deinterlace_greedytwoframe_packed422_scanline_mmxext,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -71,12 +71,7 @@ static int TwoFrameTemporalTolerance = 300;
 static int TwoFrameSpatialTolerance = 600;
 
 static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *output,
-                                                            unsigned char *t1,
-                                                            unsigned char *m1,
-                                                            unsigned char *b1,
-                                                            unsigned char *t0,
-                                                            unsigned char *m0,
-                                                            unsigned char *b0,
+                                                            deinterlace_scanline_data_t *data,
                                                             int width )
 {
     const mmx_t YMask = { 0x00ff00ff00ff00ffULL };
@@ -250,8 +245,10 @@ static deinterlace_method_t twoframe =
     0,
     2,
     settings,
+    1,
     deinterlace_twoframe_packed422_scanline_mmxext,
-    copy_scanline
+    copy_scanline,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

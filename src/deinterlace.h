@@ -19,7 +19,7 @@
 #ifndef DEINTERLACE_H_INCLUDED
 #define DEINTERLACE_H_INCLUDED
 
-#define DEINTERLACE_PLUGIN_API_VERSION 0x00000002
+#define DEINTERLACE_PLUGIN_API_VERSION 0x00000003
 
 /**
  * Our deinterlacer plugin API is modeled after DScaler's.  This module
@@ -30,6 +30,8 @@
 
 typedef struct deinterlace_setting_s deinterlace_setting_t;
 typedef struct deinterlace_method_s deinterlace_method_t;
+typedef struct deinterlace_scanline_data_s deinterlace_scanline_data_t;
+typedef struct deinterlace_frame_data_s deinterlace_frame_data_t;
 
 /**
  * Callback for setting change notification.
@@ -47,16 +49,27 @@ typedef void (*deinterlace_plugin_init_t)( void );
  * an 'interpolate' for the currently active field.  This so so that
  * while plugins may be delaying fields, the external API assumes that
  * the plugin is completely realtime.
+ *
+ * Each deinterlacing routine can require data from up to four fields.
+ * The most recent field captured is field 0, and increasing numbers go
+ * backwards in time.
  */
+struct deinterlace_scanline_data_s
+{
+    unsigned char *tt0, *t0, *m0, *b0, *bb0;
+    unsigned char *tt1, *t1, *m1, *b1, *bb1;
+    unsigned char *tt2, *t2, *m2, *b2, *bb2;
+    unsigned char *tt3, *t3, *m3, *b3, *bb3;
+};
 
 /**
- * Each deinterlacing routine can require data from up to four fields.
- * The current field is being output is Field 4:
- *
- * | Field 1 | Field 2 | Field 3 | Field 4 |
- * |         |   T0    |         |   T1    |
- * |   M0    |         |    M1   |         |
- * |         |   B0    |         |   B1    |
+ * |   t-3       t-2       t-1       t
+ * | Field 3 | Field 2 | Field 1 | Field 0 |
+ * |  TT3    |         |   TT1   |         |
+ * |         |   T2    |         |   T0    |
+ * |   M3    |         |    M1   |         |
+ * |         |   B2    |         |   B0    |
+ * |  BB3    |         |   BB1   |         |
  *
  * While all pointers are passed in, each plugin is only guarenteed for
  * the ones it indicates it requires (in the fields_required parameter)
@@ -65,30 +78,39 @@ typedef void (*deinterlace_plugin_init_t)( void );
  * Pointers are always to scanlines in the standard packed 4:2:2 format.
  */
 typedef void (*deinterlace_interp_scanline_t)( unsigned char *output,
-                                               unsigned char *t1,
-                                               unsigned char *m1,
-                                               unsigned char *b1,
-                                               unsigned char *t0,
-                                               unsigned char *m0,
-                                               unsigned char *b0,
+                                               deinterlace_scanline_data_t *data,
                                                int width );
 /**
  * For the copy scanline, the API is basically the same, except that
  * we're given a scanline to 'copy'.
  *
- * | Field 1 | Field 2 | Field 3 | Field 4 |
- * |   T0    |         |   T1    |         |
- * |         |    M1   |         |   M2    |
- * |   B0    |         |   B1    |         |
+ * |   t-3       t-2       t-1       t
+ * | Field 3 | Field 2 | Field 1 | Field 0 |
+ * |         |   TT2   |         |  TT0    |
+ * |   T3    |         |   T1    |         |
+ * |         |    M2   |         |   M0    |
+ * |   B3    |         |   B1    |         |
+ * |         |   BB2   |         |  BB0    |
  */
 typedef void (*deinterlace_copy_scanline_t)( unsigned char *output,
-                                             unsigned char *m2,
-                                             unsigned char *t1,
-                                             unsigned char *m1,
-                                             unsigned char *b1,
-                                             unsigned char *t0,
-                                             unsigned char *b0,
+                                             deinterlace_scanline_data_t *data,
                                              int width );
+
+/**
+ * The frame function is for deinterlacing plugins that can only act
+ * on whole frames, rather than on a scanline at a time.
+ */
+struct deinterlace_frame_data_s
+{
+    unsigned char *f0;
+    unsigned char *f1;
+    unsigned char *f2;
+    unsigned char *f3;
+};
+
+typedef void (*deinterlace_frame_t)( unsigned char *output,
+                                     deinterlace_frame_data_t *data,
+                                     int width );
 
 
 /**
@@ -132,8 +154,10 @@ struct deinterlace_method_s
     int doscalerbob;
     int numsettings;
     deinterlace_setting_t *settings;
+    int scanlinemode;
     deinterlace_interp_scanline_t interpolate_scanline;
     deinterlace_copy_scanline_t copy_scanline;
+    deinterlace_frame_t deinterlace_frame;
 };
 
 /**

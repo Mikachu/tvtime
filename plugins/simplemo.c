@@ -205,8 +205,10 @@ static deinterlace_method_t simplemo =
     0,
     0,
     0,
+    1,
     deinterlace_scanline_slow,
-    copy_scanline
+    copy_scanline,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -167,8 +167,10 @@ static deinterlace_method_t bobmethod =
     0,
     2,
     settings,
+    1,
     deinterlace_videobob_packed422_scanline_mmxext,
-    copy_scanline
+    copy_scanline,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

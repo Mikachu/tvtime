@@ -32,16 +32,13 @@
 #include "deinterlace.h"
 
 static void deinterlace_scanline_linear_blend( unsigned char *output,
-                                        unsigned char *t1, unsigned char *m1,
-                                        unsigned char *b1,
-                                        unsigned char *t0, unsigned char *m0,
-                                        unsigned char *b0, int width )
+                                               deinterlace_scanline_data_t *data,
+                                               int width )
 {
+    unsigned char *t0 = data->t0;
+    unsigned char *b0 = data->b0;
+    unsigned char *m1 = data->m1;
     int i;
-
-    READ_PREFETCH_2048( t1 );
-    READ_PREFETCH_2048( b1 );
-    READ_PREFETCH_2048( m1 );
 
     // Get width in bytes.
     width *= 2;
@@ -50,12 +47,12 @@ static void deinterlace_scanline_linear_blend( unsigned char *output,
 
     pxor_r2r( mm7, mm7 );
     while( i-- ) {
-        movd_m2r( *t1, mm0 );
-        movd_m2r( *b1, mm1 );
+        movd_m2r( *t0, mm0 );
+        movd_m2r( *b0, mm1 );
         movd_m2r( *m1, mm2 );
 
-        movd_m2r( *(t1+4), mm3 );
-        movd_m2r( *(b1+4), mm4 );
+        movd_m2r( *(t0+4), mm3 );
+        movd_m2r( *(b0+4), mm4 );
         movd_m2r( *(m1+4), mm5 );
 
         punpcklbw_r2r( mm7, mm0 );
@@ -80,27 +77,25 @@ static void deinterlace_scanline_linear_blend( unsigned char *output,
         movd_r2m( mm2, *output );
         movd_r2m( mm5, *(output+4) );
         output += 8;
-        t1 += 8;
-        b1 += 8;
+        t0 += 8;
+        b0 += 8;
         m1 += 8;
     }
     while( width-- ) {
-        *output++ = (*t1++ + *b1++ + (2 * *m1++))>>2;
+        *output++ = (*t0++ + *b0++ + (2 * *m1++))>>2;
     }
     sfence();
     emms();
 }
 
-static void deinterlace_scanline_linear_blend2( unsigned char *output, unsigned char *m2,
-                           unsigned char *t1, unsigned char *m1,
-                           unsigned char *b1, unsigned char *t0,
-                           unsigned char *b0, int width )
+static void deinterlace_scanline_linear_blend2( unsigned char *output,
+                                                deinterlace_scanline_data_t *data,
+                                                int width )
 {
+    unsigned char *m0 = data->m0;
+    unsigned char *t1 = data->t1;
+    unsigned char *b1 = data->b1;
     int i;
-
-    READ_PREFETCH_2048( t1 );
-    READ_PREFETCH_2048( b1 );
-    READ_PREFETCH_2048( m2 );
 
     // Get width in bytes.
     width *= 2;
@@ -111,11 +106,11 @@ static void deinterlace_scanline_linear_blend2( unsigned char *output, unsigned 
     while( i-- ) {
         movd_m2r( *t1, mm0 );
         movd_m2r( *b1, mm1 );
-        movd_m2r( *m2, mm2 );
+        movd_m2r( *m0, mm2 );
 
         movd_m2r( *(t1+4), mm3 );
         movd_m2r( *(b1+4), mm4 );
-        movd_m2r( *(m2+4), mm5 );
+        movd_m2r( *(m0+4), mm5 );
 
         punpcklbw_r2r( mm7, mm0 );
         punpcklbw_r2r( mm7, mm1 );
@@ -141,10 +136,10 @@ static void deinterlace_scanline_linear_blend2( unsigned char *output, unsigned 
         output += 8;
         t1 += 8;
         b1 += 8;
-        m2 += 8;
+        m0 += 8;
     }
     while( width-- ) {
-        *output++ = (*t1++ + *b1++ + (2 * *m2++))>>2;
+        *output++ = (*t1++ + *b1++ + (2 * *m0++))>>2;
     }
     sfence();
     emms();
@@ -161,8 +156,10 @@ static deinterlace_method_t linearblendmethod =
     0,
     0,
     0,
+    1,
     deinterlace_scanline_linear_blend,
-    deinterlace_scanline_linear_blend2
+    deinterlace_scanline_linear_blend2,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

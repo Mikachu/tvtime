@@ -38,22 +38,24 @@
 // I'd intended this to be part of a larger more elaborate method added to 
 // Blended Clip but this give too good results for the CPU to ignore here.
 
-static void copy_scanline( unsigned char *output, unsigned char *t1,
-                           unsigned char *m1, unsigned char *b1,
-                           unsigned char *t0, unsigned char *m0,
-                           unsigned char *b0, int width )
+static void copy_scanline( unsigned char *output,
+                           deinterlace_scanline_data_t *data,
+                           int width )
 {
-    blit_packed422_scanline( output, m1, width );
+    blit_packed422_scanline( output, data->m1, width );
 }
 
 static int GreedyMaxComb = 15;
 
-static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output, unsigned char *m2,
-                                                          unsigned char *t1, unsigned char *m1,
-                                                          unsigned char *b1, unsigned char *t0,
-                                                          unsigned char *b0, int width )
+static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
+                                                          deinterlace_scanline_data_t *data,
+                                                          int width )
 {
     mmx_t MaxComb;
+    unsigned char *m0 = data->m0;
+    unsigned char *t1 = data->t1;
+    unsigned char *b1 = data->b1;
+    unsigned char *m2 = data->m2;
 
     // How badly do we let it weave? 0-255
     MaxComb.ub[ 0 ] = GreedyMaxComb;
@@ -65,22 +67,17 @@ static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
     MaxComb.ub[ 6 ] = GreedyMaxComb;
     MaxComb.ub[ 7 ] = GreedyMaxComb;
 
-    // L2 = m2;
-    // L1 = t1;
-    // L3 = b1;
-    // LP2 = m1;
-
-    PREFETCH_2048( t1 );
-    PREFETCH_2048( m2 );
-    PREFETCH_2048( b1 );
-    PREFETCH_2048( m1 );
+    // L2 == m0
+    // L1 == t1
+    // L3 == b1
+    // LP2 == m2
 
     width /= 4;
     while( width-- ) {
         movq_m2r( *t1, mm1 );    // L1
-        movq_m2r( *m2, mm2 );    // L2
+        movq_m2r( *m0, mm2 );    // L2
         movq_m2r( *b1, mm3 );    // L3
-        movq_m2r( *m1, mm0 );    // LP2
+        movq_m2r( *m2, mm0 );    // LP2
 
         // average L1 and L3 leave result in mm4
         movq_r2r( mm1, mm4 );    // L1
@@ -143,10 +140,8 @@ static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
 
         // Advance to the next set of pixels.
         output += 8;
-        t0 += 8;
-        b0 += 8;
+        m0 += 8;
         t1 += 8;
-        m1 += 8;
         b1 += 8;
         m2 += 8;
     }
@@ -175,8 +170,10 @@ static deinterlace_method_t greedymethod =
     0,
     1,
     settings,
+    1,
     copy_scanline,
-    deinterlace_greedy_packed422_scanline_mmxext
+    deinterlace_greedy_packed422_scanline_mmxext,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -21,20 +21,17 @@
 #include "deinterlace.h"
 
 static void deinterlace_scanline_linear( unsigned char *output,
-                                         unsigned char *t1, unsigned char *m1,
-                                         unsigned char *b1,
-                                         unsigned char *t0, unsigned char *m0,
-                                         unsigned char *b0, int width )
+                                         deinterlace_scanline_data_t *data,
+                                         int width )
 {
-    interpolate_packed422_scanline( output, t1, b1, width );
+    interpolate_packed422_scanline( output, data->t0, data->b0, width );
 }
 
-static void copy_scanline( unsigned char *output, unsigned char *m2,
-                           unsigned char *t1, unsigned char *m1,
-                           unsigned char *b1, unsigned char *t0,
-                           unsigned char *b0, int width )
+static void copy_scanline( unsigned char *output,
+                           deinterlace_scanline_data_t *data,
+                           int width )
 {
-    blit_packed422_scanline( output, m2, width );
+    blit_packed422_scanline( output, data->m0, width );
 }
 
 
@@ -48,8 +45,10 @@ static deinterlace_method_t linearmethod =
     0,
     0,
     0,
+    1,
     deinterlace_scanline_linear,
-    copy_scanline
+    copy_scanline,
+    0
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -283,29 +283,35 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     scanline++;
 
     for( i = ((frame_height - 2) / 2); i; --i ) {
-        unsigned char *top1 = curframe;
-        unsigned char *mid1 = curframe + instride;
-        unsigned char *bot1 = curframe + (instride*2);
-        unsigned char *nxt1 = curframe + (instride*3);
+        deinterlace_scanline_data_t data;
 
-        unsigned char *top0 = lastframe;
-        unsigned char *mid0 = lastframe + instride;
-        unsigned char *bot0 = lastframe + (instride*2);
-        unsigned char *nxt0 = lastframe + (instride*3);
+        data.t0 = curframe;
+        data.b0 = curframe + (instride*2);
 
-        if( i == 1 ) {
-            nxt1 = mid1;
-            nxt0 = mid0;
+        if( bottom_field ) {
+            data.tt1 = 0;
+            data.m1  = curframe + instride;
+            data.bb1 = 0;
+        } else {
+            data.tt1 = 0;
+            data.m1  = lastframe + instride;
+            data.bb1 = 0;
         }
 
-        if( !bottom_field ) {
-            mid1 = mid0;
-            nxt1 = nxt0;
-            mid0 = secondlastframe + instride;
-            nxt0 = secondlastframe + (instride*3);
+        data.t2 = lastframe;
+        data.b2 = lastframe + (instride*2);
+
+        if( bottom_field ) {
+            data.tt3 = 0;
+            data.m3  = lastframe + instride;
+            data.bb3 = 0;
+        } else {
+            data.tt3 = 0;
+            data.m3  = secondlastframe + instride;
+            data.bb3 = 0;
         }
 
-        curmethod->interpolate_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
+        curmethod->interpolate_scanline( output, &data, width );
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
@@ -313,12 +319,35 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
-
         output += outstride;
         scanline++;
 
+        data.tt0 = 0;
+        data.m0  = curframe + (instride*2);
+        data.bb0 = 0;
+
+        if( bottom_field ) {
+            data.t1 = curframe + instride;
+            data.b1 = curframe + (instride*3);
+        } else {
+            data.t1 = lastframe + instride;
+            data.b1 = lastframe + (instride*3);
+        }
+
+        data.tt2 = 0;
+        data.m2  = lastframe + (instride*2);
+        data.bb2 = 0;
+
+        if( bottom_field ) {
+            data.t2 = lastframe + instride;
+            data.b2 = lastframe + (instride*3);
+        } else {
+            data.t2 = secondlastframe + instride;
+            data.b2 = secondlastframe + (instride*3);
+        }
+       
         /* Copy a scanline. */
-        curmethod->copy_scanline( output, bot1, mid1, bot0, nxt1, mid0, nxt0, width );
+        curmethod->copy_scanline( output, &data, width );
         curframe += instride * 2;
         lastframe += instride * 2;
         secondlastframe += instride * 2;
@@ -352,6 +381,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 }
 
 
+#if 0
 /**
  * This will be used by the DScaler filters.
  */
@@ -387,6 +417,7 @@ static void tvtime_build_deinterlaced_frame_multipass( unsigned char *output,
         if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
     }
 }
+#endif
 
 
 
@@ -561,9 +592,9 @@ int main( int argc, char **argv )
     setup_speedy_calls( verbose );
 
     greedy_plugin_init();
-    videobob_plugin_init();
+    // videobob_plugin_init();
     greedy2frame_plugin_init();
-    twoframe_plugin_init();
+    // twoframe_plugin_init();
     linearblend_plugin_init();
     linear_plugin_init();
     weave_plugin_init();
