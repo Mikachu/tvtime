@@ -96,75 +96,6 @@ struct tvtime_osd_s
     int show_credits;
 };
 
-void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
-{
-    sprintf( osd->hold_message, "%s", str );
-}
-
-void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Network Name: " );
-    strncat( fullstr, str, 127 );
-    osd->network_name = str;
-    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, 
-                          str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_NAME ].string ) );
-}
-
-void tvtime_osd_set_show_name( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Show Name: " );
-    strncat( fullstr, str, 127 );
-
-    osd->show_name = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_NAME ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_NAME ].string ) );
-}
-
-void tvtime_osd_set_network_call( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Call Letters: " );
-    strncat( fullstr, str, 127 );
-
-    osd->network_call = str;
-    osd_string_show_text( osd->strings[ OSD_NETWORK_CALL ].string, 
-                          str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_CALL ].string ) );
-}
-
-void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Show Rating: " );
-    strncat( fullstr, str, 127 );
-    osd->show_rating = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_RATING ].string ) );
-}
-
-void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Start Time: " );
-    strncat( fullstr, str, 127 );
-    osd->show_start = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_START ].string ) );
-}
-
-void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
-{
-    char fullstr[ 128 ];
-    strcpy( fullstr, "Elapsed/Length: " );
-    strncat( fullstr, str, 127 );
-    osd->show_length = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_LENGTH ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_LENGTH ].string ) );
-}
-
 const int top_size = 7;
 const int left_size = 7;
 const int bottom_size = 13;
@@ -479,6 +410,53 @@ void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode )
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
 {
     osd_string_set_timeout( osd->strings[ OSD_SIGNAL_INFO ].string, signal ? 0 : 100 );
+}
+
+void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
+{
+    sprintf( osd->hold_message, "%s", str );
+}
+
+void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
+{
+    osd->network_name = str;
+    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_NAME ].string ) );
+}
+
+void tvtime_osd_set_show_name( tvtime_osd_t* osd, const char *str )
+{
+    osd->show_name = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_NAME ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_NAME ].string ) );
+}
+
+void tvtime_osd_set_network_call( tvtime_osd_t* osd, const char *str )
+{
+    osd->network_call = str;
+    osd_string_show_text( osd->strings[ OSD_NETWORK_CALL ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_CALL ].string ) );
+}
+
+void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str )
+{
+    osd->show_rating = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_RATING ].string ) );
+}
+
+void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str )
+{
+    osd->show_start = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_START ].string ) );
+}
+
+void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
+{
+    osd->show_length = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_LENGTH ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_LENGTH ].string ) );
 }
 
 void tvtime_osd_show_info( tvtime_osd_t *osd )
