@@ -117,9 +117,9 @@ struct config_s
     char *norm;
     char *freq;
     int *keymap;
-    char *timeformat;
     int *buttonmap;
     char *ssdir;
+    char *timeformat;
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
@@ -143,7 +143,7 @@ struct config_s
 
     double overscan;
 
-    char config_filename[ 1024 ];
+    char *config_filename;
 
     configsave_t *configsave;
 
@@ -558,44 +558,50 @@ config_t *config_new( void )
     ct->start_channel = 1;
     ct->prev_channel = 1;
     ct->overscan = 0.0;
-    ct->rvr_filename = 0;
     ct->framerate = FRAMERATE_FULL;
     ct->ssdir = strdup( getenv( "HOME" ) );
     ct->timeformat = strdup( "%X" );
+
+    /* We set these to 0 so we can delete safely if necessary. */
+    ct->keymap = 0;
+    ct->buttonmap = 0;
+    ct->rvr_filename = 0;
+    ct->config_filename = 0;
+    ct->configsave = 0;
 
     ct->uid = getuid();
     pwuid = getpwuid( ct->uid );
     if( !pwuid ) {
         fprintf( stderr, "config: You don't exist, go away!\n" );
-        free( ct );
+        config_delete( ct );
         return 0;
     }
     if( asprintf( &(ct->command_pipe_dir), 
                   "%s/TV-%s", FIFODIR, pwuid->pw_name ) < 0 ) {
         fprintf( stderr, "config: Out of memory.\n" );
-        free( ct );
+        ct->command_pipe_dir = 0;
+        config_delete( ct );
         return 0;
     }
     if( asprintf( &(ct->command_pipe), 
                   "%s/TV-%s/tvtimefifo", FIFODIR, pwuid->pw_name ) < 0 ) {
         fprintf( stderr, "config: Out of memory.\n" );
-        free( ct->command_pipe_dir );
-        free( ct );
+        ct->command_pipe = 0;
+        config_delete( ct );
         return 0;
     }
 
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not allocate memory for keymap.\n" );
-        free( ct );
+        config_delete( ct );
         return 0;
     }
 
     ct->buttonmap = (int *) malloc( MAX_BUTTONS * sizeof( int ) );
     if( !ct->buttonmap ) {
         fprintf( stderr, "config: Could not allocate memory for buttonmap.\n" );
-        free( ct->keymap );
-        free( ct );
+        config_delete( ct );
         return 0;
     }
 
@@ -665,17 +671,14 @@ config_t *config_new( void )
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
             fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
-            free( ct );
-            return 0;
         } else {
             DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
                 fprintf( stderr, "config: %s is not a directory.\n", 
                          temp_dirname );
-                free( ct );
-                return 0;
+            } else {
+	        closedir( temp_dir );
             }
-	    closedir( temp_dir );
         }
         /* If the directory already exists, we didn't need to create it. */
     }
@@ -691,7 +694,7 @@ config_t *config_new( void )
     /* Then read in local settings. */
     strncpy( base, getenv( "HOME" ), 235 );
     strcat( base, "/.tvtime/tvtime.xml" );
-    sprintf( ct->config_filename, "%s", base );
+    ct->config_filename = strdup( base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         conf_xml_parse( ct, base );
@@ -733,11 +736,11 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
     /* Then read in additional settings. */
     if( configFile ) {
-        sprintf( ct->config_filename, "%s", configFile );
-        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
+        if( ct->config_filename ) free( ct->config_filename );
+        ct->config_filename = configFile;
 
+        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
         conf_xml_parse( ct, configFile );
-        free( configFile );
     }
 
     ct->configsave = configsave_open( ct->config_filename );
@@ -781,15 +784,20 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
 void config_delete( config_t *ct )
 {
-    if( ct->configsave ) configsave_close( ct->configsave );
+    if( ct->v4ldev ) free( ct->v4ldev );
+    if( ct->norm ) free( ct->norm );
+    if( ct->freq ) free( ct->freq );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
     if( ct->ssdir ) free( ct->ssdir );
-    free( ct->timeformat );
-    free( ct->norm );
-    free( ct->freq );
-    free( ct->vbidev );
-    free( ct->v4ldev );
+    if( ct->timeformat ) free( ct->timeformat );
+    if( ct->command_pipe_dir ) free( ct->command_pipe_dir );
+    if( ct->command_pipe ) free( ct->command_pipe );
+    if( ct->rvr_filename ) free( ct->rvr_filename );
+    if( ct->vbidev ) free( ct->vbidev );
+    if( ct->config_filename ) free( ct->config_filename );
+    if( ct->configsave ) configsave_close( ct->configsave );
+    /* TODO: Free modelist. */
     free( ct );
 }
 
