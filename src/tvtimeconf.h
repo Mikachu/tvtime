@@ -40,6 +40,7 @@ int config_key_to_menu_command( config_t *ct, int key );
 int config_menu_command_to_key( config_t *ct, int command );
 
 int config_button_to_command( config_t *ct, int button );
+int config_button_to_menu_command( config_t *ct, int button );
 
 int config_get_verbose( config_t *ct );
 int config_get_send_fields( config_t *ct );

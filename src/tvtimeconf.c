@@ -65,6 +65,7 @@ struct config_s
     int keymap[ 8 * MAX_KEYSYMS ];
     int keymapmenu[ 8 * MAX_KEYSYMS ];
     int buttonmap[ MAX_BUTTONS ];
+    int buttonmapmenu[ MAX_BUTTONS ];
 
     int inputwidth;
     int inputnum;
@@ -385,7 +386,12 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
                 if( button ) {
                     int id = atoi( (const char *) button );
                     if( (id > 0) && (id < MAX_BUTTONS) ) {
-                        ct->buttonmap[ id ] = tvtime_string_to_command( (const char *) command );
+                        int command_id = tvtime_string_to_command( (const char *) command );
+                        if( tvtime_is_menu_command( command_id ) ) {
+                            ct->buttonmapmenu[ id ] = command_id;
+                        } else {
+                            ct->buttonmap[ id ] = command_id;
+                        }
                     }
                     xmlFree( button );
                 }
@@ -705,6 +711,7 @@ config_t *config_new( void )
     ct->keymap[ 'y' ] = TVTIME_SHOW_DEINTERLACER_INFO;
     ct->keymap[ 'u' ] = TVTIME_SHOW_MENU;
 
+    memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
@@ -723,6 +730,9 @@ config_t *config_new( void )
     ct->keymapmenu[ 'l' ] = TVTIME_MENU_RIGHT;
     ct->keymapmenu[ I_ENTER ] = TVTIME_MENU_ENTER;
     ct->keymapmenu[ 'm' ] = TVTIME_MENU_EXIT;
+    ct->buttonmapmenu[ 1 ] = TVTIME_MENU_ENTER;
+    ct->buttonmapmenu[ 4 ] = TVTIME_MENU_UP;
+    ct->buttonmapmenu[ 5 ] = TVTIME_MENU_DOWN;
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
     asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) );
@@ -1014,6 +1024,16 @@ int config_button_to_command( config_t *ct, int button )
         return ct->buttonmap[ button ];
     }
 }
+
+int config_button_to_menu_command( config_t *ct, int button )
+{
+    if( button < 0 || button >= MAX_BUTTONS ) {
+        return 0;
+    } else {
+        return ct->buttonmapmenu[ button ];
+    }
+}
+
 
 int config_get_num_modes( config_t *ct )
 {

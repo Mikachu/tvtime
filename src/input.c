@@ -205,7 +205,11 @@ void input_callback( input_t *in, int command, int arg )
         if( command == I_REMOTE ) {
             tvtime_cmd = arg;
         } else if( command == I_BUTTONPRESS ) {
-            tvtime_cmd = config_button_to_command( in->cfg, arg );
+            if( commands_in_menu( in->com ) ) {
+                tvtime_cmd = config_button_to_menu_command( in->cfg, arg );
+            } else {
+                tvtime_cmd = config_button_to_command( in->cfg, arg );
+            }
         } else {
             if( commands_in_menu( in->com ) ) {
                 tvtime_cmd = config_key_to_menu_command( in->cfg, arg );
