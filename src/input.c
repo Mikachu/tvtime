@@ -232,9 +232,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                               "tvtime: Can't change channel, "
                               "no tuner available on this input!\n" );
              } else {
-                 char timestamp[50];
-                 time_t tm = time(NULL);
                  int start_index = chanindex;
+
                  do {
                      chanindex = (chanindex + 
                                   ( (tvtime_cmd == TVTIME_CHANNEL_UP) ? 
@@ -252,14 +251,14 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                         "channel %s\n", 
                                         chanlist[ chanindex ].name );
                  if( in->osd ) {
-                     tvtime_osd_show_channel_number( in->osd,
-                                                     chanlist[ chanindex ].name );
-                 }
-                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
-                           localtime(&tm) );
-                 if( in->osd ) {
-                     tvtime_osd_show_channel_info( in->osd, timestamp );
-                     tvtime_osd_show_channel_logo( in->osd );
+                     char timestamp[50];
+                     time_t tm = time(NULL);
+
+                     strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
+                               localtime(&tm) );
+
+                     tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+                     tvtime_osd_show_info( in->osd, timestamp );
                  }
              }
              break;
@@ -284,14 +283,13 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_TV_VIDEO:
              videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
+             tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
              /* Setup the tuner if available. */
              if( videoinput_has_tuner( in->vidin ) ) {
                  /**
                   * Set to the current channel, or the first channel in our
                   * frequency list.
                   */
-                 char timestamp[50];
-                 time_t tm = time(NULL);
                  int rc = frequencies_find_current_index( in->vidin );
                  if( rc == -1 ) {
                      /* set to a known frequency */
@@ -306,16 +304,18 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                             "tvtime: Changing to channel %s.\n",
                                             chanlist[ chanindex ].name );
                  }
-                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
-                           localtime(&tm) );
                  if( in->osd ) {
-                     tvtime_osd_show_channel_number( in->osd, chanlist[ chanindex ].name );
-                     tvtime_osd_show_channel_info( in->osd, timestamp );
-                     tvtime_osd_show_channel_logo( in->osd );
+                     tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
                  }
+             } else if( in->osd ) {
+                 tvtime_osd_set_channel_number( in->osd, "" );
              }
              if( in->osd ) {
-                 tvtime_osd_show_message( in->osd, videoinput_get_input_name( in->vidin ) );
+                 char timestamp[50];
+                 time_t tm = time(NULL);
+                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
+                           localtime(&tm) );
+                 tvtime_osd_show_info( in->osd, timestamp );
              }
              break;
 
@@ -363,8 +363,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
          case TVTIME_ENTER:
              if( in->frame_counter ) {
                  if( *in->next_chan_buffer ) {
-                     char timestamp[50];
-                     time_t tm = time(NULL);
                      int found;
 
                      /* this sets chanindex accordingly */
@@ -386,18 +384,13 @@ void input_callback( input_t *in, InputEvent command, int arg )
                          }
 
                          if( in->osd ) {
-                             tvtime_osd_show_channel_number( 
-                                 in->osd, 
-                                 chanlist[ chanindex ].name );
-                         }
-
-                         strftime( timestamp, 50, 
-                                   config_get_timeformat( in->cfg ), 
-                                   localtime(&tm) );
-
-                         if( in->osd ) {
-                             tvtime_osd_show_channel_info( in->osd, timestamp );
-                             tvtime_osd_show_channel_logo( in->osd );
+                             char timestamp[50];
+                             time_t tm = time(NULL);
+                             strftime( timestamp, 50, 
+                                       config_get_timeformat( in->cfg ), 
+                                       localtime(&tm) );
+                             tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+                             tvtime_osd_show_info( in->osd, timestamp );
                          }
                          in->frame_counter = 0;
                      } else {
@@ -479,7 +472,8 @@ void input_next_frame( input_t *in )
         if( !(in->frame_counter % 10) )
             strcat( input_text, "_" );
         if( in->osd ) {
-            tvtime_osd_show_channel_number( in->osd, input_text );
+            tvtime_osd_set_channel_number( in->osd, input_text );
+            tvtime_osd_show_info( in->osd, "" );
         }
     }
 

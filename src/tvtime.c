@@ -380,10 +380,6 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    if( config_get_inputwidth( ct ) != 720 && verbose ) {
-        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", 
-                 config_get_inputwidth( ct ) );
-    }
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputwidth( ct ), 
                             norm, verbose );
@@ -396,6 +392,10 @@ int main( int argc, char **argv )
     videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
+    if( verbose ) {
+        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", 
+                 width );
+    }
 
     /**
      * 1 buffer : 0 fields available.  [t][b]
@@ -450,6 +450,8 @@ int main( int argc, char **argv )
     if( !osd ) {
         fprintf( stderr, "Can't initialize OSD object.\n" );
     }
+    tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
+    tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
 
     /**
      * Set to the current channel, or the first channel in our
@@ -468,29 +470,31 @@ int main( int argc, char **argv )
          * Set to the current channel, or the first channel in our
          * frequency list.
          */
-        char timestamp[ 50 ];
-        time_t tm = time( 0 );
         int rc = frequencies_find_current_index( vidin );
         if( rc == -1 ) {
             /* set to a known frequency */
             videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq +
                                        config_get_finetune( ct ) );
-
-            if( verbose ) fprintf( stderr, 
-                                   "tvtime: Changing to channel %s.\n", 
-                                   chanlist[ chanindex ].name );
-        } else if( rc > 0 ) {
-            if( verbose ) fprintf( stderr, 
-                                   "tvtime: Changing to channel %s.\n",
-                                   chanlist[ chanindex ].name );
         }
+
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Changing to channel %s.\n", 
+                     chanlist[ chanindex ].name );
+        }
+
+        if( osd ) {
+            tvtime_osd_set_channel_number( osd, chanlist[ chanindex ].name );
+        }
+    } else if( osd ) {
+        tvtime_osd_set_channel_number( osd, "" );
+    }
+
+    if( osd ) {
+        char timestamp[ 50 ];
+        time_t tm = time( 0 );
         strftime( timestamp, 50, config_get_timeformat( ct ), 
                   localtime( &tm ) );
-        if( osd ) {
-            tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
-            tvtime_osd_show_channel_info( osd, timestamp );
-            tvtime_osd_show_channel_logo( osd );
-        }
+        tvtime_osd_show_info( osd, timestamp );
     }
 
     /* Setup the video correction tables. */
@@ -694,7 +698,9 @@ int main( int argc, char **argv )
             /* Wait until it's time to blit the first field. */
             if( rtctimer ) {
                 while( performance_get_usecs_since_frame_aquired( perf )
-                       < ( fieldtime - safetytime - performance_get_usecs_of_last_blit( perf ) - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
+                       < ( fieldtime - safetytime
+                           - performance_get_usecs_of_last_blit( perf )
+                           - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
             }
@@ -778,7 +784,9 @@ int main( int argc, char **argv )
             /* Wait for the next field time. */
             if( rtctimer ) {
                 while( performance_get_usecs_since_last_field( perf )
-                       < ( fieldtime - performance_get_usecs_of_last_blit( perf ) - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
+                       < ( fieldtime
+                           - performance_get_usecs_of_last_blit( perf )
+                           - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
             }

@@ -125,7 +125,6 @@ int rtctimer_set_interval( rtctimer_t *rtctimer, int hz )
 
     rtctimer->current_hz = hz;
     rtctimer->usecs = (int) ( ( ( 1000.0 * 1000.0 ) / hz ) + 0.5 );
-    fprintf( stderr, "usecs is %d\n", rtctimer->usecs );
 
     if( restart ) {
         rtctimer_start_clock( rtctimer );

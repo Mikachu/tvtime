@@ -49,6 +49,10 @@ struct tvtime_osd_s
     int channel_logo_ypos;
 
     int ismuted;
+
+    char channel_number_text[ 20 ];
+    char tv_norm_text[ 20 ];
+    char input_text[ 128 ];
 };
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
@@ -66,6 +70,10 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd->data_bar = 0;
     osd->muted = 0;
     osd->channel_logo = 0;
+
+    memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
+    memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
+    memset( osd->input_text, 0, sizeof( osd->input_text ) );
 
     fontfile = DATADIR "/FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
@@ -130,15 +138,31 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     free( osd );
 }
 
-void tvtime_osd_show_channel_number( tvtime_osd_t *osd, const char *text )
+void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
 {
-    osd_string_show_text( osd->channel_number, text, 80 );
+    snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, norm );
 }
 
-void tvtime_osd_show_channel_info( tvtime_osd_t *osd, const char *text )
+void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
 {
-    osd_string_show_text( osd->channel_info, text, 80 );
+    snprintf( osd->input_text, sizeof( osd->input_text ) - 1, norm );
 }
+
+void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
+{
+    snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
+}
+
+void tvtime_osd_show_info( tvtime_osd_t *osd, const char *date )
+{
+    char text[ 200 ];
+    osd_string_show_text( osd->channel_number, osd->channel_number_text, 80 );
+    osd_string_show_text( osd->channel_info, date, 80 );
+    sprintf( text, "[%s] %s", osd->tv_norm_text, osd->input_text );
+    osd_string_show_text( osd->data_bar, text, 80 );
+    osd_string_set_timeout( osd->volume_bar, 0 );
+}
+
 
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                                int percentage )

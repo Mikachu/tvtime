@@ -5,7 +5,5 @@
   * (vektor) Smoothness improvement, frames are now scheduled at
     more correct times.  Added a performance tracker object.
   * (vektor) Removed the force-DScaler-defaults on startup for V4L settings.
-
-Fri Oct 25 09:17:02 ADT 2002
-  * (vektor) Autoconfed
+  * (vektor) Improved OSD display to show more information more consistently.
 

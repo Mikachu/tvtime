@@ -49,6 +49,11 @@ typedef struct videoinput_s videoinput_t;
 #define VIDEOINPUT_NTSC_JP 6
 
 /**
+ * Returns a text version of the norm.
+ */
+const char *videoinput_norm_name( int norm );
+
+/**
  * Create a new input device from the given device name and which input
  * number (cable, composite1, composite2, etc) to use.
  *
@@ -75,6 +80,11 @@ int videoinput_get_width( videoinput_t *vidin );
  * Returns the height of the input images.
  */
 int videoinput_get_height( videoinput_t *vidin );
+
+/**
+ * Returns the current TV norm.
+ */
+int videoinput_get_norm( videoinput_t *vidin );
 
 /**
  * Returns true if this input is a BT8x8-based card.
@@ -104,12 +114,16 @@ int videoinput_has_tuner( videoinput_t *vidin );
  * Controls...
  */
 int videoinput_get_hue( videoinput_t *vidin );
+void videoinput_set_hue( videoinput_t *vidin, int newhue );
 void videoinput_set_hue_relative( videoinput_t *vidin, int offset );
 int videoinput_get_brightness( videoinput_t *vidin );
+void videoinput_set_brightness( videoinput_t *vidin, int newbright );
 void videoinput_set_brightness_relative( videoinput_t *vidin, int offset );
 int videoinput_get_contrast( videoinput_t *vidin );
+void videoinput_set_contrast( videoinput_t *vidin, int newcont );
 void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
 int videoinput_get_colour( videoinput_t *vidin );
+void videoinput_set_colour( videoinput_t *vidin, int newcolour );
 void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
 
 void videoinput_reset_default_settings( videoinput_t *vidin );

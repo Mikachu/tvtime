@@ -20,6 +20,69 @@ void (*blit_colour_packed4444_scanline)( unsigned char *output,
 void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
 
 
+void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid, unsigned char *bot, int width )
+{
+    const int64_t qwYMask = 0x00ff00ff00ff00ff;
+    const int64_t qwOnes = 0x0001000100010001;
+    int64_t qwThreshold;
+
+    width /= 4;
+
+    movq_m2r( qwThreshold, mm0 );
+    movq_m2r( qwYMask, mm1 );
+    movq_m2r( qwOnes, mm2 );
+    pxor_r2r( mm7, mm7 );         /* mm7 = 0. */
+
+    while( width-- ) {
+        /* Load and keep just the luma. */
+        movq_m2r( *top, mm3 );
+        movq_m2r( *mid, mm4 );
+        movq_m2r( *bot, mm5 );
+
+        pand_r2r( mm1, mm3 );
+        pand_r2r( mm1, mm4 );
+        pand_r2r( mm1, mm5 );
+
+        /* Work out mm6 = (top - mid) * (bot - mid) - ( (top - mid)^2 >> 7 ) */
+        psrlw_i2r( 1, mm3 );
+        psrlw_i2r( 1, mm4 );
+        psrlw_i2r( 1, mm5 );
+
+        /* mm6 = (top - mid) */
+        movq_r2r( mm3, mm6 );
+        psubw_r2r( mm4, mm6 );
+
+        /* mm3 = (top - bot) */
+        psubw_r2r( mm5, mm3 );
+
+        /* mm5 = (bot - mid) */
+        psubw_r2r( mm4, mm5 );
+
+        /* mm6 = (top - mid) * (bot - mid) */
+        pmullw_r2r( mm5, mm6 );
+
+        /* mm3 = (top - bot)^2 >> 7 */
+        pmullw_r2r( mm3, mm3 );   /* mm3 = (top - bot)^2 */
+        psrlw_i2r( 7, mm3 );      /* mm3 = ((top - bot)^2 >> 7) */
+
+        /* mm6 is what we want. */
+        psubw_r2r( mm3, mm6 );
+
+        /* FF's if greater than qwTheshold */
+        pcmpgtw_r2r( mm0, mm6 );
+
+        /* Add to count if we are greater than threshold */
+        pand_r2r( mm2, mm6 );
+        paddw_r2r( mm6, mm7 );
+
+        top += 8;
+        mid += 8;
+        bot += 8;
+    }
+}
+
+
+
 void interpolate_packed422_scanline_c( unsigned char *output,
                                        unsigned char *top,
                                        unsigned char *bot, int width )

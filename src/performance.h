@@ -20,7 +20,8 @@
 #define PERFORMANCE_H_INCLUDED
 
 /**
- * This object provides performance tracking features of tvtime.
+ * This object provides timing data for tvtime, taking timestamps and
+ * answering questions about how long things took.
  */
 
 #ifdef __cplusplus
