@@ -172,38 +172,6 @@ static int bothistory_diff[ 5 ];
 
 static int histpos = 0;
 
-static void fill_history( int tff )
-{
-    if( tff ) {
-        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
-        tophistory[ 1 ] =       0; bothistory[ 1 ] = INT_MAX;
-        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
-        tophistory[ 3 ] = INT_MAX; bothistory[ 3 ] =       0;
-        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
-
-        tophistory_diff[ 0 ] = 0; bothistory_diff[ 0 ] = 0;
-        tophistory_diff[ 1 ] = 1; bothistory_diff[ 1 ] = 0;
-        tophistory_diff[ 2 ] = 0; bothistory_diff[ 2 ] = 0;
-        tophistory_diff[ 3 ] = 0; bothistory_diff[ 3 ] = 1;
-        tophistory_diff[ 4 ] = 0; bothistory_diff[ 3 ] = 0;
-    } else {
-        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
-        tophistory[ 1 ] = INT_MAX; bothistory[ 1 ] =       0;
-        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
-        tophistory[ 3 ] =       0; bothistory[ 3 ] = INT_MAX;
-        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
-
-        tophistory_diff[ 0 ] = 0; bothistory_diff[ 0 ] = 0;
-        tophistory_diff[ 1 ] = 0; bothistory_diff[ 1 ] = 1;
-        tophistory_diff[ 2 ] = 0; bothistory_diff[ 2 ] = 0;
-        tophistory_diff[ 3 ] = 1; bothistory_diff[ 3 ] = 0;
-        tophistory_diff[ 4 ] = 0; bothistory_diff[ 3 ] = 0;
-    }
-
-    histpos = 0;
-}
-
-
 int determine_pulldown_offset_history( int top_repeat, int bot_repeat, int tff, int *realbest )
 {
     int avgbot = 0;

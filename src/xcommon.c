@@ -270,14 +270,6 @@ static int xv_get_height_for_width( int window_width )
     return rounded_int_division( window_width * n, d );
 }
 
-static void x11_static_gravity( Display *dpy, Window win )
-{
-    XSizeHints hints;
-    hints.flags = PWinGravity;
-    hints.win_gravity = StaticGravity;
-    XSetWMNormalHints( dpy, win, &hints );
-}
-
 static void x11_northwest_gravity( Display *dpy, Window win )
 {
     XSizeHints hints;
