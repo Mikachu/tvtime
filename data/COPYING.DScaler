@@ -1,5 +1,182 @@
-License Exception
-=================
+tvtime contains libraries from DScaler, downloaded from
+http://deinterlace.sourceforge.net/
+
+Upstream authors: Tom Barry <trbarry@trbarry.com>
+		  John Adcock <John@adcock8.freeserve.co.uk>
+
+Upstream Copyrights:
+
+   Copyright (c) 2001 Tom Barry.  All rights reserved.
+        trbarry@trbarry.com
+   
+        This file is subject to the terms of the GNU General Public License as
+        published by the Free Software Foundation.  A copy of this license is
+        included with this software distribution in the file COPYING.  If you
+        do not have a copy, you may obtain a copy by writing to the Free
+        Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+        02111-1307, USA.
+
+   Copyright (c) 2000 John Adcock.  All rights reserved.
+
+    This file is subject to the terms of the GNU General Public License as
+    published by the Free Software Foundation.  A copy of this license is
+    included with this software distribution in the file COPYING.  If you
+    do not have a copy, you may obtain a copy by writing to the Free
+    Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+    02111-1307, USA.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details
+
+
+Library License Exception
+=========================
+
+The following is the license exception from Tom Barry, copyright
+holder of the DI_GreedyH.dll and DI_TomsMoComp.dll libraries in DScaler.
+
+----- Forwarded message from trbarry@trbarry.com -----
+
+From: trbarry@trbarry.com
+To: Billy Biggs <vektor@dumbterm.net>
+Subject: RE: Annoying licensing question
+Date: Fri, 12 Sep 2003 00:08:08 -0400
+X-Mailer: Microsoft Outlook IMO, Build 9.0.2416 (9.0.2910.0)
+
+Billy -
+
+I"m happy that you can find my code useful in tvtime.
+
+I do hold the copyrights to those 2 modules mentioned below but choose
+to interpret the system & compiler exemption clause somewhat more
+liberally.  That is, I think the exemption applies to whatever closed
+source tools are needed to compile and run Greedy/HM & TomsMoComp on
+your target platform, as long as you don't have source for them anyway.
+That is, I don't see it as a problem.
+
+So please take this as my permission to include those two deinterlacing
+modules in tvtime, without further obligation other than the terms of
+the GPL, as loosely interpreted above.
+
+I also have no problems with LGPL terms if that also becomes necessary
+for common sense reasons in some cases, so please contact me again if
+that becomes the case or if this email does not seem to give the needed
+permissions.
+
+I'm not particularly active on DScaler anymore but would like to
+continue to see my code be of value to people.  And while I'm not Linux
+literate myself I very much like the idea of my contributions finding a
+home there.
+
+Of course, continuing to receive credit would be nice. ;-)
+
+Cheers,
+
+- Tom
+
+
+
+| -----Original Message-----
+| From: Billy Biggs [mailto:vektor@dumbterm.net]
+| Sent: Thursday, September 11, 2003 9:30 PM
+| To: trbarry@trbarry.com
+| Subject: Annoying licensing question
+|
+|
+|   Hey, sorry to bother you.  This email is somewhat long but
+| I hope you
+| can get through it.  I need a favour.
+|
+|   I have been using your excellent GreedyH and TomsMoComp
+| deinterlacers
+| in tvtime under Linux.  It's been great.  Thanks a ton.  They rock.
+|
+|   However, we've been using them through a Windows emulator DLL loader
+| from the Wine project, rather than doing a port.  This is because the
+| porting task is somewhat large and I haven't had time to devote to it,
+| not because it's impossible (it's not).
+|
+|   By a strict reading of the GPL though, this is not good.
+| Users of GPL
+| software need to be given the "complete" source code to build the
+| software, with a special exemption for the source to any
+| compilers or OS
+| pieces you would already need to build software on the target OS.
+| However, the target OS for tvtime is Linux, not Windows.  The Windows
+| compiler is not a standard Linux tool, so the exemption doesn't apply.
+| I would need to ship the full source code to Windows and MSVC++.
+|
+|   To get around this, we asked John Adcock for an exemption to the GPL
+| in this case.  At the time, we were using a bunch of DScaler modules,
+| and he asserted that he had copyright over all DScaler plugins.
+| However, in our latest version we only use the GreedyH and TomsMoComp
+| deinterlacers, both of which were written by you, are independently
+| distributed by you, and have your Copyright on them.
+|
+|   I'm wondering if you'd be willing to extend an exemption to us as
+| well.  We've had some discussions on the Debian legal mailing list[1]
+| about this, and it's still unclear to me whether this is strictly
+| necessary, but it would help us out a lot if you are willing.
+|
+|   To do so, I think you just have to send me an email like
+| the one below
+| which we used to have John give us permission.  The original thread
+| URL[2] is alsso listed below.
+|
+|   Thanks, and sorry for the verbosity,
+|   -Billy
+|
+|
+| [1]
+| http://lists.debian.org/debian-legal/2003/debian-legal-200309/ msg00184.html
+| [2]
+| http://sourceforge.net/mailarchive/forum.php?thread_id=1937234&forum_id=6588
+
+
+> ----- Forwarded message from Simon Law
+> <sfllaw@engmail.uwaterloo.ca> -----
+>
+> Date: Sun, 20 Apr 2003 23:22:02 -0400
+> From: Simon Law <sfllaw@engmail.uwaterloo.ca>
+> To: Billy Biggs <vektor@dumbterm.net>
+> Subject: License exception for John Adcock
+>
+> Hi Billy,
+>
+>       From my reading of John's mailing list posting,
+> http://sourceforge.net/mailarchive/forum.php?thread_id=1937234&forum_id=6588
+> the following exception statement seems to be in line with his
+> thinking.
+>
+> In addition to the GNU General Public License, as a special exception to
+> Section 3, John Adcock gives permission to distribute the Program,
+> DScaler, where the source code distributed need not include anything
+> that is normally distributed (in either source or binary form) with
+> major components (compiler, kernel, and so on) of the Microsoft Windows
+> family of operating systems, unless that component itself accompanies
+> the executable.  You must obey the GNU General Public License in all
+> respects for all of the Program code used.  If you modify the Program,
+> you may extend this exception to your version of the file, but you are
+> not obligated to do so.  If you do not wish to do so, delete this
+> exception statement from your version.
+>
+>       It is best if you capture his entire response OK-ing this
+> statement, and we can put it in COPYING.DScaler in your distribution.
+> Sorry for the inconvenience.
+>
+> Simon
+>
+> P.S. Why did I have to be a Free Software developer, and not a lawyer?
+>      My parents would have been much more proud.
+>
+> ----- End forwarded message -----
+
+----- End forwarded message -----
+
+DScaler License Exception
+=========================
 
 The following is the license exception from John Adcock, copyright
 holder of DScaler, and its associated libraries.
@@ -118,3 +295,4 @@ John
 > 
 > ----- End forwarded message -----
 > 
+
