@@ -28,6 +28,7 @@ typedef struct tvtime_mode_settings_s tvtime_mode_settings_t;
 
 struct tvtime_mode_settings_s
 {
+    const char *name;
     const char *deinterlacer;
     int fullscreen;
     int fullscreen_width;

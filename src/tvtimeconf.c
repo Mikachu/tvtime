@@ -366,6 +366,71 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
     }
 }
 
+static void parse_mode( config_t *ct, xmlNodePtr node )
+{
+    xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+    if( name ) {
+        tvtime_modelist_t *mode = (tvtime_modelist_t *) malloc( sizeof( tvtime_modelist_t ) );
+        if( mode ) {
+            xmlChar *deinterlacer = xmlGetProp( node, BAD_CAST "deinterlacer" );
+            xmlChar *fullscreen = xmlGetProp( node, BAD_CAST "fullscreen" );
+            xmlChar *fullscreen_width = xmlGetProp( node, BAD_CAST "fullscreen_width" );
+            xmlChar *fullscreen_height = xmlGetProp( node, BAD_CAST "fullscreen_height" );
+            xmlChar *window_height = xmlGetProp( node, BAD_CAST "window_height" );
+            xmlChar *framerate_mode = xmlGetProp( node, BAD_CAST "framerate_mode" );
+
+            if( deinterlacer ) {
+                mode->settings.deinterlacer = strdup( (char *) deinterlacer );
+                xmlFree( deinterlacer );
+            } else {
+                mode->settings.deinterlacer = strdup( "Linear" );
+            }
+
+            if( fullscreen ) {
+                mode->settings.fullscreen = atoi( (char *) fullscreen );
+                xmlFree( fullscreen );
+            } else {
+                mode->settings.fullscreen = 0;
+            }
+
+            if( fullscreen_width ) {
+                mode->settings.fullscreen_width = atoi( (char *) fullscreen_width );
+                xmlFree( fullscreen_width );
+            } else {
+                mode->settings.fullscreen_width = 0;
+            }
+
+            if( fullscreen_height ) {
+                mode->settings.fullscreen_height = atoi( (char *) fullscreen_height );
+                xmlFree( fullscreen_height );
+            } else {
+                mode->settings.fullscreen_height = 0;
+            }
+
+            if( window_height ) {
+                mode->settings.window_height = atoi( (char *) window_height );
+                xmlFree( window_height );
+            } else {
+                mode->settings.window_height = 0;
+            }
+
+            if( framerate_mode ) {
+                mode->settings.framerate_mode = atoi( (char *) framerate_mode );
+                xmlFree( framerate_mode );
+            } else {
+                mode->settings.framerate_mode = 0;
+            }
+
+            mode->settings.name = strdup( (char *) name );
+            mode->next = ct->modelist;
+            ct->modelist = mode;
+            ct->nummodes++;
+        }
+        xmlFree( name );
+    }
+}
+
 static int conf_xml_parse( config_t *ct, char *configFile )
 {
     xmlDocPtr doc;
@@ -397,6 +462,8 @@ static int conf_xml_parse( config_t *ct, char *configFile )
                 parse_option( ct, node );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "bind" ) ) {
                 parse_bind( ct, node );
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "mode" ) ) {
+                parse_mode( ct, node );
             }
         }
         node = node->next;
@@ -904,18 +971,17 @@ int config_get_num_modes( config_t *ct )
 tvtime_mode_settings_t *config_get_mode_info( config_t *ct, int mode )
 {
     tvtime_modelist_t *cur = ct->modelist;
-    int i;
 
     if( !cur ) {
         /* No modes. */
         return 0;
     }
 
-    while( i && cur->next ) {
+    while( mode && cur->next ) {
         cur = cur->next;
-        i--;
+        mode--;
     }
 
-    return cur;
+    return &(cur->settings);
 }
 
