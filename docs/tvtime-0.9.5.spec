@@ -1,7 +1,7 @@
 Summary: A high quality TV viewer.
 Name: tvtime
 Version: 0.9.5
-Release: 2
+Release: 3
 URL: http://tvtime.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
 License: GPL
@@ -28,10 +28,12 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root)
 %doc AUTHORS COPYING ChangeLog NEWS README
-/usr/bin/tvtime
-/usr/share/tvtime
+%{_bindir}/tvtime
+%{_datadir}/tvtime
 
 %changelog
+* Sat Nov 9 2002 Paul Jara
+- Should work better with RPMs installed in non-standard locations
 * Fri Nov 8 2002 Paul Jara
 - Removed the post-uninstall script which is no longer necessary for proper RPM removal.
 * Tue Nov 4 2002 Paul Jara
