@@ -25,7 +25,7 @@ static const char *videodev = "/dev/video0";
 
 static const int block_size = 4096;
 
-static const int use_hufftftm = 1;
+static const int use_hufftftm = 0;
 static unsigned int blocks_written = 0;
 
 static ree_file_header_t *fileheader;
@@ -124,11 +124,11 @@ static void *video_capture_thread_main( void *crap )
             huffpkt->lumasize = diffcomp_compress_plane( huffpkt->data, curimage,
                                                          fileheader->width, fileheader->height );
 
-/*
+            /*
             chroma_422_to_420( tmp420space,
                                curimage + (fileheader->width * fileheader->height),
                                fileheader->width/2, fileheader->height*2 );
-*/
+            */
 
             huffpkt->cbsize = diffcomp_compress_plane( huffpkt->data + huffpkt->lumasize,
                                                        tmp420space,
@@ -140,19 +140,13 @@ static void *video_capture_thread_main( void *crap )
                                                        fileheader->width/2, fileheader->height/2 );
             huffpkt->hdr.datasize += huffpkt->lumasize + huffpkt->cbsize + huffpkt->crsize;
         } else {
-            vpkt->hdr.id = REE_VIDEO_YCBCR420;
-            vpkt->hdr.datasize = ( fileheader->width * fileheader->height * 12 ) / 8;
-            memcpy( vpkt->data, curimage, fileheader->width * fileheader->height );
-/*
-            chroma_422_to_420( vpkt->data + (fileheader->width * fileheader->height),
-                               curimage + (fileheader->width * fileheader->height),
-                               fileheader->width/2,
-                               fileheader->height*2 );
-*/
+            vpkt->hdr.id = REE_VIDEO_YCBCR422;
+            vpkt->hdr.datasize = fileheader->width * fileheader->height * 2;
+            memcpy( vpkt->data, curimage, fileheader->width * fileheader->height * 2 );
         }
         videoinput_free_frame( vidin, frameid );
 
-        full = ( fileheader->width * fileheader->height * 12 ) / 8;
+        full = fileheader->width * fileheader->height * 2;
         fprintf( stderr, "\rrvr: video compression %3.0f%% "
                          "[q: %4d, d: %4d, wrote %02ld:%02ld:%02ld in %4dM]\r",
                  100.0 * ( (double) vpkt->hdr.datasize / (double) full ),
