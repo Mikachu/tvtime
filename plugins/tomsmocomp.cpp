@@ -18,6 +18,7 @@
 
 #include "tomsmocomp.h"
 #include "tomsmocomp/tomsmocompmacros.h"
+#include "pointer.inc"
 
 #define SearchEffortDefault 5
 #define UseStrangeBobDefault false

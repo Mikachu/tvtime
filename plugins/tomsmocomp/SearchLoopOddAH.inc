@@ -3,8 +3,8 @@
 // pixel addresses. Any chroma match will not be used. (YUY2)
 		__asm
 		{
-        MERGE4PIXavgH(edi-2, edi+ecx-2, esi+ecx+2, esi+2*ecx+2)  // up left, down right
-        MERGE4PIXavgH(edi+2, edi+ecx+2, esi+ecx-2, esi+2*ecx-2)   // up right, down left
-        MERGE4PIXavgH(edi+2*ecx-2, edi+ecx-2, esi+ecx+2, esi+2)   // down left, up right
-        MERGE4PIXavgH(edi+2*ecx+2, edi+ecx+2, esi+ecx-2, esi-2)   // down right, up left   
+        MERGE4PIXavgH("XDI"-2, "XDI"+"XCX"-2, "XSI"+"XCX"+2, "XSI"+2*"XCX"+2)  // up left, down right
+        MERGE4PIXavgH("XDI"+2, "XDI"+"XCX"+2, "XSI"+"XCX"-2, "XSI"+2*"XCX"-2)   // up right, down left
+        MERGE4PIXavgH("XDI"+2*"XCX"-2, "XDI"+"XCX"-2, "XSI"+"XCX"+2, "XSI"+2)   // down left, up right
+        MERGE4PIXavgH("XDI"+2*"XCX"+2, "XDI"+"XCX"+2, "XSI"+"XCX"-2, "XSI"-2)   // down right, up left   
 		}

@@ -31,8 +31,8 @@
         "pxor %%mm6, %%mm6\n\t"
         "pxor %%mm7, %%mm7\n\t"
 
-		"movq    -2(%%ebx), %%mm0\n\t"		// value a from top left		
-		"movq    -4(%%ebx, %%ecx), %%mm1\n\t"	// value m from bottom right			
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value m from bottom right			
         
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
@@ -45,8 +45,8 @@
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(a,m) > Thres, else 00
 
 
-		"movq    -4(%%ebx), %%mm0\n\t"		// value j
-		"movq    4(%%ebx, %%ecx), %%mm1\n\t"	// value n
+		"movq    -4(%%"XBX"), %%mm0\n\t"		// value j
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n
 		"movq	%%mm0, %%mm2\n\t"					
 		"pavgb	%%mm1, %%mm2\n\t"					// avg(j,n)
         "movq	%%mm0, %%mm3\n\t"
@@ -75,8 +75,8 @@
         "por     %%mm0, %%mm7\n\t"
         
         // k & m
-		"movq    2(%%ebx), %%mm0\n\t"		// value c from top left		
-		"movq    4(%%ebx, %%ecx), %%mm1\n\t"	// value n from bottom right			
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value c from top left		
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
@@ -89,8 +89,8 @@
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(c,n) > Thres, else 00
 
 
-		"movq    4(%%ebx), %%mm0\n\t"		// value k
-		"movq    -4(%%ebx, %%ecx), %%mm1\n\t"	// value m
+		"movq    4(%%"XBX"), %%mm0\n\t"		// value k
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value m
 		"movq	%%mm0, %%mm2\n\t"					
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(k,m)
         "movq	%%mm0, %%mm3\n\t"
@@ -120,8 +120,8 @@
 
 
         // c & d
-		"movq    (%%ebx), %%mm0\n\t"		// value b from top left		
-		"movq    2(%%ebx, %%ecx), %%mm1\n\t"	// value f from bottom right			
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top left		
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
@@ -133,8 +133,8 @@
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(b,f) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(b,f) > Thres, else 00
 
-		"movq    2(%%ebx), %%mm0\n\t"		// value c
-		"movq    -2(%%ebx, %%ecx), %%mm1\n\t"	// value d
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value c
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value d
 		"movq	%%mm0, %%mm2\n\t"					
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(c,d)
         "movq	%%mm0, %%mm3\n\t"
@@ -163,8 +163,8 @@
         "por     %%mm0, %%mm7\n\t"
 
         // a & f
-		"movq    (%%ebx), %%mm0\n\t"		// value b from top left		
-		"movq    -2(%%ebx, %%ecx), %%mm1\n\t"	// value d from bottom right			
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top left		
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value d from bottom right			
 
 		"movq	%%mm0, %%mm3\n\t"
 		"psubusb	%%mm1, %%mm3\n\t"
@@ -176,8 +176,8 @@
 		"pcmpeqb %%mm4, %%mm3\n\t"			// now ff where abs(b,d) < Thres, else 00	
 		"pcmpeqb	%%mm3, %%mm4\n\t"			// here ff where abs(b,d) > Thres, else 00
 
-		"movq    -2(%%ebx), %%mm0\n\t"		// value a
-		"movq    2(%%ebx, %%ecx), %%mm1\n\t"	// value f
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f
 		"movq	%%mm0, %%mm2\n\t"					
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(a,f)
         "movq	%%mm0, %%mm3\n\t"
@@ -210,8 +210,8 @@
  		"pand	"_YMask", %%mm7\n\t"			// mask out chroma from here
 
 		// b,e
-		"movq    (%%ebx), %%mm0\n\t"		// value b from top 		
-		"movq    (%%ebx, %%ecx), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 		"movq	%%mm0, %%mm2\n\t"					
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(b,e)
         "movq	%%mm0, %%mm3\n\t"
@@ -238,8 +238,8 @@
         "por     %%mm0, %%mm7\n\t"
 
 		// bob in any leftovers
-		"movq    (%%ebx), %%mm0\n\t"		// value b from top 		
-		"movq    (%%ebx, %%ecx), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 
 
 // We will also calc here the max/min values to later limit comb
@@ -259,13 +259,13 @@
 
 #else
         "movq	%%mm0, %%mm2\n\t"
-		"movq	(%%eax), %%mm4\n\t"
+		"movq	(%%"XAX"), %%mm4\n\t"
 		"psubusb %%mm4, %%mm2\n\t"
 		"psubusb %%mm0, %%mm4\n\t"
 		"por		%%mm2, %%mm4\n\t"			// abs diff
 		
 		"movq	%%mm1, %%mm2\n\t"
-		"movq	(%%eax, %%ecx), %%mm3\n\t"
+		"movq	(%%"XAX", %%"XCX"), %%mm3\n\t"
 		"psubusb %%mm3, %%mm2\n\t"
 		"psubusb %%mm1, %%mm3\n\t"
 		"por		%%mm2, %%mm3\n\t"			// abs diff

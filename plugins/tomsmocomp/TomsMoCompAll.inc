@@ -199,7 +199,9 @@ void FUNCT_NAME(TDeinterlaceInfo* pInfo)
 		}
 	}
 
+#ifdef ARCH_386
     __asm__ __volatile__("emms");
+#endif
 }
 
 

@@ -1253,7 +1253,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         linearblend_plugin_init();
         vfir_plugin_init();
 
-#ifdef ARCH_386
+#ifdef ARCH_X86
         dscaler_tomsmocomp_plugin_init();
         dscaler_greedyh_plugin_init();
 #endif
@@ -1601,7 +1601,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         int exposed = output->is_exposed();
         int current_id;
 
-        if( videoinput_has_tuner( vidin ) ) {
+        if( vidin && videoinput_has_tuner( vidin ) ) {
             current_id = station_get_current_id( stationmgr );
         } else {
             current_id = 0;

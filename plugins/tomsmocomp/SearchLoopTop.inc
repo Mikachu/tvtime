@@ -17,23 +17,26 @@ Q_INT64 Min_Vals  = 0x0000000000000000ull;
 Q_INT64 Max_Vals  = 0x0000000000000000ull;
 Q_INT64 ShiftMask = 0xfefffefffefffeffull;
 
+// long is int32 on ARCH_368, int64 on ARCH_AMD64. Declaring it this way
+// saves a lot of xor's to delete big-endian garbage.
+
 #if defined(DBL_RESIZE) || defined(USE_FOR_DSCALER)
-int	    src_pitch2 = src_pitch;			// even & odd lines are not interleaved in DScaler
+long	    src_pitch2 = src_pitch;			// even & odd lines are not longerleaved in DScaler
 #else
-int	    src_pitch2 = 2 * src_pitch;		// even & odd lines are interleaved in Avisynth
+long	    src_pitch2 = 2 * src_pitch;		// even & odd lines are longerleaved in Avisynth
 #endif
 
-int	    dst_pitch2 = 2 * dst_pitch;
-int     y;
+long	    dst_pitch2 = 2 * dst_pitch;
+long     y;
 
 #ifdef IS_SSE2
-int     Last8 = (rowsize-16);			// ofs to last 16 bytes in row for SSE2
+long     Last8 = (rowsize-16);			// ofs to last 16 bytes in row for SSE2
 #else
-int     Last8 = (rowsize-8);			// ofs to last 8 bytes in row
+long     Last8 = (rowsize-8);			// ofs to last 8 bytes in row
 #endif
 
-int		dst_pitchw = dst_pitch; // local stor so asm can ref
-	pSrc  = pWeaveSrc;			// points 1 weave line above
+long		dst_pitchw = dst_pitch; // local stor so asm can ref
+	pSrc  = pWeaveSrc;			// polongs 1 weave line above
 	pSrcP = pWeaveSrcP;			// " 
 
 #ifdef DBL_RESIZE
@@ -93,15 +96,15 @@ int		dst_pitchw = dst_pitch; // local stor so asm can ref
             (
              // Loop general reg usage
              //
-             // eax - pBobP, then pDest 
-             // ebx - pBob
-             // ecx - src_pitch2
-             // edx - current offset
-             // edi - prev weave pixels, 1 line up
-             // esi - next weave pixels, 1 line up
+             // "XAX" - pBobP, then pDest 
+             // XBX - pBob
+             // "XCX" - src_pitch2
+             // "XDX" - current offset
+             // XDI - prev weave pixels, 1 line up
+             // XSI - next weave pixels, 1 line up
 
-             // Save ebx (-fPIC)
-             "pushl %%ebx\n\t"
+             // Save "XBX" (-fPIC)
+            // ""PUSHX" %%"XBX"\n\t"
              
 #ifdef IS_SSE2
              
@@ -109,60 +112,60 @@ int		dst_pitchw = dst_pitch; // local stor so asm can ref
 
 #else
              // simple bob first 8 bytes
-             "movl		"_pBob",        %%ebx\n\t"
-             "movl	"_src_pitch2",  %%ecx\n\t"
+             ""MOVX"		"_pBob",        %%"XBX"\n\t"
+             ""MOVX"	"_src_pitch2",  %%"XCX"\n\t"
 
 #ifdef USE_VERTICAL_FILTER
-             "movq	    (%%ebx),        %%mm0\n\t"
-             "movq	    (%%ebx, %%ecx), %%mm1\n\t" //, qword ptr[ebx+ecx]
+             "movq	    (%%"XBX"),        %%mm0\n\t"
+             "movq	    (%%"XBX", %%"XCX"), %%mm1\n\t" //, qword ptr["XBX"+"XCX"]
              "movq	    %%mm0,          %%mm2\n\t"
              V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)		// halfway between
              V_PAVGB ("%%mm0", "%%mm2", "%%mm3", _ShiftMask)		// 1/4 way
              V_PAVGB ("%%mm1", "%%mm2", "%%mm3", _ShiftMask)		// 3/4 way
-             "movl		"_pDest",       %%edi\n\t"
-             "movl		"_dst_pitchw",  %%eax\n\t"
-             V_MOVNTQ	("(%%edi)", "%%mm0")
-             V_MOVNTQ	("(%%edi, %%eax)", "%%mm1") // qword ptr[edi+eax], mm1
+             ""MOVX"		"_pDest",       %%"XDI"\n\t"
+             ""MOVX"		"_dst_pitchw",  %%"XAX"\n\t"
+             V_MOVNTQ	("(%%"XDI")", "%%mm0")
+             V_MOVNTQ	("(%%"XDI", %%"XAX")", "%%mm1") // qword ptr["XDI"+"XAX"], mm1
 
              // simple bob last 8 bytes
-             "movl		"_Last8", %%edx\n\t"
-             "leal		(%%ebx, %%edx), %%esi\n\t"  // [ebx+edx]
-             "movq	    (%%esi), %%mm0\n\t"
-             "movq	    (%%esi, %%ecx), %%mm1\n\t"    // qword ptr[esi+ecx]
+             ""MOVX"		"_Last8", %%"XDX"\n\t"
+             ""LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t"  // ["XBX"+"XDX"]
+             "movq	    (%%"XSI"), %%mm0\n\t"
+             "movq	    (%%"XSI", %%"XCX"), %%mm1\n\t"    // qword ptr["XSI"+"XCX"]
              "movq	    %%mm0, %%mm2\n\t"
              V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)		// halfway between
              V_PAVGB ("%%mm0", "%%mm2", "%%mm3", _ShiftMask)		// 1/4 way
              V_PAVGB ("%%mm1", "%%mm2", "%%mm3", _ShiftMask)		// 3/4 way
-             "addl		%%edx, %%edi\n\t"						// last 8 bytes of dest
-             V_MOVNTQ	("%%edi", "%%mm0")
-             V_MOVNTQ	("(%%edi, %%eax)", "%%mm1") // qword ptr[edi+eax], mm1)
+             ""ADDX"		%%"XDX", %%"XDI"\n\t"						// last 8 bytes of dest
+             V_MOVNTQ	("%%"XDI"", "%%mm0")
+             V_MOVNTQ	("(%%"XDI", %%"XAX")", "%%mm1") // qword ptr["XDI"+"XAX"], mm1)
 
 #else
-             "movq	(%%ebx), %%mm0\n\t"
-             //		pavgb	mm0, qword ptr[ebx+ecx]
-             V_PAVGB ("%%mm0", "(%%ebx, %%ecx)", "%%mm2", _ShiftMask) // qword ptr[ebx+ecx], mm2, ShiftMask)
-             "movl		"_pDest", %%edi\n\t"
-             V_MOVNTQ	("(%%edi)", "%%mm0")
+             "movq	(%%"XBX"), %%mm0\n\t"
+             //		pavgb	mm0, qword ptr["XBX"+"XCX"]
+             V_PAVGB ("%%mm0", "(%%"XBX", %%"XCX")", "%%mm2", _ShiftMask) // qword ptr["XBX"+"XCX"], mm2, ShiftMask)
+             ""MOVX"		"_pDest", %%"XDI"\n\t"
+             V_MOVNTQ	("(%%"XDI")", "%%mm0")
 
              // simple bob last 8 bytes
-             "movl		"_Last8", %%edx\n\t"
-             "leal		(%%ebx, %%edx), %%esi\n\t" //esi, [ebx+edx]
-             "movq	    (%%esi), %%mm0\n\t"
-             //		pavgb	mm0, qword ptr[esi+ecx]
-             V_PAVGB	("%%mm0", "(%%esi, %%ecx)", "%%mm2", _ShiftMask) // qword ptr[esi+ecx], mm2, ShiftMask)
-             V_MOVNTQ	("(%%edi, %%edx)", "%%mm0") // qword ptr[edi+edx], mm0)
+             ""MOVX"		"_Last8", %%"XDX"\n\t"
+             ""LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t" //"XSI", ["XBX"+"XDX"]
+             "movq	    (%%"XSI"), %%mm0\n\t"
+             //		pavgb	mm0, qword ptr["XSI"+"XCX"]
+             V_PAVGB	("%%mm0", "(%%"XSI", %%"XCX")", "%%mm2", _ShiftMask) // qword ptr["XSI"+"XCX"], mm2, ShiftMask)
+             V_MOVNTQ	("(%%"XDI", %%"XDX")", "%%mm0") // qword ptr["XDI"+"XDX"], mm0)
 #endif
              // now loop and get the middle qwords
-             "movl		"_pSrc", %%esi\n\t"
-             "movl		"_pSrcP", %%edi\n\t"
-             "movl		$8, %%edx\n\t"				// curr offset into all lines
+             ""MOVX"		"_pSrc", %%"XSI"\n\t"
+             ""MOVX"		"_pSrcP", %%"XDI"\n\t"
+             ""MOVX"		$8, %%"XDX"\n\t"				// curr offset longo all lines
 
              "1:\n\t"	
-             "movl		"_pBobP", %%eax\n\t"
-             "addl		$8, %%edi\n\t"
-             "addl		$8, %%esi\n\t"
-             "addl		$8, %%ebx\n\t"
-             "addl		%%edx, %%eax\n\t"
+             ""MOVX"		"_pBobP", %%"XAX"\n\t"
+             ""ADDX"		$8, %%"XDI"\n\t"
+             ""ADDX"		$8, %%"XSI"\n\t"
+             ""ADDX"		$8, %%"XBX"\n\t"
+             ""ADDX"		%%"XDX", %%"XAX"\n\t"
 
 #ifdef USE_STRANGE_BOB
 #include "StrangeBob.inc"
@@ -171,7 +174,7 @@ int		dst_pitchw = dst_pitch; // local stor so asm can ref
 #endif
 
              // For non-SSE2:
-             // through out most of the rest of this loop we will maintain
+             // through out most of the rest of this loop we will malongain
              //	mm4		our min bob value
              //	mm5		best weave pixels so far
              //  mm6		our max Bob value 

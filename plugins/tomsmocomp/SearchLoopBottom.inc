@@ -49,31 +49,31 @@
 #endif
 
 
-            "movl     "_pDest", %%eax\n\t"
+            ""MOVX"     "_pDest", %%"XAX"\n\t"
                 
 #ifdef USE_VERTICAL_FILTER
             "movq    %%mm0, %%mm1\n\t"
-            //      pavgb   mm0, qword ptr[ebx]
-            V_PAVGB ("%%mm0", "(%%ebx)", "%%mm2", _ShiftMask)
-            //      movntq  qword ptr[eax+edx], mm0
-            V_MOVNTQ ("(%%eax, %%edx)", "%%mm0")
-            //      pavgb   mm1, qword ptr[ebx+ecx]
-            V_PAVGB ("%%mm1", "(%%ebx, %%ecx)", "%%mm2", _ShiftMask)
-            "addl   "_dst_pitchw", %%eax"
-            //      movntq  qword ptr[eax+edx], mm1
-            V_MOVNTQ ("(%%eax, %%edx)", "%%mm1")
+            //      pavgb   mm0, qword ptr["XBX"]
+            V_PAVGB ("%%mm0", "(%%"XBX")", "%%mm2", _ShiftMask)
+            //      movntq  qword ptr["XAX"+"XDX"], mm0
+            V_MOVNTQ ("(%"XAX", %%"XDX")", "%%mm0")
+            //      pavgb   mm1, qword ptr["XBX"+"XCX"]
+            V_PAVGB ("%%mm1", "(%%"XBX", %%"XCX")", "%%mm2", _ShiftMask)
+            "addq   "_dst_pitchw", %%"XBX""
+            //      movntq  qword ptr["XAX"+"XDX"], mm1
+            V_MOVNTQ ("(%%"XAX", %%"XDX")", "%%mm1")
 #else
                 
-            //      movntq  qword ptr[eax+edx], mm0
-                V_MOVNTQ ("(%%eax, %%edx)", "%%mm0")
+            //      movntq  qword ptr["XAX"+"XDX"], mm0
+                V_MOVNTQ ("(%%"XAX", %%"XDX")", "%%mm0")
 #endif
                 
-           "leal    8(%%edx), %%edx\n\t"       // bump offset pointer
-           "cmpl    "_Last8", %%edx\n\t"       // done with line?
+           ""LEAX"    8(%%"XDX"), %%"XDX"\n\t"       // bump offset pointer
+           ""CMPX"    "_Last8", %%"XDX"\n\t"       // done with line?
            "jb      1b\n\t"                    // y
 #endif
 
-            "popl %%ebx\n\t"
+    //        ""POPX" %%"XBX"\n\t"
 
         : /* no outputs */
         : "m"(pBob),
@@ -95,7 +95,7 @@
           "m"(Max_Mov),
           "m"(YMask)
 
-        : "eax", "ecx", "edx", "esi", "edi",
+        : ""XAX"", ""XBX"", ""XCX"", ""XDX"", ""XSI"", ""XDI"",
           "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",
           "mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7",
           "memory", "cc"

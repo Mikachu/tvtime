@@ -14,8 +14,8 @@
 		// selected for the	smallest of abs(a,f), abs(c,d), or abs(b,e), etc.
 
 		// a,f
-		"movq    -2(%%ebx), %%mm0\n\t"		// value a from top left		
-		"movq    2(%%ebx, %%ecx), %%mm1\n\t"	// value f from bottom right			
+		"movq    -2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 		"movq	%%mm0, %%mm6\n\t"					
 //		pavgb	%%mm6, %%mm1					// avg(a,f), also best so far
 		V_PAVGB ("%%mm6", "%%mm1", "%%mm7", _ShiftMask)	// avg(a,f), also best so far
@@ -25,8 +25,8 @@
 		"por		%%mm1, %%mm7\n\t"					// abs diff, also best so far
 
 		// c,d
-		"movq    2(%%ebx), %%mm0\n\t"		// value a from top left		
-		"movq    -2(%%ebx, %%ecx), %%mm1\n\t"	// value f from bottom right			
+		"movq    2(%%"XBX"), %%mm0\n\t"		// value a from top left		
+		"movq    -2(%%"XBX", %%"XCX"), %%mm1\n\t"	// value f from bottom right			
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(c,d)
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(c,d)
@@ -53,8 +53,8 @@
 		"pand	"_YMask", %%mm5\n\t"			// mask out chroma from here also
 
 		// j,n
-		"movq    -4(%%ebx), %%mm0\n\t"		// value j from top left		
-		"movq    4(%%ebx, %%ecx), %%mm1\n\t"	// value n from bottom right			
+		"movq    -4(%%"XBX"), %%mm0\n\t"		// value j from top left		
+		"movq    4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom right			
 		"movq	%%mm0, %%mm2\n\t"						
 //		pavgb	%%mm2, %%mm1					// avg(j,n)
 		V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)	// avg(j,n)
@@ -79,8 +79,8 @@
 		"por		%%mm1, %%mm7\n\t"			// "
 
 		// k, m
-		"movq    4(%%ebx), %%mm0\n\t"		// value k from top right		
-		"movq    -4(%%ebx, %%ecx), %%mm1\n\t"	// value n from bottom left			
+		"movq    4(%%"XBX"), %%mm0\n\t"		// value k from top right		
+		"movq    -4(%%"XBX", %%"XCX"), %%mm1\n\t"	// value n from bottom left			
 		"movq	%%mm0, %%mm4\n\t"						
 //		pavgb	%%mm4, %%mm1					// avg(k,m)
 		V_PAVGB ("%%mm4", "%%mm1", "%%mm3", _ShiftMask)	// avg(k,m)
@@ -108,8 +108,8 @@
 		"por		%%mm1, %%mm7\n\t"			// "
 
 		// b,e
-		"movq    (%%ebx), %%mm0\n\t"		// value b from top 		
-		"movq    (%%ebx, %%ecx), %%mm1\n\t"	// value e from bottom 
+		"movq    (%%"XBX"), %%mm0\n\t"		// value b from top 		
+		"movq    (%%"XBX", %%"XCX"), %%mm1\n\t"	// value e from bottom 
 
 // We will also calc here the max/min values to later limit comb
 // so the max excursion will not exceed the Max_Comb constant
@@ -128,13 +128,13 @@
 
 #else
         "movq	%%mm0, %%mm2\n\t"
-		"movq	(%%eax), %%mm4\n\t"
+		"movq	(%%"XAX"), %%mm4\n\t"
 		"psubusb %%mm4, %%mm2\n\t"
 		"psubusb %%mm0, %%mm4\n\t"
 		"por		%%mm2, %%mm4\n\t"			// abs diff
 		
 		"movq	%%mm1, %%mm2\n\t"
-		"movq	(%%eax, %%ecx), %%mm3\n\t"
+		"movq	(%%"XAX", %%"XCX"), %%mm3\n\t"
 		"psubusb %%mm3, %%mm2\n\t"
 		"psubusb %%mm1, %%mm3\n\t"
 		"por		%%mm2, %%mm3\n\t"			// abs diff

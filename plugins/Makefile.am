@@ -20,7 +20,7 @@ OPT_CFLAGS = -Wall -I. -pedantic
 
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
-if ARCH_386
+if ARCH_X86
 DSCALER_SRCS = dscalerapi.h greedyhmacros.h kdetv_greedyh.c \
 	kdetv_tomsmocomp.c greedyh.h greedyh.cpp tomsmocomp.h \
 	tomsmocomp.cpp
