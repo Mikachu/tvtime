@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include "speedy.h"
 #include "videotools.h"
 
 struct video_correction_s
@@ -136,16 +137,6 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
         output[ (i*2) + 1 ] = ((topcb[ i/2 ] + botcb[ i/2 ] - 256) >> 1) + 128;
         output[ (i*2) + 2 ] = (topluma[ i+1 ] + botluma[ i+1 ]) >> 1;
         output[ (i*2) + 3 ] = ((topcr[ i/2 ] + botcr[ i/2 ] - 256) >> 1) + 128;
-    }
-}
-
-void interpolate_packed422_scanline( unsigned char *output, unsigned char *top,
-                                     unsigned char *bot, int width )
-{
-    int i;
-
-    for( i = width*2; i; --i ) {
-        *output++ = ((*top++) + (*bot++)) >> 1;
     }
 }
 

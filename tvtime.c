@@ -37,6 +37,7 @@
 #include "tvtimeosd.h"
 #include "tvtimeconf.h"
 #include "input.h"
+#include "speedy.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -133,6 +134,8 @@ int main( int argc, char **argv )
     unsigned char *colourbars;
     config_t *ct;
     input_t *in;
+
+    setup_speedy_calls();
 
     ct = config_new( argc, argv );
     if( !ct ) {

@@ -137,7 +137,7 @@ void sdl_poll_events( input_t *in )
     int curcommand = 0, arg = 0;
     SDLMod mods;
 
-    if( SDL_PollEvent( &event ) ) {
+    while( SDL_PollEvent( &event ) ) {
 
         if( event.type == SDL_QUIT ) {
             curcommand = I_QUIT;

@@ -19,7 +19,7 @@ LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS)
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
 	videotools.o ttfont.o efs.o osd.o parser.o tvtimeconf.o \
-	pngoutput.o tvtimeosd.o input.o cpu_accel.o
+	pngoutput.o tvtimeosd.o input.o cpu_accel.o speedy.o
 
 all: tvtime
 

@@ -98,8 +98,6 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *botcb,
                                                     unsigned char *botcr,
                                                     int width );
-void interpolate_packed422_scanline( unsigned char *output, unsigned char *top,
-                                     unsigned char *bot, int width );
 void composite_alphamask_packed422_scanline( unsigned char *output,
                                              unsigned char *input,
                                              unsigned char *mask, int width,
