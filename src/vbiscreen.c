@@ -18,7 +18,7 @@
 #define NUM_LINES  15
 #define ROWS       15
 #define COLS       32
-#define FONT_SIZE  45
+#define FONT_SIZE  20
 
 struct vbiscreen_s {
 
@@ -510,7 +510,7 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
     fprintf( stderr, "in print\n");
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
-        for( i = 0; i < COLS; i++ ) {
+        for( i = 0; i < COLS; i+=2 ) {
             if( !vs->buffers[ i ] ) {
                 if( i == COLS-1 ) {
                     vs->buffers[ i ] = c2;
