@@ -886,7 +886,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int option_index = 0;
     int saveoptions = 0;
     int filename_specified = 0;
-    char c;
+    int c;
 
     if( argc ) {
         while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
@@ -1022,7 +1022,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
     };
     int option_index = 0;
     int filename_specified = 0;
-    char c;
+    int c;
 
     if( argc == 1 ) {
         print_config_usage( argv );
@@ -1196,7 +1196,7 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc,
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
-    char c;
+    int c;
 
     while( (c = getopt_long( argc, argv, "hF:d:i:n:",
             long_options, &option_index )) != -1 ) {
