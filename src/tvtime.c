@@ -1682,11 +1682,21 @@ int main( int argc, char **argv )
                 secondlastframe = rvrreader_get_secondlastframe( rvrreader );
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
-            } else {
-                usleep( 10000 );
             }
             acquired = 1;
             filtered_cur = 0;
+        } else {
+            /**
+             * Wait for the next field time.
+             */
+            if( rtctimer ) {
+                while( performance_get_usecs_since_frame_acquired( perf )
+                       < ( (fieldtime*2) - (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
+                    rtctimer_next_tick( rtctimer );
+                }
+            } else if( performance_get_usecs_since_frame_acquired( perf ) < fieldtime ) {
+                usleep( fieldtime - performance_get_usecs_since_frame_acquired( perf ) );
+            }
         }
 
         if( tuner_state != TUNER_STATE_HAS_SIGNAL ) {
