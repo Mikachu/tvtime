@@ -6,6 +6,8 @@ For news and updates on tvtime, please visit our website at:
 News for 0.9.8.1
 
   *  Alot of minor bugfixes.
+  *  Partial EXPERIMENTAL UTF-8 support. Only works with UTF-8 characters
+     that are also in ISO-8859-1 (Latin-1).
 
 News for 0.9.8
 
