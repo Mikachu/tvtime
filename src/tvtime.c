@@ -1405,7 +1405,7 @@ int main( int argc, char **argv )
         }
 
         /* Read commands from standard input. */
-        while( !ioctl( 0, FIONREAD, &kbd_available ) ) {
+        while( !ioctl( STDIN_FILENO, FIONREAD, &kbd_available ) ) {
             char c;
 
             if( (kbd_available > 0) && read( STDIN_FILENO, &c, 1 ) == 1 ) {
