@@ -35,6 +35,7 @@ typedef struct output_api_s
     int (* is_exposed)( void );
     int (* get_visible_width)( void );
     int (* get_visible_height)( void );
+    int (* is_fullscreen)( void );
 
     /* Output API for interlaced displays. */
     int (* is_interlaced)( void );

@@ -762,6 +762,11 @@ int xv_get_visible_height( void )
     return video_area.height;
 }
 
+int xv_is_fullscreen( void )
+{
+    return output_fullscreen;
+}
+
 void xv_set_window_height( int window_height )
 {
     XWindowChanges win_changes;
@@ -813,6 +818,7 @@ static output_api_t xvoutput =
     xv_is_exposed,
     xv_get_visible_width,
     xv_get_visible_height,
+    xv_is_fullscreen,
 
     xv_is_interlaced,
     xv_wait_for_sync,
