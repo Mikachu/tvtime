@@ -102,7 +102,7 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
-    osd_graphic_show_graphic( osd->channel_logo, 10, 250 );
+    osd_graphic_show_graphic( osd->channel_logo, 80, 255 );
 }
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
@@ -142,7 +142,7 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
                                         stride, 20, height - 40, 0 );
     } else if( osd_graphic_visible( osd->channel_logo ) ) {
         osd_graphic_composite_packed422( osd->channel_logo, output, width, 
-                                         height, stride, 20, height - 60 );
+                                         height, stride, width/2, 86 );
 
     }
 }

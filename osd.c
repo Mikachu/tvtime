@@ -431,7 +431,7 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
     int has_alpha = pnginput_has_alpha( osdg->png );
 
     width = pnginput_get_width( osdg->png );
-    height = pnginput_get_width( osdg->png );
+    height = pnginput_get_height( osdg->png );
 
     cb444 = (unsigned char *) malloc( (width * 3) );
     if( !cb444 ) return;
@@ -489,13 +489,21 @@ void osd_graphic_composite_packed422( osd_graphic_t *osdg,
                                       int width, int height, int stride,
                                       int xpos, int ypos )
 {
+    int alpha;
+
     if( !osdg->png ) return;
     if( !osdg->frames_left ) return;
+
+    if( osdg->frames_left < 50 ) {
+        alpha = (int) ( ( ( ( (double) osdg->frames_left ) / 50.0 ) * osdg->alpha ) + 0.5 );
+    } else {
+        alpha = osdg->alpha;
+    }
 
     composite_packed4444_alpha_to_packed422( output, width, height, stride,
                                        osdg->image4444, 
                                        osdg->image_adjusted_width,
                                        pnginput_get_height( osdg->png ),
                                        osdg->image_width*4,
-                                       xpos, ypos, osdg->alpha );
+                                       xpos, ypos, alpha );
 }

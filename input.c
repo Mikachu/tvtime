@@ -118,8 +118,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
     verbose = config_get_verbose( in->cfg );
 
     if( in->togglemenumode ) {
-        input_menu_callback( in, command, arg );
-        return;
+        if( input_menu_callback( in, command, arg ) ) {
+            return;
+        }
     }
 
     switch( command ) {
@@ -138,7 +139,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_MENUMODE:
              in->togglemenumode = 1;
-             tvtime_osd_show_channel_logo( in->osd );
              input_menu_init( in );
              break;
 
@@ -235,6 +235,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                  strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
                            localtime(&tm) );
                  tvtime_osd_show_channel_info( in->osd, timestamp );
+                 tvtime_osd_show_channel_logo( in->osd );
              }
              break;
 
@@ -320,7 +321,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                    localtime(&tm) );
 
                          tvtime_osd_show_channel_info( in->osd, timestamp );
-
+                         tvtime_osd_show_channel_logo( in->osd );
                          in->frame_counter = 0;
                      } else {
                          /* no valid channel */
@@ -404,8 +405,6 @@ void input_next_frame( input_t *in )
 
     if( in->videohold ) in->videohold--;
 
-    if( in->togglemenumode ) tvtime_osd_show_channel_logo( in->osd );
-
     in->printdebug = 0;
     in->screenshot = 0;
     in->togglefullscreen = 0;
@@ -486,19 +485,15 @@ void menu_preview( input_t *in, int key )
 {
 }
 
-void input_menu_callback( input_t *in, InputEvent command, int arg )
+int input_menu_callback( input_t *in, InputEvent command, int arg )
 {
     int tvtime_cmd, verbose, fixed_arg = 0;
 
-    if( in->quit ) return;
+    if( in->quit ) return 1;
 
     verbose = config_get_verbose( in->cfg );
 
     switch( command ) {
-    case I_QUIT:
-        in->quit = 1;
-        break;
-
     case I_KEYDOWN:
 
         fixed_arg = arg & 0xFFFF;
@@ -571,26 +566,26 @@ void input_menu_callback( input_t *in, InputEvent command, int arg )
 
             switch( tvtime_cmd ) {
 
-            case TVTIME_QUIT:
-                in->quit = 1;
-                break;
-
-            case TVTIME_SCREENSHOT:
-                in->screenshot = 1;
-                break;
-
             case TVTIME_MENUMODE:
                 in->togglemenumode = 0;
                 in->menu_screen = MENU_MAIN;
                 /* now remove OSD */
+                return 1;
                 break;
+
             default:
+                /* cause input_callback to handle this */
+                return 0;
                 break;
             }
             break;
         }
 
     default:
+        /* cause input_callback to handle this */
+        return 0;
         break;
     }
+
+    return 1;
 }
