@@ -1327,10 +1327,12 @@ void xcommon_poll_events( input_t *in )
             }
             break;
         case ConfigureNotify:
-            window_area.x = event.xconfigure.x;
-            window_area.y = event.xconfigure.y;
-            window_area.width = event.xconfigure.width;
-            window_area.height = event.xconfigure.height;
+            if( event.xconfigure.window == wm_window ) {
+                window_area.x = event.xconfigure.x;
+                window_area.y = event.xconfigure.y;
+                window_area.width = event.xconfigure.width;
+                window_area.height = event.xconfigure.height;
+            }
             reconfwidth = event.xconfigure.width;
             reconfheight = event.xconfigure.height;
             if( reconfwidth != output_width || reconfheight != output_height ) {
@@ -1423,10 +1425,13 @@ void xcommon_poll_events( input_t *in )
         }
     }
 
-    // fprintf( stderr, "fullscreen %d focus %d\n", output_fullscreen, has_focus );
-
     if( !has_ewmh_state_fullscreen && output_fullscreen ) {
-        if( !xcommon_exposed || !has_focus ) {
+        /**
+         * We used to check if we still have focus too.
+         * Let's ignore that for now and see how well this
+         * works.
+         */
+        if( !xcommon_exposed /* || !has_focus */ ) {
             /**
              * Switch back to windowed mode if we have lost
              * input focus or window visibility.

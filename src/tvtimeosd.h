@@ -59,6 +59,7 @@ void tvtime_osd_set_pixel_aspect( tvtime_osd_t *osd, double pixel_aspect );
 void tvtime_osd_show_info( tvtime_osd_t *osd );
 
 void tvtime_osd_hold( tvtime_osd_t *osd, int hold );
+void tvtime_osd_clear( tvtime_osd_t *osd );
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm );
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable );
