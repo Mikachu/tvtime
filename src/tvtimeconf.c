@@ -471,7 +471,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
                 fprintf( stderr, "config: Could not create new config file.\n" );
                 return 0;
             }
-	    create_file = 1;
+            create_file = 1;
         }
     }
 
@@ -521,59 +521,51 @@ static xmlDocPtr configsave_open( const char *config_filename )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-ahkmMsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
-                     "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
-                     "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n"
-                     "\t\t[-D <output_driver>] [-x <mixer device>[:<channel>]]\n" , argv[ 0 ] );
+    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
 
-    fprintf( stderr, "\t-a\t16:9 mode.\n" );
-    fprintf( stderr, "\t-h\tShow this help message.\n" );
-    fprintf( stderr, "\t-k\tDisables keyboard input handling in tvtime (slave mode).\n" );
-    fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
-    fprintf( stderr, "\t-M\tStart tvtime in windowed mode.\n" );
-    fprintf( stderr, "\t-s\tPrint stats on frame drops (for debugging).\n" );
-
-    fprintf( stderr, "\t-S\tSave command line options to the config file.\n" );
-
-    fprintf( stderr, "\t-v\tShow verbose messages.\n" );
-
-    fprintf( stderr, "\t-F\tAdditional config file to load settings from.\n" );
-
-    fprintf( stderr, "\t-r\tRVR recorded file to play (for debugging).\n" );
-
-    fprintf( stderr, "\t-H\tOutput window height (defaults to 576).\n" );
-    fprintf( stderr, "\t-I\tvideo4linux input scanline sampling (defaults to 720).\n" );
-
-    fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
-    fprintf( stderr, "\t-b\tVBI device (defaults to /dev/vbi0).\n" );
-    fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
-
-    fprintf( stderr, "\t-c\tTune to this channel on startup.\n" );
-
-    fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
-                     "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
-    fprintf( stderr, "\t-D\tThe output driver to use: Xv, DirectFB, mga, xmga (defaults to Xv).\n");
-
-    fprintf( stderr, "\t-x\tThe mixer device and channel.  (defaults to /dev/mixer:line)\n"
-                     "\t  \tValid channels are:\n"
-                     "\t  \t\tvol, bass, treble, synth, pcm, speaker, line, mic,\n"
-                     "\t  \t\tcd, mix, pcm2, rec, igain, ogain, line1, line2,\n"
-                     "\t  \t\tline3, dig1, dig2, dig3, phin, phout, video,\n"
-                     "\t  \t\tradio, monitor\n" );
-
-    fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
-                     "\t  \t(defaults to us-cable).\n"
-                     "\t  \tValid values are:\n"
-                     "\t  \t\tus-cable\n"
-                     "\t  \t\tus-broadcast\n"
-                     "\t  \t\tjapan-cable\n"
-                     "\t  \t\tjapan-broadcast\n"
-                     "\t  \t\teurope\n"
-                     "\t  \t\taustralia\n"
-                     "\t  \t\taustralia-optus\n"
-                     "\t  \t\tnewzealand\n"
-                     "\t  \t\tfrance\n"
-                     "\t  \t\trussia\n" );
+    fprintf( stderr,
+             "  -a, --widescreen           16:9 mode.\n"
+             "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+             "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+             "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga or\n"
+             "                             xmga (defaults to Xv).\n"
+             "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+             "                             (defaults to us-cable).\n\n"
+             "                             Valid values are:\n"
+             "                                 us-cable\n"
+             "                                 us-broadcast\n"
+             "                                 japan-cable\n"
+             "                                 japan-broadcast\n"
+             "                                 europe\n"
+             "                                 australia\n"
+             "                                 australia-optus\n"
+             "                                 newzealand\n"
+             "                                 france\n"
+             "                                 russia\n\n"
+             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
+             "  -h, --help                 Show this help message.\n"
+             "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+             "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+             "                             (defaults to 720).\n"
+             "  -k, --slave                Disables input handling in tvtime (slave mode).\n"
+             "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+             "  -M, --window               Start tvtime in window mode.\n"
+             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+             "                             PAL, NTSC, SECAM, PAL-NC, PAL-M, PAL-N or NTSC-JP\n"
+             "                             (defaults to NTSC).\n"
+             "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+             "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+             "  -S, --saveoptions          Save command line options to the config file.\n"
+             "  -v, --verbose              Print debugging messages to stderr.\n"
+             "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+             "                             (defaults to /dev/mixer:line)\n\n"
+             "                             Valid channels are:\n"
+             "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
+             "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
+             "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+             "                                 video, radio, monitor\n" );
 }
 
 config_t *config_new( void )
@@ -745,11 +737,36 @@ config_t *config_new( void )
 
 int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 {
+    static struct option long_options[] = {
+        { "help", 0, 0, 'h' },
+        { "verbose", 0, 0, 'v' },
+        { "height", 1, 0, 'H' },
+        { "saveoptions", 0, 0, 'S' },
+        { "inputwidth", 1, 0, 'I' },
+        { "driver", 1, 0, 'D' },
+        { "input", 1, 0, 'i' },
+        { "channel", 1, 0, 'c' },
+        { "configfile", 1, 0, 'F' },
+        { "norm", 1, 0, 'n' },
+        { "frequencies", 1, 0, 'f' },
+        { "vbidevice", 1, 0, 'b' },
+        { "device", 1, 0, 'd' },
+        { "mixer", 1, 0, 'x' },
+        { "showdrops", 0, 0, 's' },
+        { "fullscreen", 0, 0, 'm' },
+        { "window", 0, 0, 'M' },
+        { "slave", 0, 0, 'k' },
+        { "widescreen", 0, 0, 'a' },
+        { "rvr", 1, 0, 'r' },
+        { 0, 0, 0, 0 }
+    };
+    int option_index = 0;
     char *configFile = 0;
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:" )) != -1 ) {
+    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:",
+            long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'k': ct->slave_mode = 1; break;
