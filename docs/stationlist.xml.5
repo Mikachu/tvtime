@@ -10,7 +10,10 @@ stationlist.xml -- tvtime station configuration file
 The stationlist.xml file contains the configuration of channel
 information for capture cards with tuners.  It contains a list of active
 channels along with their frequencies, renumbering information, and
-channel name.
+channel name.  The stationlist.xml file is updated by tvtime at runtime,
+to store settings across sessions.  For this reason, you should not edit
+the stationlist.xml file while tvtime is running, as your changes may be
+overwritten.
 
 The stationlist.xml file is created or updated whenever channel
 information is changed in tvtime.  This can be done by renumbering a
@@ -66,7 +69,7 @@ Entries in a list are in the following form:
                 band="Custom" channel="55.69MHz"/>
 
 
-.SH "AUTHORS"
+.SH AUTHORS
 .LP 
 Achim Schneider, Billy Biggs
 
