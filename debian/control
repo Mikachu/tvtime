@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 4.1.16), libc6-dev, zlib1g-dev, libpng-dev, libfree
 Standards-Version: 3.6.1
 
 Package: tvtime
-Architecture: i386
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ttf-freefont, ucf
 Recommends: xmltv-util
 Suggests: lirc-x, libdscaler
