@@ -39,6 +39,8 @@
     <table class="doclist" width="95%">
     <tr><th class="docbox">support</td></tr>
     <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/cards.html">supported cards</a></td></tr>
+    <tr><td class="docentry">
         <a href="help.html">help and faq</a></td></tr>
     <tr><td class="docentry">
         <a href="usage.html">using tvtime</a></td></tr>
@@ -76,6 +78,13 @@
     <table width="90%" class="centered">
     <tr><td valign="top">
 
+        <h2 class="center">Common error messages</h2>
+        <ol>
+        <li><a href="#rtcerror">Errors about RTC, the Linux real time clock
+            device</a>
+        <li><a href="#vidmemory">Video card memory errors</a>
+        </ol>
+
         <h2 class="center">Capture card problems</h2>
         <ol>
         <li><a href="#tvwonder">Channels black-and-white and numbers
@@ -85,16 +94,9 @@
         <li><a href="#bttvload">bttv takes a long time to load</a>
         <li><a href="#prolink-audio">Audio problems with Prolink PixelView
             cards</a>
-        <li><a href="#linux-dvb">Green and corrupted frames with the
-            linux-dvb driver</a>
-        <li><a href="#zoran">Problems with the zoran driver (used by the
-            DC10 cards)</a>
-        <li><a href="#marvel">Problems with Matrox Marvel capture cards</a>
         <li><a href="#rivatv">Poor performance with the rivatv driver</a>
-        <li><a href="#aiw">Unusable drivers for ATI All-In-Wonder
-            video+capture cards</a>
-        <li><a href="#voodoo3500">Unusable drivers for the Voodoo 3500 TV
-            card</a>
+        <li><a href="#undetected">Unable to tune to channels using the
+            bttv, saa7134 or cx88 drivers</a>
         </ol>
 
         <h2 class="center">Video card problems</h2>
@@ -125,6 +127,54 @@
         </ol>
 
 
+        <h2>Common error messages</h2>
+
+        <h3><a name="rtcerror">1. Errors about RTC, the Linux real time
+            clock device</a></h3>
+
+        <p>Enhanced Real Time Clock support in your kernel can help applications
+        like tvtime improve the smoothness of their output.  The kernel module
+        that provides this feature is called <b>rtc</b>, and it is compiled and
+        installed by default on most Linux distributions.</p>
+
+        <p>This feature will improve the quality of tvtime's output, but is
+        <b>NOT</b> required for tvtime to operate.</p>
+
+        <p>Reasons why tvtime might not be able to use /dev/rtc include:</p>
+        <ol>
+        <li>Your user does not have read/write access to the device
+        file <tt>/dev/rtc</tt>.
+        <li>You compiled your own kernel and forgot to enable the RTC device.
+        <li>Your user does not have the rights to get high resolution timers.
+        </ol>
+
+        <p>If your user does not have sufficient priviledge, the RTC device
+        cannot be used for high-resolution timers.  To solve this, you can
+        do one of the following:</p>
+
+        <ol>
+        <li>Run tvtime as <b>root</b>.
+        <li>Set the tvtime executable <i>SUID root</i> using this command:<br>
+            <tt>chmod u+s /usr/bin/tvtime</tt>.
+        <li>Allow user processes the ability to use high resolution timers
+            by running this command as root every time your machine boots:<br>
+            <tt>sysctl -w dev.rtc.max-user-freq=1024</tt>
+        </ol>
+
+        <h3><a name="vidmemory">2. Video card memory errors</a></h3>
+
+        <p>tvtime uses the XVIDEO extension, which allocates video card
+        memory.  We have experienced some problems where the X server fails
+        to provide enough video card memory for tvtime to use it.  This can
+        happen if your video card is old and simply doesn't have enough memory
+        to hold the framebuffer and tvtime at once.  However, there are also
+        bugs in X servers and X drivers that can cause this.</p>
+
+        <p>If your distribution is using the
+        <a href="http://freedesktop.org/Software/xorg">Xorg X server</a> and you
+        are seeing these errors, please comment on
+        <a href="http://freedesktop.org/bugzilla/show_bug.cgi?id=474">Xorg bug
+        474</a>.</p>
 
         <h2>Capture card problems</h2>
 
@@ -135,11 +185,11 @@
         capture cards, a notable example being the ATI TV Wonder cards.  This
         causes all of the cable frequencies to be out of alignment, channel
         numbers are off-by-one and slightly detuned.  To fix this, the tuner
-        module must be told explicitly the tuner type when it is loaded by doing
-        the following:</p>
+        type must be told explicitly when loading your capture driver.  For
+        example, with the bttv driver use the following:</p>
 
 <pre>
-    modprobe tuner type=2
+    modprobe bttv tuner=2
 </pre>
 
         <p>You may have to first remove the bttv module if it is already
@@ -147,7 +197,7 @@
         <tt>/etc/modules.conf</tt> file, add the following line:</p>
 
 <pre>
-    options tuner type=2
+    options bttv tuner=2
 </pre>
 
         <p>This will ensure that whenever the tuner module is loaded, it will
@@ -155,6 +205,10 @@
         please post a bug report on
         <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">the
         tvtime bugs page</a>.</p>
+
+        <p>In older versions of bttv, this module option could also be passed
+        to the tuner module.  This method is deprecated in newer 2.6 kernels,
+        and so you must pass the parameter to the capture driver itself.</p>
 
         <p>To attack this problem, we believe that the tuner module must be
         fixed to correctly detect the difference in tuner, as so many users
@@ -225,61 +279,7 @@
         the newer Pixelview cards should use <tt>card=70</tt> and not
         <tt>card=72</tt>.</p>
 
-        <h3><a name="linux-dvb">5. Green and corrupted frames with the
-            linux-dvb driver</a></h3>
-
-        <p>tvtime will not work properly with the stable <b>linux-dvb</b>
-        driver found on the <a href="http://linuxtv.org/">linuxtv.org</a>
-        page.  This supports many cards including the Hauppauge Nexus-S.</p>
-
-        <p>tvtime will work find with the new <b>dvb-kernel</b> V4L2 driver
-        from CVS on the same site.  Please get this new driver for use with
-        tvtime.</p>
-
-        <p>For reference, the original project page for this driver is 
-        <a href="http://www.gdv.uni-hannover.de/~hunold1/linux/saa7146/index.html">at this link</a>
-        and and an explanation of the current DVB driver situation is at
-        <a href="http://linuxtv.org/dvb/drivers.xml">http://linuxtv.org/dvb/drivers.xml</a>.
-        As well, the thread on this issue on the linux-dvb mailing list can be
-        <a href="http://linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html">found here</a>
-        and the tvtime bug report is
-        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694544&amp;group_id=64301&amp;atid=506987">bug 694544</a>.</p>
-
-        <h3><a name="zoran">6. Problems with the zoran driver (used by the
-            DC10 cards)</a></h3>
-
-        <p>Once someone tried to use tvtime with the
-        <a href="http://www.cicese.mx/~mirsev/Linux/DC10plus/">zoran driver
-        for the DC10plus and related cards</a> that is part of a
-        <a href="http://mjpegtools.sourceforge.net">larger project called
-        'mjpegtools'</a>.  This is an older card, and depending on your PCI
-        configuration, many users with seemingly high powered machines
-        experience extremely poor performance.  Please read
-        <a href="zoran-email.txt">this email extract from the driver
-        authors</a>.</p>
-
-        <h3><a name="marvel">7. Problems with Matrox Marvel capture
-            cards</a></h3>
-
-        <p>A user has reported an unsuccessful attempt to use tvtime with
-        a G400 marvel card supported by
-        <a href="http://marvel.sourceforge.net">Matrox Marvel driver
-        project</a>.  To quote:</p>
-
-        <p><i>"Its taking 38ms to grab a frame, but the marvel does all
-        its own scaling in hardware (ie not via Xv, well I dont think
-        it does) the anoying thing is that if the hardware scaling is
-        in use Xv cant be used."</i></p>
-
-        <p><i>"It would be nice if tvtime supported overlay mode so that
-        us marvel users can at least use the 16:9 mode in fullscreen."</i></p>
-
-        <p>I think we may be able to get this card working, but it will take
-        someone with a bit of know-how to figure out what the card expects,
-        and I guess the ability to shut off whatever hardware scaling prevents
-        us from using XVideo.</p>
-
-        <h3><a name="rivatv">8. Poor performance with the rivatv capture
+        <h3><a name="rivatv">5. Poor performance with the rivatv capture
              driver</a></h3>
 
         <p>By default, the rivatv the driver copies frames from video memory
@@ -295,52 +295,50 @@
     options rivatv dma=1
 </pre>
 
-        <h3><a name="aiw">9. Unusable drivers for ATI All-In-Wonder
-            video+capture cards</a></h3>
+        <h3><a name="undetected">6. Unable to tune to channels using the
+            bttv, saa7134 or cx88 drivers</a></h3>
 
-        <p>ATI has a line of video cards with video capture capabilities,
-        and the <a href="http://gatos.sourceforge.net/">GATOS</a> project
-        develops drivers for these cards which includes <b>km</b>, a kernel
-        module for a Video4Linux interface to the capture components on
-        these cards.</p>
+        <p>The bttv, saa7134, and cx88 drivers each support a wide variety
+        of cards which all use the same chip.  In particular, these cards
+        differ in what tuner they use, how many inputs they have, and how
+        it is configured.</p>
 
-        <p><i>This is <b>just</b> for video cards with capture capabilities,
-        not for the <b>ATI TV Wonder</b> line of capture cards which use the
-        BT878 chip and are supported by the bttv driver.</i></p>
+        <p>Often, these drivers cannot autodetect the card type, or detect
+        the incorrect card.  To debug this, you must watch your kernels logs
+        by running the "<tt>dmesg</tt>" command, potentially loading and
+        unloading the driver with different options until the driver is
+        successfully loaded.</p>
 
-        <p>The Video4Linux interface provided by
-        <a href="http://gatos.sourceforge.net/">GATOS</a> is currently
-        unusable with tvtime, and at this point it seems unlikely that
-        they ever will.  The problems are:</p>
-
+        <p>Some hints:</p>
         <ol>
-        <li>The rumor is that the All-In-Wonder cards cannot both capture and
-            allow an application to use the hardware overlay scaler of the
-            card.  If this is true, then tvtime would be unable to do any
-            processing on the video.
-        <li>The Video4Linux interface provided by the km driver is nonstandard.
-            It provides at field rate instead of frame rate, and does not
-            seem to provide a way of detecting this.  This may require
-            additional code to support it in tvtime.
-        <li>The km driver only supports <b>read()</b> mode, which is currently
-            untested in the tvtime code.  If someone could test this out, I
-            would appreciate it.
+        <li>If your card appears as <tt>UNKNOWN/GENERIC</tt>, then the
+            tuner driver will not be loaded and the card will likely not
+            work.  You will need to load the driver with the correct card
+            number.
+        <li>If your tuner reports that it is using type -1, it is not loaded
+            and you will not be able to tune any stations.
+        <li>If you are an NTSC user, make sure the tuner you are using announces
+            itself as an NTSC tuner.
         </ol>
 
-        <p>Assistance in investigating this for conclusive information would be
-        appreciated.  Please contact the tvtime developers if you can help
-        out.</p>
-
-        <h3><a name="voodoo3500">10. Unusable drivers for the Voodoo 3500
-            TV card</a></h3>
-
-        <p>An unmaintained TV card driver for the Voodoo 3500 card is located
-        at <a href="http://sourceforge.net/projects/v3tv/">http://sourceforge.net/projects/v3tv/</a>.</p>
-
-        <p>However, this driver does not support capturing, and therefore
-        cannot be used with tvtime.</p>
-
-
+        <p>For example, if you are using the bttv driver, the common
+        procedure for setting up a card is as follows:</p>
+        <ol>
+        <li>Run "<tt>modprobe bttv</tt>" with no options.
+        <li>Run "<tt>dmesg</tt>".  Check to see if your card is autodetected,
+            and if the tuner is correct.  If everything looks fine, you're done.
+        <li>If the card appears as <tt>UNKNOWN/GENERIC</tt>, find the CARDLIST
+            file in your kernel documentation and find your card in the list.
+        <li>Unload bttv and tuner using "<tt>rmmod bttv</tt>" and
+            "<tt>rmmod tuner</tt>".
+        <li>Run "<tt>modprobe bttv card=X</tt>" where X is the number of
+            your card.
+        <li>Run "<tt>dmesg</tt>" again.  See if the card loaded properly
+            and if the tuner is correct.
+        <li>If not, unload bttv and tuner again, and try specifying the tuner
+            type as well using "<tt>modprobe bttv card=X tuner=Y</tt>".
+        <li>Curse Linux for being so complicated.
+        </ol>
 
 
         <h2>Video card problems</h2>
