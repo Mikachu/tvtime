@@ -156,9 +156,9 @@ static void station_dump( station_mgr_t *mgr )
     station_info_t *rp = mgr->first;
     if( !rp ) return;
 
-    fprintf( stderr, "#\tBand\t\tChannel\tFreq\tActive\tName\n" );
+    fprintf( stderr, "station: #\tBand\t\tChannel\tFreq\tActive\tName\n" );
     do {
-        fprintf( stderr, "%d\t%s\t%s\t%d\t%s\t%s\n",rp->pos, rp->band->name,
+        fprintf( stderr, "station: %d\t%s\t%s\t%d\t%s\t%s\n",rp->pos, rp->band->name,
             rp->channel->name, rp->channel->freq, rp->active ? "true" : "false", rp->name);
         rp = rp->next;
     } while( rp != mgr->first );
