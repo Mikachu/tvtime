@@ -365,7 +365,6 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
         return;
     }
 
-    
     /* Yes, strlen. I want to know how many bytes, not how many characters. */
     inbytesleft = strlen( ntext );
     
