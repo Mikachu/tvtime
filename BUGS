@@ -6,33 +6,57 @@ Bugs can be checked on the tvtime sourceforge page:
 http://sourceforge.net/projects/tvtime/
 
 
-626927 - Slow compositing routines
+Fullscreen bugs
+---------------
+
+693337 Fullscreen problems with icewm
+693329 Fullscreen problem with fvwm 2.4.0
+692137 full screen problem on kwin
+691892 Fullscreen doesn't follow virtual desktop position
+683283 Fullscreen broken with metacity from RH 8.0
+
+
+General bugs
+------------
+
+692392 XVideo problems with two X servers
+691857 tvtime ignores wss signals
+691797 rivatv requires UYVY support
+691315 i845G XVideo crashes
+690473 Blue frame shown on channel change
+692392 XVideo problems with two X servers and X4.2.1 mga driver
+690473 Blue frame shown on channel change when gbuffers=2
+690428 No detection of non-square-pixel displays
+672810 g400 marvel
+
+
+626927 Slow compositing routines
  * The compositing routines are slow and cause framedrops on slower
    machines.  We need to do MMX versions.
 
-628943 - Font aspect not updated with output
+628943 Font aspect not updated with output
  * If you start tvtime in 16:9 or 4:3 mode and switch using the 'a'
    key, then the OSD fonts aren't updated for the new aspect ratio.
 
-630236 - No MMX versions of MMXEXT functions
+630236 No MMX versions of MMXEXT functions
  * While it would be easy to provide MMX versions of the DScaler-ported
    deinterlacing algorithms, we currently only have MMXEXT versions.
    Shouldn't take long just haven't bothered yet.
 
-632781 - Data bars mess up at other frame sizes 
+632781 Data bars mess up at other frame sizes 
  * If you're not using 720 pixels/scanline input sampling, tvtime
    doesn't do the volume/data OSD bars correctly.  We have no idea why
    this is yet.
 
-633235 - No on-frame indication of dropped frames
+633235 No on-frame indication of dropped frames
  * You can use the -s switch to see when you drop frames, but it would
    be nice to be told somehow using the OSD or something...
 
-636423 - No support for 16:9 geometry output
+636423 No support for 16:9 geometry output
  * We should detect when your monitor's aspect ratio is not 4:3 and
    correct for that, and also check for non-square pixel sizes.
 
-636424 - Xinerama support
+636424 Xinerama support
  * We should enable the Xinerama support code from ogle that we have
    in our source tree.
 
@@ -40,31 +64,32 @@ http://sourceforge.net/projects/tvtime/
 Known incompatibility problems
 ------------------------------
 
-630585 - blits are still taking waaay too long
+630585 blits are still taking waaay too long
  * We've had alot of reports about Geforce2 users having really poor
    blit performance.  See the bug report for more details.  We
    suspect this may have to do with slow AGP on some crappy
    motherboards.
 
-636338 - XVideo extremely slow on sis
+636338 XVideo extremely slow on sis
  * The SiS drivers currently in X have really slow XVideo (it polls
    waiting for the retrace every upload).  Apparently these drivers
    will be put in X soon and have much better performance:
 
    http://www.winischhofer.net/linuxsis630.shtml
 
-628292 - Voodoo 3500 TV card.
+628292 Voodoo 3500 TV card.
  * This card has minimal V4L support but no support for capturing
    it seems, which is required for tvtime.
 
-630198 - preemptive kernel from gentoo
+630198 preemptive kernel from gentoo
  * The preemptive kernel patches backport to 2.4.19 in gentoo apparently
    break the bttv driver.  I'd like this to be confirmed elsewhere.
 
-634674 - tvtime drops frames when gkrellm running
+634674 tvtime drops frames when gkrellm running
  * On one user's system, gkrellm was polling an ntfs partition.  There
    may be some kernel driver that is blocking for a really long time,
    and screwing up our captures.
+
 
 General Info for improving video quality
 ----------------------------------------
@@ -76,3 +101,4 @@ http://www.colby.edu/personal/k/kjseptor/bttv.html for info on that.
 If you are experiencing a generally fuzzy picture, try moving your tv card 
 one or two slots away from your soundcard (inside your pc). Interference from 
 the soundcard can mess up some channels.
+
