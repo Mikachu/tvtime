@@ -33,9 +33,9 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c \
 	videoinput.h videotools.h outputapi.h performance.h performance.c \
 	vbidata.h vbidata.c credits.c credits.h xvoutput.h xvoutput.c display.h \
 	display.c wm_state.h wm_state.c console.h console.c speedtools.h \
-	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
-	station.h station.c bands.h configsave.h configsave.c x11tools.c \
-	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
+	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
+	videofilter.c station.h station.c bands.h configsave.h configsave.c \
+	x11tools.c x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
 	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h
 
 bin_PROGRAMS = tvtime tvtime-command

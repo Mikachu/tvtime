@@ -745,19 +745,9 @@ int config_get_preferred_deinterlace_method( config_t *ct )
     return ct->preferred_deinterlace_method;
 }
 
-void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction )
-{
-    ct->apply_luma_correction = apply_luma_correction;
-}
-
 double config_get_luma_correction( config_t *ct )
 {
     return ct->luma_correction;
-}
-
-void config_set_luma_correction( config_t *ct, double luma_correction )
-{
-    ct->luma_correction = luma_correction;
 }
 
 const char *config_get_v4l_device( config_t *ct )

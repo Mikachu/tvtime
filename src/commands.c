@@ -159,7 +159,6 @@ struct commands_s {
     config_t *cfg;
     videoinput_t *vidin;
     tvtime_osd_t *osd;
-    video_correction_t *vc;
     char next_chan_buffer[ 5 ];
     int frame_counter;
     int digit_counter;
@@ -176,6 +175,10 @@ struct commands_s {
     int halfrate;
     int scan_channels;
     int pause;
+
+    int apply_luma;
+    int update_luma;
+    double luma_power;
     
     int menu_on;
     menu_t *menu;
@@ -232,8 +235,7 @@ static void reinit_tuner( commands_t *in )
 }
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
-                          station_mgr_t *mgr, tvtime_osd_t *osd,
-                          video_correction_t *vc )
+                          station_mgr_t *mgr, tvtime_osd_t *osd )
 {
     commands_t *in = (commands_t *) malloc( sizeof( struct commands_s ) );
 
@@ -244,7 +246,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->cfg = cfg;
     in->vidin = vidin;
     in->osd = osd;
-    in->vc = vc;
     in->stationmgr = mgr;
     in->frame_counter = 0;
     in->digit_counter = 0;
@@ -264,6 +265,22 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->scrollconsole = 0;
     in->scan_channels = 0;
     in->pause = 0;
+
+    in->apply_luma = config_get_apply_luma_correction( cfg );
+    in->update_luma = 0;
+    in->luma_power = config_get_luma_correction( cfg );
+
+    if( !videoinput_is_bttv( vidin ) && in->apply_luma ) {
+        in->apply_luma = 0;
+        fprintf( stderr, "commands: Input isn't from a bt8x8, disabling luma correction.\n" );
+    }
+
+    if( in->luma_power < 0.0 || in->luma_power > 10.0 ) {
+        fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
+        in->luma_power = 1.0;
+    } else if( config_get_verbose( cfg ) ) {
+        fprintf( stderr, "commands: Luma correction value: %.1f\n", in->luma_power );
+    }
 
     in->console = 0;
     in->vbi = 0;
@@ -445,9 +462,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_LUMA_CORRECTION:
-        config_set_apply_luma_correction( in->cfg, !config_get_apply_luma_correction( in->cfg ) );
+        in->apply_luma = !in->apply_luma;
         if( in->osd ) {
-            if( config_get_apply_luma_correction( in->cfg ) ) {
+            if( in->apply_luma ) {
                 tvtime_osd_show_message( in->osd, "Luma correction enabled." );
                 configsave( "ApplyLumaCorrection", "1", 1 );
             } else {
@@ -473,33 +490,26 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_LUMA_UP:
     case TVTIME_LUMA_DOWN:
-        if( !config_get_apply_luma_correction( in->cfg ) ) {
+        if( !in->apply_luma ) {
             fprintf( stderr, "tvtime: Luma correction disabled.  "
                      "Run with -c to use it.\n" );
         } else {
             char message[ 200 ];
-            config_set_luma_correction( in->cfg, 
-                config_get_luma_correction( in->cfg ) + 
-                ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 ));
+            in->luma_power = in->luma_power + ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 );
 
-            if( config_get_luma_correction( in->cfg ) > 10.0 ) 
-                config_set_luma_correction( in->cfg , 10.0);
+            in->update_luma = 1;
 
-            if( config_get_luma_correction( in->cfg ) <  0.0 ) 
-                config_set_luma_correction( in->cfg, 0.0 );
+            if( in->luma_power > 10.0 ) in->luma_power = 10.0;
+            if( in->luma_power <  0.0 ) in->luma_power = 0.0;
 
-            if( verbose ) fprintf( stderr, "tvtime: Luma "
-                                   "correction value: %.1f\n", 
-                                   config_get_luma_correction( in->cfg ));
+            if( verbose ) {
+                fprintf( stderr, "tvtime: Luma correction value: %.1f\n", in->luma_power );
+            }
 
-            video_correction_set_luma_power( in->vc,
-                                             config_get_luma_correction( in->cfg ) );
-
-            sprintf( message, "%.1f", config_get_luma_correction( in->cfg ) );
+            sprintf( message, "%.1f", in->luma_power );
             configsave( "LumaCorrection", message, 1 );
             if( in->osd ) {
-                sprintf( message, "Luma correction value: %.1f", 
-                         config_get_luma_correction( in->cfg ) );
+                sprintf( message, "Luma correction value: %.1f", in->luma_power );
                 tvtime_osd_show_message( in->osd, message );
             }
         }
@@ -769,6 +779,7 @@ void commands_next_frame( commands_t *in )
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglepulldowndetection = 0;
+    in->update_luma = 0;
 }
 
 
@@ -800,5 +811,20 @@ int commands_scan_channels( commands_t *in )
 int commands_pause( commands_t *in )
 {
     return in->pause;
+}
+
+int commands_apply_luma_correction( commands_t *in )
+{
+    return in->apply_luma;
+}
+
+int commands_update_luma_power( commands_t *in )
+{
+    return in->update_luma;
+}
+
+double commands_get_luma_power( commands_t *in )
+{
+    return in->luma_power;
 }
 

@@ -55,9 +55,6 @@ int config_get_right_scanline_bias( config_t *ct );
 
 const char *config_get_config_filename( config_t *ct );
 
-void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction );
-void config_set_luma_correction( config_t *ct, double luma_correction );
-
 double config_get_horizontal_overscan( config_t *ct );
 double config_get_vertical_overscan( config_t *ct );
 void config_set_horizontal_overscan( config_t *ct, double hoverscan );
