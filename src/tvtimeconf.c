@@ -888,7 +888,11 @@ config_t *config_new( void )
     ct->buttonmapmenu[ 5 ] = TVTIME_MENU_DOWN;
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
-    asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) );
+    if( asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) ) < 0 ) {
+        /* FIXME: Clean up ?? */
+        return 0;
+    }
+
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
             fprintf( stderr, "config: Cannot create %s: %s.\n",
