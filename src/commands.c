@@ -582,18 +582,20 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
     menu_set_right_command( menu, 1, TVTIME_CHANNEL_RENUMBER, "" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    /*
     sprintf( string, "%c%c%c  Station favorites", 0xee, 0x80, 0xaa );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    */
     sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
-    menu_set_text( menu, 3, string );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 4, string );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
@@ -601,7 +603,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "input" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c Television standard", 0xee, 0x80, 0xad );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
@@ -748,7 +750,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "brightness" );
     menu_set_text( menu, 0, "Setup - Picture - Brightness" );
-    sprintf( string, "%c%c%c Adjust %c%c%c",
+    sprintf( string, "%c%c%c  Adjust  %c%c%c",
              0xe2, 0x97, 0x80,
              0xe2, 0x96, 0xb6 );
     menu_set_text( menu, 1, string );
@@ -764,7 +766,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "contrast" );
     menu_set_text( menu, 0, "Setup - Picture - Contrast" );
-    sprintf( string, "%c%c%c Adjust %c%c%c",
+    sprintf( string, "%c%c%c  Adjust  %c%c%c",
              0xe2, 0x97, 0x80,
              0xe2, 0x96, 0xb6 );
     menu_set_text( menu, 1, string );
@@ -780,7 +782,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "colour" );
     menu_set_text( menu, 0, "Setup - Picture - Colour" );
-    sprintf( string, "%c%c%c Adjust %c%c%c",
+    sprintf( string, "%c%c%c  Adjust  %c%c%c",
              0xe2, 0x97, 0x80,
              0xe2, 0x96, 0xb6 );
     menu_set_text( menu, 1, string );
@@ -796,7 +798,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "hue" );
     menu_set_text( menu, 0, "Setup - Picture - Hue" );
-    sprintf( string, "%c%c%c Adjust %c%c%c",
+    sprintf( string, "%c%c%c  Adjust  %c%c%c",
              0xe2, 0x97, 0x80,
              0xe2, 0x96, 0xb6 );
     menu_set_text( menu, 1, string );
