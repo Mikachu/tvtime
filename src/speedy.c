@@ -1804,7 +1804,11 @@ static void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
                                                           int textluma, int textcb,
                                                           int textcr )
 {
+#ifdef WORDS_BIGENDIAN
+    uint32_t opaque = textcr | (textcb << 8) | (textluma << 16) | 0xff<<24;
+#else
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+#endif
     int i;
 
     for( i = 0; i < width; i++ ) {
@@ -1813,14 +1817,27 @@ static void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
         if( a == 0xff ) {
             *((uint32_t *) output) = opaque;
         } else if( (input[ 0 ] == 0x00) ) {
+#ifdef WORDS_BIGENDIAN
+            *((uint32_t *) output) = multiply_alpha( a, textcr )
+                                       | (multiply_alpha( a, textcb ) << 8)
+                                       | (multiply_alpha( a, textluma ) << 16) | a << 24;
+#else
             *((uint32_t *) output) = (multiply_alpha( a, textcr ) << 24)
                                        | (multiply_alpha( a, textcb ) << 16)
                                        | (multiply_alpha( a, textluma ) << 8) | a;
+#endif
         } else if( a ) {
+#ifdef WORDS_BIGENDIAN
+            *((uint32_t *) output) = (input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] ))
+                                       | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 8)
+                                       | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 16)
+                                       | ((input[ 0 ] + multiply_alpha( a, 0xff - input[ 0 ] )) << 24);
+#else
             *((uint32_t *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
                                        | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
                                        | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
                                        |  (input[ 0 ] + multiply_alpha( a, 0xff - input[ 0 ] ));
+#endif
         }
         mask++;
         output += 4;
