@@ -55,17 +55,13 @@
 #include "fifo.h"
 #include "commands.h"
 #include "station.h"
+#include "dfboutput.h"
+#include "rvrreader.h"
+#include "pulldown.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#ifdef HAVE_DIRECTFB
-#include "dfboutput.h"
-#endif
-
-#include "rvrreader.h"
-#include "pulldown.h"
 
 /**
  * Michael Niedermayer's magic FIRs
