@@ -435,6 +435,10 @@ void xv_poll_events( input_t *in )
             default: break;
             }
             input_callback( in, I_KEYDOWN, arg );
+            break;
+        case ButtonPress:
+            input_callback( in, I_BUTTONPRESS, event.xbutton.button );
+            break;
         default: break;
         }
     }
