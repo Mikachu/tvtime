@@ -878,7 +878,7 @@ int main( int argc, char **argv )
     setup_speedy_calls( verbose );
 
     dscaler_greedyh_plugin_init();
-    dscaler_greedy_plugin_init();
+    greedy_plugin_init();
 
     linearblend_plugin_init();
 
