@@ -22,6 +22,7 @@
 #include "rtctimer.h"
 #include "videotools.h"
 #include "speedy.h"
+#include "leetft.h"
 
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
@@ -34,6 +35,11 @@ static int timediff( struct timeval *large, struct timeval *small )
 /* Include these because I'm lazy and don't want to disturb other code. */
 char *program_name = "tvtime";
 int dlevel = 5;
+
+/* What font to test text rendering with. */
+static const char *leeft_font = "../data/FreeSansBold.ttf";
+const unsigned int leeft_size = 30;
+const double leetft_aspect = 1.125;
 
 /* Use a constant random seed for tests. */
 const unsigned int seed = 2;
@@ -55,7 +61,8 @@ static const char *tests[] = {
    "interpolate_packed422_scanline_mmxext 720x480 frame",
    "blend_packed422_scanline_c 720x480 120/256 frame",
    "blend_packed422_scanline_mmxext 720x480 120/256 frame",
-   "comb_factor_packed422_scanline 720x480 frame" 
+   "comb_factor_packed422_scanline 720x480 frame",
+   "leetft_render_test_string" 
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -65,6 +72,8 @@ int main( int argc, char **argv )
     unsigned char *source422packed2;
     unsigned char *source4444packed;
     unsigned char *dest422packed;
+    ft_font_t *font = 0;
+    ft_string_t *fts = 0;
     unsigned int datasize = 0;
     uint64_t avg_sum = 0;
     uint64_t avg_count = 0;
@@ -91,6 +100,19 @@ int main( int argc, char **argv )
         return 1;
     } else {
         fprintf( stderr, "timingtest: Testing %s.\n", tests[ testid ] );
+    }
+
+    if( !strcmp( tests[ testid ], "leetft_render_test_string" ) ) {
+        font = ft_font_new( leeft_font, leeft_size, leetft_aspect );
+        if( !font ) {
+            fprintf( stderr, "timingtest: Running leetft test, but font %s not found.\n", leeft_font );
+            return 1;
+        }
+        fts = ft_string_new( font );
+        if( !fts ) {
+            fprintf( stderr, "timingtest: Can't create string object.\n" );
+            return 1;
+        }
     }
   
     if( !set_realtime_priority( 0 ) ) {
@@ -211,6 +233,11 @@ int main( int argc, char **argv )
             }
             rdtscll( after );
             datasize += width * height * 2;
+        } else if( !strcmp( tests[ testid ], "leetft_render_test_string" ) ) {
+            rdtscll( before );
+            ft_string_set_text( fts, "The quick brown fox jumped over the lazy dog", 0 );
+            rdtscll( after );
+            datasize += ft_string_get_stride( fts ) * ft_string_get_height( fts );
         }
 
         fprintf( stderr, "[%4d] Cycles: %7d\r", i, (int) (after - before) );
