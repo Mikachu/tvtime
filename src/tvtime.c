@@ -872,6 +872,7 @@ int main( int argc, char **argv )
     int kbd_pos = 0;
     int kbd_available;
     char *error_string = 0;
+    int read_stdin = 1;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -883,6 +884,12 @@ int main( int argc, char **argv )
     fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
                        "*** based on released versions only!!\n\n" );
 
+    /* Ditch stdin early. */
+    if( isatty( STDIN_FILENO ) ) {
+        read_stdin = 0;
+        close( STDIN_FILENO );
+    }
+
     ct = config_new();
     if( !ct ) {
         fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
@@ -891,6 +898,7 @@ int main( int argc, char **argv )
 
     /* Parse command line arguments. */
     if( !config_parse_tvtime_command_line( ct, argc, argv ) ) {
+        config_delete( ct );
         return 1;
     }
 
@@ -1421,32 +1429,34 @@ int main( int argc, char **argv )
             if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, 0 );
         }
 
-        /* Read commands from standard input. */
-        while( !ioctl( STDIN_FILENO, FIONREAD, &kbd_available ) ) {
-            char c;
+        if( read_stdin ) {
+            /* Read commands from standard input. */
+            while( !ioctl( STDIN_FILENO, FIONREAD, &kbd_available ) ) {
+                char c;
 
-            if( (kbd_available > 0) && read( STDIN_FILENO, &c, 1 ) == 1 ) {
-                if( c == '\n' ) {
-                    int cmd;
+                if( (kbd_available > 0) && read( STDIN_FILENO, &c, 1 ) == 1 ) {
+                    if( c == '\n' ) {
+                        int cmd;
 
-                    kbd_cmd[ kbd_pos ] = '\0';
+                        kbd_cmd[ kbd_pos ] = '\0';
 
-                    cmd = tvtime_string_to_command( kbd_cmd );
-                    if( cmd != TVTIME_NOCOMMAND ) {
-                        commands_handle( commands, cmd, 0 );
-                    }
-                    memset( kbd_cmd, 0, sizeof( kbd_cmd ) );
-                    kbd_pos = 0;
-                } else {
-                    if( kbd_pos < sizeof( kbd_cmd ) - 1 ) {
-                        kbd_cmd[ kbd_pos++ ] = c;
-                    } else {
+                        cmd = tvtime_string_to_command( kbd_cmd );
+                        if( cmd != TVTIME_NOCOMMAND ) {
+                            commands_handle( commands, cmd, 0 );
+                        }
                         memset( kbd_cmd, 0, sizeof( kbd_cmd ) );
                         kbd_pos = 0;
+                    } else {
+                        if( kbd_pos < sizeof( kbd_cmd ) - 1 ) {
+                            kbd_cmd[ kbd_pos++ ] = c;
+                        } else {
+                            memset( kbd_cmd, 0, sizeof( kbd_cmd ) );
+                            kbd_pos = 0;
+                        }
                     }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
 
