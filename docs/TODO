@@ -2,22 +2,16 @@
 Stuff to do
 -----------
 
-1.  OSD code.
-2.  Dynamic resizing of the window maybe?
-4.  Config file, name = value pairs
-5.  Screenshot taker to png.
-6.  Ability to change inputs on the fly.
-7.  Eventually make up/down channel use a definable list of channels
+1.  Eventually make up/down channel use a definable list of channels
     with extended channel data (string eg "CNN", volume, PICT settings,
     fine tune adjustment etc)
-8.  Pong?
-9.  Temporary fine tune adjustment per channel ie. lost when you change
+2.  Pong?
+3.  Temporary fine tune adjustment per channel ie. lost when you change
     channels
-10. Menu system like a real tv.
-11. Display of stereo/mono etc (maybe time/date) when changing
+4.  Menu system like a real tv.
+5.  Display of stereo/mono etc (maybe time/date) when changing
     channels or requested by keystroke.
-12. break apart main
-13. autotools stuff
+6.  break apart main
 
 Longer term TODO stuff
 ----------------------
