@@ -43,7 +43,7 @@ void station_prev( station_mgr_t *mgr );
 /**
  * Set the us cable mode (global).
  */
-void station_set_us_cable_mode( station_mgr_t *mgr, int us_cable );
+void station_toggle_us_cable_mode( station_mgr_t *mgr );
 
 /**
  * Information about the current channel.

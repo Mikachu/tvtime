@@ -334,8 +334,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
-        // to be removed
-        // Billy: Again, uh, why should this be removed??
+	station_toggle_us_cable_mode( in->stationmgr );
+	commands_station_change( in );
         break;
 
     case TVTIME_FINETUNE_DOWN:

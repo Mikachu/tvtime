@@ -260,9 +260,9 @@ const char *station_get_current_band( station_mgr_t *mgr )
     }
 }
 
-void station_set_us_cable_mode( station_mgr_t *mgr, int us_cable )
+void station_toggle_us_cable_mode( station_mgr_t *mgr )
 {
-    mgr->us_cable_mode = us_cable;
+    mgr->us_cable_mode = (mgr->us_cable_mode + 1) % 3;
 }
 
 int station_get_current_frequency( station_mgr_t *mgr )
@@ -329,19 +329,22 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
 }
 
 int station_scan_band( station_mgr_t *mgr, const char *band )
-{
+{ // 
     return 0;
 }
 
-int station_toggle_curr( station_mgr_t *mgr ) {
+int station_toggle_curr( station_mgr_t *mgr ) 
+{
     if ( mgr->current ) {
         mgr->current->active= !mgr->current->active;
-    } else {
-        return 0;
+	return 1;
     }
+    return 0;
+   
 }
 
-int station_scan( station_mgr_t *mgr ) {
+int station_scan( station_mgr_t *mgr ) 
+{
     return 0;
 }
 
