@@ -1408,7 +1408,7 @@ int main( int argc, char **argv )
         while( !ioctl( 0, FIONREAD, &kbd_available ) ) {
             char c;
 
-            if( (kbd_available > 0) && read( 0, &c, 1 ) == 1 ) {
+            if( (kbd_available > 0) && read( STDIN_FILENO, &c, 1 ) == 1 ) {
                 if( c == '\n' ) {
                     int cmd;
 

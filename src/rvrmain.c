@@ -288,7 +288,7 @@ int main( int argc, char **argv )
     /* Wait for the user to request that we stop. */
     for(;;) {
         char curcrap[ 200 ];
-        read( 0, curcrap, 199 );
+        read( STDIN_FILENO, curcrap, 199 );
         if( curcrap[ 0 ] == 'q' ) break;
     }
 
