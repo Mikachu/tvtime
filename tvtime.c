@@ -270,13 +270,6 @@ int main( int argc, char **argv )
         curcb422 = curluma  + ( width   * height );
         curcr422 = curcb422 + ( width/2 * height );
 
-        /**
-         * Map luma values according to the correction table.
-         * We only do this once on the entire luma plane, instead of
-         * once on each field.
-         */
-        // video_correction_correct_luma_plane( vc, curluma, width, height, width );
-
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
             build_plane( sdl_get_output(), curluma,
