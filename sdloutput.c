@@ -27,7 +27,6 @@
 #include "videoinput.h"
 #include "sdloutput.h"
 #include "input.h"
-#include "config.h"
 
 static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;

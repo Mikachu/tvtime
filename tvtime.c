@@ -34,7 +34,7 @@
 #include "mixer.h"
 #include "osd.h"
 #include "tvtimeosd.h"
-#include "config.h"
+#include "tvtimeconf.h"
 #include "input.h"
 
 /**

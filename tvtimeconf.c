@@ -22,7 +22,7 @@
 #include <getopt.h>
 #include <ctype.h>
 #include "parser.h"
-#include "config.h"
+#include "tvtimeconf.h"
 #include "input.h"
 
 struct config_s

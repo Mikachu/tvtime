@@ -16,8 +16,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef CONFIG_H_INCLUDED
-#define CONFIG_H_INCLUDED
+#ifndef TVTIMECONF_H_INCLUDED
+#define TVTIMECONF_H_INCLUDED
 
 typedef struct config_s config_t;
 
@@ -90,4 +90,4 @@ void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
 void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
 void config_set_tuner_number( config_t *ct, int tuner_number );
 
-#endif /* CONFIG_H_INCLUDED */
+#endif /* TVTIMECONF_H_INCLUDED */

@@ -19,12 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "input.h"
-#include "config.h"
-#include "videotools.h"
-#include "videoinput.h"
+#include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
+#include "input.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100

@@ -22,8 +22,8 @@
 
 #include "tvtimeosd.h"
 #include "videoinput.h"
-#include "config.h"
 #include "videotools.h"
+#include "tvtimeconf.h"
 
 typedef struct input_s input_t;
 
