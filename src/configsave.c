@@ -39,7 +39,7 @@
 struct configsave_s
 {
     char *configFile;
-    xmlDocPtr Doc;
+    xmlDocPtr doc;
 };
 
 static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
@@ -93,8 +93,8 @@ configsave_t *configsave_open( const char *filename )
         return 0;
     }
 
-    cs->Doc = xmlParseFile( cs->configFile );
-    if( !cs->Doc ) {
+    cs->doc = xmlParseFile( cs->configFile );
+    if( !cs->doc ) {
         if( file_is_openable_for_read( cs->configFile ) ) {
             fprintf( stderr, "configsave: Config file exists, but cannot be parsed.\n" );
             fprintf( stderr, "configsave: Settings will NOT be saved.\n" );
@@ -104,8 +104,8 @@ configsave_t *configsave_open( const char *filename )
         } else {
             /* Config file doesn't exist, create a new one. */
             fprintf( stderr, "configsave: No config file found, creating a new one.\n" );
-            cs->Doc = xmlNewDoc( BAD_CAST "1.0" );
-            if( !cs->Doc ) {
+            cs->doc = xmlNewDoc( BAD_CAST "1.0" );
+            if( !cs->doc ) {
                 fprintf( stderr, "configsave: Could not create new config file.\n" );
                 free( cs->configFile );
                 free( cs );
@@ -114,62 +114,62 @@ configsave_t *configsave_open( const char *filename )
         }
     }
 
-    top = xmlDocGetRootElement( cs->Doc );
+    top = xmlDocGetRootElement( cs->doc );
     if( !top ) {
-        top = xmlNewDocNode( cs->Doc, 0, BAD_CAST "tvtime", 0 );
+        top = xmlNewDocNode( cs->doc, 0, BAD_CAST "tvtime", 0 );
         if( !top ) {
             fprintf( stderr, "configsave: Could not create toplevel element 'tvtime'.\n" );
-            xmlFreeDoc( cs->Doc );
+            xmlFreeDoc( cs->doc );
             free( cs->configFile );
             free( cs );
             return 0;
         } else {
-            xmlDocSetRootElement( cs->Doc, top );
+            xmlDocSetRootElement( cs->doc, top );
             xmlNewProp( top, BAD_CAST "xmlns", BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
         }
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
         fprintf( stderr, "configsave: Root node in file %s should be 'tvtime'.\n", cs->configFile );
-        xmlFreeDoc( cs->Doc );
+        xmlFreeDoc( cs->doc );
         free( cs->configFile );
         free( cs );
         return 0;
     }
 
     xmlKeepBlanksDefault( 0 );
-    xmlSaveFormatFile( cs->configFile, cs->Doc, 1 );
+    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
     return cs;
 }
 
 void configsave_close( configsave_t *cs )
 {
-    xmlFreeDoc( cs->Doc );
+    xmlFreeDoc( cs->doc );
     free( cs->configFile );
     free( cs );
 }
 
-int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num )
+int configsave( configsave_t *cs, const char *name, const char *value )
 {
     xmlNodePtr top, node;
 
-    top = xmlDocGetRootElement( cs->Doc );
+    top = xmlDocGetRootElement( cs->doc );
     if( !top ) {
         fprintf( stderr, "configsave: Error, can't get document root.\n" );
         return 0;
     }
 
-    node = find_option( top->xmlChildrenNode, INIT_name );
+    node = find_option( top->xmlChildrenNode, name );
     if( !node ) {
         node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
-        xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
-        xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
+        xmlNewProp( node, BAD_CAST "name", BAD_CAST name );
+        xmlNewProp( node, BAD_CAST "value", BAD_CAST value );
     } else {
-        xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );
+        xmlSetProp( node, BAD_CAST "value", BAD_CAST value );
     }
 
     xmlKeepBlanksDefault( 0 );
-    xmlSaveFormatFile( cs->configFile, cs->Doc, 1 );
+    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
     return 1;
 }
 

@@ -27,7 +27,7 @@ typedef struct configsave_s configsave_t;
 
 configsave_t *configsave_open( const char *filename );
 void configsave_close( configsave_t *cs );
-int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num );
+int configsave( configsave_t *cs, const char *name, const char *value );
 
 #ifdef __cplusplus
 };
