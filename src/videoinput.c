@@ -724,13 +724,13 @@ void videoinput_delete( videoinput_t *vidin )
     } else {
         if( vidin->have_mmap ) {
             munmap( vidin->map, vidin->gb_buffers.size );
+            free( vidin->grab_buf );
         } else {
             free( vidin->grab_data );
         }
     }
 
     close( vidin->grab_fd );
-    free( vidin->grab_buf );
     free( vidin );
 }
 
