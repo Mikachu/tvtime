@@ -303,8 +303,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     if( in->luma_power < 0.0 || in->luma_power > 10.0 ) {
         fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
         in->luma_power = 1.0;
-    } else if( config_get_verbose( cfg ) ) {
-        fprintf( stderr, "commands: Luma correction value: %.1f\n", in->luma_power );
     }
 
     in->overscan = config_get_overscan( cfg );
