@@ -84,7 +84,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         } else if( !file_is_openable_for_read( fontfilename ) ) {
             fprintf( stderr, "osd_string: Can't find font '%s' in path '%s' "
 			     "or path '../data/'.\n",
-                     fontfile, DATADIR, "../data/" );
+                     fontfile, DATADIR );
             free( fontfilename );
             fontfilename = 0;
         }
