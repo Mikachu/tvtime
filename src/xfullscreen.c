@@ -131,7 +131,8 @@ xfullscreen_t *xfullscreen_new( Display *display, int screen, int verbose )
     xf->heads[ 0 ].h = DisplayHeight( xf->display, xf->screen );
 
 #ifdef HAVE_XINERAMA
-    if( XineramaQueryExtension( xf->display, &event_base, &error_base ) && XineramaIsActive( xf->display ) ) {
+    if( XineramaQueryExtension( xf->display, &event_base, &error_base ) &&
+        XineramaIsActive( xf->display ) ) {
         XineramaScreenInfo *screens;
         int i;
 
@@ -145,7 +146,8 @@ xfullscreen_t *xfullscreen_new( Display *display, int screen, int verbose )
         }
 
         if( verbose ) {
-            fprintf( stderr, "xfullscreen: Using XINERAMA for dual-head information.\n" );
+            fprintf( stderr, "xfullscreen: Using XINERAMA for "
+                             "dual-head information.\n" );
         }
         return xf;
     }
@@ -155,9 +157,10 @@ xfullscreen_t *xfullscreen_new( Display *display, int screen, int verbose )
 #ifdef HAVE_XF86VIDMODE
     if( XF86VidModeQueryExtension( xf->display, &event_base, &error_base ) &&
         get_current_modeline_parameters( xf->display, xf->screen, &xf->panx,
-                                         &xf->pany, &xf->hdisplay, &xf->vdisplay,
-                                         &xf->refresh ) &&
-        get_largest_vidmode_resolution( xf->display, xf->screen, &max_h, &max_v ) ) {
+                                         &xf->pany, &xf->hdisplay,
+                                         &xf->vdisplay, &xf->refresh ) &&
+        get_largest_vidmode_resolution( xf->display, xf->screen,
+                                        &max_h, &max_v ) ) {
 
         xf->usevidmode = 1;
 
@@ -165,12 +168,14 @@ xfullscreen_t *xfullscreen_new( Display *display, int screen, int verbose )
             max_v < DisplayHeight( xf->display, xf->screen ) ) {
 
             if( verbose ) {
-                fprintf( stderr, "xfullscreen: Desktop larger than primary display, assuming square pixels.\n" );
+                fprintf( stderr, "xfullscreen: Desktop larger than "
+                                 "primary display, assuming square pixels.\n" );
             }
 
         } else {
             if( verbose ) {
-                fprintf( stderr, "xfullscreen: Single-head detected, pixel aspect will be calculated.\n" );
+                fprintf( stderr, "xfullscreen: Single-head detected, "
+                                 "pixel aspect will be calculated.\n" );
             }
 
             xf->squarepixel = 0;
@@ -184,7 +189,8 @@ xfullscreen_t *xfullscreen_new( Display *display, int screen, int verbose )
 
     /* There is no support for XINERAMA or VidMode. */
     if( verbose ) {
-        fprintf( stderr, "xfullscreen: No support for the vidmode extension, assuming square pixels.\n" );
+        fprintf( stderr, "xfullscreen: No support for the vidmode "
+                         "extension, assuming square pixels.\n" );
     }
 
     return xf;
@@ -200,23 +206,27 @@ void xfullscreen_print_summary( xfullscreen_t *xf )
     if( xf->squarepixel ) {
         fprintf( stderr, "xfullscreen: Pixels are square.\n" );
     } else {
-        fprintf( stderr, "xfullscreen: Pixel aspect ratio on the primary head is: %.2f.\n",
-                 ((double) (xf->heightmm * xf->hdisplay)) / ((double) (xf->widthmm * xf->vdisplay)) );
+        fprintf( stderr, "xfullscreen: Pixel aspect ratio on the primary "
+                         "head is: %.2f.\n",
+                 ((double) (xf->heightmm * xf->hdisplay)) /
+                 ((double) (xf->widthmm * xf->vdisplay)) );
     }
 
     if( xf->usevidmode ) {
-        fprintf( stderr, "xfullscreen: Using the XFree86-VidModeExtension to calculate fullscreen size.\n" );
+        fprintf( stderr, "xfullscreen: Using the XFree86-VidModeExtension "
+                         "to calculate fullscreen size.\n" );
         fprintf( stderr, "xfullscreen: Fullscreen to %d,%d with size %dx%d.\n",
                  xf->panx, xf->pany, xf->hdisplay, xf->vdisplay );
     } else {
         int i;
 
-        fprintf( stderr, "xfullscreen: Fullscreen uses display information.\n" );
-        fprintf( stderr, "xfullscreen: Number of displays is %d.\n", xf->nheads );
+        fprintf( stderr, "xfullscreen: Number of displays is %d.\n",
+                 xf->nheads );
 
         for( i = 0; i < xf->nheads; i++ ) {
             fprintf( stderr, "xfullscreen: Head %d at %d,%d with size %dx%d.\n",
-                     i, xf->heads[ i ].x, xf->heads[ i ].y, xf->heads[ i ].w, xf->heads[ i ].h );
+                     i, xf->heads[ i ].x, xf->heads[ i ].y,
+                     xf->heads[ i ].w, xf->heads[ i ].h );
         }
     }
 }
@@ -226,8 +236,8 @@ void xfullscreen_update( xfullscreen_t *xf )
 #ifdef HAVE_XF86VIDMODE
     if( xf->usevidmode ) {
         get_current_modeline_parameters( xf->display, xf->screen, &xf->panx,
-                                         &xf->pany, &xf->hdisplay, &xf->vdisplay,
-                                         &xf->refresh );
+                                         &xf->pany, &xf->hdisplay,
+                                         &xf->vdisplay, &xf->refresh );
     }
 #endif
 }
@@ -272,7 +282,8 @@ static int calculate_gcd( int x, int y )
     return x;
 }
 
-void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n, int *aspect_d )
+void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
+                                   int *aspect_d )
 {
     if( xf->squarepixel ) {
         *aspect_n = *aspect_d = 1;
