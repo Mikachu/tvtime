@@ -564,12 +564,11 @@ int main( int argc, char **argv )
     videobob_plugin_init();
     greedy2frame_plugin_init();
     twoframe_plugin_init();
+    linearblend_plugin_init();
     linear_plugin_init();
     weave_plugin_init();
     double_plugin_init();
-    linearblend_plugin_init();
     scalerbob_plugin_init();
-    simplemo_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {
