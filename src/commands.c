@@ -484,7 +484,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "rename" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "rename" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 3, "Station favorites" );
+    sprintf( string, "%c%c%c  Station favorites", 0xee, 0x80, 0xaa );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
@@ -531,7 +532,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    menu_set_text( menu, 2, "Sharpness" );
+    sprintf( string, "%c%c%c  Sharpness", 0xe2, 0x80, 0xa7 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
@@ -549,12 +551,12 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "deinterlacer" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "deinterlacer" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "Current deinterlacer description" );
+    sprintf( string, "%c%c%c  Current deinterlacer description", 0xee, 0x80, 0xab );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "Attempted framerate" );
+    sprintf( string, "%c%c%c  Attempted framerate", 0xee, 0x80, 0xac );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
@@ -809,6 +811,7 @@ static void display_current_menu( commands_t *cmd )
     int i;
 
     if( cmd->curmenu == MENU_FAVORITES ) {
+        char string[ 128 ];
         tvtime_osd_list_set_lines( cmd->osd, cmd->numfavorites + 3 );
         tvtime_osd_list_set_text( cmd->osd, 0, "Favorites" );
         for( i = 0; i < cmd->numfavorites; i++ ) {
@@ -816,8 +819,10 @@ static void display_current_menu( commands_t *cmd )
             sprintf( text, "%d", cmd->favorites[ i ] );
             tvtime_osd_list_set_text( cmd->osd, i + 1, text );
         }
-        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, "Add current station" );
-        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, "Exit" );
+        sprintf( string, "%c%c%c  Add current station", 0xee, 0x80, 0xa8 );
+        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, string );
+        sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, string );
         cmd->curmenusize = cmd->numfavorites + 2;
     } else if( cmd->curmenu == MENU_USER && cmd->curusermenu ) {
         tvtime_osd_list_set_lines( cmd->osd, menu_get_num_lines( cmd->curusermenu ) );
