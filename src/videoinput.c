@@ -136,20 +136,6 @@ static int videoinput_get_audmode_v4l2( int mode )
     return V4L2_TUNER_MODE_MONO;
 }
 
-static int videoinput_is_audmode_supported_v4l2( uint32_t rxchans, int mode )
-{
-    if( mode == VIDEOINPUT_MONO ) {
-        return (rxchans & V4L2_TUNER_SUB_MONO) ? 1 : 0;
-    } else if( mode == VIDEOINPUT_STEREO ) {
-        return (rxchans & V4L2_TUNER_SUB_STEREO) ? 1 : 0;
-    } else if( mode == VIDEOINPUT_LANG1 ) {
-        return (rxchans & V4L2_TUNER_SUB_LANG1) ? 1 : 0;
-    } else if( mode == VIDEOINPUT_LANG2 ) {
-        return (rxchans & V4L2_TUNER_SUB_LANG2) ? 1 : 0;
-    }
-    return 1;
-}
-
 int videoinput_get_norm_number( const char *name )
 {
     int i;
@@ -179,22 +165,6 @@ int videoinput_get_time_per_field( int norm )
     } else {
         return 20000;
     }
-}
-
-static int videoinput_next_compatible_norm( int norm, int isbttv )
-{
-    int height = videoinput_get_norm_height( norm );
-
-    do {
-        norm = norm + 1;
-        if( isbttv ) {
-            norm %= VIDEOINPUT_NTSC_JP + 1;
-        } else {
-            norm %= VIDEOINPUT_PAL_NC;
-        }
-    } while( videoinput_get_norm_height( norm ) != height );
-
-    return norm;
 }
 
 typedef struct capture_buffer_s
