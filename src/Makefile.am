@@ -38,9 +38,9 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	performance.c vbidata.h vbidata.c speedtools.h vbiscreen.h \
 	vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
 	videofilter.c station.h station.c bands.h utils.h utils.c \
-	diffcomp.h diffcomp.c pulldown.h pulldown.c hashtable.h hashtable.c \
-	cpuinfo.h cpuinfo.c videodev.h videodev2.h menu.c menu.h \
-	outputfilter.h outputfilter.c xmltv.h xmltv.c gettext.h tvtimeglyphs.h
+	pulldown.h pulldown.c hashtable.h hashtable.c cpuinfo.h cpuinfo.c \
+	videodev.h videodev2.h menu.c menu.h outputfilter.h outputfilter.c \
+	xmltv.h xmltv.c gettext.h tvtimeglyphs.h
 
 if ARCH_X86
 DSCALER_SRCS = $(top_builddir)/plugins/dscalerapi.h \
