@@ -37,8 +37,8 @@
 #define NUM_FAVORITES 9
 #define MAX_USER_MENUS 64
 
-/* Minutes to increment sleeptimer */
-#define SLEEPTIMER_STEP 10
+/* Maximum number of steps to increment sleeptimer. */
+#define SLEEPTIMER_NUMSTEPS 13
 
 enum menu_type
 {
@@ -78,6 +78,15 @@ static void set_redirect( const char *menu, const char *dest )
     }
 }
 
+
+static int sleeptimer_function( int step )
+{
+    if( step < 3 ) {
+       return step * 10;
+    } else {
+       return (step - 2) * 30;
+    }
+}
 
 struct commands_s {
     config_t *cfg;
@@ -1880,6 +1889,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->sleeptimer_start && (now > (cmd->sleeptimer_start + 5)) ) {
             cmd->sleeptimer = 0;
             cmd->sleeptimer_start = 0;
+        } else if( cmd->sleeptimer > SLEEPTIMER_NUMSTEPS ) {
+            cmd->sleeptimer = 0;
+            cmd->sleeptimer_start = 0;
         } else {
             cmd->sleeptimer++;
             cmd->sleeptimer_start = now;
@@ -1889,10 +1901,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char message[ 25 ];
 
             if( cmd->sleeptimer ) {
-                sprintf( message, "Sleep in %d Min.",
-                         (int) (cmd->sleeptimer * SLEEPTIMER_STEP) );
+                sprintf( message, "Sleep in %d minutes.",
+                         sleeptimer_function( cmd->sleeptimer ) );
             } else {
-                sprintf( message, "Sleeptimer: off" );
+                sprintf( message, "Sleep off." );
             }
 
             tvtime_osd_show_message( cmd->osd, message );
@@ -3124,6 +3136,6 @@ int commands_sleeptimer_do_shutdown( commands_t *cmd )
 
     time( &now );
 
-    return (now >= ((cmd->sleeptimer * SLEEPTIMER_STEP * 60) + cmd->sleeptimer_start));
+    return (now >= ((sleeptimer_function( cmd->sleeptimer ) * 60) + cmd->sleeptimer_start));
 }
 
