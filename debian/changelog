@@ -4,6 +4,13 @@ tvtime (0.9.10-8.1) experimental; urgency=low
 
  -- J. Random Hacker <jrhacker@example.com>  Fri, 24 Oct 2003 12:56:14 -0400
 
+tvtime (0.9.10-9) unstable; urgency=low
+
+  * Use strict POSIX shell functions in the postinst, for people with
+    minimal shells.  (Closes: Bug#219818)
+
+ -- Simon Law <sfllaw@debian.org>  Sun, 09 Nov 2003 12:41:13 -0500
+
 tvtime (0.9.10-8) unstable; urgency=low
 
   * Switch to gettext-based debconf templates.  (Closes: Bug#217271)
