@@ -70,7 +70,7 @@ struct tvtime_osd_s
     int channel_logo_ypos;
 
     char channel_number_text[ 20 ];
-    char channel_name_text[ 20 ];
+    char channel_name_text[ 128 ];
     char tv_norm_text[ 20 ];
     char input_text[ 128 ];
     char freqtable_text[ 128 ];
@@ -426,38 +426,38 @@ void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
 {
-    snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, "%s", norm );
+    snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ), "%s", norm );
 }
 
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
 {
-    snprintf( osd->input_text, sizeof( osd->input_text ) - 1, "%s", norm );
+    snprintf( osd->input_text, sizeof( osd->input_text ), "%s", norm );
 }
 
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
 {
-    snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, "%s", freqtable );
+    snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ), "%s", freqtable );
 }
 
 void tvtime_osd_set_audio_mode( tvtime_osd_t *osd, const char *audiomode )
 {
-    snprintf( osd->audiomode_text, sizeof( osd->audiomode_text ) - 1, audiomode );
+    snprintf( osd->audiomode_text, sizeof( osd->audiomode_text ), audiomode );
 }
 
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text )
 {
-    snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, "%s", text );
+    snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ), "%s", text );
 }
 
 void tvtime_osd_set_channel_name( tvtime_osd_t *osd, const char *text )
 {
-    snprintf( osd->channel_name_text, sizeof( osd->channel_name_text ) - 1, "%s", text );
+    snprintf( osd->channel_name_text, sizeof( osd->channel_name_text ), "%s", text );
 }
 
 
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )
 {
-    snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ) - 1, "%s", method );
+    snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ), "%s", method );
 }
 
 void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode )
@@ -467,7 +467,7 @@ void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode )
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
 {
-    snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, "%s", format );
+    snprintf( osd->timeformat, sizeof( osd->timeformat ), "%s", format );
 }
 
 void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode )
