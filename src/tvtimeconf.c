@@ -754,32 +754,17 @@ config_t *config_new( void )
     ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
     ct->keymap[ I_BACKSPACE ] = TVTIME_CHANNEL_PREV;
-    ct->keymap[ 'k' ] = TVTIME_CHANNEL_INC;
-    ct->keymap[ 'j' ] = TVTIME_CHANNEL_DEC;
-    ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
-    ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
-
-    ct->keymap[ 'c' ] = TVTIME_TOGGLE_LUMA_CORRECTION;
-    ct->keymap[ 'z' ] = TVTIME_LUMA_DOWN;
-    ct->keymap[ 'x' ] = TVTIME_LUMA_UP;
-
+    ct->keymap[ 'c' ] = TVTIME_TOGGLE_CC;
     ct->keymap[ 'm' ] = TVTIME_TOGGLE_MUTE;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
-    ct->keymap[ ',' ] = TVTIME_MIXER_TOGGLE_MUTE;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
-    ct->keymap[ I_F1 ] = TVTIME_BRIGHTNESS_DOWN;
-    ct->keymap[ I_F2 ] = TVTIME_BRIGHTNESS_UP;
-    ct->keymap[ I_F3 ] = TVTIME_CONTRAST_DOWN;
-    ct->keymap[ I_F4 ] = TVTIME_CONTRAST_UP;
-    ct->keymap[ I_F5 ] = TVTIME_COLOUR_DOWN;
-    ct->keymap[ I_F6 ] = TVTIME_COLOUR_UP;
-    ct->keymap[ I_F7 ] = TVTIME_HUE_DOWN;
-    ct->keymap[ I_F8 ] = TVTIME_HUE_UP;
-    ct->keymap[ I_F9 ] = TVTIME_CHANNEL_SAVE_TUNING;
-    ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
-    ct->keymap[ I_F11 ] = TVTIME_CHANNEL_ACTIVATE_ALL;
-    ct->keymap[ I_F12 ] = TVTIME_CHANNEL_SKIP;
+    ct->keymap[ I_F1 ] = TVTIME_SHOW_MENU;
+    ct->keymap[ 'h' ] = TVTIME_SHOW_MENU;
+    ct->keymap[ '	' ] = TVTIME_SHOW_MENU;
+    ct->keymap[ I_F5 ] = TVTIME_PICTURE;
+    ct->keymap[ I_F6 ] = TVTIME_PICTURE_DOWN;
+    ct->keymap[ I_F7 ] = TVTIME_PICTURE_UP;
     ct->keymap[ 'r' ] = TVTIME_CHANNEL_RENUMBER;
     ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
@@ -788,12 +773,9 @@ config_t *config_new( void )
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_TOGGLE_DEINTERLACER;
     ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
-    ct->keymap[ 'o' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
-    ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
     ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
-    ct->keymap[ 'w' ] = TVTIME_TOGGLE_CC;
     ct->keymap[ '=' ] = TVTIME_TOGGLE_FRAMERATE;
     ct->keymap[ I_END ] = TVTIME_TOGGLE_PAUSE;
     ct->keymap[ 'e' ] = TVTIME_TOGGLE_AUDIO_MODE;
@@ -802,11 +784,8 @@ config_t *config_new( void )
     ct->keymap[ 'b' ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
-    ct->keymap[ 'n' ] = TVTIME_TOGGLE_PAL_SECAM;
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
-    ct->keymap[ 'y' ] = TVTIME_SHOW_DEINTERLACER_INFO;
-    ct->keymap[ 'u' ] = TVTIME_SHOW_MENU;
 
     memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
@@ -821,14 +800,13 @@ config_t *config_new( void )
     ct->keymapmenu[ I_DOWN ] = TVTIME_MENU_DOWN;
     ct->keymapmenu[ I_LEFT ] = TVTIME_MENU_LEFT;
     ct->keymapmenu[ I_RIGHT ] = TVTIME_MENU_RIGHT;
-    ct->keymapmenu[ 'k' ] = TVTIME_MENU_UP;
-    ct->keymapmenu[ 'j' ] = TVTIME_MENU_DOWN;
-    ct->keymapmenu[ 'h' ] = TVTIME_MENU_LEFT;
-    ct->keymapmenu[ 'l' ] = TVTIME_MENU_RIGHT;
     ct->keymapmenu[ I_ENTER ] = TVTIME_MENU_ENTER;
-    ct->keymapmenu[ 'm' ] = TVTIME_MENU_EXIT;
+    ct->keymapmenu[ I_F1 ] = TVTIME_MENU_EXIT;
+    ct->keymapmenu[ '	' ] = TVTIME_MENU_EXIT;
+    ct->keymapmenu[ 'q' ] = TVTIME_MENU_EXIT;
     ct->keymapmenu[ I_ESCAPE ] = TVTIME_MENU_EXIT;
     ct->buttonmapmenu[ 1 ] = TVTIME_MENU_ENTER;
+    ct->buttonmapmenu[ 3 ] = TVTIME_MENU_EXIT;
     ct->buttonmapmenu[ 4 ] = TVTIME_MENU_UP;
     ct->buttonmapmenu[ 5 ] = TVTIME_MENU_DOWN;
 

@@ -369,15 +369,19 @@
     <keyboard key="q"/>
   </bind>
 
+  <bind command="show_menu">
+    <keyboard key="F1"/>
+    <keyboard key="	"/>
+    <mouse button="3"/>
+  </bind>
+
   <bind command="channel_inc">
     <keyboard key="up"/>
-    <keyboard key="k"/>
     <mouse button="4"/>
   </bind>
 
   <bind command="channel_dec">
     <keyboard key="down"/>
-    <keyboard key="j"/>
     <mouse button="5"/>
   </bind>
 
@@ -387,30 +391,21 @@
 
   <bind command="finetune_up">
     <keyboard key="right"/>
-    <keyboard key="l"/>
-  </bind>
-  <bind command="finetune_down">
-    <keyboard key="left"/>
-    <keyboard key="h"/>
   </bind>
 
-  <bind command="toggle_luma_correction">
-    <keyboard key="c"/>
-  </bind>
-  <bind command="luma_up">
-    <keyboard key="x"/>
-  </bind>
-  <bind command="luma_down">
-    <keyboard key="z"/>
+  <bind command="finetune_down">
+    <keyboard key="left"/>
   </bind>
 
   <bind command="toggle_mute">
     <keyboard key="m"/>
     <mouse button="2"/>
   </bind>
+
   <bind command="mixer_up">
     <keyboard key="+"/>
   </bind>
+
   <bind command="mixer_down">
     <keyboard key="-"/>
   </bind>
@@ -419,53 +414,20 @@
     <keyboard key="enter"/>
   </bind>
 
-  <bind command="brightness_down">
-    <keyboard key="F1"/>
-  </bind>
-  <bind command="brightness_up">
-    <keyboard key="F2"/>
-  </bind>
-
-  <bind command="contrast_down">
-    <keyboard key="F3"/>
-  </bind>
-  <bind command="contrast_up">
-    <keyboard key="F4"/>
-  </bind>
-
-  <bind command="colour_down">
+  <bind command="picture">
     <keyboard key="F5"/>
   </bind>
-  <bind command="colour_up">
+
+  <bind command="picture_down">
     <keyboard key="F6"/>
   </bind>
 
-  <bind command="hue_down">
+  <bind command="picture_up">
     <keyboard key="F7"/>
-  </bind>
-  <bind command="hue_up">
-    <keyboard key="F8"/>
-  </bind>
-
-  <bind command="channel_save_tuning">
-    <keyboard key="F9"/>
-  </bind>
-  <bind command="channel_scan">
-    <keyboard key="F10"/>
-  </bind>
-  <bind command="channel_activate_all">
-    <keyboard key="F11"/>
-  </bind>
-  <bind command="channel_skip">
-    <keyboard key="F12"/>
   </bind>
 
   <bind command="channel_renumber">
     <keyboard key="r"/>
-  </bind>
-
-  <bind command="toggle_bars">
-    <keyboard key="b"/>
   </bind>
 
   <bind command="show_stats">
@@ -478,7 +440,6 @@
 
   <bind command="toggle_input">
     <keyboard key="i"/>
-    <mouse button="3"/>
   </bind>
 
   <bind command="toggle_aspect">
@@ -497,36 +458,12 @@
     <keyboard key="p"/>
   </bind>
 
-  <bind command="toggle_ntsc_cable_mode">
-    <keyboard key="o"/>
-  </bind>
-
-  <bind command="auto_adjust_pict">
-    <keyboard key=" "/>
-  </bind>
-
-  <bind command="toggle_console">
-    <keyboard key="`"/>
-  </bind>
-
-  <bind command="scroll_console_up">
-    <keyboard key="pgup"/>
-  </bind>
-
-  <bind command="scroll_console_down">
-    <keyboard key="pgdn"/>
-  </bind>
-
   <bind command="toggle_cc">
-    <keyboard key="w"/>
+    <keyboard key="c"/>
   </bind>
 
   <bind command="toggle_framerate">
     <keyboard key="="/>
-  </bind>
-
-  <bind command="toggle_pause">
-    <keyboard key="end"/>
   </bind>
 
   <bind command="toggle_audio_mode">
@@ -536,28 +473,14 @@
   <bind command="overscan_up">
     <keyboard key="&gt;"/>
   </bind>
+
   <bind command="overscan_down">
     <keyboard key="&lt;"/>
   </bind>
 
   <bind command="display_info">
+    <keyboard key="?"/>
     <mouse button="1"/>
-  </bind>
-
-  <bind command="toggle_mode">
-    <keyboard key="*"/>
-  </bind>
-
-  <bind command="auto_adjust_window">
-    <keyboard key="/"/>
-  </bind>
-
-  <bind command="toggle_pal_secam">
-    <keyboard key="n"/>
-  </bind>
-
-  <bind command="mixer_toggle_mute">
-    <keyboard key=","/>
   </bind>
 
   <bind command="toggle_matte">
@@ -568,8 +491,53 @@
     <keyboard key="v"/>
   </bind>
 
-  <bind command="show_deinterlacer_info">
-    <keyboard key="y"/>
+
+  <!--
+    The following keys are active when tvtime is displaying the menu.
+   -->
+  <bind command="menu_exit">
+    <keyboard key="esc"/>
+    <keyboard key="q"/>
+    <keyboard key="F1"/>
+    <keyboard key="	"/>
+    <mouse button="3"/>
   </bind>
+
+  <bind command="menu_enter">
+    <keyboard key="enter"/>
+    <mouse button="1"/>
+  </bind>
+
+  <bind command="menu_down">
+    <keyboard key="down"/>
+    <mouse button="5"/>
+  </bind>
+
+  <bind command="menu_up">
+    <keyboard key="up"/>
+    <mouse button="4"/>
+  </bind>
+
+  <bind command="menu_left">
+    <keyboard key="left"/>
+  </bind>
+
+  <bind command="menu_right">
+    <keyboard key="right"/>
+  </bind>
+
+  <!--
+    The following keys are not part of the core tvtime functionality,
+    that is, they are mostly for debugging, but are bound to keys by
+    default in tvtime.
+   -->
+
+  <bind command="auto_adjust_window">  <keyboard key="/"/>    </bind>
+  <bind command="toggle_bars">         <keyboard key="b"/>    </bind>
+  <bind command="toggle_mode">         <keyboard key="*"/>    </bind>
+  <bind command="toggle_pause">        <keyboard key="end"/>  </bind>
+  <bind command="toggle_console">      <keyboard key="`"/>    </bind>
+  <bind command="scroll_console_up">   <keyboard key="pgup"/> </bind>
+  <bind command="scroll_console_down"> <keyboard key="pgdn"/> </bind>
 
 </tvtime>
