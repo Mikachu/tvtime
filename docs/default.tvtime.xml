@@ -1,9 +1,37 @@
 <?xml version="1.0"?>
 <tvtime>
+
+  <!-- Default to an 800x600 window. -->
+  <option name="OutputWidth" value="800"/>
+
+  <option name="InputWidth" value="720"/>
+  <option name="Verbose" value="0"/>
+  <option name="Widescreen" value="0"/>
+  <option name="DebugMode" value="0"/>
+  <option name="ApplyLumaCorrection" value="0"/>
+  <option name="LumaCorrection" value="1.0"/>
+  <option name="V4LDevice" value="/dev/video0"/>
+  <option name="VBIDevice" value="/dev/vbi0"/>
+  <option name="CaptureSource" value="0"/>
+  <option name="UseVBI" value="0"/>
+  <option name="ProcessPriority" value="-19"/>
+  <option name="Fullscreen" value="0"/>
+  <option name="FramerateMode" value="0"/>
+  <option name="Norm" value="NTSC"/>
+  <option name="Frequencies" value="US-Cable"/>
+  <option name="CommandPipe" value="~/.tvtime/tvtimefifo"/>
+  <option name="TimeFormat" value="%X"/>
+  <option name="ScreenShotDir" value="~"/>
+  <option name="MenuBG" value="0"/>
+  <option name="ChannelTextFG" value="0xFFFFFF00"/>
+  <option name="OtherTextFG" value="0xFFF5DEB3"/>
+
   <option name="PrevChannel" value="9"/>
   <option name="StartChannel" value="10"/>
-  <option name="FramerateMode" value="0"/>
-  <option name="CaptureSource" value="0"/>
+  <option name="NTSCCableMode" value="Nominal"/>
+  <option name="PreferredDeinterlaceMethod" value="0"/>
+  <option name="CheckForSignal" value="1"/>
+  <option name="Overscan" value="0.0"/>
 
   <bind command="quit">
     <keyboard key="escape"/>
@@ -174,10 +202,10 @@
   </bind>
 
   <bind command="overscan_up">
-    <keyboard key=">"/>
+    <keyboard key="&gt;"/>
   </bind>
   <bind command="overscan_down">
-    <keyboard key="<"/>
+    <keyboard key="&lt;"/>
   </bind>
 
   <bind command="renumber_channel">
