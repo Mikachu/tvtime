@@ -98,7 +98,7 @@ void build_plane( unsigned char *output, unsigned char *field,
     }
 }
 
-void clear_scanline_packed_422( unsigned char *output, int size )
+static inline void clear_scanline_packed_422( unsigned char *output, int size )
 {
     static int clear = 128 << 24 | 16 << 16 | 128 << 8 | 16;
     unsigned int *o = (unsigned int *) output;
@@ -108,8 +108,8 @@ void clear_scanline_packed_422( unsigned char *output, int size )
     }
 }
 
-void copy_scanline_packed_422( unsigned char *output, unsigned char *luma,
-                               unsigned char *cb, unsigned char *cr, int width )
+static inline void copy_scanline_packed_422( unsigned char *output, unsigned char *luma,
+                                             unsigned char *cb, unsigned char *cr, int width )
 {
     unsigned int *o = (unsigned int *) output;
 
@@ -130,9 +130,9 @@ void copy_scanline_packed_422( unsigned char *output, unsigned char *luma,
     }
 }
 
-void interpolate_scanline_packed_422( unsigned char *output,
-                                      unsigned char *luma, unsigned char *cb,
-                                      unsigned char *cr, int lstride, int cstride, int width )
+static inline void interpolate_scanline_packed_422( unsigned char *output,
+                                                    unsigned char *luma, unsigned char *cb,
+                                                    unsigned char *cr, int lstride, int cstride, int width )
 {
     for( width /= 2; width; --width ) {
         *output = (*luma + *(luma+lstride)) >> BRIGHT_FACTOR;
@@ -163,12 +163,18 @@ void interpolate_scanline_packed_422( unsigned char *output,
     }
 }
 
+unsigned char *temp_scanline_data = 0;
+
 void build_packed_422_frame( unsigned char *output, unsigned char *fieldluma,
                              unsigned char *fieldcb, unsigned char *fieldcr,
                              int bottom_field, int lstride, int cstride,
-                             int width, int height )
+                             int width, int height, video_correction_t *vc )
 {
     int i;
+
+    if( !temp_scanline_data ) {
+        temp_scanline_data = (unsigned char *) malloc( 720 * 2 );
+    }
 
     if( bottom_field ) {
         /* Clear a scanline. */
@@ -176,21 +182,26 @@ void build_packed_422_frame( unsigned char *output, unsigned char *fieldluma,
         output += width * 2;
 
         /* Copy a scanline. */
-        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+        video_correction_correct_luma_scanline( vc, temp_scanline_data, fieldluma, width );
+        copy_scanline_packed_422( output, temp_scanline_data, fieldcb, fieldcr, width );
         output += width * 2;
     }
 
     for( i = 0; i < (height / 2) - 1; i++ ) {
 
+        /* Correct top scanline. */
+        video_correction_correct_luma_scanline( vc, temp_scanline_data, fieldluma, width );
+
         if( !bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+            copy_scanline_packed_422( output, temp_scanline_data, fieldcb, fieldcr, width );
             output += width * 2;
         }
 
         /* Interpolate a scanline. */
-        interpolate_scanline_packed_422( output, fieldluma, fieldcb, fieldcr,
-                                         lstride, cstride, width );
+        video_correction_correct_luma_scanline( vc, temp_scanline_data + width, fieldluma + lstride, width );
+        interpolate_scanline_packed_422( output, temp_scanline_data, fieldcb, fieldcr,
+                                         width, cstride, width );
         output += width * 2;
 
         fieldluma += lstride;
@@ -199,14 +210,15 @@ void build_packed_422_frame( unsigned char *output, unsigned char *fieldluma,
 
         if( bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+            copy_scanline_packed_422( output, temp_scanline_data + width, fieldcb, fieldcr, width );
             output += width * 2;
         }
     }
 
     if( !bottom_field ) {
         /* Copy a scanline. */
-        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+        video_correction_correct_luma_scanline( vc, temp_scanline_data, fieldluma, width );
+        copy_scanline_packed_422( output, temp_scanline_data, fieldcb, fieldcr, width );
         output += width * 2;
 
         /* Clear a scanline. */
@@ -312,6 +324,13 @@ void video_correction_correct_luma_plane( video_correction_t *vc, unsigned char 
         for( x = 0; x < width; x++ ) {
             scanline[ x ] = vc->luma_table[ scanline[ x ] ];
         }
+    }
+}
+
+void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned char *output, unsigned char *luma, int width )
+{
+    while( width-- ) {
+        *output++ = vc->luma_table[ *luma++ ];
     }
 }
 

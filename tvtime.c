@@ -275,7 +275,7 @@ int main( int argc, char **argv )
          * We only do this once on the entire luma plane, instead of
          * once on each field.
          */
-        video_correction_correct_luma_plane( vc, curluma, width, height, width );
+        // video_correction_correct_luma_plane( vc, curluma, width, height, width );
 
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
@@ -288,7 +288,7 @@ int main( int argc, char **argv )
         } else {
             build_packed_422_frame( sdl_get_output(), curluma,
                                     curcb422, curcr422, 0,
-                                    width * 2, width, width, height );
+                                    width * 2, width, width, height, vc );
         }
 
         /* Display. */
@@ -307,7 +307,7 @@ int main( int argc, char **argv )
             build_packed_422_frame( sdl_get_output(), curluma + width,
                                     curcb422 + (width / 2),
                                     curcr422 + (width / 2), 1,
-                                    width * 2, width, width, height );
+                                    width * 2, width, width, height, vc );
         }
 
         /* We're done with the input now. */
