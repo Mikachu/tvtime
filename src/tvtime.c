@@ -1072,8 +1072,13 @@ int main( int argc, char **argv )
                 strftime( timestamp, sizeof( timestamp ),
                           config_get_timeformat( ct ), localtime( &tm ) );
                 sprintf( filename, "tvtime-output-%s.png", timestamp );
-                pngscreenshot( filename, output->get_output_buffer(),
-                               width, height, width * 2 );
+                if( curmethod->doscalerbob ) {
+                    pngscreenshot( filename, output->get_output_buffer(),
+                                   width, height/2, width * 2 );
+                } else {
+                    pngscreenshot( filename, output->get_output_buffer(),
+                                   width, height, width * 2 );
+                }
             }
             output->unlock_output_buffer();
             performance_checkpoint_constructed_top_field( perf );
