@@ -1118,7 +1118,8 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
  * setup_i18n() is run by main() before tvtime_main(),
  * so using gettext here is safe.
  */
-int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
+int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
+                 int argc, char **argv )
 {
     videoinput_t *vidin = 0;
     station_mgr_t *stationmgr = 0;
@@ -2249,9 +2250,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             int framesize = width * height * 2;
-            lfprintf( stderr, _("tvtime: Stats using '%s' at %dx%d.\n"), 
+            lfprintf( stderr, _("tvtime: Stats using '%s' at %dx%d%s.\n"), 
                       (curmethod) ? curmethod->name : "interlaced passthrough", 
-                      width, height );
+                      width, height, realtime ? " [RT]" : "" );
             if( curmethod && curmethod->doscalerbob ) {
                 framesize = width * height;
             }
@@ -2672,6 +2673,7 @@ int main( int argc, char **argv )
     rtctimer_t *rtctimer = 0;
     int read_stdin = 1;
     int result = 0;
+    int realtime = 0;
 
     /*
      * Setup i18n. This has to be done as early as possible in order
@@ -2689,9 +2691,8 @@ int main( int argc, char **argv )
 
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
-    if( !set_realtime_priority( 0 ) ) {
-        lfputs( _("tvtime: Cannot get realtime priority for better "
-                  "performance, need root access.\n"), stderr );
+    if( set_realtime_priority( 0 ) ) {
+        realtime = 1;
     }
 
     rtctimer = rtctimer_new( 1 );
@@ -2756,9 +2757,9 @@ int main( int argc, char **argv )
             new_argv[ 0 ] = "tvtime";
             new_argv[ 1 ] = 0;
 
-            result = tvtime_main( rtctimer, read_stdin, 0, new_argv );
+            result = tvtime_main( rtctimer, read_stdin, realtime, 0, new_argv );
         } else {
-            result = tvtime_main( rtctimer, read_stdin, argc, argv );
+            result = tvtime_main( rtctimer, read_stdin, realtime, argc, argv );
         }
 
         if( result != 2 ) break;
