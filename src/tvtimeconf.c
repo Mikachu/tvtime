@@ -36,6 +36,7 @@ struct config_s
 
     int apply_luma_correction;
     double luma_correction;
+    int bt8x8_correction;
 
     int inputwidth;
     int inputnum;
@@ -52,7 +53,7 @@ void config_init_keymap( config_t *ct );
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-I <sampling>] "
+    fprintf( stderr, "usage: %s [-vasb] [-w <width>] [-I <sampling>] "
                      "[-d <device>] [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-v\tShow verbose messages.\n"
@@ -62,8 +63,11 @@ static void print_usage( char **argv )
                      "\t-w\tOutput window width, defaults to 800.\n"
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
                      "\t-i\tvideo4linux input number (defaults to 0).\n"
+
                      "\t-c\tApply luma correction.\n"
                      "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n"
+                     "\t-b\tse bt8x8 correction when applying luma correction.\n"
+
                      "\t-n\tThe mode to set the tuner to: PAL, NTSC or SECAM.\n"
                      "\t  \t(defaults to NTSC)\n"
                      "\t-f\tThe channels you are receiving with the tuner\n"
@@ -108,12 +112,13 @@ config_t *config_new( int argc, char **argv )
     ct->debug = 0;
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
+    ct->bt8x8_correction = 0;
     ct->inputnum = 0;
     ct->tuner_number = 0;
-    ct->v4ldev = strdup("/dev/video0");
-    ct->norm = strdup("ntsc");
-    ct->freq = strdup("us-cable");
-    ct->timeformat = strdup("%r");
+    ct->v4ldev = strdup( "/dev/video0" );
+    ct->norm = strdup( "ntsc" );
+    ct->freq = strdup( "us-cable" );
+    ct->timeformat = strdup( "%r" );
     ct->keymap = (int *) malloc( TVTIME_LAST * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -161,13 +166,14 @@ config_t *config_new( int argc, char **argv )
         config_init( ct );
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcs:d:i:l:n:f:t:F:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcbs:d:i:l:n:f:t:F:" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'v': ct->verbose = 1; break;
         case 'a': ct->aspect = 1; break;
         case 's': ct->debug = 1; break;
+        case 'b': ct->bt8x8_correction = 1; break;
         case 'c': ct->apply_luma_correction = 1; break;
         case 'd': ct->v4ldev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
@@ -195,6 +201,13 @@ config_t *config_new( int argc, char **argv )
     }
 
     if( configFile && configFile != base ) free( configFile );
+
+    /* Sanity check parameters into reasonable ranges here. */
+    if( ct->inputwidth & 1 ) {
+        ct->inputwidth -= 1;
+        fprintf( stderr, "config: Odd values for input width not allowed, "
+                         "using %d instead.\n", ct->inputwidth );
+    }
 
     return ct;
 }
@@ -239,6 +252,10 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "LumaCorrection")) ) {
         ct->luma_correction = atof( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "Bt8x8Correction")) ) {
+        ct->bt8x8_correction = atoi( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "V4LDevice")) ) {
@@ -606,6 +623,11 @@ double config_get_luma_correction( config_t *ct )
 void config_set_luma_correction( config_t *ct, double luma_correction )
 {
     ct->luma_correction = luma_correction;
+}
+
+int config_get_bt8x8_correction( config_t *ct )
+{
+    return ct->bt8x8_correction;
 }
 
 const char *config_get_v4l_device( config_t *ct )

@@ -1,19 +1,45 @@
+########################################
 #
-# This is a nice comment
+# Default .tvtimerc file with comments
 #
 
+# The verbose setting indicates that we should print full informational
+# and warning messages to stderr while running tvtime.  Otherwise, only
+# fatal errors will be printed to the output.
 verbose = 0
+
+# This sets the default capture source to be opened by tvtime.  Cards
+# commonly have a bunch of sources, for example, for my WinTV card source
+# 0 is my tuner and source 1 is the composite input.
 CaptureSource = 0
-OutputWidth = 800
-InputWidth = 720
-WideScreen = 0
-DebugMode = 0
-ApplyLumaCorrection = 0
-LumaCorrection = 1.0
+
 V4LDevice = /dev/video0
 Norm = ntsc
 Frequencies = us-cable
 TunerNumber = 0
+
+# This sets the initial width of the output window.
+OutputWidth = 800
+
+# This sets how many pixels per scanline to request from the capture card.
+# A higher setting gives better quality, while a lower setting means we do
+# less work, and so tvtime will run faster.  If you have a slower CPU (like,
+# less than 500Mhz or so), maybe values of 480 or 400 might suit you best.
+# For best quality, choose a high value like 720 or 768.  Many capture
+# cards cannot sample higher than 768 pixels per scanline.
+InputWidth = 720
+
+# This option enables 16:9 mode by default on startup.
+WideScreen = 0
+
+ApplyLumaCorrection = 0
+LumaCorrection = 1.0
+Bt8x8Correction = 0
+
+# This option enables a special debug mode.  In debug mode, if we are
+# running behind and cannot keep up with the number of frames being provided
+# by the capture card, we will print frame drop information to stderr.
+DebugMode = 0
 
 ########################################
 #

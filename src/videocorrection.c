@@ -84,29 +84,43 @@ static void video_correction_update_table( video_correction_t *vc )
 */
 }
 
-video_correction_t *video_correction_new( void )
+video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_correction )
 {
     video_correction_t *vc = (video_correction_t *) malloc( sizeof( video_correction_t ) );
     if( !vc ) {
         return 0;
     }
 
-    /*
-    vc->source_black_level = 0;
-    vc->source_white_level = 255;
+    /* Support the broken bt8x8 extents, plus the bt8x8 in full luma mode */
+    if( bt8x8_correction && !full_extent_correction ) {
+        vc->source_black_level = 16;
+        vc->source_white_level = 253;
+        vc->source_chroma_start = 2;
+        vc->source_chroma_end   = 253;
+    } else if( bt8x8_correction && full_extent_correction ) {
+        vc->source_black_level = 0;
+        vc->source_white_level = 255;
+        vc->source_chroma_start = 2;
+        vc->source_chroma_end   = 253;
+    } else if( !bt8x8_correction && full_extent_correction ) {
+        vc->source_black_level = 0;
+        vc->source_white_level = 255;
+        vc->source_chroma_start = 0;
+        vc->source_chroma_end   = 255;
+    } else {
+        vc->source_black_level = 16;
+        vc->source_white_level = 235;
+        vc->source_chroma_start = 16;
+        vc->source_chroma_end   = 240;
+    }
+
+    /* We assume for now that we're always outputting to a Rec.601-compliant
+     * video surface.  In the future maybe I can add an option for the broken
+     * colourspace used by voodoo-based cards?
+     */
     vc->target_black_level = 16;
     vc->target_white_level = 235;
-    */
-
-    /* These are set this way to compensate for the bttv. */
-    vc->source_black_level = 16;
-    vc->source_white_level = 253;
-    vc->target_black_level = 16;
-    vc->target_white_level = 235;
-
-    vc->source_chroma_start = 2;
-    vc->source_chroma_end   = 253;
-    vc->target_chroma_start = 12;
+    vc->target_chroma_start = 16;
     vc->target_chroma_end   = 240;
 
     vc->luma_correction = 1.0;

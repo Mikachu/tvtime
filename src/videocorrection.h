@@ -31,7 +31,7 @@ extern "C" {
 
 typedef struct video_correction_s video_correction_t;
 
-video_correction_t *video_correction_new( void );
+video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_correction );
 void video_correction_delete( video_correction_t *vc );
 void video_correction_set_luma_power( video_correction_t *vc, double power );
 void video_correction_correct_luma_scanline( video_correction_t *vc,
