@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) Limit to 4 buffers from the card, even if they provide more.
+    This fixes a/v sync issues (fixes bug 691629)
   * (vektor) Europe-east is now just part of the 'europe' frequency map.
     If you are just using the OIRT frequencies and UHF, you can also use
     'russia' (fixes 640620)
