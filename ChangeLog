@@ -1,5 +1,5 @@
 
-0.9.9.1
+0.9.10
   * vektor: Fixed device closing for V4L2, fixes some problems with
       restarting tvtime.
   * vektor: Added a sleep command and sleep timer.

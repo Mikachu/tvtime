@@ -4,7 +4,7 @@ For news and updates on tvtime, please visit our website at:
   http://tvtime.net/
 
 
-News for 0.9.9.1
+News for 0.9.10
 
   *  Added program listings using XMLTV.  Use with --xmltv=filename.
   *  Added commands for chroma kill, sleep timer, and enabling or
