@@ -272,6 +272,58 @@ static void tvtime_build_frame( unsigned char *output,
     if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
 
+/**
+ * This code is an experiment I was running where we output at 2*field rate and
+ * use linear interpolation.  The idea is to always show a new frame every refresh rate
+ * of the output device, and have the output emulate a TV.  Unfortunately this has
+ * not been a very successful experiment...  If my CRT is at 100hz for example, I don't
+ * get the horrid bounciness of linear interpolation, however I get a lower frequency
+ * bounce.  I've just pushed the temporal alias lower...
+ */
+static void tvtime_build_between_frame( unsigned char *output,
+                                        unsigned char *topframe,
+                                        unsigned char *botframe,
+                                        int width,
+                                        int frame_height,
+                                        int instride,
+                                        int outstride,
+                                        video_correction_t *vc,
+                                        tvtime_osd_t *osd,
+                                        menu_t *menu )
+{
+    unsigned char tempscanline[ 768*2 ];
+    int scanline = 0;
+    int i;
+
+    // First scanline, copy both top and bot
+    botframe += instride;
+    interpolate_packed422_scanline( output, topframe, botframe, width );
+    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+    output += outstride;
+    scanline++;
+
+    for( i = 0; i < (frame_height - 2) / 2; i++ ) {
+        /* Interp top, copy bottom. */
+        interpolate_packed422_scanline( tempscanline, topframe, topframe + (instride*2), width );
+        interpolate_packed422_scanline( output, tempscanline, botframe, width );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        topframe += (instride*2);
+        output += outstride;
+        scanline++;
+
+        /* Interp bottom, copy top. */
+        interpolate_packed422_scanline( tempscanline, botframe, botframe + (instride*2), width );
+        interpolate_packed422_scanline( output, tempscanline, topframe, width );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        botframe += (instride*2);
+        output += outstride;
+        scanline++;
+    }
+
+    /* Should handle the last scanline here... */
+}
+
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -302,11 +354,11 @@ int main( int argc, char **argv )
     menu_t *menu;
 
     setup_speedy_calls();
-    greedy2frame_plugin_init();
     twoframe_plugin_init();
-    linear_plugin_init();
     videobob_plugin_init();
+    linear_plugin_init();
     weave_plugin_init();
+    greedy2frame_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -754,6 +806,7 @@ int main( int argc, char **argv )
         gettimeofday( &blitend, 0 );
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
+
 
         if( osd ) {
             tvtime_osd_advance_frame( osd );
