@@ -669,12 +669,12 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
         fprintf( stderr, "videoinput: Requested input number %d not valid, "
                  "max is %d.\n", inputnum, vidin->numinputs );
     } else {
+        vidin->grab_chan.channel = inputnum;
         if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) ) < 0 ) {
             fprintf( stderr, "videoinput: Card refuses to give information on its current input.\n"
                      "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
                      "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
         } else {
-
             vidin->grab_chan.channel = inputnum;
             if( vidin->norm == VIDEOINPUT_NTSC ) {
                 vidin->grab_chan.norm = VIDEO_MODE_NTSC;
@@ -698,6 +698,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                          "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
             }
 
+            vidin->grab_chan.channel = inputnum;
             ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) );
         }
     }
