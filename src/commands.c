@@ -1207,7 +1207,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "hres" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
-              _("Setup"), _("Input configuration"), _("Horizontal Resolution") );
+              _("Setup"), _("Input configuration"), _("Horizontal resolution") );
     menu_set_text( menu, 0, string );
     menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
