@@ -2114,6 +2114,8 @@ int main( int argc, char **argv )
         station_writeconfig( stationmgr );
     }
 
+    config_save( ct, "Norm", commands_get_new_norm( commands ) );
+
     snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );
     config_save( ct, "PrevChannel", number );
 

@@ -112,6 +112,8 @@ static command_names_t command_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
+    { "SET_NORM", TVTIME_SET_NORM },
+
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
     { "SHOW_MENU", TVTIME_SHOW_MENU },
     { "SHOW_STATS", TVTIME_SHOW_STATS },
@@ -255,6 +257,7 @@ struct commands_s {
     int pause;
     int resizewindow;
     int restarttvtime;
+    const char *newnorm;
 
     int delay;
 
@@ -351,6 +354,91 @@ static void reinit_tuner( commands_t *cmd )
     }
 }
 
+static void reset_norm_menu( menu_t *menu, const char *norm )
+{
+    char string[ 128 ];
+
+    if( !strcasecmp( norm, "ntsc" ) ) {
+        sprintf( string, "%c%c%c  NTSC", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  NTSC", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SET_NORM, "ntsc" );
+    menu_set_right_command( menu, 1, TVTIME_SET_NORM, "ntsc" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "pal" ) ) {
+        sprintf( string, "%c%c%c  PAL", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  PAL", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_NORM, "pal" );
+    menu_set_right_command( menu, 2, TVTIME_SET_NORM, "pal" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "secam" ) ) {
+        sprintf( string, "%c%c%c  SECAM", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  SECAM", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_NORM, "secam" );
+    menu_set_right_command( menu, 3, TVTIME_SET_NORM, "secam" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "pal-nc" ) ) {
+        sprintf( string, "%c%c%c  PAL-Nc", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  PAL-Nc", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SET_NORM, "pal-nc" );
+    menu_set_right_command( menu, 4, TVTIME_SET_NORM, "pal-nc" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "pal-m" ) ) {
+        sprintf( string, "%c%c%c  PAL-M", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  PAL-M", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SET_NORM, "pal-m" );
+    menu_set_right_command( menu, 5, TVTIME_SET_NORM, "pal-m" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "pal-n" ) ) {
+        sprintf( string, "%c%c%c  PAL-N", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  PAL-N", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SET_NORM, "pal-n" );
+    menu_set_right_command( menu, 6, TVTIME_SET_NORM, "pal-n" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "ntsc-jp" ) ) {
+        sprintf( string, "%c%c%c  NTSC-JP", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  NTSC-JP", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SET_NORM, "ntsc-jp" );
+    menu_set_right_command( menu, 7, TVTIME_SET_NORM, "ntsc-jp" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( norm, "pal-60" ) ) {
+        sprintf( string, "%c%c%c  PAL-60", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  PAL-60", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 8, string );
+    menu_set_enter_command( menu, 8, TVTIME_SET_NORM, "pal-60" );
+    menu_set_right_command( menu, 8, TVTIME_SET_NORM, "pal-60" );
+    menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "input" );
+}
+
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime )
@@ -396,6 +484,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->renumbering = 0;
     cmd->resizewindow = 0;
     cmd->restarttvtime = 0;
+    cmd->newnorm = "";
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
@@ -512,45 +601,57 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "input" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c  Device setup", 0xee, 0x80, 0xa6 );
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "device" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "device" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Data services", 0xee, 0x80, 0x9a );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 3, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
-
-    menu = menu_new( "device" );
-    menu_set_text( menu, 0, "Setup - Input configuration - Device setup" );
     menu_set_text( menu, 1, "Television standard" );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Data services", 0xee, 0x80, 0x9a );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "norm" );
+    menu_set_text( menu, 0, "Setup - Input configuration - Television standard" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 9, string );
+    menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+
+    if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {
+        cmd->newnorm = "PAL";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "secam" ) ) {
+        cmd->newnorm = "SECAM";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-nc" ) ) {
+        cmd->newnorm = "PAL-Nc";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-m" ) ) {
+        cmd->newnorm = "PAL-M";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-n" ) ) {
+        cmd->newnorm = "PAL-N";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "ntsc-jp" ) ) {
+        cmd->newnorm = "NTSC-JP";
+    } else {
+        cmd->newnorm = "NTSC";
+    }
+    reset_norm_menu( menu, cmd->newnorm );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
@@ -1073,6 +1174,38 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             station_writeconfig( cmd->stationmgr );
         }
     break;
+
+    case TVTIME_SET_NORM:
+        if( !arg || !*arg ) {
+            cmd->newnorm = "NTSC";
+        } else if( !strcasecmp( arg, "pal" ) ) {
+            cmd->newnorm = "PAL";
+        } else if( !strcasecmp( arg, "secam" ) ) {
+            cmd->newnorm = "SECAM";
+        } else if( !strcasecmp( arg, "pal-nc" ) ) {
+            cmd->newnorm = "PAL-Nc";
+        } else if( !strcasecmp( arg, "pal-m" ) ) {
+            cmd->newnorm = "PAL-M";
+        } else if( !strcasecmp( arg, "pal-n" ) ) {
+            cmd->newnorm = "PAL-N";
+        } else if( !strcasecmp( arg, "ntsc-jp" ) ) {
+            cmd->newnorm = "NTSC-JP";
+        } else {
+            cmd->newnorm = "NTSC";
+        }
+
+        if( cmd->osd ) {
+            menu_t *normmenu = find_menu( cmd, "norm" );
+            char message[ 128 ];
+            reset_norm_menu( normmenu, cmd->newnorm );
+            if( cmd->menuactive ) {
+                display_current_menu( cmd );
+            }
+            sprintf( message, "Television standard will be %s on restart.",
+                     cmd->newnorm );
+            tvtime_osd_show_message( cmd->osd, message );
+        }
+        break;
             
     case TVTIME_TOGGLE_ASPECT:
         cmd->toggleaspect = 1;
@@ -1867,5 +2000,10 @@ int commands_show_deinterlacer_info( commands_t *cmd )
 int commands_restart_tvtime( commands_t *cmd )
 {
     return cmd->restarttvtime;
+}
+
+const char *commands_get_new_norm( commands_t *cmd )
+{
+    return cmd->newnorm;
 }
 
