@@ -13,9 +13,9 @@ AC_PROG_CC
 AC_CHECK_PROG(found_cc, "$CC", yes, no)
 test "x$found_cc" = "xyes" || exit 1
 
-AC_PROG_CXX
-AC_CHECK_PROG(found_cxx, "$CXX", yes, no)
-test "x$found_cxx" = "xyes" || exit 1
+# AC_PROG_CXX
+# AC_CHECK_PROG(found_cxx, "$CXX", yes, no)
+# test "x$found_cxx" = "xyes" || exit 1
 
 # Check for libtool.
 AC_PROG_LIBTOOL
