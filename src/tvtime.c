@@ -2152,9 +2152,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             int framesize = width * height * 2;
-            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d%s.\n",
+            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d%s%s.\n",
                       (curmethod) ? curmethod->name : "interlaced passthrough", 
-                      width, height, realtime ? " [RT]" : "" );
+                      width, height, realtime ? " [RT]" : "", rtctimer ? " [RTC]" : " [no RTC]" );
             if( curmethod && curmethod->doscalerbob ) {
                 framesize = width * height;
             }
@@ -2639,32 +2639,17 @@ int main( int argc, char **argv )
         realtime = 1;
     }
 
-    rtctimer = rtctimer_new( 1 );
-    if( !rtctimer ) {
-        lfprintf( stderr, _("\n"
-     "    Enhanced Real Time Clock support in your kernel is necessary for\n"
-     "    smooth video.  We strongly recommend that you load the 'rtc' kernel\n"
-     "    module before starting tvtime, and make sure that your user has\n"
-     "    access to the device file (/dev/rtc or /dev/misc/rtc).  See our\n"
-     "    support page at %s for more information.\n\n"), PACKAGE_BUGREPORT );
-    } else {
+    rtctimer = rtctimer_new( 0 );
+    if( rtctimer ) {
         if( !rtctimer_set_interval( rtctimer, 1024 ) &&
             !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
             rtctimer_start_clock( rtctimer );
-
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                lfprintf( stderr, _("\n"
-      "    Failed to get 1024 Hz resolution from your RTC device.  High\n"
-      "    resolution access is necessary for video to be smooth.  Please\n"
-      "    run tvtime as root, set tvtime as SUID root, or change the\n"
-      "    maximum RTC resolution allowed for user processes by running this\n"
-      "    command as root:\n"
-      "        sysctl -w dev.rtc.max-user-freq=1024\n"
-      "    See our support page at %s for more information.\n\n"),
-                    PACKAGE_BUGREPORT );
+                rtctimer_delete( rtctimer );
+                rtctimer = 0;
             }
         }
     }

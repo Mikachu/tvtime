@@ -1,5 +1,7 @@
 
 1.0RC1 -
+  * vektor: Don't bother complaining about /dev/rtc, we don't really
+      need to use it under Linux 2.6 anyway, and it confuses everyone.
   * vektor: Added a config file option to shut off the taglines.
   * vektor: Relicensed deinterlacer code written by me under the LGPL.
   * vektor: Stop setting the window caption so often.  This should be
