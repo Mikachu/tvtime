@@ -2293,6 +2293,17 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
+    case TVTIME_SET_STATION:
+        if( arg ) {
+            if( isdigit( arg[ 0 ] ) ) {
+                station_set( cmd->stationmgr, atoi( arg ) );
+            } else {
+                station_set_by_name( cmd->stationmgr, arg );
+            }
+            cmd->change_channel = 1;
+        }
+        break;
+
     case TVTIME_SET_NORM:
         if( !arg || !*arg ) {
             cmd->newnorm = "NTSC";

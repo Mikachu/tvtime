@@ -150,6 +150,26 @@ void input_xawtv_command( input_t *in, int argc, char **argv )
         commands_handle( in->com, TVTIME_DISPLAY_INFO, "" );
     } else if( !strcasecmp( argv[ 0 ], "message" ) ) {
         commands_handle( in->com, TVTIME_DISPLAY_MESSAGE, argv[ 1 ] );
+    } else if( !strcasecmp( argv[ 0 ], "keypad" ) ) {
+        commands_handle( in->com, TVTIME_KEY_EVENT, argv[ 1 ] );
+    } else if( !strcasecmp( argv[ 0 ], "setchannel" ) && argc > 1 ) {
+        if( !strcasecmp( argv[ 1 ], "next" ) ) {
+            commands_handle( in->com, TVTIME_CHANNEL_INC, "" );
+        } else if( !strcasecmp( argv[ 1 ], "prev" ) ) {
+            commands_handle( in->com, TVTIME_CHANNEL_DEC, "" );
+        } else if( !strcasecmp( argv[ 1 ], "back" ) ) {
+            commands_handle( in->com, TVTIME_CHANNEL_PREV, "" );
+        } else {
+            commands_handle( in->com, TVTIME_SET_STATION, argv[ 1 ] );
+        }
+    } else if( !strcasecmp( argv[ 0 ], "setstation" ) && argc > 1 ) {
+        if( !strcasecmp( argv[ 1 ], "next" ) ) {
+            commands_handle( in->com, TVTIME_CHANNEL_INC, "" );
+        } else if( !strcasecmp( argv[ 1 ], "prev" ) ) {
+            commands_handle( in->com, TVTIME_CHANNEL_DEC, "" );
+        } else {
+            commands_handle( in->com, TVTIME_SET_STATION, argv[ 1 ] );
+        }
     }
 }
 

@@ -496,6 +496,27 @@ int station_set( station_mgr_t *mgr, int pos )
     return 0;
 }
 
+int station_set_by_name( station_mgr_t *mgr, const char *name )
+{
+    station_info_t *rp = mgr->first;
+
+    if( rp ) {
+        do {
+            if( !strcasecmp( rp->name, name ) ) {
+                if( mgr->current == rp ) {
+                    return 0;
+                }
+                mgr->last_channel = station_get_current_id( mgr );
+                mgr->current = rp;
+                return 1;
+            }
+            rp = rp->next;
+        } while( rp != mgr->first );
+    }
+
+    return 0;
+}
+
 void station_inc( station_mgr_t *mgr )
 {
     mgr->last_channel = station_get_current_id( mgr );

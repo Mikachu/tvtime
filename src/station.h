@@ -72,6 +72,11 @@ int station_is_new_install( station_mgr_t *mgr );
 int station_set( station_mgr_t *mgr, int pos );
 
 /**
+ * Set the current channel to the channel with the given name.
+ */
+int station_set_by_name( station_mgr_t *mgr, const char *name );
+
+/**
  * Change up one channel in the list.
  */
 void station_inc( station_mgr_t *mgr );
