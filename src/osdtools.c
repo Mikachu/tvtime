@@ -828,13 +828,14 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
     }
 }
 
-#define OSD_LIST_MAX_LINES 10
+#define OSD_LIST_MAX_LINES 16
 
 struct osd_list_s
 {
     double aspect;
     int numlines;
     int hilight;
+    int width;
     osd_font_t *font;
     osd_string_t *lines[ OSD_LIST_MAX_LINES ];
 };
@@ -850,6 +851,7 @@ osd_list_t *osd_list_new( double pixel_aspect )
 
     osdl->hilight = -1;
     osdl->numlines = 0;
+    osdl->width = 0;
     osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
     if( !osdl->font ) {
         free( osdl );
@@ -890,6 +892,7 @@ void osd_list_set_text( osd_list_t *osdl, int line, const char *text )
 
 void osd_list_set_lines( osd_list_t *osdl, int numlines )
 {
+    if( numlines > OSD_LIST_MAX_LINES ) numlines = OSD_LIST_MAX_LINES;
     osdl->numlines = numlines;
 }
 
@@ -951,6 +954,11 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
 
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
         if( scanline < osd_string_get_height( osdl->lines[ i ] ) ) {
+            if( !i ) {
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, width, 80 );
+            } else {
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, width, 80 );
+            }
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
                                                      output, background,
                                                      width, xpos, scanline );
