@@ -59,18 +59,16 @@
  */
 int setresuid( uid_t ruid, uid_t euid, uid_t suid );
 
-
-/* Number of frames to pause after channel change. */
-#define CHANNEL_ACTIVE_DELAY 2
-
 /**
  * Current deinterlacing method.
  */
 static deinterlace_method_t *curmethod;
 static int curmethodid;
 
-static int fadepos = 0;
-static double fadespeed = 65.0;
+/**
+ * Speed at which to fade to blue on channel changes.
+ */
+const double fadespeed = 65.0;
 
 static void build_colourbars( unsigned char *output, int width, int height )
 {
@@ -497,6 +495,7 @@ int main( int argc, char **argv )
     fifo_t *fifo = 0;
     commands_t *commands = 0;
     int usevbi = 1;
+    int fadepos = 0;
 
     setup_speedy_calls();
 
