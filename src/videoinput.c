@@ -240,9 +240,10 @@ struct videoinput_s
     int muted;
     int user_muted;
 
+    int hastuner;
     int numtuners;
-    int tuner_number;
-    struct video_tuner tuner;
+    int tunerid;
+    int tunerlow;
 
     int cur_tuner_state;
     int signal_recover_wait;
@@ -409,17 +410,24 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->norm = norm;
     vidin->height = videoinput_get_norm_height( norm );
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
+
+    vidin->hastuner = 0;
+    vidin->numtuners = 0;
+    vidin->tunerid = 0;
+    vidin->tunerlow = 0;
+
+    vidin->isv4l2 = 0;
+    vidin->isbttv = 0;
+    vidin->isuyvy = 0;
+
     vidin->signal_recover_wait = 0;
     vidin->signal_acquire_wait = 0;
     vidin->muted = 1;
     vidin->user_muted = 0;
     vidin->has_audio = 1;
-    vidin->isv4l2 = 0;
     vidin->curinput = 0;
-    vidin->numtuners = 0;
     vidin->have_mmap = 0;
-    vidin->isbttv = 0;
-    vidin->isuyvy = 0;
+
     memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
 
     /* First, open the device. */
@@ -1036,27 +1044,40 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 /* freqKHz is in KHz (duh) */
 void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 {
-    if( !vidin->isv4l2 ) {
-        unsigned long frequency = freqKHz;
+    unsigned long frequency = freqKHz;
 
-        if( videoinput_has_tuner( vidin ) ) {
-            if( frequency < 0 ) {
-                /* Ignore bogus frequencies. */
-                return;
+    if( videoinput_has_tuner( vidin ) ) {
+        if( frequency < 0 ) {
+            /* Ignore bogus frequencies. */
+            return;
+        }
+
+        frequency *= 16;
+
+        if( !vidin->tunerlow ) {
+            frequency /= 1000; /* switch to MHz */
+        }
+
+        vidin->muted = 1;
+        videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+        vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
+        vidin->signal_acquire_wait = SIGNAL_ACQUIRE_DELAY;
+        vidin->signal_recover_wait = 0;
+
+        if( vidin->isv4l2 ) {
+            struct v4l2_frequency freqinfo;
+
+            memset( &freqinfo, 0, sizeof( struct v4l2_frequency ) );
+            freqinfo.tuner = vidin->tunerid;
+            freqinfo.type = V4L2_TUNER_ANALOG_TV;
+            freqinfo.frequency = frequency;
+
+            if( ioctl( vidin->grab_fd, VIDIOC_S_FREQUENCY, &freqinfo ) < 0 ) {
+                fprintf( stderr, "videoinput: Tuner present, but our request to change to\n"
+                         "videoinput: frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
             }
-
-            frequency *= 16;
-
-            if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-                frequency /= 1000; /* switch to MHz */
-            }
-
-            vidin->muted = 1;
-            videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
-            vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
-            vidin->signal_acquire_wait = SIGNAL_ACQUIRE_DELAY;
-            vidin->signal_recover_wait = 0;
-
+        } else {
             if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
                 fprintf( stderr, "videoinput: Tuner present, but our request to change "
                                  "to frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
@@ -1068,40 +1089,65 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 
 int videoinput_get_tuner_freq( videoinput_t *vidin ) 
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->hastuner ) {
         unsigned long frequency;
 
-        if( vidin->tuner.tuner > -1 ) {
+        if( vidin->isv4l2 ) {
+            struct v4l2_frequency freqinfo;
 
+            if( ioctl( vidin->grab_fd, VIDIOC_G_FREQUENCY, &freqinfo ) < 0 ) {
+                fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
+                         strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
+                return 0;
+            }
+            frequency = freqinfo.frequency;
+        } else {
             if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
                 fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
                          strerror( errno ) );
                 fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
                 return 0;
             }
-
-            if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-                frequency *= 1000; /* switch from MHz to KHz */
-            }
-
-            return frequency/16;
         }
+
+        if( !vidin->tunerlow ) {
+            frequency *= 1000; /* switch from MHz to KHz */
+        }
+
+        return frequency / 16;
     }
     return 0;
 }
 
 int videoinput_freq_present( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        struct v4l2_tuner tuner;
+
+        tuner.index = vidin->tunerid;
+        if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
+            fprintf( stderr, "can't get tuner info: %s\n", strerror( errno ) );
+        } else {
+            if( tuner.signal ) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+    } else {
         if( videoinput_has_tuner( vidin ) ) {
-            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+            struct video_tuner tuner;
+
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
                 if( vidin->verbose ) {
                     fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
                              strerror( errno ) );
                 }
                 return 1;
             }
-            if( vidin->tuner.signal ) {
+            if( tuner.signal ) {
                 return 1;
             } else {
                 return 0;
@@ -1116,20 +1162,31 @@ int videoinput_freq_present( videoinput_t *vidin )
  */
 static void videoinput_find_and_set_tuner( videoinput_t *vidin )
 {
-    int found = 0;
-    int i;
+    if( vidin->isv4l2 ) {
+        struct v4l2_tuner tuner;
 
-    if( !vidin->isv4l2 ) {
-        vidin->tuner_number = -1;
+        tuner.index = vidin->tunerid;
+        if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
+            fprintf( stderr, "can't get tuner info: %s\n", strerror( errno ) );
+        } else {
+            vidin->tunerlow = (tuner.capability & V4L2_TUNER_CAP_LOW) ? 1 : 0;
+        }
+
+    } else {
+        struct video_tuner tuner;
+        int tuner_number = -1;
+        int found = 0;
+        int i;
+
         for( i = 0; i < vidin->numtuners; i++ ) {
-            vidin->tuner.tuner = i;
+            tuner.tuner = i;
 
-            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) >= 0 ) {
-                if( ((vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N) && vidin->tuner.flags & VIDEO_TUNER_PAL) ||
-                    (vidin->norm == VIDEOINPUT_SECAM && vidin->tuner.flags & VIDEO_TUNER_SECAM) ||
-                    ((vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M) && vidin->tuner.flags & VIDEO_TUNER_NTSC) ) {
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &tuner ) >= 0 ) {
+                if( ((vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N) && tuner.flags & VIDEO_TUNER_PAL) ||
+                    (vidin->norm == VIDEOINPUT_SECAM && tuner.flags & VIDEO_TUNER_SECAM) ||
+                    ((vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M) && tuner.flags & VIDEO_TUNER_NTSC) ) {
                     found = 1;
-                    vidin->tuner_number = i;
+                    tuner_number = i;
                     break;
                 }
             }
@@ -1138,29 +1195,29 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
         if( found ) {
             int mustchange = 0;
 
-            vidin->tuner.tuner = vidin->tuner_number;
+            tuner.tuner = tuner_number;
 
             if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N ) {
-                if( vidin->tuner.mode != VIDEO_MODE_PAL ) {
+                if( tuner.mode != VIDEO_MODE_PAL ) {
                     mustchange = 1;
-                    vidin->tuner.mode = VIDEO_MODE_PAL;
+                    tuner.mode = VIDEO_MODE_PAL;
                 }
             } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-                if( vidin->tuner.mode != VIDEO_MODE_SECAM ) {
+                if( tuner.mode != VIDEO_MODE_SECAM ) {
                     mustchange = 1;
-                    vidin->tuner.mode = VIDEO_MODE_SECAM;
+                    tuner.mode = VIDEO_MODE_SECAM;
                 }
             } else {
-                if( vidin->tuner.mode != VIDEO_MODE_NTSC ) {
+                if( tuner.mode != VIDEO_MODE_NTSC ) {
                     mustchange = 1;
-                    vidin->tuner.mode = VIDEO_MODE_NTSC;
+                    tuner.mode = VIDEO_MODE_NTSC;
                 }
             }
 
             if( mustchange ) {
                 struct video_channel grab_chan;
 
-                if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
+                if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &tuner ) < 0 ) {
                     fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
                              "            Please file a bug report at " PACKAGE_BUGREPORT "\n"
                              "            indicating your card, driver and this error message: %s.\n",
@@ -1187,9 +1244,9 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
         }
 
         if( vidin->numtuners > 0 ) {
-            vidin->tuner.tuner = vidin->tuner_number;
+            tuner.tuner = tuner_number;
 
-            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
                 fprintf( stderr, "videoinput: Input indicates that tuners are available, but "
                          "driver refuses to give information about them.\n"
                          "videoinput: Please file a bug report at " PACKAGE_BUGREPORT
@@ -1205,20 +1262,20 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
                                  "videoinput: tuner.rangehigh = %ld\n"
                                  "videoinput: tuner.signal = %d\n"
                                  "videoinput: tuner.flags = ",
-                         vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
-                         vidin->tuner.rangehigh, vidin->tuner.signal );
+                         tuner.tuner, tuner.name, tuner.rangelow,
+                         tuner.rangehigh, tuner.signal );
 
-                if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
-                if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
-                if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
-                if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
-                if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
-                if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
-                if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
-                if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
+                if( tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
+                if( tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
+                if( tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
+                if( tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
+                if( tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
+                if( tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
+                if( tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
+                if( tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
 
                 fprintf( stderr, "\nvideoinput: tuner.mode = " );
-                switch (vidin->tuner.mode) {
+                switch (tuner.mode) {
                 case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
                 case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
                 case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
@@ -1227,8 +1284,11 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
                 }
                 fprintf( stderr, "\n");
             }
+
+            vidin->tunerlow = (tuner.flags & VIDEO_TUNER_LOW) ? 1 : 0;
+            vidin->hastuner = 1;
         }
-   }
+    }
 }
 
 
@@ -1257,7 +1317,8 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 fprintf( stderr, "won't tell us input info: %s\n", strerror( errno ) );
             } else {
                 snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", input.name );
-                vidin->numtuners = input.tuner ? 1 : 0;
+                vidin->hastuner = input.type == V4L2_INPUT_TYPE_TUNER;
+                vidin->tunerid = input.tuner;
             }
         }
 
@@ -1302,6 +1363,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 } else {
                     snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", grab_chan.name );
                     vidin->numtuners = grab_chan.tuners;
+                    vidin->hastuner = (vidin->numtuners > 0);
                 }
             }
         }
@@ -1407,7 +1469,7 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
 
 int videoinput_has_tuner( videoinput_t *vidin )
 {
-    return ( vidin->numtuners > 0 );
+    return vidin->hastuner;
 }
 
 int videoinput_get_width( videoinput_t *vidin )
