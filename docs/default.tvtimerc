@@ -112,13 +112,6 @@ OtherTextFG = 0xFFF5DEB3
 # bindings, that is, key_channel_prev should be sent as 'channel_prev'.
 CommandPipe = ~/.tvtime/tvtimefifo
 
-# This sets the scanline bias, that is, how many pixels to drop of the left
-# and right side of every scanline.  For my capture card, about 7 pixels on
-# the left and right of every scanline are oversamples which are always
-# black, so I can use a bias of 7 on each side.
-LeftScanlineBias = 0
-RightScanlineBias = 0
-
 # This sets the percent of the sides to leave to the overscan, that is,
 # don't show them at all.  Safe action area on a television is 10% in
 # the overscan, but that's a bit restrictive.  If you want to look like
