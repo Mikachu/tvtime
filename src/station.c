@@ -150,6 +150,26 @@ static void station_dump( station_mgr_t *mgr )
     } while( rp != mgr->first );
 }
 
+static void station_readconfig( station_mgr_t *mgr )
+{
+    char name[256];
+    FILE *f;
+    int pos;
+
+    strncpy( name, getenv( "HOME" ), 235 );
+    strncat( name, "/.tvtime/stations", 255 );
+
+    f = fopen( name, "r");
+    if( !f ) { 
+        fprintf( stderr, "station: No saved station data found in %s, all channels active.\n", name );
+    } else {
+        while ( EOF != fscanf( f, "%d\n", &pos ) ) {
+            station_set( mgr, pos );
+            station_toggle_curr( mgr );
+        }
+    }
+}
+
 station_mgr_t *station_init( config_t *ct )
 {
     station_mgr_t *mgr = (station_mgr_t *) malloc( sizeof( station_mgr_t ) );
@@ -196,28 +216,8 @@ station_mgr_t *station_init( config_t *ct )
         station_add_band( mgr, "uhf" );
     }
 
-    {
-        char name[256];
-        FILE *f;
-        int pos;
-        
-        strncpy( name, getenv( "HOME" ), 235 );
-        strncat( name, "/.tvtime/stations", 255 );
-        
-        f= fopen( name, "r");
-        if( !f ) { 
-            fprintf( stderr, "station: Couldn't open %s for reading\n", name );
-        }
-    
-        if( f ) {
-            while ( EOF != fscanf( f, "%d\n", &pos ) ) {
-                station_set( mgr, pos );
-                station_toggle_curr( mgr );
-            }
-        }
-    }
-        
-    
+    station_readconfig( mgr );
+
     mgr->current = mgr->first;
     if( mgr->verbose ) {
         station_dump( mgr );
