@@ -65,6 +65,8 @@ struct commands_s {
 
     vbidata_t *vbi;
     int capturemode;
+
+    station_mgr_t *stationmgr;
 };
 
 static void reinit_tuner( commands_t *in )
@@ -79,7 +81,7 @@ static void reinit_tuner( commands_t *in )
             /* set to a known frequency */
             //frequencies_choose_first_frequency();
             
-	videoinput_set_tuner_freq( in->vidin, station_get_current_frequency() );
+	videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
         if( in->vbi ) {
             vbidata_reset( in->vbi );
             vbidata_capture_mode( in->vbi, in->capturemode );
@@ -87,12 +89,12 @@ static void reinit_tuner( commands_t *in )
         //}
 
         if( config_get_verbose( in->cfg ) ) {
-            fprintf( stderr, "tvtime: Changing to channel %s.\n", station_get_current_channel_name() );
+            fprintf( stderr, "tvtime: Changing to channel %s.\n", station_get_current_channel_name( in->stationmgr ) );
         }
 
         if( in->osd ) {
-            tvtime_osd_set_freq_table( in->osd, station_get_current_band() );
-            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name() );
+            tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
+            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
     } else if( in->osd ) {
@@ -103,7 +105,8 @@ static void reinit_tuner( commands_t *in )
 }
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
-                          tvtime_osd_t *osd, video_correction_t *vc )
+                          station_mgr_t *mgr, tvtime_osd_t *osd,
+                          video_correction_t *vc )
 {
     commands_t *in = (commands_t *) malloc( sizeof( struct commands_s ) );
 
@@ -115,6 +118,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->vidin = vidin;
     in->osd = osd;
     in->vc = vc;
+    in->stationmgr = mgr;
     in->frame_counter = 0;
     in->digit_counter = 0;
     in->menu = 0;
@@ -166,19 +170,19 @@ static void commands_station_change( commands_t *in )
                      "no tuner available on this input!\n" );
     } else {
 
-        videoinput_set_tuner_freq( in->vidin, station_get_current_frequency() );
+        videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
         if( in->vbi ) {
             vbidata_reset( in->vbi );
             vbidata_capture_mode( in->vbi, in->capturemode );
         }
 
         if( verbose ) {
-            fprintf( stderr, "tvtime: Changing to channel %s\n", station_get_current_channel_name() );
+            fprintf( stderr, "tvtime: Changing to channel %s\n", station_get_current_channel_name( in->stationmgr ) );
         }
         if( in->osd ) {
 	    //tvtime_osd_set_station_name( in->osd, i->name );
-            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name() );
-            tvtime_osd_set_freq_table( in->osd, station_get_current_band() );
+            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
+            tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
     }
@@ -357,12 +361,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_UP: 
-	station_next();
-	commands_station_change(in);
+	station_next( in->stationmgr );
+	commands_station_change( in );
 	break;
     case TVTIME_CHANNEL_DOWN:
-	station_prev();
-	commands_station_change(in);
+	station_prev( in->stationmgr );
+	commands_station_change( in );
         break;
 
     case TVTIME_CHANNEL_PREV:
@@ -436,8 +440,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_ENTER:
-	//if ( station_byName( *in->next_chan_buffer ) ) 
-	//	commands_station_change(in);
+        station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
+        commands_station_change( in );
+        in->frame_counter = 0;
 	break;
     }
 }
@@ -496,7 +501,7 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter == 0 ) {
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
-        tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name() );
+        tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
     }
 
     if( in->frame_counter > 0 && !(in->frame_counter % 5)) {

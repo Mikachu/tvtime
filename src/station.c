@@ -23,7 +23,6 @@
 #include "bands.h"
 
 typedef struct station_info_s station_info_t;
-
 struct station_info_s
 {
     int pos;
@@ -36,13 +35,16 @@ struct station_info_s
     station_info_t *prev;
 };
 
-static station_info_t *first = 0;
-static station_info_t *current = 0;
-static int verbose = 0;
-static int debug = 0;
-static int us_cable_mode = 0;
+struct station_mgr_s
+{
+    station_info_t *first;
+    station_info_t *current;
+    int verbose;
+    int debug;
+    int us_cable_mode;
+};
 
-const band_t *get_band( const char *band )
+static const band_t *get_band( const char *band )
 {
     const band_t *rp;
     
@@ -55,25 +57,25 @@ const band_t *get_band( const char *band )
     return 0;
 }
 
-int isFreePos( int pos )
+static int isFreePos( station_mgr_t *mgr, int pos )
 {
-    station_info_t *rp = first;
+    station_info_t *rp = mgr->first;
     if( !rp ) return 1;
 
     do {
         if( pos == rp->pos ) return 0;
         rp = rp->next;
-    } while ( rp != first );
+    } while ( rp != mgr->first );
 
     return 1;
 }
 
-int getNextPos( void )
+static int getNextPos( station_mgr_t *mgr )
 {
-    return first->prev->pos + 1;
+    return mgr->first->prev->pos + 1;
 }
 
-station_info_t *newInfo( int pos, const char *name, const band_t *band, const band_entry_t *channel )
+static station_info_t *newInfo( int pos, const char *name, const band_t *band, const band_entry_t *channel )
 {
     station_info_t *i;
 
@@ -99,14 +101,14 @@ station_info_t *newInfo( int pos, const char *name, const band_t *band, const ba
     return 0;
 }
 
-int insert( station_info_t *i )
+static int insert( station_mgr_t *mgr, station_info_t *i )
 {
-    if( !first ) {
-        first = i;
-        first->next = first;
-        first->prev = first;
+    if( !mgr->first ) {
+        mgr->first = i;
+        mgr->first->next = mgr->first;
+        mgr->first->prev = mgr->first;
     } else {
-        station_info_t *rp = first;
+        station_info_t *rp = mgr->first;
 
         do {
             if( rp->pos == i->pos ) {
@@ -117,24 +119,24 @@ int insert( station_info_t *i )
             if( rp->pos > i->pos ) break;
 
             rp = rp->next;
-        } while( rp != first );
+        } while( rp != mgr->first );
 
         i->next = rp;
         i->prev = rp->prev;
         rp->prev->next = i;
         rp->prev = i;
 
-        if( rp == first && i->pos < first->pos ) {
-            first = i;
+        if( rp == mgr->first && i->pos < mgr->first->pos ) {
+            mgr->first = i;
         }
     }
 
     return 1;
 }
 
-void station_dump( void )
+static void station_dump( station_mgr_t *mgr )
 {
-    station_info_t *rp = first;
+    station_info_t *rp = mgr->first;
     if( !rp ) return;
 
     fprintf( stderr, "#\tBand\t\tChannel\tFreq\tName\n" );
@@ -142,13 +144,23 @@ void station_dump( void )
         fprintf( stderr, "%d\t%s\t%s\t%d\t%s\n",rp->pos, rp->band->name,
             rp->channel->name, rp->channel->freq, rp->name);
         rp = rp->next;
-    } while( rp != first );
+    } while( rp != mgr->first );
 }
 
-int station_init( config_t *ct )
+station_mgr_t *station_init( config_t *ct )
 {
-    debug = config_get_debug( ct );
-    verbose = config_get_verbose( ct );
+    station_mgr_t *mgr = (station_mgr_t *) malloc( sizeof( station_mgr_t ) );
+    const char *frequencies;
+
+    if( !mgr ) return 0;
+
+    mgr->debug = config_get_debug( ct );
+    mgr->verbose = config_get_verbose( ct );
+    mgr->first = 0;
+    mgr->current = 0;
+    mgr->us_cable_mode = 0;
+
+    frequencies = config_get_v4l_freq( ct );
 
     // this is a config file parser  (no it isn't!) ;-)
 /*
@@ -157,97 +169,97 @@ int station_init( config_t *ct )
     station_add( 3, "VHF E2-E12", "E6", "ndr" );
 */
 
-    station_add_band( "us cable" );
+    station_add_band( mgr, "us cable" );
 
-    current = first;
-    if( verbose ) {
-        station_dump();
+    mgr->current = mgr->first;
+    if( mgr->verbose ) {
+        station_dump( mgr );
     }
 
-    return 1;
+    return mgr;
 }
 
 
-int station_set( int pos )
+int station_set( station_mgr_t *mgr, int pos )
 {
-    station_info_t *rp = first;
-    if( !first ) return 0;
+    station_info_t *rp = mgr->first;
+    if( !mgr->first ) return 0;
 
     do {
         if( rp->pos == pos ) {
-            current = rp;
+            mgr->current = rp;
             return 1;
         }
         rp = rp->next;
-    } while( rp != first );
+    } while( rp != mgr->first );
 
     return 0;
 }
 
-void station_next( void )
+void station_next( station_mgr_t *mgr )
 {
-    if( current ) {
-        current = current->next;
+    if( mgr->current ) {
+        mgr->current = mgr->current->next;
     }
 }
 
-void station_prev( void )
+void station_prev( station_mgr_t *mgr )
 {
-    if( current ) {
-        current = current->prev;
+    if( mgr->current ) {
+        mgr->current = mgr->current->prev;
     }
 }
 
-int station_get_current_id( void )
+int station_get_current_id( station_mgr_t *mgr )
 {
-    if( !current ) {
+    if( !mgr->current ) {
         return 0;
     } else {
-        return current->pos;
+        return mgr->current->pos;
     }
 }
 
-const char *station_get_current_channel_name( void )
+const char *station_get_current_channel_name( station_mgr_t *mgr )
 {
-    if( !current ) {
+    if( !mgr->current ) {
         return "No Frequency";
     } else {
-        return current->name;
+        return mgr->current->name;
     }
 }
 
-const char *station_get_current_band( void )
+const char *station_get_current_band( station_mgr_t *mgr )
 {
-    if( !current ) {
+    if( !mgr->current ) {
         return "No Band";
     } else {
-        return current->band->name;
+        return mgr->current->band->name;
     }
 }
 
-void station_set_us_cable_mode( int us_cable )
+void station_set_us_cable_mode( station_mgr_t *mgr, int us_cable )
 {
-    us_cable_mode = us_cable;
+    mgr->us_cable_mode = us_cable;
 }
 
-int station_get_current_frequency( void )
+int station_get_current_frequency( station_mgr_t *mgr )
 {
-    if( !current ) {
+    if( !mgr->current ) {
         return 0;
     } else {
-        if( current->band == us_cable_band ) {
-            if( us_cable_mode == US_CABLE_HRC ) {
-                return NTSC_CABLE_HRC( current->channel->freq );
-            } else if( us_cable_mode == US_CABLE_IRC ) {
-                return NTSC_CABLE_IRC( current->channel->freq );
+        if( mgr->current->band == us_cable_band ) {
+            if( mgr->us_cable_mode == US_CABLE_HRC ) {
+                return NTSC_CABLE_HRC( mgr->current->channel->freq );
+            } else if( mgr->us_cable_mode == US_CABLE_IRC ) {
+                return NTSC_CABLE_IRC( mgr->current->channel->freq );
             }
         }
 
-        return current->channel->freq;
+        return mgr->current->channel->freq;
     }
 }
 
-int station_add( int pos, const char *bandname, const char *channel, const char *name )
+int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *channel, const char *name )
 {
     const band_t *band = get_band( bandname );
     const band_entry_t *entry;
@@ -257,19 +269,19 @@ int station_add( int pos, const char *bandname, const char *channel, const char 
         return 0;
     }
 
-    if( !isFreePos( pos ) ) pos = getNextPos();
+    if( !isFreePos( mgr, pos ) ) pos = getNextPos( mgr );
 
     for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
         if( !strcasecmp( entry->name, channel ) ) {
             info = newInfo( pos, name, band, entry );
-            if( info ) insert( info );
+            if( info ) insert( mgr, info );
             return 1;
         }
     }
     return 0;
 }
 
-int station_add_band( const char *bandname )
+int station_add_band( station_mgr_t *mgr, const char *bandname )
 {
     const band_t *band = get_band( bandname );
     int i;
@@ -282,18 +294,18 @@ int station_add_band( const char *bandname )
         station_info_t *info;
         int pos;
 
-        if( !sscanf( band->channels[ i ].name, "%d", &pos ) || !isFreePos( pos ) ) {
-            pos = getNextPos();
+        if( !sscanf( band->channels[ i ].name, "%d", &pos ) || !isFreePos( mgr, pos ) ) {
+            pos = getNextPos( mgr );
         }
 
         info = newInfo( pos, 0, band, &(band->channels[ i ]) );
-        if( info ) insert( info );
+        if( info ) insert( mgr, info );
     }
 
     return 1;
 }
 
-int station_scan( void )
+int station_scan( station_mgr_t *mgr )
 {
     /* Billy:
      * I think the scanner should go through the current list of

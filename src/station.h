@@ -29,35 +29,36 @@ extern "C" {
 #define US_CABLE_HRC		1
 #define US_CABLE_IRC		2
 
-int station_init( config_t *ct );
-int station_writeConfig( config_t *ct );
+typedef struct station_mgr_s station_mgr_t;
+
+station_mgr_t *station_init( config_t *ct );
 
 /**
  * Set the current channel.
  */
-int station_set( int pos );
-void station_next( void );
-void station_prev( void );
+int station_set( station_mgr_t *mgr, int pos );
+void station_next( station_mgr_t *mgr );
+void station_prev( station_mgr_t *mgr );
 
 /**
  * Set the us cable mode (global).
  */
-void station_set_us_cable_mode( int us_cable );
+void station_set_us_cable_mode( station_mgr_t *mgr, int us_cable );
 
 /**
  * Information about the current channel.
  */
-int station_get_current_id( void );
-const char *station_get_current_channel_name( void );
-const char *station_get_current_band( void );
-int station_get_current_frequency( void );
+int station_get_current_id( station_mgr_t *mgr );
+const char *station_get_current_channel_name( station_mgr_t *mgr );
+const char *station_get_current_band( station_mgr_t *mgr );
+int station_get_current_frequency( station_mgr_t *mgr );
 
 /**
  * Add or update the channel list.
  */
-int station_add( int pos, const char *band, const char *channel, const char *name );
-int station_add_band( const char *band );
-int station_scan( void );
+int station_add( station_mgr_t *mgr, int pos, const char *band, const char *channel, const char *name );
+int station_add_band( station_mgr_t *mgr, const char *band );
+int station_scan( station_mgr_t *mgr );
 
 #ifdef __cplusplus
 };

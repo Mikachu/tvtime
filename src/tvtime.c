@@ -467,6 +467,7 @@ int main( int argc, char **argv )
     video_correction_t *vc = 0;
     videoinput_t *vidin = 0;
     rtctimer_t *rtctimer = 0;
+    station_mgr_t *stationmgr = 0;
     int width, height;
     int norm = 0;
     int fieldtime;
@@ -522,7 +523,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
     }
 
-    station_init( ct );
+    stationmgr = station_init( ct );
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         norm = VIDEOINPUT_PAL;
@@ -671,7 +672,7 @@ int main( int argc, char **argv )
                                          config_get_luma_correction( ct ) );
     }
 
-    commands = commands_new( ct, vidin, osd, vc );
+    commands = commands_new( ct, vidin, stationmgr, osd, vc );
     if( !commands ) {
         fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;

@@ -33,10 +33,12 @@ typedef struct commands_s commands_t;
 #include "menu.h"
 #include "console.h"
 #include "vbidata.h"
+#include "station.h"
 
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
-                          tvtime_osd_t *osd, video_correction_t *vc );
+                          station_mgr_t *mgr, tvtime_osd_t *osd,
+                          video_correction_t *vc );
 void commands_delete( commands_t *in );
 void commands_handle( commands_t *in, int command, int arg );
 
