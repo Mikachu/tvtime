@@ -881,11 +881,9 @@ int main( int argc, char **argv )
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
     /* Disable this code for a release. */
-    /* Woot, it's 0.9.8 time.
     fprintf( stderr, "\n*** WARNING: you are running a DEVELOPMENT version of tvtime.\n" );
     fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
                        "*** based on released versions only!!\n\n" );
-    */
 
     /* Ditch stdin early. */
     if( isatty( STDIN_FILENO ) ) {
