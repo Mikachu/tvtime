@@ -1717,12 +1717,18 @@ void xcommon_close_display( void )
     xfullscreen_delete( xf );
 }
 
+static char *old_caption = 0;
+
 void xcommon_set_window_caption( const char *caption )
 {
-    XStoreName( display, wm_window, caption );
-    XChangeProperty( display, wm_window, net_wm_name, utf8_string, 8,
-                     PropModeReplace, (const unsigned char *) caption,
-                     strlen( caption ) );
+    if( !old_caption || strcmp( caption, old_caption ) ) {
+        if( old_caption ) free( old_caption );
+        old_caption = strdup( caption );
+        XStoreName( display, wm_window, caption );
+        XChangeProperty( display, wm_window, net_wm_name, utf8_string, 8,
+                         PropModeReplace, (const unsigned char *) caption,
+                         strlen( caption ) );
+    }
 }
 
 Display *xcommon_get_display( void )
