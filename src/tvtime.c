@@ -1199,7 +1199,7 @@ int main( int argc, char **argv )
 
     /* Setup the output. */
     output = get_xv_output();
-    if( !output->init( width, height, config_get_outputwidth( ct ), 
+    if( !output->init( width, height, config_get_outputheight( ct ), 
                        config_get_aspect( ct ), verbose ) ) {
         fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );

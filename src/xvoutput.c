@@ -167,6 +167,30 @@ static int xv_check_extension( void )
     return 0;
 }
 
+static int xv_get_width_for_height( int window_height )
+{
+    int widthratio = output_aspect ? 16 : 4;
+    int heightratio = output_aspect ? 9 : 3;
+    int sar_frac_n, sar_frac_d;
+
+    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
+                     sar_frac_n, sar_frac_d );
+        }
+    } else {
+        /* Assume 4:3 aspect ? */
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
+        }
+        sar_frac_n = 1;
+        sar_frac_d = 1;
+    }
+
+    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
+    return ( window_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
+}
+
 static int open_display( void )
 {
     Pixmap curs_pix;
@@ -243,6 +267,23 @@ static int open_display( void )
     completion_type = XShmGetEventBase( display ) + ShmCompletion;
 
     screen = DefaultScreen( display );
+
+    DpyInfoInit( display, screen );
+    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode );
+    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
+
+    DpyInfoUpdateResolution( display, screen, 0, 0 );
+    DpyInfoUpdateGeometry( display, screen );
+
+    if( xvoutput_verbose && DpyInfoGetGeometry( display, screen, &displaywidthratio, &displayheightratio ) ) {
+        fprintf( stderr, "xvoutput: Geometry %dx%d, display aspect ratio %.2f\n",
+                 displaywidthratio, displayheightratio,
+                 (double) displaywidthratio / (double) displayheightratio );
+    }
+
+    /* Initially, get the best width for our height. */
+    output_width = xv_get_width_for_height( output_height );
+
     XGetWindowAttributes( display, DefaultRootWindow( display ), &attribs );
 
     xswa.override_redirect = False;
@@ -281,19 +322,6 @@ static int open_display( void )
     curs_col.flags = 0;
     curs_col.pad = 0;
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
-
-    DpyInfoInit( display, screen );
-    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode );
-    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
-
-    DpyInfoUpdateResolution( display, screen, 0, 0 );
-    DpyInfoUpdateGeometry( display, screen );
-
-    if( xvoutput_verbose && DpyInfoGetGeometry( display, screen, &displaywidthratio, &displayheightratio ) ) {
-        fprintf( stderr, "xvoutput: Geometry %dx%d, display aspect ratio %.2f\n",
-                 displaywidthratio, displayheightratio,
-                 (double) displaywidthratio / (double) displayheightratio );
-    }
 
     XInternAtoms( display, atomNames, 2, False, &wmProtocolsAtom );
 
@@ -452,13 +480,13 @@ static void xv_clear_screen( void )
                     video_area.width, video_area.height );
 }
 
-int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect, int verbose )
+int xv_init( int inputwidth, int inputheight, int outputheight, int aspect, int verbose )
 {
     output_aspect = aspect;
     input_width = inputwidth;
     input_height = inputheight;
-    output_width = outputwidth;
-    output_height = ( output_width * 3 ) / 4;
+    output_height = outputheight;
+    output_width = ( output_height * 4 ) / 3;
     xvoutput_verbose = verbose;
 
     if( !open_display() ) return 0;
@@ -770,31 +798,13 @@ int xv_is_fullscreen( void )
 void xv_set_window_height( int window_height )
 {
     XWindowChanges win_changes;
-    int widthratio = output_aspect ? 16 : 4;
-    int heightratio = output_aspect ? 9 : 3;
-    int sar_frac_n, sar_frac_d;
     int window_width;
 
     if( output_fullscreen ) {
         xv_toggle_fullscreen( 0, 0 );
     }
 
-    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
-        if( xvoutput_verbose ) {
-            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
-                     sar_frac_n, sar_frac_d );
-        }
-    } else {
-        /* Assume 4:3 aspect ? */
-        if( xvoutput_verbose ) {
-            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
-        }
-        sar_frac_n = 1;
-        sar_frac_d = 1;
-    }
-
-    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
-    window_width = ( window_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
+    window_width = xv_get_width_for_height( window_height );
 
     if( xvoutput_verbose ) {
         fprintf( stderr, "xvoutput: Target window size %dx%d.\n", window_width, window_height );

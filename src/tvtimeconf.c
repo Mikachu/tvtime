@@ -97,7 +97,7 @@ static key_name_t key_names[] = {
 
 struct config_s
 {
-    int outputwidth;
+    int outputheight;
     int verbose;
     int aspect;
     int debug;
@@ -200,8 +200,8 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     if( name && value ) {
         char *curval = (char *) value;
 
-        if( !xmlStrcasecmp( name, BAD_CAST "OutputWidth" ) ) {
-            ct->outputwidth = atoi( curval );
+        if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
+            ct->outputheight = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "InputWidth" ) ) {
@@ -474,7 +474,7 @@ static int conf_xml_parse( config_t *ct, char *configFile )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
+    fprintf( stderr, "usage: %s [-vamsb] [-H <height>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>] "
                      "[-D <deinterlace method>] [-r rvrfile]\n", argv[ 0 ] );
@@ -482,7 +482,7 @@ static void print_usage( char **argv )
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
     fprintf( stderr, "\t-I\tV4L input scanline sampling, defaults to 720.\n" );
-    fprintf( stderr, "\t-w\tOutput window width, defaults to 800.\n" );
+    fprintf( stderr, "\t-H\tOutput window height, defaults to 576.\n" );
 
     fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
     fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
@@ -541,7 +541,7 @@ config_t *config_new( int argc, char **argv )
         return 0;
     }
 
-    ct->outputwidth = 800;
+    ct->outputheight = 576;
     ct->inputwidth = 720;
     ct->verbose = 0;
     ct->aspect = 0;
@@ -706,9 +706,9 @@ config_t *config_new( int argc, char **argv )
         conf_xml_parse(ct, configFile);
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:Ib:r:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hH:I:avcsmd:i:l:n:f:t:F:D:Ib:r:" )) != -1 ) {
         switch( c ) {
-        case 'w': ct->outputwidth = atoi( optarg ); break;
+        case 'H': ct->outputheight = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'v': ct->verbose = 1; break;
         case 'a': ct->aspect = 1; break;
@@ -809,9 +809,9 @@ int config_get_debug( config_t *ct )
     return ct->debug;
 }
 
-int config_get_outputwidth( config_t *ct )
+int config_get_outputheight( config_t *ct )
 {
-    return ct->outputwidth;
+    return ct->outputheight;
 }
 
 int config_get_inputwidth( config_t *ct )
