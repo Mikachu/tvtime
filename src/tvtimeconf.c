@@ -118,6 +118,7 @@ config_t *config_new( int argc, char **argv )
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
+        free( ct );
         return 0;
     }
 

@@ -58,13 +58,11 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
     if( !osds ) {
-        fprintf( stderr, "osd: Can't allocate memory.\n" );
         return 0;
     }
 
     osds->image4444 = (unsigned char *) malloc( video_width * video_height * 4 );
     if( !osds->image4444 ) {
-        fprintf( stderr, "osd: Can't allocate memory.\n" );
         free( osds );
         return 0;
     }
