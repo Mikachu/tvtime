@@ -53,6 +53,8 @@ struct tvtime_osd_s
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
 {
+    char *fontfile;
+    char *logofile;
     tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
     if( !osd ) {
         return 0;
@@ -65,18 +67,20 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd->muted = 0;
     osd->channel_logo = 0;
 
-    osd->channel_number = osd_string_new( "FreeSansBold.ttf", 80, width,
-                                          height, frameaspect );
-    osd->channel_info = osd_string_new( "FreeSansBold.ttf", 30, width,
-                                        height, frameaspect );
-    osd->volume_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                      height, frameaspect );
-    osd->data_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                    height, frameaspect );
-    osd->muted = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                 height, frameaspect );
-    osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
-                                         frameaspect, 256 );
+    fontfile = DATADIR "/FreeSansBold.ttf";
+    logofile = DATADIR "/testlogo.png";
+
+    osd->channel_number = osd_string_new( fontfile, 80, width, height, frameaspect );
+    if( !osd->channel_number ) {
+        fontfile = "./FreeSansBold.ttf";
+        logofile = "./testlogo.png";
+        osd->channel_number = osd_string_new( fontfile, 80, width, height, frameaspect );
+    }
+    osd->channel_info = osd_string_new( fontfile, 30, width, height, frameaspect );
+    osd->volume_bar = osd_string_new( fontfile, 15, width, height, frameaspect );
+    osd->data_bar = osd_string_new( fontfile, 15, width, height, frameaspect );
+    osd->muted = osd_string_new( fontfile, 15, width, height, frameaspect );
+    osd->channel_logo = osd_graphic_new( logofile, width, height, frameaspect, 256 );
 
     if( !osd->channel_number || !osd->channel_info || !osd->volume_bar ||
         !osd->data_bar || !osd->muted || !osd->channel_logo ) {

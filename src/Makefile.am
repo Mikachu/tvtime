@@ -10,7 +10,7 @@ PNG_LIBS = -lpng
 PLUGINS_CFLAGS = -I../plugins
 PLUGINS_LIBS = -L../plugins -ltvtimeplugins
 
-OPT_CFLAGS = -Wall -I. -O3 -rdynamic -DDATADIR="$(tvtimedatadir)"
+OPT_CFLAGS = -Wall -I. -O3 -rdynamic -DDATADIR="\"$(tvtimedatadir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) $(PLUGINS_CFLAGS)
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) $(PLUGINS_CFLAGS)

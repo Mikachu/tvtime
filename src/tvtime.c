@@ -71,7 +71,7 @@ static void build_test_frames( unsigned char *oddframe,
     memset( oddframe, 0, width * height * 2 );
     memset( evenframe, 0, width * height * 2 );
 
-    test_string = osd_string_new( "FreeSansBold.ttf", 80, width, height, 4.0 / 3.0 );
+    test_string = osd_string_new( DATADIR "/FreeSansBold.ttf", 80, width, height, 4.0 / 3.0 );
     if( !test_string ) {
         fprintf( stderr, "tvtime: Can't create string for test frame, test frames unavailable.\n" );
         return;
