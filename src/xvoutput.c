@@ -111,6 +111,7 @@ static int xv_check_extension( void )
     unsigned int adaptors;
     unsigned int i;
     unsigned long j;
+    int has_yuy2 = 0;
     XvAdaptorInfo *adaptorInfo;
 
     if( ( XvQueryExtension( display, &version, &release,
@@ -136,21 +137,33 @@ static int xv_check_extension( void )
                         XvFreeAdaptorInfo( adaptorInfo );
                         return 1;
                     }
+                    has_yuy2 = 1;
                 }
             }
         }
     }
 
     XvFreeAdaptorInfo( adaptorInfo );
-    fprintf( stderr, "xvoutput: No XVIDEO port found which supports YUY2 images.\n" );
 
-    fprintf( stderr, "\n*** tvtime requires hardware YUY2 overlay support from your video card\n"
-                       "*** driver.  If you are using an older NVIDIA card (TNT2), then\n"
-                       "*** this capability is only available with their binary drivers.\n"
-                       "*** For some ATI cards, this feature may be found in the experimental\n"
-                       "*** GATOS drivers: http://gatos.souceforge.net/\n"
-                       "*** If unsure, please check with your distribution to see if your\n"
-                       "*** X driver supports hardware overlay surfaces.\n\n" );
+    if( has_yuy2 ) {
+        fprintf( stderr, "xvoutput: No YUY2 XVIDEO port available.\n" );
+
+        fprintf( stderr, "\n*** tvtime requires a hardware YUY2 overlay.  One is supported\n"
+                           "*** by your driver, but we could not grab it.  It is likely\n"
+                           "*** being used by another application, either another tvtime\n"
+                           "*** instance or a media player.  Please shut down this other\n"
+                           "*** application and try tvtime again.\n\n" );
+    } else {
+        fprintf( stderr, "xvoutput: No XVIDEO port found which supports YUY2 images.\n" );
+
+        fprintf( stderr, "\n*** tvtime requires hardware YUY2 overlay support from your video card\n"
+                           "*** driver.  If you are using an older NVIDIA card (TNT2), then\n"
+                           "*** this capability is only available with their binary drivers.\n"
+                           "*** For some ATI cards, this feature may be found in the experimental\n"
+                           "*** GATOS drivers: http://gatos.souceforge.net/\n"
+                           "*** If unsure, please check with your distribution to see if your\n"
+                           "*** X driver supports hardware overlay surfaces.\n\n" );
+    }
     return 0;
 }
 
