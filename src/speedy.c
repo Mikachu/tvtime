@@ -112,14 +112,11 @@ void (*composite_alphamask_alpha_to_packed4444_scanline)( uint8_t *output,
 void (*premultiply_packed4444_scanline)( uint8_t *output, uint8_t *input, int width );
 void (*blend_packed422_scanline)( uint8_t *output, uint8_t *src1,
                                   uint8_t *src2, int width, int pos );
-void (*filter_luma_121_packed422_inplace_scanline)( uint8_t *data, int width );
-void (*filter_luma_14641_packed422_inplace_scanline)( uint8_t *data, int width );
 unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *old, int width );
 unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
                                                 uint8_t *bot, int width );
 void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
-void (*halfmirror_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*speedy_memcpy)( void *output, const void *input, size_t size );
 void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
                                  uint8_t *new, int os, int ns );
@@ -163,9 +160,6 @@ void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int
 void (*composite_colour4444_alpha_to_packed422_scanline)( uint8_t *output, uint8_t *input,
                                                           int af, int y, int cb, int cr,
                                                           int width, int alpha );
-void (*pointsample_packed422_image)( uint8_t *dst, int dwidth, int dheight, int dstride,
-                                     uint8_t *src, int swidth, int sheight, int sstride );
-
 
 /**
  * result = (1 - alpha)B + alpha*F
@@ -805,30 +799,6 @@ static void invert_colour_packed422_inplace_scanline_c( uint8_t *data, int width
     }
 }
 
-/*
-// this duplicates alternate lines in alternate frames to highlight or mute
-// the effects of chroma crawl. it is not a solution or proper filter. it's
-// only for testing.
-void testing_packed422_inplace_scanline_c( uint8_t *data, int width, int scanline )
-{
-    volatile static int topbottom = 0;
-    static uint8_t scanbuffer[2048];
-
-    if( scanline <= 1 ) {
-        topbottom = scanline;
-        memcpy(scanbuffer, data, width*2);
-    }
-    if ( scanline < 10 ) {
-        printf("scanline: %d %d\n", scanline, topbottom);
-    }
-    if ( ((scanline-topbottom)/2)%2 && scanline > 1 ) {
-        memcpy(data, scanbuffer, width*2);
-    } else {
-        memcpy(scanbuffer, data, width*2);
-    }
-}
-*/
-
 static void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x, tmp1, tmp2;
@@ -841,52 +811,6 @@ static void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
         data[ x+1 ] = data[ width2 - x + 1 ];
         data[ width2 - x     ] = tmp1;
         data[ width2 - x + 1 ] = tmp2;
-    }
-}
-
-static void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
-{
-    int x;
-
-    for( x = 0; x < width; x += 2 ) {
-        data[ width + x     ] = data[ width - x     ];
-        data[ width + x + 1 ] = data[ width - x + 1 ];
-    }
-}
-
-static void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
-{
-    int r1 = 0;
-    int r2 = 0;
-
-    data += 2;
-    width -= 1;
-    while( width-- ) {
-        int s1, s2;
-        s1 = *data + r1; r1 = *data;
-        s2 = s1    + r2; r2 = s1;
-        *(data - 2) = s2 >> 2;
-        data += 2;
-    }
-}
-
-static void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
-{
-    int r1 = 0;
-    int r2 = 0;
-    int r3 = 0;
-    int r4 = 0;
-
-    width -= 4;
-    data += 4;
-    while( width-- ) {
-        int s1, s2, s3, s4;
-        s1 = *data + r1; r1 = *data;
-        s2 = s1    + r2; r2 = s1;
-        s3 = s2    + r3; r3 = s2;
-        s4 = s3    + r4; r4 = s3;
-        *(data - 4) = s4 >> 4;
-        data += 2;
     }
 }
 
@@ -2552,24 +2476,6 @@ static void aspect_adjust_packed4444_scanline_c( uint8_t *output,
     }
 }
 
-void pointsample_packed422_image_c( uint8_t *dst, int dwidth, int dheight, int dstride,
-                                    uint8_t *src, int swidth, int sheight, int sstride )
-{
-    int x, y;
-    int qdwidth = (dwidth * 2) / 4;
-    int qswidth = (swidth * 2) / 4;
-
-    for( y = 0; y < dheight; y++ ) {
-        uint8_t *curdst = dst + (y * dstride);
-        uint8_t *cursrc = src + (((y * (sheight - 1)) / (dheight - 1)) * sstride);
-
-        for( x = 0; x < qdwidth; x++ ) {
-            uint8_t *srcpx = cursrc + (((x * (qswidth - 1)) / (qdwidth - 1)) * 4);
-            *((uint32_t *) (curdst + (x * 4))) = *((uint32_t *) srcpx);
-        }
-    }
-}
-
 static uint32_t speedy_accel;
 
 void setup_speedy_calls( uint32_t accel, int verbose )
@@ -2586,13 +2492,10 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
-    filter_luma_121_packed422_inplace_scanline = filter_luma_121_packed422_inplace_scanline_c;
-    filter_luma_14641_packed422_inplace_scanline = filter_luma_14641_packed422_inplace_scanline_c;
     comb_factor_packed422_scanline = 0;
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
-    halfmirror_packed422_inplace_scanline = halfmirror_packed422_inplace_scanline_c;
     speedy_memcpy = speedy_memcpy_c;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
@@ -2611,7 +2514,6 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
     convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_c;
     composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_c;
-    pointsample_packed422_image = pointsample_packed422_image_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {

@@ -168,16 +168,6 @@ extern void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width
                                                       uint8_t *m, uint8_t *t, uint8_t *b );
 
 /**
- * In-place [1 2 1] filter.
- */
-extern void (*filter_luma_121_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
- * In-place [1 4 6 4 1] filter.
- */
-extern void (*filter_luma_14641_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
  * Sets the chroma of the scanline to neutral (128) in-place.
  */
 extern void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
@@ -186,11 +176,6 @@ extern void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width 
  * Mirrors the scanline in-place.
  */
 extern void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
- * Mirrors the first half of the scanline onto the second half in-place.
- */
-extern void (*halfmirror_packed422_inplace_scanline)( uint8_t *data, int width );
 
 /**
  * Inverts the colours on a scanline in-place.
@@ -296,12 +281,6 @@ extern void (*rgba32_to_packed4444_rec601_scanline)( uint8_t *output,
  */
 extern void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf,
                                               uint8_t *yuyv_buf, int width );
-
-/**
- * Point sampler.
- */
-extern void (*pointsample_packed422_image)( uint8_t *dst, int dwidth, int dheight, int dstride,
-                                            uint8_t *src, int swidth, int sheight, int sstride );
 
 /**
  * Sets up the function pointers to point at the fastest function
