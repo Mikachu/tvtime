@@ -22,7 +22,6 @@
 typedef struct config_s config_t;
 
 config_t *config_new( const char *filename );
-int config_init( config_t *ct );
 int config_dump( config_t *ct );
 
 int config_get_verbose( config_t *ct );
@@ -37,5 +36,18 @@ double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
+
+void config_set_verbose( config_t *ct, int verbose );
+void config_set_debug( config_t *ct, int debug );
+void config_set_outputwidth( config_t *ct, int outputwidth );
+void config_set_inputwidth( config_t *ct, int inputwidth );
+void config_set_aspect( config_t *ct, int aspect );
+void config_set_inputnum( config_t *ct, int inputnum );
+void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction );
+void config_set_luma_correction( config_t *ct, double luma_correction );
+void config_set_v4l_device( config_t *ct, const char *v4ldev );
+void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
+void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
+void config_set_tuner_number( config_t *ct, int tuner_number );
 
 #endif /* CONFIG_H_INCLUDED */

@@ -27,18 +27,22 @@ struct config_s
     parser_file_t pf;
 
     int outputwidth;
-    int inputwidth;
     int verbose;
     int aspect;
     int debug;
+
     int apply_luma_correction;
-    char *v4ldev;
-    int inputnum;
     double luma_correction;
+
+    int inputwidth;
+    int inputnum;
+    char *v4ldev;
     char *norm;
     char *freq;
     int tuner_number;
 };
+
+void config_init( config_t *ct );
 
 
 config_t *config_new( const char *filename )
@@ -48,70 +52,70 @@ config_t *config_new( const char *filename )
         return 0;
     }
 
-    if( !parser_new( &(ct->pf), filename ) ) {
-        free( ct );
-        return 0;
+    ct->outputwidth = 800;
+    ct->inputwidth = 720;
+    ct->verbose = 0;
+    ct->aspect = 0;
+    ct->debug = 0;
+    ct->apply_luma_correction = 1;
+    ct->luma_correction = 1.0;
+    ct->inputnum = 0;
+    ct->tuner_number = 0;
+    ct->v4ldev = "/dev/video0";
+    ct->norm = "ntsc";
+    ct->freq = "us-cable";
+
+    /*
+    if( parser_new( &(ct->pf), filename ) ) {
+        config_init( ct );
     }
+    */
 
     return ct;
 }
 
-int config_init( config_t *ct )
+void config_init( config_t *ct )
 {
     char *tmp;
 
     if( !ct ) {
         fprintf( stderr, "config: NULL received as config structure.\n" );
-        return 0;
+        return;
     }
 
     if( parser_get( &(ct->pf), "OutputWidth", "800", &tmp) ) {
         ct->outputwidth = atoi( tmp );
         free( tmp );
-    } else {
-        ct->outputwidth = 800;
     }
-    
+
     if( parser_get( &(ct->pf), "InputWidth", "720", &tmp) ) {
         ct->inputwidth = atoi( tmp );
         free( tmp );
-    } else {
-        ct->inputwidth = 720;
     }
 
     if( parser_get( &(ct->pf), "Verbose", "0", &tmp) ) {
         ct->verbose = atoi( tmp );
         free( tmp );
-    } else {
-        ct->verbose = 0;
     }
 
     if( parser_get( &(ct->pf), "Widescreen", "0", &tmp) ) {
         ct->aspect = atoi( tmp );
         free( tmp );
-    } else {
-        ct->aspect = 0;
     }
 
     if( parser_get( &(ct->pf), "DebugMode", "0", &tmp) ) {
         ct->debug = atoi( tmp );
         free( tmp );
-    } else {
-        ct->debug = 0;
     }
 
     if( parser_get( &(ct->pf), "ApplyLumaCorrection", "1", &tmp) ) {
         ct->apply_luma_correction = atoi( tmp );
         free( tmp );
-    } else {
-        ct->apply_luma_correction = 1;
     }
 
     if( parser_get( &(ct->pf), "LumaCorrection", "1.0", &tmp) ) {
         ct->luma_correction = atof( tmp );
         free( tmp );
-    } else {
-        ct->luma_correction = 1.0;
     }
 
     if( !parser_get( &(ct->pf), "V4LDevice", "/dev/video0", &(ct->v4ldev)) ) {
@@ -122,8 +126,6 @@ int config_init( config_t *ct )
     if( parser_get( &(ct->pf), "CaptureSource", "0", &tmp) ) {
         ct->inputnum = atoi( tmp );
         free( tmp );
-    } else {
-        ct->inputnum = 0;
     }
 
     if( !parser_get( &(ct->pf), "Norm", "ntsc", &(ct->norm)) ) {
@@ -139,13 +141,9 @@ int config_init( config_t *ct )
     if( parser_get( &(ct->pf), "TunerNumber", "0", &tmp) ) {
         ct->tuner_number = atoi( tmp );
         free( tmp );
-    } else {
-        ct->tuner_number = 0;
     }
 
     config_dump( ct );
-
-    return 1;
 }
 
 int config_dump( config_t *ct )
