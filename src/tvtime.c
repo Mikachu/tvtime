@@ -709,7 +709,9 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
 
     /* Copy a scanline. */
     if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + bottom_field ) ) {
-        videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline + bottom_field );
+        videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, 0 );
+        videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, 1 );
+        videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, 2 );
     }
     // blit_packed422_scanline( output, curframe, width );
     quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
@@ -723,17 +725,21 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     scanline += 2;
 
     for( i = ((frame_height - 2) / 2); i; --i ) {
+
+        if( tvtime->filter && !tvtime->filtered_curframe && 
+                (videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ||
+                 videofilter_active_on_scanline( tvtime->filter, scanline + 2 )) ) {
+            videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, scanline + 1 );
+            if( i > 1 ) {
+                videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, scanline + 2 );
+            }
+        }
+
         /* Copy/interpolate a scanline. */
         if( bottom_field ) {
-            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ) {
-                videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline + 1 );
-            }
             // interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
             quarter_blit_vertical_packed422_scanline( output, curframe - (instride*2), curframe, width );
         } else {
-            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline ) ) {
-                videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline );
-            }
             // blit_packed422_scanline( output, curframe, width );
             if( i > 1 ) {
                 quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
