@@ -91,8 +91,8 @@
   <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
   <option name="Widescreen" value="0"/>
 
-  <!-- Default to an 800x600 window. -->
-  <option name="OutputWidth" value="800"/>
+  <!-- Default to a 768x576 window. -->
+  <option name="OutputHeight" value="576"/>
 
   <!--
     This sets the percent of the sides to leave to the overscan, that is,
@@ -183,7 +183,7 @@
   -->
 
   <mode name="Fullscreen" deinterlacer="GreedyH" fullscreen="1" framerate_mode="0"/>
-  <mode name="Window" deinterlacer="Vertical" fullscreen="0" window_height="600" framerate_mode="0"/>
+  <mode name="Window" deinterlacer="Vertical" fullscreen="0" window_height="576" framerate_mode="0"/>
   <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
 
 
