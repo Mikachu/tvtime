@@ -43,11 +43,6 @@ void xmltv_delete( xmltv_t *xmltv );
 void xmltv_set_channel( xmltv_t *xmltv, const char *channel );
 
 /**
- * Sets the preferred language for xmltv data.
- */
-void xmltv_set_language( xmltv_t *xmltv, const char *locale );
-
-/**
  * Refreshes the information given a new time.
  */
 void xmltv_refresh( xmltv_t *xmltv );

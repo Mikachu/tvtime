@@ -23,7 +23,7 @@
 #include <libxml/tree.h>
 #include "xmltv.h"
 
-#define MAX_LANGUAGES 3
+#define MAX_LANGUAGES 10
 
 typedef struct language_s language_t;
 typedef struct program_s program_t;
@@ -568,7 +568,6 @@ void xmltv_delete( xmltv_t *xmltv )
     program_delete( xmltv->next_pro );
     if( xmltv->curchan ) xmlFree( xmltv->curchan );
     if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
-    if( xmltv->locale ) xmlFree( xmltv->locale );
     xmlFreeDoc( xmltv->doc );
     languages_delete( xmltv->languages );
     free( xmltv );
