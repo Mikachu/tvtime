@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <linux/videodev.h>
+#include <signal.h>
 #include "videoinput.h"
 #include "mixer.h"
 
@@ -70,6 +71,11 @@
 #define SIGNAL_RECOVER_DELAY 2
 #define SIGNAL_AQUIRE_DELAY  2
 
+/**
+ * How many seconds to wait before deciding it's a driver problem.
+ */
+#define SYNC_TIMEOUT 3
+
 struct videoinput_s
 {
     int grab_fd;
@@ -107,6 +113,24 @@ struct videoinput_s
     int user_muted;
 };
 
+static int alarms;
+
+static void sigalarm( int signal )
+{
+    alarms++;
+    fprintf( stderr, "videoinput: Frame capture timed out (got SIGALRM), hardware/driver problems?\n" );
+}
+
+static void siginit( void )
+{
+    struct sigaction act, old;
+
+    memset( &act, 0, sizeof( act ) );
+    act.sa_handler = sigalarm;
+    sigemptyset( &act.sa_mask );
+    sigaction( SIGALRM, &act, &old );
+}
+
 
 static void free_frame( videoinput_t *vidin, int frameid )
 {
@@ -117,9 +141,12 @@ static void free_frame( videoinput_t *vidin, int frameid )
 
 static void wait_for_frame( videoinput_t *vidin, int frameid )
 {
+    alarms = 0;
+    alarm( SYNC_TIMEOUT );
     if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frameid ) < 0 ) {
         fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n", frameid, strerror( errno ) );
     }
+    alarm( 0 );
 }
 
 unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
@@ -339,6 +366,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         fprintf( stderr, "videoinput: Can't allocate memory.\n" );
         return 0;
     }
+
+    siginit();
 
     vidin->curframe = 0;
     vidin->verbose = verbose;

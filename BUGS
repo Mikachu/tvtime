@@ -14,11 +14,6 @@ http://sourceforge.net/projects/tvtime/
  * If you start tvtime in 16:9 or 4:3 mode and switch using the 'a'
    key, then the OSD fonts aren't updated for the new aspect ratio.
 
-630210 - drop root after stealing resources
- * tvtime does nasty performance-stealing things if you're root, and
-   keeps root access if you start as root.  This should probably be
-   cleaned up.
-
 630236 - No MMX versions of MMXEXT functions
  * While it would be easy to provide MMX versions of the DScaler-ported
    deinterlacing algorithms, we currently only have MMXEXT versions.

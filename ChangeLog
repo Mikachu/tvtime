@@ -1,5 +1,7 @@
 
 0.9.6
+  * (vektor) We now drop root priviledges if tvtime is setuid root and run
+    as a normal user (bug 630210)
   * (vektor) Redid a bunch of the default key bindings.
   * (vektor) Added our own XVideo output module, using fullscreen and VidMode
     code from Ogle.  This may give better performance.
