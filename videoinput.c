@@ -350,8 +350,6 @@ void videoinput_set_tuner_freq( int freqKHz )
 
     if (frequency < 0) return;
 
-    videoinput_mute(1);
-
     if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
         frequency /= 1000; // switch to MHz
     }
@@ -363,7 +361,6 @@ void videoinput_set_tuner_freq( int freqKHz )
         videoinput_mute(0);
         return;
     }
-    videoinput_mute(0);
 }
 
 void videoinput_mute( int mute ) 

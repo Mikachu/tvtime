@@ -1301,7 +1301,7 @@ struct STRTAB chanlist_names[] = {
 int                chantab   = 1;
 struct CHANLIST   *chanlist  = ntsc_cable;
 int                chancount = CHAN_COUNT(ntsc_cable);
-int                chanindex = 0;
+int                chanindex = 1;
 
 int frequencies_set_chanlist( char *str )
 {
