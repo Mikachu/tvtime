@@ -4,10 +4,10 @@
 # Tapio Leipälä <lucid@sci.fi>, 2003
 msgid ""
 msgstr ""
-"Project-Id-Version: tvtime 0.9.12\n"
+"Project-Id-Version: tvtime 0.9.14\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2004-10-28 00:03-0400\n"
-"PO-Revision-Date: 2004-09-05 18:18+0300\n"
+"PO-Revision-Date: 2004-10-28 22:52+0300\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
 "MIME-Version: 1.0\n"
@@ -541,9 +541,9 @@ msgid "High (768 pixels)"
 msgstr "Korkea (768 kuvapistettä)"
 
 #: src/commands.c:838
-#, fuzzy, c-format
+#, c-format
 msgid "%s  Maximum (%d pixels)"
-msgstr "%s  Valittu: %d kuvapistettä"
+msgstr "%s  Maksimi (%d kuvapistettä)"
 
 #: src/commands.c:848 src/commands.c:1388
 msgid "Restart with new settings"
@@ -695,7 +695,6 @@ msgstr "Kontrasti"
 
 #: src/commands.c:1516 src/commands.c:1566 src/commands.c:1681
 #: src/commands.c:3144 src/commands.c:3163
-#, fuzzy
 msgid "Saturation"
 msgstr "Värikylläisyys"
 
@@ -1193,7 +1192,7 @@ msgstr "Luetaan asetukset tiedostosta %s\n"
 
 #: src/tvtimeconf.c:949
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
-msgstr ""
+msgstr "Ei voida ajaa useaa tvtimen ilmentymää samoilla asetuksilla.\n"
 
 #: src/tvtimeconf.c:960
 msgid "Saving command line options.\n"
@@ -1319,18 +1318,3 @@ msgid ""
 msgstr ""
 "Kanava löydetty taajuudelta %6.2f MHz (%.2f - %.2f MHz);\n"
 "lisätään kanavalistaan.\n"
-
-#~ msgid "BT8x8 luma correction"
-#~ msgstr "BT8x8-luminanssikorjaus"
-
-#~ msgid "Luma correction enabled."
-#~ msgstr "Luminanssikorjaus käytössä."
-
-#~ msgid "Luma correction disabled."
-#~ msgstr "Luminanssikorjaus poistettu käytöstä."
-
-#~ msgid "Luma correction value: %.1f"
-#~ msgstr "Luminanssikorjauksen kerroin: %.1f"
-
-#~ msgid "Colour"
-#~ msgstr "Värikylläisyys"
