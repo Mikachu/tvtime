@@ -62,6 +62,14 @@ char *get_tvtime_file( const char *filename )
 {
     char *cur;
 
+#ifdef FONTDIR
+    /* If FONTDIR is defined, we'll look for files there first.
+     * This is designed for distributions that already have a standard
+     * FreeFont package installed. */
+    cur = check_path( FONTDIR, filename );
+    if( cur ) return cur;
+#endif
+
     cur = check_path( DATADIR, filename );
     if( cur ) return cur;
 

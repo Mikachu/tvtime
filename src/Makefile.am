@@ -28,6 +28,9 @@ TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
 PLUGINS_LIBS = -L$(top_builddir)/plugins
 
+# Set the following if you want to specify an additional font directory
+# FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
+
 # directfb output currently disabled
 # if HAVE_DIRECTFB
 # DIRECTFB_CFLAGS = `directfb-config --cflags`
@@ -40,7 +43,8 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" -DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" -D_LARGEFILE64_SOURCE
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
+	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+	$(FONT_CFLAGS)
 AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
