@@ -76,6 +76,7 @@ struct config_s
     int invert;
     int cc;
     int mirror;
+    int boost;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -275,6 +276,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "MirrorInput" ) ) {
             ct->mirror = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "AudioBoost" ) ) {
+            ct->boost = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
@@ -778,6 +783,7 @@ config_t *config_new( void )
     ct->invert = 0;
     ct->cc = 0;
     ct->mirror = 0;
+    ct->boost = -1;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1732,5 +1738,10 @@ int config_get_cc( config_t *ct )
 int config_get_mirror( config_t *ct )
 {
     return ct->mirror;
+}
+
+int config_get_audio_boost( config_t *ct )
+{
+    return ct->boost;
 }
 
