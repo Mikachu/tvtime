@@ -1,9 +1,9 @@
 
-Thu Oct 31 19:24:02 AST 2002
-  * (vektor) Huge smoothness improvement, frames are now scheduled at
+0.9.5 
+  * (vektor) Cleanup of the /dev/rtc handling, can still use /dev/rtc even if
+    we can't get high resolution timing from it.
+  * (vektor) Smoothness improvement, frames are now scheduled at
     more correct times.  Added a performance tracker object.
-
-Thu Oct 31 14:27:05 AST 2002
   * (vektor) Removed the force-DScaler-defaults on startup for V4L settings.
 
 Fri Oct 25 09:17:02 ADT 2002

@@ -554,19 +554,18 @@ int main( int argc, char **argv )
     rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
         if( verbose ) {
-            fprintf( stderr, "tvtime: Can't open /dev/rtc "
-                             "(for my wakeup call).\n" );
+            fprintf( stderr, "tvtime: Can't open /dev/rtc (needed for accurate blit scheduling).\n" );
         }
     } else {
-        if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
-            if( verbose ) {
-                fprintf( stderr, "tvtime: Can't set 1024hz "
-                                 "from /dev/rtc.\n" );
-            }
+        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
             rtctimer_start_clock( rtctimer );
+
+            if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
+                fprintf( stderr, "tvtime: Can't get 1024hz resolution from /dev/rtc.\n" );
+            }
         }
     }
     if( verbose ) {

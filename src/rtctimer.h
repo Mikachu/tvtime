@@ -81,6 +81,11 @@ int rtctimer_set_interval( rtctimer_t *rtctimer, int hz );
 int rtctimer_next_tick( rtctimer_t *rtctimer );
 
 /**
+ * Returns the current resolution in hz.
+ */
+int rtctimer_get_resolution( rtctimer_t *rtctimer );
+
+/**
  * Returns the number of usecs in each tick.
  */
 int rtctimer_get_usecs( rtctimer_t *rtctimer );

@@ -167,6 +167,11 @@ int rtctimer_stop_clock( rtctimer_t *rtctimer )
     return was_running;
 }
 
+int rtctimer_get_resolution( rtctimer_t *rtctimer )
+{
+    return rtctimer->current_hz;
+}
+
 int rtctimer_get_usecs( rtctimer_t *rtctimer )
 {
     return rtctimer->usecs;
