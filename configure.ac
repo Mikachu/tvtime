@@ -160,15 +160,6 @@ fi
 AC_SUBST(X11_CFLAGS)
 AC_SUBST(X11_LIBS)
 
-AC_ARG_ENABLE([warnings],
-    [  --disable-warnings      do not treat warnings as errors])
-if test x"$enable_warnings" != x"no"; then
-    dnl compiler warnings
-    OPT_CFLAGS="$CFLAGS -Wall -Werror"
-    dnl FIXME
-    dnl AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS])
-fi
-
 dnl This stuff looked kinda cool in the mpeg2dec source tree.
 
 dnl GCC-specific flags
