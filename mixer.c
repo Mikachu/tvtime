@@ -161,12 +161,13 @@ int mixer_conditional_mute( void )
     return 0;
 }
 
-void mixer_toggle_mute()
+void mixer_toggle_mute( void )
 {
     mixer_mute( !muted );
 }
 
-int mixer_ismute()
+int mixer_ismute( void )
 {
     return muted;
 }
+

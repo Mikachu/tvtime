@@ -25,7 +25,7 @@ int mixer_get_volume( void );
 int mixer_set_volume( int percentdiff );
 void mixer_mute( int mute );
 int mixer_conditional_mute( void );
-void mixer_toggle_mute();
-int mixer_ismute();
+void mixer_toggle_mute( void );
+int mixer_ismute( void );
 
 #endif /* MIXER_H_INCLUDED */
