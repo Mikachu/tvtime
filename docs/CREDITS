@@ -21,11 +21,9 @@ Code we stole (well, used under the GPL)
 
   Freetype2 code and compositing ideas from mythtv
     http://mythtv.sourceforge.net/
-    The ttfont.[h,c] is from mythtv, original code partly from Freeamp,
-    Copyright (C) 1999 EMusic.  It also lists some code from Carsten
-    Haitzler, citing Copyright (C) 1999 Carsten Haitzler and various
-    contributors.
-    Alot of that will be cleaned up/merged to be common with mythtv.
+    The ttfont.[h,c] is from mythtv, original code from Carsten Haitzler,
+    citing Copyright (C) 1999 Carsten Haitzler and various contributors.
+    Hopefully this will be cleaned up/merged to be common with mythtv.
 
   Some great colourbar generation and Y'CbCr<->R'G'B' code
     Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>

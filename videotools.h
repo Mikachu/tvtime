@@ -25,12 +25,28 @@ extern "C" {
 #endif
 
 /**
+ * This is a collection of useful video-related functions.  Some of
+ * these depend on the speedy.[h,c] functions, or are implementations
+ * of the full-frame versions.
+ */
+
+/**
  * Scanline functions.
+ */
+
+/**
+ * Create a packed 4:2:2 scanline from a (planar) luma scanline and
+ * both associated cb and cr scanlines.
  */
 void create_packed422_from_planar422_scanline( unsigned char *output,
                                                unsigned char *luma,
                                                unsigned char *cb,
                                                unsigned char *cr, int width );
+
+/**
+ * This function was useful when I was doing linear interpolation from
+ * a 4:2:0 planar image to a 4:2:2 surface.
+ */
 void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,
@@ -39,6 +55,10 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *botcb,
                                                     unsigned char *botcr,
                                                     int width );
+
+/**
+ * These are the compositing routines we use in tvtime.
+ */
 void composite_alphamask_packed422_scanline( unsigned char *output,
                                              unsigned char *input,
                                              unsigned char *mask, int width,

@@ -1,3 +1,12 @@
+/**
+ * This file is originally from mythtv by Isaac Richards <ijr@po.cwru.edu>.
+ * http://mythtv.sourceforge.net/
+ *
+ * MythTV is distributed under the terms of the GPL, version 2 only.
+ * If you don't have a copy of the GPL, get one at:
+ *    http://www.gnu.org/licenses/gpl.txt
+ */
+
 #ifndef INCLUDED_TTFONT__H_
 #define INCLUDED_TTFONT__H_
 
