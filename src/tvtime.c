@@ -894,7 +894,8 @@ int main( int argc, char **argv )
     rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
         fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
-                         "*** that you load the 'rtc' kernel module before starting tvtime.\n"
+                         "*** that you load the 'rtc' kernel module before starting tvtime,\n"
+                         "*** and make sure that your user has access to the device file.\n"
                          "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
@@ -1009,8 +1010,6 @@ int main( int argc, char **argv )
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }
-            fprintf( stderr, "tvtime: Can't open video input, "
-                             "maybe try a different device?\n" );
         } else {
             videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
             width = videoinput_get_width( vidin );
@@ -1121,16 +1120,7 @@ int main( int argc, char **argv )
         return 1;
     }
 
-
     /* Setup the video correction tables. */
-    if( verbose ) {
-        if( config_get_apply_luma_correction( ct ) ) {
-            fprintf( stderr, "tvtime: Luma correction enabled.\n" );
-        } else {
-            fprintf( stderr, "tvtime: Luma correction disabled.\n" );
-        }
-    }
-
     filter = videofilter_new();
     if( !filter ) {
         fprintf( stderr, "tvtime: Can't initialize filters.\n" );
@@ -1140,7 +1130,8 @@ int main( int argc, char **argv )
         videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
     }
 
-    /*
+    /**
+     * Menu disabled until we have time to work on it again.
     menu = menu_new( commands, ct, vidin, osd, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
@@ -1152,30 +1143,29 @@ int main( int argc, char **argv )
     /* Ensure the FIFO directory exists */
     fifodir = opendir( FIFODIR );
     if( !fifodir ) {
-        fprintf( stderr, "tvtime: Not reading input from fifo.  "
-                         "Directory %s does not exist.\n", FIFODIR );
+        fprintf( stderr, "tvtime: Directory %s does not exist.  FIFO disabled.\n", FIFODIR );
     } else {
         closedir( fifodir );
-	/* Create the user's FIFO directory */
+        /* Create the user's FIFO directory */
         if( mkdir( config_get_command_pipe_dir( ct ), S_IRWXU ) < 0 ) {
             if( errno != EEXIST ) {
-                fprintf( stderr, "tvtime: Cannot create FIFO directory %s.\n", 
+                fprintf( stderr, "tvtime: Cannot create directory %s.  FIFO disabled.\n", 
                         config_get_command_pipe_dir( ct ) );
             } else {
                 fifodir = opendir( config_get_command_pipe_dir( ct ) );
                 if( !fifodir ) {
-                    fprintf( stderr, "tvtime: %s is not a directory.\n", 
+                    fprintf( stderr, "tvtime: %s is not a directory.  FIFO disabled.\n", 
                             config_get_command_pipe_dir( ct ) );
                 } else {
                     closedir( fifodir );
+                    /* Setup the FIFO */
+                    fifo = fifo_new( config_get_command_pipe( ct ) );
+                    if( !fifo && verbose ) {
+                        fprintf( stderr, "tvtime: Not reading input from FIFO. Creating "
+                                         "FIFO object failed.\n" );
+                    }
                 }
             }
-        }
-        /* Setup the FIFO */
-        fifo = fifo_new( config_get_command_pipe( ct ) );
-        if( !fifo ) {
-            fprintf( stderr, "tvtime: Not reading input from FIFO. Creating "
-                             "FIFO object failed.\n" );
         }
     }
 
