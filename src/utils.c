@@ -55,6 +55,7 @@ ings in this Software without prior written authorization from him.
 #include <wordexp.h>
 #include <errno.h>
 #include <dirent.h>
+#include <ctype.h>
 #include <pwd.h>
 #include <string.h>
 #include <stdarg.h>
