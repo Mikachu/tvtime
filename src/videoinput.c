@@ -252,6 +252,7 @@ struct videoinput_s
 
     /* V4L2 capture state. */
     capture_buffer_t capbuffers[ MAX_CAPTURE_BUFFERS ];
+    int is_streaming;
 
     /* V4L1 mmap-mode state. */
     int have_mmap;
@@ -342,6 +343,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
         if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
             fprintf( stderr, "videoinput: Can't read frame. Error was: %s.\n",
                      strerror( errno ) );
+            *frameid = -1;
             return 0;
         }
         vidin->capbuffers[ cur_buf.index ].free = 0;
@@ -396,17 +398,23 @@ int videoinput_buffer_invalid( videoinput_t *vidin, int frameid )
 
 static void videoinput_start_capture_v4l2( videoinput_t *vidin )
 {
-    if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-        fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
-                 strerror( errno ) );
+    if( !vidin->is_streaming ) {
+        if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+            fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
+                     strerror( errno ) );
+        }
+        vidin->is_streaming = 1;
     }
 }
 
 static void videoinput_stop_capture_v4l2( videoinput_t *vidin )
 {
-    if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-        fprintf( stderr, "videoinput: Driver refuses to halt streaming: %s.\n",
-                 strerror( errno ) );
+    if( vidin->is_streaming ) {
+        if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+            fprintf( stderr, "videoinput: Driver refuses to halt streaming: %s.\n",
+                     strerror( errno ) );
+        }
+        vidin->is_streaming = 0;
     }
 }
 
@@ -455,6 +463,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->has_audio = 1;
     vidin->curinput = 0;
     vidin->have_mmap = 0;
+    vidin->is_streaming = 0;
 
     memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
 
@@ -779,13 +788,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         /**
          * Tell video stream to begin capture.
          */
-        if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
-                     strerror( errno ) );
-            close( vidin->grab_fd );
-            free( vidin );
-            return 0;
-        }
+        videoinput_start_capture_v4l2( vidin );
+
         return vidin;
     } else {
         /* Try to set up mmap-based capture. */
@@ -1094,16 +1098,22 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 
         if( vidin->isv4l2 ) {
             struct v4l2_frequency freqinfo;
+            int wasstreaming = vidin->is_streaming;
 
             memset( &freqinfo, 0, sizeof( struct v4l2_frequency ) );
             freqinfo.tuner = vidin->tunerid;
             freqinfo.type = V4L2_TUNER_ANALOG_TV;
             freqinfo.frequency = frequency;
 
+            videoinput_stop_capture_v4l2( vidin );
             if( ioctl( vidin->grab_fd, VIDIOC_S_FREQUENCY, &freqinfo ) < 0 ) {
                 fprintf( stderr, "videoinput: Tuner present, but our request to change to\n"
                          "videoinput: frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
                 fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
+            }
+            if( wasstreaming ) {
+                videoinput_free_all_frames( vidin );
+                videoinput_start_capture_v4l2( vidin );
             }
         } else {
             if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
@@ -1319,6 +1329,9 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
     if( vidin->isv4l2 ) {
         v4l2_std_id std;
         int index = inputnum;
+        int wasstreaming = vidin->is_streaming;
+
+        videoinput_stop_capture_v4l2( vidin );
 
         if( ioctl( vidin->grab_fd, VIDIOC_S_INPUT, &index ) < 0 ) {
             fprintf( stderr, "videoinput: Card refuses to set its input.\n"
@@ -1354,6 +1367,11 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 fprintf( stderr, "can't set the current standard: %s\n",
                          strerror( errno ) );
             }
+        }
+
+        if( wasstreaming ) {
+            videoinput_free_all_frames( vidin );
+            videoinput_start_capture_v4l2( vidin );
         }
     } else {
         if( inputnum >= vidin->numinputs ) {

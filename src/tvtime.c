@@ -1533,6 +1533,23 @@ int main( int argc, char **argv )
                     fprintf( stderr, "tvtime: Can't capture next frame, exiting.\n" );
                     tuner_state = TUNER_STATE_NO_SIGNAL;
                     acquired = 0;
+                } else {
+                    /* Make sure our buffers are valid. */
+                    if( fieldsavailable == 2 ) {
+                        if( videoinput_buffer_invalid( vidin, lastframeid ) ) {
+                            lastframe = curframe;
+                            lastframeid = -1;
+                        }
+                    } else if( fieldsavailable == 4 ) {
+                        if( videoinput_buffer_invalid( vidin, secondlastframeid ) ) {
+                            secondlastframe = curframe;
+                            secondlastframeid = -1;
+                        }
+                        if( videoinput_buffer_invalid( vidin, lastframeid ) ) {
+                            lastframe = curframe;
+                            lastframeid = -1;
+                        }
+                    }
                 }
             }
             tvtime->filtered_curframe = 0;
