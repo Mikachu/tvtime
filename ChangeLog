@@ -1,5 +1,8 @@
 
 0.9.9.1
+  * vektor: Only print frame drop information if signal detection
+      is turned on.  This is because stats will only be reliable
+      if the signal is good.
   * vektor: Add a command RUN_COMMAND to have tvtime execute an
       external program.
   * vektor: Key binding commands can now take arguments.

@@ -2105,7 +2105,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                  width, height, framesize, fieldtime, framerate_mode,
                                  videoinput_get_norm( vidin ) );
         }
-        if( config_get_debug( ct ) ) {
+        if( config_get_debug( ct ) && commands_check_freq_present( commands ) ) {
             if( curmethod )  {
                 performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
             } else {
