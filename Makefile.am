@@ -1,3 +1,4 @@
 
+AUTOMAKE_OPTIONS = 1.6
 SUBDIRS = plugins src
 
