@@ -531,14 +531,12 @@ int main( int argc, char **argv )
                                          config_get_luma_correction( ct ) );
     }
 
-
     in = input_new( ct, vidin, osd, vc );
     if( !in ) {
         fprintf( stderr, "tvtime: Can't create input handler.\n" );
         return 1;
     }
 
-/* Billy - menu code disabled for now. */
     menu = menu_new( in, ct, vidin, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
@@ -666,7 +664,13 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
-            if( vidmode ) vidmode_print_modeline( vidmode );
+            if( vidmode ) {
+                fprintf( stderr, "vidmode: Currently at %dx%d resolution, "
+                         "display refresh is %2.2fhz.\n",
+                         vidmode_get_current_width( vidmode ),
+                         vidmode_get_current_height( vidmode ),
+                         vidmode_get_current_refresh_rate( vidmode ) );
+            }
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );
