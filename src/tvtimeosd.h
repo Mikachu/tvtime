@@ -91,6 +91,7 @@ int tvtime_osd_list_get_numlines( tvtime_osd_t *osd );
 void tvtime_osd_list_set_hilight( tvtime_osd_t *osd, int pos );
 void tvtime_osd_list_set_text( tvtime_osd_t *osd, int line, const char *text );
 void tvtime_osd_list_set_lines( tvtime_osd_t *osd, int numlines );
+void tvtime_osd_list_hold( tvtime_osd_t *osd, int hold );
 
 /**
  * This function must be called every frame to update the state of the OSD.

@@ -763,6 +763,7 @@ struct osd_list_s
 {
     double aspect;
     int frames_left;
+    int hold;
     int numlines;
     int hilight;
     int width;
@@ -785,6 +786,7 @@ osd_list_t *osd_list_new( double pixel_aspect )
     osdl->frames_left = 0;
     osdl->width = 0;
     osdl->height = 0;
+    osdl->hold = 0;
     osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
     if( !osdl->font ) {
         free( osdl );
@@ -893,16 +895,23 @@ int osd_list_visible( osd_list_t *osdl )
     return (osdl->numlines > 0 && osd_string_visible( osdl->lines[ 0 ] ));
 }
 
+void osd_list_set_hold( osd_list_t *osdl, int hold )
+{
+    osdl->hold = hold;
+}
+
 void osd_list_advance_frame( osd_list_t *osdl )
 {
     int i;
 
-    if( osdl->frames_left > 0 ) {
+    if( !osdl->hold && osdl->frames_left > 0 ) {
         osdl->frames_left--;
     }
 
-    for( i = 0; i < osdl->numlines; i++ ) {
-        osd_string_advance_frame( osdl->lines[ i ] );
+    if( !osdl->hold ) {
+        for( i = 0; i < osdl->numlines; i++ ) {
+            osd_string_advance_frame( osdl->lines[ i ] );
+        }
     }
 }
 

@@ -411,6 +411,7 @@ static void osd_list_favorites( commands_t *in )
     tvtime_osd_list_set_text( in->osd, in->numfavorites + 1, "Add current station" );
     tvtime_osd_list_set_text( in->osd, in->numfavorites + 2, "Exit" );
     tvtime_osd_list_set_hilight( in->osd, in->curfavpos + 1 );
+    tvtime_osd_list_hold( in->osd, 1 );
     tvtime_osd_show_list( in->osd, 1 );
 }
 
@@ -445,6 +446,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
     if( in->showfavorites ) {
         switch( tvtime_cmd ) {
         case TVTIME_MENU_EXIT:
+            tvtime_osd_list_hold( in->osd, 0 );
             tvtime_osd_show_list( in->osd, 0 );
             in->showfavorites = 0;
             break;
@@ -465,6 +467,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
                     in->change_channel = 1;
                 }
             }
+            tvtime_osd_list_hold( in->osd, 0 );
             tvtime_osd_show_list( in->osd, 0 );
             in->showfavorites = 0;
             break;

@@ -691,6 +691,11 @@ void tvtime_osd_list_set_lines( tvtime_osd_t *osd, int numlines )
     osd_list_set_lines( osd->list, numlines );
 }
 
+void tvtime_osd_list_hold( tvtime_osd_t *osd, int hold )
+{
+    osd_list_set_hold( osd->list, hold );
+}
+
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 {
     char timestamp[ 50 ];
