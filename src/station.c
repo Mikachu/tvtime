@@ -171,7 +171,7 @@ int station_readconfig( station_mgr_t *mgr )
         return 0;
     }
 
-    if( xmlStrcmp( cur->name, BAD_CAST "STATIONRC" ) ) {
+    if( xmlStrcmp( cur->name, BAD_CAST "stationlist" ) ) {
         fprintf( stderr, "station: %s: document of the wrong type", mgr->stationrc );
         xmlFreeDoc( doc );
         return 0;
@@ -225,7 +225,7 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
     if( !mgr ) return 0;
 
     strncpy( mgr->stationrc, getenv( "HOME" ), 235 );
-    strncat( mgr->stationrc, "/.tvtime/stations.xml", 255 );
+    strncat( mgr->stationrc, "/.tvtime/stationlist.xml", 255 );
     mgr->verbose = verbose;
     mgr->first = 0;
     mgr->current = 0;
@@ -574,7 +574,7 @@ int station_writeconfig( station_mgr_t *mgr)
     }
 
     doc = xmlNewDoc( BAD_CAST "1.0" );
-    doc->children = xmlNewDocNode( doc, 0, BAD_CAST "STATIONRC", 0 );
+    doc->children = xmlNewDocNode( doc, 0, BAD_CAST "stationlist", 0 );
 
     sprintf( buf, "%d", mgr->current->pos );
 
