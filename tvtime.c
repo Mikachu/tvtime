@@ -334,8 +334,11 @@ int main( int argc, char **argv )
     /**
      * 1 buffer : 0 fields available.  [t][b]
      * 2 buffers: 1 field  available.  [t][b][-][-]
+     *                                 ^^^
      * 3 buffers: 3 fields available.  [t][b][t][b][-][-]
+     *                                 ^^^^^^^^^
      * 4 buffers: 5 fields available.  [t][b][t][b][t][b][-][-]
+     *                                 ^^^^^^^^^^^^^^^
      */
     if( videoinput_get_numframes( vidin ) < 2 ) {
         fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
@@ -371,7 +374,6 @@ int main( int argc, char **argv )
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
     colourbars = (unsigned char *) malloc( width * height * 2 );
-    lastframe = (unsigned char *) malloc( width * height * 2 );
     if( !testframe_odd || !testframe_even || !colourbars || !lastframe ) {
         fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
         return 1;
