@@ -13,7 +13,7 @@ static const char *taglines[] = {
 "tvtime: the word of the day",
 "tvtime: a drug-free way to promote regularity",
 "tvtime: taste it again, for the first time",
-"a different kind of company, a different kind of tvtime",
+"tvtime: a different kind of company, a different kind of tvtime",
 "tvtime: for the strong, silent type",
 "tvtime: it does go well with the chicken",
 "tvtime: the deinterlacer kids ask for by name",
@@ -36,7 +36,7 @@ static const char *taglines[] = {
 "tvtime: make room",
 "tvtime: my tv has a first name, it's t-v-t-i-m-e",
 "tvtime: linux: $0, libpng: $0, libsdl: $0, tvtime: priceless",
-"tvtime: vosprung durch technik",
+"tvtime: Vorsprung durch Technik",
 "tvtime: a tvtime a day helps you work, rest and play",
 "tvtime: I liked the deinterlacer so much... I bought the company",
 "tvtime: top breeders recommend it", };

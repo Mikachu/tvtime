@@ -113,8 +113,6 @@ static void wait_for_frame( videoinput_t *vidin, int frameid )
 
 unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
 {
-    int rc;
-
     if( vidin->have_mmap ) {
         unsigned char *cur;
         wait_for_frame( vidin, vidin->curframe );
@@ -123,9 +121,9 @@ unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
         vidin->curframe = ( vidin->curframe + 1 ) % vidin->numframes;
         return cur;
     } else {
-        rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
+        int rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
         if( vidin->grab_size != rc ) {
-            fprintf( stderr, "videoinput: grabber read error (rc=%d)\n", rc );
+            fprintf( stderr, "videoinput: grabber read error (rc=%d).\n", rc );
             return 0;
         } else {
             return vidin->grab_data;
@@ -135,7 +133,9 @@ unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
 
 void videoinput_free_frame( videoinput_t *vidin, int frameid )
 {
-    free_frame( vidin, frameid );
+    if( vidin->have_mmap ) {
+        free_frame( vidin, frameid );
+    }
 }
 
 static void videoinput_free_all_frames( videoinput_t *vidin )
@@ -477,7 +477,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     grab_pict.depth = 16;
     grab_pict.palette = VIDEO_PALETTE_YUV422;
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCSPICT" );
+        fprintf( stderr, "videoinput: Can't get Y'CbCr 4:2:2 packed images from the card, unable to"
+                 "process the output: %s.\n", strerror( errno ) );
+        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
+                 "indicating your capture card, driver, and the error message above.\n" );
+        close( vidin->grab_fd );
+        free( vidin );
         return 0;
     }
 
@@ -493,8 +498,9 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         perror( "ioctl VIDIOCGWIN" );
         return 0;
     }
-    vidin->grab_size = vidin->grab_win.width * vidin->grab_win.height * 3;
+    vidin->grab_size = (vidin->grab_win.width * vidin->grab_win.height * 2);
     vidin->grab_data = (unsigned char *) malloc( vidin->grab_size );
+    vidin->numframes = 2;
 
     return vidin;
 }

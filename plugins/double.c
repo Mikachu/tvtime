@@ -30,7 +30,7 @@ static deinterlace_method_t doublemethod =
     DEINTERLACE_PLUGIN_API_VERSION,
     "Line doubler",
     "Double",
-    2,
+    1,
     0,
     0,
     0,

@@ -53,4 +53,7 @@ Code we stole (well, used under the GPL)
   Contains fonts which are hosted under the freefont project:
     http://www.nongnu.org/freefont/
 
+  Lots of help with the V4L API, bttv-specific features, and tuner dealings
+  from the source of video4linux information, xawtv, by Gerd Knorr:
+    http://bytesex.org/xawtv/
 
