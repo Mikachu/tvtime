@@ -216,7 +216,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
 
     if( osd_string_visible( osd->channel_info ) ) {
         if( scanline >= osd->channel_info_ypos &&
-            scanline < osd->channel_info_ypos + osd_string_get_height( osd->channel_number ) ) {
+            scanline < osd->channel_info_ypos + osd_string_get_height( osd->channel_info ) ) {
 
             int startx = osd->channel_info_xpos - xpos;
             int strx = 0;
@@ -260,7 +260,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
      */
     if( osd_string_visible( osd->data_bar ) ) {
         if( scanline >= osd->data_bar_ypos &&
-            scanline < osd->data_bar_ypos + osd_string_get_height( osd->channel_number ) ) {
+            scanline < osd->data_bar_ypos + osd_string_get_height( osd->data_bar ) ) {
 
             int startx = osd->data_bar_xpos - xpos;
             int strx = 0;
@@ -278,7 +278,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     } else if( osd->ismuted ) {
         if( scanline >= osd->muted_ypos &&
-            scanline < osd->muted_ypos + osd_string_get_height( osd->channel_number ) ) {
+            scanline < osd->muted_ypos + osd_string_get_height( osd->muted ) ) {
 
             int startx = osd->muted_xpos - xpos;
             int strx = 0;
@@ -296,7 +296,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     } else if( osd_string_visible( osd->volume_bar ) ) {
         if( scanline >= osd->volume_bar_ypos &&
-            scanline < osd->volume_bar_ypos + osd_string_get_height( osd->channel_number ) ) {
+            scanline < osd->volume_bar_ypos + osd_string_get_height( osd->volume_bar ) ) {
 
             int startx = osd->volume_bar_xpos - xpos;
             int strx = 0;
