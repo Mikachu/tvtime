@@ -1,5 +1,5 @@
 
-0.9.8
+0.9.8 - Mon Apr 28 23:55:41 ADT 2003
   * vektor: Used dalias' new quater-scanline interpolation method for
       overlay bob (improves quality).
   * vektor: Added Australia Optus cable frequencies, for users who want
@@ -17,8 +17,8 @@
       (fixes 716119)
   * vektor: Solved a segfault with the TimeFormat setting (fixes 720429)
   * vektor: Fixed data bar rendering code (fixees 632781)
-  * sflaw: Moved the fifo out of $HOME and into /var/run (fixes 694685)
-  * sflaw: Fifo group is now restricted (fixes 711332)
+  * sfllaw: Moved the fifo out of $HOME and into /var/run (fixes 694685)
+  * sfllaw: Fifo group is now restricted (fixes 711332)
   * vektor: Startup window size is now dependent on pixel aspect
       (fixes 723477)
   * vektor: Fixed some string memory errors in tvtime.c, which fixed some
@@ -39,7 +39,7 @@
   * vektor: Fixed string rendering where they were being cut off on
       the right hand side (fixes 693642)
   * vektor: Support for non-square pixel displays added (fixes 690428)
-  * sflaw: autoconf cleanups (fixes 711334)
+  * sfllaw: autoconf cleanups (fixes 711334)
   * vektor: configure fails if X development headers aren't found (fixes
       bug 696069)
   * vektor: ENTER added to the command list (fixes 708596)
