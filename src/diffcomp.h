@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Lossless Differential coding (prediction coding) based compression
  * algorithm.  Based on an idea from the 'Huffyuv' codec by Ben
@@ -54,4 +58,7 @@ int diffcomp_compress_packed422( uint8_t *dst, uint8_t *src,
 void diffcomp_decompress_packed422( uint8_t *dst, uint8_t *src,
                                     int width, int height );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* DIFFCOMP_H_INCLUDED */
