@@ -665,7 +665,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
             break;
 
         case TVTIME_CHANNEL_PREV:
-       		input_channel_change_relative(in, (prev_channel - cur_channel));
+       		input_channel_change_relative( in, prev_channel ? (prev_channel - cur_channel) : 0 );
 			break;
 		
 		case TVTIME_MIXER_UP: 

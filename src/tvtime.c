@@ -677,7 +677,7 @@ int main( int argc, char **argv )
     if( !vbidata ) {
         fprintf( stderr, "tvtime: Could not create vbidata.\n" );
     } else {
-        vbidata_capture_mode( vbidata, CAPTURE_CC1 );
+        vbidata_capture_mode( vbidata, CAPTURE_OFF );
     }
 
     /* Setup the output. */
