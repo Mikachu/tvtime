@@ -26,8 +26,8 @@ computer monitor or projector.
       experience.
 
 
-  See the file docs/default.tvtimerc for a default configuration file
-(place as ~/.tvtime/tvtimerc) and the default runtime keybindings.  The
+  See the file docs/default.tvtime.xml for a default configuration file
+(place as ~/.tvtime/tvtime.xml) and the default runtime keybindings.  The
 keybindings are also listed in detail on the help page of the tvtime
 website.
 
