@@ -625,7 +625,7 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness <= 360 ) {
+    if( sharpness == 360 ) {
         sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa4 );
@@ -635,7 +635,7 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
     menu_set_right_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness > 360 && sharpness <= 576 ) {
+    if( sharpness == 576 ) {
         sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa4 );
@@ -645,7 +645,7 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
     menu_set_right_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness > 576 && sharpness <= 720 ) {
+    if( sharpness == 720 ) {
         sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa4 );
@@ -655,7 +655,7 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
     menu_set_right_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness > 720 ) {
+    if( sharpness == 768 ) {
         sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa4 );
