@@ -57,9 +57,18 @@
 #include "pulldown.h"
 
 /**
- * Set this to 1 to enable the experimental pulldown detection code.
+ * 0 == PULLDOWN_NONE
+ * 1 == PULLDOWN_VEKTOR
+ * 2 == PULLDOWN_DALIAS
  */
-static unsigned int detect_pulldown = 0;
+enum {
+    PULLDOWN_NONE = 0,
+    PULLDOWN_VEKTOR = 1,
+    PULLDOWN_DALIAS = 2,
+    PULLDOWN_MAX = 3,
+};
+
+static unsigned int pulldown_alg = 0;
 
 /**
  * scratch paper:
@@ -284,6 +293,11 @@ static int last_botdiff = 0;
 static videofilter_t *filter = 0;
 static int filtered_cur = 0;
 
+static int pulldown_merge = 0;
+static int pulldown_copy = 0;
+static int did_copy_top = 0;
+static int last_fieldcount = 0;
+
 static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              unsigned char *curframe,
                                              unsigned char *lastframe,
@@ -302,7 +316,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     int i;
 
     /* Make pulldown decisions every top field. */
-    if( detect_pulldown && !bottom_field ) {
+    if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field ) {
         int predicted;
 
         predicted = pdoffset << 1;
@@ -415,7 +429,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                 filmmode = 0;
             }
         }
-    } else if( detect_pulldown && !pderror ) {
+    } else if( (pulldown_alg == PULLDOWN_VEKTOR) && !pderror ) {
         int curoffset = pdoffset << 1;
         if( curoffset > PULLDOWN_OFFSET_5 ) curoffset = PULLDOWN_OFFSET_1;
 
@@ -443,21 +457,89 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         return;
     }
 
-    /*
-    if( !bottom_field ) {
-        pulldown_metrics_t peak, rel, mean;
-        diff_factor_packed422_frame( &peak, &rel, &mean, lastframe, curframe,
-                                     width, frame_height, width*2, width*2 );
-        fprintf( stderr, "stats: pd=%d re=%d ro=%d rt=%d rs=%d rp=%d rd=%d, took %d\n",
-                peak.d, rel.e, rel.o, rel.t, rel.s, rel.p, rel.d, timediff( &after, &before ) );
+    if( pulldown_alg == PULLDOWN_DALIAS ) {
+        last_fieldcount++;
+
+        if( !bottom_field ) {
+            static pulldown_metrics_t old_peak;
+            static pulldown_metrics_t old_rel;
+            static pulldown_metrics_t old_mean;
+            static int drop = 0;
+            int do_drop = 0;
+            pulldown_metrics_t new_peak, new_rel, new_mean;
+
+            diff_factor_packed422_frame( &new_peak, &new_rel, &new_mean, lastframe, curframe,
+                                         width, frame_height, width*2, width*2 );
+            /*
+            fprintf( stderr, "stats: pd=%d re=%d ro=%d rt=%d rs=%d rp=%d rd=%d\n",
+                    new_peak.d, new_rel.e, new_rel.o, new_rel.t, new_rel.s, new_rel.p, new_rel.d );
+            */
+
+            if( drop ) {
+                drop = 0;
+                do_drop = 1;
+                pulldown_copy = 2;
+            } else {
+                switch(determine_pulldown_offset_dalias( &old_peak, &old_rel, &old_mean,
+                                                         &new_peak, &new_rel, &new_mean )) {
+                    case PULLDOWN_ACTION_MRGE3: drop = 1; pulldown_merge = 1; break;
+                    default:
+                    case PULLDOWN_ACTION_COPY1: break;
+                    case PULLDOWN_ACTION_DROP2: break;
+                }
+            }
+            old_peak = new_peak;
+            old_rel = new_rel;
+            old_mean = new_mean;
+            if( drop || do_drop ) return;
+            if( !pulldown_copy ) return;
+            // Copy.
+            for( i = 0; i < frame_height; i++ ) {
+                unsigned char *curoutput = output + (i * outstride);
+                blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
+                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+            }
+            pulldown_copy--;
+            did_copy_top = 1;
+            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+        } else if( pulldown_merge ) {
+            // Merge.
+            for( i = 0; i < frame_height; i++ ) {
+                unsigned char *curoutput = output + (i * outstride);
+
+                if( i & 1 ) {
+                    blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
+                } else {
+                    blit_packed422_scanline( curoutput, curframe + (i * instride), width );
+                }
+                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+            }
+            pulldown_merge = 0;
+            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+        } else if( !pulldown_copy ) {
+            // Copy.
+            if( did_copy_top ) { did_copy_top = 0; return; }
+            for( i = 0; i < frame_height; i++ ) {
+                unsigned char *curoutput = output + (i * outstride);
+                blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
+                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+            }
+            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+        }
+        return;
     }
-    */
 
 
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( detect_pulldown && !bottom_field ) {
+        if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field ) {
             for( i = 40; i < frame_height/2 - 40; i += 2 ) {
                 topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
                                                            lastframe + (i*instride*2), width );
@@ -583,7 +665,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             }
 
             /* Copy a scanline. */
-            if( detect_pulldown && !bottom_field && scanline > 40 && (scanline & 3) == 0 && scanline < frame_height - 40 ) {
+            if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field && scanline > 40 && (scanline & 3) == 0 && scanline < frame_height - 40 ) {
                 topdiff += diff_factor_packed422_scanline( curframe, lastframe, width );
                 botdiff += diff_factor_packed422_scanline( curframe + instride, lastframe + instride, width );
             }
@@ -1202,13 +1284,16 @@ int main( int argc, char **argv )
             }
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
-            if( detect_pulldown ) {
-                if( osd ) tvtime_osd_show_message( osd, "Pulldown detection disabled." );
-            } else {
-                if( osd ) tvtime_osd_show_message( osd, "Pulldown detection enabled." );
+            pulldown_alg = (pulldown_alg + 1) % PULLDOWN_MAX;
+            if( osd ) {
+                if( pulldown_alg == PULLDOWN_NONE ) {
+                    tvtime_osd_show_message( osd, "Pulldown detection disabled." );
+                } else if( pulldown_alg == PULLDOWN_VEKTOR ) {
+                    tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
+                } else if( pulldown_alg == PULLDOWN_DALIAS ) {
+                    tvtime_osd_show_message( osd, "Using dalias's pulldown detection." );
+                }
             }
-            detect_pulldown = !detect_pulldown;
-            fprintf( stderr, "Pulldown detection %s.\n", detect_pulldown ? "enabled" : "disabled" );
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();

@@ -458,7 +458,6 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak,
 
     if (new_relative->t < 2*new_relative->p) {
         if ((3*old_relative->e < old_relative->o) || (2*new_relative->t < new_relative->p)) {
-            // p->sync = 1;
             return PULLDOWN_ACTION_MRGE3;
         }
     }
