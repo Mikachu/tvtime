@@ -1,2 +1,2 @@
 ?package(tvtime):needs=x11 section=Apps/Viewers\
-  title="tvtime" command="/usr/bin/tvtime"
+  title="tvtime" command="/usr/bin/tvtime" icon="tvtime.png"
