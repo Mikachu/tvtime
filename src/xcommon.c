@@ -155,7 +155,8 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
     }
 }
 
-static unsigned long req_serial;        /* used for error handling */
+/* Used for error handling. */
+static unsigned long req_serial;
 static int (*prev_xerrhandler)( Display *dpy, XErrorEvent *ev );
 
 static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
@@ -176,6 +177,73 @@ static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
     }
 }
 
+static void get_window_manager_name( Display *dpy, Window wm_window, char **wm_name_return )
+{
+    Atom atom;
+
+    atom = XInternAtom( dpy, "_NET_WM_NAME", True );
+    if( atom != None ) {
+        Atom type_return;
+        int format_return;
+        unsigned long bytes_after_return;
+        unsigned long nitems_return;
+        unsigned char *prop_return = 0;
+
+        if( XGetWindowProperty( dpy, wm_window, atom, 0,
+                                4, False, XA_STRING,
+                                &type_return, &format_return,
+                                &nitems_return, &bytes_after_return,
+                                &prop_return ) != Success ) {
+            fprintf( stderr, "xcommon: Can't get window manager name "
+                             "property (WM not compliant).\n" );
+            *wm_name_return = strdup( "unknown" );
+            return;
+        }
+    
+        if( type_return == None ) {
+            fprintf( stderr, "xcommon: No window manager name "
+                             "property found (WM not compliant).\n" );
+            *wm_name_return = strdup( "unknown" );
+            return;
+        }
+
+        if( type_return != XA_STRING ) {
+            Atom type_utf8 = XInternAtom( dpy, "UTF8_STRING", True );
+            if( type_utf8 == None ) {
+                fprintf( stderr, "xcommon: Window manager name not "
+                                 "ASCII or UTF8, giving up.\n" );
+                *wm_name_return = strdup( "unknown" );
+                return;
+            }
+
+            if( type_return == type_utf8 ) {
+                if( XGetWindowProperty( dpy, wm_window, atom, 0,
+                                        4, False, type_utf8,
+                                        &type_return, &format_return,
+                                        &nitems_return,
+                                        &bytes_after_return,
+                                        &prop_return ) != Success ) {
+                    fprintf( stderr, "wm_name: Can't get window "
+                                     "manager name propety "
+                                     "(WM not compliant).\n" );
+                    *wm_name_return = strdup( "unknown" );
+                    return;
+                }
+
+                if( format_return == 8 ) {
+                    *wm_name_return = strdup( (char *) prop_return );
+                }
+            }
+            if( prop_return ) XFree( prop_return );
+        } else {
+            if( format_return == 8 ) {
+                *wm_name_return = strdup( (char *) prop_return );
+            }
+            XFree( prop_return );
+        }
+    }
+}
+
 /**
  * returns 1 if a window manager compliant to the
  * Extended Window Manager Hints (EWMH) spec is running.
@@ -186,161 +254,101 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
 {
     Atom atom;
     Atom type_return;
-    Atom type_utf8;
     int format_return;
     unsigned long nitems_return;
     unsigned long bytes_after_return;
-    unsigned char *prop_return = NULL;
-    Window win_id;
-    int status;
+    unsigned char *prop_return = 0;
 
     atom = XInternAtom( dpy, "_NET_SUPPORTING_WM_CHECK", True );
     if( atom == None ) {
         return 0;
     }
 
-    if( XGetWindowProperty( dpy, DefaultRootWindow(dpy), atom, 0,
+    if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), atom, 0,
                             1, False, XA_WINDOW,
                             &type_return, &format_return, &nitems_return,
-                            &bytes_after_return, &prop_return) != Success ) {
-        fprintf( stderr, "check_for_EWMH: XGetWindowProperty failed\n" );
+                            &bytes_after_return, &prop_return ) != Success ) {
+        fprintf( stderr, "xcommon: Can't get window property to check for EWMH.\n" );
         return 0;
     }
   
     if( type_return == None ) {
-        fprintf( stderr, "check_for_EWMH: property does not exist\n" );
+        fprintf( stderr, "xcommon: No window properties found for EWMH.\n" );
         return 0;
     }
 
     if( type_return != XA_WINDOW ) {
-        fprintf( stderr, "check_for_EWMH: XA_WINDOW property has wrong type\n" );
-        if( prop_return != NULL ) {
-            XFree(prop_return);
-        }
-        return 0;
-    } else {
-
-        if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
-
-            win_id = *( (long *) prop_return );
-
-            XFree( prop_return );
-            prop_return = NULL;
-      
-            /* make sure we don't have any unhandled errors */
-            XSync( dpy, False );
-
-            /* set error handler so we can check if XGetWindowProperty failed */
-            prev_xerrhandler = XSetErrorHandler( xprop_errorhandler );
-
-            /* get the serial of the XGetWindowProperty request */
-            req_serial = NextRequest( dpy );
-
-            /* try to get property
-             * this can fail if we have a property with the win_id on the
-             * root window, but the win_id is no longer valid.
-             * This is to check for a stale window manager
-             */
-            status = XGetWindowProperty( dpy, win_id, atom, 0,
-                                         1, False, XA_WINDOW,
-                                         &type_return, &format_return, &nitems_return,
-                                         &bytes_after_return, &prop_return );
-      
-            /* make sure XGetWindowProperty has been processed and any errors
-               have been returned to us */
-            XSync( dpy, False );
-      
-            /* revert to the previous xerrorhandler */
-            XSetErrorHandler( prev_xerrhandler );
-      
-            if( status != Success ) {
-                fprintf( stderr, "check_for_EWMH: XGetWindowProperty failed\n" );
-                return 0;
-            }
-      
-            if( type_return == None ) {
-                fprintf( stderr, "check_for_EWMH: property does not exist\n" );
-                return 0;
-            }
-      
-            if( type_return != XA_WINDOW ) {
-                fprintf( stderr, "check_for_EWMH: property has wrong type (%ld)\n", type_return );
-                if( prop_return != NULL ) {
-                    XFree( prop_return );
-                }
-                return 0;
-            }
-      
-            if( type_return == XA_WINDOW ) {
-
-                if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
-
-                    if( win_id == *( (long *) prop_return ) ) {
-                        // We have successfully detected a EWMH compliant Window Manager
-                        XFree( prop_return );
-
-                        /* check the name of the wm */
-                        atom = XInternAtom(dpy, "_NET_WM_NAME", True);
-                        if( atom != None ) {
-
-                            if( XGetWindowProperty( dpy, win_id, atom, 0,
-                                                    4, False, XA_STRING,
-                                                    &type_return, &format_return,
-                                                    &nitems_return,
-                                                    &bytes_after_return,
-                                                    &prop_return ) != Success ) {
-                                fprintf( stderr, "XGetWindowProperty failed in wm_name\n" );
-                                return 0;
-                            }
-    
-                            if( type_return == None ) {
-                                fprintf( stderr, "wm_name: property does not exist\n" );
-                                return 0;
-                            }
-
-                            if( type_return != XA_STRING ) {
-                                type_utf8 = XInternAtom( dpy, "UTF8_STRING", True );
-                                if( type_utf8 == None ) {
-                                    fprintf( stderr, "wm_name: not UTF8_STRING either\n" );
-                                    return 0;
-                                }
-
-                                if( type_return == type_utf8 ) {
-                                    if( XGetWindowProperty( dpy, win_id, atom, 0,
-                                                            4, False, type_utf8,
-                                                            &type_return, &format_return,
-                                                            &nitems_return,
-                                                            &bytes_after_return,
-                                                            &prop_return ) != Success ) {
-                                        fprintf( stderr, "wm_name: XGetWindowProperty failed\n" );
-                                        return 0;
-                                    }
-
-                                    if(format_return == 8) {
-                                        *wm_name_return = strdup( (char *) prop_return );
-                                    }
-                                }
-                                if(prop_return != NULL) {
-                                    XFree( prop_return );
-                                }
-                            } else {
-                                if(format_return == 8) {
-                                    *wm_name_return = strdup( (char *) prop_return );
-                                }
-                                XFree( prop_return );
-                                /* end name check */
-                            }
-                        }
-                        return 1;
-                    }
-                }
-                XFree( prop_return );
-                return 0;
-            }
-        }
-        XFree( prop_return );
+        fprintf( stderr, "xcommon: Can't get window property for EWMH.\n" );
+        if( prop_return ) XFree( prop_return );
         return 0;
     }
+
+    if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
+        Window win_id = *( (long *) prop_return );
+        int status;
+
+        XFree( prop_return );
+        prop_return = 0;
+
+        /* Make sure we don't have any unhandled errors. */
+        XSync( dpy, False );
+
+        /* Set error handler so we can check if XGetWindowProperty failed. */
+        prev_xerrhandler = XSetErrorHandler( xprop_errorhandler );
+
+        /* get the serial of the XGetWindowProperty request */
+        req_serial = NextRequest( dpy );
+
+        /* try to get property
+         * this can fail if we have a property with the win_id on the
+         * root window, but the win_id is no longer valid.
+         * This is to check for a stale window manager
+         */
+        status = XGetWindowProperty( dpy, win_id, atom, 0,
+                                     1, False, XA_WINDOW,
+                                     &type_return, &format_return, &nitems_return,
+                                     &bytes_after_return, &prop_return );
+
+        /* make sure XGetWindowProperty has been processed and any errors
+           have been returned to us */
+        XSync( dpy, False );
+
+        /* revert to the previous xerrorhandler */
+        XSetErrorHandler( prev_xerrhandler );
+
+        if( status != Success || type_return == None ) {
+            fprintf( stderr, "xcommon: EWMH check failed on child window, "
+                             "stale window manager property on root?\n" );
+            return 0;
+        }
+
+        if( type_return != XA_WINDOW ) {
+            fprintf( stderr, "xcommon: EWMH check failed on child window, "
+                             "stale window manager property on root?\n" );
+            if( prop_return ) {
+                XFree( prop_return );
+            }
+            return 0;
+        }
+
+        if( format_return == 32 && nitems_return == 1 && bytes_after_return == 0 ) {
+            if( win_id == *( (long *) prop_return ) ) {
+                /* We have successfully detected a EWMH compliant Window Manager. */
+                XFree( prop_return );
+
+                /* Get the name of the wm */
+                get_window_manager_name( dpy, win_id, wm_name_return );
+                return 1;
+            }
+            XFree( prop_return );
+            return 0;
+        } else if( prop_return ) {
+            XFree( prop_return );
+        }
+    } else if( prop_return ) {
+        XFree( prop_return );
+    }
+
     return 0;
 }
 
@@ -641,6 +649,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
             }
             wm_is_metacity = 1;
         }
+        free( wmname );
     }
     has_ewmh_state_fullscreen = check_for_state_fullscreen( display );
     if( has_ewmh_state_fullscreen && xcommon_verbose ) {
