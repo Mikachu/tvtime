@@ -40,6 +40,11 @@ efont_t *efont_new( const char *fontfile, int fontsize, int video_width,
         delete font;
         return 0;
     }
+    if( !font->font->isValid() ) {
+        delete font->font;
+        delete font;
+        return 0;
+    }
     font->width = video_width;
     font->height = video_height;
 

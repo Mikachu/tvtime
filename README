@@ -1,33 +1,33 @@
 
-  ...   tvtime!
 
-  tvtime is a realtime video4linux deinterlacer.  Currently, tvtime
-attempts to mimic the behavior of a cheap TV, and once I'm happy with
-the performance there, I can start enabling more expensive deinterlacing
-algorithms to improve the visual quality.  Getting high framerates using
-X's Xv drivers and the Linux bttv driver has proven enough of a
-challenge for now.
+             * * * *    tvtime  0.9.1    * * * *
 
-  tvtime currently grabs frames of video and draws each field
-independently to the screen, using linear interpolation on the missing
-scanlines.  Each field is shown at the correct time, and we assume the
-frames from the video4linux device are always top-field-first.
 
-  I'm using the original video4linux API (not v4l2).  This only enables
-me to get an interrupt once every frame, and not every field, so I have
-to use /dev/rtc to sleep until the time for the second field arrives to
-blit it.  This is really unfortunate, and hopefully with v4l2 I can get
-an interrupt every field to fix this.  I plan to try that out soon.
+  tvtime is a high quality television application for use with video
+capture cards.  tvtime processes the input from a capture card,
+processes it, and displays it on a computer monitor or projector.
 
-  I would appreciate any comments you have.  The source code is
-reasonably documented, so please take a look if you're curious.
+  tvtime supports:
 
-  - Billy Biggs <vektor@dumbterm.net>
-    Sat Dec 15 22:01:30 EST 2001
-    Tue Oct  8 14:44:37 ADT 2002
+  o   Deinterlaced output at full interlaced rate of 59.94 frames per
+      second for NTSC source, or 50 frames per second for PAL sources.
+      This gives smoothness of motion and high visual quality.
+
+  o   Multiple deinterlacing algorithms for finding the optimal mode for
+      the video content and available processor speed.
+
+  o   16:9 aspect ratio mode for the highest available resolution when
+      processing input from an external DVD player or digital satellite
+      receiver.
+
+  o   A super-slick on-screen-display for the complete television
+      experience.
+
 
 
   Using tvtime
+  
+
 
 usage: ./tvtime [-as] [-I <sampling>] [-w <width>] [-d <device>
                 [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]

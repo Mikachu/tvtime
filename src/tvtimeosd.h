@@ -27,6 +27,20 @@ extern "C" {
  * This object is the master on-screen-display controler.  It's basically
  * the high-level API to control the simple OSD items like the channel
  * number, volume bar, etc.
+ *
+ * The OSD currently lays out the screen as follows:
+ *
+ * +-----------                     ------+
+ * |                                      |
+ * |   Channel             Channel Info
+ * |   Number              Channel Logo
+ * |
+ * |
+ *
+ * |
+ * |  [ Muted - Volume Bar - Data Bar   ]
+ * |                                      |
+ * +----                            ------+
  */
 
 typedef struct tvtime_osd_s tvtime_osd_t;
