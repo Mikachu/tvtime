@@ -98,6 +98,20 @@ configsave_t *configsave_open( const char *filename )
 
     top = xmlDocGetRootElement( cs->doc );
     if( !top ) {
+        /* Set the DTD */
+        xmlDtdPtr dtd;
+        dtd = xmlNewDtd( cs->doc,
+                         BAD_CAST "tvtime",
+                         BAD_CAST "-//tvtime//DTD tvtime 1.0//EN",
+                         BAD_CAST "http://tvtime.sourceforge.net/DTD/tvtime1.dtd" );
+        cs->doc->intSubset = dtd;
+        if( cs->doc->children == NULL ) {
+            xmlAddChild( (xmlNodePtr)cs->doc, (xmlNodePtr)dtd );
+        } else {
+            xmlAddPrevSibling( cs->doc->children, (xmlNodePtr)dtd );
+        }
+
+        /* Create the root node */
         top = xmlNewDocNode( cs->doc, 0, BAD_CAST "tvtime", 0 );
         if( !top ) {
             fprintf( stderr, "configsave: Could not create toplevel element 'tvtime'.\n" );
@@ -107,7 +121,9 @@ configsave_t *configsave_open( const char *filename )
             return 0;
         } else {
             xmlDocSetRootElement( cs->doc, top );
-            xmlNewProp( top, BAD_CAST "xmlns", BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
+            xmlNewProp( top,
+                        BAD_CAST "xmlns",
+                        BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
         }
     }
 

@@ -719,6 +719,20 @@ int station_writeconfig( station_mgr_t *mgr )
 
     top = xmlDocGetRootElement( doc );
     if( !top ) {
+        /* Set the DTD */
+        xmlDtdPtr dtd;
+        dtd = xmlNewDtd( doc,
+                         BAD_CAST "stationlist",
+                         BAD_CAST "-//tvtime//DTD stationlist 1.0//EN",
+                         BAD_CAST "http://tvtime.sourceforge.net/DTD/stationlist1.dtd" );
+        doc->intSubset = dtd;
+        if( doc->children == NULL ) {
+            xmlAddChild( (xmlNodePtr)doc, (xmlNodePtr)dtd );
+        } else {
+            xmlAddPrevSibling( doc->children, (xmlNodePtr)dtd );
+        }
+
+        /* Create the root node */
         top = xmlNewDocNode( doc, 0, BAD_CAST "stationlist", 0 );
         if( !top ) {
             fprintf( stderr, "station: Could not create toplevel element 'stationlist'.\n" );
