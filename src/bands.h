@@ -32,12 +32,17 @@ const band_entry_t band_data_vhf_ireland[] = {
     { "I4", 175250 }, { "I5", 183250 }, { "I6", 191250 },
     { "I7", 299250 }, { "I8", 207250 }, { "I9", 215250 }
 };
+
+/**
+ * For australian VHF information, see:
+ * http://www.aba.gov.au/broadcasters/television.htm
+ */
 const band_entry_t band_data_vhf_australia[] = {
     { "AS1",   57250 }, { "AS2",   64250 }, { "AS3",   86250 },
     { "AS4",   95250 }, { "AS5",  102250 }, { "AS5A", 138250 },
     { "AS6",  175250 }, { "AS7",  182250 }, { "AS8",  189250 },
-    { "AS9",  196250 }, { "AS10", 209250 }, { "AS11", 216250 },
-    { "AS12", 223250 }
+    { "AS9",  196250 }, { "AS9A", 203250 }, { "AS10", 209250 },
+    { "AS11", 216250 }, { "AS12", 223250 }
 };
 
 /**
