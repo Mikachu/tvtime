@@ -195,6 +195,12 @@ int station_readconfig( station_mgr_t *mgr )
     xmlNodePtr station;
     xmlNodePtr list;
 
+    if( !file_is_openable_for_read( mgr->stationrc ) ) {
+        /* There is no file to try to read, so forget it. */
+        return 0;
+    }
+
+    fprintf( stderr, "station: Reading stationlist from %s\n", mgr->stationrc );
     doc = xmlParseFile( mgr->stationrc );
     if( !doc ) {
         return 0;
@@ -289,11 +295,13 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
     }
 
     if( !station_readconfig( mgr ) ) {
-        fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
-
         mgr->new_install = 1;
         frequencies = table;
-        fprintf( stderr, "station: Adding frequency table %s, all channels active\n", frequencies );
+
+        if( verbose ) {
+            fprintf( stderr, "station: Adding frequency table %s, all channels active\n",
+                     frequencies );
+        }
 
         if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
             !strcasecmp( frequencies, "europe-cable" ) ) {
