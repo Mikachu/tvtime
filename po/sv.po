@@ -1,4 +1,4 @@
-# Swedish translation of TVtime
+# Swedish translation of tvtime
 # Copyright (C) 2003 Billy Biggs
 # This file is distributed under the same license as the tvtime package.
 # Per von Zweigbergk <pvz@e.kth.se>, 2003
@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-11-01 01:44+0100\n"
-"PO-Revision-Date: 2003-11-01 01:42+0100\n"
+"POT-Creation-Date: 2003-11-01 19:49+0100\n"
+"PO-Revision-Date: 2003-11-01 16:47+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -36,12 +36,12 @@ msgstr "Full bildfrekvens: %.2f b/s"
 #: src/tvtime.c:871 src/tvtime.c:993
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
-msgstr "Halv bildfrekvens, deinterlace på övre bildfälten: %.2f b/s"
+msgstr "Halv bildfrekvens, avflätar (deinterlacing) övre bildfälten: %.2f b/s"
 
 #: src/tvtime.c:878 src/tvtime.c:997
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
-msgstr "Halv bildfrekvens, deinterlace på nedre bildfälten: %.2f b/s"
+msgstr "Halv bildfrekvens, avflätar (deinterlacing) nedre bildfälten: %.2f b/s"
 
 #: src/tvtime.c:901
 msgid "Overscan setting"
@@ -79,10 +79,9 @@ msgstr "Uppe"
 msgid "Bottom"
 msgstr "Nere"
 
-# Den engelska strängen i det här fallet är ganska förvirrande.
-#: src/tvtime.c:987
-msgid "Frame drop setting"
-msgstr "Bildfrekvens vid videofångst"
+#: src/tvtime.c:987 src/commands.c:1305 src/commands.c:1335
+msgid "Attempted framerate"
+msgstr "Målvärde för bildfrekvens"
 
 #: src/tvtime.c:1014
 msgid "Performance estimates"
@@ -90,7 +89,7 @@ msgstr "Uppskattad prestanda"
 
 #: src/tvtime.c:1016
 msgid "Deinterlacer"
-msgstr "Deinterlacer"
+msgstr "Avflätare (Deinterlacer)"
 
 #: src/tvtime.c:1019
 #, c-format
@@ -189,7 +188,7 @@ msgid ""
 msgstr ""
 "\n"
 "    Din videofångarkortsdrivrutin, %s, verkar inte\n"
-"    stödja videofångst vid full bildfrekvens. Var god kontrollera\n"
+"    stödja videofångande vid full bildfrekvens. Var god kontrollera\n"
 "    att drivrutinen är rätt inställd, och att du valt rätt enhet\n"
 "    (%s).\n"
 "\n"
@@ -276,7 +275,7 @@ msgstr "2:3-matnings-kompensering aktiverad."
 
 #: src/tvtime.c:2000
 msgid "2-3 pulldown inversion is not valid with your TV norm."
-msgstr "2:3-matning-kompensering ej relevant för din TV-standard."
+msgstr "2:3-matning-kompensering ej relevant för din tv-standard."
 
 #: src/tvtime.c:2385 src/tvtime.c:2526
 #, c-format
@@ -362,9 +361,6 @@ msgstr "Aktuell"
 msgid "No program information available"
 msgstr "Ingen programinformation tillgänglig"
 
-# Det här är nästa TV-program. Jag vet inte om den här översättningen är
-# optimal. Kanske kan problemet undvikas genom att skriva om så att den
-# istället specifierar start- och sluttid för nästa TV-program?
 #: src/commands.c:265
 #, c-format
 msgid "Next: %s"
@@ -396,7 +392,7 @@ msgstr "Fininställning"
 
 #: src/commands.c:352
 msgid "Change NTSC cable mode"
-msgstr "Ändra läge för NTSC-kabel-TV."
+msgstr "Ändra läge för NTSC-kabel-tv."
 
 #: src/commands.c:358
 msgid "Set current channel as SECAM"
@@ -420,7 +416,7 @@ msgstr "Aktivera signalavkänning"
 
 #: src/commands.c:535 src/commands.c:562
 msgid "Cable"
-msgstr "Kabel-TV"
+msgstr "Kabel-tv"
 
 #: src/commands.c:543 src/commands.c:570
 msgid "Broadcast"
@@ -428,7 +424,7 @@ msgstr "Marksänt"
 
 #: src/commands.c:550
 msgid "Cable with channels 100+"
-msgstr "Kabel-TV med över 100 kanaler"
+msgstr "Kabel-tv med över 100 kanaler"
 
 #: src/commands.c:582
 msgid "Europe"
@@ -623,15 +619,11 @@ msgstr "Helskärmsposition"
 
 #: src/commands.c:1296 src/commands.c:1321
 msgid "Deinterlacer configuration"
-msgstr "Deinterlace-inställningar"
+msgstr "Inställningar för avflätare (deinterlacer)"
 
 #: src/commands.c:1301
 msgid "Current deinterlacer description"
-msgstr "Beskrivning av vald deinterlacemetod"
-
-#: src/commands.c:1305 src/commands.c:1335
-msgid "Attempted framerate"
-msgstr "Målvärde för bildfrekvens"
+msgstr "Beskrivning av vald avflätare (deinterlacer)"
 
 #: src/commands.c:1309 src/commands.c:1341
 msgid "Input filters"
@@ -639,7 +631,7 @@ msgstr "Signalfilter"
 
 #: src/commands.c:1327
 msgid "Deinterlacer description"
-msgstr "Beskrivning av deinterlacemetod"
+msgstr "Beskrivning av avflätare (deinterlacer)"
 
 #: src/commands.c:1352 src/commands.c:1401 src/commands.c:1464
 #: src/commands.c:1497 src/commands.c:1530 src/commands.c:1563
@@ -837,15 +829,15 @@ msgstr "Bildinställningar återställda till förval."
 
 #: src/commands.c:2648
 msgid "Using nominal NTSC cable frequencies."
-msgstr "Använder nominella kabel-TV-frekvenser för NTSC."
+msgstr "Använder standardfrekvenser för NTSC-kabel-tv."
 
 #: src/commands.c:2654
 msgid "Using IRC cable frequencies."
-msgstr "Använder IRC-frekvenser för kabel-TV."
+msgstr "Använder frekvenser för IRC-kabel-tv."
 
 #: src/commands.c:2660
 msgid "Using HRC cable frequencies."
-msgstr "Använder HRC-frekvenser för kabel-TV."
+msgstr "Använder frekvenser för HRC-kabel-tv."
 
 #: src/commands.c:2744 src/commands.c:2758
 msgid "Volume"
@@ -1049,7 +1041,7 @@ msgid ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
-"  -n, --norm=NORM            Specifierar TV-norm. tvtime stödjer:\n"
+"  -n, --norm=NORM            Specifierar tv-standard. tvtime stödjer:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N och PAL-60 (NTSC om ej specifierad).\n"
 "\n"
@@ -1211,7 +1203,7 @@ msgstr "%s: Sänder kommandot %s.\n"
 #: src/tvtime-scanner.c:91
 #, c-format
 msgid "Scanning using TV standard %s.\n"
-msgstr "Söker efter kanaler med TV-standarden %s.\n"
+msgstr "Söker efter kanaler med tv-standarden %s.\n"
 
 #: src/tvtime-scanner.c:114
 #, c-format
@@ -1246,3 +1238,7 @@ msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
 "Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
+
+# Den engelska strängen i det här fallet är ganska förvirrande.
+#~ msgid "Frame drop setting"
+#~ msgstr "Bildfrekvens vid videofångande"
