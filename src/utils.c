@@ -509,6 +509,7 @@ static command_names_t command_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
+    { "SET_AUDIO_BOOST", TVTIME_SET_AUDIO_BOOST },
     { "SET_AUDIO_MODE", TVTIME_SET_AUDIO_MODE },
     { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
@@ -611,7 +612,8 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_INPUT_WIDTH ||
             command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE ||
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION ||
-	    command == TVTIME_MIXER_UP || command == TVTIME_MIXER_DOWN);
+            command == TVTIME_MIXER_UP || command == TVTIME_MIXER_DOWN ||
+            command == TVTIME_SET_AUDIO_BOOST);
 }
 
 #ifdef ENABLE_NLS

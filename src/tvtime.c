@@ -2515,6 +2515,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     snprintf( number, 4, "%d", commands_check_freq_present( commands ) );
     config_save( ct, "CheckForSignal", number );
 
+    snprintf( number, 4, "%d", commands_get_audio_boost( commands ) );
+    config_save( ct, "AudioBoost", number );
+
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
         config_save( ct, "V4LInput", number );

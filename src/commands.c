@@ -115,6 +115,8 @@ struct commands_s {
     int colour;
     int hue;
 
+    int boost;
+
     int displayinfo;
     int screenshot;
     char screenshotfile[ 2048 ];
@@ -640,6 +642,40 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
     }
 }
 
+static void reset_audio_boost_menu( menu_t *menu, int curvol )
+{
+    char string[ 128 ];
+
+    snprintf( string, sizeof( string ), (curvol == -1) ?
+              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+              _("Disabled") );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SET_AUDIO_BOOST, "-1" );
+
+    snprintf( string, sizeof( string ), (curvol == 50) ?
+              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+              _("Quiet") );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_AUDIO_BOOST, "50" );
+
+    snprintf( string, sizeof( string ), (curvol == 90) ?
+              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+              _("Medium") );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_BOOST, "90" );
+
+    snprintf( string, sizeof( string ), (curvol == 100) ?
+              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+              _("Full") );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SET_AUDIO_BOOST, "100" );
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
+              _("Back") );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+}
+
 static void reset_inputwidth_menu( menu_t *menu, int inputwidth )
 {
     char string[ 128 ];
@@ -945,6 +981,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->update_luma = 0;
     cmd->luma_power = config_get_luma_correction( cfg );
 
+    cmd->boost = config_get_audio_boost( cfg );
+
     cmd->overscan = config_get_overscan( cfg );
     if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
 
@@ -1141,30 +1179,35 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
 
+    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+              _("Audio volume boost") );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "audioboost" );
+
     snprintf( string, sizeof( string ), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
               _("Television standard") );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "norm" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
               _("Horizontal resolution") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hres" );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "hres" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_CLOSEDCAPTIONICON "  %s",
               _("Toggle closed captions") );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_TOGGLE_CC, "" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_TVPGICON "  %s",
               _("Toggle XDS decoding") );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_TOGGLE_XDS, "" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
-    menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 8, string );
+    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
 
     commands_add_menu( cmd, menu );
 
@@ -1188,20 +1231,25 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
 
+    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+              _("Audio volume boost") );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "audioboost" );
+
     snprintf( string, sizeof( string ), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
               _("Television standard") );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "norm" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
               _("Horizontal resolution") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hres" );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "hres" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
 
     commands_add_menu( cmd, menu );
 
@@ -1226,6 +1274,15 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     } else {
         reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ), 0, 0 );
     }
+
+    menu = menu_new( "audioboost" );
+    snprintf( string, sizeof( string ), "%s - %s - %s",
+              _("Setup"), _("Input configuration"), _("Audio volume boost") );
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
+    commands_add_menu( cmd, menu );
+    reset_audio_boost_menu( commands_get_menu( cmd, "audioboost" ),
+                            cmd->boost );
 
     menu = menu_new( "norm" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
@@ -2055,6 +2112,25 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                  cmd->scan_channels );
             commands_refresh_menu( cmd );
             station_writeconfig( cmd->stationmgr );
+        }
+        break;
+
+    case TVTIME_SET_AUDIO_BOOST:
+        cmd->boost = atoi( arg );
+        if( cmd->osd ) {
+            menu_t *boostmenu = commands_get_menu( cmd, "audioboost" );
+            char message[ 128 ];
+            reset_audio_boost_menu( boostmenu, cmd->boost );
+            commands_refresh_menu( cmd );
+            if( cmd->boost < 0 ) {
+                snprintf( message, sizeof( message ),
+                          _("Capture card volume will not be set by tvtime.") );
+            } else {
+                snprintf( message, sizeof( message ),
+                          _("Setting capture card volume to %d%%."),
+                          cmd->boost );
+            }
+            tvtime_osd_show_message( cmd->osd, message );
         }
         break;
 
@@ -3374,5 +3450,10 @@ const char *commands_get_fs_pos( commands_t *cmd )
     } else {
         return 0;
     }
+}
+
+int commands_get_audio_boost( commands_t *cmd )
+{
+    return cmd->boost;
 }
 
