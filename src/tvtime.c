@@ -1455,6 +1455,10 @@ int main( int argc, char **argv )
                 secondlastframe = rvrreader_get_secondlastframe( rvrreader );
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
+                if( !curframe ) {
+                    fprintf( stderr, "tvtime: Can't capture next frame, exiting.\n" );
+                    break;
+                }
             }
             acquired = 1;
             filtered_cur = 0;
