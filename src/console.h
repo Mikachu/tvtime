@@ -16,8 +16,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef HAVE_CONSOLE_H
-#define HAVE_CONSOLE_H
+#ifndef CONSOLE_H_INCLUDED
+#define CONSOLE_H_INCLUDED
 
 #include "tvtimeconf.h"
 
@@ -41,4 +41,4 @@ void console_composite_packed422_scanline( console_t *con,
                                            unsigned char *output,
                                            int width, int xpos, int scanline );
 
-#endif
+#endif /* CONSOLE_H_INCLUDED */
