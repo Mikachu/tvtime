@@ -6,6 +6,10 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.13
 
+  *  Added support for changing the default language read from XMLTV.
+  *  Added support for PAL-BG/DK audio mode switching.
+  *  Added an audio boost setting for controlling capture card volume.
+  *  Fixed a bunch of critical bugs.
   *  Removed the SDL, MGA, and DirectFB output drivers.
   *  Removed the unfinished MPEG2 support and the unreleased recording
      application 'rvr'.
