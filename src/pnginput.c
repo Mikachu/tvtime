@@ -110,6 +110,12 @@ pnginput_t *pnginput_new( const char *filename )
 
 void pnginput_delete( pnginput_t *pnginput )
 {
+    if( pnginput->png_ptr && pnginput->info_ptr ) {
+        png_destroy_read_struct( &(pnginput->png_ptr), &(pnginput->info_ptr), 0 );
+    }
+    if( pnginput->f ) {
+        fclose( pnginput->f );
+    }
     free( pnginput );
 }
 
