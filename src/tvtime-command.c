@@ -50,10 +50,8 @@ int main( int argc, char **argv )
         config_delete( cfg );
         return 1;
     }
-    close(i);
 
-    /* will only fail if fifo doesn't exist for some reason */
-    fifo = fopen( config_get_command_pipe( cfg ), "w" );
+    fifo = fdopen( i, "w" );
     if( !fifo ) {
         fprintf( stderr, "tvtime-command: Can't open fifo file %s.\n", config_get_command_pipe( cfg ) );
         config_delete( cfg );
