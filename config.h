@@ -51,6 +51,8 @@ enum tvtime_commands
     TVTIME_SHOW_TEST,
     TVTIME_DEBUG,
 
+    TVTIME_FULLSCREEN,
+    TVTIME_ASPECT,
     TVTIME_SCREENSHOT,
 
     TVTIME_LAST

@@ -48,6 +48,8 @@ struct input_s {
     int printdebug;
     int showbars;
     int showtest;
+    int togglefullscreen;
+    int toggleaspect;
 };
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
@@ -72,6 +74,8 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->showtest = 0;
     in->printdebug = 0;
     in->screenshot = 0;
+    in->togglefullscreen = 0;
+    in->toggleaspect = 0;
 
     return in;
 }
@@ -118,6 +122,14 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_SHOW_BARS:
              in->showbars = !in->showbars;
+             break;
+
+         case TVTIME_FULLSCREEN:
+             in->togglefullscreen = 1;
+             break;
+
+         case TVTIME_ASPECT:
+             in->toggleaspect = 1;
              break;
 
          case TVTIME_CHANNEL_CHAR:
@@ -302,6 +314,16 @@ int input_videohold( input_t *in )
     return in->videohold;
 }
 
+int input_toggle_fullscreen( input_t *in )
+{
+    return in->togglefullscreen;
+}
+
+int input_toggle_aspect( input_t *in )
+{
+    return in->toggleaspect;
+}
+
 void input_next_frame( input_t *in )
 {
     /* Decrement the frame counter if user is typing digits */
@@ -324,5 +346,7 @@ void input_next_frame( input_t *in )
     if( in->videohold ) in->videohold--;
     in->printdebug = 0;
     in->screenshot = 0;
+    in->togglefullscreen = 0;
+    in->toggleaspect = 0;
 }
 

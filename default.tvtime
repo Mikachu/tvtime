@@ -65,6 +65,9 @@ TunerNumber = 0
 #  key_show_bars    = F11
 #  key_show_test    = F12
 #  key_debug        = d
+#  key_fullscreen   = f
+#  key_aspect       = a
+#  key_screenshot   = s
 
 key_quit         = \0033
 key_channel_up   = \0421
@@ -85,3 +88,7 @@ key_colour_up    = F8
 key_show_bars    = F11
 key_show_test    = F12
 key_debug        = d
+key_fullscreen   = f
+key_aspect       = a
+key_screenshot   = s
+

@@ -31,6 +31,8 @@
 
 static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;
+static int sdlaspect = 0;
+static int outwidth = 0;
 static int fs = 0;
 
 unsigned char *sdl_get_output( void )
@@ -42,6 +44,9 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
 {
     SDL_Rect **modes;
     int ret, i;
+
+    aspect = sdlaspect;
+    outwidth = outputwidth;
 
     /* Initialize SDL. */
     ret = SDL_Init( SDL_INIT_VIDEO );
@@ -67,7 +72,7 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
 
     /* Create screen surface. */
     /* Unfortunately, we always assume square pixels for now. */
-    if( aspect ) {
+    if( sdlaspect ) {
         /* Run in 16:9 mode. */
         screen = SDL_SetVideoMode( outputwidth, outputwidth / 16 * 9, 0, 0 );
     } else {
@@ -91,6 +96,27 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
     SDL_EnableKeyRepeat( SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL );
     return 1;
 }
+
+
+void sdl_toggle_fullscreen( void )
+{
+    SDL_WM_ToggleFullScreen( screen );
+    fs = !fs;
+}
+
+void sdl_toggle_aspect( void )
+{
+    sdlaspect = !sdlaspect;
+    SDL_UnlockYUVOverlay( frame );
+    if( sdlaspect ) {
+        /* Run in 16:9 mode. */
+        screen = SDL_SetVideoMode( outwidth, outwidth / 16 * 9, 0, 0 );
+    } else {
+        screen = SDL_SetVideoMode( outwidth, outwidth / 4 * 3, 0, 0 );
+    }
+    SDL_LockYUVOverlay( frame );
+}
+
 
 void sdl_show_frame( void )
 {

@@ -334,6 +334,12 @@ int main( int argc, char **argv )
         showbars = input_show_bars( in );
         showtest = input_show_test( in );
         screenshot = input_take_screenshot( in );
+        if( input_toggle_fullscreen( in ) ) {
+            sdl_toggle_fullscreen();
+        }
+        if( input_toggle_aspect( in ) ) {
+            sdl_toggle_aspect();
+        }
 
         input_next_frame( in );
 

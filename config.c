@@ -141,6 +141,8 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_SHOW_BARS ]      = I_F11;
     ct->keymap[ TVTIME_SHOW_TEST ]      = I_F12;
     ct->keymap[ TVTIME_DEBUG ]          = 'd';
+    ct->keymap[ TVTIME_FULLSCREEN ]     = 'f';
+    ct->keymap[ TVTIME_ASPECT ]         = 'a';
     ct->keymap[ TVTIME_SCREENSHOT ]     = 's';
 
     if( !configFile ) {
@@ -479,6 +481,16 @@ void config_init_keymap( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "key_debug")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_DEBUG ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_fullscreen")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_FULLSCREEN ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_aspect")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_ASPECT ] = key;
     }
 
     if( (tmp = parser_get( &(ct->pf), "key_screenshot")) ) {

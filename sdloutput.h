@@ -51,6 +51,16 @@ unsigned char *sdl_get_output( void );
 void sdl_show_frame( void );
 
 /**
+ * Toggle fullscreen mode.
+ */
+void sdl_toggle_fullscreen( void );
+
+/**
+ * Toggle display aspect ratio.
+ */
+void sdl_toggle_aspect( void );
+
+/**
  * Perform the polling of events.  Sends signals to the input object.
  */
 void sdl_poll_events( input_t *in );
