@@ -305,11 +305,18 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
             if( !xmlStrcasecmp( binding->name, BAD_CAST "keyboard" ) ) {
                 xmlChar *key = xmlGetProp( binding, BAD_CAST "key" );
                 if( key ) {
-                    int keycode = input_string_to_special_key( (const char *) key );
+                    int keycode, command_id;
+
+                    keycode = input_string_to_special_key( (const char *) key );
                     if( !keycode ) {
                         keycode = (*key);
                     }
-                    ct->keymap[ keycode ] = tvtime_string_to_command( (const char *) command );
+
+                    command_id = tvtime_string_to_command( (const char *) command );
+                    if( command_id != TVTIME_NOCOMMAND ) {
+                        ct->keymap[ keycode ] = command_id;
+                    }
+
                     xmlFree( key );
                 }
             } else if( !xmlStrcasecmp( binding->name, BAD_CAST "mouse" ) ) {
