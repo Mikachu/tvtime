@@ -297,6 +297,27 @@ const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode )
     return "ERROR";
 }
 
+static void videoinput_start_capture_v4l2( videoinput_t *vidin )
+{
+    if( !vidin->is_streaming ) {
+        if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+            fprintf( stderr, "videoinput: Driver refuses to start streaming: %s.\n",
+                     strerror( errno ) );
+        }
+        vidin->is_streaming = 1;
+    }
+}
+
+static void videoinput_stop_capture_v4l2( videoinput_t *vidin )
+{
+    if( vidin->is_streaming ) {
+        if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+            fprintf( stderr, "videoinput: Driver refuses to stop streaming: %s.\n",
+                     strerror( errno ) );
+        }
+        vidin->is_streaming = 0;
+    }
+}
 
 static int alarms;
 
@@ -331,6 +352,23 @@ static void free_frame( videoinput_t *vidin, int frameid )
                      frameid, strerror( errno ) );
         }
     }
+}
+
+void videoinput_free_frame( videoinput_t *vidin, int frameid )
+{
+    if( vidin->isv4l2 || vidin->have_mmap ) {
+        free_frame( vidin, frameid );
+    }
+}
+
+static void videoinput_free_all_frames( videoinput_t *vidin )
+{
+    int i;
+
+    for( i = 0; i < vidin->numframes; i++ ) {
+        free_frame( vidin, i );
+    }
+    vidin->curframe = 0;
 }
 
 static void wait_for_frame_v4l1( videoinput_t *vidin, int frameid )
@@ -376,6 +414,10 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
         if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
             fprintf( stderr, "videoinput: Can't read frame. Error was: %s.\n",
                      strerror( errno ) );
+            /* We must now restart capture. */
+            videoinput_stop_capture_v4l2( vidin );
+            videoinput_free_all_frames( vidin );
+            videoinput_start_capture_v4l2( vidin );
             *frameid = -1;
             return 0;
         }
@@ -403,51 +445,12 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
     }
 }
 
-void videoinput_free_frame( videoinput_t *vidin, int frameid )
-{
-    if( vidin->isv4l2 || vidin->have_mmap ) {
-        free_frame( vidin, frameid );
-    }
-}
-
-static void videoinput_free_all_frames( videoinput_t *vidin )
-{
-    int i;
-
-    for( i = 0; i < vidin->numframes; i++ ) {
-        free_frame( vidin, i );
-    }
-    vidin->curframe = 0;
-}
-
 int videoinput_buffer_invalid( videoinput_t *vidin, int frameid )
 {
     if( !vidin->isv4l2 ) {
         return 0;
     } else {
         return vidin->capbuffers[ frameid ].free;
-    }
-}
-
-static void videoinput_start_capture_v4l2( videoinput_t *vidin )
-{
-    if( !vidin->is_streaming ) {
-        if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver refuses to start streaming: %s.\n",
-                     strerror( errno ) );
-        }
-        vidin->is_streaming = 1;
-    }
-}
-
-static void videoinput_stop_capture_v4l2( videoinput_t *vidin )
-{
-    if( vidin->is_streaming ) {
-        if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver refuses to stop streaming: %s.\n",
-                     strerror( errno ) );
-        }
-        vidin->is_streaming = 0;
     }
 }
 
