@@ -86,4 +86,6 @@ if [ "$action" = "configure" ]; then
     fi
 fi
 
+#DEBHELPER#
+
 exit 0
