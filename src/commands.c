@@ -500,7 +500,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 in->capturemode = CAPTURE_CC1;
             }
         } else {
-            if( in->osd ) tvtime_osd_show_message( in->osd, "No VBI device available for CC decoding." );
+            if( in->osd ) tvtime_osd_show_message( in->osd, "No VBI device configured for CC decoding." );
         }
         break;
 
