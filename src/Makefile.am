@@ -44,13 +44,12 @@ AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
-COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c \
-	parser.c tvtimeconf.c pngoutput.c tvtimeosd.c input.c cpu_accel.c \
-	speedy.c pnginput.c menu.c deinterlace.c videocorrection.c \
-	videotools.c attributes.h deinterlace.h leetft.h input.h menu.h mixer.h \
-	mm_accel.h mmx.h osdtools.h parser.h pnginput.h pngoutput.h rtctimer.h \
-	speedy.h taglines.h tvtimeconf.h tvtimeosd.h videocorrection.h \
-	videoinput.h videotools.h performance.h performance.c \
+COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
+	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c menu.c \
+	deinterlace.c videocorrection.c videotools.c attributes.h deinterlace.h \
+	leetft.h input.h menu.h mixer.h mm_accel.h mmx.h osdtools.h pnginput.h \
+	pngoutput.h rtctimer.h speedy.h taglines.h tvtimeconf.h tvtimeosd.h \
+	videocorrection.h videoinput.h videotools.h performance.h performance.c \
 	vbidata.h vbidata.c credits.c credits.h console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
 	videofilter.c station.h station.c bands.h configsave.h configsave.c \
