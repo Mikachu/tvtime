@@ -43,13 +43,12 @@ Output Configuration  0xEE 0x80 0xB9  U+E039
 Frequency Table Sel.  0xEE 0x80 0xBA  U+E03A
 Closed caption icon   0xEE 0x80 0xB6  U+E036
 Video input           0xEE 0x80 0xBB  U+E03B
+Save current (global) 0xEE 0x80 0xBD  U+E03D
+Save current (chan.)  0xEE 0x80 0xBC  U+E03C
+Reset to defaults     0xEE 0x80 0xBE  U+E03E
 
 TBD
 Setup
   Station management
     * Reset all channels as active
     * Toggle NTSC cable mode
-  Picture
-    * Save current settings as global defaults
-    * Save current settings as channel defaults
-    * Reset to global defaults
