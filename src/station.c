@@ -578,6 +578,7 @@ void station_activate_all_channels( station_mgr_t *mgr )
     while( rp ) {
         rp->active = 1;
         rp = rp->next;
+        if( rp == mgr->first ) break;
     }
 }
 
