@@ -775,13 +775,15 @@ static void osd_list_deinterlacer_info( tvtime_osd_t *osd, int curmethod )
 {
     int i;
 
-    tvtime_osd_list_set_lines( osd, 11 );
-    tvtime_osd_list_set_text( osd, 0, get_deinterlace_method( curmethod )->name );
-    for( i = 0; i < 10; i++ ) {
-        tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+    if( get_deinterlace_method( curmethod ) ) {
+        tvtime_osd_list_set_lines( osd, 11 );
+        tvtime_osd_list_set_text( osd, 0, get_deinterlace_method( curmethod )->name );
+        for( i = 0; i < 10; i++ ) {
+            tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+        }
+        tvtime_osd_list_set_hilight( osd, -1 );
+        tvtime_osd_show_list( osd, 1 );
     }
-    tvtime_osd_list_set_hilight( osd, -1 );
-    tvtime_osd_show_list( osd, 1 );
 }
 
 static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
@@ -789,13 +791,15 @@ static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
     int nummethods = get_num_deinterlace_methods();
     int i;
 
-    tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
-    tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
-    for( i = 0; i < nummethods; i++ ) {
-        tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
+    if( nummethods ) {
+        tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
+        tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
+        for( i = 0; i < nummethods; i++ ) {
+            tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
+        }
+        tvtime_osd_list_set_hilight( osd, curmethod + 1 );
+        tvtime_osd_show_list( osd, 1 );
     }
-    tvtime_osd_list_set_hilight( osd, curmethod + 1 );
-    tvtime_osd_show_list( osd, 1 );
 }
 
 static void build_deinterlacer_menu( menu_t *menu, int curmethod )
@@ -830,18 +834,20 @@ static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
     char string[ 128 ];
     int i;
 
-    menu_set_text( menu, 0, get_deinterlace_method( curmethod )->name );
-    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
-    for( i = 0; i < 10; i++ ) {
-        menu_set_text( menu, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+    if( get_deinterlace_method( curmethod ) ) {
+        menu_set_text( menu, 0, get_deinterlace_method( curmethod )->name );
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
+        for( i = 0; i < 10; i++ ) {
+            menu_set_text( menu, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+            menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+        }
+        snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
+                  _("Back") );
+        menu_set_default_cursor( menu, i );
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
+        menu_set_text( menu, i + 1, string );
         menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
     }
-    snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
-              _("Back") );
-    menu_set_default_cursor( menu, i );
-    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
-    menu_set_text( menu, i + 1, string );
-    menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
 }
 
 static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
@@ -2043,7 +2049,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             }
             config_save( ct, "DeinterlaceMethod", curmethod->short_name );
         }
-        if( commands_set_deinterlacer( commands ) ) {
+        if( !output->is_interlaced() && commands_set_deinterlacer( commands ) ) {
             curmethodid = 0;
             curmethod = get_deinterlace_method( 0 );
             while( strcasecmp( commands_get_new_deinterlacer( commands ),
