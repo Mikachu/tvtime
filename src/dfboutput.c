@@ -25,7 +25,9 @@
 #ifdef HAVE_DIRECTFB
 /* directfb includes */
 #include <directfb.h>
-#define DIRECTFB_VERSION (directfb_major_version*100+directfb_minor_version)*100+directfb_micro_version
+#define DIRECTFB_RUNTIME_VERSION (directfb_major_version*100+directfb_minor_version)*100+directfb_micro_version
+#define DIRECTFB_COMPILE_VERSION (DIRECTFB_MAJOR*100+DIRECTFB_MINOR)*100+DIRECTFB_MICRO
+#define DIRECTFB_VERSION DIRECTFB_RUNTIME_VERSION
 
 /* other things */
 #include <stdio.h>
@@ -77,8 +79,10 @@ unsigned char *dfb_get_output_buffer( void )
 
 int dfb_get_current_output_field( void )
 {
-    int fieldid;
+    int fieldid = 0;
+#if DIRECTFB_COMPILE_VERSION >= 914
     crtc2->GetCurrentOutputField( crtc2, &fieldid );
+#endif
     return fieldid;
 }
 
@@ -140,11 +144,14 @@ int dfb_init( int outputheight, int aspect, int verbose )
     DFBDisplayLayerConfig dlc;
     DFBDisplayLayerConfigFlags failed;
 
-    if (verbose)
-        fprintf(stderr,"Using directfb version:%d\n",DIRECTFB_VERSION);
-    if (DIRECTFB_VERSION < 918)
-        fprintf(stderr,"\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
-                "*** this may lead to less than optimal output\n");
+    if( verbose ) {
+        fprintf( stderr, "Using directfb version: %d\n", DIRECTFB_VERSION );
+ 	fprintf( stderr, "Compiled with directfb version: %d\n", DIRECTFB_COMPILE_VERSION );
+    }
+    if( DIRECTFB_VERSION < 918 ) {
+        fprintf( stderr, "\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
+                 "*** this may lead to less than optimal output\n" );
+    }
     
     DirectFBInit( 0, 0 );
 
@@ -157,7 +164,8 @@ int dfb_init( int outputheight, int aspect, int verbose )
     DirectFBCreate( &dfb );
     dfb->GetDisplayLayer( dfb, 2, &crtc2 );
     if( !crtc2 ) {
-        fprintf( stderr, "damnit! failure, exiting\n" );
+        fprintf( stderr, "dfboutput: Failed to initialize DirectFB.\n"
+                         "dfboutput: (tvtime DirectFB driver requires a Matrox card), exiting.\n" );
         dfb_shutdown();
         return 0;
     }
@@ -282,7 +290,9 @@ void dfb_wait_for_sync( int field )
 {
     while( dfb_get_current_output_field() != field ) {
     /*do { */
+#if DIRECTFB_COMPILE_VERSION >= 916
         crtc2->WaitForSync( crtc2 );
+#endif
     /*} while( dfb_get_current_output_field() != field ); */
     }
 }

@@ -142,6 +142,14 @@ if test "$DIRECTFB_CONFIG" != "no" ; then
   AC_CHECK_DECL(DLBM_TRIPLE, [AC_DEFINE([DIRECTFB_HAS_TRIPLE],,[DirectFB Supports triple buffering])],,[#include <directfb.h>])
   AC_CHECK_DECL(DLCAPS_FIELD_PARITY, [AC_DEFINE([DIRECTFB_HAS_FIELD_PARITY],,[DirectFB Supports setting field parity])],,[#include <directfb.h>])
   AC_CHECK_DECL(DLCAPS_FLICKER_FILTERING, [AC_DEFINE([DIRECTFB_HAS_FLICKER_FILTERING],,[DirectFB Supports setting flicker filtering])],,[#include <directfb.h>])
+  DIRECTFB_VERSION_STRING=`directfb-config --version`
+  DIRECTFB_MAJOR=`directfb-config --version | awk 'BEGIN {FS = "."} {print $1}'`
+  DIRECTFB_MINOR=`directfb-config --version | awk 'BEGIN {FS = "."} {print $2}'`
+  DIRECTFB_MICRO=`directfb-config --version | awk 'BEGIN {FS = "."} {print $3}'`
+  AC_DEFINE_UNQUOTED(DIRECTFB_VERSION_STRING, "${DIRECTFB_VERSION_STRING}", [DirectFB Version String])
+  AC_DEFINE_UNQUOTED(DIRECTFB_MAJOR, ${DIRECTFB_MAJOR}, [DirectFB Major Version])
+  AC_DEFINE_UNQUOTED(DIRECTFB_MINOR, ${DIRECTFB_MINOR}, [DirectFB Minor Version])
+  AC_DEFINE_UNQUOTED(DIRECTFB_MICRO, ${DIRECTFB_MICRO}, [DirectFB Micro Version])
 fi
 
 dnl ---------------------------------------------

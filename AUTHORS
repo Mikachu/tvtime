@@ -65,6 +65,9 @@ Authors and contributors
   David Atkinson <psykax@psykax.com>
     - Updates for Australian frequencies
 
+  Mike Bourgeous <nitrogen@slimetech.com>
+    - Compile fixes and some autoconf work for DirectFB
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
