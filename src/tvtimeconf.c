@@ -666,7 +666,7 @@ static void print_usage( char **argv )
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
     lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
-    lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+    lfputs( _("  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
               "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -k, --slave                Disables input handling in tvtime (slave mode).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
@@ -719,7 +719,7 @@ static void print_config_usage( char **argv )
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
     lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
-    lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+    lfputs( _("  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
               "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
     lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
