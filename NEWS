@@ -12,6 +12,8 @@ News for 0.9.9
   *  Support for saving picture settings both globally and per-channel.
   *  Finetune settings saved per-channel.
   *  Support for the V4L2 DVB driver and bttv9 for PAL-60 support.
+  *  Added a channel scanner application 'tvtime-scanner' that outputs
+     to the 'Custom' frequency table.
   *  Native support for UYVY input from the rivatv driver.
   *  Removed lirc support in favour of using tvtime-command.
   *  Fixed remaining screensaver, Xinerama and fullscreen issues.
