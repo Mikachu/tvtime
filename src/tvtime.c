@@ -820,6 +820,26 @@ static void build_deinterlacer_menu( menu_t *menu, int curmethod )
     menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
 }
 
+static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
+{
+    char string[ 128 ];
+    int i;
+
+    menu_set_text( menu, 0, get_deinterlace_method( curmethod )->name );
+    for( i = 0; i < 10; i++ ) {
+        menu_set_text( menu, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
+        menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+        menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+        menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    }
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_default_cursor( menu, i );
+    menu_set_text( menu, i + 1, string );
+    menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+}
+
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1324,6 +1344,7 @@ int main( int argc, char **argv )
         return 1;
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
+    build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
 
     if( tvtime->inputfilter ) {
         /* Setup the video correction tables. */
@@ -1714,6 +1735,7 @@ int main( int argc, char **argv )
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
                 build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
+                build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
                 commands_refresh_menu( commands );
                 osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
@@ -1731,6 +1753,7 @@ int main( int argc, char **argv )
             }
             if( osd ) {
                 build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
+                build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
                 commands_refresh_menu( commands );
             }
             tvtime_set_deinterlacer( tvtime, curmethod );

@@ -685,6 +685,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer configuration" );
     commands_add_menu( cmd, menu );
 
+    menu = menu_new( "deintdescription" );
+    menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer description" );
+    commands_add_menu( cmd, menu );
+
     menu = menu_new( "filters" );
     menu_set_text( menu, 0, "Setup - Video processing - Input filters" );
     if( cmd->apply_luma ) {
@@ -1054,7 +1058,7 @@ void commands_clear_menu_positions( commands_t *cmd )
 
     for( i = 0; i < MAX_USER_MENUS; i++ ) {
         if( cmd->menus[ i ] ) {
-            menu_set_cursor( cmd->menus[ i ], 0 );
+            menu_set_cursor( cmd->menus[ i ], menu_get_default_cursor( cmd->menus[ i ] ) );
         } else {
             return;
         }

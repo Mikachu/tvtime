@@ -35,6 +35,7 @@ struct menu_s
     int right_commands[ MENU_MAX ];
     int numlines;
     int cursor;
+    int defaultcursor;
 };
 
 menu_t *menu_new( const char *name )
@@ -46,6 +47,7 @@ menu_t *menu_new( const char *name )
 
     menu->numlines = 0;
     menu->cursor = 0;
+    menu->defaultcursor = 0;
     menu->name = strdup( name );
     if( !menu->name ) {
         free( menu );
@@ -143,5 +145,15 @@ const char *menu_get_right_argument( menu_t *menu, int line )
 int menu_get_cursor( menu_t *menu )
 {
     return menu->cursor;
+}
+
+int menu_get_default_cursor( menu_t *menu )
+{
+    return menu->defaultcursor;
+}
+
+void menu_set_default_cursor( menu_t *menu, int cursor )
+{
+    menu->defaultcursor = cursor;
 }
 
