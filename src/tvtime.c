@@ -802,6 +802,7 @@ int main( int argc, char **argv )
     linear_plugin_init();
     weave_plugin_init();
     double_plugin_init();
+    gamedither_plugin_init();
 
     scalerbob_plugin_init();
 
@@ -1380,6 +1381,7 @@ int main( int argc, char **argv )
                     }
                     sprintf( message, "Screenshot saved: %s", basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
+                    screenshot = 0;
                 }
                 output->unlock_output_buffer();
                 performance_checkpoint_constructed_top_field( perf );
@@ -1442,6 +1444,38 @@ int main( int argc, char **argv )
                                           secondlastframe, osd, con, vs, 1,
                                           width, height, width * 2, output->get_output_stride() );
                     }
+                }
+
+                /* For the screenshot, use may need to use the output after we build the bot field. */
+                if( screenshot ) {
+                    const char *basename;
+                    const char *outfile;
+                    char filename[ 256 ];
+                    char message[ 512 ];
+                    char pathfilename[ 256 ];
+                    char timestamp[ 50 ];
+                    time_t tm = time( 0 );
+
+                    if( fifo_args && strlen( fifo_args ) ) {
+                        basename = outfile = fifo_args;
+                    } else {
+                        strftime( timestamp, sizeof( timestamp ),
+                                  config_get_timeformat( ct ), localtime( &tm ) );
+                        sprintf( filename, "tvtime-output-%s.png", timestamp );
+                        sprintf( pathfilename, "%s/%s", config_get_screenshot_dir( ct ), filename );
+                        outfile = pathfilename;
+                        basename = filename;
+                    }
+                    if( curmethod->doscalerbob ) {
+                        pngscreenshot( outfile, output->get_output_buffer(),
+                                       width, height/2, width * 2 );
+                    } else {
+                        pngscreenshot( outfile, output->get_output_buffer(),
+                                       width, height, width * 2 );
+                    }
+                    sprintf( message, "Screenshot saved: %s", basename );
+                    if( osd ) tvtime_osd_show_message( osd, message );
+                    screenshot = 0;
                 }
                 output->unlock_output_buffer();
             }
