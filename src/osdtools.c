@@ -31,11 +31,6 @@
 
 #define MEMORY_PER_STRING (256*1024)
 
-int aspect_adjust_packed4444_scanline( uint8_t *output,
-                                       uint8_t *input, 
-                                       int width,
-                                       double aspectratio );
-
 struct osd_font_s
 {
     ft_font_t *font;
@@ -718,70 +713,6 @@ void osd_graphic_delete( osd_graphic_t *osdg )
     free( osdg );
 }
 
-void composite_packed444_to_packed4444_alpha_scanline( uint8_t *output, 
-                                                       uint8_t *input,
-                                                       int width, int alpha )
-{
-    int i;
-
-    for( i = 0; i < width; i++ ) {
-        output[ 0 ] = alpha & 0xff;
-        output[ 1 ] = input[ 0 ] & 0xff;
-        output[ 2 ] = input[ 1 ] & 0xff;
-        output[ 3 ] = input[ 2 ] & 0xff;
-
-        output += 4;
-        input += 3;
-    }
-
-}
-
-int aspect_adjust_packed4444_scanline( uint8_t *output,
-                                       uint8_t *input, 
-                                       int width,
-                                       double aspectratio )
-{
-    double i;
-    int prev_i = 0;
-    int w = 0;
-
-    for( i = 0.0; i < width; i += aspectratio ) {
-        uint8_t *curin = input + ((int) i)*4;
-
-        if( !prev_i ) {
-            output[ 0 ] = curin[ 0 ];
-            output[ 1 ] = curin[ 1 ];
-            output[ 2 ] = curin[ 2 ];
-            output[ 3 ] = curin[ 3 ];
-        } else {
-            int avg_a = 0;
-            int avg_y = 0;
-            int avg_cb = 0;
-            int avg_cr = 0;
-            int pos = prev_i * 4;
-            int c = 0;
-            int j;
-
-            for( j = prev_i; j <= (int) i; j++ ) {
-                avg_a += input[ pos++ ];
-                avg_y += input[ pos++ ];
-                avg_cb += input[ pos++ ];
-                avg_cr += input[ pos++ ];
-                c++;
-            }
-            output[ 0 ] = avg_a / c;
-            output[ 1 ] = avg_y / c;
-            output[ 2 ] = avg_cb / c;
-            output[ 3 ] = avg_cr / c;
-        }
-        output += 4;
-        prev_i = (int) i;
-        w++;
-    }
-
-    return w;
-}
-
 void osd_graphic_render_image4444( osd_graphic_t *osdg )
 {
     int i, width, height;
@@ -810,16 +741,11 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
             premultiply_packed4444_scanline( curout, curout, width );
         } else {
             rgb24_to_packed444_rec601_scanline( cb444, scanline, width );
-            composite_packed444_to_packed4444_alpha_scanline( curout, 
-                                                              cb444, 
-                                                              width, 
-                                                              255 );
+            packed444_to_nonpremultiplied_packed4444_scanline( curout, cb444, width, 255 );
         }
         osdg->image_adjusted_width = aspect_adjust_packed4444_scanline( 
                                            osdg->image4444+(i*osdg->image_width*4),
-                                           curout, 
-                                           width, 
-                                           osdg->image_aspect );
+                                           curout, width, osdg->image_aspect );
     }
 
     free( curout );

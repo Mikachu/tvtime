@@ -247,6 +247,18 @@ void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int wi
 void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
 
 /**
+ * I don't think these functions are correctly named or implemented, but
+ * they do belong here in speedy.
+ */
+void packed444_to_nonpremultiplied_packed4444_scanline( uint8_t *output, 
+                                                        uint8_t *input,
+                                                        int width, int alpha );
+int aspect_adjust_packed4444_scanline( uint8_t *output,
+                                       uint8_t *input, 
+                                       int width,
+                                       double aspectratio );
+
+/**
  * Struct for pulldown detection metrics.
  */
 typedef struct pulldown_metrics_s {
