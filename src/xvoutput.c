@@ -23,6 +23,8 @@
 # include "config.h"
 #endif
 
+#include "xvoutput.h"
+
 #ifdef HAVE_XV
 
 #include <stdio.h>
@@ -53,7 +55,6 @@
 #include "display.h"
 #include "speedy.h"
 #include "xcommon.h"
-#include "xvoutput.h"
 
 #define FOURCC_YUY2 0x32595559
 

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/select.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
