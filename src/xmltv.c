@@ -149,6 +149,7 @@ static time_t parse_xmltv_date( const char *date )
     memset( sday, 0, sizeof( sday ) );
     memset( shour, 0, sizeof( shour ) );
     memset( smin, 0, sizeof( smin ) );
+    memset( ssec, 0, sizeof( ssec ) );
 
     /*
      * example *date = "20031022220000 +0200"
