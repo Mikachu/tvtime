@@ -56,8 +56,8 @@ struct config_s
     int apply_luma_correction;
     double luma_correction;
 
-    int *keymap;
-    int *buttonmap;
+    int keymap[ 8 * MAX_KEYSYMS ];
+    int buttonmap[ MAX_BUTTONS ];
 
     int inputwidth;
     int inputnum;
@@ -109,8 +109,6 @@ static void copy_config( config_t *dest, config_t *src )
     (*dest) = (*src);
 
     /* Some of these I am keeping invalid for now. */
-    dest->keymap = 0;
-    dest->buttonmap = 0;
     dest->v4ldev = 0;
     dest->vbidev = 0;
     dest->command_pipe_dir = 0;
@@ -491,8 +489,6 @@ config_t *config_new( void )
     ct->timeformat = strdup( "%X" );
 
     /* We set these to 0 so we can delete safely if necessary. */
-    ct->keymap = 0;
-    ct->buttonmap = 0;
     ct->rvr_filename = 0;
     ct->config_filename = 0;
     ct->configsave = 0;
@@ -519,21 +515,7 @@ config_t *config_new( void )
         return 0;
     }
 
-    ct->keymap = malloc( 8*MAX_KEYSYMS * sizeof( int ) );
-    if( !ct->keymap ) {
-        fprintf( stderr, "config: Could not allocate memory for keymap.\n" );
-        config_delete( ct );
-        return 0;
-    }
-
-    ct->buttonmap = malloc( MAX_BUTTONS * sizeof( int ) );
-    if( !ct->buttonmap ) {
-        fprintf( stderr, "config: Could not allocate memory for buttonmap.\n" );
-        config_delete( ct );
-        return 0;
-    }
-
-    memset( ct->keymap, 0, 8*MAX_KEYSYMS * sizeof( int ) );
+    memset( ct->keymap, 0, sizeof( ct->keymap ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
 
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
@@ -589,7 +571,7 @@ config_t *config_new( void )
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
 
-    memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
+    memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
     ct->buttonmap[ 3 ] = TVTIME_TOGGLE_INPUT;
@@ -730,8 +712,6 @@ void config_free_data( config_t *ct )
     if( ct->v4ldev ) free( ct->v4ldev );
     if( ct->norm ) free( ct->norm );
     if( ct->freq ) free( ct->freq );
-    if( ct->keymap ) free( ct->keymap );
-    if( ct->buttonmap ) free( ct->buttonmap );
     if( ct->ssdir ) free( ct->ssdir );
     if( ct->timeformat ) free( ct->timeformat );
     if( ct->command_pipe_dir ) free( ct->command_pipe_dir );
@@ -758,12 +738,6 @@ void config_delete( config_t *ct )
 
 int config_key_to_command( config_t *ct, int key )
 {
-    if( !ct || !ct->keymap ) {
-        fprintf( stderr, "config: key_to_command: Invalid config obj "
-                 "or no keymap.\n" );
-        return TVTIME_NOCOMMAND;
-    }
-
     if( !key ) return TVTIME_NOCOMMAND;
 
     if( ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
@@ -790,9 +764,8 @@ int config_command_to_key( config_t *ct, int command )
 
 int config_button_to_command( config_t *ct, int button )
 {
-    if( !ct || !ct->buttonmap ) return 0;
     if( button < 0 || button >= MAX_BUTTONS ) return 0;
-    return ct->buttonmap[button];
+    return ct->buttonmap[ button ];
 }
 
 int config_get_verbose( config_t *ct )
