@@ -47,7 +47,7 @@ unsigned int config_get_channel_text_rgb( config_t *ct );
 unsigned int config_get_other_text_rgb( config_t *ct );
 int config_get_fullscreen( config_t *ct );
 int config_get_priority( config_t *ct );
-char *config_get_command_pipe( config_t *ct );
+const char *config_get_command_pipe( config_t *ct );
 int config_get_preferred_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );
 int config_get_left_scanline_bias( config_t *ct );

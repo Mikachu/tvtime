@@ -808,7 +808,7 @@ const char *config_get_config_filename( config_t *ct )
     return ct->config_filename;
 }
 
-char *config_get_command_pipe( config_t *ct )
+const char *config_get_command_pipe( config_t *ct )
 {
     return ct->command_pipe;
 }
