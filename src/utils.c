@@ -91,9 +91,9 @@ const char *get_tvtime_paths( void )
 {
 #ifdef FONTDIR
     return FONTDIR ":" DATADIR ":../data:./data";
-#else /* FONTDIR */
+#else
     return DATADIR ":../data:./data";
-#endif /* FONTDIR */
+#endif
 }
 
 const char *get_tvtime_fifodir( uid_t uid )
