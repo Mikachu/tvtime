@@ -114,14 +114,13 @@ void input_callback( input_t *in, InputEvent command, int arg )
     int tvtime_cmd, verbose;
     /* XXX: fix this so it's useful */
     int printdebug=0, showtest=0;
-    char bar[108];
     int volume;
 
 
     verbose = config_get_verbose( in->cfg );
 
+    fprintf( stderr, "input: command = %o  arg = %d\n", command, arg );
     switch( command ) {
-        fprintf( stderr, "input: command = %o  arg = %d\n" );
 
     case I_QUIT:
         break;
