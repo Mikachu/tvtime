@@ -150,6 +150,7 @@ struct config_s
     int right_scanline_bias;
 
     char config_filename[ 1024 ];
+    int config_open;
 };
 
 void config_init( config_t *ct );
@@ -253,6 +254,7 @@ config_t *config_new( int argc, char **argv )
     ct->voverscan = 0.0;
     ct->left_scanline_bias = 0;
     ct->right_scanline_bias = 0;
+    ct->config_open = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -346,6 +348,7 @@ config_t *config_new( int argc, char **argv )
         configFile = base;
         if( parser_new( &(ct->pf), configFile ) ) {
             config_init( ct );
+            ct->config_open = 1;
         }
     }
 
@@ -359,6 +362,7 @@ config_t *config_new( int argc, char **argv )
         configFile = base;
         if( parser_new( &(ct->pf), configFile ) ) {
             config_init( ct );
+            ct->config_open = 1;
         }
     }
 
@@ -396,6 +400,7 @@ config_t *config_new( int argc, char **argv )
             fprintf( stderr, "config: Could not read configuration from %s\n", configFile );
         } else {
             config_init( ct );
+            ct->config_open = 1;
         }
         free( configFile );
     }
@@ -412,7 +417,7 @@ config_t *config_new( int argc, char **argv )
 
 void config_delete( config_t *ct )
 {
-    parser_delete( &(ct->pf) );
+    if( ct->config_open ) parser_delete( &(ct->pf) );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
     free( ct->timeformat );
