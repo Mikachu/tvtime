@@ -423,7 +423,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "root-tuner" );
     menu_set_text( menu, 0, "Setup" );
-    menu_set_text( menu, 1, "Station management" );
+    sprintf( string, "%c%c%c  Station management", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
     menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
@@ -435,11 +436,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 4, "Video processing" );
+    sprintf( string, "%c%c%c  Video processing", 0xee, 0x80, 0x9f );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 5, "Exit" );
+    sprintf( string, "%c%c%c  Exit", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
@@ -455,11 +458,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 3, "Video processing" );
+    sprintf( string, "%c%c%c  Video processing", 0xee, 0x80, 0x9f );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 4, "Exit" );
+    sprintf( string, "%c%c%c  Exit", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_MENU_EXIT, 0 );
     menu_set_right_command( menu, 4, TVTIME_MENU_EXIT, 0 );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
@@ -496,11 +501,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "device" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "device" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 2, "Data services" );
+    sprintf( string, "%c%c%c  Data services", 0xee, 0x80, 0x9a );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 3, "Restart with new settings" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_RESTART, "" );
     menu_set_right_command( menu, 3, TVTIME_RESTART, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
