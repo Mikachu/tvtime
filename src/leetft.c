@@ -78,7 +78,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
     FT_Set_Char_Size( font->face, 0, font->fontsize * 64, xdpi, 72 );
 
-    FT_Select_Charmap( font->face, FT_ENCODING_UNICODE );
+    FT_Select_Charmap( font->face, ft_encoding_unicode );
 
     for( i = 0; i < 256; i++ ) {
         FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
