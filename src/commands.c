@@ -57,6 +57,7 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_9", TVTIME_CHANNEL_9 },
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
+    { "CHANNEL_ACTIVATE_ALL", TVTIME_CHANNEL_ACTIVATE_ALL },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
     { "CHANNEL_SAVE_TUNING", TVTIME_CHANNEL_SAVE_TUNING },
@@ -441,6 +442,14 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             station_writeconfig( in->stationmgr );
             station_set( in->stationmgr, pos );
             in->change_channel = 1;
+        }
+        break;
+
+    case TVTIME_CHANNEL_ACTIVATE_ALL:
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            if( in->osd ) tvtime_osd_show_message( in->osd, "All channels re-activated." );
+            station_activate_all_channels( in->stationmgr );
+            station_writeconfig( in->stationmgr );
         }
         break;
 
