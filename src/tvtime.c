@@ -703,17 +703,6 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_aquired_input_frame( perf );
 
-        if( screenshot ) {
-            char filename[ 256 ];
-            char timestamp[ 50 ];
-            time_t tm = time( 0 );
-            strftime( timestamp, sizeof( timestamp ),
-                      config_get_timeformat( ct ), localtime( &tm ) );
-            sprintf( filename, "tvtime-shot-input-%s.png", timestamp );
-            pngscreenshot( filename, curframe, width, height, width * 2 );
-        }
-
-
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
@@ -721,7 +710,6 @@ int main( int argc, char **argv )
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );
         }
-
 
         if( output->is_interlaced() ) {
             /* Wait until we can draw the even field. */
@@ -746,13 +734,15 @@ int main( int argc, char **argv )
                                    vc && config_get_apply_luma_correction( ct ),
                                    width, height, width * 2, output->get_output_stride() );
             }
+
+            /* For the screenshot, use the output after we build the top field. */
             if( screenshot ) {
                 char filename[ 256 ];
                 char timestamp[ 50 ];
                 time_t tm = time( 0 );
                 strftime( timestamp, sizeof( timestamp ),
                           config_get_timeformat( ct ), localtime( &tm ) );
-                sprintf( filename, "tvtime-shot-top-%s.png", timestamp );
+                sprintf( filename, "tvtime-output-%s.png", timestamp );
                 pngscreenshot( filename, output->get_output_buffer(),
                                width, height, width * 2 );
             }
@@ -799,16 +789,6 @@ int main( int argc, char **argv )
                                   secondlastframe, vc, osd, menu, 1,
                                   vc && config_get_apply_luma_correction( ct ),
                                   width, height, width * 2, output->get_output_stride() );
-            }
-            if( screenshot ) {
-                char filename[ 256 ];
-                char timestamp[ 50 ];
-                time_t tm = time( 0 );
-                strftime( timestamp, sizeof( timestamp ),
-                          config_get_timeformat( ct ), localtime( &tm ) );
-                sprintf( filename, "tvtime-shot-bot-%s.png", timestamp );
-                pngscreenshot( filename, output->get_output_buffer(),
-                               width, height, width * 2 );
             }
             output->unlock_output_buffer();
             performance_checkpoint_constructed_bot_field( perf );
