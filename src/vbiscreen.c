@@ -157,7 +157,6 @@ void blank_screen( vbiscreen_t *vs )
 {
     int i;
 
-    if( vs->verbose ) fprintf( stderr, "vbiscreen: Blanking screen.\n" );
     for( i = 0; i < ROWS; i++ ) {
         osd_string_show_text( vs->line[ i ], " ", 0 );
     }

@@ -1198,8 +1198,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0
         && verbose ) {
-        fprintf( stderr, _("tvtime: Cannot set priority to %d: %s.\n"),
-                 config_get_priority( ct ), strerror( errno ) );
+        fprintf( stderr, "tvtime: Cannot set priority to %d: %s.\n",
+                  config_get_priority( ct ), strerror( errno ) );
     }
 
     send_fields = config_get_send_fields( ct );
@@ -1326,20 +1326,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
-            if( asprintf( &error_string, _("Can't open rvr file '%s'."),
+            if( asprintf( &error_string, _("Can't open RVR file '%s'."),
                           config_get_rvr_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
-            /*
-             * The three following commands should NOT be reassembled into
-             * a single command -- since we don't want unneccecary string
-             * duplication for translators. (See asprintf() above for the
-             * exact same string.
-             */
-            fputs ("tvtime: ", stderr );
-            fprintf( stderr, _("Can't open rvr file '%s'."),
-                     config_get_rvr_filename( ct ) );
-            fputc( '\n', stderr );
         } else {
             width = rvrreader_get_width( rvrreader );
             height = rvrreader_get_height( rvrreader );
@@ -1350,7 +1340,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                 norm, verbose );
         if( !vidin ) {
             if( asprintf( &error_string,
-                          _("Can't open video4linux device '%s'."),
+                          _("Can't open capture device '%s'."),
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }
@@ -1373,16 +1363,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             width = videoinput_get_width( vidin );
             height = videoinput_get_height( vidin );
             if( verbose ) {
-                fprintf( stderr, _("tvtime: Sampling input at %d pixels "
-                                   "per scanline.\n"), width );
+                fprintf( stderr, "tvtime: Sampling input at %d pixels "
+                                   "per scanline.\n", width );
             }
         }
     }
 
     /* Set input size. */
     if( !output->set_input_size( width, height ) ) {
-        fprintf( stderr, _("tvtime: Can't display input size %dx%d.\n"),
-                 width, height );
+        lfprintf( stderr, _("tvtime: Can't display input size %dx%d.\n"),
+                  width, height );
         /* FIXME: Clean up. */
         return 1;
     }
@@ -1401,33 +1391,33 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         fieldsavailable = 4;
     } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                               "V4L.  Not enough to continue.  Exiting.\n"),
+            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
+                                "V4L.  Not enough to continue.  Exiting.\n"),
                      videoinput_get_numframes( vidin ) );
             return 1;
         } else if( videoinput_get_numframes( vidin ) == 2 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                               "V4L.  Limiting deinterlace plugins\n"
-                               "tvtime: to those which only need 1 field.\n"),
+            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
+                                "V4L.  Limiting deinterlace plugins\n"
+                                "tvtime: to those which only need 1 field.\n"),
                      videoinput_get_numframes( vidin ) );
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                               "V4L.  Limiting deinterlace plugins\n"
-                               "tvtime: to those which only need 2 fields.\n"),
+            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
+                                "V4L.  Limiting deinterlace plugins\n"
+                                "tvtime: to those which only need 2 fields.\n"),
                      videoinput_get_numframes( vidin ) );
             fieldsavailable = 2;
         } else {
             fieldsavailable = 4;
         }
         if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
-            fprintf( stderr,
-                     _("\n*** You are using the bttv driver, but without "
-                       "enough gbuffers available.\n"
-                       "*** See the support page at %s "
-                       "for information\n"
-                       "*** on how to increase your gbuffers setting.\n\n"),
-                       PACKAGE_BUGREPORT );
+            lfprintf( stderr,
+                      _("\n*** You are using the bttv driver, but without "
+                        "enough gbuffers available.\n"
+                        "*** See the support page at %s "
+                        "for information\n"
+                        "*** on how to increase your gbuffers setting.\n\n"),
+                        PACKAGE_BUGREPORT );
         }
     } else {
         fieldsavailable = 4;
@@ -1439,8 +1429,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     } else {
         filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
         if( !output->is_interlaced() && !get_num_deinterlace_methods() ) {
-            fprintf( stderr, _("tvtime: No deinterlacing methods "
-                               "available, exiting.\n") );
+            lfprintf( stderr, _("tvtime: No deinterlacing methods "
+                                "available, exiting.\n") );
             return 1;
         }
         curmethodid = 0;
@@ -1511,7 +1501,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
-        fprintf( stderr, _("tvtime: Out of memory.\n") );
+        lfprintf( stderr, _("tvtime: Out of memory.\n") );
         return 1;
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),
@@ -1553,14 +1543,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU )
             < 0 ) {
             if( errno != EEXIST ) {
-                fprintf( stderr, _("tvtime: Cannot create directory %s.  "
-                                   "FIFO disabled.\n"), 
-                         get_tvtime_fifodir( config_get_uid( ct ) ) );
+                lfprintf( stderr, _("tvtime: Cannot create directory %s: %s\n"
+                                    "tvtime: FIFO disabled.\n"), 
+                         get_tvtime_fifodir( config_get_uid( ct ) ),
+                         strerror( errno ) );
             } else {
                 fifodir = opendir
                     ( get_tvtime_fifodir( config_get_uid( ct ) ) );
                 if( !fifodir ) {
-                    fprintf( stderr, _("tvtime: %s is not a directory.  "
+                    lfprintf( stderr, _("tvtime: %s is not a directory.  "
                                        "FIFO disabled.\n"), 
                              get_tvtime_fifodir( config_get_uid( ct ) ) );
                 } else {
@@ -1572,15 +1563,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             success = 1;
                         } else {
-                            fprintf( stderr, _("tvtime: You do not own %s.  "
-                                               "FIFO disabled.\n"),
-                                     get_tvtime_fifodir (config_get_uid
-                                                         ( ct ) ) );
+                            lfprintf( stderr, _("tvtime: You do not own %s.  "
+                                                "FIFO disabled.\n"),
+                                      get_tvtime_fifodir( config_get_uid( ct ) ) );
                         }
                     } else {
-                        fprintf( stderr, _("tvtime: Cannot stat %s.  "
-                                         "FIFO disabled.\n"),
-                                 get_tvtime_fifodir( config_get_uid( ct ) ) );
+                        lfprintf( stderr, _("tvtime: Cannot stat %s: %s\n"
+                                            "tvtime: FIFO disabled.\n"),
+                                  get_tvtime_fifodir( config_get_uid( ct ) ),
+                                  strerror( errno ) );
                     }
                 }
             }
@@ -2261,9 +2252,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             int framesize = width * height * 2;
-            fprintf( stderr, _("tvtime: Stats using '%s' at %dx%d.\n"), 
-                     (curmethod) ? curmethod->name : "interlaced passthrough", 
-                     width, height );
+            lfprintf( stderr, _("tvtime: Stats using '%s' at %dx%d.\n"), 
+                      (curmethod) ? curmethod->name : "interlaced passthrough", 
+                      width, height );
             if( curmethod && curmethod->doscalerbob ) {
                 framesize = width * height;
             }
@@ -2671,11 +2662,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     xmlCleanupParser();
 
     if( restarttvtime ) {
-        fprintf( stderr, _("tvtime: Restarting.\n") );
+        lfprintf( stderr, _("tvtime: Restarting.\n") );
         return 2;
     }
 
-    fprintf( stderr, _("tvtime: Thank you for using tvtime.\n") );
+    lfprintf( stderr, _("tvtime: Thank you for using tvtime.\n") );
     return 0;
 }
 
@@ -2708,15 +2699,15 @@ int main( int argc, char **argv )
 
     rtctimer = rtctimer_new( 1 );
     if( !rtctimer ) {
-        fprintf( stderr,
-                 _("\n*** /dev/rtc support is needed for smooth video.  "
-                   "We STRONGLY recommend\n"
-                   "*** that you load the 'rtc' kernel module "
-                   "before starting tvtime,\n"
-                   "*** and make sure that your user "
-                   "has access to the device file.\n"
-                   "*** See our support page at %s"
-                   " for more information\n\n"), PACKAGE_BUGREPORT );
+        lfprintf( stderr,
+                  _("\n*** /dev/rtc support is needed for smooth video.  "
+                    "We STRONGLY recommend\n"
+                    "*** that you load the 'rtc' kernel module "
+                    "before starting tvtime,\n"
+                    "*** and make sure that your user "
+                    "has access to the device file.\n"
+                    "*** See our support page at %s"
+                    " for more information\n\n"), PACKAGE_BUGREPORT );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) &&
             !rtctimer_set_interval( rtctimer, 64 ) ) {
@@ -2726,16 +2717,16 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr,
-                         _( "\n*** Failed to get 1024hz resolution from "
-                            "/dev/rtc.  This will cause\n"
-                            "*** video to not be smooth.  Please run tvtime "
-                            "as root, or change\n"
-                            "*** the maximum resolution by running this "
-                            "command as root:\n"
-                            "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                            "*** See our support page at %s for more "
-                            "information\n\n"), PACKAGE_BUGREPORT );
+                lfprintf( stderr,
+                          _( "\n*** Failed to get 1024hz resolution from "
+                             "/dev/rtc.  This will cause\n"
+                             "*** video to not be smooth.  Please run tvtime "
+                             "as root, or change\n"
+                             "*** the maximum resolution by running this "
+                             "command as root:\n"
+                             "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                             "*** See our support page at %s for more "
+                             "information\n\n"), PACKAGE_BUGREPORT );
             }
         }
     }
@@ -2747,8 +2738,9 @@ int main( int argc, char **argv )
          * This used to say "Unknown problems", but we're printing an
          * error string, so that didn't really make sense, did it?
          */
-        fprintf( stderr, "tvtime: Problem dropping root access: %s\n",
-                 strerror( errno ) );
+        lfprintf( stderr, _("tvtime: Failed to drop root access: %s.\n"
+                            "tvtime: Exiting to avoid security problems.\n"),
+                  strerror( errno ) );
         return 1;
     }
 
