@@ -36,9 +36,9 @@ struct config_s
 
     int inputwidth;
     int inputnum;
-    char *v4ldev;
-    char *norm;
-    char *freq;
+    const char *v4ldev;
+    const char *norm;
+    const char *freq;
     int tuner_number;
 };
 
@@ -76,7 +76,7 @@ config_t *config_new( const char *filename )
 
 void config_init( config_t *ct )
 {
-    char *tmp;
+    const char *tmp;
 
     if( !ct ) {
         fprintf( stderr, "config: NULL received as config structure.\n" );
