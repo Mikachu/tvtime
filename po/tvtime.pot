@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-11-01 19:46-0400\n"
+"POT-Creation-Date: 2003-11-04 14:34-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:831 src/tvtime.c:850 src/tvtime.c:885 src/tvtime.c:949
-#: src/tvtime.c:977 src/tvtime.c:1103 src/commands.c:379 src/commands.c:555
+#: src/tvtime.c:830 src/tvtime.c:849 src/tvtime.c:884 src/tvtime.c:948
+#: src/tvtime.c:976 src/tvtime.c:1102 src/commands.c:379 src/commands.c:555
 #: src/commands.c:575 src/commands.c:637 src/commands.c:683 src/commands.c:758
 #: src/commands.c:775 src/commands.c:802 src/commands.c:863
 #: src/commands.c:1118 src/commands.c:1165 src/commands.c:1202
@@ -28,155 +28,155 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: src/tvtime.c:863 src/tvtime.c:989
+#: src/tvtime.c:862 src/tvtime.c:988
 #, c-format
 msgid "Full rate: %.2f fps"
 msgstr ""
 
-#: src/tvtime.c:871 src/tvtime.c:993
+#: src/tvtime.c:870 src/tvtime.c:992
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
 msgstr ""
 
-#: src/tvtime.c:878 src/tvtime.c:997
+#: src/tvtime.c:877 src/tvtime.c:996
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
 msgstr ""
 
-#: src/tvtime.c:901
+#: src/tvtime.c:900
 msgid "Overscan setting"
 msgstr ""
 
-#: src/tvtime.c:908 src/commands.c:1273
+#: src/tvtime.c:907 src/commands.c:1273
 msgid "Apply matte"
 msgstr ""
 
-#: src/tvtime.c:916
+#: src/tvtime.c:915
 msgid "16:9 output"
 msgstr ""
 
-#: src/tvtime.c:925
+#: src/tvtime.c:924
 msgid "Fullscreen"
 msgstr ""
 
-#: src/tvtime.c:932
+#: src/tvtime.c:931
 msgid "Set fullscreen position"
 msgstr ""
 
-#: src/tvtime.c:942
+#: src/tvtime.c:941
 msgid "Always-on-top"
 msgstr ""
 
-#: src/tvtime.c:960
+#: src/tvtime.c:959
 msgid "Centre"
 msgstr ""
 
-#: src/tvtime.c:967
+#: src/tvtime.c:966
 msgid "Top"
 msgstr ""
 
-#: src/tvtime.c:973
+#: src/tvtime.c:972
 msgid "Bottom"
 msgstr ""
 
-#: src/tvtime.c:987 src/commands.c:1305 src/commands.c:1335
+#: src/tvtime.c:986 src/commands.c:1305 src/commands.c:1335
 msgid "Attempted framerate"
 msgstr ""
 
-#: src/tvtime.c:1014
+#: src/tvtime.c:1013
 msgid "Performance estimates"
 msgstr ""
 
-#: src/tvtime.c:1016
+#: src/tvtime.c:1015
 msgid "Deinterlacer"
 msgstr ""
 
-#: src/tvtime.c:1019
+#: src/tvtime.c:1018
 #, c-format
 msgid "Input: %s at %dx%d pixels"
 msgstr ""
 
-#: src/tvtime.c:1023
+#: src/tvtime.c:1022
 #, c-format
 msgid "Attempted framerate: %.2f fps"
 msgstr ""
 
-#: src/tvtime.c:1027
+#: src/tvtime.c:1026
 #, c-format
 msgid "Average blit time: %.2f ms (%.0f MB/sec)"
 msgstr ""
 
-#: src/tvtime.c:1031
+#: src/tvtime.c:1030
 #, c-format
 msgid "Average render time: %5.2f ms"
 msgstr ""
 
-#: src/tvtime.c:1035
+#: src/tvtime.c:1034
 #, c-format
 msgid "Dropped frames: %d"
 msgstr ""
 
-#: src/tvtime.c:1041
+#: src/tvtime.c:1040
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
 msgstr ""
 
-#: src/tvtime.c:1060 src/tvtime.c:1113
+#: src/tvtime.c:1059 src/tvtime.c:1112
 msgid "16:9 + Overscan"
 msgstr ""
 
-#: src/tvtime.c:1065 src/tvtime.c:1092
+#: src/tvtime.c:1064 src/tvtime.c:1091
 msgid "1.85:1"
 msgstr ""
 
-#: src/tvtime.c:1070 src/tvtime.c:1097
+#: src/tvtime.c:1069 src/tvtime.c:1096
 msgid "2.35:1"
 msgstr ""
 
-#: src/tvtime.c:1075 src/tvtime.c:1116
+#: src/tvtime.c:1074 src/tvtime.c:1115
 msgid "4:3 centre"
 msgstr ""
 
-#: src/tvtime.c:1081 src/tvtime.c:1119
+#: src/tvtime.c:1080 src/tvtime.c:1118
 msgid "4:3 + Overscan"
 msgstr ""
 
-#: src/tvtime.c:1087
+#: src/tvtime.c:1086
 msgid "16:9"
 msgstr ""
 
-#: src/tvtime.c:1112
+#: src/tvtime.c:1111
 msgid "Matte setting (Anamorphic input)"
 msgstr ""
 
-#: src/tvtime.c:1118
+#: src/tvtime.c:1117
 msgid "Matte setting (4:3 input)"
 msgstr ""
 
-#: src/tvtime.c:1198 src/tvtime.c:1270 src/tvtime.c:1314 src/tvtime.c:1322
-#: src/tvtime.c:1471 src/tvtime.c:1524 src/tvtime.c:1549 src/tvtime.c:1583
-#: src/tvtime.c:1600 src/tvtime-command.c:56 src/tvtime-command.c:71
+#: src/tvtime.c:1196 src/tvtime.c:1268 src/tvtime.c:1312 src/tvtime.c:1320
+#: src/tvtime.c:1469 src/tvtime.c:1522 src/tvtime.c:1547 src/tvtime.c:1581
+#: src/tvtime.c:1595 src/tvtime-command.c:56 src/tvtime-command.c:71
 #: src/tvtime-configure.c:48 src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
 msgstr ""
 
-#: src/tvtime.c:1335
+#: src/tvtime.c:1333
 #, c-format
 msgid "Cannot open MPEG file %s."
 msgstr ""
 
-#: src/tvtime.c:1346
+#: src/tvtime.c:1344
 #, c-format
 msgid "Cannot open RVR file %s."
 msgstr ""
 
-#: src/tvtime.c:1360
+#: src/tvtime.c:1358
 #, c-format
 msgid "Cannot open capture device %s."
 msgstr ""
 
-#: src/tvtime.c:1365
+#: src/tvtime.c:1363
 #, c-format
 msgid ""
 "\n"
@@ -187,7 +187,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:1429
+#: src/tvtime.c:1427
 #, c-format
 msgid ""
 "\n"
@@ -199,7 +199,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:1436
+#: src/tvtime.c:1434
 #, c-format
 msgid ""
 "\n"
@@ -211,69 +211,69 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:1488
+#: src/tvtime.c:1486
 msgid "On screen display failed to initialize, disabled.\n"
 msgstr ""
 
-#: src/tvtime.c:1507
+#: src/tvtime.c:1505
 msgid "No video source"
 msgstr ""
 
-#: src/tvtime.c:1553
+#: src/tvtime.c:1551
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
 msgstr ""
 
-#: src/tvtime.c:1594
+#: src/tvtime.c:1589
 msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr ""
 
-#: src/tvtime.c:1851
+#: src/tvtime.c:1845
 msgid "Always-on-top enabled."
 msgstr ""
 
-#: src/tvtime.c:1856
+#: src/tvtime.c:1850
 msgid "Always-on-top disabled."
 msgstr ""
 
-#: src/tvtime.c:1875
+#: src/tvtime.c:1869
 msgid "16:9 display mode active."
 msgstr ""
 
-#: src/tvtime.c:1884
+#: src/tvtime.c:1878
 msgid "4:3 display mode active."
 msgstr ""
 
-#: src/tvtime.c:1991
+#: src/tvtime.c:1985
 msgid "2-3 pulldown inversion disabled."
 msgstr ""
 
-#: src/tvtime.c:1994
+#: src/tvtime.c:1988
 msgid "2-3 pulldown inversion enabled."
 msgstr ""
 
-#: src/tvtime.c:2000
+#: src/tvtime.c:1994
 msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr ""
 
-#: src/tvtime.c:2385 src/tvtime.c:2526
+#: src/tvtime.c:2379 src/tvtime.c:2520
 #, c-format
 msgid "Screenshot: %s"
 msgstr ""
 
-#: src/tvtime.c:2662
+#: src/tvtime.c:2653
 msgid "Restarting tvtime.\n"
 msgstr ""
 
-#: src/tvtime.c:2666
+#: src/tvtime.c:2657
 msgid "Thank you for using tvtime.\n"
 msgstr ""
 
-#: src/tvtime.c:2688
+#: src/tvtime.c:2679
 #, c-format
 msgid "Running %s.\n"
 msgstr ""
 
-#: src/tvtime.c:2706
+#: src/tvtime.c:2697
 #, c-format
 msgid ""
 "\n"
@@ -285,7 +285,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:2721
+#: src/tvtime.c:2712
 #, c-format
 msgid ""
 "\n"
@@ -299,7 +299,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:2741
+#: src/tvtime.c:2732
 #, c-format
 msgid ""
 "\n"
@@ -1042,12 +1042,12 @@ msgstr ""
 msgid "Cannot open %s: %s\n"
 msgstr ""
 
-#: src/utils.c:607
+#: src/utils.c:610
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 
-#: src/utils.c:618
+#: src/utils.c:621
 #, c-format
 msgid ""
 "\n"
