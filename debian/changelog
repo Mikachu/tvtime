@@ -1,8 +1,21 @@
-tvtime (0.9.10-8.1) experimental; urgency=low
+tvtime (0.9.12-1.1) experimental; urgency=low
 
   * Unofficial build from CVS.
 
- -- J. Random Hacker <jrhacker@example.com>  Fri, 24 Oct 2003 12:56:14 -0400
+ -- J. Random Hacker <jrhacker@example.com>  Sun, 30 Nov 2003 16:53:54 -0500
+
+tvtime (0.9.12-1) unstable; urgency=low
+
+  * New upstream release
+    - xmga mode has been removed.  (Closes: Bug#216474)
+    - Wine is disabled on non-X86 systems.  (Closes: Bug#213334)
+  * Switch to Architecture: any.
+  * FTBFS: Fix kernel-header error in wine/ldt_keeper.c.
+    (Closes: Bug#221094)
+  * Fix Debconf script so it doesn't emit Perl warnings.
+  * Actually put our .desktop entry into /usr/share/applnk/Multimedia
+
+ -- Simon Law <sfllaw@debian.org>  Sat, 29 Nov 2003 19:29:47 -0500
 
 tvtime (0.9.10-9) unstable; urgency=low
 
