@@ -58,6 +58,7 @@ struct config_s
     int *keymap;
     char *timeformat;
     int *buttonmap;
+    char *ssdir;
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
@@ -354,6 +355,11 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->timeformat = strdup( tmp );
     }
 
+    if( (tmp = parser_get( pf, "ScreenShotDir", 1 )) ) {
+        free( ct->ssdir );
+        ct->ssdir = strdup( tmp );
+    }
+
     if( (tmp = parser_get( pf, "MenuBG", 1 )) ) {
         ct->menu_bg_rgb = parse_colour( tmp );
     }
@@ -488,6 +494,7 @@ config_t *config_new( int argc, char **argv )
     } else {
         ct->timeformat = strdup( "%r" );
     }
+    ct->ssdir = strdup( getenv( "HOME" ) );
     ct->finetune = 0;
     ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
@@ -657,6 +664,11 @@ config_t *config_new( int argc, char **argv )
                          "using %d instead.\n", ct->inputwidth );
     }
 
+    /* I phear that users may want to know this. */
+    if( ct->verbose ) {
+        fprintf( stderr, "config: Screenshots saved to %s\n", ct->ssdir );
+    }
+
     return ct;
 }
 
@@ -664,6 +676,7 @@ void config_delete( config_t *ct )
 {
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
+    free( ct->ssdir );
     free( ct->timeformat );
     free( ct->norm );
     free( ct->freq );
@@ -838,6 +851,11 @@ double config_get_vertical_overscan( config_t *ct )
 int config_get_ntsc_cable_mode( config_t *ct )
 {
     return ct->ntsc_mode;
+}
+
+const char *config_get_screenshot_dir( config_t *ct )
+{
+    return ct->ssdir;
 }
 
 void config_set_horizontal_overscan( config_t *ct, double hoverscan )

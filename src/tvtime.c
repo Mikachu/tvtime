@@ -1378,18 +1378,23 @@ int main( int argc, char **argv )
 
                 /* For the screenshot, use the output after we build the top field. */
                 if( screenshot ) {
+                    const char *basename;
                     const char *outfile;
                     char filename[ 256 ];
+                    char message[ 512 ];
+                    char pathfilename[ 256 ];
                     char timestamp[ 50 ];
                     time_t tm = time( 0 );
 
                     if( fifo_args && strlen( fifo_args ) ) {
-                        outfile = fifo_args;
+                        basename = outfile = fifo_args;
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
                               config_get_timeformat( ct ), localtime( &tm ) );
                         sprintf( filename, "tvtime-output-%s.png", timestamp );
-                        outfile = filename;
+                        sprintf( pathfilename, "%s/%s", config_get_screenshot_dir( ct ), filename );
+                        outfile = pathfilename;
+                        basename = filename;
                     }
                     if( curmethod->doscalerbob ) {
                         pngscreenshot( outfile, output->get_output_buffer(),
@@ -1398,6 +1403,8 @@ int main( int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
+                    sprintf( message, "Screenshot saved: %s", basename );
+                    tvtime_osd_show_message( osd, message );
                 }
                 output->unlock_output_buffer();
                 performance_checkpoint_constructed_top_field( perf );
