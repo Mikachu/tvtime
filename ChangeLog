@@ -1,4 +1,6 @@
 
+1.0RC1 -
+
 0.9.15 - Sat Oct 30 11:46:07 EDT 2004
   * vektor: It seems that some systems need #include <locale.h>
   * vektor: Use ARCH_X86_64 instead of ARCH_AMD64 to follow kdetv.
