@@ -833,12 +833,12 @@ static void reset_overscan_menu( menu_t *menu, double overscan )
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
     menu_set_right_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
     sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
     menu_set_right_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
@@ -1045,7 +1045,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0xb0 );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );

@@ -889,16 +889,16 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
 {
     char string[ 128 ];
 
-    snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0x80 );
+    snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0xb1 );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
 
     if( widescreen ) {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa5 );
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb5 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa4 );
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb4 );
     }
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
@@ -906,9 +906,9 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
 
     if( fullscreen ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa5 );
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb3 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa4 );
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb2 );
     }
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_TOGGLE_FULLSCREEN, "" );
