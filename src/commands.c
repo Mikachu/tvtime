@@ -207,37 +207,32 @@ static void update_xmltv_listings( commands_t *cmd )
         time_t tm = time( 0 );
 
         if( xmltv_needs_refresh( cmd->xmltv, tm ) ) {
+            const int maxlinelen = 64;
             const char *desc;
             char title[ 128 ];
             char next_title_data[ 128 ];
             char subtitle[ 1024 ];
-            char descdata[ 1024 ];
+            char descdata[ 128 ];
             char *line1 = 0;
             char *line2 = 0;
-            char *next_title = 0;
+            char next_title[64];
 
             xmltv_refresh( cmd->xmltv, tm );
 
             desc = xmltv_get_description( cmd->xmltv );
             if( desc ) {
-                snprintf( descdata, sizeof( descdata ), "%s", desc );
                 line1 = descdata;
                 line2 = 0;
-
-                if( strlen( descdata ) > 128 ) {
-                    sprintf( descdata + 128, "..." );
-                }
-
-                if( strlen( descdata ) > 45 ) {
-                    int desc_i = strlen( descdata ) / 2;
-
-                    /* find nearest white space */
-                    while( desc_i ) {
-                        if( descdata[ desc_i ] == ' ') break; else desc_i--;
-                    }
-                    if( desc_i ) {
-                        line2 = descdata + desc_i + 1; /* +1 for the space */
-                        descdata[ desc_i ] = '\0';
+                if( truncate_string( descdata, desc, "...",
+                                     sizeof( descdata ) ) > maxlinelen ) {
+                    /* truncate_string returns strlen(descdata) */
+                    line2 = break_line( descdata, maxlinelen );
+                    if( line2 == NULL ) {
+                        /*
+                         * FIXME
+                         * line breaking failed because no white space
+                         * was found. what should we do here?
+                         */
                     }
                 }
             }
@@ -252,25 +247,23 @@ static void update_xmltv_listings( commands_t *cmd )
             }
 
             if( xmltv_get_title( cmd->xmltv ) ) {
-                snprintf( title, sizeof( title ), "%s", xmltv_get_title( cmd->xmltv ) );
-                if( strlen( title ) > 40 ) {
-                    sprintf( title + 40, "..." );
-                }
+                truncate_string( title, xmltv_get_title( cmd->xmltv ), "...",
+                                 sizeof( title ) );
             } else {
                 *title = '\0';
             }
 
             if( xmltv_get_next_title( cmd->xmltv ) ) {
-                sprintf( next_title_data, "Next: " );
-                snprintf( next_title_data + 6, sizeof( next_title_data ) - 6, "%s",
-                          xmltv_get_next_title( cmd->xmltv ) );
-                if( strlen( next_title_data ) > 40 ) {
-                    sprintf( next_title_data + 40, "..." );
-                }
-                next_title = next_title_data;
+                snprintf( next_title_data, sizeof( next_title_data ),
+                          _("Next: %s"), xmltv_get_next_title( cmd->xmltv ) );
+                truncate_string ( next_title, next_title_data,
+                                  "...", sizeof( next_title ) );
+            } else {
+                *next_title = '\0';
             }
 
-            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2, next_title );
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle,
+                                          line1, line2, next_title );
         }
     }
 }
