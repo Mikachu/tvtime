@@ -909,7 +909,7 @@ int main( int argc, char **argv )
     dscaler_greedy2frame_plugin_init();
     dscaler_twoframe_plugin_init();
 
-    dscaler_videobob_plugin_init();
+    videobob_plugin_init();
     dscaler_videoweave_plugin_init();
     dscaler_tomsmocomp_plugin_init();
 

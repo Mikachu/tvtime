@@ -160,8 +160,8 @@ static deinterlace_setting_t settings[] =
 static deinterlace_method_t bobmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Bob (DScaler)",
-    "Bob",
+    "DScaler: VideoBob",
+    "VideoBob",
     2,
     MM_ACCEL_X86_MMXEXT,
     0,
