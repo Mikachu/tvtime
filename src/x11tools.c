@@ -154,99 +154,86 @@ void saver_off(Display *mDisplay) {
     /* Disabling xscreensaver by simulating activity. 
      * http://www.jwz.org/xscreensaver/faq.html#dvd */
     if( stop_xscreensaver && !ping_xscreensaver_child ) {
-      struct sigaction sigchld_act;
+        struct sigaction sigchld_act;
 
-      /* Set a handler for the child */
-      sigchld_act.sa_handler = sigchld_handler;
-      sigemptyset( &sigchld_act.sa_mask );
-      sigchld_act.sa_flags = SA_NOCLDSTOP;
-      sigaction( SIGCHLD, &sigchld_act, NULL );
+        /* Set a handler for the child */
+        sigchld_act.sa_handler = sigchld_handler;
+        sigemptyset( &sigchld_act.sa_mask );
+        sigchld_act.sa_flags = SA_NOCLDSTOP;
+        sigaction( SIGCHLD, &sigchld_act, NULL );
 
-      errno = 0;
-      printf( "Creating child...\n" );
-      ping_xscreensaver_child = fork();
-      if( !ping_xscreensaver_child ) {
-        int result;
-        printf( "Child executing.\n" );
-        /* We are the child, and we will ping xscreensaver every minute,
-         * to keep it from activating on us. */
-
-        /* We don't trap for any close() errors because we don't care
-         * about data lossage. */
-        close( STDIN_FILENO );
-
-        /* Don't close stdin/out as it's nice to see any errors */
-/*        close( STDOUT_FILENO );
-        close( STDERR_FILENO );*/
-
-        /* We need to drop privileges to the normal user, in case we are
-         * still setuid. */
-#ifdef _POSIX_SAVED_IDS
-        if( seteuid( getuid() ) == -1 ) {
-#else
-        if( setreuid( -1, getuid() ) == -1 ) {
-#endif
-          fprintf( stderr, 
-                   "x11tools: Unknown problems dropping root access: %s\n",
-                   strerror( errno ) );
-        }
-
-        /* Now we should re-nice ourselves so we don't get scheduled too
-         * often. */
         errno = 0;
-        result = getpriority( PRIO_PROCESS, 0 );
-        if( errno != 0 || result < 0 ) {
-          /* Ensure that we are at least 0 nice. */
-          setpriority( PRIO_PROCESS, 0, 0 );
-        }
+        ping_xscreensaver_child = fork();
+        if( !ping_xscreensaver_child ) {
+            int result;
+            /* We are the child, and we will ping xscreensaver every minute,
+             * to keep it from activating on us. */
 
-        /* Ping xscreensaver once every ping_xscreensaver_sleep 
-         * seconds. */
-        for( ;; ) {
+            /* We don't trap for any close() errors because we don't care
+             * about data lossage. */
+            close( STDIN_FILENO );
+            close( STDOUT_FILENO );
+            close( STDERR_FILENO );
 
-          errno = 0;
-
-          /* create a new process that will be _replaced_ by xscreensaver */
-          result = fork();
-
-          if ( result == 0 ) {
-
-            /* Child process - exec xscreensaver */
-            /* xscreensaver-command must be written _twice_ as execlp starts
-            its parameters with arg[0], not arg[1] */
-            result = execlp( "xscreensaver-command", "xscreensaver-command",
-              "-deactivate", NULL );
-            if( errno ) {
-              exit( NO_XSCREENSAVER );
+            /* We need to drop privileges to the normal user, in case we are
+             * still setuid. */
+#ifdef _POSIX_SAVED_IDS
+            if( seteuid( getuid() ) == -1 ) {
+#else
+            if( setreuid( -1, getuid() ) == -1 ) {
+#endif
+                fprintf( stderr, 
+                        "x11tools: Unknown problems dropping root access: %s\n",
+                        strerror( errno ) );
             }
 
-          } else if ( result > 0 ) {
-
-            /* Parent process - wait for child */
-            wait( &result );
-            if ( result > 0 ) {
-
-              /* xscreensaver-command exited nonzero status, or the child
-              couldn't exec xscreensaver-command */
-              printf( "Parent: Child exited with nonzero status.\n" );
-              exit( result );
-
+            /* Now we should re-nice ourselves so we don't get scheduled too
+             * often. */
+            errno = 0;
+            result = getpriority( PRIO_PROCESS, 0 );
+            if( errno || result < 0 ) {
+                /* Ensure that we are at least 0 nice. */
+                setpriority( PRIO_PROCESS, 0, 0 );
             }
 
-          } else {
+            /* Ping xscreensaver once every ping_xscreensaver_sleep 
+             * seconds. */
+            for( ;; ) {
+                /* create a new process that will be _replaced_ by 
+                 * xscreensaver-command */
+                errno = 0;
+                result = fork();
 
-              /* Could not create child to run xscreensaver-command */
-              printf( "Could not create xscreensaver child.\n" );
-              exit( NO_XSCREENSAVER );
+                if ( !result ) {
+                    /* Child process: exec xscreensaver-command */
+                    /* xscreensaver-command must be written _twice_ as 
+                     * execlp starts its parameters with arg[0], not arg[1] */
+                    errno = 0;
+                    result = execlp( "xscreensaver-command", 
+                                     "xscreensaver-command",
+                                     "-deactivate", 
+                                     NULL );
+                    if( errno ) {
+                        exit( NO_XSCREENSAVER );
+                    }
+                } else if ( result > 0 ) {
+                    /* Parent spinning process: wait for xscreensaver-command */
+                    wait( &result );
+                    if ( result > 0 ) {
+                        /* xscreensaver-command exited nonzero status, or 
+                         * the child couldn't exec xscreensaver-command */
+                        exit( result );
+                    }
+                } else {
+                    /* Could not create child to run xscreensaver-command */
+                    exit( NO_XSCREENSAVER );
+                }
 
-          }
-
-          sleep( ping_xscreensaver_sleep );
-
+                sleep( ping_xscreensaver_sleep );
+            }
+        } else if( ping_xscreensaver_child < 0 ) {
+            fprintf( stderr, "x11tools: Cannot fork a new process.\n" );
         }
-      } else if( ping_xscreensaver_child < 0 ) {
-        fprintf( stderr, "x11tools: can't fork a child.\n" );
-      }
     }
 
     if (stop_kscreensaver && !kdescreensaver_was_running)
