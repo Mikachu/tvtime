@@ -1021,7 +1021,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->renumbering = 0;
 
     cmd->apply_invert = config_get_invert( cfg );
-    cmd->apply_mirror = 0;
+    cmd->apply_mirror = config_get_mirror( cfg );
     cmd->apply_chroma_kill = 0;
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
     cmd->update_luma = 0;
@@ -2468,6 +2468,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             } else {
                 tvtime_osd_show_message( cmd->osd, _("Mirror disabled.") );
             }
+        }
+        if( cmd->apply_mirror ) {
+            config_save( cmd->cfg, "MirrorInput", "1" );
+        } else {
+            config_save( cmd->cfg, "MirrorInput", "0" );
         }
         break;
 

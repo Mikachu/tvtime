@@ -189,6 +189,7 @@ int config_get_usexds( config_t *ct );
 char *config_get_vbidev( config_t *ct );
 int config_get_invert( config_t *ct );
 int config_get_cc( config_t *ct );
+int config_get_mirror( config_t *ct );
 
 int config_get_num_modes( config_t *ct );
 config_t *config_get_mode_info( config_t *ct, int mode );

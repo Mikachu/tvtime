@@ -76,6 +76,7 @@ struct config_s
     int hue;
     int invert;
     int cc;
+    int mirror;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -270,6 +271,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "ColourInvert" ) ) {
             ct->invert = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "MirrorInput" ) ) {
+            ct->mirror = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
@@ -765,6 +770,7 @@ config_t *config_new( void )
     ct->hue = -1;
     ct->invert = 0;
     ct->cc = 0;
+    ct->mirror = 0;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1703,4 +1709,8 @@ int config_get_cc( config_t *ct )
     return ct->cc;
 }
 
+int config_get_mirror( config_t *ct )
+{
+    return ct->mirror;
+}
 
