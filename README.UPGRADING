@@ -1,7 +1,28 @@
 
-Here is where we list important differences
-between tvtime versions.
+This file contains important messages about upgrading tvtime.
 
 Upgrading to tvtime 0.9
 -----------------------
+
+tvtime 0.9 is a big step from previous versions.  Because of this,
+we have made some incompatible change that may cause difficulty for
+some users.  While we believe that the changes made are reasonable,
+we are curious to know your thoughts and opinions.
+
+  1. Keybindings have changed, and we have a menu.
+
+     The default key bindings have changed significantly.  We recommend
+     that users start over by deleting their config files, and
+     reconfiguring tvtime from scratch.  Feedback on how easy tvtime is
+     to configure with the new menu would be greatly appreciated.
+
+  2. Some of the stationlist management policy has changed.
+
+     The stationlist will now disallow multiple channels with the same
+     frequency, even if they have different names.  We think this is a
+     good thing, but in some cases, it may mean that old stationlist.xml
+     files could lose some channels for European users.  If you have
+     spent a long time editing your stationlist.xml file, make a backup
+     and try tvtime in verbose mode first and make sure none of your
+     channels are missing.
 

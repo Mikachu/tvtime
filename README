@@ -25,7 +25,7 @@ videophiles.
       receiver.
 
   o   A super-slick on-screen-display for the complete television
-      experience.
+      experience, with a featureful menu system.
 
   o   2-3 Pulldown detection for optimal quality viewing of film content
       from NTSC sources.
@@ -46,14 +46,17 @@ Contents
 Detailed help, documentation, known bugs, and known hardware issues 
 can be found on the tvtime website:
 
-     http://tvtime.ca/
+     http://tvtime.net/
 
 
 2 How to configure your tvtime
   ----------------------------
 
-Run 'tvtime --help' to get a list of command line arguments.  You can
-also save command line arguments to the config file using --saveoptions.
+Most everything in tvtime can be configured via the OSD menu system, hit <tab>
+or <F1> to get to the menu in tvtime.  However, some settings must be
+configured on the command line.  Run 'tvtime --help' to get a list of command
+line arguments.  You can also save command line arguments to the config file
+using --saveoptions.
 
      tvtime --saveoptions --norm=pal --frequencies=europe
 
@@ -65,76 +68,56 @@ configuration file and the default runtime keybindings.
 3 An introduction to using tvtime
   -------------------------------
 
-  General keys
-    Quit                                  Escape and q
-    Channel up/down and fine tuning       Arrow keys, vi movement keys
-                                          Mouse wheel
-    Previous channel                      Backspace
-    Channel access                        Numbers + enter
-    Display info                          Left Mouse Button
-    Mute capture card                     m and Middle Mouse Button
-    Volume Control (Line input)           +/-
-    Switch deinterlacer                   t
-    Switch framerate                      =
-    Toggle pulldown detection mode        p
-    Fullscreen toggle                     f
-    Aspect ratio toggle                   a
-    Take a screenshot                     s
-    Change overscan compensation          < and >
-    Load next preset settings mode        *
-    Toggle channel norm (if compatible)   n
+Here are the core set of key bindings you want to learn for using tvtime:
 
-  Video input keys
-    Switch input (Tuner, S-Video, ...)    i and Right Mouse Button
-    Toggle audio mode (Stero, Mono, SAP)  e
-    Enable closed captions                w
-    Brightness/Contrast/Colour/Hue        F1-F8
-    Reset default colour settings         Spacebar
-    Show colourbars                       b
+    Escape or q     Quit
+    F1 or tab       Show menu
+    up/down         Change channels
+    0-9 and Enter   Change channels
+    Backspace       Jump to previous channel
+    i               Change input
+    m               Mute
+    +/-             Volume control
+    f               Fullscreen
+    s               Take a screenshot
+    ?               Display info
+    d               Display debug statistics
 
-  Channel setup keys
-    See below
+  Here are some advanced keys.  These features are all configurable via
+the menu, but some of these may be useful if you use the features often:
+
+    left/right      Channel finetuning
+    < / >           Overscan setting
+    e               Toggle audio mode (stereo/mono/SAP)
+    a               Change output aspect ratio
+    r               Renumber current channel
+    v               Toggle always-on-top with supporting window managers
+    p               Toggle pulldown detection (NTSC only)
+    t               Change deinterlacer
+    =               Change attempted output framerate
+    F5/F6/F7        Picture settings
+    c               Toggle closed caption decoding (NTSC only)
+    ins             Change matte mode
 
 
   Commands can be sent to a running tvtime using the 'tvtime-command'
 application.  For example, 'tvtime-command channel_inc' to change
 channel, or 'tvtime-command channel_1 channel_5 enter' to change to
-channel 15.  Run 'tvtime-command' to get a list of commands.
+channel 15.  Run 'tvtime-command' without arguments to get a list of
+available commands.
 
 
 4 Setting up your channel list in tvtime
   --------------------------------------
 
 tvtime supports a channel scanner, channel renumbering, channel names,
-and a list of active channels for browsing.  Below are the commands
-available for input bindings and through tvtime-command, along with
-their default key bindings.
+and a list of active channels for browsing.  All of these features are
+available within the OSD menu system itself.  Here we present some of
+the details for users that wish to configure their stations directly.
 
-  Command reference:
-
-  CHANNEL_SAVE_TUNING (F9)
-    - Saves the current fine tuning settings as a custom channel in the
-      station list.
-
-  CHANNEL_SCAN (F10)
-    - Walks from the current position through the channel list,
-      disabling any channels for which no signal is detected.  This
-      command is only available if signal checking is enabled.
-
-  CHANNEL_ACTIVATE_ALL (F11)
-    - Re-activates all channels in the list.  Use this to re-initialize
-      the channel list before running the scanner if you believe some
-      channels are missing, or if new channels have become available.
-
-  CHANNEL_SKIP (F12)
-    - Toggles the current channel as being active or disabled in the
-      station list.  You can use this to manually scan your channels and
-      enable those with signal or disable duplicate stations.
-
-  CHANNEL_RENUMBER (r)
-    - Renumbers the current channel.  This will swap the current channel
-      with the number you type in.  Use this to configure your station
-      list to suit preference or locality.
+  For European users of cable providers that do not use standard
+frequencies, try out our new channel scanner, 'tvtime-scanner'.  This
+outputs to the 'Custom' frequency table, selectable in the OSD menu.
 
 
 4.1 stationlist.xml
@@ -153,7 +136,8 @@ Entries in a list are in the following form:
 
     Band name           Stations provided
     ---------           -----------------
-    US Cable            1 - 125
+    US Cable            1 - 99
+    US Cable 100        100 - 125
     US Two-Way          T7, T8, T9, T10, T11, T12 T13, T14
     US Broadcast        2 - 83
     China Broadcast     1 - 68, A1 - A7, B1 - B31, C1 - C5
@@ -181,9 +165,7 @@ Entries in a list are in the following form:
     -------------------
 
 tvtime still needs a method of editing channel names at runtime
-(should not be hard), a full frequency band scanner, and native
-support for the weird frequencies used by some cable providers
-such as UPC.
+(should not be hard).
 
 
 5 Using tvtime in areas that receive both PAL and SECAM stations
@@ -191,8 +173,7 @@ such as UPC.
 
 If you live in an area which receives stations in both PAL and SECAM
 formats, no worries, tvtime can switch between norms on a per-channel
-basis.  Use the 'n' key in tvtime to toggle the norm of the current
-channel.  Your changes will be saved to the stationlist.xml file.
+basis.  This feature is available in the OSD menu.
 
   tvtime cannot currently remember norms per input, that is, you cannot
 yet tell tvtime that your composite in is SECAM but your tuner input is
