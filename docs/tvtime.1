@@ -4,7 +4,7 @@
 \fBtvtime\fR \- high quality television application
 .SH "SYNTAX"
 .LP 
-tvtime [\-vasb] [\-w <width>] [\-I <sampling>] [\-d <device>] [\-i <input>] [\-n <norm>] [\-f <frequencies>] [\-t <tuner>]
+tvtime [\-vasb] [\-w <width>] [\-I <sampling>] [\-d <device>] [\-i <input>] [\-n <norm>] [\-f <frequencies>] [\-t <tuner>] [\-D <preferred deinterlace method>]
        
 .SH "DESCRIPTION"
 .LP 
@@ -79,6 +79,9 @@ tvtime is a high quality television application for use with video capture cards
                 italy
                 france
                 argentina
+\-D
+.br
+	Sets the deinterlace method that will be used when tvtime starts up (defaults to 0).
 .SH "FILES"
 .LP 
 ~/.tvtimerc

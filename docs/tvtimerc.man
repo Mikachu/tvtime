@@ -49,6 +49,9 @@ This sets the magnitude of the luma correction.  A value of 1.0 does nothing exc
 .B DebugMode = 0 | 1
 This option enables a special debug mode.  In debug mode, frame drop information is printed to stderr if tvtime cannot keep up with the number of frames provided by the capture card.
 .TP
+.B PreferredDeinterlaceMethod = n
+Sets the deinterlace method that will be used by default when tvtime starts up. Default: 0.
+.TP
 .B ChannelTextFG = colour
 This option is the ARGB colour used for the Channel Number in the OSD. The default is 0xFFFFFF00 (yellow). The colour format can be hex or decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If the alpha channel is not specified the default is 255 (opaque).
 
