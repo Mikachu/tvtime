@@ -1,13 +1,381 @@
-This package was debianized by Bart Dorsey <echo@thebucket.org> on
-Tue, 12 Nov 2002 10:46:08 -0600.
+This package was debianized by Simon Law <sfllaw@ethiopia> on
+Tue,  4 Feb 2003 06:27:57 -0500.
 
 It was downloaded from http://tvtime.sourceforge.net
 
-Upstream Author(s): vektor@dumbterm.net
+Upstream Authors: Billy Biggs <vektor@dumbterm.net>
+                  Doug Bell <drbell@users.sourceforge.net>
+		  David I. Lehn <dlehn@users.sourceforge.net>
+		  Paul Jara <rascass@users.sourceforget.net>
+		  Robert Högberg <cogline@linux.se>
+		  Craig Dooley <cd5697@albany.edu>
+                  Alexander S. Belov <asbel@sice.ru>
+		  Achim Schneider <batchall@mordor.ch>
+		  Mark Trolley <mtrolley@scs.carleton.ca>
 
-Copyright:
-  
-You are free to distribute this software under the terms of
-the GNU General Public License.
-On Debian systems, the complete text of the GNU General Public
-License can be found in the file `/usr/share/common-licenses/GPL'.
+Upstream Copyright:
+
+   tvtime is a high quality television application.
+   Copyright (C) 2001, 2002  Billy Biggs, Doug Bell, Alexander S. Belov,
+   Achim Schneider
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.
+
+	 tvtime also includes source code borrowed or derived from other
+projects, whose copyright notices are reproduced below:
+
+plugins/greedy.c
+   /**
+    * Copyright (c) 2000 Tom Barry  All rights reserved.
+    * mmx.h port copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This code is ported from DScaler: http://deinterlace.sf.net/
+    *
+    * This file is subject to the terms of the GNU General Public License as
+    * published by the Free Software Foundation.  A copy of this license is
+    * included with this software distribution in the file COPYING.  If you
+    * do not have a copy, you may obtain a copy by writing to the Free
+    * Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    * This software is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details
+    */
+
+plugins/greedy2frame.c
+   /**
+    * Copyright (c) 2000 John Adcock, Tom Barry, Steve Grimm  All rights 
+    * reserved.
+    * mmx.h port copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This code is ported from DScaler: http://deinterlace.sf.net/
+    *
+    * This file is subject to the terms of the GNU General Public License as
+    * published by the Free Software Foundation.  A copy of this license is
+    * included with this software distribution in the file COPYING.  If you
+    * do not have a copy, you may obtain a copy by writing to the Free
+    * Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    * This software is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details
+    */
+
+plugins/linearblend.c
+   /**
+    * Linear blend deinterlacing plugin.  The algorithm for this filter is based
+    * on the mythtv sources, which took it from the mplayer sources.
+    *
+    * The file is postprocess_template.c in mplayer, and is
+    *
+    *  Copyright (C) 2001-2002 Michael Niedermayer (michaelni@gmx.at)
+    *
+    *  This program is free software; you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation; either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  This program is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with this program; if not, write to the Free Software
+    *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    */
+
+plugins/twoframe.c
+   /**
+    * Copyright (c) 2000 Steven Grimm.  All rights reserved.
+    * mmx.h port copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This code is ported from DScaler: http://deinterlace.sf.net/
+    *
+    * This file is subject to the terms of the GNU General Public License as
+    * published by the Free Software Foundation.  A copy of this license is
+    * included with this software distribution in the file COPYING.  If you
+    * do not have a copy, you may obtain a copy by writing to the Free
+    * Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    * This software is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details
+    */
+
+plugins/videobob.c
+   /**
+    * Copyright (c) 2000 John Adcock.  All rights reserved.
+    * Based on code from Virtual Dub Plug-in by Gunnar Thalin
+    * mmx.h port copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This code is ported from DScaler: http://deinterlace.sf.net/
+    *
+    * This file is subject to the terms of the GNU General Public License as
+    * published by the Free Software Foundation.  A copy of this license is
+    * included with this software distribution in the file COPYING.  If you
+    * do not have a copy, you may obtain a copy by writing to the Free
+    * Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    * This software is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details
+    */
+
+src/wine/...
+    1 Copyright (c) 1993-2002 the Wine project authors (see the file AUTHORS
+    2 for a complete list)
+    3 
+    4 Wine is free software; you can redistribute it and/or modify it under
+    5 the terms of the GNU Lesser General Public License as published by the
+    6 Free Software Foundation; either version 2.1 of the License, or (at
+    7 your option) any later version. 
+    8 
+    9 This program is distributed in the hope that it will be useful, but
+   10 WITHOUT ANY WARRANTY; without even the implied warranty of
+   11 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   12 Lesser General Public License for more details.
+   13 
+   14 A copy of the GNU Lesser General Public License is included in the
+   15 Wine distribution in the file COPYING.LIB. If you did not receive this
+   16 copy, write to the Free Software Foundation, Inc., 59 Temple Place,
+   17 Suite 330, Boston, MA 02111-1307 USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU Lesser General
+Public License can be found in `/usr/share/common-licenses/LGPL'.
+Since tvtime uses a smidgen of code from Wine, here is the list of authors
+whose work is included:
+    - Alexandre Julliard
+    - Bertho A. Stultien
+    - Eric Youndale 
+    - Erik Bos
+    - Eugene Kuznetsov (divx@euro.ru)
+    - Marcus Meissner
+    - Martin von Löwis
+    - Robert J. Amstadt
+    - Thomas Sandford
+
+src/wine/ldt_keeper.c
+   /*
+    * Copyright (C) 2000-2001 the xine project
+    *
+    * This file is part of xine, a unix video player.
+    *
+    * xine is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or
+    * (at your option) any later version.
+    *
+    * xine is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+    */
+
+src/DS_*.h
+   ////////////////////////////////////////////////////////////////////////////
+   // Copyright (c) 2000 John Adcock.  All rights reserved.
+   ////////////////////////////////////////////////////////////////////////////
+   // This header file is free software; you can redistribute it and/or modify
+   // it under the terms of the GNU Library General Public License as published
+   // by the Free Software Foundation; either version 2 of the License, or (at
+   // your option) any later version.
+   //
+   // This software is distributed in the hope that it will be useful,
+   // but WITHOUT ANY WARRANTY; without even the implied warranty of
+   // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   // GNU Library General Public License for more details
+   ////////////////////////////////////////////////////////////////////////////
+
+On Debian GNU/Linux systems, the complete text of the GNU Library General
+Public License can be found in `/usr/share/common-licenses/LGPL'.
+
+src/attributes.h
+src/cpu_accel.c
+src/mm_accel.h
+src/mmx.h
+   /*
+    * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
+    * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+    *
+    * This file is part of mpeg2dec, a free MPEG-2 video stream decoder.
+    * See http://libmpeg2.sourceforge.net/ for updates.
+    *
+    * mpeg2dec is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or
+    * (at your option) any later version.
+    *
+    * mpeg2dec is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    */
+
+src/display.*
+src/wmstate.*
+   /* Ogle - A video player
+    * Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort
+    *
+    * This program is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    */
+
+src/rtctime.c
+   /**
+    * Copyright (C) 2001 Paul Davis <pbd@Op.Net>,
+    *                    Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This program is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or (at
+    * your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful, but
+    * WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    * General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    */
+
+src/speedy.c
+   /**
+    * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+    *
+    * This file is subject to the terms of the GNU General Public License as
+    * published by the Free Software Foundation.  A copy of this license is
+    * included with this software distribution in the file COPYING.  If you
+    * do not have a copy, you may obtain a copy by writing to the Free
+    * Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+    *
+    * This software is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details
+    *
+    * Uses code from:
+    *
+    *  linux/arch/i386/kernel/setup.c
+    *
+    *  Copyright (C) 1995  Linus Torvalds
+    *
+    * Found in linux 2.4.20.
+    *
+    * Also helped from code in 'cpuinfo.c' found in mplayer.
+    */
+
+src/ttfont.*
+   /**
+    * This file is originally from mythtv by Isaac Richards <ijr@po.cwru.edu>.
+    * http://mythtv.sourceforge.net/
+    *
+    * MythTV is distributed under the terms of the GPL, version 2 only.
+    * If you don't have a copy of the GPL, get one at:
+    *    http://www.gnu.org/licenses/gpl.txt
+    *
+    * Copyright (C) 1999 Carsten Haitzler and various contributors
+    *
+    * Permission is hereby granted, free of charge, to any person obtaining a
+    * copy of this software and associated documentation files (the "Software"),
+    * to deal in the Software without restriction, including without limitation
+    * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    * and/or sell copies of the Software, and to permit persons to whom the
+    * Software is furnished to do so, subject to the following conditions:
+    *
+    * The above copyright notice and this permission notice shall be included in
+    * all copies or substantial portions of the Software.
+    *
+    * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    * THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    */
+
+src/videotools.*
+   /**
+    * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+    * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
+    *
+    * This program is free software; you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation; either version 2 of the License, or (at
+    * your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful, but
+    * WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    * General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    */
+
+src/xawtvconfig.*
+   /**
+    * This code comes from xawtv, http://bytesex.org/xawtv/
+    * Copyright Gerd Knorr <kraxel@bytesex.org>
+    * Relased under the GNU GPL v2.
+    */
+
+data/freefont-sfd.tar.gz
+data/*.ttf
+      freefont is a collection of free Universal Character Set outline fonts.
+      Copyright (C) 2002  Free Software Foundation
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
