@@ -23,15 +23,15 @@
 #define SearchEffortDefault 5
 #define UseStrangeBobDefault false
 
-class TomsMoCompImageFilter
+class DScalerFilterTomsMoComp
 {
 public:
-    TomsMoCompImageFilter() {}
-    virtual ~TomsMoCompImageFilter() {}
+    DScalerFilterTomsMoComp() {}
+    virtual ~DScalerFilterTomsMoComp() {}
 
 #define IS_MMX
 #define SSE_TYPE MMX
-#define FUNCT_NAME TomsMoCompImageFilter::filterDScaler_MMX
+#define FUNCT_NAME DScalerFilterTomsMoComp::filterDScaler_MMX
 #include "tomsmocomp/TomsMoCompAll.inc"
 #undef  IS_MMX
 #undef  SSE_TYPE
@@ -39,7 +39,7 @@ public:
 
 #define IS_3DNOW
 #define SSE_TYPE 3DNOW
-#define FUNCT_NAME TomsMoCompImageFilter::filterDScaler_3DNOW
+#define FUNCT_NAME DScalerFilterTomsMoComp::filterDScaler_3DNOW
 #include "tomsmocomp/TomsMoCompAll.inc"
 #undef  IS_3DNOW
 #undef  SSE_TYPE
@@ -47,7 +47,7 @@ public:
 
 #define IS_SSE
 #define SSE_TYPE SSE
-#define FUNCT_NAME TomsMoCompImageFilter::filterDScaler_SSE
+#define FUNCT_NAME DScalerFilterTomsMoComp::filterDScaler_SSE
 #include "tomsmocomp/TomsMoCompAll.inc"
 #undef  IS_SSE
 #undef  SSE_TYPE
@@ -88,11 +88,11 @@ public:
     int FldHeight;
 };
 
-static TomsMoCompImageFilter *filter;
+static DScalerFilterTomsMoComp *filter;
 
 void tomsmocomp_init( void )
 {
-    filter = new TomsMoCompImageFilter();
+    filter = new DScalerFilterTomsMoComp();
     filter->SearchEffort = SearchEffortDefault;
     filter->UseStrangeBob = UseStrangeBobDefault;
 }
