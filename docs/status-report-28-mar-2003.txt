@@ -1,0 +1,53 @@
+
+  Hi all, here's the tvtime status report in four sections:
+    1. What's going on right now
+    2. What we need to finish to release 0.9.8
+    3. What we will postpone until 0.9.9
+    4. Outstanding long-term issues
+
+
+Current goal
+  - Fix remaining 0.9.7 bugs, do channel renumbering/XML files, release
+
+
+1. What's going on currently
+  - The DScaler loader code is active and working.
+  - I rewrote the text rendering code, works great at low input sizes
+    now, and I believe I have improved the speed.
+  - Most of the bugs in the 0.9.7 release are fixed in CVS.
+  - Achim has been busy and Alex hasn't been around, but they're still
+    doing the XML stuff, right? :)  I haven't been much help here, but I
+    cleaned up tvtimeconf.c, don't know if that helped or not though.
+    The idea was to get code out of there so that it's easier to convert
+    to loading from an XML file.
+  - Doug has been too busy to do any serious hacking.
+
+2. To do for 0.9.8
+  - Channel renumbering must get solved.
+  - Clean as much as possible of the list of bugs in 0.9.7.
+  - Can we move to an XML config file?  We'll need a conversion script
+    as well that handles converting to XML, and changing the commands to
+    their new names.
+  - Do a new audit of the fullscreen code after consulting with bjorn.
+  - I'm going try and enable some form of 3:2 pulldown support
+
+3. Postpone until a future release
+  - While some nagging stuff got fixed, some of these are probably worth
+    waiting on:
+      - bug 690473 Blue frame shown on channel change when gbuffers=2
+      - bug 633235 no on-frame indication of dropped frames
+      - bug 628943 font aspect not updated with output
+      - bug 691797 rivatv requires UYVY support
+      - bug 691892 Fullscreen doesn't follow virtual desktop position
+      - bug 630236 No MMX versions of MMXEXT functions
+
+4. Outstanding long-term issues
+  - We badly need to get a usable menu, and the issue is mostly just
+    fighting with making sure whatever we choose is simple to extend,
+    maintain, and most importantly, simple to use.  Run-time
+    configuration with a menu is essential to solving many of our
+    current usability problems.
+  - We still need to decide how closely our deinterlacing API should try
+    and follow DScaler's, and at what point it will be necessary to add
+    4:2:0 support to the API.
+
