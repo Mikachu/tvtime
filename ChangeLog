@@ -1,5 +1,6 @@
 
 0.9.13 -
+  * inguin: German translation of man pages.
   * inguin: Added code to set the XMLTV language using the command
       SET_XMLTV_LANGUAGE.
   * vektor: Mute the mixer device on exit to work around noisy capture
