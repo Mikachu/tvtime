@@ -670,8 +670,8 @@ struct osd_graphic_s
     int alpha;
 };
 
-int load_png_to_packed4444( uint8_t *buffer, int width, int height, int stride,
-                            double pixel_aspect, pnginput_t *pngin )
+static int load_png_to_packed4444( uint8_t *buffer, int width, int height, int stride,
+                                   double pixel_aspect, pnginput_t *pngin )
 {
     int has_alpha = pnginput_has_alpha( pngin );
     int pngwidth, pngheight;
@@ -778,11 +778,6 @@ int osd_graphic_get_height( osd_graphic_t *osdg )
     return osdg->image_height;
 }
 
-void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout )
-{
-    osdg->frames_left = timeout;
-}
-
 void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout )
 {
     osdg->frames_left = timeout;
@@ -826,4 +821,173 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
         }
     }
 }
+
+/* Graphic functions */
+struct osd_animation_s
+{
+    int numframes;
+    uint8_t *frames4444;
+    int paused;
+    int curtime;
+    int image_width;
+    int image_height;
+    int image_size;
+    int frames_left;
+    int alpha;
+    int frametime;
+    uint8_t *curframe;
+};
+
+static int animation_get_num_frames( const char *filename_base )
+{
+    int numframes = 0;
+
+    for(;;) {
+        char curfilename[ 1024 ];
+        char *fullfilename;
+
+        snprintf( curfilename, sizeof( curfilename ), "%s_%04d.png", filename_base, numframes );
+        fullfilename = get_tvtime_file( curfilename );
+        if( !fullfilename ) {
+            return numframes;
+        }
+
+        free( fullfilename );
+        numframes++;
+    }
+}
+
+osd_animation_t *osd_animation_new( const char *filename_base,
+                                    double pixel_aspect, int alpha, int frametime )
+{
+    osd_animation_t *osda = malloc( sizeof( osd_animation_t ) );
+    char curfilename[ 1024 ];
+    char *fullfilename;
+    pnginput_t *pngin;
+    int i;
+
+    if( !osda ) {
+        return 0;
+    }
+
+    osda->numframes = animation_get_num_frames( filename_base );
+    if( !osda->numframes ) {
+        free( osda );
+        return 0;
+    }
+
+    /* Get info from the first frame. */
+    snprintf( curfilename, sizeof( curfilename ), "%s_%04d.png", filename_base, 0 );
+    fullfilename = get_tvtime_file( curfilename );
+    pngin = pnginput_new( fullfilename );
+    free( fullfilename );
+
+    if( !pngin ) {
+        free( osda );
+        return 0;
+    }
+
+    osda->curtime = 0;
+    osda->paused = 0;
+    osda->frametime = frametime;
+    osda->frames_left = 0;
+    osda->alpha = alpha;
+    osda->image_width = (int) (( ((double) pnginput_get_width( pngin )) * pixel_aspect ) + 1.5);
+    osda->image_height = pnginput_get_height( pngin );
+    osda->image_size = osda->image_width * osda->image_height * 4;
+    pnginput_delete( pngin );
+
+    osda->frames4444 = malloc( osda->numframes * osda->image_size );
+    if( !osda->frames4444 ) {
+        free( osda );
+        return 0;
+    }
+    osda->curframe = osda->frames4444;
+
+    /* Load each frame. */
+    for( i = 0; i < osda->numframes; i++ ) {
+        snprintf( curfilename, sizeof( curfilename ), "%s_%04d.png", filename_base, i );
+        fullfilename = get_tvtime_file( curfilename );
+        pngin = pnginput_new( fullfilename );
+        free( fullfilename );
+
+        if( !load_png_to_packed4444( osda->frames4444 + (i * osda->image_size),
+                                     osda->image_width, osda->image_height, osda->image_width * 4,
+                                     pixel_aspect, pngin ) ) {
+            fprintf( stderr, "osd_animation: Can't render image '%s'.\n", curfilename );
+            pnginput_delete( pngin );
+            free( osda->frames4444 );
+            free( osda );
+            return 0;
+        }
+        pnginput_delete( pngin );
+    }
+
+    return osda;
+}
+
+void osd_animation_delete( osd_animation_t *osda )
+{
+    free( osda->frames4444 );
+    free( osda );
+}
+
+int osd_animation_get_width( osd_animation_t *osda )
+{
+    return osda->image_width;
+}
+
+int osd_animation_get_height( osd_animation_t *osda )
+{
+    return osda->image_height;
+}
+
+void osd_animation_set_timeout( osd_animation_t *osda, int timeout )
+{
+    osda->frames_left = timeout;
+}
+
+int osd_animation_visible( osd_animation_t *osda )
+{
+    return (osda->frames_left > 0);
+}
+
+void osd_animation_advance_frame( osd_animation_t *osda )
+{
+    if( osda->frames_left > 0) {
+        if( !osda->paused ) {
+            osda->curtime = (osda->curtime + 1) % (osda->frametime * osda->numframes);
+            osda->curframe = osda->frames4444 + ((osda->curtime / osda->frametime) * osda->image_size);
+        }
+        osda->frames_left--;
+    }
+}
+
+void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
+                                                 uint8_t *output,
+                                                 uint8_t *background,
+                                                 int width, int xpos,
+                                                 int scanline )
+{
+    if( osda->frames_left ) {
+        if( scanline < osda->image_height && xpos < osda->image_width ) {
+            int alpha;
+
+            if( (xpos+width) > osda->image_width ) {
+                width = osda->image_width - xpos;
+            }
+
+            if( osda->frames_left < OSD_FADEOUT_TIME ) {
+                alpha = (int) ( ( ( ( (double) osda->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osda->alpha ) + 0.5 );
+            } else {
+                alpha = osda->alpha;
+            }
+
+            composite_packed4444_alpha_to_packed422_scanline( output, background,
+                osda->curframe + (osda->image_width*scanline*4) + (xpos*4),
+                width, alpha );
+        }
+    }
+}
+
 

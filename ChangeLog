@@ -1,5 +1,6 @@
 
 0.9.9 -
+  * vektor: Made the tvtime logo animate.
   * vektor: Fixed up and added back the SDL output layer for
       demonstrations and testing with fbcon drivers and maybe
       some DirectFB drivers.

@@ -40,7 +40,7 @@ typedef struct osd_font_s osd_font_t;
 typedef struct osd_databars_s osd_databars_t;
 typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_shape_s osd_shape_t;
-typedef struct osd_fixedfont_s osd_fixedfont_t;
+typedef struct osd_animation_s osd_animation_t;
 
 typedef enum OSD_Shapes_e {
     OSD_Rect        = (1<<0),
@@ -138,7 +138,6 @@ osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int a
 void osd_graphic_delete( osd_graphic_t *osdg );
 int osd_graphic_get_width( osd_graphic_t *osdg );
 int osd_graphic_get_height( osd_graphic_t *osdg );
-void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout );
 void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
 int osd_graphic_visible( osd_graphic_t *osdg );
 void osd_graphic_advance_frame( osd_graphic_t *osdg );
@@ -147,6 +146,20 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                uint8_t *background,
                                                int width, int xpos,
                                                int scanline );
+
+osd_animation_t *osd_animation_new( const char *filename_base,
+                                    double pixel_aspect, int alpha, int frametime );
+void osd_animation_delete( osd_animation_t *osda );
+int osd_animation_get_width( osd_animation_t *osda );
+int osd_animation_get_height( osd_animation_t *osda );
+void osd_animation_set_timeout( osd_animation_t *osda, int timeout );
+int osd_animation_visible( osd_animation_t *osda );
+void osd_animation_advance_frame( osd_animation_t *osda );
+void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
+                                                 uint8_t *output,
+                                                 uint8_t *background,
+                                                 int width, int xpos,
+                                                 int scanline );
 
 #ifdef __cplusplus
 };

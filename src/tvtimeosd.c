@@ -64,7 +64,7 @@ struct tvtime_osd_s
     osd_font_t *bigfont;
     string_object_t strings[ OSD_MAX_STRING_OBJECTS ];
 
-    osd_graphic_t *channel_logo;
+    osd_animation_t *channel_logo;
     int channel_logo_xpos;
     int channel_logo_ypos;
 
@@ -125,7 +125,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
 
     fontfile = "FreeSansBold.ttf";
-    logofile = "tvtimelogo-small.png";
+    logofile = "tvtimelogo";
 
     osd->smallfont = osd_font_new( fontfile, 18, pixel_aspect );
     if( !osd->smallfont ) {
@@ -177,7 +177,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont );
 
     /* We create the logo, but it's ok if it fails to load. */
-    osd->channel_logo = osd_graphic_new( logofile, pixel_aspect, 256 );
+    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 3 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -290,7 +290,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_border( osd->strings[ OSD_NETWORK_NAME ].string, 1 );
     osd->strings[ OSD_NETWORK_NAME ].xpos = osd->strings[ OSD_TIME_STRING ].xpos;
     if( osd->channel_logo ) {
-        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo );
+        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->channel_logo_ypos + osd_animation_get_height( osd->channel_logo );
     } else {
         osd->strings[ OSD_NETWORK_NAME ].ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
     }
@@ -314,7 +314,7 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
             osd_string_delete( osd->strings[ i ].string );
         }
     }
-    if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
+    if( osd->channel_logo ) osd_animation_delete( osd->channel_logo );
     osd_font_delete( osd->smallfont );
     osd_font_delete( osd->medfont );
     osd_font_delete( osd->bigfont );
@@ -501,7 +501,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
 
     /* Billy: What's up?  Are we ditching the logo for XDS? */
     if( osd->channel_logo ) {
-        osd_graphic_show_graphic( osd->channel_logo, delay );
+        osd_animation_set_timeout( osd->channel_logo, delay );
     }
 
     for( i = OSD_NETWORK_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
@@ -539,7 +539,7 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
     if( osd->channel_logo ) {
-        osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
+        osd_animation_set_timeout( osd->channel_logo, OSD_FADE_DELAY );
     }
 }
 
@@ -578,7 +578,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     }
 
     if( osd->channel_logo ) {
-        osd_graphic_advance_frame( osd->channel_logo );
+        osd_animation_advance_frame( osd->channel_logo );
     }
 }
 
@@ -625,23 +625,23 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
     }
 
     if( osd->channel_logo ) {
-        if( osd_graphic_visible( osd->channel_logo ) ) {
+        if( osd_animation_visible( osd->channel_logo ) ) {
             if( scanline >= osd->channel_logo_ypos &&
-                scanline < osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo ) ) {
+                scanline < osd->channel_logo_ypos + osd_animation_get_height( osd->channel_logo ) ) {
 
-                int startx = osd->channel_logo_xpos - osd_graphic_get_width( osd->channel_logo ) - xpos;
+                int startx = osd->channel_logo_xpos - osd_animation_get_width( osd->channel_logo ) - xpos;
                 int strx = 0;
                 if( startx < 0 ) {
                     strx = -startx;
                     startx = 0;
                 }
                 if( startx < width ) {
-                    osd_graphic_composite_packed422_scanline( osd->channel_logo,
-                                                              output + (startx*2),
-                                                              output + (startx*2),
-                                                              width - startx,
-                                                              strx,
-                                                              scanline - osd->channel_logo_ypos );
+                    osd_animation_composite_packed422_scanline( osd->channel_logo,
+                                                                output + (startx*2),
+                                                                output + (startx*2),
+                                                                width - startx,
+                                                                strx,
+                                                                scanline - osd->channel_logo_ypos );
                 }
             }
         }
