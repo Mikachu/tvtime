@@ -418,17 +418,25 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             predicted = tvtime->pdoffset << 1;
             if( predicted > PULLDOWN_SEQ_DD ) predicted = PULLDOWN_SEQ_AA;
 
+            calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
+
+            tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
+                                                                            tvtime->last_botdiff, 1, predicted );
+            // fprintf( stderr, "last topdiff %d, last botdiff %d, predicted %d, pdoffset %d\n",
+            //          tvtime->last_topdiff, tvtime->last_botdiff, predicted, tvtime->pdoffset );
+
             /**
              * Old algorithm:
             pdoffset = determine_pulldown_offset_history( last_topdiff, last_botdiff, 1, &realbest );
             if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
              */
 
-            tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
-                                                                            tvtime->last_botdiff, 1, predicted );
-            //pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
+            //tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
+            //                                                                tvtime->last_botdiff, 1, predicted );
+            //calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
 
-            calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
+            // tvtime->pdoffset = determine_pulldown_offset_history_new( tvtime->last_topdiff, tvtime->last_botdiff, 1, predicted );
+            // calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
 
             /* 3:2 pulldown state machine. */
             if( !tvtime->pdoffset ) {
@@ -790,21 +798,13 @@ static void osd_list_deinterlacer_info( tvtime_osd_t *osd, int curmethod )
     tvtime_osd_show_list( osd, 1 );
 }
 
-static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod, int helpkey )
+static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
 {
-    const char *special = input_special_key_to_string( helpkey );
     int nummethods = get_num_deinterlace_methods();
-    char text[ 200 ];
     int i;
 
-    if( special ) {
-        snprintf( text, sizeof( text ), "Deinterlacer mode (press %s for a description)", special );
-    } else {
-        snprintf( text, sizeof( text ), "Deinterlacer mode (press %c for a description)", helpkey );
-    }
-
     tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
-    tvtime_osd_list_set_text( osd, 0, text );
+    tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
     for( i = 0; i < nummethods; i++ ) {
         tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
     }
@@ -1688,8 +1688,7 @@ int main( int argc, char **argv )
             curmethod = get_deinterlace_method( curmethodid );
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
-                osd_list_deinterlacers( osd, curmethodid,
-                                        config_command_to_key( ct, TVTIME_SHOW_DEINTERLACER_INFO ) );
+                osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }

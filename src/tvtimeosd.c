@@ -256,8 +256,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_MUTED ].string = osd_string_new( osd->smallfont );
 
     /* We create the logos, but it's ok if they fail to load. */
-    osd->channel_logo = 0; // osd_animation_new( logofile, pixel_aspect, 256, 1 );
-    osd->film_logo = 0; // osd_animation_new( "filmstrip", pixel_aspect, 256, 2 );
+    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 1 );
+    osd->film_logo = osd_animation_new( "filmstrip", pixel_aspect, 256, 2 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_INPUT_NAME ].string || !osd->strings[ OSD_NETWORK_NAME ].string ||
@@ -385,16 +385,20 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
 
     /* Images. */
-    osd->channel_logo_xpos = osd->margin_right;
-    osd->channel_logo_ypos = osd->strings[ OSD_TUNER_INFO ].ypos
-                           + osd_string_get_height( osd->strings[ OSD_TUNER_INFO ].string ) + 2;
+    if( osd->channel_logo ) {
+        osd->channel_logo_xpos = osd->margin_right;
+        osd->channel_logo_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos
+                               - osd_animation_get_height( osd->channel_logo );
+    }
 
     if( osd->channel_logo ) {
         osd->film_logo_xpos = osd->channel_logo_xpos - osd_animation_get_width( osd->channel_logo );
-    } else {
+        osd->film_logo_ypos = osd->channel_logo_ypos;
+    } else if( osd->film_logo ) {
         osd->film_logo_xpos = osd->margin_right;
+        osd->film_logo_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos
+                              - osd_animation_get_height( osd->film_logo );
     }
-    osd->film_logo_ypos = osd->channel_logo_ypos;
 
     return osd;
 }

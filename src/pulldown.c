@@ -537,11 +537,25 @@ void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *
 
 int pulldown_source( int action, int bottom_field )
 {
+    if( action == PULLDOWN_SEQ_AA ) {
+        return !bottom_field;
+    } else if( action == PULLDOWN_SEQ_AB ) {
+        return 1;
+    } else if( action == PULLDOWN_SEQ_BC ) {
+        return bottom_field;
+    } else if( action == PULLDOWN_SEQ_CC ) {
+        return 0;
+    } else if( action == PULLDOWN_SEQ_DD ) {
+        return !bottom_field;
+    }
+
+    /*
     if( action == PULLDOWN_SEQ_AB || action == PULLDOWN_SEQ_BC ) {
         return bottom_field;
     } else {
         return !bottom_field;
     }
+    */
 }
 
 int pulldown_drop( int action, int bottom_field )
