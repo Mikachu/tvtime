@@ -49,6 +49,7 @@ ings in this Software without prior written authorization from him.
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/param.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -142,16 +143,29 @@ int mkdir_and_force_owner( const char *path, uid_t uid, gid_t gid )
 
 char *get_tvtime_fifo_filename( uid_t uid )
 {
-    /* SUSv2 guarantees that 'Host names are limited to 255  bytes'. */
-    static char hostname[ 256 ];
+    /* SUSv3 provides no guarantees to the length of a hostname.  It
+     * specifies that HOST_NAME_MAX will give you the maximum number
+     * of bytes, however, this is not defined on all platforms.
+     */
+#ifdef HOST_NAME_MAX
+    size_t hostname_size = HOST_NAME_MAX;
+#else
+#ifdef MAXHOSTNAMELEN
+    /* MAXHOSTNAMELEN is widely used on UNIX systems, but was never
+     * formalised by POSIX.  Strangely enough, POSIX didn't adopt this
+     * symbol in SUSv3.
+     */
+    size_t hostname_size = MAXHOSTNAMELEN;
+#else
+    size_t hostname_size = 255;
+#endif /* MAXHOSTNAMELEN */
+#endif /* HOST_NAME_MAX */
+    char *hostname = 0;
+    char *hostname_realloc = 0;
+
     struct passwd *pwuid = 0;
     char *fifodir;
     char *fifo;
-
-    if( gethostname( hostname, sizeof( hostname ) ) == -1 ) {
-        /* Put errno in the filename for interest. */
-        snprintf( hostname, sizeof( hostname ), "unknown%d", errno );
-    }
 
     /* Create string for the directory in FIFODIR */
     pwuid = getpwuid( uid );
@@ -162,6 +176,27 @@ char *get_tvtime_fifo_filename( uid_t uid )
     } else {
         if( asprintf( &fifodir, FIFODIR "/.TV-%u", uid ) < 0 ) {
             return 0;
+        }
+    }
+
+    /* Try to get a hostname */
+    hostname = malloc( hostname_size * sizeof( char ) );
+    errno = 0;
+    while( gethostname( hostname, hostname_size ) < 0 ) {
+        if( errno == ENAMETOOLONG ) {
+            hostname_size *= 2;
+            hostname_realloc = realloc( hostname, hostname_size );
+            if( !hostname_realloc ) {
+                /* Use a partial hostname. */
+                hostname_size /= 2;
+                break;
+            } else {
+                hostname = hostname_realloc;
+            }
+        } else {
+            /* Unknown error.  Put errno in the filename for interest. */
+            free( hostname );
+            asprintf( &hostname, "unknown%d", errno );
         }
     }
 
@@ -176,6 +211,7 @@ char *get_tvtime_fifo_filename( uid_t uid )
             fifo = 0;
         }
     }
+    free( hostname );
     free( fifodir );
     return fifo;
 }
