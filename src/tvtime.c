@@ -737,13 +737,11 @@ int main( int argc, char **argv )
     }
 
     /* setup the fifo */
-    /* Fifo disabled for 0.9.7 release
     fifo = fifo_new( ct, NULL );
     if( !fifo ) {
         fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
                          "fifo object failed.\n" );
     }
-    */
 
     /* Setup the console */
     /* Console disabled for 0.9.7 release
@@ -830,13 +828,13 @@ int main( int argc, char **argv )
         int tuner_state;
         int we_were_late = 0;
 
-        output->poll_events( in );
-
         if( fifo ) {
             int cmd;
             cmd = fifo_next_command( fifo );
             commands_handle( commands, cmd, 0 );
         }
+
+        output->poll_events( in );
 
         if( commands_quit( commands ) ) break;
         printdebug = commands_print_debug( commands );
