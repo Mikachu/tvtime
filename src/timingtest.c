@@ -65,7 +65,8 @@ static const char *tests[] = {
    "diff_factor_packed422_scanline_c 720x480 frame",
    "diff_factor_packed422_scanline_mmx 720x480 frame",
    "leetft_render_test_string",
-   "packed444_to_rgb24_rec601_scanline"
+   "packed444_to_rgb24_rec601_scanline",
+   "packed444_to_rgb24_rec601_reference_scanline"
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -264,6 +265,14 @@ int main( int argc, char **argv )
             for( j = 0; j < height; j++ ) {
                 packed444_to_rgb24_rec601_scanline( dest444packed + (stride444*j),
                                                     source444packed + (stride444*j), width );
+            }
+            rdtscll( after );
+            datasize += width * height * 3;
+        } else if( !strcmp( tests[ testid ], "packed444_to_rgb24_rec601_reference_scanline" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                packed444_to_rgb24_rec601_reference_scanline( dest444packed + (stride444*j),
+                                                              source444packed + (stride444*j), width );
             }
             rdtscll( after );
             datasize += width * height * 3;
