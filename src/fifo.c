@@ -82,7 +82,12 @@ char *fifo_next_line( fifo_t *fifo )
 
     while( read( fifo->fd, &c, 1 ) > 0 ) {
         if( c == '\n' ) return fifo->buf;
-        if( fifo->bufpos < sizeof( fifo->buf ) - 1 )
+        if( c == '\b' ) {
+            if( fifo->bufpos == 0 ) continue;
+            fifo->buf[ --fifo->bufpos ] = 0;
+            continue;
+        }
+        if( fifo->bufpos < sizeof( fifo->buf ) - 1 ) 
             fifo->buf[ fifo->bufpos++ ] = c;
     }
     return NULL;
