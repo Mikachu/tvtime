@@ -1,12 +1,15 @@
 
-tvtime 0.9.8
+  Bug summary for tvtime 0.9.8
+  ============================
 
-http://bugs.debian.org/cgi-bin/bugreport.cgi?archive=no&bug=171480
+  For detailed information on each of the following bugs, please see our
+bug tracker on our sourceforge webpage:
 
-Known bugs
-----------
-Bugs can be checked on the tvtime sourceforge page:
-http://sourceforge.net/projects/tvtime/
+    http://sourceforge.net/projects/tvtime/
+
+
+  Known bugs
+  ----------
 
 725162 tvtime.xml needs a man page
 725145 No man page for tvtime-command
@@ -61,13 +64,14 @@ http://sourceforge.net/projects/tvtime/
 705179 tvtime help.html page not 4.01 strict
 
 
-Fullscreen bugs
----------------
-There have been some updates to our fullscreen code, however,
-we still very much fear some of these fullscreen issues.  Please,
-if you can test or provide fixes for your window manager, it would
-be very much appreciated.  Some problems are known but not
-reproducable by the authors.
+  Fullscreen bugs
+  ---------------
+
+  There have been some updates to our fullscreen code, however, we still
+very much fear some of these fullscreen issues.  Please, if you can test
+or provide fixes for your window manager, it would be very much
+appreciated.  Some problems are known but not reproducable or not well
+understood by the authors.
 
 716301 Start on fullscreen busted with e17
 694282 root fullscreen problem
@@ -79,8 +83,8 @@ reproducable by the authors.
 694455 kwin still broken with Seli's proposed fix
 
 
-Known incompatibility problems
-------------------------------
+  Known incompatibility problems
+  ------------------------------
 
 711966 Mute/Unmute while in Comp/S-Video switches sound to tuner
 711428 Tuner type=2 almost always misdetected
@@ -91,24 +95,9 @@ Known incompatibility problems
 694144 Overscan feature vs nvidia driver: corrupted borders
 672810 g400 marvel
 636338 SiS XVideo driver unusably slow in XFree86 4.2.1 and earlier
- * This is fixed in the drivers included in X 4.3.  You can also get
-   the latest drivers from here:
-
-   http://www.winischhofer.net/linuxsis630.shtml
-
+ * This is fixed in the drivers included in X 4.3.  The latest drivers
+   are here:   http://www.winischhofer.net/linuxsis630.shtml
 691315 i845G XVideo crashes
 702539 Using overlay mode in xawtv/zapping causes system crashes
 628292 Voodoo 3500 driver does not support capture
-
-
-General Info for improving video quality
-----------------------------------------
-
-If you are having problems with video strangeness, try disabling Macrovision 
-in your bttv driver (if you have a bttv card). See 
-http://www.colby.edu/personal/k/kjseptor/bttv.html for info on that.
-
-If you are experiencing a generally fuzzy picture, try moving your tv card 
-one or two slots away from your soundcard (inside your pc). Interference from 
-the soundcard can mess up some channels.
 
