@@ -344,26 +344,6 @@ void setup_speedy_calls( int verbose );
  */
 int speedy_get_accel( void );
 
-/**
- * Returns the time in clock ticks.
- */
-unsigned int speedy_get_cycles( void );
-
-/**
- * Resets the speedy timer.
- */
-void speedy_reset_timer( void );
-
-/**
- * Returns a measurement of the CPU speed.
- */
-double speedy_measure_cpu_mhz( void );
-
-/**
- * Prints info about the CPU.
- */
-void speedy_print_cpu_info( void );
-
 #ifdef __cplusplus
 };
 #endif
