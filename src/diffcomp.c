@@ -520,28 +520,56 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
     for( i = 0; i < width * height / 2; i++ ) {
         mytuple_t *decodedword;
 
-        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        if( bitsused < 16 ) {
+            unsigned int coolstuff = (*src << 8) | *(src + 1);
+            curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
+            bitsused += 16;
+            readdist += 2;
+            src += 2;
+        }
+        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_y + decodedword->value ) & 0xff;
         lastvalue_y = *dst;
         dst++;
 
-        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        if( bitsused < 16 ) {
+            unsigned int coolstuff = (*src << 8) | *(src + 1);
+            curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
+            bitsused += 16;
+            readdist += 2;
+            src += 2;
+        }
+        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_cb + decodedword->value ) & 0xff;
         lastvalue_cb = *dst;
         dst++;
 
-        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        if( bitsused < 16 ) {
+            unsigned int coolstuff = (*src << 8) | *(src + 1);
+            curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
+            bitsused += 16;
+            readdist += 2;
+            src += 2;
+        }
+        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_y + decodedword->value ) & 0xff;
         lastvalue_y = *dst;
         dst++;
 
-        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        if( bitsused < 16 ) {
+            unsigned int coolstuff = (*src << 8) | *(src + 1);
+            curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
+            bitsused += 16;
+            readdist += 2;
+            src += 2;
+        }
+        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_cr + decodedword->value ) & 0xff;
