@@ -63,6 +63,11 @@ void menu_delete( menu_t *menu )
     free( menu );
 }
 
+void menu_reset_num_lines( menu_t *menu )
+{
+    menu->numlines = 0;
+}
+
 void menu_set_text( menu_t *menu, int line, const char *text )
 {
     snprintf( menu->text[ line ], sizeof( menu->text[ 0 ] ), "%s", text );

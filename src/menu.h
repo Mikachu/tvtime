@@ -37,6 +37,7 @@ void menu_set_right_command( menu_t *menu, int line, int command,
                              const char *argument );
 void menu_set_cursor( menu_t *menu, int cursor );
 void menu_set_default_cursor( menu_t *menu, int cursor );
+void menu_reset_num_lines( menu_t *menu );
 
 const char *menu_get_name( menu_t *menu );
 int menu_get_num_lines( menu_t *menu );
