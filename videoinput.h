@@ -89,19 +89,19 @@ int videoinput_get_num_frames( videoinput_t *vidin );
  * mode to mode. Valid modes are VIDEO_MODE_PAL, VIDEO_MODE_NTSC, 
  * VIDEO_MODE_SECAM, VIDEO_MODE_AUTO (not sure if AUTO would have any effect)
  */
-void videoinput_set_tuner( int tuner_number, int mode );
+void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode );
 
 /**
  * Sets the frequency to tune in to. (ie. the station to watch)
  * Since frequencies.c specifies all freqs in KHz, we take that as input.
  * If the card expects frequency in MHz, this function handles that.
  */
-void videoinput_set_tuner_freq( int freqKHz );
+void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz );
 
 /**
  * Returns the currently tuned frequency in KHz
  */
-int videoinput_get_tuner_freq( void );
+int videoinput_get_tuner_freq( videoinput_t *vidin );
 
 /**
  * Signal to the videoinput device that we're done reading the last frame, to

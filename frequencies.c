@@ -1325,9 +1325,9 @@ int frequencies_set_chanlist( char *str )
     return 1;
 }
 
-int frequencies_find_current_index()
+int frequencies_find_current_index( videoinput_t *vidin )
 {
-    int curfreq = videoinput_get_tuner_freq();
+    int curfreq = videoinput_get_tuner_freq( vidin );
     int i;
     fprintf( stderr, "frequencies: current frequency %d\n", curfreq);
 

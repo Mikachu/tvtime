@@ -175,12 +175,12 @@ int main( int argc, char **argv )
     /* Setup the tuner now */
     if( palmode ) {
         if( secam ) {
-            videoinput_set_tuner( tuner_number, VIDEO_MODE_SECAM );
+            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_SECAM );
         } else {
-            videoinput_set_tuner( tuner_number, VIDEO_MODE_PAL );
+            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_PAL );
         }
     } else {
-        videoinput_set_tuner( tuner_number, VIDEO_MODE_NTSC );
+        videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_NTSC );
     }
 
     /* Set to the first channel in our frequency list */
@@ -189,8 +189,8 @@ int main( int argc, char **argv )
 
         return 1;
     } else {
-        if( frequencies_find_current_index() == -1 ) {
-            videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+        if( frequencies_find_current_index( vidin ) == -1 ) {
+            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
         }
         fprintf( stderr, "tvtime: Changing to channel %s\n", 
                  chanlist[ chanindex ].name );
@@ -316,7 +316,7 @@ int main( int argc, char **argv )
             chanindex %= chancount;
             last_chan_time = 0;
 
-            videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
@@ -326,7 +326,7 @@ int main( int argc, char **argv )
             chanindex %= chancount;
             last_chan_time = 0;
 
-            videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
@@ -363,7 +363,7 @@ int main( int argc, char **argv )
                     last_chan_time = time(NULL);
                     chanindex = digit - 1;
 
-                    videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+                    videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
                     fprintf( stderr, "tvtime: Changing to channel %s\n",
                              chanlist[ chanindex ].name );
@@ -377,7 +377,7 @@ int main( int argc, char **argv )
                     chanindex = (chanindex+1)*10 + digit - 1;
                 }
 
-                videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+                videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
                 fprintf( stderr, "tvtime: Changing to channel %s\n", 
                          chanlist[ chanindex ].name );                    

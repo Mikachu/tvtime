@@ -32,53 +32,52 @@
 
 struct videoinput_s
 {
-    int foo;
+    int grab_fd;
+    int grab_size;
+    int numframes;
+    int have_mmap;
+
+    int width;
+    int height;
+
+    /* Wouldn't it be nice if ... */
+    int maxbufs;
+
+    unsigned char *grab_data;
+    unsigned char *map;
+    struct video_mmap *grab_buf;
+    struct video_window grab_win;
+    struct video_audio audio;
+    struct video_channel grab_chan;
+    struct video_tuner tuner;
+    int curframe;
+
+    struct video_mbuf gb_buffers;
+
 };
 
-static int grab_fd;
-static int grab_size;
-static int numframes;
-static int have_mmap;
-
-static int width;
-static int height;
-
-/* Wouldn't it be nice if ... */
-static int maxbufs = 16;
-
-static unsigned char *grab_data;
-static unsigned char *map;
-static struct video_mmap *grab_buf;
-static struct video_window grab_win;
-static struct video_audio audio;
-static struct video_channel grab_chan;
-static struct video_tuner tuner;
-
-static int curframe = 0;
-
-static struct video_mbuf gb_buffers = { 2*0x151000, 0, {0,0x151000 }};
 
 int videoinput_get_num_frames( videoinput_t *vidin )
 {
-    return numframes;
+    return vidin->numframes;
 }
 
-static int grab_next( void )
+static int grab_next( videoinput_t *vidin )
 {
-    int frame = curframe++ % numframes;
+    int frame = vidin->curframe++ % vidin->numframes;
 
-    if( ioctl( grab_fd, VIDIOCMCAPTURE, grab_buf + frame ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frame ) < 0 ) {
         perror( "VIDIOCMCAPTURE" );
     }
 
     return frame;
 }
 
-static int grab_wait( void )
+static int grab_wait( videoinput_t *vidin )
 {
-    int frame = curframe % numframes;
+    int frame = vidin->curframe % vidin->numframes;
 
-    if( ioctl( grab_fd, VIDIOCSYNC, grab_buf + frame ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frame ) < 0 ) {
         perror( "VIDIOCSYNC" );
     }
 
@@ -90,15 +89,15 @@ unsigned char *videoinput_next_image( videoinput_t *vidin )
     int rc;
 
     for(;;) {
-        if( have_mmap ) {
-            return map + gb_buffers.offsets[ grab_wait() ];
+        if( vidin->have_mmap ) {
+            return vidin->map + vidin->gb_buffers.offsets[ grab_wait(vidin) ];
         } else {
-            rc = read( grab_fd, grab_data, grab_size );
-            if( grab_size != rc ) {
+            rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
+            if( vidin->grab_size != rc ) {
                 fprintf( stderr, "videoinput: grabber read error (rc=%d)\n", rc );
                 return NULL;
             } else {
-                return grab_data;
+                return vidin->grab_data;
             }
         }
 
@@ -108,24 +107,24 @@ unsigned char *videoinput_next_image( videoinput_t *vidin )
 
 void videoinput_free_last_frame( videoinput_t *vidin )
 {
-    grab_next();
+    grab_next(vidin);
 }
 
 void videoinput_free_all_frames( videoinput_t *vidin )
 {
     int i;
 
-    for( i = 0; i < numframes; i++ ) grab_next();
+    for( i = 0; i < vidin->numframes; i++ ) grab_next(vidin);
 }
 
 int videoinput_get_width( videoinput_t *vidin )
 {
-    return width;
+    return vidin->width;
 }
 
 int videoinput_get_height( videoinput_t *vidin )
 {
-    return height;
+    return vidin->height;
 }
 
 /**
@@ -145,55 +144,59 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     if( !vidin ) return 0;
 
-    width = capwidth;
-    height = capheight;
+    vidin->maxbufs = 16;
+    vidin->curframe = 0;
+    vidin->gb_buffers = (struct video_mbuf){ 2*0x151000, 0, {0,0x151000 }};
 
-    grab_fd = open( v4l_device, O_RDWR );
-    if( grab_fd < 0 ) {
+    vidin->width = capwidth;
+    vidin->height = capheight;
+
+    vidin->grab_fd = open( v4l_device, O_RDWR );
+    if( vidin->grab_fd < 0 ) {
         fprintf( stderr, "videoinput: Can't open %s: %s\n", v4l_device, strerror( errno ) );
         free( vidin );
         return 0;
     }
 
-    if( ioctl( grab_fd, VIDIOCGCAP, &grab_cap ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGCAP, &grab_cap ) < 0 ) {
         fprintf( stderr, "videoinput: No v4l device (%s).\n", v4l_device );
         return 0;
     }
 
-    grab_chan.channel = inputnum;
-    if( ioctl( grab_fd, VIDIOCGCHAN, &grab_chan ) < 0 ) {
+    vidin->grab_chan.channel = inputnum;
+    if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) ) < 0 ) {
         perror( "ioctl VIDIOCGCHAN" );
         return 0;
     }
 
-    grab_chan.channel = inputnum;
-    grab_chan.norm = palmode ? VIDEO_MODE_PAL : VIDEO_MODE_NTSC;
+    vidin->grab_chan.channel = inputnum;
+    vidin->grab_chan.norm = palmode ? VIDEO_MODE_PAL : VIDEO_MODE_NTSC;
 
-    if( ioctl( grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
         perror( "ioctl VIDIOCSCHAN" );
         return 0;
     }
 
-    if( ioctl( grab_fd, VIDIOCGMBUF, &gb_buffers ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGMBUF, &(vidin->gb_buffers) ) < 0 ) {
         perror( "VIDIOCGMBUF" );
         return 0;
     }
 
-    if( ioctl( grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCGAUDIO" );
         return 0;
     }
 
-    audio.flags &= ~VIDEO_AUDIO_MUTE;
+    vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
 
-    if( ioctl( grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCGAUDIO" );
         return 0;
     }
 
-    if( grab_chan.tuners > 0 ) {
-        tuner.tuner = 0;
-        if( ioctl( grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
+    if( vidin->grab_chan.tuners > 0 ) {
+        vidin->tuner.tuner = 0;
+        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
             perror( "ioctl VIDIOCGTUNER" );
             return 0;
         }
@@ -203,20 +206,20 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
                          "tuner.rangehigh = %ld\n"
                          "tuner.signal = %d\n"
                          "tuner.flags = ",
-                 tuner.tuner, tuner.name, tuner.rangelow,
-                 tuner.rangehigh, tuner.signal );
+                 vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
+                 vidin->tuner.rangehigh, vidin->tuner.signal );
 
-        if( tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
-        if( tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
-        if( tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
-        if( tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
-        if( tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
-        if( tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
-        if( tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
-        if( tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
+        if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
+        if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
+        if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
+        if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
+        if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
+        if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
+        if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
+        if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
 
         fprintf( stderr, "\ntuner.mode = " );
-        switch (tuner.mode) {
+        switch (vidin->tuner.mode) {
         case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
         case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
         case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
@@ -225,12 +228,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         }
         fprintf( stderr, "\n");
     } else {
-        tuner.tuner = -1;
-        fprintf( stderr, "videoinput: Channel %d has no tuner.\n", grab_chan.channel );
+        vidin->tuner.tuner = -1;
+        fprintf( stderr, "videoinput: Channel %d has no tuner.\n", vidin->grab_chan.channel );
     }
 
 
-    if( ioctl( grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCGPICT" );
         return 0;
     }
@@ -249,7 +252,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
         grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
     }
-    if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
     }
@@ -257,21 +260,21 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
              grab_pict.brightness, grab_pict.hue, grab_pict.colour,
              grab_pict.contrast );
 
-    numframes = gb_buffers.frames;
-    if( maxbufs < numframes ) numframes = maxbufs;
-    grab_buf = (struct video_mmap *) malloc( sizeof( struct video_mmap ) * numframes );
+    vidin->numframes = vidin->gb_buffers.frames;
+    if( vidin->maxbufs < vidin->numframes ) vidin->numframes = vidin->maxbufs;
+    vidin->grab_buf = (struct video_mmap *) malloc( sizeof( struct video_mmap ) * vidin->numframes );
 
     /* Try to setup mmap-based capture. */
-    for( i = 0; i < numframes; i++ ) {
-        grab_buf[ i ].format = VIDEO_PALETTE_YUV422P; /* Y'CbCr 4:2:0 Planar */
-        grab_buf[ i ].frame = i;
-        grab_buf[ i ].width = width;
-        grab_buf[ i ].height = height;
+    for( i = 0; i < vidin->numframes; i++ ) {
+        vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422P; /* Y'CbCr 4:2:0 Planar */
+        vidin->grab_buf[ i ].frame = i;
+        vidin->grab_buf[ i ].width = vidin->width;
+        vidin->grab_buf[ i ].height = vidin->height;
     }
 
-    map = (unsigned char *) mmap( 0, gb_buffers.size, PROT_READ|PROT_WRITE, MAP_SHARED, grab_fd, 0 );
-    if( (int) map != -1 ) {
-        have_mmap = 1;
+    vidin->map = (unsigned char *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE, MAP_SHARED, vidin->grab_fd, 0 );
+    if( (int) (vidin->map) != -1 ) {
+        vidin->have_mmap = 1;
         //for( i = 0; i < numframes - 1; i++ ) {
             //grab_wait();
         //}
@@ -284,15 +287,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     /* Fallback to read(). */
     fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
-    have_mmap = 0;
+    vidin->have_mmap = 0;
 
     grab_pict.depth = 16;
     grab_pict.palette = VIDEO_PALETTE_YUV422P;
-    if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
     }
-    if( ioctl( grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         perror("ioctl VIDIOCGPICT");
         return 0;
     }
@@ -300,46 +303,46 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
              grab_pict.brightness, grab_pict.hue, grab_pict.colour,
              grab_pict.contrast, grab_pict.whiteness );
 
-    memset( &grab_win, 0, sizeof( struct video_window ) );
-    grab_win.width = width;
-    grab_win.height = height;
+    memset( &(vidin->grab_win), 0, sizeof( struct video_window ) );
+    vidin->grab_win.width = vidin->width;
+    vidin->grab_win.height = vidin->height;
 
-    if( ioctl( grab_fd, VIDIOCSWIN, &grab_win ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSWIN, &(vidin->grab_win) ) < 0 ) {
         perror( "ioctl VIDIOCSWIN" );
         return 0;
     }
 
-    if( ioctl( grab_fd, VIDIOCGWIN, &grab_win ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGWIN, &(vidin->grab_win) ) < 0 ) {
         perror( "ioctl VIDIOCGWIN" );
         return 0;
     }
 
-    grab_size = grab_win.width * grab_win.height * 3;
-    grab_data = (unsigned char *) malloc( grab_size );
+    vidin->grab_size = vidin->grab_win.width * vidin->grab_win.height * 3;
+    vidin->grab_data = (unsigned char *) malloc( vidin->grab_size );
 
     return vidin;
 }
 
-void videoinput_set_tuner(int tuner_number, int mode)
+void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode )
 {
-    if (tuner.tuner > -1) {
-        if (grab_chan.tuners <= tuner_number) {
+    if (vidin->tuner.tuner > -1) {
+        if (vidin->grab_chan.tuners <= tuner_number) {
             fprintf( stderr, "videoinput: tuner %d is not a valid tuner for channel %d\n",
-                     tuner_number, grab_chan.channel );
+                     tuner_number, vidin->grab_chan.channel );
             return;
         }
 
-        if ( (mode == VIDEO_MODE_PAL && !(tuner.flags & VIDEO_TUNER_PAL)) ||
-             (mode == VIDEO_MODE_NTSC && !(tuner.flags & VIDEO_TUNER_NTSC)) ||
-             (mode == VIDEO_MODE_SECAM && !(tuner.flags & VIDEO_TUNER_SECAM))
+        if ( (mode == VIDEO_MODE_PAL && !(vidin->tuner.flags & VIDEO_TUNER_PAL)) ||
+             (mode == VIDEO_MODE_NTSC && !(vidin->tuner.flags & VIDEO_TUNER_NTSC)) ||
+             (mode == VIDEO_MODE_SECAM && !(vidin->tuner.flags & VIDEO_TUNER_SECAM))
             ) {
             fprintf( stderr, "videoinput: invalid tuner mode\n" );
             return;
         }
 
-        tuner.tuner = tuner_number;
-        tuner.mode = mode;
-        if( ioctl( grab_fd, VIDIOCSTUNER, &tuner ) < 0 ) {
+        vidin->tuner.tuner = tuner_number;
+        vidin->tuner.mode = mode;
+        if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
             perror( "ioctl VIDIOCSTUNER" );
             return;
         }
@@ -349,15 +352,15 @@ void videoinput_set_tuner(int tuner_number, int mode)
 }
 
 /* freqKHz is in KHz (duh) */
-void videoinput_set_tuner_freq( int freqKHz )
+void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 {
     unsigned long frequency = freqKHz;
     int mute;
 
-    if (tuner.tuner > -1) {
+    if (vidin->tuner.tuner > -1) {
         if (frequency < 0) return;
 
-        if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
+        if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
             frequency /= 1000; // switch to MHz
         }
 
@@ -365,7 +368,7 @@ void videoinput_set_tuner_freq( int freqKHz )
 
         mute = mixer_conditional_mute();
 
-        if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
+        if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
         }
 
@@ -380,18 +383,18 @@ void videoinput_set_tuner_freq( int freqKHz )
     }
 }
 
-int videoinput_get_tuner_freq( void ) 
+int videoinput_get_tuner_freq( videoinput_t *vidin ) 
 {
     unsigned long frequency;
 
-    if (tuner.tuner > -1) {
+    if (vidin->tuner.tuner > -1) {
 
-        if( ioctl( grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
+        if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
             return 0;
         }
 
-        if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
+        if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
             frequency *= 1000; // switch from MHz to KHz
         }
 
@@ -405,29 +408,29 @@ int videoinput_get_tuner_freq( void )
 void videoinput_delete( videoinput_t *vidin )
 {
 
-    if( ioctl( grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCGAUDIO" );
         return;
     }
 
-    audio.flags |= VIDEO_AUDIO_MUTE;
+    vidin->audio.flags |= VIDEO_AUDIO_MUTE;
 
-    if( ioctl( grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCSAUDIO" );
         return;
     }
 
-    if( have_mmap ) {
-        munmap( map, gb_buffers.size );
+    if( vidin->have_mmap ) {
+        munmap( vidin->map, vidin->gb_buffers.size );
     }
 
-    close( grab_fd );
+    close( vidin->grab_fd );
 
-    if( !have_mmap ) {
-        free( grab_data );
+    if( !vidin->have_mmap ) {
+        free( vidin->grab_data );
     }
 
-    free( grab_buf );
+    free( vidin->grab_buf );
     free( vidin );
 }
 

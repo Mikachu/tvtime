@@ -5,6 +5,9 @@
  *
  * Frequencies are given in kHz 
  */
+
+#include "videoinput.h" /* for videoinput_t */
+
 #define NTSC_AUDIO_CARRIER	4500
 #define PAL_AUDIO_CARRIER_I	6000
 #define PAL_AUDIO_CARRIER_BGHN	5500
@@ -116,6 +119,6 @@ extern int                chantab;
 extern struct CHANLIST   *chanlist;
 extern int                chancount;
 int                       frequencies_set_chanlist( char *str );
-int                       frequencies_find_current_index();
+int                       frequencies_find_current_index( videoinput_t *vidin );
 extern int                chanindex;
 #endif
