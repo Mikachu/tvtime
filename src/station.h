@@ -74,12 +74,12 @@ int station_set( station_mgr_t *mgr, int pos );
 /**
  * Change up one channel in the list.
  */
-void station_up( station_mgr_t *mgr );
+void station_inc( station_mgr_t *mgr );
 
 /**
  * Change down one channel in the list.
  */
-void station_down( station_mgr_t *mgr );
+void station_dec( station_mgr_t *mgr );
 
 /**
  * Change to the last channel we were at before the current one.

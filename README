@@ -95,7 +95,7 @@ configuration file and the default runtime keybindings.
 
 
   Commands can be sent to a running tvtime using the 'tvtime-command'
-application.  For example, 'tvtime-command channel_up' to change
+application.  For example, 'tvtime-command channel_inc' to change
 channel, or 'tvtime-command channel_1 channel_5 enter' to change to
 channel 15.  Run 'tvtime-command' to get a list of commands.
 

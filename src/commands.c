@@ -62,13 +62,15 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
 
     { "CHANNEL_ACTIVATE_ALL", TVTIME_CHANNEL_ACTIVATE_ALL },
-    { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
+    { "CHANNEL_DEC", TVTIME_CHANNEL_DEC },
+    { "CHANNEL_DOWN", TVTIME_CHANNEL_DEC },
+    { "CHANNEL_INC", TVTIME_CHANNEL_INC },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
     { "CHANNEL_SAVE_TUNING", TVTIME_CHANNEL_SAVE_TUNING },
     { "CHANNEL_SCAN", TVTIME_CHANNEL_SCAN },
     { "CHANNEL_SKIP", TVTIME_CHANNEL_SKIP },
-    { "CHANNEL_UP", TVTIME_CHANNEL_UP },
+    { "CHANNEL_UP", TVTIME_CHANNEL_INC },
 
     { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
     { "COLOUR_UP", TVTIME_COLOUR_UP },
@@ -687,7 +689,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_CHANNEL_UP: 
+    case TVTIME_CHANNEL_INC: 
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
 
             /**
@@ -698,11 +700,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_up( in->stationmgr );
+            station_inc( in->stationmgr );
             in->change_channel = 1;
         }
         break;
-    case TVTIME_CHANNEL_DOWN:
+    case TVTIME_CHANNEL_DEC:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
@@ -710,7 +712,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_down( in->stationmgr );
+            station_dec( in->stationmgr );
             in->change_channel = 1;
         }
         break;

@@ -931,7 +931,7 @@ void vbidata_reset( vbidata_t *vbi )
 
     vbi->wanttop = 0;
     vbi->wanttext = 0;
-    vbi->colour = 0xFFFFFFFFU;
+    vbi->colour = 0xFFFFFFFF;
     vbi->row = 0; 
 
     vbi->ital = 0; 

@@ -34,7 +34,7 @@ struct station_info_s
 {
     int pos;
     int active;
-    char name[32];
+    char name[ 32 ];
     const band_t *band;
     const band_entry_t *channel;
 
@@ -395,7 +395,7 @@ int station_set( station_mgr_t *mgr, int pos )
     return 0;
 }
 
-void station_up( station_mgr_t *mgr )
+void station_inc( station_mgr_t *mgr )
 {
     mgr->last_channel = station_get_current_id( mgr );
 
@@ -407,7 +407,7 @@ void station_up( station_mgr_t *mgr )
     }
 }
 
-void station_down( station_mgr_t *mgr )
+void station_dec( station_mgr_t *mgr )
 {
     mgr->last_channel = station_get_current_id( mgr );
 

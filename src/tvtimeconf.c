@@ -544,13 +544,13 @@ config_t *config_new( void )
 
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
     ct->keymap[ 'q' ] = TVTIME_QUIT;
-    ct->keymap[ I_UP ] = TVTIME_CHANNEL_UP;
-    ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DOWN;
+    ct->keymap[ I_UP ] = TVTIME_CHANNEL_INC;
+    ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DEC;
     ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
     ct->keymap[ I_BACKSPACE ] = TVTIME_CHANNEL_PREV;
-    ct->keymap[ 'k' ] = TVTIME_CHANNEL_UP;
-    ct->keymap[ 'j' ] = TVTIME_CHANNEL_DOWN;
+    ct->keymap[ 'k' ] = TVTIME_CHANNEL_INC;
+    ct->keymap[ 'j' ] = TVTIME_CHANNEL_DEC;
     ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
     ct->keymap[ 'c' ] = TVTIME_TOGGLE_LUMA_CORRECTION;
@@ -598,8 +598,8 @@ config_t *config_new( void )
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
     ct->buttonmap[ 3 ] = TVTIME_TOGGLE_INPUT;
-    ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
-    ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
+    ct->buttonmap[ 4 ] = TVTIME_CHANNEL_INC;
+    ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DEC;
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
     snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );

@@ -1648,7 +1648,7 @@ int main( int argc, char **argv )
                     station_set_current_active( stationmgr, 0 );
                 }
                 before_pos = station_get_current_pos( stationmgr );
-                commands_handle( commands, TVTIME_CHANNEL_UP, 0 );
+                commands_handle( commands, TVTIME_CHANNEL_INC, 0 );
                 after_pos = station_get_current_pos( stationmgr );
 
                 numscanned += (after_pos + station_get_num_stations( stationmgr ) - before_pos) % station_get_num_stations( stationmgr );
