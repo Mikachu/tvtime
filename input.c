@@ -121,6 +121,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
     verbose = config_get_verbose( in->cfg );
 
     switch( command ) {
+        fprintf( stderr, "input: command = %o  arg = %d\n" );
 
     case I_QUIT:
         break;
