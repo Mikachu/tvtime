@@ -1,15 +1,15 @@
 # Swedish translation of tvtime
-# Copyright (C) 2003 Billy Biggs
+# Copyright (C) 2003, 2004 Billy Biggs
 # This file is distributed under the same license as the tvtime package.
-# Per von Zweigbergk <pvz@e.kth.se>, 2003
+# Per von Zweigbergk <pvz@e.kth.se>, 2003, 2004
 # Many thanks to Göran Uddeborg <goeran@uddeborg.se> for suggestions on
 # improvements.
 msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-08-31 03:24+0200\n"
-"PO-Revision-Date: 2003-11-20 00:24+0100\n"
+"POT-Creation-Date: 2004-08-31 04:34+0200\n"
+"PO-Revision-Date: 2004-08-31 04:52+0200\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: src/tvtime.c:794 src/commands.c:1437 src/commands.c:1462
 msgid "Deinterlacer configuration"
-msgstr "Inställningar för avflätare (deinterlacer)"
+msgstr "Inställningar för deinterlacer"
 
 #: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:959
 #: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:433
@@ -40,12 +40,12 @@ msgstr "Full bildfrekvens: %.2f b/s"
 #: src/tvtime.c:864 src/tvtime.c:1003
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
-msgstr "Halv bildfrekvens, avflätar (deinterlacing) övre bildfälten: %.2f b/s"
+msgstr "Halv bildfrekvens, deinterlacear övre bildfälten: %.2f b/s"
 
 #: src/tvtime.c:871 src/tvtime.c:1007
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
-msgstr "Halv bildfrekvens, avflätar (deinterlacing) nedre bildfälten: %.2f b/s"
+msgstr "Halv bildfrekvens, deinterlacear nedre bildfälten: %.2f b/s"
 
 #: src/tvtime.c:896
 msgid "Overscan setting"
@@ -61,7 +61,7 @@ msgstr "16:9-visning"
 
 #: src/tvtime.c:918
 msgid "Resize window to match contents"
-msgstr ""
+msgstr "Ändra fönstrets storlek för att matcha innehållet"
 
 #: src/tvtime.c:927
 msgid "Fullscreen"
@@ -76,9 +76,8 @@ msgid "Always-on-top"
 msgstr "Alltid-överst"
 
 #: src/tvtime.c:953
-#, fuzzy
 msgid "Quiet screenshots"
-msgstr "Skärmbild: %s"
+msgstr "Tysta skärmdumpar"
 
 #: src/tvtime.c:970
 msgid "Centre"
@@ -102,7 +101,7 @@ msgstr "Uppskattad prestanda"
 
 #: src/tvtime.c:1026
 msgid "Deinterlacer"
-msgstr "Avflätare (Deinterlacer)"
+msgstr "Deinterlacer"
 
 #: src/tvtime.c:1029
 #, c-format
@@ -271,11 +270,11 @@ msgstr "4:3-visning aktivt."
 
 #: src/tvtime.c:1827
 msgid "Screenshot messages disabled."
-msgstr ""
+msgstr "Skärmdumpsmeddelanden inaktiverade."
 
 #: src/tvtime.c:1829
 msgid "Screenshot messages enabled."
-msgstr ""
+msgstr "Skärmdumpsmeddelanden aktiverade."
 
 #: src/tvtime.c:1904
 msgid "2-3 pulldown inversion disabled."
@@ -416,11 +415,11 @@ msgstr "Växla till PAL-läge för denna kanal"
 
 #: src/commands.c:371
 msgid "Use PAL-BG audio decoding"
-msgstr ""
+msgstr "Avkoda ljud med PAL-BG"
 
 #: src/commands.c:376
 msgid "Use PAL-DK audio decoding"
-msgstr ""
+msgstr "Avkoda ljud med PAL-DK"
 
 #: src/commands.c:384
 msgid "Change frequency table"
@@ -436,11 +435,11 @@ msgstr "Aktivera signalavkänning"
 
 #: src/commands.c:411 src/commands.c:2018
 msgid "Default language"
-msgstr ""
+msgstr "Förvalt språk"
 
 #: src/commands.c:426 src/commands.c:2023
 msgid "Unknown language"
-msgstr ""
+msgstr "Okänt språk"
 
 #: src/commands.c:592 src/commands.c:1285 src/commands.c:1351
 #: src/commands.c:1777
@@ -449,11 +448,11 @@ msgstr "Önskat ljudläge"
 
 #: src/commands.c:602
 msgid "Default to PAL-DK audio decoding"
-msgstr ""
+msgstr "Använd PAL-DK som förval vid ljudavkodning"
 
 #: src/commands.c:609 src/commands.c:1290 src/commands.c:1364
 msgid "Audio volume boost"
-msgstr ""
+msgstr "Förstärk ljudvolymen"
 
 #: src/commands.c:615 src/commands.c:1295 src/commands.c:1373
 msgid "Television standard"
@@ -508,21 +507,20 @@ msgid "Custom (first run tvtime-scanner)"
 msgstr "Egen (kör tvtime-scanner först)"
 
 #: src/commands.c:755
-#, fuzzy
 msgid "Disabled"
-msgstr "Kabel-tv"
+msgstr "Avstängt"
 
 #: src/commands.c:761
 msgid "Quiet"
-msgstr ""
+msgstr "Tyst"
 
 #: src/commands.c:767
 msgid "Medium"
-msgstr ""
+msgstr "Mellan"
 
 #: src/commands.c:773
 msgid "Full"
-msgstr ""
+msgstr "Full"
 
 #: src/commands.c:788
 #, c-format
@@ -672,7 +670,7 @@ msgstr "Helskärmsposition"
 
 #: src/commands.c:1442
 msgid "Current deinterlacer description"
-msgstr "Beskrivning av vald avflätare (deinterlacer)"
+msgstr "Beskrivning av vald deinterlacer"
 
 #: src/commands.c:1450 src/commands.c:1482
 msgid "Input filters"
@@ -680,7 +678,7 @@ msgstr "Signalfilter"
 
 #: src/commands.c:1468
 msgid "Deinterlacer description"
-msgstr "Beskrivning av avflätare (deinterlacer)"
+msgstr "Beskrivning av deinterlacer"
 
 #: src/commands.c:1493 src/commands.c:1542 src/commands.c:1605
 #: src/commands.c:1638 src/commands.c:1671 src/commands.c:1704
@@ -725,9 +723,8 @@ msgid "Save current settings as channel defaults"
 msgstr "Spara bildinställningar som förval för denna kanal"
 
 #: src/commands.c:1736 src/commands.c:2017
-#, fuzzy
 msgid "Preferred XMLTV language"
-msgstr "Språk 1"
+msgstr "Förvalt XMLTV-språk"
 
 #: src/commands.c:1851
 msgid "Favorites"
@@ -747,26 +744,29 @@ msgid "Sleep in %d minutes."
 msgstr "Insomningstimer: %d minuter."
 
 #: src/commands.c:2155
+#, c-format
 msgid "Sleep off."
 msgstr "Insomningsfunktionen inaktiverad."
 
 #: src/commands.c:2194
-#, fuzzy
+#, c-format
 msgid "Using PAL-BG audio decoding for this channel."
-msgstr "Kanalens färger avkodas som %s."
+msgstr "Använder PAL-BG-avkodning för den här kanalens ljud."
 
 #: src/commands.c:2197
-#, fuzzy
+#, c-format
 msgid "Using PAL-DK audio decoding for this channel."
-msgstr "Kanalens färger avkodas som %s."
+msgstr "Använder PAL-DK-avkorning för den här kanalens ljud."
 
 #: src/commands.c:2226
+#, c-format
 msgid "Defaulting to PAL-DK audio decoding."
-msgstr ""
+msgstr "Avkodar ljud som PAL-DK som förval."
 
 #: src/commands.c:2229
+#, c-format
 msgid "Defaulting to PAL-BG audio decoding."
-msgstr ""
+msgstr "Avkodar ljud som PAL-BK som förval."
 
 #: src/commands.c:2257
 msgid "Channel marked as active in the browse list."
@@ -777,13 +777,14 @@ msgid "Channel disabled from the browse list."
 msgstr "Kanalen visas inte längre vid bläddring."
 
 #: src/commands.c:2290
+#, c-format
 msgid "Capture card volume will not be set by tvtime."
-msgstr ""
+msgstr "Capturekortets ljudvolym kommer inte ställas in av tvtime."
 
 #: src/commands.c:2293
 #, c-format
 msgid "Setting capture card volume to %d%%."
-msgstr ""
+msgstr "Sätter capturekortets ljudvolym till %d%%."
 
 #: src/commands.c:2326
 msgid "Processing every input field."
@@ -808,18 +809,19 @@ msgid "Television standard will be %s on restart."
 msgstr "TV-standarden %s kommer vara vald efter omstart."
 
 #: src/commands.c:2432
+#, c-format
 msgid "Using default language for XMLTV data."
-msgstr ""
+msgstr "Använder förvalt språk för XMLTV-data."
 
 #: src/commands.c:2435
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
-msgstr ""
+msgstr "Använder okänt språk (%s) för XMLTV-data."
 
 #: src/commands.c:2439
 #, c-format
 msgid "XMLTV language set to %s (%s)."
-msgstr ""
+msgstr "XMLTV-språk ställt till %s (%s)."
 
 #: src/commands.c:2474
 msgid "All channels re-activated."
@@ -1086,7 +1088,7 @@ msgstr "  -h, --help                 Visa det här hjälpmeddelandet.\n"
 
 #: src/tvtimeconf.c:604 src/tvtimeconf.c:654
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
-msgstr ""
+msgstr "  -g, --geometry=GEOMETRI    Ställer in visningsfönstrets storlek.\n"
 
 #: src/tvtimeconf.c:605 src/tvtimeconf.c:655 src/tvtimeconf.c:681
 msgid ""
@@ -1150,6 +1152,8 @@ msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
 msgstr ""
+"  -l, --xmltvlanguage=SPRÅK  Använd XMLTV-data i ett givet språk, om\n"
+"                             tillgängligt.\n"
 
 #: src/tvtimeconf.c:618
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
@@ -1202,9 +1206,8 @@ msgid "Saving command line options.\n"
 msgstr "Sparar kommandoradsflaggorna.\n"
 
 #: src/tvtimeconf.c:1125
-#, fuzzy
 msgid "Cannot update configuration while tvtime running.\n"
-msgstr "%s är inte en tvtime-inställningsfil.\n"
+msgstr "Kan inte uppdatera inställningsfilen när tvtime körs.\n"
 
 #: src/tvtimeosd.c:355 src/tvtime-scanner.c:144
 msgid "No signal"
@@ -1249,6 +1252,7 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
+#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1257,6 +1261,7 @@ msgstr ""
 "Tillgängliga kommandon:\n"
 
 #: src/tvtime-command.c:80
+#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime är inte igång.\n"
 
@@ -1318,37 +1323,3 @@ msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
 "Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
-
-#~ msgid ""
-#~ "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-#~ "                             matroxtv or SDL (defaults to Xv).\n"
-#~ msgstr ""
-#~ "  -D, --driver=NAMN          Välj visningsdrivrutin: Xv, DirectFB, mga,\n"
-#~ "                             matroxtv eller SDL (Xv om ej vald).\n"
-
-#~ msgid ""
-#~ "  -H, --height=HEIGHT        Output window height (defaults to 576 "
-#~ "pixels).\n"
-#~ msgstr ""
-#~ "  -H, --height=HÖJD          Visningsfönstrets höjd (576 bildpunkter om "
-#~ "ej\n"
-#~ "                             vald).\n"
-
-#~ msgid ""
-#~ "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-#~ "                             centre (default).\n"
-#~ msgstr ""
-#~ "  -p, --fspos=POS            Ställ in helskärmsposition: top [uppe],\n"
-#~ "                             bottom [nere], eller centre [i mitten]\n"
-#~ "                             (centre om ej vald. Du måste använda det\n"
-#~ "                             engelska namnet.)\n"
-
-#~ msgid ""
-#~ "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
-#~ msgstr "  -r, --rvr=FILE             Spela upp RVR-fil (för avlusning).\n"
-
-#~ msgid "Cannot open MPEG file %s."
-#~ msgstr "Kan inte öppna MPEG-filen %s."
-
-#~ msgid "Cannot open RVR file %s."
-#~ msgstr "Kan inte öppna RVR-filen %s."
