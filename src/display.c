@@ -428,7 +428,7 @@ DpyInfoOrigin_t DpyInfoSetUpdateGeometry(Display *dpy, int screen_nr,
 #ifdef HAVE_XINERAMA
     if(XineramaQueryExtension(dpy, &event_base, &error_base) &&
        XineramaIsActive(dpy)) {
-      dpyinfo.geometry_origin = DpyInfoOriginX11;
+      dpyinfo.geometry_origin = DpyInfoOriginXinerama;
       return dpyinfo.geometry_origin;
     }
 #endif
