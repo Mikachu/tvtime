@@ -403,15 +403,15 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 int main( int argc, char **argv )
 {
     video_correction_t *vc = 0;
-    videoinput_t *vidin;
-    rtctimer_t *rtctimer;
+    videoinput_t *vidin = NULL;
+    rtctimer_t *rtctimer = NULL;
     int width, height;
     int norm = 0;
     int fieldtime;
     int safetytime;
     int fieldsavailable = 0;
     int verbose;
-    tvtime_osd_t *osd;
+    tvtime_osd_t *osd = NULL;
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
@@ -421,17 +421,18 @@ int main( int argc, char **argv )
     const char *tagline;
     int lastframeid;
     int secondlastframeid;
-    config_t *ct;
-    input_t *in;
-    menu_t *menu;
-    output_api_t *output;
-    performance_t *perf;
-    console_t *con;
+    config_t *ct = NULL;
+    input_t *in = NULL;
+    menu_t *menu = NULL;
+    output_api_t *output = NULL;
+    performance_t *perf = NULL;
+    console_t *con = NULL;
     int has_signal = 0;
-    vbidata_t *vbidata;
-    vbiscreen_t *vs;
-    fifo_t *fifo;
-    commands_t *commands;
+    vbidata_t *vbidata = NULL;
+    vbiscreen_t *vs = NULL;
+    fifo_t *fifo = NULL;
+    commands_t *commands = NULL;
+    int usevbi = 1;
 
     setup_speedy_calls();
 
@@ -683,21 +684,25 @@ int main( int argc, char **argv )
         return 1;
     }
 
-
-    vs = vbiscreen_new( width, height, 
-                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
-                        verbose );
-    if( !vs ) {
-        fprintf( stderr, "tvtime: Could not create vbiscreen.\n" );
-        return 1;
+    usevbi = config_get_usevbi( ct );
+    if( usevbi ) {
+        vs = vbiscreen_new( width, height, 
+                            config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
+                            verbose );
+        if( !vs ) {
+            fprintf( stderr, "tvtime: Could not create vbiscreen.\n" );
+            return 1;
+        }
     }
 
     /* Open the VBI device. */
-    vbidata = vbidata_new( "/dev/vbi0", vs, osd, verbose );
-    if( !vbidata ) {
-        fprintf( stderr, "tvtime: Could not create vbidata.\n" );
-    } else {
-        vbidata_capture_mode( vbidata, CAPTURE_OFF );
+    if( usevbi ) {
+        vbidata = vbidata_new( config_get_vbidev( ct ), vs, osd, verbose );
+        if( !vbidata ) {
+            fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+        } else {
+            vbidata_capture_mode( vbidata, CAPTURE_OFF );
+        }
     }
 
     /* Setup the output. */

@@ -348,6 +348,10 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     osd->strings[ OSD_NETWORK_CALL ].ypos = osd->strings[ OSD_NETWORK_NAME ].ypos + osd_string_get_height( osd->strings[ OSD_MUTED ].string );
 
 
+    /* remove these strings */
+    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, "", 0 );
+    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, "", 0 );
+
     osd->channel_logo_xpos = (( width * 60 ) / 100) & ~1;
     osd->channel_logo_ypos = ( height * 14 ) / 100;
 

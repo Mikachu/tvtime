@@ -120,6 +120,9 @@ struct config_s
     char command_pipe[ 256 ];
 
 	int preferred_deinterlace_method;
+
+    int use_vbi;
+    char *vbidev;
 };
 
 void config_init( config_t *ct );
@@ -190,6 +193,7 @@ config_t *config_new( int argc, char **argv )
     ct->luma_correction = 1.0;
     ct->inputnum = 0;
     ct->v4ldev = strdup( "/dev/video0" );
+    ct->vbidev = strdup( "/dev/vbi0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
     strncpy( ct->command_pipe, getenv( "HOME" ), 235 );
@@ -202,6 +206,7 @@ config_t *config_new( int argc, char **argv )
     ct->other_text_rgb = 4294303411U; /* opaque wheat */
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
 	ct->preferred_deinterlace_method = 0;
+    ct->use_vbi = 1;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -292,7 +297,7 @@ config_t *config_new( int argc, char **argv )
         }
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:I" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:Ib:" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
@@ -301,6 +306,7 @@ config_t *config_new( int argc, char **argv )
         case 's': ct->debug = 1; break;
         case 'c': ct->apply_luma_correction = 1; break;
         case 'd': ct->v4ldev = strdup( optarg ); break;
+        case 'b': ct->vbidev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'l': ct->luma_correction = atof( optarg );
                   ct->apply_luma_correction = 1; break;
@@ -386,8 +392,17 @@ void config_init( config_t *ct )
         ct->v4ldev = strdup( tmp );
     }
 
+    if( (tmp = parser_get( &(ct->pf), "VBIDevice", 1 )) ) {
+        free( ct->vbidev );
+        ct->vbidev = strdup( tmp );
+    }
+
     if( (tmp = parser_get( &(ct->pf), "CaptureSource", 1 )) ) {
         ct->inputnum = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "UseVBI", 1 )) ) {
+        ct->use_vbi = atoi( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "ProcessPriority", 1 )) ) {
@@ -839,4 +854,14 @@ parser_file_t *config_get_parsed_file( config_t *ct )
 char *config_get_command_pipe( config_t *ct )
 {
     return ct->command_pipe;
+}
+
+int config_get_usevbi( config_t *ct )
+{
+    return ct->use_vbi;
+}
+
+char *config_get_vbidev( config_t *ct )
+{
+    return ct->vbidev;
 }

@@ -68,13 +68,32 @@ const char *parser_get( parser_file_t *pf, const char *name, int k )
 
     for( i=0; i < pf->num_pairs && pf->nv_pairs[i].name; i++ ) {
         if( !strcasecmp( name, pf->nv_pairs[i].name ) ) {
-            if ( --k <= 0 )
-                return pf->nv_pairs[i].value;
+            if ( --k <= 0 ) {
+                    return pf->nv_pairs[i].value;
+            }
         }
     }
 
     return NULL;
 }
+
+/*
+void parser_set( parser_file_t *pf, const char *name, int k, 
+                 const char * value )
+{
+    parser_fetch( pf, name, k, (void**)value, 1 );
+}
+
+
+const char *parser_get( parser_file_t *pf, const char *name, int k )
+{
+    char *value;
+
+    parser_fetch( pf, name, k, (void**)&value, 0 );
+
+    return value;
+}
+*/
 
 int parser_readfile( parser_file_t *pf )
 {
@@ -237,7 +256,7 @@ int parser_merge_file( parser_file_t* pf, const char *filename )
 
 int parser_new( parser_file_t *pf, const char *filename )
 {
-    if( !pf ) return;
+    if( !pf ) return 0;
 
     pf->fh = NULL;
     pf->file_length = 0;
