@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=High quality video deinterlacer
+Icon=tvtime-logo.png
+Exec=tvtime
+Name=tvtime
+Terminal=0
+Type=Application
+Categories=Application;AudioVideo;

@@ -24,7 +24,7 @@ docs_html = html/tvtime_logo_vertical.png \
             html/hardware.html            \
             html/help.html                \
             html/usage.html
-EXTRA_DIST = default.tvtime.xml example.lircrc quotes.txt \
+EXTRA_DIST = default.tvtime.xml example.lircrc tvtime.desktop \
              $(man_MANS) $(docs_html)
 
 .PHONY: install-exec-hook
