@@ -61,6 +61,7 @@
 #include "rvrreader.h"
 #include "pulldown.h"
 #include "utils.h"
+#include "cpuinfo.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -792,6 +793,10 @@ int main( int argc, char **argv )
     }
 
     verbose = config_get_verbose( ct );
+
+    if( verbose ) {
+        cpuinfo_print_info();
+    }
 
     send_fields = config_get_send_fields( ct );
     if( verbose ) {
@@ -1526,7 +1531,6 @@ int main( int argc, char **argv )
             } else {
                 performance_print_last_frame_stats( perf, width * height * 2 );
             }
-            fprintf( stderr, "tvtime: Speedy time last frame: %d cycles.\n", speedy_get_cycles() );
         }
         if( config_get_debug( ct ) ) {
             if( curmethod )  {
@@ -1535,8 +1539,6 @@ int main( int argc, char **argv )
                 performance_print_frame_drops( perf, width * height * 2 );
             }
         }
-        speedy_reset_timer();
-
 
         /**
          * Show the bottom field.

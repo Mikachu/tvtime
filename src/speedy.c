@@ -17,24 +17,9 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
- * Uses code from:
- *
- *  linux/arch/i386/kernel/setup.c
- *
- *  Copyright (C) 1995  Linus Torvalds
- *
- * Found in linux 2.4.20.
- *
- * Also helped from code in 'cpuinfo.c' found in mplayer.
- */
-
 #include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
 #include <stdint.h>
-#include <unistd.h>
-#include <ctype.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -45,8 +30,6 @@
 #include "mm_accel.h"
 #include "speedtools.h"
 #include "speedy.h"
-
-#define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
 /* Function pointer definitions. */
 void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
@@ -95,16 +78,6 @@ void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
                                                  uint8_t *bot, int subpixpos, int width );
 
 
-static uint64_t speedy_time = 0;
-static uint64_t cur_start_time, cur_end_time;
-
-#define SPEEDY_START() \
-    rdtscll( cur_start_time );
-
-#define SPEEDY_END() \
-    rdtscll( cur_end_time ); \
-    speedy_time += cur_end_time - cur_start_time;
-
 /**
  * result = (1 - alpha)B + alpha*F
  *        =  B - alpha*B + alpha*F
@@ -138,8 +111,6 @@ unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
     const mmx_t qwOnes = { 0x0001000100010001ULL };
     mmx_t qwThreshold;
     unsigned int temp1, temp2;
-
-    SPEEDY_START();
 
     width /= 4;
 
@@ -210,8 +181,6 @@ unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
 
     emms();
 
-    SPEEDY_END();
-
     return temp1;
 }
 
@@ -220,8 +189,6 @@ static unsigned long BitShift = 6;
 unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
-
-    SPEEDY_START();
 
     width /= 4;
 
@@ -235,7 +202,6 @@ unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int w
         cur += 8;
         old += 8;
     }
-    SPEEDY_END();
 
     return ret;
 }
@@ -243,8 +209,6 @@ unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int w
 unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
-
-    SPEEDY_START();
 
     width /= 16;
 
@@ -258,7 +222,6 @@ unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, 
         cur += (8*4);
         old += (8*4);
     }
-    SPEEDY_END();
 
     return ret;
 }
@@ -268,8 +231,6 @@ unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     unsigned int temp1, temp2;
-
-    SPEEDY_START();
 
     width /= 4;
 
@@ -300,8 +261,6 @@ unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int
 
     emms();
 
-    SPEEDY_END();
-
     return temp1;
 }
 
@@ -315,8 +274,6 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
     uint8_t *outdata = (uint8_t *) out;
     uint8_t *oldp, *newp;
     int i;
-
-    SPEEDY_START();
 
     pxor_r2r( mm4, mm4 );  // 4 even difference sums.
     pxor_r2r( mm5, mm5 );  // 4 odd difference sums.
@@ -450,8 +407,6 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
     }
 
     emms();
-
-    SPEEDY_END();
 }
 
 void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
@@ -460,7 +415,6 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
     int x, y, e=0, o=0, s=0, p=0, t=0;
     uint8_t *oldp, *newp;
 
-    SPEEDY_START();
     m->s = m->p = m->t = 0;
     for (x = 8; x; x--) {
         oldp = old; old += 2;
@@ -482,12 +436,10 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
     m->e = e;
     m->o = o;
     m->d = e+o;
-    SPEEDY_END();
 }
 
 void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
-    SPEEDY_START();
     width /= 2;
     while( width-- ) {
         output[ 0 ] = input[ 0 ];
@@ -497,12 +449,10 @@ void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int wid
         output += 4;
         input += 6;
     }
-    SPEEDY_END();
 }
 
 void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
-    SPEEDY_START();
     width /= 2;
     while( width-- ) {
         output[ 0 ] = input[ 0 ];
@@ -514,7 +464,6 @@ void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int wid
         output += 6;
         input += 4;
     }
-    SPEEDY_END();
 }
 
 /**
@@ -526,7 +475,6 @@ void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int wi
 {
     int i;
 
-    SPEEDY_START();
     /* Process two input pixels at a time.  Input is [Y'][Cb][Y'][Cr]. */
     for( i = 0; i < width / 2; i++ ) {
         dest[ (i*6) + 0 ] = src[ (i*4) + 0 ];
@@ -555,15 +503,12 @@ void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int wi
             dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
     }
-    SPEEDY_END();
 }
 
 void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
 {
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     const mmx_t nullchroma = { 0x8000800080008000ULL };
-
-    SPEEDY_START();
 
     movq_m2r( ymask, mm7 );
     movq_m2r( nullchroma, mm6 );
@@ -580,17 +525,14 @@ void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
         data[ 1 ] = 128;
         data += 2;
     }
-    SPEEDY_END();
 }
 
 void kill_chroma_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
-    SPEEDY_START();
     while( width-- ) {
         data[ 1 ] = 128;
         data += 2;
     }
-    SPEEDY_END();
 }
 
 /*
@@ -602,7 +544,6 @@ void testing_packed422_inplace_scanline_c( uint8_t *data, int width, int scanlin
     volatile static int topbottom = 0;
     static uint8_t scanbuffer[2048];
 
-    SPEEDY_START();
     if( scanline <= 1 ) {
         topbottom = scanline;
         memcpy(scanbuffer, data, width*2);
@@ -615,7 +556,6 @@ void testing_packed422_inplace_scanline_c( uint8_t *data, int width, int scanlin
     } else {
         memcpy(scanbuffer, data, width*2);
     }
-    SPEEDY_END();
 }
 */
 
@@ -624,7 +564,6 @@ void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
     int x, tmp1, tmp2;
     int width2 = width*2;
 
-    SPEEDY_START();
     for( x = 0; x < width; x += 2 ) {
         tmp1 = data[ x   ];
         tmp2 = data[ x+1 ];
@@ -633,19 +572,16 @@ void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
         data[ width2 - x     ] = tmp1;
         data[ width2 - x + 1 ] = tmp2;
     }
-    SPEEDY_END();
 }
 
 void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x;
 
-    SPEEDY_START();
     for( x = 0; x < width; x += 2 ) {
         data[ width + x     ] = data[ width - x     ];
         data[ width + x + 1 ] = data[ width - x + 1 ];
     }
-    SPEEDY_END();
 }
 
 void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
@@ -653,7 +589,6 @@ void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
     int r1 = 0;
     int r2 = 0;
 
-    SPEEDY_START();
     data += 2;
     width -= 1;
     while( width-- ) {
@@ -663,7 +598,6 @@ void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
         *(data - 2) = s2 >> 2;
         data += 2;
     }
-    SPEEDY_END();
 }
 
 void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
@@ -673,7 +607,6 @@ void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
     int r3 = 0;
     int r4 = 0;
 
-    SPEEDY_START();
     width -= 4;
     data += 4;
     while( width-- ) {
@@ -685,7 +618,6 @@ void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
         *(data - 4) = s4 >> 4;
         data += 2;
     }
-    SPEEDY_END();
 }
 
 void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
@@ -693,13 +625,9 @@ void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
 {
     int i;
 
-    SPEEDY_START();
-
     for( i = width*2; i; --i ) {
         *output++ = ((*top++) + (*bot++)) >> 1;
     }
-
-    SPEEDY_END();
 }
 
 void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
@@ -707,8 +635,6 @@ void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
 {
     const mmx_t shiftmask = { 0xfefffefffefffeffULL };  /* To avoid shifting chroma to luma. */
     int i;
-
-    SPEEDY_START();
 
     for( i = width/16; i; --i ) {
         movq_m2r( *bot, mm0 );
@@ -770,16 +696,12 @@ void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
     }
 
     emms();
-
-    SPEEDY_END();
 }
 
 void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
                                             uint8_t *bot, int width )
 {
     int i;
-
-    SPEEDY_START();
 
     for( i = width/16; i; --i ) {
         movq_m2r( *bot, mm0 );
@@ -822,8 +744,6 @@ void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
 
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
@@ -831,21 +751,15 @@ void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     uint32_t *o = (uint32_t *) output;
 
-    SPEEDY_START();
-
     for( width /= 2; width; --width ) {
         *o++ = colour;
     }
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int cb, int cr )
 {
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
-
-    SPEEDY_START();
 
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
@@ -878,16 +792,12 @@ void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int 
     }
 
     emms();
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, int cb, int cr )
 {
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
-
-    SPEEDY_START();
 
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
@@ -921,8 +831,6 @@ void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, i
 
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
@@ -930,16 +838,12 @@ void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
 {
     int j;
 
-    SPEEDY_START();
-
     for( j = 0; j < width; j++ ) {
         *output++ = alpha;
         *output++ = luma;
         *output++ = cb;
         *output++ = cr;
     }
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
@@ -949,8 +853,6 @@ void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
     uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
-    SPEEDY_START();
-
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
     psllq_i2r( 32, mm1 );
@@ -977,8 +879,6 @@ void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
     }
 
     emms();
-
-    SPEEDY_END();
 }
 
 void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
@@ -987,8 +887,6 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
 {
     uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
-
-    SPEEDY_START();
 
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
@@ -1017,8 +915,6 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
 
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 
@@ -1047,21 +943,15 @@ static inline __attribute__ ((always_inline,const)) void small_memcpy( void *to,
 
 void speedy_memcpy_c( void *dest, const void *src, size_t n )
 {
-    SPEEDY_START();
-
     if( dest != src ) {
         memcpy( dest, src, n );
     }
-
-    SPEEDY_END();
 }
 
 void speedy_memcpy_mmx( void *d, const void *s, size_t n )
 {
     const uint8_t *src = s;
     uint8_t *dest = d;
-
-    SPEEDY_START();
 
     if( dest != src ) {
         while( n > 64 ) {
@@ -1098,16 +988,12 @@ void speedy_memcpy_mmx( void *d, const void *s, size_t n )
 
         emms();
     }
-
-    SPEEDY_END();
 }
 
 void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
 {
     const uint8_t *src = s;
     uint8_t *dest = d;
-
-    SPEEDY_START();
 
     if( dest != src ) {
         while( n > 64 ) {
@@ -1145,8 +1031,6 @@ void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
         sfence();
         emms();
     }
-
-    SPEEDY_END();
 }
 
 void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
@@ -1169,7 +1053,6 @@ void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_
 {
     int i;
 
-    SPEEDY_START();
     for( i = 0; i < width; i++ ) {
         int af = foreground[ 0 ];
 
@@ -1221,7 +1104,6 @@ void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_
         output += 2;
         input += 2;
     }
-    SPEEDY_END();
 }
 
 void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
@@ -1244,7 +1126,6 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
         return;
     }
 
-    SPEEDY_START();
     READ_PREFETCH_2048( input );
     READ_PREFETCH_2048( foreground );
 
@@ -1323,15 +1204,12 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
     }
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
                                                    uint8_t *foreground, int width )
 {
     int i;
-    SPEEDY_START();
     for( i = 0; i < width; i++ ) {
         int a = foreground[ 0 ];
 
@@ -1365,7 +1243,6 @@ void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *inp
         output += 2;
         input += 2;
     }
-    SPEEDY_END();
 }
 
 
@@ -1377,7 +1254,6 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
     const mmx_t round  = { 0x0080008000800080ULL };
     int i;
 
-    SPEEDY_START();
     READ_PREFETCH_2048( input );
     READ_PREFETCH_2048( foreground );
 
@@ -1461,8 +1337,6 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
     }
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 /**
@@ -1483,8 +1357,6 @@ void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
 
-    SPEEDY_START();
-
     for( i = 0; i < width; i++ ) {
         int a = *mask;
 
@@ -1504,7 +1376,6 @@ void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
         output += 4;
         input += 4;
     }
-    SPEEDY_END();
 }
 
 void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
@@ -1518,8 +1389,6 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
     const mmx_t round = { 0x0080008000800080ULL };
     const mmx_t fullalpha = { 0x00000000000000ffULL };
     mmx_t colour;
-
-    SPEEDY_START();
 
     colour.w[ 0 ] = 0x00;
     colour.w[ 1 ] = textluma;
@@ -1604,7 +1473,6 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
     }
     sfence();
     emms();
-    SPEEDY_END();
 }
 
 void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
@@ -1615,8 +1483,6 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
 {
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
-
-    SPEEDY_START();
 
     for( i = 0; i < width; i++ ) {
         int af = *mask;
@@ -1641,14 +1507,10 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
         output += 4;
         input += 4;
     }
-
-    SPEEDY_END();
 }
 
 void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
-    SPEEDY_START();
-
     while( width-- ) {
         unsigned int cur_a = input[ 0 ];
 
@@ -1660,8 +1522,6 @@ void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int wid
         output += 4;
         input += 4;
     }
-
-    SPEEDY_END();
 }
 
 void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, int width )
@@ -1669,8 +1529,6 @@ void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, in
     const mmx_t round  = { 0x0080008000800080ULL };
     const mmx_t alpha  = { 0x00000000000000ffULL };
     const mmx_t noalp  = { 0xffffffffffff0000ULL };
-
-    SPEEDY_START();
 
     pxor_r2r( mm7, mm7 );
     while( width-- ) {
@@ -1701,8 +1559,6 @@ void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, in
     }
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 void blend_packed422_scanline_c( uint8_t *output, uint8_t *src1,
@@ -1735,8 +1591,6 @@ void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
         const mmx_t all256 = { 0x0100010001000100ULL };
         const mmx_t round  = { 0x0080008000800080ULL };
 
-        SPEEDY_START();
-
         movd_m2r( pos, mm0 );
         pshufw_r2r( mm0, mm0, 0 );
         movq_m2r( all256, mm1 );
@@ -1764,8 +1618,6 @@ void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
         }
         sfence();
         emms();
-
-        SPEEDY_END();
     }
 }
 
@@ -1774,7 +1626,6 @@ void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *
 {
     int i;
 
-    SPEEDY_START();
     for( i = width/16; i; --i ) {
         movq_m2r( *one, mm0 );
         movq_m2r( *three, mm1 );
@@ -1823,22 +1674,18 @@ void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *
 
     sfence();
     emms();
-
-    SPEEDY_END();
 }
 
 
 void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *one,
                                                  uint8_t *three, int width )
 {
-    SPEEDY_START();
     width *= 2;
     while( width-- ) {
         *output++ = (*one + *three + *three + *three + 2) / 4;
         one++;
         three++;
     }
-    SPEEDY_END();
 }
 
 void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
@@ -1853,13 +1700,10 @@ void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
     } else {
         int x;
 
-        SPEEDY_START();
-
         width *= 2;
         for( x = 0; x < width; x++ ) {
             output[ x ] = ( ( top[ x ] * subpixpos ) + ( bot[ x ] * ( 0xffff - subpixpos ) ) ) >> 16;
         }
-        SPEEDY_END();
     }
 }
 
@@ -2226,10 +2070,6 @@ void setup_speedy_calls( int verbose )
 {
     speedy_accel = mm_accel();
 
-    if( verbose ) {
-        speedy_print_cpu_info();
-    }
-
     interpolate_packed422_scanline = interpolate_packed422_scanline_c;
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
     blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_c;
@@ -2295,209 +2135,5 @@ void setup_speedy_calls( int verbose )
 int speedy_get_accel( void )
 {
     return speedy_accel;
-}
-
-unsigned int speedy_get_cycles( void )
-{
-    return (unsigned int) speedy_time;
-}
-
-void speedy_reset_timer( void )
-{
-    speedy_time = 0;
-}
-
-double speedy_measure_cpu_mhz( void )
-{
-    uint64_t tsc_start, tsc_end;
-    struct timeval tv_start, tv_end;
-    int usec_delay;
-
-    rdtscll( tsc_start );
-    gettimeofday( &tv_start, 0 );
-    usleep( 100000 );
-    rdtscll( tsc_end );
-    gettimeofday( &tv_end, 0 );
-
-    usec_delay = 1000000 * (tv_end.tv_sec - tv_start.tv_sec) + (tv_end.tv_usec - tv_start.tv_usec);
-
-    return (((double) (tsc_end - tsc_start)) / ((double) usec_delay));
-}
-
-typedef struct cpuid_regs {
-    unsigned int eax;
-    unsigned int ebx;
-    unsigned int ecx;
-    unsigned int edx;
-} cpuid_regs_t;
-
-static cpuid_regs_t cpuid( int func ) {
-    cpuid_regs_t regs;
-#define CPUID ".byte 0x0f, 0xa2; "
-    asm("movl %4,%%eax; " CPUID
-        "movl %%eax,%0; movl %%ebx,%1; movl %%ecx,%2; movl %%edx,%3"
-            : "=m" (regs.eax), "=m" (regs.ebx), "=m" (regs.ecx), "=m" (regs.edx)
-            : "g" (func)
-            : "%eax", "%ebx", "%ecx", "%edx");
-    return regs;
-}
-
-#define X86_VENDOR_INTEL 0
-#define X86_VENDOR_CYRIX 1
-#define X86_VENDOR_AMD 2
-#define X86_VENDOR_UMC 3
-#define X86_VENDOR_NEXGEN 4
-#define X86_VENDOR_CENTAUR 5
-#define X86_VENDOR_RISE 6
-#define X86_VENDOR_TRANSMETA 7
-#define X86_VENDOR_NSC 8
-#define X86_VENDOR_UNKNOWN 0xff
-
-struct cpu_model_info {
-    int vendor;
-    int family;
-    char *model_names[16];
-};
-
-/* Naming convention should be: <Name> [(<Codename>)] */
-/* This table only is used unless init_<vendor>() below doesn't set it; */
-/* in particular, if CPUID levels 0x80000002..4 are supported, this isn't used */
-static struct cpu_model_info cpu_models[] = {
-    { X86_VENDOR_INTEL,    4,
-      { "486 DX-25/33", "486 DX-50", "486 SX", "486 DX/2", "486 SL", 
-        "486 SX/2", NULL, "486 DX/2-WB", "486 DX/4", "486 DX/4-WB", NULL, 
-        NULL, NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_INTEL,    5,
-      { "Pentium 60/66 A-step", "Pentium 60/66", "Pentium 75 - 200",
-        "OverDrive PODP5V83", "Pentium MMX", NULL, NULL,
-        "Mobile Pentium 75 - 200", "Mobile Pentium MMX", NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_INTEL,    6,
-      { "Pentium Pro A-step", "Pentium Pro", NULL, "Pentium II (Klamath)", 
-        NULL, "Pentium II (Deschutes)", "Mobile Pentium II",
-        "Pentium III (Katmai)", "Pentium III (Coppermine)", NULL,
-        "Pentium III (Cascades)", NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_AMD,    4,
-      { NULL, NULL, NULL, "486 DX/2", NULL, NULL, NULL, "486 DX/2-WB",
-        "486 DX/4", "486 DX/4-WB", NULL, NULL, NULL, NULL, "Am5x86-WT",
-        "Am5x86-WB" }},
-    { X86_VENDOR_AMD,    5, /* Is this this really necessary?? */
-      { "K5/SSA5", "K5",
-        "K5", "K5", NULL, NULL,
-        "K6", "K6", "K6-2",
-        "K6-3", NULL, NULL, NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_AMD,    6, /* Is this this really necessary?? */
-      { "Athlon", "Athlon",
-        "Athlon", NULL, "Athlon", NULL,
-        NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_UMC,    4,
-      { NULL, "U5D", "U5S", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_NEXGEN,    5,
-      { "Nx586", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-        NULL, NULL, NULL, NULL, NULL, NULL, NULL }},
-    { X86_VENDOR_RISE,    5,
-      { "iDragon", NULL, "iDragon", NULL, NULL, NULL, NULL,
-        NULL, "iDragon II", "iDragon II", NULL, NULL, NULL, NULL, NULL, NULL }},
-};
-
-/* Look up CPU names by table lookup. */
-static char *table_lookup_model( int vendor, int family, int model )
-{
-    struct cpu_model_info *info = cpu_models;
-    int i;
-
-    if( model >= 16 ) {
-        return NULL; /* Range check */
-    }
-
-    for( i = 0; i < sizeof(cpu_models)/sizeof(struct cpu_model_info); i++ ) {
-        if( info->vendor == vendor && info->family == family ) {
-            return info->model_names[ model ];
-        }
-        info++;
-    }
-
-    return NULL; /* Not found */
-}
-
-int get_cpu_vendor( const char *idstr )
-{
-    if( !strcmp( idstr, "GenuineIntel" ) ) return X86_VENDOR_INTEL;
-    if( !strcmp( idstr, "AuthenticAMD" ) ) return X86_VENDOR_AMD;
-    if( !strcmp( idstr, "CyrixInstead" ) ) return X86_VENDOR_CYRIX;
-    if( !strcmp( idstr, "Geode by NSC" ) ) return X86_VENDOR_NSC;
-    if( !strcmp( idstr, "UMC UMC UMC " ) ) return X86_VENDOR_UMC;
-    if( !strcmp( idstr, "CentaurHauls" ) ) return X86_VENDOR_CENTAUR;
-    if( !strcmp( idstr, "NexGenDriven" ) ) return X86_VENDOR_NEXGEN;
-    if( !strcmp( idstr, "RiseRiseRise" ) ) return X86_VENDOR_RISE;
-    if( !strcmp( idstr, "GenuineTMx86" ) || !strcmp( idstr, "TransmetaCPU" ) ) return X86_VENDOR_TRANSMETA;
-    return X86_VENDOR_UNKNOWN;
-}
-
-
-static void store32( char *d, unsigned int v )
-{
-    d[0] =  v        & 0xff;
-    d[1] = (v >>  8) & 0xff;
-    d[2] = (v >> 16) & 0xff;
-    d[3] = (v >> 24) & 0xff;
-}
-
-void speedy_print_cpu_info( void )
-{
-    cpuid_regs_t regs, regs_ext;
-    unsigned int max_cpuid;
-    unsigned int max_ext_cpuid;
-    unsigned int amd_flags;
-    int family, model, stepping;
-    char idstr[13];
-    char *model_name;
-    char processor_name[49];
-    int i;
-
-    regs = cpuid(0);
-    max_cpuid = regs.eax;
-
-    store32(idstr+0, regs.ebx);
-    store32(idstr+4, regs.edx);
-    store32(idstr+8, regs.ecx);
-    idstr[12] = 0;
-
-    regs = cpuid( 1 );
-    family = (regs.eax >> 8) & 0xf;
-    model = (regs.eax >> 4) & 0xf;
-    stepping = regs.eax & 0xf;
-
-    model_name = table_lookup_model( get_cpu_vendor( idstr ), family, model );
-
-    regs_ext = cpuid((1<<31) + 0);
-    max_ext_cpuid = regs_ext.eax;
-
-    if (max_ext_cpuid >= (1<<31) + 1) {
-        regs_ext = cpuid((1<<31) + 1);
-        amd_flags = regs_ext.edx;
-
-        if (max_ext_cpuid >= (1<<31) + 4) {
-            for (i = 2; i <= 4; i++) {
-                regs_ext = cpuid((1<<31) + i);
-                store32(processor_name + (i-2)*16, regs_ext.eax);
-                store32(processor_name + (i-2)*16 + 4, regs_ext.ebx);
-                store32(processor_name + (i-2)*16 + 8, regs_ext.ecx);
-                store32(processor_name + (i-2)*16 + 12, regs_ext.edx);
-            }
-            processor_name[48] = 0;
-            model_name = processor_name;
-        }
-    } else {
-        amd_flags = 0;
-    }
-
-    /* Is this dangerous? */
-    while( isspace( *model_name ) ) model_name++;
-
-    fprintf( stderr, "speedycode: CPU %s, family %d, model %d, stepping %d.\n", model_name, family, model, stepping );
-    fprintf( stderr, "speedycode: CPU measured at %.3fMHz.\n", speedy_measure_cpu_mhz() );
 }
 
