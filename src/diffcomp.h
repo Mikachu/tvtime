@@ -45,4 +45,10 @@ int diffcomp_compress_plane( unsigned char *dst, unsigned char *src,
 void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
                                 int width, int height );
 
+/**
+ * Compress a 4:2:2 image.
+ */
+int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
+                                 int width, int height );
+
 #endif /* DIFFCOMP_H_INCLUDED */

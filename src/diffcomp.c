@@ -414,3 +414,139 @@ void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
     }
 }
 
+void compress_next_byte( unsigned char **dst, uint32_t *curout, int *bitsused, int *outsize,
+                         unsigned char diff )
+{
+    mytuple_t *nextout = &(codetable[ diff ]);
+
+    /**
+     * If we're going to overflow, write out some bytes.
+     */
+    while( ( nextout->numbits + *bitsused ) > 32 ) {
+        *bitsused -= 8;
+        **dst = ( *curout >> *bitsused );
+        *dst += 1;
+        *outsize = *outsize + 1;
+    }
+
+    /**
+     * Shift over enough space for our codeword, then or in the
+     * value of the codeword.
+     */
+    *curout = *curout << nextout->numbits;
+    *curout = *curout | nextout->value;
+    *bitsused += nextout->numbits;
+}
+
+int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
+                                 int width, int height )
+{
+    unsigned char lastcode_y = 0;
+    unsigned char lastcode_cb = 0;
+    unsigned char lastcode_cr = 0;
+    uint32_t curout = 0;
+    int bitsused = 0;
+    int outsize = 0;
+    int i;
+
+    if( !codesgenerated ) generate_codes();
+
+    for( i = 0; i < width * height / 2; i++ ) {
+        compress_next_byte( &dst, &curout, &bitsused, &outsize, (*src - lastcode_y) & 0xff );
+        lastcode_y = *src;
+        src++;
+
+        compress_next_byte( &dst, &curout, &bitsused, &outsize, (*src - lastcode_cb) & 0xff );
+        lastcode_cb = *src;
+        src++;
+
+        compress_next_byte( &dst, &curout, &bitsused, &outsize, (*src - lastcode_y) & 0xff );
+        lastcode_y = *src;
+        src++;
+
+        compress_next_byte( &dst, &curout, &bitsused, &outsize, (*src - lastcode_cr) & 0xff );
+        lastcode_cr = *src;
+        src++;
+    }
+
+    /* Write what's left, and write some buffer room for safety. */
+    curout = curout << ( 32 - bitsused );
+    *dst++ = ( curout >> 24 ) & 0xff;
+    *dst++ = ( curout >> 16 ) & 0xff;
+    *dst++ = ( curout >>  8 ) & 0xff;
+    *dst++ = ( curout       ) & 0xff;
+    *dst++ = 0;
+    *dst++ = 0;
+    *dst++ = 0;
+    *dst++ = 0;
+    outsize += 8;
+    return outsize;
+}
+
+mytuple_t *decompress_next_byte( unsigned char **src, uint32_t *curstuff, int *bitsused, int *readdist )
+{
+    /**
+     * Any time we have less than 16 bits, load up some more data
+     * from the compressed image.
+     */
+    if( *bitsused < 16 ) {
+        unsigned int coolstuff = (**src) << 8 | *((*src) + 1);
+        *curstuff = *curstuff | ( coolstuff << ( 16 - *bitsused ) );
+        *bitsused += 16;
+        *readdist += 2;
+        *src += 2;
+    }
+
+    /**
+     * Since we have that ereet table, all we need do is look up
+     * which value we just read!
+     */
+    return &(decompressiontable[ ( *curstuff >> 16 ) & 0xffff ]);
+}
+
+void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
+                                    int width, int height )
+{
+    unsigned char lastvalue_y = 0;
+    unsigned char lastvalue_cb = 0;
+    unsigned char lastvalue_cr = 0;
+    uint32_t curstuff = 0;
+    int bitsused = 0;
+    int readdist = 0;
+    int i;
+
+    if( !table_generated ) generate_decompression_table();
+
+    for( i = 0; i < width * height / 2; i++ ) {
+        mytuple_t *decodedword;
+
+        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        curstuff = curstuff << decodedword->numbits;
+        bitsused -= decodedword->numbits;
+        *dst = ( lastvalue_y + decodedword->value ) & 0xff;
+        lastvalue_y = *dst;
+        dst++;
+
+        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        curstuff = curstuff << decodedword->numbits;
+        bitsused -= decodedword->numbits;
+        *dst = ( lastvalue_cb + decodedword->value ) & 0xff;
+        lastvalue_cb = *dst;
+        dst++;
+
+        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        curstuff = curstuff << decodedword->numbits;
+        bitsused -= decodedword->numbits;
+        *dst = ( lastvalue_y + decodedword->value ) & 0xff;
+        lastvalue_y = *dst;
+        dst++;
+
+        decodedword = decompress_next_byte( &src, &curstuff, &bitsused, &readdist );
+        curstuff = curstuff << decodedword->numbits;
+        bitsused -= decodedword->numbits;
+        *dst = ( lastvalue_cr + decodedword->value ) & 0xff;
+        lastvalue_cr = *dst;
+        dst++;
+    }
+}
+
