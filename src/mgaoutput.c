@@ -229,6 +229,11 @@ static int mga_toggle_alwaysontop( void )
     return 0;
 }
 
+static int mga_is_overscan_supported( void )
+{
+    return 0;
+}
+
 static output_api_t mgaoutput =
 {
     mga_init,
@@ -249,6 +254,7 @@ static output_api_t mgaoutput =
 
     mga_is_fullscreen_supported,
     mga_is_alwaysontop_supported,
+    mga_is_overscan_supported,
 
     mga_is_interlaced,
     mga_wait_for_sync,

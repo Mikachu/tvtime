@@ -525,7 +525,10 @@ static void dfb_shutdown( void )
      dfb->Release( dfb );
 }
 
-
+static int dfb_is_overscan_supported( void )
+{
+    return 0;
+}
 
 static output_api_t dfboutput =
 {
@@ -547,6 +550,7 @@ static output_api_t dfboutput =
 
      dfb_is_fullscreen_supported,
      dfb_is_alwaysontop_supported,
+     dfb_is_overscan_supported,
 
      dfb_is_interlaced,
      dfb_wait_for_sync,

@@ -371,6 +371,11 @@ static int sdl_toggle_alwaysontop( void )
     return 0;
 }
 
+static int sdl_is_overscan_supported( void )
+{
+    return 0;
+}
+
 static output_api_t sdloutput =
 {
     sdl_init,
@@ -391,6 +396,7 @@ static output_api_t sdloutput =
 
     sdl_is_fullscreen_supported,
     sdl_is_alwaysontop_supported,
+    sdl_is_overscan_supported,
 
     sdl_is_interlaced,
     sdl_wait_for_sync,

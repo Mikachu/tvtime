@@ -888,28 +888,32 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
 
 static void build_output_menu( menu_t *menu, int widescreen,
                                int fullscreen, int alwaysontop,
-                               int fullscreen_supported, int alwaysontop_supported )
+                               int fullscreen_supported, int alwaysontop_supported,
+                               int overscan_supported )
 {
     char string[ 128 ];
-    int cur;
+    int cur = 1;
 
-    snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0xb1 );
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    if( overscan_supported ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0xb1 );
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "overscan" );
+        menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "overscan" );
+        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+        cur++;
+    }
 
     if( widescreen ) {
         snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb7 );
     } else {
         snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb8 );
     }
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_right_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_right_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+    cur++;
 
-    cur = 3;
     if( fullscreen_supported ) {
         if( fullscreen ) {
             snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb7 );
@@ -1672,7 +1676,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                        output->is_fullscreen(), output->is_alwaysontop(),
-                       output->is_fullscreen_supported(), output->is_alwaysontop_supported() );
+                       output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                       output->is_overscan_supported() );
     if( height == 480 ) {
         build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
     }
@@ -1790,7 +1795,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                     output->toggle_fullscreen( 0, 0 );
                     build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                        output->is_fullscreen(), output->is_alwaysontop(),
-                                       output->is_fullscreen_supported(), output->is_alwaysontop_supported() );
+                                       output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                                       output->is_overscan_supported() );
                 } else {
                     if( config_get_outputheight( cur ) < 0 ) {
                         output->resize_window_fullscreen();
@@ -1831,7 +1837,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
             build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported() );
+                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                               output->is_overscan_supported() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_alwaysontop( commands ) ) {
@@ -1842,7 +1849,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
             build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported() );
+                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                               output->is_overscan_supported() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_aspect( commands ) ) {
@@ -1865,7 +1873,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
             build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported() );
+                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                               output->is_overscan_supported() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_matte( commands ) ) {

@@ -49,6 +49,7 @@ typedef struct output_api_s
     /* Some support questions. */
     int (* is_fullscreen_supported)( void );
     int (* is_alwaysontop_supported)( void );
+    int (* is_overscan_supported)( void );
 
     /* Output API for interlaced displays. */
     int (* is_interlaced)( void );

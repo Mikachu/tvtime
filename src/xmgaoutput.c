@@ -182,6 +182,11 @@ static void mga_shutdown( void )
     xcommon_close_display();
 }
 
+static int mga_is_overscan_supported( void )
+{
+    return 0;
+}
+
 static output_api_t mgaoutput =
 {
     mga_init,
@@ -202,6 +207,7 @@ static output_api_t mgaoutput =
 
     xcommon_is_fullscreen_supported,
     xcommon_is_alwaysontop_supported,
+    mga_is_overscan_supported,
 
     mga_is_interlaced,
     mga_wait_for_sync,

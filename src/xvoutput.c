@@ -344,6 +344,11 @@ static int xv_can_read_from_buffer( void )
     return 1;
 }
 
+static int xv_is_overscan_supported( void )
+{
+    return 1;
+}
+
 static output_api_t xvoutput =
 {
     xv_init,
@@ -364,6 +369,7 @@ static output_api_t xvoutput =
 
     xcommon_is_fullscreen_supported,
     xcommon_is_alwaysontop_supported,
+    xv_is_overscan_supported,
 
     xv_is_interlaced,
     xv_wait_for_sync,
