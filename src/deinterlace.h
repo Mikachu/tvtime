@@ -19,7 +19,7 @@
 #ifndef DEINTERLACE_H_INCLUDED
 #define DEINTERLACE_H_INCLUDED
 
-#define DEINTERLACE_PLUGIN_API_VERSION 0x00000001
+#define DEINTERLACE_PLUGIN_API_VERSION 0x00000002
 
 /**
  * Our deinterlacer plugin API is modeled after DScaler's.  This module
