@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-09-02 14:42-0400\n"
+"POT-Creation-Date: 2004-09-18 23:43-0400\n"
 "PO-Revision-Date: 2003-11-02 20:08+0100\n"
 "Last-Translator: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "Language-Team: Lukáš Slánský <lukas@schnauzer.cz>\n"
@@ -166,9 +166,9 @@ msgstr "Nastavení ořezání (vstup 4:3)"
 
 #: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
 #: src/tvtime.c:1422 src/tvtime.c:1472 src/tvtime.c:1497 src/tvtime.c:1511
-#: src/tvtime.c:1525 src/tvtimeconf.c:1118 src/tvtime-command.c:56
-#: src/tvtime-command.c:71 src/tvtime-configure.c:48 src/tvtime-scanner.c:61
-#: src/tvtime-scanner.c:97
+#: src/tvtime.c:1525 src/tvtimeconf.c:955 src/tvtimeconf.c:1139
+#: src/tvtime-command.c:56 src/tvtime-command.c:71 src/tvtime-configure.c:48
+#: src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
 msgstr "%s: Nelze naalokovat paměť.\n"
@@ -1192,17 +1192,21 @@ msgid ""
 msgstr ""
 "  -R, --priority=PRIORITA    Nastavit prioritu, pod kterou má tvtime běžet.\n"
 
-#: src/tvtimeconf.c:853 src/tvtimeconf.c:862 src/tvtimeconf.c:922
-#: src/tvtimeconf.c:1034 src/tvtimeconf.c:1199
+#: src/tvtimeconf.c:853 src/tvtimeconf.c:862 src/tvtimeconf.c:924
+#: src/tvtimeconf.c:1055 src/tvtimeconf.c:1220
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr "Čtení konfigurace z %s\n"
 
-#: src/tvtimeconf.c:952
+#: src/tvtimeconf.c:962
+msgid "Cannot run two instances of tvtime with the same configuration.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:973
 msgid "Saving command line options.\n"
 msgstr "Ukládání voleb z příkazové řádky.\n"
 
-#: src/tvtimeconf.c:1125
+#: src/tvtimeconf.c:1146
 msgid "Cannot update configuration while tvtime running.\n"
 msgstr "Není možné změnit konfiguraci za běhu tvtime.\n"
 
