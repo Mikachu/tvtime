@@ -1662,7 +1662,7 @@ int main( int argc, char **argv )
 
         if( vidin ) {
             snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
-            configsave( config_get_configsave( ct ), "CaptureSource", number );
+            configsave( config_get_configsave( ct ), "V4LInput", number );
         }
     }
 
