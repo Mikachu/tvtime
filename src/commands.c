@@ -2506,10 +2506,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_LUMA_UP:
     case TVTIME_LUMA_DOWN:
-        if( !cmd->apply_luma ) {
-            fprintf( stderr, "tvtime: Luma correction disabled.  "
-                     "Run with -c to use it.\n" );
-        } else {
+        if( cmd->apply_luma ) {
             char message[ 200 ];
             cmd->luma_power = cmd->luma_power + ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 );
 
@@ -2587,7 +2584,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), 0xee, 0x80, 0xb0 );
                 commands_refresh_menu( cmd );
-                tvtime_osd_show_data_bar_centered( cmd->osd, "Finetune",
+                tvtime_osd_show_data_bar_centered( cmd->osd, _("Finetune"),
                                                    station_get_current_finetune( cmd->stationmgr ) );
             }
         } else if( cmd->osd ) {
@@ -2646,7 +2643,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         mixer_mute( !mixer_ismute() );
 
         if( cmd->osd ) {
-            tvtime_osd_show_data_bar( cmd->osd, "Volume", (mixer_get_volume()) & 0xff );
+            tvtime_osd_show_data_bar( cmd->osd, _("Volume"), (mixer_get_volume()) & 0xff );
         }
         break;
 
@@ -2660,7 +2657,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
 
         if( cmd->osd ) {
-            tvtime_osd_show_data_bar( cmd->osd, "Volume", volume & 0xff );
+            tvtime_osd_show_data_bar( cmd->osd, _("Volume"), volume & 0xff );
         }
         break;
 
@@ -2707,7 +2704,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             videoinput_set_hue_relative( cmd->vidin, (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
             if( cmd->osd ) {
                 int hue = videoinput_get_hue( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Hue", hue );
+                tvtime_osd_show_data_bar( cmd->osd, _("Hue"), hue );
                 menu_set_value( commands_get_menu( cmd, "hue" ), hue, 0xe2, 0x97, 0xaf );
                 commands_refresh_menu( cmd );
             }
@@ -2720,7 +2717,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             videoinput_set_brightness_relative( cmd->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );
             if( cmd->osd ) {
                 int brightness = videoinput_get_brightness( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Brightness", brightness );
+                tvtime_osd_show_data_bar( cmd->osd, _("Brightness"), brightness );
                 menu_set_value( commands_get_menu( cmd, "brightness" ), brightness, 0xe2, 0x98, 0x80 );
                 commands_refresh_menu( cmd );
             }
@@ -2733,7 +2730,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             videoinput_set_contrast_relative( cmd->vidin, (tvtime_cmd == TVTIME_CONTRAST_UP) ? 1 : -1 );
             if( cmd->osd ) {
                 int contrast = videoinput_get_contrast( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Contrast", contrast );
+                tvtime_osd_show_data_bar( cmd->osd, _("Contrast"), contrast );
                 menu_set_value( commands_get_menu( cmd, "contrast" ), contrast, 0xe2, 0x97, 0x90 );
                 commands_refresh_menu( cmd );
             }
@@ -2746,7 +2743,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             videoinput_set_colour_relative( cmd->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
             if( cmd->osd ) {
                 int colour = videoinput_get_colour( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Colour", colour );
+                tvtime_osd_show_data_bar( cmd->osd, _("Colour"), colour );
                 menu_set_value( commands_get_menu( cmd, "colour" ), colour, 0xe2, 0x98, 0xb0 );
                 commands_refresh_menu( cmd );
             }
@@ -2758,16 +2755,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->osd && cmd->vidin ) {
             if( cmd->picturemode == 0 ) {
                 int cur = videoinput_get_brightness( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Brightness", cur );
+                tvtime_osd_show_data_bar( cmd->osd, _("Brightness"), cur );
             } else if( cmd->picturemode == 1 ) {
                 int cur = videoinput_get_contrast( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Contrast", cur );
+                tvtime_osd_show_data_bar( cmd->osd, _("Contrast"), cur );
             } else if( cmd->picturemode == 2 ) {
                 int cur = videoinput_get_colour( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Colour", cur );
+                tvtime_osd_show_data_bar( cmd->osd, _("Colour"), cur );
             } else if( cmd->picturemode == 3 ) {
                 int cur = videoinput_get_hue( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, "Hue", cur );
+                tvtime_osd_show_data_bar( cmd->osd, _("Hue"), cur );
             }
         }
         break;
