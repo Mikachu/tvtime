@@ -15,11 +15,7 @@
 #include "reepktq.h"
 #include "diffcomp.h"
 #include "ree.h"
-
-static inline void get_time( int64_t *const ptime )
-{
-   asm volatile ( "rdtsc" : "=A" (*ptime) );
-}
+#include "tvtimeconf.h"
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -27,8 +23,7 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-
-static const char *videodev = "/dev/video0";
+static const char *videodev = "/dev/video1";
 
 static const int block_size = 4096;
 
@@ -44,15 +39,7 @@ static int outfd;
 static struct timeval basetime;
 static pthread_mutex_t rec_start_mut = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t rec_start_cond = PTHREAD_COND_INITIALIZER;
-static int rec_start_now = 0;
-
-
-static int32_t time_diff( int32_t big_tv_sec, int32_t big_tv_usec,
-                          int32_t small_tv_sec, int32_t small_tv_usec )
-{
-    return ( ( ( big_tv_sec  * 1000 * 1000 ) + big_tv_usec )
-             - ( ( small_tv_sec * 1000 * 1000 ) + small_tv_usec ) );
-}
+static int fieldtime;
 
 /**
  * Capture the video and put it in the queue.
@@ -81,7 +68,6 @@ static void *video_capture_thread_main( void *crap )
 
 
     pthread_mutex_lock( &rec_start_mut );
-    rec_start_now = 1;
     pthread_cond_broadcast( &rec_start_cond );
     pthread_mutex_unlock( &rec_start_mut );
 
@@ -105,7 +91,7 @@ static void *video_capture_thread_main( void *crap )
         vpkt = (ree_packet_t *) reepktq_enqueue( video_queue );
 
         gotframes++;
-        ccframes = timediff( &curtime, &starttime ) / (16666*2);
+        ccframes = timediff( &curtime, &starttime ) / (fieldtime*2);
 
         // We may have to drop a frame if the queue is full.
         if( !vpkt ) {
@@ -201,7 +187,9 @@ static void *disk_writer_thread_main( void *crap )
 
 int main( int argc, char **argv )
 {
+    config_t *cfg = config_new( 0, 0 );
     int headersize, i;
+    int norm = 0;
 
     /* Check args. */
     if( argc < 2 ) {
@@ -217,14 +205,39 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {
+        norm = VIDEOINPUT_PAL;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "secam" ) ) {
+        norm = VIDEOINPUT_SECAM;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-nc" ) ) {
+        norm = VIDEOINPUT_PAL_NC;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-m" ) ) {
+        norm = VIDEOINPUT_PAL_M;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-n" ) ) {
+        norm = VIDEOINPUT_PAL_N;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "ntsc-jp" ) ) {
+        norm = VIDEOINPUT_NTSC_JP;
+    } else {
+        /* Only allow NTSC otherwise. */
+        norm = VIDEOINPUT_NTSC;
+    }
+
+    /* Field display in microseconds. */
+    if( norm != VIDEOINPUT_NTSC ) {
+        fieldtime = 20000;
+    } else {
+        fieldtime = 16683;
+    }
+
     /* Open the capture card. */
-    vidin = videoinput_new( videodev, 480, VIDEOINPUT_NTSC, 1 );
+    vidin = videoinput_new( config_get_v4l_device( cfg ),
+                            config_get_inputwidth( cfg ), norm, 1 );
     if( !vidin ) {
         fprintf( stderr, "rvr: Can't open video input device.\n" );
         close( outfd );
         return 1;
     }
-    videoinput_set_input_num( vidin, 1 );
+    videoinput_set_input_num( vidin, config_get_inputnum( cfg ) );
 
     /* Create our file header. */
     fileheader = (ree_file_header_t *) malloc( sizeof( ree_file_header_t ) );
