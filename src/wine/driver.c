@@ -53,6 +53,7 @@ extern char* win32_def_path;
     "pop %%ebx\n\t"::)
 #endif
 
+#if 0
 static int needs_free=0;
 void SetCodecPath(const char* path)
 {
@@ -67,6 +68,7 @@ void SetCodecPath(const char* path)
     strcpy(win32_def_path, path);
     needs_free=1;
 }
+#endif
 
 static DWORD dwDrvID = 0;
 
@@ -131,6 +133,7 @@ void DrvClose(HDRVR hDriver)
 HDRVR DrvOpen(LPARAM lParam2)
 {
     NPDRVR hDriver;
+//    int i;
     char unknown[0x124];
     const char* filename = (const char*) ((ICOPEN*) lParam2)->pV1Reserved;
 

@@ -101,12 +101,13 @@ static HRSRC RES_FindResource( HMODULE hModule, LPCSTR type,
 static DWORD RES_SizeofResource( HMODULE hModule, HRSRC hRsrc)
 {
     DWORD size = 0;
-
+//    HRSRC hRsrc32;
+//
 //    HMODULE16 hMod16   = MapHModuleLS( hModule );
 //    NE_MODULE *pModule = NE_GetPtr( hMod16 );
 //    WINE_MODREF *wm    = pModule && pModule->module32? 
 //                         MODULE32_LookupHMODULE( pModule->module32 ) : NULL;
-    // WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
+//    WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
 
     if ( !hModule || !hRsrc ) return 0;
 
@@ -129,7 +130,7 @@ static HFILE RES_AccessResource( HMODULE hModule, HRSRC hRsrc )
 {
     HFILE hFile = HFILE_ERROR;
 
-    // WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
+//    WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
 
     if ( !hModule || !hRsrc ) return HFILE_ERROR;
 
@@ -146,6 +147,7 @@ static HFILE RES_AccessResource( HMODULE hModule, HRSRC hRsrc )
 static HGLOBAL RES_LoadResource( HMODULE hModule, HRSRC hRsrc)
 {
     HGLOBAL hMem = 0;
+//    HRSRC hRsrc32;
     WINE_MODREF *wm = MODULE32_LookupHMODULE( hModule );
 
 

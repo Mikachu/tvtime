@@ -30,16 +30,16 @@ extern "C" {
 
 /* Type model indepent typedefs */
 
+#ifndef __ICC
 typedef char          __int8;
-typedef unsigned char __uint8;
+typedef short         __int16;
+typedef int           __int32;
+typedef long long     __int64;
+#endif
 
-typedef short          __int16;
-typedef unsigned short __uint16;
-
-typedef int          __int32;
-typedef unsigned int __uint32;
-
-typedef long long          __int64;
+typedef unsigned char      __uint8;
+typedef unsigned short     __uint16;
+typedef unsigned int       __uint32;
 typedef unsigned long long __uint64;
 
 #if defined(_WIN64)

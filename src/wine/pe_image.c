@@ -45,7 +45,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <fcntl.h>
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
@@ -648,8 +647,8 @@ HMODULE PE_LoadImage( int handle, LPCSTR filename, WORD *version )
             DWORD end = (pe_sec->SizeOfRawData & ~(page_size-1)) + page_size;
             if (end > pe_sec->Misc.VirtualSize) end = pe_sec->Misc.VirtualSize;
             TRACE("clearing %p - %p\n",
-                  RVA(pe_sec->VirtualAddress) + pe_sec->SizeOfRawData,
-                  RVA(pe_sec->VirtualAddress) + end );
+                  (char *)RVA(pe_sec->VirtualAddress) + pe_sec->SizeOfRawData,
+                  (char *)RVA(pe_sec->VirtualAddress) + end );
             memset( (char*)RVA(pe_sec->VirtualAddress) + pe_sec->SizeOfRawData, 0,
                     end - pe_sec->SizeOfRawData );
         }
@@ -953,6 +952,7 @@ WIN_BOOL PE_InitDLL( WINE_MODREF *wm, DWORD type, LPVOID lpReserved )
     return retv;
 }
 
+#if 0
 static LPVOID
 _fixup_address(PIMAGE_OPTIONAL_HEADER opt,int delta,LPVOID addr) {
 	if (	((DWORD)addr>opt->ImageBase) &&
@@ -964,3 +964,4 @@ _fixup_address(PIMAGE_OPTIONAL_HEADER opt,int delta,LPVOID addr) {
 		
 		return addr;
 }
+#endif

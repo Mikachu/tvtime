@@ -240,10 +240,15 @@ typedef struct th_list_t{
 
 
 // have to be cleared by GARBAGE COLLECTOR
-static unsigned char* heap=NULL;
-static int heap_counter=0;
 static tls_t* g_tls=NULL;
 static th_list* list=NULL;
+
+#undef MEMORY_DEBUG
+
+#ifdef MEMORY_DEBUG
+
+static unsigned char* heap=NULL;
+static int heap_counter=0;
 
 static void test_heap(void)
 {
@@ -265,10 +270,6 @@ static void test_heap(void)
 	    printf("Free heap corruption at address %d\n", offset);
 	}
 }
-#undef MEMORY_DEBUG
-
-#ifdef MEMORY_DEBUG
-
 static void* my_mreq(int size, int to_zero)
 {
     static int test=0;
@@ -847,7 +848,7 @@ static void WINAPI expExitThread(int retcode)
 static HANDLE WINAPI expCreateMutexA(void *pSecAttr,
 		    char bInitialOwner, const char *name)
 {
-    HANDLE mlist = (HANDLE) expCreateEventA(pSecAttr, 0, 0, name);
+    HANDLE mlist = (HANDLE)expCreateEventA(pSecAttr, 0, 0, name);
     
     if (name)
 	dbgprintf("CreateMutexA(0x%x, %d, '%s') => 0x%x\n",
@@ -894,6 +895,9 @@ static void WINAPI expGetSystemInfo(SYSTEM_INFO* si)
     /* FIXME: better values for the two entries below... */
     static int cache = 0;
     static SYSTEM_INFO cachedsi;
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__)
+    unsigned int regs[4];
+#endif
     dbgprintf("GetSystemInfo(%p) =>\n", si);
 
     if (cache) {
@@ -2530,7 +2534,7 @@ static int WINAPI expGetMonitorInfoA(void *mon, LPMONITORINFO lpmi)
 
     if (lpmi->cbSize == sizeof(MONITORINFOEX))
     {
-	LPMONITORINFOEX lpmiex = (LPMONITORINFOEX) lpmi;
+	LPMONITORINFOEX lpmiex = (LPMONITORINFOEX)lpmi;
 	dbgprintf("MONITORINFOEX!\n");
 	strncpy(lpmiex->szDevice, "Monitor1", CCHDEVICENAME);
     }
@@ -3571,9 +3575,9 @@ static DWORD WINAPI expGetFullPathNameA
 #endif
 #else
     if (strrchr(lpFileName, '\\'))
-	*lpFilePart = (int) strrchr(lpFileName, '\\');
+	*lpFilePart = (int)strrchr(lpFileName, '\\');
     else
-	*lpFilePart = (int) lpFileName;
+	*lpFilePart = (int)lpFileName;
 #endif
     strcpy(lpBuffer, lpFileName);
 //    strncpy(lpBuffer, lpFileName, rindex(lpFileName, '\\')-lpFileName);
@@ -4171,13 +4175,13 @@ static double expcos(double x)
     return cos(x);
 }
 
+#else
+
 /* doens't work */
 static long exp_ftol_wrong(double x)
 {
     return (long) x;
 }
-
-#else
 
 static void explog10(void)
 {
@@ -4414,7 +4418,7 @@ static void WINAPI expGlobalMemoryStatus(
 	lpmem->dwAvailPageFile = 16*1024*1024;
     }
     expGetSystemInfo(&si);
-    lpmem->dwTotalVirtual  = si.lpMaximumApplicationAddress-si.lpMinimumApplicationAddress;
+    lpmem->dwTotalVirtual  = (char *)si.lpMaximumApplicationAddress-(char *)si.lpMinimumApplicationAddress;
     /* FIXME: we should track down all the already allocated VM pages and substract them, for now arbitrarily remove 64KB so that it matches NT */
     lpmem->dwAvailVirtual  = lpmem->dwTotalVirtual-64*1024;
     memcpy(&cached_memstatus,lpmem,sizeof(MEMORYSTATUS));
@@ -4445,7 +4449,7 @@ static WIN_BOOL WINAPI expSetThreadPriority(
 
 static void WINAPI expExitProcess( DWORD status )
 {
-    printf("EXIT - code %d\n",(int) status);
+    printf("EXIT - code %d\n",(int)status);
     exit(status);
 }
 
@@ -4530,8 +4534,8 @@ static HPALETTE WINAPI expCreatePalette(CONST LOGPALETTE *lpgpl)
     dbgprintf("CreatePalette(%x) => NULL\n", lpgpl);
 
     i = sizeof(LOGPALETTE)+((lpgpl->palNumEntries-1)*sizeof(PALETTEENTRY));
-    test = (HPALETTE) malloc(i);
-    memcpy((void *) test, lpgpl, i);
+    test = (HPALETTE)malloc(i);
+    memcpy((void *)test, lpgpl, i);
 
     return test;
 }

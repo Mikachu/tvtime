@@ -495,7 +495,7 @@ typedef LRESULT CALLBACK (*WNDPROC16)(HWND16,UINT16,WPARAM16,LPARAM);
 
 /* Macro for structure packing. */
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__ICC)
 #ifndef _EGCS_
 #define WINE_PACKED   __attribute__((packed))
 #define WINE_UNUSED   __attribute__((unused))

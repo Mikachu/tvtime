@@ -1,7 +1,7 @@
 #ifndef __WINE_PSHPACK_H
 #define __WINE_PSHPACK_H 4
 
-#if defined(__GNUC__) || defined(__SUNPRO_CC)
+#if defined(__GNUC__) || defined(__SUNPRO_CC) || defined(__ICC)
 //#pragma pack(4)
 #elif defined(__SUNPRO_C)
 //#pragma pack()

@@ -373,7 +373,6 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 //	if(fs_installed==0)
 //	    install_fs();
 
-        sprintf( checked, "%s.\nwine: Looked in ", libname );
 	while (wm == 0 && listpath[++i])
 	{
 	    if (i < 2)
@@ -401,9 +400,9 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 
 	    if (!wm)
 	    {
-		if (i)
-		    strcat(checked, ":");
-		strcat(checked, listpath[i]);
+		if (checked[0])
+		    strcat(checked, ", ");
+		strcat(checked, path);
                 checked[1500] = 0;
 
 	    }
@@ -421,7 +420,40 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 	}
 
 	if (!wm)
-	    fprintf(stderr,"wine: Win32 LoadLibrary failed to load: %s\n", checked);
+	    printf("wine/module: Win32 LoadLibrary failed to load: %s\n", checked);
+
+        // remove a few divs in the VP codecs that make trouble
+        if (strstr(libname,"vp5vfw.dll") && wm)
+        {
+          int i;
+          if (PE_FindExportedFunction(wm, "DriverProc", TRUE)==(void*)0x10003930) {
+            for (i=0;i<3;i++) ((char*)0x10004e86)[i]=0x90;
+            for (i=0;i<3;i++) ((char*)0x10005a23)[i]=0x90;
+            for (i=0;i<3;i++) ((char*)0x10005bff)[i]=0x90;
+          } else {
+            printf("wine/module: Unsupported VP5 version\n");
+            return 0;
+          }
+        }
+
+        if (strstr(libname,"vp6vfw.dll") && wm)
+        {
+          int i;
+          if (PE_FindExportedFunction(wm, "DriverProc", TRUE)==(void*)0x10003ef0) {
+            // looks like VP 6.1.0.2
+            for (i=0;i<6;i++) ((char*)0x10007268)[i]=0x90;
+            for (i=0;i<6;i++) ((char*)0x10007e83)[i]=0x90;
+            for (i=0;i<6;i++) ((char*)0x1000806a)[i]=0x90;
+          } else if (PE_FindExportedFunction(wm, "DriverProc", TRUE)==(void*)0x10004120) {
+            // looks like VP 6.2.0.10
+            for (i=0;i<6;i++) ((char*)0x10007688)[i]=0x90;
+            for (i=0;i<6;i++) ((char*)0x100082c3)[i]=0x90;
+            for (i=0;i<6;i++) ((char*)0x100084aa)[i]=0x90;
+          } else {
+            printf("wine/module: Unsupported VP6 version\n");
+            return 0;
+          }
+        }
 
 	if (strstr(libname,"QuickTime.qts") && wm)
 	{
@@ -431,10 +463,10 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 
 //	    dispatch_addr = GetProcAddress(wm->module, "theQuickTimeDispatcher", TRUE);
 	    dispatch_addr = PE_FindExportedFunction(wm, "theQuickTimeDispatcher", TRUE);
-	    if (dispatch_addr == (void *) 0x62924c30)
+	    if (dispatch_addr == (void *)0x62924c30)
 	    {
 	        printf ("wine/module: QuickTime5 DLLs found\n");
-		ptr = (void *) 0x62b75ca4; // dispatch_ptr
+		ptr = (void **)0x62b75ca4; // dispatch_ptr
 	        for (i=0;i<5;i++)  ((char*)0x6299e842)[i]=0x90; // make_new_region ?
 	        for (i=0;i<28;i++) ((char*)0x6299e86d)[i]=0x90; // call__call_CreateCompatibleDC ?
 		for (i=0;i<5;i++)  ((char*)0x6299e898)[i]=0x90; // jmp_to_call_loadbitmap ?
@@ -459,10 +491,10 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 		((char *)0x6288e0ae)[0] = 0xc3; // font/dc remover
 		for (i=0;i<24;i++) ((char*)0x6287a1ad)[i]=0x90; // destroy window
 #endif
-	    } else if (dispatch_addr == (void *) 0x6693b330)
+	    } else if (dispatch_addr == (void *)0x6693b330)
 	    {
 	        printf ("wine/module: QuickTime6 DLLs found\n");
-		ptr = (void *) 0x66bb9524; // dispatcher_ptr
+		ptr = (void **)0x66bb9524; // dispatcher_ptr
 		for (i=0;i<5;i++)  ((char *)0x66a730cc)[i]=0x90; // make_new_region
 		for (i=0;i<28;i++) ((char *)0x66a730f7)[i]=0x90; // call__call_CreateCompatibleDC
 		for (i=0;i<5;i++)  ((char *)0x66a73122)[i]=0x90; // jmp_to_call_loadbitmap
@@ -470,8 +502,8 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 		for (i=0;i<96;i++) ((char *)0x66aac852)[i]=0x90; // disable threads
 	    } else
 	    {
-	        printf ("wine/module: Unsupported QuickTime version (0x%x)\n",
-			(unsigned int) dispatch_addr);
+	        printf ("wine/module: Unsupported QuickTime version (%p)\n",
+			dispatch_addr);
 		return 0;
 	    }
 
@@ -725,15 +757,15 @@ static int report_func(void *stack_base, int stack_size, reg386_t *reg, u_int32_
   // memory management:
   case 0x150011: //NewPtrClear
   case 0x150012: //NewPtrSysClear
-      reg->eax=(int) malloc(((u_int32_t *)stack_base)[1]);
-      memset((void *) reg->eax,0,((u_int32_t *)stack_base)[1]);
+      reg->eax=(u_int32_t)malloc(((u_int32_t *)stack_base)[1]);
+      memset((void *)reg->eax,0,((u_int32_t *)stack_base)[1]);
 #ifdef DEBUG_QTX_API
       printf("%*sLEAVE(%d): EMULATED! 0x%X\n",ret_i*2,"",ret_i, reg->eax);
 #endif
       return 1;
   case 0x15000F: //NewPtr
   case 0x150010: //NewPtrSys
-      reg->eax=(int)malloc(((u_int32_t *)stack_base)[1]);
+      reg->eax=(u_int32_t)malloc(((u_int32_t *)stack_base)[1]);
 #ifdef DEBUG_QTX_API
       printf("%*sLEAVE(%d): EMULATED! 0x%X\n",ret_i*2,"",ret_i, reg->eax);
 #endif
@@ -742,7 +774,7 @@ static int report_func(void *stack_base, int stack_size, reg386_t *reg, u_int32_
       if(((u_int32_t *)stack_base)[1]>=0x60000000)
           printf("WARNING! Invalid Ptr handle!\n");
       else
-          free((void *) (((u_int32_t *)stack_base)[1]));
+          free((void *)(((u_int32_t *)stack_base)[1]));
       reg->eax=0;
 #ifdef DEBUG_QTX_API
       printf("%*sLEAVE(%d): EMULATED! 0x%X\n",ret_i*2,"",ret_i, reg->eax);
@@ -843,6 +875,11 @@ static int report_func(void *stack_base, int stack_size, reg386_t *reg, u_int32_
 
 static int report_func_ret(void *stack_base, int stack_size, reg386_t *reg, u_int32_t *flags)
 {
+#ifdef DEBUG_QTX_API
+  int i;
+  short err;
+#endif
+
   // restore ret addr:
   --ret_i;
   ((u_int32_t *)stack_base)[0]=ret_array[ret_i];
@@ -953,8 +990,8 @@ FARPROC MODULE_GetProcAddress(
 	fprintf(stderr,"theQuickTimeDispatcher caught -> %p\n",retproc);
       report_entry = report_func;
       report_ret   = report_func_ret;
-      wrapper_target=(void *) retproc;
-      retproc=(void *) wrapper;
+      wrapper_target=(void *)retproc;
+      retproc=(void *)wrapper;
     }
 
     }

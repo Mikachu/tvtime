@@ -430,6 +430,7 @@ long VFWAPIV ICUniversalEx(HIC hic,int command,LPBITMAPINFOHEADER lpbiFormat,LPB
 #define ICDRAW_FULLSCREEN   0x00000002L   /* draw to full screen */
 #define ICDRAW_HDC          0x00000004L   /* draw to a HDC/HWND */
 
+long VFWAPI VideoForWindowsVersion(void);
 
 WIN_BOOL	VFWAPI	ICInfo(long fccType, long fccHandler, ICINFO * lpicinfo);
 LRESULT	VFWAPI	ICGetInfo(HIC hic,ICINFO *picinfo, long cb);
