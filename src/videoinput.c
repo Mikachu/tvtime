@@ -178,8 +178,8 @@ typedef struct capture_buffer_s
 struct videoinput_s
 {
     int verbose;
-
     int grab_fd;
+    char drivername[ 64 ];
 
     int numinputs;
     int curinput;
@@ -277,8 +277,6 @@ static int alarms;
 static void sigalarm( int signal )
 {
     alarms++;
-    fprintf( stderr, "videoinput: Frame capture timed out, hardware/driver problems?\n" );
-    fprintf( stderr, "videoinput: Please report this on our bugs page: " PACKAGE_BUGREPORT "\n" );
 }
 
 static void siginit( void )
@@ -331,6 +329,17 @@ static void wait_for_frame_v4l1( videoinput_t *vidin, int frameid )
     if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frameid ) < 0 ) {
         fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n",
                  frameid, strerror( errno ) );
+    }
+    sleep( 3 );
+    if( alarms ) {
+        fprintf( stderr, "\n"
+      "    Your capture card driver: %s\n"
+      "    is taking too long to provide frames to tvtime.  This could be due\n"
+      "    either to a broken capture card, a signal that has become unstable\n"
+      "    or very noisy, or a driver misconfiguration.\n"
+      "\n"
+      "    Please report this on our bugs page: " PACKAGE_BUGREPORT "\n\n",
+           vidin->drivername );
     }
     alarm( 0 );
 }
@@ -458,6 +467,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->is_streaming = 0;
 
     memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
+    memset( vidin->drivername, 0, sizeof( vidin->drivername ) );
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -486,6 +496,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                              "videoinput: Card type is %x, audio %d.\n",
                      caps_v4l1.name, caps_v4l1.type, caps_v4l1.audios );
         }
+        snprintf( vidin->drivername, sizeof( vidin->drivername ),
+                  "%s", caps_v4l1.name );
     } else {
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: Using video4linux2 driver '%s', card '%s' (bus %s).\n"
@@ -494,6 +506,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                      caps_v4l2.version, caps_v4l2.capabilities );
         }
         vidin->isv4l2 = 1;
+        snprintf( vidin->drivername, sizeof( vidin->drivername ),
+                  "%s (card %s, bus %s) - %u",
+                  caps_v4l2.driver, caps_v4l2.card,
+                  caps_v4l2.bus_info, caps_v4l2.version );
     }
 
     if( vidin->isv4l2 ) {
@@ -608,12 +624,17 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             /* Try for UYVY instead. */
             imgformat.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
             if( ioctl( vidin->grab_fd, VIDIOC_S_FMT, &imgformat ) < 0 ) {
-                fprintf( stderr, "videoinput: video4linux device '%s' refuses "
-                         "to provide YUYV or UYVY format video: %s.\n",
-                         v4l_device, strerror( errno ) );
-                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT "\n"
-                                 "videoinput: indicating your capture card, driver, and the\n"
-                                 "videoinput: error message above.\n" );
+
+                fprintf( stderr, "\n"
+     "    Your capture card driver: %s\n"
+     "    does not support studio-quality colour images required by tvtime.\n"
+     "    This is a hardware limitation of some cards including many\n"
+     "    low-quality webcams.  Please select a different video device to use\n"
+     "    with the command line option --device.\n"
+     "\n"
+     "    Message from the card was: %s\n\n",
+                    vidin->drivername, strerror( errno ) );
+
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -621,26 +642,22 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             vidin->isuyvy = 1;
         }
 
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Field %d, colorspace %d.\n",
-                     imgformat.fmt.pix.field, imgformat.fmt.pix.colorspace );
-        }
-
         if( vidin->height != imgformat.fmt.pix.height ) {
-            fprintf( stderr, "videoinput: Card refuses to give full-height "
-                     "frames, gives %d instead.\n"
-                     "videoinput: Giving up, sorry!\n",
-                     imgformat.fmt.pix.height );
+                fprintf( stderr, "\n"
+    "    Your capture card driver: %s\n"
+    "    does not support full size studio-quality images required by tvtime.\n"
+    "    This is true for many low-quality webcams.  Please select a\n"
+    "    different video device for tvtime to use with the command line\n"
+    "    option --device.\n\n", vidin->drivername );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
         }
 
         if( capwidth != imgformat.fmt.pix.width ) {
-            fprintf( stderr, "videoinput: Requested input width %d unavailable: "
-                     "driver offers %d.  Using %d.\n",
-                     capwidth, imgformat.fmt.pix.width,
-                     imgformat.fmt.pix.width );
+            fprintf( stderr, "videoinput: Width %d too high, using %d "
+                             "instead as suggested by the driver.",
+                     capwidth, imgformat.fmt.pix.width );
         }
         vidin->width = imgformat.fmt.pix.width;
 
@@ -653,15 +670,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             return 0;
         }
         if( capwidth > caps_v4l1.maxwidth ) {
-            fprintf( stderr, "videoinput: Requested input width %d too large: "
-                     "maximum supported by card is %d.  Using %d.\n",
-                     capwidth, caps_v4l1.maxwidth, caps_v4l1.maxwidth );
+            fprintf( stderr, "videoinput: Width %d too high, using %d "
+                             "instead as suggested by the driver.",
+                     capwidth, caps_v4l1.maxwidth );
             capwidth = caps_v4l1.maxwidth;
         }
         if( capwidth < caps_v4l1.minwidth ) {
-            fprintf( stderr, "videoinput: Requested input width %d too small: "
-                     "minimum supported by card is %d.  Using %d.\n",
-                     capwidth, caps_v4l1.minwidth, caps_v4l1.minwidth );
+            fprintf( stderr, "videoinput: Width %d too low, using %d "
+                             "instead as suggested by the driver.",
+                     capwidth, caps_v4l1.minwidth );
             capwidth = caps_v4l1.minwidth;
         }
         vidin->width = capwidth;
@@ -684,10 +701,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             /* Try for UYVY instead. */
             grab_pict.palette = VIDEO_PALETTE_UYVY;
             if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-                fprintf( stderr, "videoinput: Can't get YUVY or UYVY images from the card, unable to"
-                         "process the output: %s.\n", strerror( errno ) );
-                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
-                         " indicating your capture card, driver, and the error message above.\n" );
+                fprintf( stderr, "\n"
+     "    Your capture card driver: %s\n"
+     "    does not support studio-quality colour images required by tvtime.\n"
+     "    This is a hardware limitation of some cards including many\n"
+     "    low-quality webcams.  Please select a different video device to use\n"
+     "    with the command line option --device.\n"
+     "\n"
+     "    Message from the card was: %s\n\n",
+                    vidin->drivername, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
