@@ -25,7 +25,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
-#include "tvtimeconf.h"
+#include "commands.h"
 #include "fifo.h"
 
 struct fifo_s {

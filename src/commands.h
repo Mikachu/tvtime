@@ -35,6 +35,88 @@ typedef struct commands_s commands_t;
 #include "vbidata.h"
 #include "station.h"
 
+#define MAX_CMD_NAMELEN 64
+
+/**
+ * Input commands for keymap
+ */
+enum tvtime_commands
+{
+    TVTIME_NOCOMMAND,
+    TVTIME_QUIT,
+    TVTIME_CHANNEL_UP,
+    TVTIME_CHANNEL_DOWN,
+    TVTIME_CHANNEL_PREV,
+    TVTIME_LUMA_CORRECTION_TOGGLE,
+    TVTIME_LUMA_UP,
+    TVTIME_LUMA_DOWN,
+    TVTIME_MIXER_MUTE,
+    TVTIME_MIXER_UP,
+    TVTIME_MIXER_DOWN,
+    TVTIME_ENTER,
+    TVTIME_CHANNEL_CHAR,
+
+    TVTIME_TV_VIDEO,
+    TVTIME_HUE_DOWN,
+    TVTIME_HUE_UP,
+    TVTIME_BRIGHT_DOWN,
+    TVTIME_BRIGHT_UP,
+    TVTIME_CONT_DOWN,
+    TVTIME_CONT_UP,
+    TVTIME_COLOUR_DOWN,
+    TVTIME_COLOUR_UP,
+
+    TVTIME_FINETUNE_DOWN,
+    TVTIME_FINETUNE_UP,
+
+    TVTIME_FREQLIST_DOWN,
+    TVTIME_FREQLIST_UP,
+
+    TVTIME_SHOW_BARS,
+    TVTIME_DEBUG,
+
+    TVTIME_FULLSCREEN,
+    TVTIME_ASPECT,
+    TVTIME_SCREENSHOT,
+    TVTIME_DEINTERLACINGMODE,
+
+    TVTIME_MENUMODE,
+    TVTIME_DISPLAY_INFO,
+    TVTIME_SHOW_CREDITS,
+
+    TVTIME_TOGGLE_NTSC_CABLE_MODE,
+    TVTIME_AUTO_ADJUST_PICT,
+    TVTIME_SKIP_CHANNEL,
+    TVTIME_TOGGLE_CONSOLE,
+    TVTIME_SCROLL_CONSOLE_UP,
+    TVTIME_SCROLL_CONSOLE_DOWN,
+    TVTIME_TOGGLE_CC,
+
+    TVTIME_TOGGLE_HALF_FRAMERATE,
+
+    TVTIME_SCAN_CHANNELS,
+
+    TVTIME_OVERSCAN_UP,
+    TVTIME_OVERSCAN_DOWN,
+
+    TVTIME_CHANNEL_1,
+    TVTIME_CHANNEL_2,
+    TVTIME_CHANNEL_3,
+    TVTIME_CHANNEL_4,
+    TVTIME_CHANNEL_5,
+    TVTIME_CHANNEL_6,
+    TVTIME_CHANNEL_7,
+    TVTIME_CHANNEL_8,
+    TVTIME_CHANNEL_9,
+    TVTIME_CHANNEL_0,
+
+    TVTIME_LAST
+};
+
+int tvtime_string_to_command( const char *str );
+int tvtime_num_commands( void );
+const char *tvtime_get_command( int pos );
+int tvtime_get_command_id( int pos );
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
                           station_mgr_t *mgr, tvtime_osd_t *osd,

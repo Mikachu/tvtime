@@ -32,77 +32,7 @@
 
 
 #define MAX_KEYSYMS 350
-#define MAX_CMD_NAMELEN 64
 #define MAX_BUTTONS 10
-
-typedef struct {
-    char name[MAX_CMD_NAMELEN];
-    int command;
-} Cmd_Names;
-
-static Cmd_Names cmd_table[] = {
-    { "QUIT", TVTIME_QUIT },
-    { "CHANNEL_UP", TVTIME_CHANNEL_UP },
-    { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
-    { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
-    { "LUMA_CORRECTION_TOGGLE", TVTIME_LUMA_CORRECTION_TOGGLE },
-    { "LUMA_UP", TVTIME_LUMA_UP },
-    { "LUMA_DOWN", TVTIME_LUMA_DOWN },
-    { "MIXER_MUTE", TVTIME_MIXER_MUTE },
-    { "MIXER_UP", TVTIME_MIXER_UP },
-    { "MIXER_DOWN", TVTIME_MIXER_DOWN },
-    { "TV_VIDEO", TVTIME_TV_VIDEO },
-    { "HUE_DOWN", TVTIME_HUE_DOWN },
-    { "HUE_UP", TVTIME_HUE_UP },
-    { "BRIGHT_DOWN", TVTIME_BRIGHT_DOWN },
-    { "BRIGHT_UP", TVTIME_BRIGHT_UP },
-    { "CONT_DOWN", TVTIME_CONT_DOWN },
-    { "CONT_UP", TVTIME_CONT_UP },
-    { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
-    { "COLOUR_UP", TVTIME_COLOUR_UP },
-
-    { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
-    { "FINETUNE_UP", TVTIME_FINETUNE_UP },
-
-    { "FREQLIST_DOWN", TVTIME_FREQLIST_DOWN },
-    { "FREQLIST_UP", TVTIME_FREQLIST_UP },
-
-    { "SHOW_BARS", TVTIME_SHOW_BARS },
-    { "DEBUG", TVTIME_DEBUG },
-
-    { "FULLSCREEN", TVTIME_FULLSCREEN },
-    { "ASPECT", TVTIME_ASPECT },
-    { "SCREENSHOT", TVTIME_SCREENSHOT },
-    { "DEINTERLACING_MODE", TVTIME_DEINTERLACINGMODE },
-
-    { "MENUMODE", TVTIME_MENUMODE },
-    { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
-    { "SHOW_CREDITS", TVTIME_SHOW_CREDITS },
-
-    { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
-    { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
-    { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
-    { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
-    { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
-    { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL },
-    { "TOGGLE_CC", TVTIME_TOGGLE_CC },
-    { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
-    { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
-    { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
-    { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
-    { "CHANNEL_1", TVTIME_CHANNEL_1 },
-    { "CHANNEL_2", TVTIME_CHANNEL_2 },
-    { "CHANNEL_3", TVTIME_CHANNEL_3 },
-    { "CHANNEL_4", TVTIME_CHANNEL_4 },
-    { "CHANNEL_5", TVTIME_CHANNEL_5 },
-    { "CHANNEL_6", TVTIME_CHANNEL_6 },
-    { "CHANNEL_7", TVTIME_CHANNEL_7 },
-    { "CHANNEL_8", TVTIME_CHANNEL_8 },
-    { "CHANNEL_9", TVTIME_CHANNEL_9 },
-    { "CHANNEL_0", TVTIME_CHANNEL_0 },
-};
-#define NUM_CMDS (sizeof(cmd_table)/sizeof(Cmd_Names))
-
 
 struct config_s
 {
@@ -307,14 +237,14 @@ static void config_init_keymap( config_t *ct, parser_file_t *pf )
         return;
     }
 
-    for( cmd=0; cmd < NUM_CMDS; cmd++ ) {
+    for( cmd=0; cmd < tvtime_num_commands(); cmd++ ) {
         char keystr[ 5+MAX_CMD_NAMELEN ];
-        sprintf( keystr, "key_%s", cmd_table[cmd].name );
+        sprintf( keystr, "key_%s", tvtime_get_command( cmd ) );
 
         for(i=1;;i++)
             if( (tmp = parser_get( pf, keystr, i )) ) {
                 key = string_to_key( tmp );
-                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = cmd_table[ cmd ].command;
+                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = tvtime_get_command_id( cmd );
             } else { break; }
     }   
 }
@@ -755,21 +685,6 @@ int config_key_to_command( config_t *ct, int key )
     }
         
     return TVTIME_NOCOMMAND;
-}
-
-int tvtime_string_to_command( const char *str )
-{
-    int i=0;
-
-    if( !str ) return TVTIME_NOCOMMAND;
-
-    while( i < NUM_CMDS ) {
-        if( !strcasecmp( cmd_table[i].name, str ) ) {
-            return cmd_table[i].command;
-        }
-        i++;
-    }
-    return -1;
 }
 
 int config_button_to_command( config_t *ct, int button )
