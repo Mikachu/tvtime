@@ -1,130 +1,171 @@
 
 0.9.8
-  * (vektor) No longer write past the end of the number string (fixes
-    bug 715997)
-  * (vektor) Screenshots save to $HOME, print a message to OSD on
-    screenshot.
-  * (vektor) Wrote a videofilter object, and sped up luma correction by
-    about 2x.
-  * (mrallen/vektor) Added an insanely useful pause command for debugging,
-    defaults to I_END (fixes bug 715068)
-  * (vektor) Fixed a small memleak in the screenshot code.
-  * (vektor) Added a new filter for the CC data written by diz.  It's
-    definitely better than the crappy averaging mess that was there before,
-    but it should probably go through another revision before we release.
-  * (vektor) Time and network information is now right justified (fixes
-    bug 711654).
-  * (vektor) Default to using locale information for the time format (fixes
-    bug 710875).
-  * (mrallen) Previous channel info not lost when you change to the same
-    channel you're already on.
-  * (vektor) Text rendering is now subpixel correct (fixes bug 632781).
-  * (vektor) Rewrote the text rendering code (fixes bug 693642).
-  * (vektor) tvtime now doesn't render output when the window is obscured or
-    hidden.
-  * (vektor) Added console app 'tvtime-command' to send commands to a running
-    tvtime instance using the fifo.
-  * (vektor) configure.ac now fails if X isn't found.
-  * (vektor) Enabled DScaler DLL filters, added the wine directory.
-  * (vektor) Completely removed the scanline bias code, I don't think it's
-    the right hting to do.
-  * (vektor) We now depend on libxml2 in our configure script.
-  * (vektor) Enabled the console code.
-  * (batchall) Stations are now saved in ~/.tvime/stationrc. Happy editing.
-  * (vektor) Added Seli's kwin fix for ogle's fullscreen code.
+  * vektor: Support added for channel renumbering (fixes 711431)
+  * vektor: tvtime now frees its shared memory segments (fixes 711470)
+  * vektor: Fixed some annoying issues with non-square pixel outputs
+      (fixes 716119)
+  * vektor: Solved a segfault with the TimeFormat setting (fixes 720429)
+  * vektor: Fixed data bar rendering code (fixees 632781)
+  * sflaw: Moved the fifo out of $HOME and into /var/run (fixes 694685)
+  * sflaw: Fifo group is now restricted (fixes 711332)
+  * vektor: Startup window size is now dependent on pixel aspect
+      (fixes 723477)
+  * vektor: Fixed some string memory errors in tvtime.c, which fixed some
+      random errors on deinterlacer change (fixes 715997)
+  * vektor: Added a config file option for framerate mode (fixes 693599)
+  * vektor: Deprecated the FineTuneOffset config file option
+      (fixes 707278)
+  * vektor: Fixed a segfault with the closed captioning code
+      (fixes 722944)
+  * vektor: We now support audio mode changing (stereo, mono, ...)
+      (fixes 709505)
+  * vektor: When input source is changed, we now clear all XDS info
+      from the OSD (fixes 699810)
+  * vektor: Auto-adjust now displays on the OSD, making the UI
+      a bit more intuitive when adjusting settings (fixes 711706)
+  * vektor: Enabled closed caption decoding (fixes 711424)
+  * vektor: Support for non-4:3 displays added (fixes 636423)
+  * vektor: Fixed string rendering where they were being cut off on
+      the right hand side (fixes 693642)
+  * vektor: Support for non-square pixel displays added (fixes 690428)
+  * sflaw: autoconf cleanups (fixes 711334)
+  * vektor: configure fails if X development headers aren't found (fixes
+      bug 696069)
+  * vektor: ENTER added to the command list (fixes 708596)
+  * vektor: Implemented a wider filter for 4:2:2->4:4:4 conversions
+      used for screenshots (fixes 715067)
+  * vektor: Fixed timing, tuner norm, and norm switching for PAL-M
+      support (fixes bugs 722859, 722091, 722131)
+  * vektor: Updated timing for NTSC-JP (fixes 720502)
+  * vektor: DScaler filters are now installed on make install (fixes
+      bugs 715053, 720457)
+  * MipsIrv/vektor: Finish up the XML work for config files
+  * vektor: Man pages are now installed (fixes bug 720431)
+  * vektor: No longer write past the end of the number string (fixes
+      bug 715997)
+  * vektor: Screenshots save to $HOME, print a message to OSD on
+      screenshot
+  * vektor: Wrote a videofilter object, and sped up luma correction by
+      about 2x
+  * mrallen/vektor: Added an insanely useful pause command for debugging,
+      defaults to I_END (fixes bug 715068)
+  * vektor: Fixed a small memleak in the screenshot code
+  * vektor/diz: Added a new filter for the CC data written by diz.  It's
+      definitely better than the crappy averaging mess that was there before,
+      but it should probably go through another revision before we release
+  * vektor: Time and network information is now right justified (fixes
+      bug 711654)
+  * vektor: Default to using locale information for the time format (fixes
+      bug 710875)
+  * mrallen: Previous channel info not lost when you change to the same
+      channel you're already on
+  * vektor: Text rendering is now subpixel correct (fixes bug 632781)
+  * vektor: Rewrote the text rendering code (fixes bug 693642)
+  * vektor: tvtime now doesn't render output when the window is obscured or
+      hidden (fixes 705989)
+  * vektor: Added console app 'tvtime-command' to send commands to a running
+      tvtime instance using the fifo.
+  * vektor: configure.ac now fails if X isn't found.
+  * vektor: Enabled DScaler DLL filters, added the wine directory.
+  * vektor: Completely removed the scanline bias code, I don't think it's
+      the right hting to do.
+  * vektor: We now depend on libxml2 in our configure script.
+  * vektor: Enabled the console code.
+  * batchall: Stations are now saved in ~/.tvime/stationrc. Happy editing.
+  * vektor: Added Seli's kwin fix for ogle's fullscreen code.
 
 0.9.7 - Wed Feb 26 21:58:13 AST 2003
-  * (vektor) Added a temporary and nasty hack to avoid fullscreen problems
-    with KWin from KDE 3.1 (avoids bug 692137)
-  * (vektor) tvtime now creates the ~/.tvtime/tvtimerc file on startup
-  * (vektor) tvtime now creates the ~/.tvtime directory on startup
-  * (vektor) Fixed screenshot code to handle the XVideo Bob filter
-  * (vektor) Added back "newzealand" at least for 0.9.7 (fixes bug 690983)
-  * (vektor) Removed the scanline bias feature until I determine if it's
-    actually a good idea
-  * (vektor) We no longer grab mouse and keyboard on fullscreen, as this
-    has problems with ewmh (no alt-tab away from a fullscreen app) and also
-    with multi-head displays.  We still need to decide what to do when the
-    virtual res is smaller than the display (fixes bug 691707)
-  * (vektor) We now show the cursor on motion, hide it on inactivity.
-  * (vektor) Limit to 4 buffers from the card, even if they provide more.
-    This fixes a/v sync issues (fixes bug 691629)
-  * (vektor) Europe-east is now just part of the 'europe' frequency map.
-    If you are just using the OIRT frequencies and UHF, you can also use
-    'russia' (fixes 640620)
-  * (vektor) More confident about the australian channel map (fixes 650055)
-  * (PunkeR) Added numeric channel commands for better lirc support
-  * (vektor) Added commands for scanline length bias and overscan
-  * (vektor) Added a channel scanner that rocks sooo much
-  * (vektor) We now set the window and palette with V4L before using mmap
-    mode.  This should solve some issues with V4L drivers other than bttv
-  * (vektor) Fixed a bunch of OSD crap relating to inputs with no tuner, and
-    some unnecessary error messages will be avoided
-  * (batchall) Added a more flexible station subsystem. Deactivated channels
-    are saved now, more to come
-  * (vektor) Moved fonts and graphics into the data directory
-  * (vektor) Increased the version number of the deinterlace plugin API
-  * (vektor) Removed the mlockall() call, I don't want to bother with
-    that right now
-  * (vektor) Added the 'XVideo Bob' equivalent to DScaler's 'scalerbob'
-    plugin (feature request 642661)
-  * (vektor) Added the SECAM-DK frequencies ("russia")
-  * (vektor) Officially re-enabled the EWMH code from the ogle
-    fullscreen handler wm_state.c
-  * (vektor) Reverted to previous frequencies.h format
-  * (vektor) Added a half-framerate mode, default key is '='
-  * (xlnx-x) Added a previous channel button
-  * (vektor) We now exit properly on window manager destroy messages
-    (fixes 659877)
-  * (vektor) Added a configure check for Xinerama (bug 636424)
-  * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576
-    (fixes bug 646494)
-  * (rascasse) You can now specify the startup deinterlacing alg (fixes 635005)
-  * (vektor) You can now change the default process priority in the .tvtimerc
-    using the ProcessPriority value
+  * vektor: Added a temporary and nasty hack to avoid fullscreen problems
+      with KWin from KDE 3.1 (avoids bug 692137)
+  * vektor: tvtime now creates the ~/.tvtime/tvtimerc file on startup
+  * vektor: tvtime now creates the ~/.tvtime directory on startup
+  * vektor: Fixed screenshot code to handle the XVideo Bob filter
+  * vektor: Added back "newzealand" at least for 0.9.7 (fixes bug 690983)
+  * vektor: Removed the scanline bias feature until I determine if it's
+      actually a good idea
+  * vektor: We no longer grab mouse and keyboard on fullscreen, as this
+      has problems with ewmh (no alt-tab away from a fullscreen app) and also
+      with multi-head displays.  We still need to decide what to do when the
+      virtual res is smaller than the display (fixes bug 691707)
+  * vektor: We now show the cursor on motion, hide it on inactivity.
+  * vektor: Limit to 4 buffers from the card, even if they provide more.
+      This fixes a/v sync issues (fixes bug 691629)
+  * vektor: Europe-east is now just part of the 'europe' frequency map.
+      If you are just using the OIRT frequencies and UHF, you can also use
+      'russia' (fixes 640620)
+  * vektor: More confident about the australian channel map (fixes 650055)
+  * PunkeR: Added numeric channel commands for better lirc support
+  * vektor: Added commands for scanline length bias and overscan
+  * vektor: Added a channel scanner that rocks sooo much
+  * vektor: We now set the window and palette with V4L before using mmap
+      mode.  This should solve some issues with V4L drivers other than bttv
+  * vektor: Fixed a bunch of OSD crap relating to inputs with no tuner, and
+      some unnecessary error messages will be avoided
+  * batchall: Added a more flexible station subsystem. Deactivated channels
+      are saved now, more to come
+  * vektor: Moved fonts and graphics into the data directory
+  * vektor: Increased the version number of the deinterlace plugin API
+  * vektor: Removed the mlockall() call, I don't want to bother with
+      that right now
+  * vektor: Added the 'XVideo Bob' equivalent to DScaler's 'scalerbob'
+      plugin (feature request 642661)
+  * vektor: Added the SECAM-DK frequencies ("russia")
+  * vektor: Officially re-enabled the EWMH code from the ogle
+      fullscreen handler wm_state.c
+  * vektor: Reverted to previous frequencies.h format
+  * vektor: Added a half-framerate mode, default key is '='
+  * xlnx-x: Added a previous channel button
+  * vektor: We now exit properly on window manager destroy messages
+      (fixes 659877)
+  * vektor: Added a configure check for Xinerama (bug 636424)
+  * vektor: Fixed the input frame height for PAL-M, should be 480 not 576
+      (fixes bug 646494)
+  * rascasse: You can now specify the startup deinterlacing alg (fixes 635005)
+  * vektor: You can now change the default process priority in the .tvtimerc
+      using the ProcessPriority value
 
 0.9.6 - Thu Nov 14 16:37:25 AST 2002
-  * (bitstream) Added the -m switch to start fullscreen (bug 636044)
-  * (bitstream) Added configurable OSD colours to the tvtimerc.
-  * (vektor) We now drop root priviledges if tvtime is setuid root and run
-    as a normal user (bug 630210)
-  * (vektor) Redid a bunch of the default key bindings.
-  * (vektor) Added our own XVideo output module, using fullscreen and VidMode
-    code from Ogle.  This may give better performance.
-  * (vektor) Removed SDL and DirectFB output drivers from the distribution
-    for now.
-  * (vektor) We now use XF86VidModeExtension, if available, to choose our
-    fullscreen mode (bug 628290)
-  * (bitstream) Added support for muting of the TV card instead of muting
-    the master mixer volume: MuteTVCard option in the tvtimerc (bug 633222)
-  * (rascasse) Added a man page for the tvtimerc file to the docs directory
-    (still not installed or in the dist, part of bug 633042)
-  * (rascasse) Added an RPM spec file to the docs directory
-  * (vektor) Added a hack/fix for a resize loop that was occuring.  If
-    you resized the window it would start wildly resizing itself for a
-    while.  Seems to not happen anymore here.
-  * (vektor) Added support for fine tuning of channels (bug 630598)
-  * (vektor) Improved the warning messages for tuners that are silly, this
-    makes the warnings less offensive for saa7134 users (bug 633039)
-  * (bitstream) OSD clock updates while on screen (bug 628186)
-  * (diz) Postscript code for credits listing
-  * (vektor) Added credits listing, updated the credits
-  * (bitstream) Support for multiple key bindings (bug 633043)
-  * (vektor) Tuner code does not search for a channel with an active
-    frequency anymore, solving some hangs on systems where channels are
-    sparse (bug 629275)
-  * (bitstream) Whitespace ignored at end of config file options (bug 633048)
-  * (vektor) Spelling updates in the defaults.tvtimerc file (bug 634068)
-  * (bitstream) Mouse button support in the config file, wheel buttons default
-    to channel up/down
+  * bitstream: Added the -m switch to start fullscreen (bug 636044)
+  * bitstream: Added configurable OSD colours to the tvtimerc.
+  * vektor: We now drop root priviledges if tvtime is setuid root and run
+      as a normal user (bug 630210)
+  * vektor: Redid a bunch of the default key bindings.
+  * vektor: Added our own XVideo output module, using fullscreen and VidMode
+      code from Ogle.  This may give better performance.
+  * vektor: Removed SDL and DirectFB output drivers from the distribution
+      for now.
+  * vektor: We now use XF86VidModeExtension, if available, to choose our
+      fullscreen mode (bug 628290)
+  * bitstream: Added support for muting of the TV card instead of muting
+      the master mixer volume: MuteTVCard option in the tvtimerc (bug 633222)
+  * rascasse: Added a man page for the tvtimerc file to the docs directory
+      (still not installed or in the dist, part of bug 633042)
+  * rascasse: Added an RPM spec file to the docs directory
+  * vektor: Added a hack/fix for a resize loop that was occuring.  If
+      you resized the window it would start wildly resizing itself for a
+      while.  Seems to not happen anymore here.
+  * vektor: Added support for fine tuning of channels (bug 630598)
+  * vektor: Improved the warning messages for tuners that are silly, this
+      makes the warnings less offensive for saa7134 users (bug 633039)
+  * bitstream: OSD clock updates while on screen (bug 628186)
+  * diz: Postscript code for credits listing
+  * vektor: Added credits listing, updated the credits
+  * bitstream: Support for multiple key bindings (bug 633043)
+  * vektor: Tuner code does not search for a channel with an active
+      frequency anymore, solving some hangs on systems where channels are
+      sparse (bug 629275)
+  * bitstream: Whitespace ignored at end of config file options (bug 633048)
+  * vektor: Spelling updates in the defaults.tvtimerc file (bug 634068)
+  * bitstream: Mouse button support in the config file, wheel buttons default
+      to channel up/down
 
 0.9.5 - Sat Nov  2 19:55:45 AST 2002
-  * (vektor) Cleanup of the /dev/rtc handling, can still use /dev/rtc even if
-    we can't get high resolution timing from it
-  * (vektor) Smoothness improvement, frames are now scheduled at
-    more correct times.  Added a performance tracker object
-  * (vektor) Removed the force-DScaler-defaults on startup for V4L settings
-  * (vektor) Improved OSD display to show more information more consistently
-  * (vektor) Added a poor configure check for freetype2, this should
-    be improved in the future
+  * vektor: Cleanup of the /dev/rtc handling, can still use /dev/rtc even if
+      we can't get high resolution timing from it
+  * vektor: Smoothness improvement, frames are now scheduled at
+      more correct times.  Added a performance tracker object
+  * vektor: Removed the force-DScaler-defaults on startup for V4L settings
+  * vektor: Improved OSD display to show more information more consistently
+  * vektor: Added a poor configure check for freetype2, this should
+      be improved in the future
 
