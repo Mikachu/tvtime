@@ -3,7 +3,7 @@
   * vektor: Added a config file option and command line parameter
       to set the mixer device and channel.  Syntax is
       tvtime -x /dev/mixer0:line1  or use the MixerDevice config
-      file option (fixes 731817)
+      file option
   * vektor: Added compatible norm switching (fixes 731813)
   * vektor: Brought back the tvtime logo (fixes 720432)
   * vektor: Mute tag on the OSD now fades out, improving usefulness
