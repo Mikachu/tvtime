@@ -66,8 +66,8 @@
 #define TVTIME_ICON_RADIOON            "\xee\x80\xa5" /* Radio on            */
 #define TVTIME_ICON_DEVICESETUP        "\xee\x80\xa6" /* Device setup        */
 #define TVTIME_ICON_SHARPNESS          "\xee\x80\xa7" /* Sharpness           */
-#define TVTIME_ICON_ADDBUTTON          "\xee\x80\xa8" /* Add Button          */
-#define TVTIME_ICON_DELETEBUTTON       "\xee\x80\xa9" /* Delete Button       */
+#define TVTIME_ICON_PLUSBUTTON         "\xee\x80\xa8" /* Plus Button         */
+#define TVTIME_ICON_MINUSBUTTON        "\xee\x80\xa9" /* Minus Button        */
 #define TVTIME_ICON_FAVORITESICON      "\xee\x80\xaa" /* Favorites Icon      */
 #define TVTIME_ICON_DEINTERLACERDESC   "\xee\x80\xab" /* Deinterlacer Desc.  */
 #define TVTIME_ICON_ATTEMPTEDFRAMERATE "\xee\x80\xac" /* Attempted Framerate */
