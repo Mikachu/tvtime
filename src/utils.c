@@ -201,6 +201,7 @@ const char *get_tvtime_fifo( config_t *ct )
         /* We have nothing in our cache. */
         const char *fifodir = NULL;
         char *hostname = NULL;
+	char *hostenv = NULL;
 
         /* Get the FIFO directory. */
         fifodir = get_tvtime_fifo( ct );
@@ -210,9 +211,9 @@ const char *get_tvtime_fifo( config_t *ct )
         }
 
         /* Try to get a hostname. */
-        hostname = getenv( "HOSTNAME" );
-        if( hostname ) {
-            if( asprintf( &hostname, "-%s", hostname ) < 0 ) {
+        hostenv = getenv( "HOSTNAME" );
+        if( hostenv ) {
+            if( asprintf( &hostname, "-%s", hostenv ) < 0 ) {
                 fprintf( stderr, "utils: Out of memory.\n" );
                 /* Try to get away with no hostname. */
                 if( asprintf( &hostname, "%s", "" ) < 0 ) {
