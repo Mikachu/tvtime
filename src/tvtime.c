@@ -352,6 +352,44 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 }
 
 
+/**
+ * This will be used by the DScaler filters.
+ */
+static void tvtime_build_deinterlaced_frame_multipass( unsigned char *output,
+                                                       unsigned char *curframe,
+                                                       unsigned char *lastframe,
+                                                       unsigned char *secondlastframe,
+                                                       video_correction_t *vc,
+                                                       tvtime_osd_t *osd,
+                                                       console_t *con,
+                                                       vbiscreen_t *vs,
+                                                       int bottom_field,
+                                                       int correct_input,
+                                                       int width,
+                                                       int frame_height,
+                                                       int instride,
+                                                       int outstride )
+{
+    int i;
+
+    /* Call deinterlacer here.
+    tvtime_just_deinterlace_frame( output, curframe, lastframe, secondlastframe,
+                                   bottom_field, width, frame_height, instride, outstride );
+     */
+
+    for( i = 0; i < frame_height; i++ ) {
+        unsigned char *curoutput = output + (i * outstride);
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, curoutput, curoutput, width );
+        }
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+        if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+    }
+}
+
+
+
 static void tvtime_build_interlaced_frame( unsigned char *output,
                                            unsigned char *curframe,
                                            video_correction_t *vc,
@@ -381,12 +419,12 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
     /* Copy a scanline. */
     blit_packed422_scanline( output, curframe, width );
 
-/*
+    /*
     if( correct_input ) {
         video_correction_correct_packed422_scanline( vc, output, output, width );
     }
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-*/
+    */
     output += outstride;
     scanline++;
 
@@ -399,12 +437,12 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
         curframe += instride * 2;
         blit_packed422_scanline( output, curframe, width );
 
-/*
+        /*
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-*/
+        */
         output += outstride;
         scanline++;
     }
