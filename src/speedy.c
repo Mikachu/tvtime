@@ -99,6 +99,17 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
     return ((temp + (temp >> 8)) >> 8);
 }
 
+static inline __attribute__ ((always_inline,const)) unsigned char clip255( int x )
+{
+    if( x > 255 ) {
+        return 255;
+    } else if( x < 0 ) {
+        return 0;
+    } else {
+        return x;
+    }
+}
+
 unsigned long CombJaggieThreshold = 73;
 
 unsigned int comb_factor_packed422_scanline_mmx( unsigned char *top, unsigned char *mid,
@@ -327,18 +338,18 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
 
         dest[ (i*6) + 3 ] = src[ (i*4) + 2 ];
         if( i > (5*2) && i < ((width/2) - (6*2)) ) {
-            dest[ (i*6) + 4 ] = ((  (80*(src[ (i*4) + 1 ] + src[ (i*4) + 5 ]))
-                                  - (24*(src[ (i*4) - 3 ] + src[ (i*4) + 9 ]))
-                                  + (12*(src[ (i*4) - 7 ] + src[ (i*4) + 13]))
-                                  - ( 6*(src[ (i*4) - 11] + src[ (i*4) + 17]))
-                                  + ( 3*(src[ (i*4) - 15] + src[ (i*4) + 21]))
-                                  - (   (src[ (i*4) - 19] + src[ (i*4) + 25]))) + 64) >> 7;
-            dest[ (i*6) + 5 ] = ((  (80*(src[ (i*4) + 3 ] + src[ (i*4) + 7 ]))
-                                  - (24*(src[ (i*4) - 1 ] + src[ (i*4) + 11]))
-                                  + (12*(src[ (i*4) - 5 ] + src[ (i*4) + 15]))
-                                  - ( 6*(src[ (i*4) - 9 ] + src[ (i*4) + 19]))
-                                  + ( 3*(src[ (i*4) - 13] + src[ (i*4) + 23]))
-                                  - (   (src[ (i*4) - 17] + src[ (i*4) + 27]))) + 64) >> 7;
+            dest[ (i*6) + 4 ] = clip255( ((  (80*(src[ (i*4) + 1 ] + src[ (i*4) + 5 ]))
+                                           - (24*(src[ (i*4) - 3 ] + src[ (i*4) + 9 ]))
+                                           + (12*(src[ (i*4) - 7 ] + src[ (i*4) + 13]))
+                                           - ( 6*(src[ (i*4) - 11] + src[ (i*4) + 17]))
+                                           + ( 3*(src[ (i*4) - 15] + src[ (i*4) + 21]))
+                                           - (   (src[ (i*4) - 19] + src[ (i*4) + 25]))) + 64) >> 7 );
+            dest[ (i*6) + 5 ] = clip255( ((  (80*(src[ (i*4) + 3 ] + src[ (i*4) + 7 ]))
+                                           - (24*(src[ (i*4) - 1 ] + src[ (i*4) + 11]))
+                                           + (12*(src[ (i*4) - 5 ] + src[ (i*4) + 15]))
+                                           - ( 6*(src[ (i*4) - 9 ] + src[ (i*4) + 19]))
+                                           + ( 3*(src[ (i*4) - 13] + src[ (i*4) + 23]))
+                                           - (   (src[ (i*4) - 17] + src[ (i*4) + 27]))) + 64) >> 7 );
         } else if( i < ((width/2) - 1) ) {
             dest[ (i*6) + 4 ] = (src[ (i*4) + 1 ] + src[ (i*4) + 5 ] + 1) >> 1;
             dest[ (i*6) + 5 ] = (src[ (i*4) + 3 ] + src[ (i*4) + 7 ] + 1) >> 1;
