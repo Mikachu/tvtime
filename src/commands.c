@@ -1333,7 +1333,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
     if( vidin ) {
-   	    reset_pal_input_menu( menu, vidin, cmd->stationmgr );
+        reset_pal_input_menu( menu, vidin, cmd->stationmgr );
     }
     commands_add_menu( cmd, menu );
 
