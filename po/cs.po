@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-11-01 19:49+0100\n"
-"PO-Revision-Date: 2003-11-02 19:06+0100\n"
+"PO-Revision-Date: 2003-11-02 20:08+0100\n"
 "Last-Translator: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "Language-Team: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "MIME-Version: 1.0\n"
@@ -118,7 +118,7 @@ msgstr "Zahozené snímky: %d"
 #: src/tvtime.c:1041
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
-msgstr ""
+msgstr "Interval překreslení:  %4.1f/%4.1f ms (potřebujeme %4.1f ms)"
 
 #: src/tvtime.c:1060 src/tvtime.c:1113
 msgid "16:9 + Overscan"
@@ -1233,6 +1233,5 @@ msgstr "Detekce signálu"
 #, c-format
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
-msgstr ""
-"Nalezen kanál na %6.2f MHz (%.2f - %.2f MHz). Přidávám ho do seznamu "
-"kanálů.\n"
+msgstr "Nalezen kanál na %6.2f MHz (%.2f - %.2f MHz). Přidávám ho do seznamu kanálů.\n"
+
