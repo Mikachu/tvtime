@@ -9,6 +9,9 @@ SDLLIBS = `sdl-config --libs`
 TTFFLAGS =
 TTFLIBS = -lfreetype
 
+PNGFLAGS =
+PNGLIBS = -lpng
+
 CFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS)
 CXXFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS) -I/usr/include/freetype2
 LDFLAGS = $(SDLLIBS) $(TTFLIBS)

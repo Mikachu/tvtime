@@ -19,6 +19,10 @@
 #ifndef VIDEOINPUT_H_INCLUDED
 #define VIDEOINPUT_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct videoinput_s videoinput_t;
 
 /**
@@ -112,4 +116,7 @@ int videoinput_freq_present( videoinput_t *vidin );
 void videoinput_free_last_frame( videoinput_t *vidin );
 void videoinput_free_all_frames( videoinput_t *vidin );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VIDEOINPUT_H_INCLUDED */

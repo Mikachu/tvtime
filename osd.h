@@ -63,5 +63,4 @@ void osd_shape_composite_packed422( osd_shape_t *osds, unsigned char *output,
                                     int width, int height, int stride, 
                                     int xpos, int ypos );
 
-
 #endif /* OSD_H_INCLUDED */

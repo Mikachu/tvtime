@@ -19,6 +19,10 @@
 #ifndef VIDEOTOOLS_H_INCLUDED
 #define VIDEOTOOLS_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Extent/scale correction code for luma and chroma.  This can
  * be used to do some tricks for increasing the brightness, and
@@ -123,4 +127,7 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth,
  */
 void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src, int srcwidth );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VIDEOTOOLS_H_INCLUDED */
