@@ -2,13 +2,14 @@
 # Copyright (C) 2003 Billy Biggs
 # This file is distributed under the same license as the tvtime package.
 # Per von Zweigbergk <pvz@e.kth.se>, 2003
-#
+# Many thanks to Göran Uddeborg <goeran@uddeborg.se> for suggestions on
+# improvements.
 msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-31 01:22+0100\n"
-"PO-Revision-Date: 2003-10-31 16:56+0100\n"
+"POT-Creation-Date: 2003-11-01 01:44+0100\n"
+"PO-Revision-Date: 2003-11-01 01:42+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +45,7 @@ msgstr "Halv bildfrekvens, deinterlace på nedre bildfälten: %.2f b/s"
 
 #: src/tvtime.c:901
 msgid "Overscan setting"
-msgstr "Översvepnings-inställningar"
+msgstr "Översvepning"
 
 #: src/tvtime.c:908 src/commands.c:1273
 msgid "Apply matte"
@@ -78,9 +79,10 @@ msgstr "Uppe"
 msgid "Bottom"
 msgstr "Nere"
 
+# Den engelska strängen i det här fallet är ganska förvirrande.
 #: src/tvtime.c:987
 msgid "Frame drop setting"
-msgstr "Framedrop-inställningar"
+msgstr "Bildfrekvens vid videofångst"
 
 #: src/tvtime.c:1014
 msgid "Performance estimates"
@@ -113,7 +115,7 @@ msgstr "Genomsnittlig renderingstid: %5.2f ms"
 #: src/tvtime.c:1035
 #, c-format
 msgid "Dropped frames: %d"
-msgstr "Antal framedrops: %d"
+msgstr "Missade bildrutor: %d"
 
 #: src/tvtime.c:1041
 #, c-format
@@ -186,10 +188,10 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Din capture-drivrutin, %s, verkar inte\n"
-"    stödja capture vid full bildfrekvens. Var god kontrollera\n"
-"    ifall drivrutinen är felinställd, eller om du valt fel\n"
-"    enhet (%s).\n"
+"    Din videofångarkortsdrivrutin, %s, verkar inte\n"
+"    stödja videofångst vid full bildfrekvens. Var god kontrollera\n"
+"    att drivrutinen är rätt inställd, och att du valt rätt enhet\n"
+"    (%s).\n"
 "\n"
 
 #: src/tvtime.c:1429
@@ -330,7 +332,7 @@ msgstr ""
 "    Kunde inte få en upplösning på 1024 Hz från din RTC-enhet. Tillgång\n"
 "    till hög upplösning är nödvändigt för mjuk videouppspelning. Kör\n"
 "    tvtime som root, sätt tvtime som SUID-root, eller ändra den maximala\n"
-"    tillåtna RTC-upplösningen för användar-processer genom att köra\n"
+"    tillåtna RTC-upplösningen för användarprocesser genom att köra\n"
 "    följande kommando som root:\n"
 "        sysctl -w dev.rtc.max-user-freq=1024\n"
 "    Se vår hjälpsida: %s för mer information.\n"
@@ -696,11 +698,11 @@ msgstr "Avsluta"
 #: src/commands.c:1980
 #, c-format
 msgid "Sleep in %d minutes."
-msgstr "Sleeptimer: %d minuter."
+msgstr "Insomningstimer: %d minuter."
 
 #: src/commands.c:1983
 msgid "Sleep off."
-msgstr "Sleeptimer inaktiverad."
+msgstr "Insomningsfuktionen inaktiverad."
 
 #: src/commands.c:2041
 msgid "Channel marked as active in the browse list."
@@ -759,7 +761,7 @@ msgstr "Closed captions aktiverade."
 
 #: src/commands.c:2281
 msgid "No VBI device configured for CC decoding."
-msgstr "Ingen VBI-enhet vald för avkodning av undertexter."
+msgstr "Ingen VBI-enhet vald för CC-avkodning."
 
 #: src/commands.c:2297
 #, c-format
@@ -813,7 +815,7 @@ msgstr "Färgspärr inaktiverad."
 
 #: src/commands.c:2548
 msgid "Luma correction enabled."
-msgstr "Luma-korrigering aktiverat."
+msgstr "Luma-korrigering aktiverad."
 
 #: src/commands.c:2550
 msgid "Luma correction disabled."
@@ -883,7 +885,8 @@ msgstr "%s är inte en tvtime-inställningsfil.\n"
 
 #: src/tvtimeconf.c:570
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
-msgstr "Inställningsfilen kunde inte tolkas. Inställningar kommer inte att sparas.\n"
+msgstr ""
+"Inställningsfilen kunde inte tolkas. Inställningar kommer inte att sparas.\n"
 
 #: src/tvtimeconf.c:577
 msgid "Could not create new config file.\n"
@@ -911,9 +914,9 @@ msgstr ""
 "\n"
 "tvtime är fri programvara, skriven av Billy Biggs, Doug Bell, och många\n"
 "andra.  För mer information och spridningsvillkor, se vår webbsida:\n"
-"http://www.tvtime.net/\n"
+"http://tvtime.net/\n"
 "\n"
-"tvtime är Copyright (C) 2001, 2002, 2003 Billy Biggs, Doug Bell,\n"
+"tvtime är Copyright © 2001, 2002, 2003 Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov, och Achim Schneider.\n"
 
 #: src/tvtimeconf.c:642 src/tvtimeconf.c:695 src/tvtimeconf.c:745
@@ -976,7 +979,7 @@ msgid ""
 "\n"
 msgstr ""
 "  -f, --frequencies=NAMN     Vilken frekvenstabell som ska användas för den\n"
-"                             här tunern. (us-cable om ej specifierad).\n"
+"                             här mottagaren. (us-cable om ej specifierad).\n"
 "\n"
 "                             Giltiga värden är:\n"
 "                                 us-cable \n"
@@ -1022,13 +1025,14 @@ msgstr ""
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
-msgstr "  -I, --inputwidth=SAMPLING  Vågrät bildupplösning (720 om ej specifierad).\n"
+msgstr ""
+"  -I, --inputwidth=SAMPLING  Vågrät bildupplösning (720 om ej specifierad).\n"
 
 #: src/tvtimeconf.c:671
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
-msgstr "  -k, --slave                Stäng av signalhantering (slav-läge).\n"
+msgstr "  -k, --slave                Stäng av signalhantering (slavläge).\n"
 
 #: src/tvtimeconf.c:672 src/tvtimeconf.c:724
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
@@ -1066,12 +1070,15 @@ msgstr "  -r, --rvr=FILE             Spela upp RVR-fil (för avlusning).\n"
 #: src/tvtimeconf.c:680
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
-msgstr "  -s, --showdrops            Visa framedrop-statistik (för avlusning).\n"
+msgstr ""
+"  -s, --showdrops            Visa statistik för missade bildrutor\n"
+"                             (för avlusning).\n"
 
 #: src/tvtimeconf.c:681
 msgid ""
 "  -S, --saveoptions          Save command line options to the config file.\n"
-msgstr "  -S, --saveoptions          Spara kommandoradsflaggor i inställningsfilen.\n"
+msgstr ""
+"  -S, --saveoptions          Spara kommandoradsflaggor i inställningsfilen.\n"
 
 #: src/tvtimeconf.c:682 src/tvtimeconf.c:732
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
@@ -1100,9 +1107,12 @@ msgstr ""
 "                             (/dev/mixer:line om ej specifierad)\n"
 "\n"
 "                             Giltiga kanaler är:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
 "                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:731
@@ -1170,7 +1180,9 @@ msgstr ""
 msgid ""
 "\n"
 "Available commands:\n"
-msgstr "\nTillgängliga kommandon:\n"
+msgstr ""
+"\n"
+"Tillgängliga kommandon:\n"
 
 #: src/tvtime-command.c:80
 msgid "tvtime not running.\n"
@@ -1210,8 +1222,8 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Ingen tuner funnen på källa %d. Om du har en tuner, specifiera\n"
-"    en annan källa med hjälp av --input=<num>.\n"
+"    Ingen tv-mottagare funnen på källa %d. Om du har en mottagare,\n"
+"    välj en annan källa med hjälp av --input=<num>.\n"
 "\n"
 
 #: src/tvtime-scanner.c:125
@@ -1232,4 +1244,5 @@ msgstr "Signal funnen"
 #, c-format
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
-msgstr "Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
+msgstr ""
+"Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
