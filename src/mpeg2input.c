@@ -31,15 +31,11 @@
 #include <mpeg2dec/convert.h>
 #include "mpeg2input.h"
 
-struct convert_init_s;
-typedef struct {
-    void (* convert) (int, int, uint32_t, void *, struct convert_init_s *);
-} vo_setup_result_t;
-
 typedef struct vo_instance_s vo_instance_t;
-struct vo_instance_s {
-    int (* setup) (vo_instance_t * instance, int width, int height,
-		   vo_setup_result_t * result);
+
+struct vo_instance_s
+{
+    int (* setup) (vo_instance_t * instance, int width, int height);
     void (* setup_fbuf) (vo_instance_t * instance, uint8_t ** buf, void ** id);
     void (* set_fbuf) (vo_instance_t * instance, uint8_t ** buf, void ** id);
     void (* start_fbuf) (vo_instance_t * instance,
@@ -50,17 +46,7 @@ struct vo_instance_s {
     void (* close) (vo_instance_t * instance);
 };
 
-typedef vo_instance_t * vo_open_t (void);
-
-typedef struct {
-    char * name;
-    vo_open_t * open;
-} vo_driver_t;
-
-void vo_accel (uint32_t accel);
-
-/* return NULL terminated array of all drivers */
-vo_driver_t * vo_drivers (void);
+typedef vo_instance_t * vo_open_t( void );
 
 #define BUFFER_SIZE 4096
 static uint8_t buffer[BUFFER_SIZE];
@@ -68,114 +54,111 @@ static FILE *in_file;
 static int demux_track = 0;
 static mpeg2dec_t *mpeg2dec;
 static vo_open_t *output_open = 0;
-static vo_instance_t * output;
+static vo_instance_t *output;
 
 typedef struct {
-    void * data;
+    void *data;
 } tvtime_frame_t;
 
 struct mpeg2input_s {
     vo_instance_t vo;
-    tvtime_frame_t frame[3];
+    tvtime_frame_t frame[ 3 ];
     int index;
     int width;
     int height;
-    char * curframe;
+    uint8_t *curframe;
     int proceed;
+    uint8_t *frames422;
+    int curout;
 };
 
-
-static void tvtime_setup_fbuf (vo_instance_t * _instance,
-			    uint8_t ** buf, void ** id)
+static void tvtime_setup_fbuf( vo_instance_t *_instance,
+                               uint8_t **buf, void **id )
 {
     mpeg2input_t * instance = (mpeg2input_t *) _instance;
 
     buf[0] = (uint8_t *) instance->frame[instance->index].data;
-    buf[1] = buf[2] = NULL;
+    buf[1] = buf[2] = 0;
     *id = instance->frame + instance->index++;
 }
 
-static void tvtime_draw_frame (vo_instance_t * _instance,
-			    uint8_t * const * buf, void * id)
+static void tvtime_draw_frame( vo_instance_t * _instance,
+                               uint8_t * const * buf, void * id)
 {
-    tvtime_frame_t * frame;
-    mpeg2input_t * instance;
-
-    frame = (tvtime_frame_t *) id;
-    instance = (mpeg2input_t *) _instance;
+    tvtime_frame_t *frame = (tvtime_frame_t *) id;
+    mpeg2input_t *instance = (mpeg2input_t *) _instance;
 
     /* draw frame->data */
-    instance->curframe = (char *)frame->data;
+    fprintf( stderr, "draw\n" );
+    instance->curframe = frame->data;
     instance->proceed = 0;
 }
 
-static int tvtime_alloc_frames (mpeg2input_t * instance)
+static int tvtime_alloc_frames( mpeg2input_t * instance )
 {
     int size;
     char * alloc;
     int i;
 
+    fprintf( stderr, "tvtime alloc\n" );
+
     size = 0;
-    alloc = NULL;
-    for (i = 0; i < 3; i++) {
-	if (i == 0) {
-	    size = (instance->width * instance->height * 3);
-	    alloc = (char *) malloc( 3 * size );
-	    if ( alloc == NULL )
-            return 1;
+    alloc = 0;
+    for( i = 0; i < 3; i++ ) {
+        if( i == 0 ) {
+            size = (instance->width * instance->height * 3);
+            alloc = malloc( 3 * size );
+            fprintf( stderr, "width %d, height %d\n", instance->width, instance->height );
+            instance->frames422 = malloc( instance->width *
+                                          instance->height * 2 * 3 );
+            if( !alloc || !instance->frames422 ) return 1;
+            instance->curout = 0;
 	}
-	instance->frame[i].data = alloc;
-	alloc += size;
+        instance->frame[i].data = alloc;
+        alloc += size;
     }
     instance->index = 0;
     return 0;
 }
 
-static void tvtime_close (vo_instance_t * _instance)
+static void tvtime_close( vo_instance_t * _instance )
 {
-    mpeg2input_t * instance = (mpeg2input_t *) _instance;
+    mpeg2input_t *instance = (mpeg2input_t *) _instance;
 
-    if ( !instance ) return;
-    if ( instance->frame[0].data ) free( instance->frame[0].data );
+    if( instance->frame[0].data ) free( instance->frame[0].data );
     free( instance );
 }
 
-static int common_setup (mpeg2input_t * instance, int width, int height,
-			 vo_setup_result_t * result)
+static int common_setup( mpeg2input_t * instance, int width, int height )
 {
     fprintf( stderr, "common_setup\n");
 
-    instance->vo.set_fbuf = NULL;
-    instance->vo.discard = NULL;
-    instance->vo.start_fbuf = NULL;
+    instance->vo.set_fbuf = 0;
+    instance->vo.discard = 0;
+    instance->vo.start_fbuf = 0;
     instance->width = width;
     instance->height = height;
-    instance->curframe = (char *)NULL;
+    instance->curframe = 0;
 
-	if (tvtime_alloc_frames (instance))
-	    return 1;
-	instance->vo.setup_fbuf = tvtime_setup_fbuf;
-	instance->vo.draw = tvtime_draw_frame;
-	instance->vo.close = tvtime_close;
-
-	result->convert = NULL;
+    if( tvtime_alloc_frames( instance ) ) return 1;
+    instance->vo.setup_fbuf = tvtime_setup_fbuf;
+    instance->vo.draw = tvtime_draw_frame;
+    instance->vo.close = tvtime_close;
 
     return 0;
 }
 
-static int tvtime_setup (vo_instance_t * instance, int width, int height,
-		      vo_setup_result_t * result)
+static int tvtime_setup( vo_instance_t * instance, int width, int height )
 {
-    return common_setup ((mpeg2input_t *)instance, width, height, result);
+    return common_setup( (mpeg2input_t *) instance, width, height );
 }
 
-static vo_instance_t * vo_tvtime_open (void)
+static vo_instance_t *vo_tvtime_open( void )
 {
-    mpeg2input_t * instance;
+    mpeg2input_t *instance;
 
-    instance = (mpeg2input_t *) malloc (sizeof(mpeg2input_t));
-    if (instance == NULL)
-	return NULL;
+    instance = (mpeg2input_t *) malloc( sizeof( mpeg2input_t ) );
+    if( !instance ) return 0;
 
     instance->vo.setup = tvtime_setup;
     instance->proceed = 1;
@@ -187,27 +170,27 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 {
     const mpeg2_info_t * info;
     int state;
-    vo_setup_result_t setup_result;
 
     mpeg2_buffer (mpeg2dec, current, end);
 
     info = mpeg2_info (mpeg2dec);
     while (1) {
+        fprintf( stderr, "parse again\n" );
 	state = mpeg2_parse (mpeg2dec);
+        fprintf( stderr, "switch state %d\n", state );
 	switch (state) {
 	case -1:
+        fprintf( stderr, "state -1\n" );
 	    return;
 	case STATE_SEQUENCE:
         fprintf( stderr, "in sequence\n" );
 	    /* might set nb fbuf, convert format, stride */
 	    /* might set fbufs */
 	    if (output->setup (output, info->sequence->width,
-			       info->sequence->height, &setup_result)) {
+			       info->sequence->height)) {
 		fprintf (stderr, "display setup failed\n");
 		exit (1);
 	    }
-	    if (setup_result.convert)
-		mpeg2_convert (mpeg2dec, setup_result.convert, NULL);
 	    if (output->set_fbuf) {
 		uint8_t * buf[3];
 		void * id;
@@ -245,18 +228,17 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 				    info->current_fbuf->id);
 	    break;
 	case STATE_PICTURE_2ND:
-	    /* should not do anything */
         fprintf( stderr, "in picture 2\n" );
+	    /* should not do anything */
 	    break;
 	case STATE_SLICE:
 	case STATE_END:
+        fprintf( stderr, "in slice or end\n" );
 	    /* draw current picture */
 	    /* might free frame buffer */
-        fprintf( stderr, "in slice or end\n" );
 	    if (info->display_fbuf) {
 		output->draw (output, info->display_fbuf->buf,
 			      info->display_fbuf->id);
-
 	    }
 	    if (output->discard && info->discard_fbuf)
 		output->discard (output, info->discard_fbuf->buf,
@@ -267,7 +249,7 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 }
 
 #define DEMUX_PAYLOAD_START 1
-static int demux (uint8_t * buf, uint8_t * end, int flags, mpeg2input_t *instance)
+static int demux(uint8_t * buf, uint8_t * end, int flags, mpeg2input_t *instance)
 {
     static int mpeg1_skip_table[16] = {
 	0, 0, 4, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -508,9 +490,14 @@ mpeg2input_t *mpeg2input_new( const char *filename, int track, int accel )
         }
     }
 
+    fprintf( stderr, "using track %x\n", demux_track );
+
+/*
     if( accel ) {
         mpeg2_accel( 0 );
     }
+*/
+        mpeg2_accel( 0 );
 
     in_file = fopen( filename, "rb" );
     if( !in_file ) {
@@ -519,12 +506,14 @@ mpeg2input_t *mpeg2input_new( const char *filename, int track, int accel )
         return 0;
     }
 
+    fprintf( stderr, "opening vo\n" );
     output_open = vo_tvtime_open;
     output = output_open();
-    if (output == NULL) {
+    if( !output ) {
         fprintf( stderr, "mpeg2input: Can not open output\n" );
         return 0;
     }
+    fprintf( stderr, "init mpeg2\n" );
     mpeg2dec = mpeg2_init();
     if( !mpeg2dec ) return 0;
 
@@ -539,22 +528,65 @@ void mpeg2input_delete( mpeg2input_t *instance )
     }
 }
 
-uint8_t *mpeg2input_get_curframe( mpeg2input_t *instance )
+static void planar420_to_packed422_frame( uint8_t *output,
+                                          uint8_t *input,
+                                          int width, int height )
 {
-    ps_loop( instance );
+    uint8_t *y = input;
+    uint8_t *cb = input + width*height;
+    uint8_t *cr = cb + ((width/2)*(height/2));
+    int i;
 
-    instance->proceed = 1;
-    return (uint8_t *) instance->curframe;
+    for( i = 0; i < height; i++ ) {
+        uint8_t *cury = y + (width*i);
+        uint8_t *curcb = cb + ((width/2)*(i/2));
+        uint8_t *curcr = cr + ((width/2)*(i/2));
+        uint8_t *curout = output + (width*2*i);
+        int x;
+
+        for( x = 0; x < (width/2); x++ ) {
+            *curout++ = *cury++;
+            *curout++ = *curcb++;
+            *curout++ = *cury++;
+            *curout++ = *curcr++;
+        }
+    }
 }
 
-
-int tvtime_mpeg2dec_get_width( mpeg2input_t * instance )
+int mpeg2input_next_frame( mpeg2input_t *mpegin )
 {
-    return instance->width;
+    fprintf( stderr, "next frame called\n" );
+    ps_loop( mpegin );
+    mpegin->proceed = 1;
+    mpegin->curout = (mpegin->curout + 1) % 3;
+    fprintf( stderr, "time to convert ?\n" );
+    planar420_to_packed422_frame( mpegin->frames422 + (mpegin->curout * mpegin->width * mpegin->height * 2),
+                                  mpegin->curframe, mpegin->width, mpegin->height );
+    return 1;
 }
 
-int tvtime_mpeg2dec_get_height( mpeg2input_t * instance )
+uint8_t *mpeg2input_get_curframe( mpeg2input_t *mpegin )
 {
-    return instance->height;
+    return mpegin->frames422 + (mpegin->curout * mpegin->width * mpegin->height * 2);
+}
+
+uint8_t *mpeg2input_get_lastframe( mpeg2input_t *mpegin )
+{
+    return mpegin->frames422 + (((mpegin->curout + 2)%3) * mpegin->width * mpegin->height * 2);
+}
+
+uint8_t *mpeg2input_get_secondlastframe( mpeg2input_t *mpegin )
+{
+    return mpegin->frames422 + (((mpegin->curout + 1)%3) * mpegin->width * mpegin->height * 2);
+}
+
+int mpeg2input_get_width( mpeg2input_t *mpegin )
+{
+    return 720; // mpegin->width;
+}
+
+int mpeg2input_get_height( mpeg2input_t *mpegin )
+{
+    return 480; // mpegin->height;
 }
 
