@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 #include "commands.h"
 #include "fifo.h"
 
@@ -33,6 +34,7 @@ struct fifo_s {
     char buf[ 256 ];
     int bufpos;
     char *filename;
+    const char *arg;
 };
 
 fifo_t *fifo_new( const char *filename )
@@ -70,7 +72,7 @@ fifo_t *fifo_new( const char *filename )
     return fifo;
 }
 
-const char *fifo_next_line( fifo_t *fifo )
+static char *fifo_next_line( fifo_t *fifo )
 {
     char c;
 
@@ -89,12 +91,24 @@ const char *fifo_next_line( fifo_t *fifo )
     return 0;
 }
 
-int fifo_next_command( fifo_t *fifo )
+int fifo_get_next_command( fifo_t *fifo )
 {
-    const char *str = fifo_next_line( fifo );
+    char *str = fifo_next_line( fifo );
 
     if( str ) {
-        int cmd = tvtime_string_to_command( str );
+        int cmd;
+        int i;
+
+        fifo->arg = "";
+        for( i = 0;; i++ ) {
+            if( !str[ i ] ) break;
+            if( isspace( str[ i ] ) ) {
+                str[ i ] = '\0';
+                fifo->arg = str + i + 1;
+            }
+        }
+
+        cmd = tvtime_string_to_command( str );
 
         memset( fifo->buf, 0, sizeof( fifo->buf ) );
         fifo->bufpos = 0;
@@ -103,6 +117,11 @@ int fifo_next_command( fifo_t *fifo )
     }
 
     return TVTIME_NOCOMMAND;
+}
+
+const char *fifo_get_arguments( fifo_t *fifo )
+{
+    return fifo->arg;
 }
 
 void fifo_delete( fifo_t *fifo )

@@ -917,7 +917,7 @@ int main( int argc, char **argv )
 
         if( fifo ) {
             int cmd;
-            cmd = fifo_next_command( fifo );
+            cmd = fifo_get_next_command( fifo );
             if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, 0 );
         }
 
