@@ -360,8 +360,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             fprintf( stderr, "Bass " );
         } else if( vidin->audio.flags & VIDEO_AUDIO_TREBLE ) {
             fprintf( stderr, "Treble " );
-        } else if( vidin->audio.flags & VIDEO_AUDIO_BALANCE ) {
-            fprintf( stderr, "Balance" );
         }
         fprintf( stderr, "\n" );
     }
