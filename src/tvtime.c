@@ -787,6 +787,9 @@ static void tvtime_build_copied_field( unsigned char *output,
     }
 
     /* Copy a scanline. */
+    if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + bottom_field ) ) {
+        videofilter_packed422_scanline( filter, curframe, width, 0, scanline + bottom_field );
+    }
     blit_packed422_scanline( output, curframe, width );
 
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
@@ -800,8 +803,14 @@ static void tvtime_build_copied_field( unsigned char *output,
     for( i = ((frame_height - 2) / 2); i; --i ) {
         /* Copy/interpolate a scanline. */
         if( bottom_field ) {
+            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
+                videofilter_packed422_scanline( filter, curframe, width, 0, scanline + 1 );
+            }
             interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
         } else {
+            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline ) ) {
+                videofilter_packed422_scanline( filter, curframe, width, 0, scanline );
+            }
             blit_packed422_scanline( output, curframe, width );
         }
         curframe += instride * 2;
