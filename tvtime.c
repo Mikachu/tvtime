@@ -34,6 +34,10 @@
 #include "mixer.h"
 #include "osd.h"
 
+/* Number of frames to wait for next channel digit */
+#define CHANNEL_DELAY 50
+
+
 /**
  * Warning tolerance, just for debugging.
  */
@@ -114,14 +118,18 @@ int main( int argc, char **argv )
     int volume;
     int debug = 0;
     osd_font_t *osdf;
-    osd_string_t *channel_number;
+    osd_string_t *channel_number, *volume_bar, *muted_osd;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
 
 
     osdf = osd_font_new( "helr.ttf" );
     channel_number = osd_string_new( osdf );
+    volume_bar = osd_string_new( osdf );
+    muted_osd = osd_string_new( osdf );
     osd_string_set_colour( channel_number, 200, 128, 128 );
+    osd_string_set_colour( volume_bar, 200, 128, 128 );
+    osd_string_set_colour( muted_osd, 200, 128, 128 );
 
 
     /* Default device. */
@@ -279,10 +287,10 @@ int main( int argc, char **argv )
 
         commands = sdl_poll_events();
         if( commands & TVTIME_CHANNEL_CHAR ) {
-            next_chan_buffer[ digit_counter ] = (char)(commands & 0x0000FF);
+            next_chan_buffer[ digit_counter ] = (char)(commands & 0x000000FF);
             digit_counter++;
             digit_counter %= 4;
-            frame_counter = 50;
+            frame_counter = CHANNEL_DELAY;
         } else {
             if( commands & TVTIME_QUIT ) {
                 break;
@@ -312,7 +320,15 @@ int main( int argc, char **argv )
                 }
             }
             if( commands & TVTIME_MIXER_UP || commands & TVTIME_MIXER_DOWN ) {
+                char bar[19];
                 volume = mixer_set_volume( ( (commands & TVTIME_MIXER_UP) ? 3 : -3 ) );
+                if( verbose )
+                    fprintf( stderr, "tvtime: volume %d\n", 
+                             (volume & 0x000000FF) );
+                memset( bar, 0, 19 );
+                strcpy( bar, "Vol " );
+                memset( bar+4, '|', (volume & 0x000000FF)/10 );
+                osd_string_show_text( volume_bar, bar, 80 );
             }
             if( commands & TVTIME_MIXER_MUTE ) {
                 mixer_toggle_mute();
@@ -334,7 +350,7 @@ int main( int argc, char **argv )
                 next_chan_buffer[ digit_counter ] = digit;
                 digit_counter++;
                 digit_counter %= 4;
-                frame_counter = 50;
+                frame_counter = CHANNEL_DELAY;
             }
             if( commands & TVTIME_KP_ENTER ) {
                 if( frame_counter ) {
@@ -378,7 +394,7 @@ int main( int argc, char **argv )
             if( !(frame_counter % 10) )
                 strcat( input_text, "_" );
             osd_string_show_text( channel_number, 
-                                  input_text, 50 );
+                                  input_text, CHANNEL_DELAY );
         }
 
         /* CHECKPOINT1 : Blit the second field */
@@ -436,6 +452,12 @@ int main( int argc, char **argv )
                                                     width, width, height );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+            if( mixer_ismute() ) {
+                osd_string_show_text( muted_osd, "Mute", 100 );
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 50, height-105, 0 );
+            } else {
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 50, height-105, 0 );
+            }
         }
 
 
@@ -489,6 +511,12 @@ int main( int argc, char **argv )
                                                     1, width * 2, width, width, height );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+            if( mixer_ismute() ) {
+                osd_string_show_text( muted_osd, "Mute", 51 );
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 50, height-105, 0 );
+            } else {
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 50, height-105, 0 );
+            }
         }
 
 
@@ -527,6 +555,8 @@ int main( int argc, char **argv )
         blittime = timediff( &blitend, &blitstart );
 
         osd_string_advance_frame( channel_number );
+        osd_string_advance_frame( muted_osd );
+        osd_string_advance_frame( volume_bar );
     }
 
     if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );

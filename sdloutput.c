@@ -127,7 +127,7 @@ int sdl_poll_events( void )
             SDL_PollEvent( &event );
             curcommand |= TVTIME_CHANNEL_CHAR;
 
-            curcommand = (curcommand & 0xFF0000) | (event.key.keysym.sym & 0x0000FF);            
+            curcommand = (curcommand & 0xFFFF0000) | (event.key.keysym.sym & 0x000000FF);            
             return curcommand;
         }
     }
