@@ -48,14 +48,17 @@ static const char *tests[] = {
    "blit_packed422_scanline_c 720x480 frame",
    "blit_packed422_scanline_i386_linux 720x480 frame",
    "blit_packed422_scanline_mmxext_billy 720x480 frame",
-   "interpolate_packed422_scanline_c 720x480->720x240 frame",
-   "interpolate_packed422_scanline_mmxext 720x480->720x240 frame",
+   "interpolate_packed422_scanline_c 720x480 frame",
+   "interpolate_packed422_scanline_mmxext 720x480 frame",
+   "blend_packed422_scanline_c 720x480 120/256 frame",
+   "blend_packed422_scanline_mmxext 720x480 120/256 frame" 
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
 int main( int argc, char **argv )
 {
     unsigned char *source422packed;
+    unsigned char *source422packed2;
     unsigned char *dest422packed;
     uint64_t avg_sum = 0;
     uint64_t avg_count = 0;
@@ -97,9 +100,10 @@ int main( int argc, char **argv )
     srandom( seed );
 
     source422packed = (unsigned char *) malloc( width * height * 2 );
+    source422packed2 = (unsigned char *) malloc( width * height * 2 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
 
-    if( !source422packed || !dest422packed ) {
+    if( !source422packed || !source422packed2 || !dest422packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );
         return 1;
     }
@@ -151,20 +155,36 @@ int main( int argc, char **argv )
                 blit_packed422_scanline_mmxext_billy( dest422packed + (stride*j), source422packed + (stride*j), width );
             }
             rdtscll( after );
-        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_c 720x480->720x240 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_c 720x480 frame" ) ) {
             rdtscll( before );
-            for( j = 0; j < height/2; j++ ) {
+            for( j = 0; j < height; j++ ) {
                 interpolate_packed422_scanline_c( dest422packed + (stride*j),
-                                                  source422packed + (stride*j*2),
-                                                  source422packed + (stride*j*2) + stride, width );
+                                                  source422packed + (stride*j),
+                                                  source422packed2 + (stride*j), width );
             }
             rdtscll( after );
-        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmxext 720x480->720x240 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmxext 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                interpolate_packed422_scanline_mmxext( dest422packed + (stride*j),
+                                                       source422packed + (stride*j),
+                                                       source422packed2 + (stride*j), width );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_c 720x480 120/256 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height/2; j++ ) {
-                interpolate_packed422_scanline_mmxext( dest422packed + (stride*j),
-                                                       source422packed + (stride*j*2),
-                                                       source422packed + (stride*j*2) + stride, width );
+                blend_packed422_scanline_c( dest422packed + (stride*j),
+                                            source422packed + (stride*j),
+                                            source422packed2 + (stride*j), width, 120 );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_mmxext 720x480 120/256 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height/2; j++ ) {
+                blend_packed422_scanline_mmxext( dest422packed + (stride*j),
+                                                 source422packed + (stride*j),
+                                                 source422packed2 + (stride*j), width, 120 );
             }
             rdtscll( after );
         }
@@ -178,6 +198,7 @@ int main( int argc, char **argv )
              avg_count, (avg_sum/avg_count ), ((double) (avg_sum/avg_count)) / (mhz * 1000.0) );
 
     free( source422packed );
+    free( source422packed2 );
     free( dest422packed );
     return 0;
 }
