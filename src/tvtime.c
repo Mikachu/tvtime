@@ -60,6 +60,10 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_DIRECTFB
+#include "dfboutput.h"
+#endif
+
 #include "rvrreader.h"
 #include "pulldown.h"
 
@@ -95,6 +99,15 @@ enum {
     PULLDOWN_MAX = 3,
 };
 static unsigned int pulldown_alg = 0;
+
+/**
+ * Which output driver we're using.
+ */
+enum {
+    OUTPUT_XV = 0,
+    OUTPUT_DIRECTFB = 1,
+};
+static unsigned int output_driver = 0;
 
 /**
  * Current deinterlacing method.
@@ -717,45 +730,57 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
                                            int width,
                                            int frame_height,
                                            int instride,
-                                           int outstride )
+                                           int outstride,
+                                           int interleaved )
 {
     /* uint8_t tempscanline[ 768*2 ]; */
     int scanline = 0;
     int i;
 
-    if( bottom_field ) {
-        /* Advance frame pointers to the next input line. */
-        curframe += instride;
-
-        /* Skip the top scanline. */
-        output += outstride;
-        scanline++;
-    }
-
-    /* Copy a scanline. */
-    blit_packed422_scanline( output, curframe, width );
-
-    /*
-    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    */
-    output += outstride;
-    scanline++;
-
-    for( i = ((frame_height - 2) / 2); i; --i ) {
-        /* Skip a scanline. */
-        output += outstride;
-        scanline++;
+    if( !interleaved ) {
+        if( bottom_field ) {
+            /* Advance frame pointers to the next input line. */
+            curframe += instride;
+  
+            /* Skip the top scanline. */
+            output += outstride;
+            scanline++;
+        }
 
         /* Copy a scanline. */
-        curframe += instride * 2;
         blit_packed422_scanline( output, curframe, width );
-
-        /*
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        */
+
         output += outstride;
         scanline++;
+
+        for( i = ((frame_height - 2) / 2); i; --i ) {
+            /* Skip a scanline. */
+            output += outstride;
+            scanline++;
+
+            /* Copy a scanline. */
+            curframe += instride * 2;
+            blit_packed422_scanline( output, curframe, width );
+  
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+
+            output += outstride;
+            scanline++;
+        }
+    } else {
+        for( i = frame_height; i; --i ) {
+
+            /* Copy a scanline. */
+            blit_packed422_scanline( output, curframe, width );
+  
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+            curframe += instride;         
+            output += outstride;
+            scanline++;
+        }
     }
+
 }
 
 
@@ -837,6 +862,7 @@ int main( int argc, char **argv )
     int safetytime;
     int fieldsavailable = 0;
     int verbose;
+    int send_fields;
     tvtime_osd_t *osd = 0;
     uint8_t *colourbars;
     uint8_t *lastframe = 0;
@@ -911,14 +937,40 @@ int main( int argc, char **argv )
 
     verbose = config_get_verbose( ct );
 
-    /* Steal system resources in the name of performance. */
-    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
-        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
+    send_fields = config_get_send_fields( ct );
+    if( verbose ) {
+        if( send_fields ) {
+            fprintf( stderr, "tvtime: Sending fields to interlaced output devices.\n" );
+        } else {
+            fprintf( stderr, "tvtime: Sending frames to interlaced output devices.\n" );
+        }
     }
 
-    if( !set_realtime_priority( 0 ) && verbose ) {
-        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+    if( config_get_output_driver( ct ) ) {
+        if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
+            fprintf( stderr, "tvtime: Using DirectFB output driver.\n" );
+            output_driver = OUTPUT_DIRECTFB;
+        } else {
+            output_driver = OUTPUT_XV;
+        }
+    } else {
+        output_driver = OUTPUT_XV;
     }
+
+
+    /* Steal system resources in the name of performance. */
+    /* FIXME: This is currently disabled for the DirectFB output while
+     *        we do some testing for some odd problems. */
+    if( output_driver != OUTPUT_DIRECTFB ) {
+        if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
+            fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
+        }
+
+        if( !set_realtime_priority( 0 ) && verbose ) {
+            fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+        }
+    }
+
     rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
         fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
@@ -963,9 +1015,14 @@ int main( int argc, char **argv )
 
 
     /* Setup the output. */
-    output = get_xv_output();
-    if( !output->init( config_get_outputheight( ct ), config_get_aspect( ct ), verbose ) ) {
-        fprintf( stderr, "tvtime: XVideo output failed to initialize: "
+    if( output_driver == OUTPUT_DIRECTFB ) {
+        output = get_dfb_output();
+    } else {
+        output = get_xv_output();
+    }
+
+    if( !output || !output->init( config_get_outputheight( ct ), config_get_aspect( ct ), verbose ) ) {
+        fprintf( stderr, "tvtime: Output driver failed to initialize: "
                          "no video output available.\n" );
         /* FIXME: Delete everything here! */
         return 1;
@@ -983,24 +1040,26 @@ int main( int argc, char **argv )
     /* Setup the speedy calls. */
     setup_speedy_calls( verbose );
 
-    dscaler_greedyh_plugin_init();
-    greedy_plugin_init();
+    if( !output->is_interlaced() ) {
+        dscaler_greedyh_plugin_init();
+        greedy_plugin_init();
 
-    linearblend_plugin_init();
+        linearblend_plugin_init();
 
-    dscaler_greedy2frame_plugin_init();
-    dscaler_twoframe_plugin_init();
+        dscaler_greedy2frame_plugin_init();
+        dscaler_twoframe_plugin_init();
 
-    dscaler_videobob_plugin_init();
-    dscaler_videoweave_plugin_init();
-    dscaler_tomsmocomp_plugin_init();
+        dscaler_videobob_plugin_init();
+        dscaler_videoweave_plugin_init();
+        dscaler_tomsmocomp_plugin_init();
 
-    linear_plugin_init();
-    weave_plugin_init();
-    double_plugin_init();
-    vfir_plugin_init();
+        linear_plugin_init();
+        weave_plugin_init();
+        double_plugin_init();
+        vfir_plugin_init();
 
-    scalerbob_plugin_init();
+        scalerbob_plugin_init();
+    }
 
     if( profile_startup ) {
         struct timeval profiletime;
@@ -1148,18 +1207,23 @@ int main( int argc, char **argv )
         fieldsavailable = 5;
     }
 
-    filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
-    if( !get_num_deinterlace_methods() ) {
-        fprintf( stderr, "tvtime: No deinterlacing methods "
-                         "available, exiting.\n" );
-        return 1;
-    }
-    curmethodid = 0;
-    curmethod = get_deinterlace_method( 0 );
-    while( strcasecmp( config_get_deinterlace_method( ct ), curmethod->short_name ) ) {
-        curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
-        curmethod = get_deinterlace_method( curmethodid );
-        if( !curmethodid ) break;
+    if( output->is_interlaced() ) {
+        curmethodid = 0;
+        curmethod = 0;
+    } else {
+        filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
+        if( !output->is_interlaced() && !get_num_deinterlace_methods() ) {
+            fprintf( stderr, "tvtime: No deinterlacing methods "
+                             "available, exiting.\n" );
+            return 1;
+        }
+        curmethodid = 0;
+        curmethod = get_deinterlace_method( 0 );
+        while( strcasecmp( config_get_deinterlace_method( ct ), curmethod->short_name ) ) {
+            curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+            curmethod = get_deinterlace_method( curmethodid );
+            if( !curmethodid ) break;
+        }
     }
 
     /* Build colourbars. */
@@ -1195,7 +1259,9 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: OSD initialization failed, OSD disabled.\n" );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
-        tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+        if( curmethod ) {
+            tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+        }
         if( rvrreader ) {
             tvtime_osd_set_input( osd, "RVR" );
             tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
@@ -1486,15 +1552,18 @@ int main( int argc, char **argv )
             preset_mode = (preset_mode + 1) % config_get_num_modes( ct );
             cur = config_get_mode_info( ct, preset_mode );
             if( cur ) {
-                int firstmethod = curmethodid;
-                while( strcasecmp( config_get_deinterlace_method( cur ), curmethod->short_name ) ) {
-                    curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
-                    curmethod = get_deinterlace_method( curmethodid );
-                    if( curmethodid == firstmethod ) break;
+                if( !output->is_interlaced() ) {
+                    int firstmethod = curmethodid;
+                    while( strcasecmp( config_get_deinterlace_method( cur ), curmethod->short_name ) ) {
+                        curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+                        curmethod = get_deinterlace_method( curmethodid );
+                        if( curmethodid == firstmethod ) break;
+                    }
+                    if( osd ) {
+                        tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+                    }
                 }
-                if( osd ) {
-                    tvtime_osd_set_deinterlace_method( osd, curmethod->name );
-                }
+
                 if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
                     output->toggle_fullscreen( 0, 0 );
                 } else {
@@ -1556,7 +1625,7 @@ int main( int argc, char **argv )
                 }
             }
         }
-        if( commands_toggle_deinterlacing_mode( commands ) ) {
+        if( !output->is_interlaced() && commands_toggle_deinterlacing_mode( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
@@ -1675,28 +1744,57 @@ int main( int argc, char **argv )
 
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
-            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", curmethod->name, width, height );
-            performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
+            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", 
+                     (curmethod) ? curmethod->name : "interlaced passthrough", 
+                     width, height );
+            if( curmethod ) {
+                performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
+            } else {
+                performance_print_last_frame_stats( perf, width * height * 2 );
+            }
             fprintf( stderr, "tvtime: Speedy time last frame: %d cycles.\n", speedy_get_cycles() );
         }
         if( config_get_debug( ct ) ) {
-            performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
+            if( curmethod )  {
+                performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
+            } else {
+                performance_print_frame_drops( perf, width * height * 2 );
+            }
         }
         speedy_reset_timer();
 
         if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
-                /* Wait until we can draw the even field. */
-                output->wait_for_sync( 0 );
+                if( send_fields ) {
+                    /* Wait until we can draw the even field. */
+                    output->wait_for_sync( 0 );
 
-                output->lock_output_buffer();
-                tvtime_build_interlaced_frame( output->get_output_buffer(),
-                           curframe, osd, con, vs, 0,
-                           width, height, width * 2, output->get_output_stride() );
-                output->unlock_output_buffer();
-                performance_checkpoint_constructed_top_field( perf );
-                performance_checkpoint_delayed_blit_top_field( perf );
-                performance_checkpoint_blit_top_field_start( perf );
+                    output->lock_output_buffer();
+                    tvtime_build_interlaced_frame( output->get_output_buffer(),
+                                                   curframe, osd, con, vs, 0,
+                                                   width, height, width * 2, 
+                                                   output->get_output_stride(),
+                                                   0);
+                    output->unlock_output_buffer();
+                    performance_checkpoint_constructed_top_field( perf );
+                    performance_checkpoint_delayed_blit_top_field( perf );
+                    performance_checkpoint_blit_top_field_start( perf );
+                    output->show_frame( output_x, output_y/2, 
+                                        output_w, output_h/2 );
+                } else {
+                    output->lock_output_buffer();
+                    tvtime_build_interlaced_frame( output->get_output_buffer(),
+                                                   curframe, osd, con, vs, 0,
+                                                   width, height, width * 2, 
+                                                   output->get_output_stride(),
+                                                   1 );
+                    output->unlock_output_buffer();
+                    performance_checkpoint_constructed_top_field( perf );
+                    performance_checkpoint_delayed_blit_top_field( perf );
+                    performance_checkpoint_blit_top_field_start( perf );
+                    output->show_frame( output_x, output_y/2, 
+                                        output_w, output_h/2 );
+                }
             } else {
                 /* Build the output from the top field. */
                 output->lock_output_buffer();
@@ -1782,14 +1880,20 @@ int main( int argc, char **argv )
 
         if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
-                /* Wait until we can draw the odd field. */
-                output->wait_for_sync( 1 );
-
-                output->lock_output_buffer();
-                tvtime_build_interlaced_frame( output->get_output_buffer(),
-                           curframe, osd, con, vs, 1,
-                           width, height, width * 2, output->get_output_stride() );
-                output->unlock_output_buffer();
+                if( send_fields ) {
+                    /* Wait until we can draw the odd field. */
+                    output->wait_for_sync( 1 );
+                    
+                    output->lock_output_buffer();
+                    tvtime_build_interlaced_frame( output->get_output_buffer(),
+                                                   curframe, osd, con, vs, 1,
+                                                   width, height, width * 2, 
+                                                   output->get_output_stride(),
+                                                   0);
+                    output->unlock_output_buffer();
+                    output->show_frame( output_x, output_y/2, 
+                                        output_w, output_h/2 );
+                }
             } else {
                 /* Build the output from the bottom field. */
                 output->lock_output_buffer();
