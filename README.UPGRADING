@@ -1,36 +1,41 @@
-
 This file contains important messages about upgrading tvtime.
 
-Upgrading to tvtime 0.9
------------------------
+Upgrading to tvtime 0.9.9 from previous versions
+------------------------------------------------
 
-tvtime 0.9 is a big step from previous versions.  Because of this,
-we have made some incompatible change that may cause difficulty for
-some users.  While we believe that the changes made are reasonable,
-we are curious to know your thoughts and opinions.
+tvtime in 0.9.9 is quite changed from previous versions.  Because of
+this, we have made some incompatible key binding changes that may cause
+difficulty for some users.  While we believe that the changes made are
+reasonable, we are curious to know your thoughts and opinions.
 
-     ***  Some default key bindings have changed  ***
+1. Summary of changes
 
-               ***  We now have a menu  ***
+     ***  Some default key bindings have changed
 
-     Some of the default key bindings have changed.  We recommend
-     that users who have not changed their key bindings to start over
-     by deleting their config files.  Feedback on how easy tvtime is
-     to configure with the new menu would be greatly appreciated.
+          We recommend that users who have not changed their key
+          bindings to start over by deleting their config files
+          (~/.tvtime/tvtime.xml).  Feedback on how easy tvtime is to
+          configure with the new menu would be appreciated.
 
-What changed with the key bindings
-----------------------------------
+     ***  We now have a menu system
 
-  1. Using the vi arrow keys h,j,k,l as directions is now disabled by
+          Hit tab or the right mouse button to try it out!  If the
+          right mouse button is still bound to TOGGLE_INPUT, then your
+          old config file is overriding the new bindings.
+
+
+2. What changed with the key bindings
+
+  a. Using the vi arrow keys h,j,k,l as directions is now disabled by
      default.  This is so we can move to having 'h' be a help key.
 
-  2. The right mouse button now brings up the menu instead of changing
+  b. The right mouse button now brings up the menu instead of changing
      inputs.
 
-  3. All picture controls (F1-F8) are now controllable via three keys
+  c. All picture controls (F1-F8) are now controllable via three keys
      using the new picture commands: F6, F7, F8.
 
-  4. New commands with new keys:
+  d. Some new commands were added and given keys.
 
          show_menu                  F1, Tab, b3
          toggle_matte               Insert
@@ -38,7 +43,7 @@ What changed with the key bindings
          picture_up                 f7
          picture_down               f8
 
-  5. Some obscure features which had key bindings are now disabled and
+  e. Some obscure features which had key bindings are now disabled and
      moved exclusively into the menu.  They are:
 
          toggle_ntsc_cable_mode     o
@@ -59,7 +64,9 @@ What changed with the key bindings
          hue_down                   f7
          hue_up                     f8
 
-  6. Complete table of differences.
+
+  That's it!  For reference, here is the complete set of key
+bindings in tvtime 0.9.8.5 and 0.9.9.
 
                                     0.9.8.5        0.9.9
          -------------------------+--------------+-------------
