@@ -535,7 +535,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
         osd_graphic_show_graphic( osd->channel_logo, delay );
     }
 
-    for( i = OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
+    for( i = OSD_NETWORK_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
         osd_string_set_timeout( osd->strings[ i ].string, delay );
     }
 }
