@@ -17,7 +17,7 @@ News for 0.9.8.3
      (see 'man tvtime' and the config file documentation).
   *  Slightly less partial experimental UTF-8 support. Now
      works with any simple left-to-right scripts which are
-     in FreeSansBold.ttf
+     in FreeSansBold.ttf .
 
 News for 0.9.8.2
 
