@@ -86,6 +86,12 @@ tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
+timingtest_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
+	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+	$(FONT_CFLAGS) $(AM_CFLAGS)
+timingtest_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
+timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 rvr_SOURCES = $(COMMON_SRCS) reepktq.h reepktq.c rvrmain.c
 rvr_LDADD = -lpthread
