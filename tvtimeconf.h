@@ -56,6 +56,8 @@ enum tvtime_commands
     TVTIME_SCREENSHOT,
     TVTIME_DEINTERLACINGMODE,
 
+    TVTIME_MENUMODE,
+
     TVTIME_LAST
 };
 
