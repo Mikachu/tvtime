@@ -493,6 +493,53 @@ void packed444_to_rgb24_rec601_scanline( unsigned char *output,
     }
 }
 
+/**
+ * 601 numbers:
+ *
+ * Y' =  0.299*R' + 0.587*G' + 0.114*B' (in  0.0 to  1.0)
+ * Cb = -0.169*R' - 0.331*G' + 0.500*B' (in -0.5 to +0.5)
+ * Cr =  0.500*R' - 0.419*G' - 0.081*B' (in -0.5 to +0.5)
+ *
+ * Inverse:
+ *      Y         Cb        Cr
+ * R  1.0000   -0.0009    1.4017
+ * G  1.0000   -0.3437   -0.7142
+ * B  1.0000    1.7722    0.0010
+ *
+ * S170M numbers:
+ * Y'   =  0.299*R' + 0.587*G' + 0.114*B' (in  0.0 to 1.0)
+ * B-Y' = -0.299*R' - 0.587*G' + 0.886*B'
+ * R-Y' =  0.701*R' - 0.587*G' - 0.114*B'
+ */
+void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
+                                                   unsigned char *input, int width )
+{
+    while( width-- ) {
+        int luma255 = input[ 0 ];
+        int cb255 = input[ 1 ];
+        int cr255 = input[ 2 ];
+        double yp = ((double) luma255) / 255.0;
+        double cb = ((double) cb255) / 255.0;
+        double cr = ((double) cr255) / 255.0;
+        double r, g, b;
+
+        r = yp - (0.0009*cb) + (1.4017*cr);
+        g = yp - (0.3437*cb) - (0.7142*cr);
+        b = yp + (1.7722*cb) + (0.0010*cr);
+
+        if( r > 1.0 ) r = 1.0; else if( r < 0.0 ) r = 0.0;
+        if( g > 1.0 ) g = 1.0; else if( g < 0.0 ) g = 0.0;
+        if( b > 1.0 ) b = 1.0; else if( b < 0.0 ) b = 0.0;
+
+        output[ 0 ] = (int) ((r * 255.0) + 0.5);
+        output[ 1 ] = (int) ((g * 255.0) + 0.5);
+        output[ 2 ] = (int) ((b * 255.0) + 0.5);
+
+        output += 3;
+        input += 3;
+    }
+}
+
 /*
  * 100% SMPTE Color Bars:
  *
