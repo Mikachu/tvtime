@@ -110,6 +110,9 @@ static command_names_t command_table[] = {
 
     { "RESTART", TVTIME_RESTART },
 
+    { "SAVE_PICTURE_GLOBAL", TVTIME_SAVE_PICTURE_GLOBAL },
+    { "SAVE_PICTURE_CHANNEL", TVTIME_SAVE_PICTURE_CHANNEL },
+
     { "SCREENSHOT", TVTIME_SCREENSHOT },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
@@ -118,6 +121,7 @@ static command_names_t command_table[] = {
     { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
     { "SET_NORM", TVTIME_SET_NORM },
+    { "SET_SHARPNESS", TVTIME_SET_SHARPNESS },
 
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
     { "SHOW_MENU", TVTIME_SHOW_MENU },
@@ -271,6 +275,7 @@ struct commands_s {
     int restarttvtime;
     int setdeinterlacer;
     const char *newnorm;
+    int newsharpness;
     char deinterlacer[ 128 ];
 
     int delay;
@@ -366,6 +371,73 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_length( cmd->osd, "" );
         tvtime_osd_show_info( cmd->osd );
     }
+}
+
+static void reset_sharpness_menu( menu_t *menu, int sharpness )
+{
+    char string[ 128 ];
+
+    sprintf( string, "%c%c%c  Current: %d pixels", 0xee, 0x80, 0x80, sharpness );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+
+    if( sharpness <= 180  ) {
+        sprintf( string, "%c%c%c  Poor (180 pixels)", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Poor (180 pixels)", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_SHARPNESS, "180" );
+    menu_set_right_command( menu, 2, TVTIME_SET_SHARPNESS, "180" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+
+    if( sharpness > 180 && sharpness <= 360 ) {
+        sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_SHARPNESS, "360" );
+    menu_set_right_command( menu, 3, TVTIME_SET_SHARPNESS, "360" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+
+    if( sharpness > 360 && sharpness <= 576 ) {
+        sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SET_SHARPNESS, "576" );
+    menu_set_right_command( menu, 4, TVTIME_SET_SHARPNESS, "576" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+
+    if( sharpness > 576 && sharpness <= 720 ) {
+        sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SET_SHARPNESS, "720" );
+    menu_set_right_command( menu, 5, TVTIME_SET_SHARPNESS, "720" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+
+    if( sharpness > 720 ) {
+        sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SET_SHARPNESS, "768" );
+    menu_set_right_command( menu, 6, TVTIME_SET_SHARPNESS, "768" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "input" );
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "input" );
 }
 
 static void reset_norm_menu( menu_t *menu, const char *norm )
@@ -573,6 +645,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->resizewindow = 0;
     cmd->restarttvtime = 0;
     cmd->setdeinterlacer = 0;
+    cmd->newsharpness = 0;
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
@@ -713,22 +786,27 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0x9a );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0x9f );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_CC, "" );
-    menu_set_right_command( menu, 3, TVTIME_TOGGLE_CC, "" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0x9a );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_CC, "" );
+    menu_set_right_command( menu, 4, TVTIME_TOGGLE_CC, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 5, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );
@@ -743,18 +821,28 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0x9f );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 3, TVTIME_RESTART, "" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "sharpness" );
+    menu_set_text( menu, 0, "Setup - Input configuration - Sharpness" );
+    commands_add_menu( cmd, menu );
+    reset_sharpness_menu( commands_get_menu( cmd, "sharpness" ), config_get_inputwidth( cfg ) );
 
     menu = menu_new( "audiomode" );
     menu_set_text( menu, 0, "Setup - Input configuration - Preferred audio mode" );
@@ -1410,6 +1498,19 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             sprintf( message, "Framerate set at %s.",
                      cmd->framerate == FRAMERATE_FULL ? "full" :
                      (cmd->framerate == FRAMERATE_HALF_TFF ? "half (top fields processed)" : "half (bottom fields processed)") );
+            tvtime_osd_show_message( cmd->osd, message );
+        }
+        break;
+
+    case TVTIME_SET_SHARPNESS:
+        cmd->newsharpness = atoi( arg );
+        if( cmd->osd ) {
+            menu_t *sharpmenu = commands_get_menu( cmd, "sharpness" );
+            char message[ 128 ];
+            reset_sharpness_menu( sharpmenu, cmd->newsharpness );
+            commands_refresh_menu( cmd );
+            sprintf( message, "Sharpness will be %d on restart.",
+                     cmd->newsharpness );
             tvtime_osd_show_message( cmd->osd, message );
         }
         break;
@@ -2303,5 +2404,10 @@ int commands_menu_active( commands_t *cmd )
 void commands_set_half_size( commands_t *cmd, int halfsize )
 {
     cmd->halfsize = halfsize;
+}
+
+int commands_get_new_sharpness( commands_t *cmd )
+{
+    return cmd->newsharpness;
 }
 

@@ -83,10 +83,14 @@ enum tvtime_commands
     TVTIME_SET_DEINTERLACER,
     TVTIME_SET_FRAMERATE,
     TVTIME_SET_AUDIO_MODE,
+    TVTIME_SET_SHARPNESS,
 
     TVTIME_MENUMODE,
     TVTIME_DISPLAY_INFO,
     TVTIME_TOGGLE_CREDITS,
+
+    TVTIME_SAVE_PICTURE_GLOBAL,
+    TVTIME_SAVE_PICTURE_CHANNEL,
 
     TVTIME_TOGGLE_NTSC_CABLE_MODE,
     TVTIME_AUTO_ADJUST_PICT,
@@ -213,6 +217,7 @@ int commands_apply_mirror( commands_t *cmd );
 int commands_set_deinterlacer( commands_t *cmd );
 const char *commands_get_new_deinterlacer( commands_t *cmd );
 const char *commands_get_new_norm( commands_t *cmd );
+int commands_get_new_sharpness( commands_t *cmd );
 
 #ifdef __cplusplus
 };
