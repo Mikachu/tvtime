@@ -906,29 +906,60 @@ void videoinput_delete( videoinput_t *vidin )
     free( vidin );
 }
 
+static double videoinput_get_control_v4l2( videoinput_t *vidin, uint32_t id )
+{
+    struct v4l2_queryctrl query;
+
+    query.id = id;
+    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 ) {
+        struct v4l2_control control;
+        control.id = id;
+        if( ioctl( vidin->grab_fd, VIDIOC_G_CTRL, &control ) >= 0 ) {
+            return (((double) (control.value - query.minimum)) / ((double) (query.maximum - query.minimum)));
+        }
+    }
+    return 0.0;
+}
+
+static void videoinput_set_control_v4l2( videoinput_t *vidin, uint32_t id, double val )
+{
+    struct v4l2_queryctrl query;
+
+    query.id = id;
+    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 ) {
+        struct v4l2_control control;
+        control.id = id;
+        control.value = query.minimum + ((int) ((val * ((double) (query.maximum - query.minimum))) + 0.5));
+        ioctl( vidin->grab_fd, VIDIOC_S_CTRL, &control );
+    }
+}
+
 int videoinput_get_hue( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        return (int) ((videoinput_get_control_v4l2( vidin, V4L2_CID_HUE ) * 100.0) + 0.5);
+    } else {
         struct video_picture grab_pict;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            return 0;
-        } else {
+        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
             return (int) ((((double) grab_pict.hue / 65535.0) * 100.0) + 0.5);
         }
-    } else {
-        return 0;
     }
+
+    return 0;
 }
 
 void videoinput_set_hue( videoinput_t *vidin, int newhue )
 {
-    if( !vidin->isv4l2 ) {
+    if( newhue > 100 ) newhue = 100;
+    if( newhue <   0 ) newhue = 0;
+
+    if( vidin->isv4l2 ) {
+        videoinput_set_control_v4l2( vidin, V4L2_CID_HUE, ((double) newhue) / 100.0 );
+    } else {
         struct video_picture grab_pict;
 
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
-            if( newhue > 100 ) newhue = 100;
-            if( newhue <   0 ) newhue = 0;
             grab_pict.hue = (int) (((((double) newhue) / 100.0) * 65535.0) + 0.5);
             ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
         }
@@ -942,27 +973,30 @@ void videoinput_set_hue_relative( videoinput_t *vidin, int offset )
 
 int videoinput_get_brightness( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        return (int) ((videoinput_get_control_v4l2( vidin, V4L2_CID_BRIGHTNESS ) * 100.0) + 0.5);
+    } else {
         struct video_picture grab_pict;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            return 0;
-        } else {
+        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
             return (int) ((((double) grab_pict.brightness / 65535.0) * 100.0) + 0.5);
         }
-    } else {
-        return 0;
     }
+
+    return 0;
 }
 
 void videoinput_set_brightness( videoinput_t *vidin, int newbright )
 {
-    if( !vidin->isv4l2 ) {
+    if( newbright > 100 ) newbright = 100;
+    if( newbright <   0 ) newbright = 0;
+
+    if( vidin->isv4l2 ) {
+        videoinput_set_control_v4l2( vidin, V4L2_CID_BRIGHTNESS, ((double) newbright) / 100.0 );
+    } else {
         struct video_picture grab_pict;
 
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
-            if( newbright > 100 ) newbright = 100;
-            if( newbright <   0 ) newbright = 0;
             grab_pict.brightness = (int) (((((double) newbright) / 100.0) * 65535.0) + 0.5);
             ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
         }
@@ -976,27 +1010,30 @@ void videoinput_set_brightness_relative( videoinput_t *vidin, int offset )
 
 int videoinput_get_contrast( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        return (int) ((videoinput_get_control_v4l2( vidin, V4L2_CID_CONTRAST ) * 100.0) + 0.5);
+    } else {
         struct video_picture grab_pict;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            return 0;
-        } else {
+        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
             return (int) ((((double) grab_pict.contrast / 65535.0) * 100.0) + 0.5);
         }
-    } else {
-        return 0;
     }
+
+    return 0;
 }
 
 void videoinput_set_contrast( videoinput_t *vidin, int newcont )
 {
-    if( !vidin->isv4l2 ) {
+    if( newcont > 100 ) newcont = 100;
+    if( newcont <   0 ) newcont = 0;
+
+    if( vidin->isv4l2 ) {
+        videoinput_set_control_v4l2( vidin, V4L2_CID_CONTRAST, ((double) newcont) / 100.0 );
+    } else {
         struct video_picture grab_pict;
 
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
-            if( newcont > 100 ) newcont = 100;
-            if( newcont <   0 ) newcont = 0;
             grab_pict.contrast = (int) (((((double) newcont) / 100.0) * 65535.0) + 0.5);
             ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
         }
@@ -1010,27 +1047,30 @@ void videoinput_set_contrast_relative( videoinput_t *vidin, int offset )
 
 int videoinput_get_colour( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        return (int) ((videoinput_get_control_v4l2( vidin, V4L2_CID_SATURATION ) * 100.0) + 0.5);
+    } else {
         struct video_picture grab_pict;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            return 0;
-        } else {
+        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
             return (int) ((((double) grab_pict.colour / 65535.0) * 100.0) + 0.5);
         }
-    } else {
-        return 0;
     }
+
+    return 0;
 }
 
 void videoinput_set_colour( videoinput_t *vidin, int newcolour )
 {
-    if( !vidin->isv4l2 ) {
+    if( newcolour > 100 ) newcolour = 100;
+    if( newcolour <   0 ) newcolour = 0;
+
+    if( vidin->isv4l2 ) {
+        videoinput_set_control_v4l2( vidin, V4L2_CID_SATURATION, ((double) newcolour) / 100.0 );
+    } else {
         struct video_picture grab_pict;
 
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
-            if( newcolour > 100 ) newcolour = 100;
-            if( newcolour <   0 ) newcolour = 0;
             grab_pict.colour = (int) (((((double) newcolour) / 100.0) * 65535.0) + 0.5);
             ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
         }
