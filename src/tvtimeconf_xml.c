@@ -138,7 +138,6 @@ static const KeyBindDef key_def[] =
     {'r',	TVTIME_SKIP_CHANNEL},
     {' ',	TVTIME_AUTO_ADJUST_PICT},
     {'=',	TVTIME_TOGGLE_HALF_FRAMERATE},
-    {'b',	TVTIME_DETECT_SCANLINE_BIAS},
     {'\0', 0}
 };
 
@@ -202,7 +201,6 @@ static const Cmd_Names cmd_table[] = {
     { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
-    { "DETECT_SCANLINE_BIAS", TVTIME_DETECT_SCANLINE_BIAS },
     { "CHANNEL_1", TVTIME_CHANNEL_1 },
     { "CHANNEL_2", TVTIME_CHANNEL_2 },
     { "CHANNEL_3", TVTIME_CHANNEL_3 },
