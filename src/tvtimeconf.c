@@ -442,6 +442,7 @@ static void print_usage( char **argv )
                      "\t  \t\tjapan-broadcast\n"
                      "\t  \t\teurope\n"
                      "\t  \t\taustralia\n"
+                     "\t  \t\taustralia-optus\n"
                      "\t  \t\tnewzealand\n"
                      "\t  \t\tfrance\n"
                      "\t  \t\trussia\n" );

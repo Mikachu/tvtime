@@ -335,6 +335,8 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
             station_add_band( mgr, "vhf australia" );
             station_add_band( mgr, "vhf e2-e12" );
             station_add_band( mgr, "uhf" );
+        } else if( !strcasecmp( frequencies, "australia-optus" ) ) {
+            station_add_band( mgr, "australia optus" );
         } else if( !strcasecmp( frequencies, "newzealand" ) ) {
             /* Billy: It's unclear to me if we should keep this around. */
             station_add_band( mgr, "vhf e2-e12" );
