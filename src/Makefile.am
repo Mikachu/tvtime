@@ -1,4 +1,6 @@
 
+tvtimedatadir = $(datadir)/tvtime
+
 TTF_CFLAGS = `freetype-config --cflags`
 TTF_LIBS = `freetype-config --libs`
 
@@ -24,3 +26,4 @@ bin_PROGRAMS = tvtime
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 
+tvtimedata_DATA = menubg.png testlogo.png FreeSansBold.ttf
