@@ -1326,7 +1326,7 @@ int main( int argc, char **argv )
         commands_set_console( commands, con );
     }
 
-    in = input_new( ct, commands, con, 0 );
+    in = input_new( ct, commands, con, 0, verbose );
     if( !in ) {
         fprintf( stderr, "tvtime: Can't create input handler.\n" );
         return 1;

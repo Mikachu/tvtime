@@ -83,7 +83,7 @@ int input_string_to_special_key( const char *str );
 const char *input_special_key_to_string( int key );
 
 input_t *input_new( config_t *cfg, commands_t *com, console_t *con, 
-                    menu_t *menu );
+                    menu_t *menu, int verbose );
 void input_delete( input_t *in );
 void input_callback( input_t *in, InputEvent command, int arg );
 void input_next_frame( input_t *in );

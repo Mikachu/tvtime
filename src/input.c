@@ -136,7 +136,8 @@ struct input_s {
 #endif
 };
 
-input_t *input_new( config_t *cfg, commands_t *com, console_t *con, menu_t *menu )
+input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
+                    menu_t *menu, int verbose )
 {
     input_t *in = (input_t *) malloc( sizeof( input_t ) );
 
@@ -158,18 +159,26 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, menu_t *menu
     in->lirc_used = 0;
 
 #ifdef HAVE_LIRC
-    in->lirc_fd = lirc_init( "tvtime", 1 ); /* Initialize lirc and let it be verbose. */
-
-    if( in->lirc_fd < 0 )
-        fprintf( stderr, "tvtime: Can't connect to lircd. Lirc disabled.\n" );
-    else {
+    if( verbose ) {
+        fprintf( stderr, "tvtime: Looking for lirc ...\n" );
+    }
+    in->lirc_fd = lirc_init( "tvtime", verbose );
+    if( in->lirc_fd < 0 ) {
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Can't connect to lircd. Lirc disabled.\n" );
+        }
+    } else {
         fcntl( in->lirc_fd, F_SETFL, O_NONBLOCK );
         if ( lirc_readconfig( NULL, &in->lirc_conf, NULL ) == 0 ) {
             in->lirc_used = 1;
         } else {
-            fprintf( stderr, "tvtime: Can't read lirc config file. "
-                     "Lirc disabled.\n" );
+            if( verbose ) {
+                fprintf( stderr, "tvtime: Can't read lirc config file. Lirc disabled.\n" );
+            }
         }
+    }
+    if( verbose ) {
+        fprintf( stderr, "tvtime: Finished lirc setup.\n" );
     }
 #endif
 
