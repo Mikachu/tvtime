@@ -43,7 +43,6 @@
 #include "plugins.h"
 #include "performance.h"
 #include "dfboutput.h"
-#include "vidmode.h"
 #include "taglines.h"
 #include "xvoutput.h"
 
@@ -132,8 +131,11 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 
     for( i = 0; i < height; i++ ) {
         unsigned char *input422 = frame422 + (i * stride);
-        // chroma422_to_chroma444_rec601_scanline( tempscanline,
-        //                                         input422, width );
+        /**
+         * This function clearly has bugs:
+         * chroma422_to_chroma444_rec601_scanline( tempscanline,
+         *                                         input422, width );
+         */
         cheap_packed422_to_packed444_scanline( tempscanline, input422, width );
         packed444_to_rgb24_rec601_scanline( tempscanline, tempscanline, width );
         pngoutput_scanline( pngout, tempscanline );
@@ -371,7 +373,6 @@ int main( int argc, char **argv )
     video_correction_t *vc = 0;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
-    vidmode_t *vidmode;
     int width, height;
     int norm = 0;
     int fieldtime;
@@ -599,8 +600,8 @@ int main( int argc, char **argv )
     }
 
     /* Setup the output. */
-    //output = get_dfb_output();
-    //output = get_sdl_output();
+    /*output = get_dfb_output();*/
+    /*output = get_sdl_output();*/
     output = get_xv_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
                        config_get_aspect( ct ) ) ) {
@@ -612,9 +613,6 @@ int main( int argc, char **argv )
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
     output->set_window_caption( tagline );
-
-    /* Start up our vidmode object. */
-    vidmode = vidmode_new();
 
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
@@ -629,7 +627,7 @@ int main( int argc, char **argv )
 
     /* Initialize our timestamps. */
     for(;;) {
-        unsigned char *curframe;
+        unsigned char *curframe = 0;
         int curframeid;
         int printdebug = 0;
         int showbars, screenshot;
@@ -642,12 +640,7 @@ int main( int argc, char **argv )
         showbars = input_show_bars( in );
         screenshot = input_take_screenshot( in );
         if( input_toggle_fullscreen( in ) ) {
-            if( vidmode ) {
-                output->toggle_fullscreen( vidmode_get_current_width( vidmode ),
-                                           vidmode_get_current_height( vidmode ) );
-            } else {
-                output->toggle_fullscreen( 0, 0 );
-            }
+            output->toggle_fullscreen( 0, 0 );
         }
         if( input_toggle_aspect( in ) ) {
             if( output->toggle_aspect() ) {
@@ -739,13 +732,6 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
-            if( vidmode ) {
-                fprintf( stderr, "vidmode: Currently at %dx%d resolution, "
-                         "display refresh is %2.2fhz.\n",
-                         vidmode_get_current_width( vidmode ),
-                         vidmode_get_current_height( vidmode ),
-                         vidmode_get_current_refresh_rate( vidmode ) );
-            }
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );

@@ -39,7 +39,6 @@ static inline unsigned char clip255( int x )
              *        =  B + alpha*(F - B)
              */
 
-//static inline int multiply_alpha( int a, int r ) __attribute__ (always_inline);
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
     int temp;

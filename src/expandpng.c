@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "pnginput.h"
 #include "pngoutput.h"
 
@@ -22,19 +23,9 @@ int main( int argc, char **argv )
         int j;
 
         for( j = 0; j < width; j++ ) {
-            temp[ (j*4) + 0 ] = 245; // wheat
+            temp[ (j*4) + 0 ] = 245; /* wheat */
             temp[ (j*4) + 1 ] = 222;
             temp[ (j*4) + 2 ] = 179;
-/*
-            temp[ (j*4) + 0 ] = 0; // sony green
-            temp[ (j*4) + 1 ] = 255;
-            temp[ (j*4) + 2 ] = 0;
-*/
-/*
-            temp[ (j*4) + 0 ] = 0xc8; // grey
-            temp[ (j*4) + 1 ] = 0xc8;
-            temp[ (j*4) + 2 ] = 0xc8;
-*/
             temp[ (j*4) + 3 ] = 0xff - inscanline[ j ];
         }
         pngoutput_scanline( outimage, temp );

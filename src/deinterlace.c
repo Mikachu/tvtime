@@ -70,7 +70,7 @@ void register_deinterlace_plugin( const char *filename )
                  filename, dlerror() );
     } else {
         deinterlace_plugin_init_t plugin_init;
-        plugin_init = dlsym( handle, "deinterlace_plugin_init" );
+        plugin_init = (deinterlace_plugin_init_t) dlsym( handle, "deinterlace_plugin_init" );
         if( plugin_init ) {
             plugin_init();
         }

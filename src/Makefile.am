@@ -33,8 +33,8 @@ COMMON_SRCS = mixer.c videoinput.c sdloutput.c rtctimer.c ttfont.cpp efs.cpp \
 	pngoutput.h rtctimer.h sdloutput.h speedy.h taglines.h ttfont.h \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
 	outputapi.h dfboutput.h dfboutput.c performance.h performance.c \
-	vidmode.h vidmode.c credits.c credits.h xvoutput.h xvoutput.c \
-	display.h display.c wm_state.h wm_state.c
+	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
+	wm_state.h wm_state.c
 
 bin_PROGRAMS = tvtime expandpng
 

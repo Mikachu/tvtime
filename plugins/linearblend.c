@@ -52,7 +52,7 @@ static void deinterlace_scanline_linear_blend2( unsigned char *output, unsigned 
 static deinterlace_method_t linearblendmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Linear Blend",
+    "Linear Blend (idea from mplayer)",
     "LinearBlend",
     1,
     0,

@@ -99,4 +99,4 @@ int set_realtime_priority( int max );
 #ifdef __cplusplus
 };
 #endif
-#endif // RTCTIMER_H_INCLUDED
+#endif /* RTCTIMER_H_INCLUDED */

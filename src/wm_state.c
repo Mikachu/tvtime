@@ -91,7 +91,7 @@ static void remove_motif_decorations(Display *dpy, Window win)
 		    (unsigned char *)&MWMHints,
 		    sizeof(MWMHints)/sizeof(long));
   } else {
-    fprintf(stderr,"_MOTIF_WM_HINTS atom not found\n");
+    fprintf(stderr,"wm_state: _MOTIF_WM_HINTS atom not found\n");
   }
 
 }
@@ -109,7 +109,7 @@ static void disable_motif_decorations(Display *dpy, Window win)
     /* Hints used by Motif compliant window managers */
     XDeleteProperty(dpy, win, WM_HINTS);
   } else {
-    fprintf(stderr,"_MOTIF_WM_HINTS atom not found\n");
+    fprintf(stderr,"wm_state: _MOTIF_WM_HINTS atom not found\n");
   }
   
 }
@@ -136,14 +136,14 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
 			  &dest_win);
     
     if(*x != dest_x_ret) {
-      fprintf(stderr,"f**king non-compliant wm, we can't trust it on x-coords\n");
-      fprintf(stderr,"wm_x: %d, xtranslate_x: %d\n", *x, dest_x_ret);
+      fprintf(stderr,"wm_state: f**king non-compliant wm, we can't trust it on x-coords\n");
+      fprintf(stderr,"wm_state: wm_x: %d, xtranslate_x: %d\n", *x, dest_x_ret);
       *x = dest_x_ret;
     }
 
     if(*y != dest_y_ret) {
-      fprintf(stderr,"f**king non-compliant wm, we can't trust it on y-coords\n");
-      fprintf(stderr,"wm_y: %d, xtranslate_y: %d\n", *y, dest_y_ret);
+      fprintf(stderr,"wm_state: f**king non-compliant wm, we can't trust it on y-coords\n");
+      fprintf(stderr,"wm_state: wm_y: %d, xtranslate_y: %d\n", *y, dest_y_ret);
       *y = dest_y_ret;
     }
     
@@ -379,7 +379,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
       //  try to compensate and move one more time
       if(x != win_changes.x || y != win_changes.y) {
 	XWindowChanges win_compensate;
-	fprintf(stderr,"window is not at screen start trying to fix that\n");
+	fprintf(stderr,"wm_state: window is not at screen start trying to fix that\n");
 	
 	win_compensate.x = win_changes.x+win_changes.x-x;
 	win_compensate.y = win_changes.y+win_changes.y-y;
@@ -401,7 +401,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 	}
 	
 	if(x != win_changes.x || y != win_changes.y) {
-	  fprintf(stderr,"Couldn't place window at %d,%d\n", win_changes.x, win_changes.y);
+	  fprintf(stderr,"wm_state: Couldn't place window at %d,%d\n", win_changes.x, win_changes.y);
 	} else {
 	  //fprintf(stderr,"Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y);
 	}
@@ -530,13 +530,13 @@ static int xprop_errorhandler(Display *dpy, XErrorEvent *ev)
      * most probable the window specified by the property
      * _WIN_SUPPORTING_WM_CHECK on the root window no longer exists
      */
-    fprintf(stderr,"xprop_errhandler: error in XGetWindowProperty\n");
+    fprintf(stderr,"wm_state: xprop_errhandler: error in XGetWindowProperty\n");
     return 0;
   } else {
     /* if we get another error we should handle it,
      * so we give it to the previous errorhandler
      */
-    fprintf(stderr,"xprop_errhandler: unexpected error\n");
+    fprintf(stderr,"wm_state: xprop_errhandler: unexpected error\n");
     return prev_xerrhandler(dpy, ev);
   }
 }
@@ -561,17 +561,17 @@ static int check_for_gnome_wm(Display *dpy)
 		     1, False, XA_CARDINAL,
 		     &type_return, &format_return, &nitems_return,
 			&bytes_after_return, &prop_return) != Success) {
-    fprintf(stderr,"XGetWindowProperty failed in check_for_gnome\n");
+    fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_gnome\n");
     return 0;
   }
   
   if(type_return == None) {
-    fprintf(stderr,"check_for_gnome: _WIN_SUPPORTING_WM_CHECK does not exist\n");
+    fprintf(stderr,"wm_state: check_for_gnome: _WIN_SUPPORTING_WM_CHECK does not exist\n");
     return 0;
   }
 
   if(type_return != XA_CARDINAL) {
-    fprintf(stderr,"check_for_gnome: _WIN_SUPPORTING_WM_CHECK has wrong type\n");
+    fprintf(stderr,"wm_state: check_for_gnome: _WIN_SUPPORTING_WM_CHECK has wrong type\n");
     if(prop_return != NULL) {
       XFree(prop_return);
     }
@@ -622,17 +622,17 @@ static int check_for_gnome_wm(Display *dpy)
       XSetErrorHandler(prev_xerrhandler);
 
       if(status != Success) {
-	fprintf(stderr,"XGetWindowProperty failed in check_for_gnome\n");
+	fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_gnome\n");
 	return 0;
       }
       
       if(type_return == None) {
-	fprintf(stderr,"check_for_gnome: _WIN_SUPPORTING_WM_CHECK does not exist in specified win\n");
+	fprintf(stderr,"wm_state: check_for_gnome: _WIN_SUPPORTING_WM_CHECK does not exist in specified win\n");
 	return 0;
       }
       
       if(type_return != XA_CARDINAL) {
-	fprintf(stderr,"check_for_gnome: property has wrong type\n");
+	fprintf(stderr,"wm_state: check_for_gnome: property has wrong type\n");
 	if(prop_return != NULL) {
 	  XFree(prop_return);
 	}
@@ -696,18 +696,18 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 			1, False, XA_WINDOW,
 			&type_return, &format_return, &nitems_return,
 			&bytes_after_return, &prop_return) != Success) {
-    fprintf(stderr,"XGetWindowProperty failed in check_for_EWMH\n");
+    fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_EWMH\n");
     return 0;
   }
   
   if(type_return == None) {
-    fprintf(stderr,"check_for_EWMH: property does not exist\n");
+    fprintf(stderr,"wm_state: check_for_EWMH: property does not exist\n");
     return 0;
   }
 
   if(type_return != XA_WINDOW) {
     
-    fprintf(stderr,"check_for_EWMH: XA_WINDOW property has wrong type\n");
+    fprintf(stderr,"wm_state: check_for_EWMH: XA_WINDOW property has wrong type\n");
     if(prop_return != NULL) {
       XFree(prop_return);
     }
@@ -754,17 +754,17 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
       XSetErrorHandler(prev_xerrhandler);
       
       if(status != Success) {
-	fprintf(stderr,"XGetWindowProperty failed in check_for_EWMH\n");
+	fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_EWMH\n");
 	return 0;
       }
       
       if(type_return == None) {
-	fprintf(stderr,"check_for_EWMH: property does not exist\n");
+	fprintf(stderr,"wm_state: check_for_EWMH: property does not exist\n");
 	return 0;
       }
       
       if(type_return != XA_WINDOW) {
-	fprintf(stderr,"check_for_EWMH: property has wrong type (%d)\n",
+	fprintf(stderr,"wm_state: check_for_EWMH: property has wrong type (%d)\n",
 		type_return);
 	if(prop_return != NULL) {
 	  XFree(prop_return);
@@ -799,19 +799,19 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 				    &bytes_after_return,
 				    &prop_return) != Success) {
 		
-		fprintf(stderr,"XGetWindowProperty failed in wm_name\n");
+		fprintf(stderr,"wm_state: XGetWindowProperty failed in wm_name\n");
 		return 0;
 	      }
 	      
 	      if(type_return == None) {
-		fprintf(stderr,"wm_name: property does not exist\n");
+		fprintf(stderr,"wm_state: wm_name: property does not exist\n");
 		return 0;
 	      }
 	      
 	      if(type_return != XA_STRING) {
 		type_utf8 = XInternAtom(dpy, "UTF8_STRING", True);
 		if(type_utf8 == None) {
-		  fprintf(stderr,"not UTF8_STRING either\n");
+		  fprintf(stderr,"wm_state: not UTF8_STRING either\n");
 		  return 0;
 		}
 		
@@ -823,7 +823,7 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 					&bytes_after_return,
 					&prop_return) != Success) {
 		    
-		    fprintf(stderr,"XGetWindowProperty failed in wm_name\n");
+		    fprintf(stderr,"wm_state: XGetWindowProperty failed in wm_name\n");
 		    return 0;
 		  }
 
@@ -833,7 +833,7 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 		  //fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
 		  //fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
 		  if(format_return == 8) {
-		    fprintf(stderr,"wm_name: %s\n", (char *)prop_return);
+		    // fprintf(stderr,"wm_state: wm_name: %s\n", (char *)prop_return);
 		    *wm_name_return = strdup((char *)prop_return);
 		  }
 		  
@@ -847,7 +847,7 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 		//fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
 		//fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
 		if(format_return == 8) {
-		  fprintf(stderr,"wm_name: %s\n", (char *)prop_return);
+		  // fprintf(stderr,"wm_name: %s\n", (char *)prop_return);
 		  *wm_name_return = strdup((char *)prop_return);
 		}
 	        XFree(prop_return);
@@ -911,18 +911,18 @@ static int check_for_state_fullscreen(Display *dpy)
 			  item_offset, nr_items, False, XA_ATOM,
 			  &type_return, &format_return, &nitems_return,
 			  &bytes_after_return, &prop_return) != Success) {
-      fprintf(stderr,"XGetWindowProperty failed in check_for_state_fullscreen\n");
+      fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_state_fullscreen\n");
       return 0;
     }
     
     if(type_return == None) {
-      fprintf(stderr,"check_for_state_fullscreen: property does not exist\n");
+      fprintf(stderr,"wm_state: check_for_state_fullscreen: property does not exist\n");
       return 0;
     }
     
     if(type_return != XA_ATOM) {
       
-      fprintf(stderr,"check_for_state_fullscreen: XA_ATOM property has wrong type\n");
+      fprintf(stderr,"wm_state: check_for_state_fullscreen: XA_ATOM property has wrong type\n");
       if(prop_return != NULL) {
 	XFree(prop_return);
       }
@@ -985,13 +985,13 @@ static int check_for_gnome_wm_layers(Display *dpy)
   
   atom = XInternAtom(dpy, "_WIN_PROTOCOLS", True);
   if(atom == None) {
-    fprintf(stderr,"no atom: _WIN_PROTOCOLS");
+    fprintf(stderr,"wm_state: no atom: _WIN_PROTOCOLS");
     return 0;
   }
   
   layer_atom = XInternAtom(dpy, "_WIN_LAYER", True);
   if(layer_atom == None) {
-    fprintf(stderr,"no atom: _WIN_LAYER");
+    fprintf(stderr,"wm_state: no atom: _WIN_LAYER");
     return 0;
   }
   
@@ -1001,18 +1001,18 @@ static int check_for_gnome_wm_layers(Display *dpy)
 			  1, False, XA_ATOM,
 			  &type_return, &format_return, &nitems_return,
 			  &bytes_after_return, &prop_return) != Success) {
-      fprintf(stderr,"XGetWindowProperty failed in check_for_gnome\n");
+      fprintf(stderr,"wm_state: XGetWindowProperty failed in check_for_gnome\n");
       return 0;
     }
     index++;
     
     if(type_return == None) {
-      fprintf(stderr,"check_for_layer: property does not exist\n");
+      fprintf(stderr,"wm_state: check_for_layer: property does not exist\n");
       return 0;
     }
     
     if(type_return != XA_ATOM) {
-      fprintf(stderr,"check_for_layer: property has wrong type\n");
+      fprintf(stderr,"wm_state: check_for_layer: property has wrong type\n");
       if(prop_return != NULL) {
 	XFree(prop_return);
       }
@@ -1070,7 +1070,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
       switch_to_normal_state(dpy, win);
       break;
     default:
-      fprintf(stderr,"unknown window state\n");
+      fprintf(stderr,"wm_state: unknown window state\n");
       break;
     }
     if(wm_name != NULL) {

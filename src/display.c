@@ -29,10 +29,23 @@
 
 #include "display.h"
 
+/* Why aren't these in the damn vidmode extension header??? */
+/* Mode flags -- ignore flags not in V_FLAG_MASK */
+#define V_FLAG_MASK     0x1FF;
+#define V_PHSYNC        0x001 
+#define V_NHSYNC        0x002
+#define V_PVSYNC        0x004
+#define V_NVSYNC        0x008
+#define V_INTERLACE     0x010 
+#define V_DBLSCAN       0x020
+#define V_CSYNC         0x040
+#define V_PCSYNC        0x080
+#define V_NCSYNC        0x100
 
 typedef struct {
   int horizontal_pixels;
   int vertical_pixels;
+  double refresh_rate;
 } resolution_t;
 
 typedef struct {
@@ -194,6 +207,8 @@ static int update_resolution_xf86vidmode(dpy_info_t *info, Display *dpy,
     }
     info->resolution.horizontal_pixels = modeline.hdisplay;
     info->resolution.vertical_pixels = modeline.vdisplay;
+    info->resolution.refresh_rate = ( (double) ( (double) dotclk * 1000.0 ) ) /
+                                    ( (double) ( modeline.htotal * modeline.vtotal ) );
 
     if(XF86VidModeGetViewPort(dpy, screen_nr, &x, &y)) {
       info->screen_offset.x = x;
@@ -228,7 +243,7 @@ static int update_resolution_xinerama(dpy_info_t *info, Display *dpy,
       s = &xinerama_screens[n];
       if((s->x_org <= x) && (x < (s->x_org + s->width)) &&
 	 (s->y_org <= y) && (y < (s->y_org + s->height))) {
-	// we have found our screen
+	/* we have found our screen */
 	
 	info->screen_offset.x = s->x_org;
 	info->screen_offset.y = s->y_org;
@@ -241,8 +256,8 @@ static int update_resolution_xinerama(dpy_info_t *info, Display *dpy,
 	return 1;
       }
     }
-    // the window isn't positioned on a screen, use the first
-    // TODO maybe this should be fixed to use the closest instead?
+    /* the window isn't positioned on a screen, use the first */
+    /* TODO maybe this should be fixed to use the closest instead? */
     s = &xinerama_screens[0];
 
     info->screen_offset.x = s->x_org;
@@ -404,7 +419,7 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	return dpyinfo.resolution_origin;
       }
     } else {
-      fprintf(stderr,"Xinerama extension not found/active\n");
+      fprintf(stderr,"display: Xinerama extension not found/active\n");
     }
 #endif
 #ifdef HAVE_XF86VIDMODE
@@ -415,7 +430,7 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	return dpyinfo.resolution_origin;
       }
     } else {
-      fprintf(stderr,"XF86VidMode extension not found\n");
+      fprintf(stderr,"display: XF86VidMode extension not found\n");
     }
 #endif
   case DpyInfoOriginX11:

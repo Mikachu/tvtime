@@ -356,7 +356,6 @@ void menu_pict( menu_t *m, int key )
 
     /* draw osd reflecting current state */
     for( i=0; i < MENU_LINES/2; i++ ) {
-        char tmpstr[50];
         if( m->menu_state == i ) {
             osd_string_set_colour( m->menu_line[i*2].line, 220, 12, 155 );
         } else {

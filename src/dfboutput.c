@@ -28,8 +28,8 @@ static DFBSurfacePixelFormat  frame_format;
 static IDirectFBInputDevice  *keyboard;
 static IDirectFBEventBuffer  *buffer = NULL;
 
-static int screen_width = 0;
-static int screen_height = 0;
+static unsigned int screen_width = 0;
+static unsigned int screen_height = 0;
 static void *screen_framebuffer = 0;
 static int screen_pitch = 0;
 
@@ -111,8 +111,8 @@ int dfb_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     keyboard->CreateEventBuffer( keyboard, &buffer );
     buffer->Reset( buffer );
 
-    dlc.flags      = DLCONF_PIXELFORMAT; // | DLCONF_BUFFERMODE;
-    dlc.buffermode = 0; // DLBM_BACKVIDEO;
+    dlc.flags      = DLCONF_PIXELFORMAT; /* | DLCONF_BUFFERMODE; */
+    dlc.buffermode = 0; /* DLBM_BACKVIDEO; */
     dlc.pixelformat = DSPF_YUY2;
 
     if( crtc2->TestConfiguration( crtc2, &dlc, &failed ) != DFB_OK ) {
@@ -184,9 +184,9 @@ int dfb_is_interlaced( void )
 void dfb_wait_for_sync( int field )
 {
     while( dfb_get_current_output_field() != field ) {
-    //do {
+    /*do { */
         dfb->WaitForSync( dfb );
-    //} while( dfb_get_current_output_field() != field );
+    /*} while( dfb_get_current_output_field() != field ); */
     }
 }
 
@@ -216,7 +216,7 @@ void dfb_poll_events( input_t *in )
             curcommand = I_KEYDOWN;
 
             if( event.flags & DIEF_MODIFIERS ) {
-                // event.modifiers
+                /* event.modifiers */
             }
 
             switch( event.key_id ) {

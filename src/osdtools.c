@@ -433,7 +433,6 @@ void osd_shape_render_image4444( osd_shape_t *osds )
 {
     double radius_sqrd, x0, y0;
     int x, y;
-    //int width = osds->shape_width/osds->aspect_ratio;
     int width = osds->shape_width;
     int height = osds->shape_height;
 

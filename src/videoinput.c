@@ -643,7 +643,6 @@ void videoinput_mute( videoinput_t *vidin, int mute )
 void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 {
     unsigned long frequency = freqKHz;
-    int mute;
 
     if (vidin->tuner.tuner > -1) {
         if (frequency < 0) return;
