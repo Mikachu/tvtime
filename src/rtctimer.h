@@ -96,6 +96,12 @@ int rtctimer_get_usecs( rtctimer_t *rtctimer );
  */
 int set_realtime_priority( int max );
 
+/**
+ * Returns a SCHED_FIFO process back to SCHED_OTHER, the default Linux
+ * scheduler.
+ */
+int set_default_priority( void );
+
 #ifdef __cplusplus
 };
 #endif

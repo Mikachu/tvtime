@@ -1982,6 +1982,9 @@ int main( int argc, char **argv )
         if( !output_success ) break;
     }
 
+    /* Return to normal scheduling. */
+    set_default_priority();
+
     /* Remember to save our settings if we were scanning. */
     if( scanning ) {
         station_writeconfig( stationmgr );

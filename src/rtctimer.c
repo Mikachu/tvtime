@@ -200,3 +200,16 @@ int set_realtime_priority( int max )
     return 1;
 }
 
+int set_default_priority( void )
+{
+    struct sched_param schp;
+
+    memset( &schp, 0, sizeof( schp ) );
+    schp.sched_priority = 0;
+    if( sched_setscheduler( 0, SCHED_OTHER, &schp ) != 0 ) {
+        return 0;
+    }
+
+    return 1;
+}
+
