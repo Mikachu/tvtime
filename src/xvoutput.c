@@ -276,7 +276,7 @@ static int open_display( void )
 
     DpyInfoInit( display, screen );
     DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXinerama );
-    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
+    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginXinerama );
 
     DpyInfoUpdateResolution( display, screen, 0, 0 );
     DpyInfoUpdateGeometry( display, screen );

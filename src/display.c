@@ -348,12 +348,29 @@ static int update_geometry_x11(dpy_info_t *info, Display *dpy, int screen_nr)
   return 1;
 }
 
+static int update_geometry_xinerama(dpy_info_t *info, Display *dpy, int screen_nr)
+{
+  /* Assume 4:3 heads for xinerama. */
+  info->geometry.width = 320;
+  info->geometry.height = 240;
+  
+  update_sar(info);
+  
+  return 1;
+}
+
+
 
 int DpyInfoUpdateGeometry(Display *dpy, int screen_nr)
 {
   int ret;
   
   switch(dpyinfo.geometry_origin) {
+#ifdef HAVE_XINERAMA
+  case DpyInfoOriginXinerama:
+    ret = update_geometry_xinerama(&dpyinfo, dpy, screen_nr);
+    break;
+#endif
   case DpyInfoOriginX11:
     ret = update_geometry_x11(&dpyinfo, dpy, screen_nr);
     break;
@@ -397,12 +414,24 @@ int DpyInfoInit(Display *dpy, int screen_nr)
 DpyInfoOrigin_t DpyInfoSetUpdateGeometry(Display *dpy, int screen_nr,
 					   DpyInfoOrigin_t origin)
 {
+#ifdef HAVE_XINERAMA
+  int event_base, error_base;
+#endif
+
   switch(origin) {
   case DpyInfoOriginUser:
     if(update_geometry_user(&dpyinfo, dpy, screen_nr)) {
       dpyinfo.geometry_origin = DpyInfoOriginUser;
       return dpyinfo.geometry_origin;
     }
+  case DpyInfoOriginXinerama:
+#ifdef HAVE_XINERAMA
+    if(XineramaQueryExtension(dpy, &event_base, &error_base) &&
+       XineramaIsActive(dpy)) {
+      dpyinfo.geometry_origin = DpyInfoOriginX11;
+      return dpyinfo.geometry_origin;
+    }
+#endif
   case DpyInfoOriginX11:
   default:
     if(update_geometry_x11(&dpyinfo, dpy, screen_nr)) {
