@@ -352,7 +352,7 @@ static WIN_BOOL MODULE_FreeLibrary( WINE_MODREF *wm )
 HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 {
 	WINE_MODREF *wm = 0;
-	char* listpath[] = { "", "", "../data/", "/usr/lib/win32", "/usr/local/lib/win32", 0 };
+	char* listpath[] = { ".", WIN32_PATH, "../data", "./data", 0 };
 	extern char* win32_def_path;
 	char path[512];
 	char checked[2000];
@@ -371,6 +371,7 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 //	if(fs_installed==0)
 //	    install_fs();
 
+        sprintf( checked, "%s.\nwine: Looked in ", libname );
 	while (wm == 0 && listpath[++i])
 	{
 	    if (i < 2)
@@ -398,9 +399,9 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 
 	    if (!wm)
 	    {
-		if (checked[0])
-		    strcat(checked, ", ");
-		strcat(checked, path);
+		if (i)
+		    strcat(checked, ":");
+		strcat(checked, listpath[i]);
                 checked[1500] = 0;
 
 	    }
@@ -418,7 +419,7 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 	}
 
 	if (!wm)
-	    printf("wine/module: Win32 LoadLibrary failed to load: %s\n", checked);
+	    fprintf(stderr,"wine: Win32 LoadLibrary failed to load: %s\n", checked);
 
 	if (strstr(libname,"QuickTime.qts") && wm)
 	{
