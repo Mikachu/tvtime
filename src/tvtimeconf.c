@@ -595,6 +595,54 @@ static void print_usage( char **argv )
              "                                 video, radio, monitor\n" );
 }
 
+static void print_config_usage( char **argv )
+{
+    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
+
+    fprintf( stderr,
+             "  -a, --widescreen           16:9 mode.\n"
+             "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+             "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+             "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+             "                             xmga or SDL (defaults to Xv).\n"
+             "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+             "                             (defaults to us-cable).\n\n"
+             "                             Valid values are:\n"
+             "                                 us-cable\n"
+             "                                 us-broadcast\n"
+             "                                 china-broadcast\n"
+             "                                 japan-cable\n"
+             "                                 japan-broadcast\n"
+             "                                 europe\n"
+             "                                 australia\n"
+             "                                 australia-optus\n"
+             "                                 newzealand\n"
+             "                                 france\n"
+             "                                 russia\n\n"
+             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
+             "  -h, --help                 Show this help message.\n"
+             "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+             "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+             "                             (defaults to 720).\n"
+             "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+             "  -M, --window               Start tvtime in window mode.\n"
+             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+             "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+             "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+             "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+             "                             centre (default).\n"
+             "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+             "                             (defaults to /dev/mixer:line)\n\n"
+             "                             Valid channels are:\n"
+             "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
+             "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
+             "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+             "                                 video, radio, monitor\n" );
+}
+
+
 config_t *config_new( void )
 {
     char *temp_dirname;
@@ -925,6 +973,142 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
     return 1;
 }
+
+int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv )
+{
+    static struct option long_options[] = {
+        { "help", 0, 0, 'h' },
+        { "height", 1, 0, 'H' },
+        { "inputwidth", 1, 0, 'I' },
+        { "driver", 1, 0, 'D' },
+        { "input", 1, 0, 'i' },
+        { "channel", 1, 0, 'c' },
+        { "configfile", 1, 0, 'F' },
+        { "norm", 1, 0, 'n' },
+        { "frequencies", 1, 0, 'f' },
+        { "vbidevice", 1, 0, 'b' },
+        { "device", 1, 0, 'd' },
+        { "mixer", 1, 0, 'x' },
+        { "fullscreen", 0, 0, 'm' },
+        { "window", 0, 0, 'M' },
+        { "widescreen", 0, 0, 'a' },
+        { "fspos", 1, 0, 'p' },
+        { 0, 0, 0, 0 }
+    };
+    int option_index = 0;
+    char *configFile = 0;
+    char c;
+
+    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:",
+            long_options, &option_index )) != -1 ) {
+        switch( c ) {
+        case 'a': ct->aspect = 1; break;
+        case 'm': ct->fullscreen = 1; break;
+        case 'M': ct->fullscreen = 0; break;
+        case 'F': if( configFile ) { free( configFile ); }
+                  configFile = strdup( optarg ); break;
+        case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
+                  ct->mixerdev = strdup( optarg ); break;
+        case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
+                      ct->outputheight = -1;
+                  } else {
+                      ct->outputheight = atoi( optarg );
+                  }
+                  break;
+        case 'I': ct->inputwidth = atoi( optarg ); break;
+        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+        case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'i': ct->inputnum = atoi( optarg ); break;
+        case 'c': ct->prev_channel = ct->start_channel;
+                  ct->start_channel = atoi( optarg ); break;
+        case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+        case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
+                  ct->output_driver = strdup( optarg ); break;
+        case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
+                      ct->fspos = 1;
+                  } else if( tolower( optarg[ 0 ] ) == 'b' ) {
+                      ct->fspos = 2;
+                  } else {
+                      ct->fspos = 0;
+                  }
+                  break;
+        case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
+        default:
+            print_config_usage( argv );
+            return 0;
+        }
+    }
+
+    /* Then read in additional settings. */
+    if( configFile ) {
+        char *temp = expand_user_path( configFile );
+        if( temp ) {
+            free( configFile );
+            configFile = temp;
+        }
+    }
+    if( configFile ) {
+        if( ct->config_filename ) free( ct->config_filename );
+        ct->config_filename = configFile;
+
+        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
+        conf_xml_parse( ct, configFile );
+    }
+
+    ct->doc = configsave_open( ct->config_filename );
+
+    if( ct->doc ) {
+        char tempstring[ 32 ];
+        fprintf( stderr, "config: Saving command line options.\n" );
+
+        /**
+         * Options that aren't specified on the command line
+         * will match the config file anyway, so save everything that
+         * you can save on the command line.
+         */
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->aspect );
+        config_save( ct, "Widescreen", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
+        config_save( ct, "Fullscreen", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
+        config_save( ct, "Verbose", tempstring );
+
+        config_save( ct, "OutputDriver", ct->output_driver );
+
+        if( ct->fspos == 0 ) {
+            config_save( ct, "FullscreenPosition", "Centre" );
+        } else if( ct->fspos == 1 ) {
+            config_save( ct, "FullscreenPosition", "Top" );
+        } else if( ct->fspos == 2 ) {
+            config_save( ct, "FullscreenPosition", "Bottom" );
+        }
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
+        config_save( ct, "OutputHeight", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputwidth );
+        config_save( ct, "InputWidth", tempstring );
+
+        config_save( ct, "V4LDevice", ct->v4ldev );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->use_vbi );
+        config_save( ct, "UseVBI", tempstring );
+        config_save( ct, "VBIDevice", ct->vbidev );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
+        config_save( ct, "V4LInput", tempstring );
+
+        config_save( ct, "Norm", ct->norm );
+        config_save( ct, "Frequencies", ct->freq );
+
+        config_save( ct, "MixerDevice", ct->mixerdev );
+    }
+
+    return 1;
+}
+
 
 void config_free_data( config_t *ct )
 {

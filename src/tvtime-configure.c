@@ -31,7 +31,7 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    config_parse_tvtime_command_line( cfg, argc, argv );
+    config_parse_tvtime_config_command_line( cfg, argc, argv );
 
     config_delete( cfg );
     return 0;
