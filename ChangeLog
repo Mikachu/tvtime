@@ -1,5 +1,7 @@
 
 0.9.8.1 -
+  * vektor: Added code to save the network name and network call
+      letters in the stationlist.xml file.
   * vektor: Swapped name and number in the OSD (fixes 730281)
   * vektor: Default to single pixel bordered text in the OSD
   * vektor: OSD text position now sub-pixel correct (fixes 709500)
