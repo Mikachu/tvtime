@@ -195,7 +195,7 @@ void frequencies_disable_freqs( config_t *ct )
     parser_file_t *pf = config_get_parsed_file( ct );
     int i=1, j=0, k=0;
     char table_name[255], chan_name[6];
-    int enabled, ret, the_freq_table, the_channel;
+    int enabled, ret, the_freq_table=-1, the_channel=-1;
 
     for(;;) {
         tmp = parser_get( pf, "channel", i++ );
@@ -203,12 +203,13 @@ void frequencies_disable_freqs( config_t *ct )
         if( acopy ) free( acopy );
         acopy = strdup( tmp );
 
-        ret = sscanf( acopy, " %s %s %d ", table_name, chan_name, &enabled );
+        ret = sscanf( acopy, " %254s %5s %d ", table_name, chan_name, &enabled );
         if( ret != 3 ) {
             fprintf( stderr, "Ignoring: ret = %d, channel = %s\n", ret, acopy);
             continue;
         }
 
+        the_freq_table = -1;
         for( j = 0; j < NUM_FREQ_TABLES; j++ ) {
             if( !strcasecmp( freq_table_names[ j ].short_name, table_name ) ) {
                 the_freq_table = j;
@@ -226,6 +227,7 @@ void frequencies_disable_freqs( config_t *ct )
             instr = "0";
         }
 
+        the_channel = -1;
         for( k = 0; k < CHAN_ENTRIES; k++ ) {
             const char *curstr = tvtuner[ k ].name;
             while( *curstr == ' ' ) curstr++;
@@ -235,7 +237,8 @@ void frequencies_disable_freqs( config_t *ct )
             }
         }
 
-        tvtuner[ the_channel ].freq[ the_freq_table ].enabled = enabled;
+        if( the_channel > -1 && the_freq_table > -1 )
+            tvtuner[ the_channel ].freq[ the_freq_table ].enabled = enabled;
     }
 }
 
@@ -412,8 +415,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
             break;
 
         case TVTIME_SKIP_CHANNEL:
-            tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled = 0;
-            fprintf( stderr, "channel = %s %s 0\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ cur_channel ].name );
+            tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled = !tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled;
+            fprintf( stderr, "channel = %s %s %d\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ cur_channel ].name, tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled );
             break;
             
         case TVTIME_ASPECT:
