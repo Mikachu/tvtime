@@ -49,7 +49,6 @@ rtctimer_t *rtctimer_new( int verbose )
         if( rtctimer->verbose ) {
             fprintf( stderr, "rtctimer: Cannot open /dev/rtc: %s\n",
                      strerror( errno ) );
-            fprintf( stderr, "rtctimer: Trying /dev/misc/rtc just in case...\n" );
         }
         if( ( rtctimer->rtc_fd = open( "/dev/misc/rtc", O_RDONLY ) ) < 0 ) {
             if( rtctimer->verbose ) {
