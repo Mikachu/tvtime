@@ -61,15 +61,16 @@ enum tvtime_commands
     TVTIME_DEINTERLACINGMODE,
 
     TVTIME_MENUMODE,
+    TVTIME_DISPLAY_INFO,
 
     TVTIME_LAST
 };
-
 
 config_t *config_new( int argc, char **argv );
 void config_delete( config_t *ct );
 int config_dump( config_t *ct );
 int config_key_to_command( config_t *ct, int key );
+int config_button_to_command( config_t *ct, int button );
 
 int config_get_verbose( config_t *ct );
 int config_get_debug( config_t *ct );

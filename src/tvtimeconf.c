@@ -25,6 +25,56 @@
 #include "tvtimeconf.h"
 #include "input.h"
 
+
+#define MAX_KEYSYMS 350
+#define MAX_CMD_NAMELEN 64
+#define MAX_BUTTONS 10
+
+typedef struct {
+    char name[MAX_CMD_NAMELEN];
+    int command;
+} Cmd_Names;
+
+static Cmd_Names cmd_table[] = {
+
+    { "QUIT", TVTIME_QUIT },
+    { "CHANNEL_UP", TVTIME_CHANNEL_UP },
+    { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
+    { "LUMA_CORRECTION_TOGGLE", TVTIME_LUMA_CORRECTION_TOGGLE },
+    { "LUMA_UP", TVTIME_LUMA_UP },
+    { "LUMA_DOWN", TVTIME_LUMA_DOWN },
+    { "MIXER_MUTE", TVTIME_MIXER_MUTE },
+    { "MIXER_UP", TVTIME_MIXER_UP },
+    { "MIXER_DOWN", TVTIME_MIXER_DOWN },
+    { "TV_VIDEO", TVTIME_TV_VIDEO },
+    { "HUE_DOWN", TVTIME_HUE_DOWN },
+    { "HUE_UP", TVTIME_HUE_UP },
+    { "BRIGHT_DOWN", TVTIME_BRIGHT_DOWN },
+    { "BRIGHT_UP", TVTIME_BRIGHT_UP },
+    { "CONT_DOWN", TVTIME_CONT_DOWN },
+    { "CONT_UP", TVTIME_CONT_UP },
+    { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
+    { "COLOUR_UP", TVTIME_COLOUR_UP },
+
+    { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
+    { "FINETUNE_UP", TVTIME_FINETUNE_UP },
+
+    { "SHOW_BARS", TVTIME_SHOW_BARS },
+    { "DEBUG", TVTIME_DEBUG },
+
+    { "FULLSCREEN", TVTIME_FULLSCREEN },
+    { "ASPECT", TVTIME_ASPECT },
+    { "SCREENSHOT", TVTIME_SCREENSHOT },
+    { "DEINTERLACING_MODE", TVTIME_DEINTERLACINGMODE },
+
+    { "MENUMODE", TVTIME_MENUMODE },
+    { "DISPLAY_INFO", TVTIME_DISPLAY_INFO }
+};
+
+
+#define NUM_CMDS (sizeof(cmd_table)/sizeof(Cmd_Names))
+
+
 struct config_s
 {
     parser_file_t pf;
@@ -45,10 +95,12 @@ struct config_s
     char *freq;
     int *keymap;
     char *timeformat;
+    int *buttonmap;
 };
 
 void config_init( config_t *ct );
 void config_init_keymap( config_t *ct );
+void config_init_buttonmap( config_t *ct );
 
 static void print_usage( char **argv )
 {
@@ -115,8 +167,7 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
-//    ct->keymap = (int *) malloc( TVTIME_LAST * sizeof( int ) );
-    ct->keymap = (int *) malloc( 8*350 * sizeof( int ) );
+    ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -124,7 +175,15 @@ config_t *config_new( int argc, char **argv )
         return 0;
     }
 
-    memset( ct->keymap, 0, 8*350 * sizeof( int ) );
+    ct->buttonmap = (int *) malloc( MAX_BUTTONS * sizeof( int ) );
+    if( !ct->buttonmap ) {
+        fprintf( stderr, "config: Could not aquire memory for buttonmap.\n" );
+        free( ct->keymap );
+        free( ct );
+        return 0;
+    }
+
+    memset( ct->keymap, 0, 8*MAX_KEYSYMS * sizeof( int ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
     ct->keymap[ I_UP ] = TVTIME_CHANNEL_UP;
@@ -155,39 +214,12 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ ',' ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ '.' ] = TVTIME_FINETUNE_UP;
 
-#if 0    
-
-    ct->keymap[ TVTIME_NOCOMMAND ]      = 0;
-    ct->keymap[ TVTIME_QUIT ]           = I_ESCAPE;
-    ct->keymap[ TVTIME_CHANNEL_UP ]     = I_UP;
-    ct->keymap[ TVTIME_CHANNEL_DOWN ]   = I_DOWN;
-    ct->keymap[ TVTIME_LUMA_CORRECTION_TOGGLE ] = 'c';
-    ct->keymap[ TVTIME_LUMA_UP ]        = 'j';
-    ct->keymap[ TVTIME_LUMA_DOWN ]      = 'h';
-    ct->keymap[ TVTIME_MIXER_MUTE ]     = 'm';
-    ct->keymap[ TVTIME_MIXER_UP ]       = '+';
-    ct->keymap[ TVTIME_MIXER_DOWN ]     = '-';
-    ct->keymap[ TVTIME_ENTER ]          = I_ENTER;
-    ct->keymap[ TVTIME_CHANNEL_CHAR ]   = 0; 
-    ct->keymap[ TVTIME_TV_VIDEO ]       = I_F9;
-    ct->keymap[ TVTIME_HUE_DOWN ]       = I_F1;
-    ct->keymap[ TVTIME_HUE_UP ]         = I_F2;
-    ct->keymap[ TVTIME_BRIGHT_DOWN ]    = I_F3; 
-    ct->keymap[ TVTIME_BRIGHT_UP ]      = I_F4;
-    ct->keymap[ TVTIME_CONT_DOWN ]      = I_F5;
-    ct->keymap[ TVTIME_CONT_UP ]        = I_F6;
-    ct->keymap[ TVTIME_COLOUR_DOWN ]    = I_F7;
-    ct->keymap[ TVTIME_COLOUR_UP ]      = I_F8;
-    ct->keymap[ TVTIME_SHOW_BARS ]      = I_F11;
-    ct->keymap[ TVTIME_DEBUG ]          = 'd';
-    ct->keymap[ TVTIME_FULLSCREEN ]     = 'f';
-    ct->keymap[ TVTIME_ASPECT ]         = 'a';
-    ct->keymap[ TVTIME_SCREENSHOT ]     = 's';
-    ct->keymap[ TVTIME_DEINTERLACINGMODE ] = 't';
-    ct->keymap[ TVTIME_MENUMODE ]       = I_HOME;
-    ct->keymap[ TVTIME_FINETUNE_DOWN ]  = ',';
-    ct->keymap[ TVTIME_FINETUNE_UP ]    = '.';
-#endif
+    memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
+    ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
+    ct->buttonmap[ 2 ] = TVTIME_MIXER_MUTE;
+    ct->buttonmap[ 3 ] = TVTIME_TV_VIDEO;
+    ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
+    ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 245 );
@@ -246,6 +278,7 @@ config_t *config_new( int argc, char **argv )
 void config_delete( config_t *ct )
 {
     if( ct->keymap ) free( ct->keymap );
+    if( ct->buttonmap ) free( ct->buttonmap );
 }
 
 void config_init( config_t *ct )
@@ -314,6 +347,7 @@ void config_init( config_t *ct )
     }
 
     config_init_keymap( ct );
+    config_init_buttonmap( ct );
 }
 
 int string_to_key( const char *str )
@@ -434,182 +468,27 @@ int string_to_key( const char *str )
 void config_init_keymap( config_t *ct )
 {
     const char *tmp;
-    int key, i=1;
+    int key, cmd=0, i=1;
     
     if( !ct->keymap ) {
         fprintf( stderr, "config: No keymap. No keybindings.\n" );
         return;
     }
 
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_quit", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_QUIT;
-    } else { break; }
+    for( cmd=0; cmd < NUM_CMDS; cmd++ ) {
+        char keystr[ 5+MAX_CMD_NAMELEN ];
+        sprintf( keystr, "key_%s", cmd_table[cmd].name );
 
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_channel_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_CHANNEL_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_channel_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_CHANNEL_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_luma_correction_toggle", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_LUMA_CORRECTION_TOGGLE;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_luma_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_LUMA_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_luma_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_LUMA_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_mixer_mute", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_MIXER_MUTE;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_mixer_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_MIXER_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_mixer_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_MIXER_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_tv_video", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_TV_VIDEO;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_hue_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_HUE_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_hue_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_HUE_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_bright_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_BRIGHT_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_bright_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_BRIGHT_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_cont_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_CONT_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_cont_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_CONT_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_colour_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_COLOUR_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_colour_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_COLOUR_UP;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_show_bars", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_SHOW_BARS;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_debug", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_DEBUG;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_fullscreen", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_FULLSCREEN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_aspect", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_ASPECT;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_screenshot", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_SCREENSHOT;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_deinterlacing_mode", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_DEINTERLACINGMODE;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_menu_mode", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_MENUMODE;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_finetune_down", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_FINETUNE_DOWN;
-    } else { break; }
-
-    for(i=1;;i++)
-    if( (tmp = parser_get( &(ct->pf), "key_finetune_up", i )) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] = TVTIME_FINETUNE_UP;
-    } else { break; }
-
-   
+        for(i=1;;i++)
+            if( (tmp = parser_get( &(ct->pf), keystr, i )) ) {
+                key = string_to_key( tmp );
+                ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ] = cmd_table[cmd].command;
+            } else { break; }
+    }   
 }
 
 int config_key_to_command( config_t *ct, int key )
 {
-    int i;
-
     if( !ct || !ct->keymap ) {
         fprintf( stderr, "config: key_to_command: Invalid config obj "
                  "or no keymap.\n" );
@@ -618,18 +497,56 @@ int config_key_to_command( config_t *ct, int key )
 
     if( !key ) return TVTIME_NOCOMMAND;
 
-#if 0
-    for( i=0; i < TVTIME_LAST; i++ ) {
-        if( ct->keymap[i] == key ) return i;
-    }
-#endif 
-
-    if( ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ] ) 
-        return ct->keymap[ 350*(key & 0x70000) + (key & 0x1ff) ];
+    if( ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ] ) 
+        return ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ];
 
     if( isalnum(key) ) return TVTIME_CHANNEL_CHAR;
         
     return TVTIME_NOCOMMAND;
+}
+
+int string_to_command( const char *str )
+{
+    int i=0;
+
+    while( i < NUM_CMDS ) {
+        if( !strcasecmp( cmd_table[i].name, str ) ) {
+            return cmd_table[i].command;
+        }
+        i++;
+    }
+    return -1;
+}
+
+void config_init_buttonmap( config_t *ct )
+{
+    int button=0, cmd=0;
+    const char *tmp;
+
+    for( button=0; button < MAX_BUTTONS; button++ ) {
+        char butstr[ 14+MAX_CMD_NAMELEN ];
+        sprintf( butstr, "mouse_button_%d", button );
+
+        if( (tmp = parser_get( &(ct->pf), butstr, 1 )) ) {
+            cmd = string_to_command( tmp );
+            if( cmd == -1 ) {
+                fprintf( stderr, 
+                         "config_init_buttonmap: %s is not a valid command.\n", 
+                         tmp );
+                continue;
+            }
+
+            ct->buttonmap[ button ] = cmd;
+        }
+    }
+
+}
+
+int config_button_to_command( config_t *ct, int button )
+{
+    if( !ct || !ct->buttonmap ) return 0;
+    if( button < 0 || button >= MAX_BUTTONS ) return 0;
+    return ct->buttonmap[button];
 }
 
 int config_dump( config_t *ct )

@@ -29,7 +29,7 @@ typedef enum InputEvent_e {
     I_NOOP                      = 0,
     I_KEYDOWN                   = (1<<0),
     I_QUIT                      = (1<<1),
-    I_CHANNEL_CHANGE_RELATIVE   = (1<<2)
+    I_BUTTONPRESS               = (1<<2)
 
 } InputEvent;
 

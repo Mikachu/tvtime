@@ -191,7 +191,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
 {
     int tvtime_cmd, verbose, fixed_arg = 0;
 
-    if( !m ) return;
+    if( !m ) return 0;
 
     verbose = config_get_verbose( m->cfg );
 

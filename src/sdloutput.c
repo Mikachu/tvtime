@@ -217,11 +217,9 @@ void sdl_poll_events( input_t *in )
         }
 
         if( event.type == SDL_MOUSEBUTTONDOWN ) {
-            if( event.button.button == 4 ) {
-                input_callback( in, I_CHANNEL_CHANGE_RELATIVE, 1 );
-            } else if( event.button.button == 5 ) {
-                input_callback( in, I_CHANNEL_CHANGE_RELATIVE, -1 );
-            }
+
+            input_callback( in, I_BUTTONPRESS, event.button.button );
+
         }
     }
 }

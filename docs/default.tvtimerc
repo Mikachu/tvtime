@@ -163,3 +163,15 @@ key_deinterlacing_mode     = t
 key_finetune_down          = ,
 key_finetune_up            = .
 
+# Up to 9 mouse button bindings are supported
+# You can bind a mouse button to any even you can set a keybinding for
+# For the list of command names, simply look at the corresponding key_
+# configuration option and use everything after the key_ for the command name.
+# Below are the default settings.
+
+mouse_button_1   = display_info
+mouse_button_2   = mixer_mute
+mouse_button_3   = tv_video
+mouse_button_4   = channel_up
+mouse_button_5   = channel_down
+
