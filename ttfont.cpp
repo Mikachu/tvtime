@@ -452,7 +452,7 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
 void TTFFont::RenderString( unsigned char *output, const char *text,
                             int *width, int *height, int maxx, int maxy )
 {
-   int w, h, inx, iny, i;
+   int w, h, inx, iny;
    Raster_Map rmap;
 
    calc_size( &w, &h, text );
@@ -471,6 +471,7 @@ void TTFFont::RenderString( unsigned char *output, const char *text,
    rmap.cols = w;
    rmap.size = w * h;
    rmap.bitmap = output;
+   memset( output, 0, w * h );
 
    inx = 0;
    iny = 0;

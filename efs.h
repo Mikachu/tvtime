@@ -13,8 +13,9 @@ efont_t *efont_new( const char *fontfile, int fontsize, int video_width,
                     int video_height, double pixel_aspect );
 void efont_delete( efont_t *font );
 
-efont_string_t *efs_new( efont_t *font, const char *text );
+efont_string_t *efs_new( efont_t *font );
 void efs_delete( efont_string_t *efs );
+void efs_set_text( efont_string_t *efs, const char *text );
 int efs_get_width( efont_string_t *efs );
 int efs_get_height( efont_string_t *efs );
 int efs_get_stride( efont_string_t *efs );

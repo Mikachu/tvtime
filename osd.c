@@ -50,7 +50,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
     osds->font = efont_new( fontfile, fontsize, video_width, video_height, video_aspect );
-    osds->efs = 0;
+    osds->efs = efs_new( osds->font );
     osds->frames_left = 0;
 
     osds->text_luma = 16;
@@ -73,9 +73,8 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 
 void osd_string_delete( osd_string_t *osds )
 {
-    if( osds->efs ) {
-        efs_delete( osds->efs );
-    }
+    efs_delete( osds->efs );
+    efont_delete( osds->font );
     free( osds );
 }
 
@@ -151,10 +150,7 @@ void osd_string_render_image4444( osd_string_t *osds )
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
-    if( osds->efs ) {
-        efs_delete( osds->efs );
-    }
-    osds->efs = efs_new( osds->font, text );
+    efs_set_text( osds->efs, text );
     osd_string_render_image4444( osds );
     osds->frames_left = timeout;
 }
