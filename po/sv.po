@@ -2,14 +2,14 @@
 # Copyright (C) 2003, 2004 Billy Biggs
 # This file is distributed under the same license as the tvtime package.
 # Per von Zweigbergk <pvz@e.kth.se>, 2003, 2004
-# Many thanks to Göran Uddeborg <goeran@uddeborg.se> for suggestions on
-# improvements.
+# Many thanks to Göran Uddeborg and Mikael Magnusson for proofreading and
+# suggestions.
 msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.13\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2004-09-18 23:43-0400\n"
-"PO-Revision-Date: 2004-09-19 21:12+0200\n"
+"PO-Revision-Date: 2004-09-19 21:38+0200\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -67,9 +67,10 @@ msgstr "Ändra fönstrets storlek för att matcha innehållet"
 msgid "Fullscreen"
 msgstr "Helskärm"
 
+# Finns bättre formulering?
 #: src/tvtime.c:934
 msgid "Set fullscreen position"
-msgstr "Välj helskärmsjustering"
+msgstr "Välj helskärmsposition"
 
 #: src/tvtime.c:944
 msgid "Always-on-top"
@@ -165,6 +166,7 @@ msgstr "Bildmaskering (Anamorfisk signal)"
 msgid "Matte setting (4:3 input)"
 msgstr "Bildmaskering (4:3-signal)"
 
+# Allokera kanske?
 #: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
 #: src/tvtime.c:1422 src/tvtime.c:1472 src/tvtime.c:1497 src/tvtime.c:1511
 #: src/tvtime.c:1525 src/tvtimeconf.c:955 src/tvtimeconf.c:1139
@@ -177,7 +179,7 @@ msgstr "%s: Kan inte tilldela minne.\n"
 #: src/tvtime.c:1315
 #, c-format
 msgid "Cannot open capture device %s."
-msgstr "Kan inte öppna captureenheten %s."
+msgstr "Kan inte öppna capture-enheten %s."
 
 #: src/tvtime.c:1320
 #, c-format
@@ -190,7 +192,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Din capturedrivrutin, %s, verkar inte stödja capture\n"
+"    Din capture-drivrutin, %s, verkar inte stödja capture\n"
 "    vid full bildfrekvens. Var god kontrollera att drivrutinen är rätt\n"
 "    inställd, och att du valt rätt enhet (%s).\n"
 "\n"
@@ -544,7 +546,7 @@ msgstr "Hög (768 bildpunkter)"
 
 #: src/commands.c:820 src/commands.c:1379
 msgid "Restart with new settings"
-msgstr "Omstart med nya inställningar"
+msgstr "Starta om med nya inställningar"
 
 #: src/commands.c:881 src/commands.c:1782
 msgid "Mono"
@@ -711,7 +713,7 @@ msgstr "Spara bildinställningar som förval"
 #: src/commands.c:1523 src/commands.c:1533 src/commands.c:1580
 #: src/commands.c:1592
 msgid "Reset to global defaults"
-msgstr "Återgå till sparade inställningar"
+msgstr "Återgå till sparade förval"
 
 #: src/commands.c:1569
 msgid "Save current settings as global defaults"
@@ -755,7 +757,7 @@ msgstr "Använder PAL-BG-avkodning för den här kanalens ljud."
 #: src/commands.c:2203
 #, c-format
 msgid "Using PAL-DK audio decoding for this channel."
-msgstr "Använder PAL-DK-avkorning för den här kanalens ljud."
+msgstr "Använder PAL-DK-avkodning för den här kanalens ljud."
 
 #: src/commands.c:2232
 #, c-format
@@ -778,12 +780,12 @@ msgstr "Kanalen visas inte längre vid bläddring."
 #: src/commands.c:2296
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
-msgstr "Tvtime ställer inte in capturekortets ljudstyrka."
+msgstr "Tvtime kommer inte ställa in capture-kortets ljudstyrka."
 
 #: src/commands.c:2299
 #, c-format
 msgid "Setting capture card volume to %d%%."
-msgstr "Ställer capturekortets ljudstyrka till %d%%."
+msgstr "Ställer capture-kortets ljudstyrka till %d%%."
 
 #: src/commands.c:2332
 msgid "Processing every input field."
@@ -829,7 +831,7 @@ msgstr "Alla kanaler visas nu vid bläddring."
 #: src/commands.c:2501
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
-msgstr "Flyttar kanal %d. Mata in det nya kanalnumret."
+msgstr "Flyttar kanal %d. Mata in nytt kanalnummer."
 
 #: src/commands.c:2513
 msgid "Scanner unavailable with signal checking disabled."
@@ -941,7 +943,7 @@ msgstr "Ljudstyrka"
 
 #: src/commands.c:3212
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Bildinställningarna sparades som förval.\n"
+msgstr "Bildinställningarna sparades som förval för alla kanaler.\n"
 
 #: src/commands.c:3225
 #, c-format
@@ -1318,4 +1320,3 @@ msgstr "Signal funnen"
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
-"Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
