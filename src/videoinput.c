@@ -1131,12 +1131,17 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                                  "videoinput: driver info to " PACKAGE_BUGREPORT "\n" );
                 fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
+
+            if( !mute ) {
+                videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, 1.0 );
+            }
         } else {
             if( mute ) {
                 audio.flags |= VIDEO_AUDIO_MUTE;
             } else {
                 audio.flags &= ~VIDEO_AUDIO_MUTE;
             }
+            audio.volume = 65535;
 
             if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
                 fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
@@ -1212,7 +1217,6 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 
                 /* Set the mode. */
                 audio.mode = mode;
-                // vidin->audio.volume = 65535;
                 if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
                     fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
                              "might cause this.  Post a bug report with your driver info to "
