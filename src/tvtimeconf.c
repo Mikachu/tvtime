@@ -91,8 +91,7 @@ struct config_s
     double overscan;
 
     char *config_filename;
-
-    configsave_t *configsave;
+    xmlDocPtr doc;
 
     int nummodes;
     tvtime_modelist_t *modelist;
@@ -151,6 +150,25 @@ static unsigned int parse_colour( const char *str )
         return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
     } else if( ret == 4 ) {
         return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
+    }
+
+    return 0;
+}
+
+static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
+            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+            if( name && !xmlStrcasecmp( name, BAD_CAST optname ) ) {
+                xmlFree( name );
+                return node;
+            }
+            if( name ) xmlFree( name );
+        }
+
+        node = node->next;
     }
 
     return 0;
@@ -410,6 +428,67 @@ static int conf_xml_parse( config_t *ct, char *configFile )
 
     return 1;
 }
+
+/* Attempt to parse the file for key elements and create them if they don't exist */
+static xmlDocPtr configsave_open( const char *config_filename )
+{
+    xmlDocPtr doc;
+    xmlNodePtr top;
+
+    doc = xmlParseFile( config_filename );
+    if( !doc ) {
+        if( file_is_openable_for_read( config_filename ) ) {
+            fprintf( stderr, "config: Config file exists, but cannot be parsed.\n" );
+            fprintf( stderr, "config: Settings will NOT be saved.\n" );
+            return 0;
+        } else {
+            /* Config file doesn't exist, create a new one. */
+            fprintf( stderr, "config: No config file found, creating a new one.\n" );
+            doc = xmlNewDoc( BAD_CAST "1.0" );
+            if( !doc ) {
+                fprintf( stderr, "config: Could not create new config file.\n" );
+                return 0;
+            }
+        }
+    }
+
+    top = xmlDocGetRootElement( doc );
+    if( !top ) {
+        /* Set the DTD */
+        xmlDtdPtr dtd;
+        dtd = xmlNewDtd( doc, BAD_CAST "tvtime",
+                         BAD_CAST "-//tvtime//DTD tvtime 1.0//EN",
+                         BAD_CAST "http://tvtime.sourceforge.net/DTD/tvtime1.dtd" );
+        doc->intSubset = dtd;
+        if( !doc->children ) {
+            xmlAddChild( (xmlNodePtr) doc, (xmlNodePtr) dtd );
+        } else {
+            xmlAddPrevSibling( doc->children, (xmlNodePtr) dtd );
+        }
+
+        /* Create the root node */
+        top = xmlNewDocNode( doc, 0, BAD_CAST "tvtime", 0 );
+        if( !top ) {
+            fprintf( stderr, "config: Could not create toplevel element 'tvtime'.\n" );
+            xmlFreeDoc( doc );
+            return 0;
+        } else {
+            xmlDocSetRootElement( doc, top );
+            xmlNewProp( top, BAD_CAST "xmlns",
+                        BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
+        }
+    }
+
+    if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
+        fprintf( stderr, "config: Root node in file %s should be 'tvtime'.\n", config_filename );
+        xmlFreeDoc( doc );
+        return 0;
+    }
+
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( config_filename, doc, 1 );
+    return doc;
+}
  
 static void print_usage( char **argv )
 {
@@ -506,7 +585,7 @@ config_t *config_new( void )
     /* We set these to 0 so we can delete safely if necessary. */
     ct->rvr_filename = 0;
     ct->config_filename = 0;
-    ct->configsave = 0;
+    ct->doc = 0;
 
     ct->uid = getuid();
     pwuid = getpwuid( ct->uid );
@@ -682,9 +761,9 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         conf_xml_parse( ct, configFile );
     }
 
-    ct->configsave = configsave_open( ct->config_filename );
+    ct->doc = configsave_open( ct->config_filename );
 
-    if( ct->configsave && saveoptions ) {
+    if( ct->doc && saveoptions ) {
         char tempstring[ 32 ];
         fprintf( stderr, "config: Saving command line options.\n" );
 
@@ -694,33 +773,33 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
          * you can save on the command line.
          */
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->aspect );
-        configsave( ct->configsave, "Widescreen", tempstring );
+        config_save( ct, "Widescreen", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
-        configsave( ct->configsave, "Fullscreen", tempstring );
+        config_save( ct, "Fullscreen", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
-        configsave( ct->configsave, "Verbose", tempstring );
+        config_save( ct, "Verbose", tempstring );
 
-        configsave( ct->configsave, "OutputDriver", ct->output_driver );
+        config_save( ct, "OutputDriver", ct->output_driver );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
-        configsave( ct->configsave, "OutputHeight", tempstring );
+        config_save( ct, "OutputHeight", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputwidth );
-        configsave( ct->configsave, "InputWidth", tempstring );
+        config_save( ct, "InputWidth", tempstring );
 
-        configsave( ct->configsave, "V4LDevice", ct->v4ldev );
+        config_save( ct, "V4LDevice", ct->v4ldev );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->use_vbi );
-        configsave( ct->configsave, "UseVBI", tempstring );
-        configsave( ct->configsave, "VBIDevice", ct->vbidev );
+        config_save( ct, "UseVBI", tempstring );
+        config_save( ct, "VBIDevice", ct->vbidev );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
-        configsave( ct->configsave, "V4LInput", tempstring );
+        config_save( ct, "V4LInput", tempstring );
 
-        configsave( ct->configsave, "Norm", ct->norm );
-        configsave( ct->configsave, "Frequencies", ct->freq );
+        config_save( ct, "Norm", ct->norm );
+        config_save( ct, "Frequencies", ct->freq );
     }
 
     return 1;
@@ -728,6 +807,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
 void config_free_data( config_t *ct )
 {
+    if( ct->doc ) xmlFreeDoc( ct->doc );
     if( ct->v4ldev ) free( ct->v4ldev );
     if( ct->norm ) free( ct->norm );
     if( ct->freq ) free( ct->freq );
@@ -740,7 +820,6 @@ void config_free_data( config_t *ct )
     if( ct->vbidev ) free( ct->vbidev );
     if( ct->config_filename ) free( ct->config_filename );
     if( ct->deinterlace_method ) free( ct->deinterlace_method );
-    if( ct->configsave ) configsave_close( ct->configsave );
 }
 
 void config_delete( config_t *ct )
@@ -754,6 +833,30 @@ void config_delete( config_t *ct )
     }
     config_free_data( ct );
     free( ct );
+}
+
+void config_save( config_t *ct, const char *name, const char *value )
+{
+    xmlNodePtr top, node;
+
+    if( !ct->doc ) return;
+
+    top = xmlDocGetRootElement( ct->doc );
+    if( !top ) {
+        return;
+    }
+
+    node = find_option( top->xmlChildrenNode, name );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
+        xmlNewProp( node, BAD_CAST "name", BAD_CAST name );
+        xmlNewProp( node, BAD_CAST "value", BAD_CAST value );
+    } else {
+        xmlSetProp( node, BAD_CAST "value", BAD_CAST value );
+    }
+
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( ct->config_filename, ct->doc, 1 );
 }
 
 int config_key_to_command( config_t *ct, int key )
@@ -976,147 +1079,5 @@ int config_get_framerate_mode( config_t *ct )
 int config_get_slave_mode( config_t *ct )
 {
     return ct->slave_mode;
-}
-
-configsave_t *config_get_configsave( config_t *ct )
-{
-    return ct->configsave;
-}
-
-struct configsave_s
-{
-    char *configFile;
-    xmlDocPtr doc;
-};
-
-static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
-{
-    while( node ) {
-        if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
-            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
-
-            if( name && !xmlStrcasecmp( name, BAD_CAST optname ) ) {
-                xmlFree( name );
-                return node;
-            }
-            if( name ) xmlFree( name );
-        }
-
-        node = node->next;
-    }
-
-    return 0;
-}
-
-/* Attempt to parse the file for key elements and create them if they don't exist */
-configsave_t *configsave_open( const char *filename )
-{
-    configsave_t *cs = malloc( sizeof( configsave_t ) );
-    xmlNodePtr top;
-
-    if( !cs ) {
-        return 0;
-    }
-
-    cs->configFile = strdup( filename );
-    if( !cs->configFile ) {
-        free( cs );
-        return 0;
-    }
-
-    cs->doc = xmlParseFile( cs->configFile );
-    if( !cs->doc ) {
-        if( file_is_openable_for_read( cs->configFile ) ) {
-            fprintf( stderr, "configsave: Config file exists, but cannot be parsed.\n" );
-            fprintf( stderr, "configsave: Settings will NOT be saved.\n" );
-            free( cs->configFile );
-            free( cs );
-            return 0;
-        } else {
-            /* Config file doesn't exist, create a new one. */
-            fprintf( stderr, "configsave: No config file found, creating a new one.\n" );
-            cs->doc = xmlNewDoc( BAD_CAST "1.0" );
-            if( !cs->doc ) {
-                fprintf( stderr, "configsave: Could not create new config file.\n" );
-                free( cs->configFile );
-                free( cs );
-                return 0;
-            }
-        }
-    }
-
-    top = xmlDocGetRootElement( cs->doc );
-    if( !top ) {
-        /* Set the DTD */
-        xmlDtdPtr dtd;
-        dtd = xmlNewDtd( cs->doc,
-                         BAD_CAST "tvtime",
-                         BAD_CAST "-//tvtime//DTD tvtime 1.0//EN",
-                         BAD_CAST "http://tvtime.sourceforge.net/DTD/tvtime1.dtd" );
-        cs->doc->intSubset = dtd;
-        if( !cs->doc->children ) {
-            xmlAddChild( (xmlNodePtr) cs->doc, (xmlNodePtr) dtd );
-        } else {
-            xmlAddPrevSibling( cs->doc->children, (xmlNodePtr) dtd );
-        }
-
-        /* Create the root node */
-        top = xmlNewDocNode( cs->doc, 0, BAD_CAST "tvtime", 0 );
-        if( !top ) {
-            fprintf( stderr, "configsave: Could not create toplevel element 'tvtime'.\n" );
-            xmlFreeDoc( cs->doc );
-            free( cs->configFile );
-            free( cs );
-            return 0;
-        } else {
-            xmlDocSetRootElement( cs->doc, top );
-            xmlNewProp( top,
-                        BAD_CAST "xmlns",
-                        BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
-        }
-    }
-
-    if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        fprintf( stderr, "configsave: Root node in file %s should be 'tvtime'.\n", cs->configFile );
-        xmlFreeDoc( cs->doc );
-        free( cs->configFile );
-        free( cs );
-        return 0;
-    }
-
-    xmlKeepBlanksDefault( 0 );
-    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
-    return cs;
-}
-
-void configsave_close( configsave_t *cs )
-{
-    xmlFreeDoc( cs->doc );
-    free( cs->configFile );
-    free( cs );
-}
-
-int configsave( configsave_t *cs, const char *name, const char *value )
-{
-    xmlNodePtr top, node;
-
-    top = xmlDocGetRootElement( cs->doc );
-    if( !top ) {
-        fprintf( stderr, "configsave: Error, can't get document root.\n" );
-        return 0;
-    }
-
-    node = find_option( top->xmlChildrenNode, name );
-    if( !node ) {
-        node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
-        xmlNewProp( node, BAD_CAST "name", BAD_CAST name );
-        xmlNewProp( node, BAD_CAST "value", BAD_CAST value );
-    } else {
-        xmlSetProp( node, BAD_CAST "value", BAD_CAST value );
-    }
-
-    xmlKeepBlanksDefault( 0 );
-    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
-    return 1;
 }
 

@@ -27,13 +27,6 @@
 extern "C" {
 #endif
 
-typedef struct configsave_s configsave_t;
-
-configsave_t *configsave_open( const char *filename );
-void configsave_close( configsave_t *cs );
-int configsave( configsave_t *cs, const char *name, const char *value );
-
-
 typedef struct config_s config_t;
 
 config_t *config_new( void );
@@ -80,10 +73,10 @@ int config_get_check_freq_present( config_t *ct );
 int config_get_usevbi( config_t *ct );
 char *config_get_vbidev( config_t *ct );
 
-configsave_t *config_get_configsave( config_t *ct );
-
 int config_get_num_modes( config_t *ct );
 config_t *config_get_mode_info( config_t *ct, int mode );
+
+void config_save( config_t *ct, const char *name, const char *value );
 
 #ifdef __cplusplus
 };

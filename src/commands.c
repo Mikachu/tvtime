@@ -554,14 +554,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) {
             if( in->apply_luma ) {
                 tvtime_osd_show_message( in->osd, "Luma correction enabled." );
-                if( config_get_configsave( in->cfg ) ) {
-                    configsave( config_get_configsave( in->cfg ), "ApplyLumaCorrection", "1" );
-                }
+                config_save( in->cfg, "ApplyLumaCorrection", "1" );
             } else {
                 tvtime_osd_show_message( in->osd, "Luma correction disabled." );
-                if( config_get_configsave( in->cfg ) ) {
-                    configsave( config_get_configsave( in->cfg ), "ApplyLumaCorrection", "0" );
-                }
+                config_save( in->cfg, "ApplyLumaCorrection", "0" );
             }
         }
         break;
@@ -598,9 +594,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             }
 
             snprintf( message, sizeof( message ), "%.1f", in->luma_power );
-            if( config_get_configsave( in->cfg ) ) {
-                configsave( config_get_configsave( in->cfg ), "LumaCorrection", message );
-            }
+            config_save( in->cfg, "LumaCorrection", message );
             if( in->osd ) {
                 snprintf( message, sizeof( message ), "Luma correction value: %.1f",
                           in->luma_power );
