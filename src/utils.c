@@ -343,6 +343,7 @@ static key_name_t key_names[] = {
     { "Enter", I_ENTER },
     { "Print", I_PRINT },
     { "Menu", I_MENU },
+    { "Tab", '\t' },
     { 0, 0 }
 };
 

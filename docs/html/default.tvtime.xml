@@ -414,7 +414,7 @@
       Up, Down, Left, Right, Insert, Home, End, PgUp, Page_Up, PageUp,
       PgDn, Page_Down, PageDown, F1, F2, F3, F4, F5, F6, F7, F8, F9,
       F10, F11, F12, F13, F14, F15 Backspace, BS, Delete, Del, Esc,
-      Escape, Enter, Print, Menu
+      Escape, Enter, Print, Menu, Tab
   -->
 
   <bind command="quit">
@@ -424,7 +424,7 @@
 
   <bind command="show_menu">
     <keyboard key="F1"/>
-    <keyboard key="	"/>
+    <keyboard key="Tab"/>
     <mouse button="3"/>
   </bind>
 
@@ -544,7 +544,7 @@
     <keyboard key="esc"/>
     <keyboard key="q"/>
     <keyboard key="F1"/>
-    <keyboard key="	"/>
+    <keyboard key="Tab"/>
     <mouse button="3"/>
   </bind>
 
