@@ -1107,7 +1107,7 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
             }
 
             if( !mute ) {
-                videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, 1.0 );
+                videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, 0.9155 );
             }
         } else {
             struct video_audio audio;
@@ -1121,7 +1121,7 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                 } else {
                     audio.flags &= ~VIDEO_AUDIO_MUTE;
                 }
-                audio.volume = 65535;
+                audio.volume = 60000;
 
                 if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
                     fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
