@@ -155,6 +155,24 @@ XDS\-Informationen ausgelesen, sofern die VBI\-Dekodierung aktiviert ist.
 Gibt das Senderkürzel zur Anzeige im OSD an.  In NTSC\-Gebieten wird es aus
 den XDS\-Informationen ausgelesen, sofern die VBI\-Dekodierung aktiviert ist.
 
+.TP
+.B xmltvid
+Gibt die XMLTV\-Kennung des Senders an, für den Fall, daß die automatische
+Auswahl anhand des Sendernamens fehlschlägt.
+Angenommen, in Ihrer XMLTV\-Datei ist ein Sender folgendermaßen definiert:
+
+  <channel id="zdf.de">
+    <display-name lang="de">ZDF</display-name>
+  </channel>
+
+Ein passender Eintrag in der Senderliste sähe dann so aus:
+
+  <station name="2" active="1" position="2"
+           band="VHF E2-E12" channel="E7" xmltvid="zdf.de"/>
+
+Den Sendernamen können Sie in nach Belieben festlegen, solange die xmltvid in
+der Senderliste mit der Kennung in der XMLTV\-Datei übereinstimmt.
+
 .SH AUTOREN
 
 Achim Schneider,
