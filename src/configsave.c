@@ -28,7 +28,11 @@
    for compile use gcc configsave.c && ./a.out
 */
 
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <libxml/parser.h>
 #include "configsave.h"
 
@@ -57,11 +61,27 @@ static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
     return 0;
 }
 
+/**
+ * This should be moved elsewhere.
+ */
+static int file_is_openable_for_read( const char *filename )
+{
+    int fd;
+    fd = open( filename, O_RDONLY );
+    if( fd < 0 ) {
+        return 0;
+    } else {
+        close( fd );
+        return 1;
+    }
+}
+
+
 /* Attempt to parse the file for key elements and create them if they don't exist */
 configsave_t *configsave_open( const char *filename )
 {
     configsave_t *cs = (configsave_t *) malloc( sizeof( configsave_t ) );
-    xmlNodePtr top, node;
+    xmlNodePtr top;
 
     if( !cs ) {
         return 0;
@@ -75,13 +95,22 @@ configsave_t *configsave_open( const char *filename )
 
     cs->Doc = xmlParseFile( cs->configFile );
     if( !cs->Doc ) {
-        /* Config file doesn't exist, create a new one. */
-        cs->Doc = xmlNewDoc( BAD_CAST "1.0" );
-        if( !cs->Doc ) {
-            fprintf( stderr, "configsave: Could not create new config file.\n" );
+        if( file_is_openable_for_read( cs->configFile ) ) {
+            fprintf( stderr, "configsave: Config file exists, but cannot be parsed.\n" );
+            fprintf( stderr, "configsave: Settings will NOT be saved.\n" );
             free( cs->configFile );
             free( cs );
             return 0;
+        } else {
+            /* Config file doesn't exist, create a new one. */
+            fprintf( stderr, "configsave: No config file found, creating a new one.\n" );
+            cs->Doc = xmlNewDoc( BAD_CAST "1.0" );
+            if( !cs->Doc ) {
+                fprintf( stderr, "configsave: Could not create new config file.\n" );
+                free( cs->configFile );
+                free( cs );
+                return 0;
+            }
         }
     }
 
@@ -121,7 +150,7 @@ void configsave_close( configsave_t *cs )
 
 int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num )
 {
-    xmlNodePtr top, section, node;
+    xmlNodePtr top, node;
     xmlAttrPtr attr;
 
     top = xmlDocGetRootElement( cs->Doc );
