@@ -87,6 +87,13 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int width, int xpos,
                                               int scanline );
 
+void tvtime_osd_set_network_call( tvtime_osd_t* osd, char *str );
+void tvtime_osd_set_network_name( tvtime_osd_t* osd, char *str );
+void tvtime_osd_set_show_name( tvtime_osd_t* osd, char *str );
+void tvtime_osd_set_show_rating( tvtime_osd_t* osd, char *str );
+void tvtime_osd_set_show_start( tvtime_osd_t* osd, char *str );
+void tvtime_osd_set_show_length( tvtime_osd_t* osd, char *str );
+
 #ifdef __cplusplus
 };
 #endif

@@ -673,7 +673,7 @@ int main( int argc, char **argv )
     }
 
     /* Open the VBI device. */
-    vbidata = vbidata_new( "/dev/vbi0", vs, verbose );
+    vbidata = vbidata_new( "/dev/vbi0", vs, osd, verbose );
     if( !vbidata ) {
         fprintf( stderr, "tvtime: Could not create vbidata.\n" );
     } else {

@@ -3,6 +3,7 @@
 #define VBIDATA_H_INCLUDED
 
 #include "vbiscreen.h"
+#include "tvtimeosd.h"
 
 typedef struct vbidata_s vbidata_t;
 
@@ -16,7 +17,9 @@ typedef struct vbidata_s vbidata_t;
 #define CAPTURE_T3  8
 #define CAPTURE_T4  9
 
-vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose  );
+vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
+                        tvtime_osd_t* osd, int verbose  );
+
 void vbidata_delete( vbidata_t *vbi );
 void vbidata_reset( vbidata_t *vbi );
 void vbidata_capture_mode( vbidata_t *vbi, int mode );
