@@ -1,5 +1,9 @@
 
 0.9.8.4 -
+  * vektor: Fixed our metacity check by working around some bugs
+      in older versions of metacity.
+  * vektor: Updated the error message for when the XVIDEO port we
+      want is already in use.
 
 0.9.8.3 - Sun Jun  8 22:48:56 ADT 2003
   * vektor: Added mga_vid support and an X output driver that uses
