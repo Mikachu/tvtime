@@ -130,13 +130,13 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     font->cd = iconv_open( "WCHAR_T", "UTF-8" );
     if( font->cd == (iconv_t) -1 ) {
-	free( font );
-	return 0;
+        free( font );
+        return 0;
     }
 
     font->glyphdata = hashtable_init( HASHTABLE_SIZE );
     if( !font->glyphdata ) {
-	iconv_close( font->cd );
+        iconv_close( font->cd );
         free( font );
         return 0;
     }
@@ -145,7 +145,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         if( FT_Init_FreeType( &ft_lib ) ) {
             fprintf( stderr, "ftfont: Can't load freetype library.\n" );
             hashtable_destroy( font->glyphdata );
-	    iconv_close( font->cd );
+            iconv_close( font->cd );
             free( font );
             return 0;
         }
@@ -159,7 +159,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
             FT_Done_FreeType( ft_lib );
         }
         hashtable_destroy( font->glyphdata );
-	iconv_close( font->cd );
+        iconv_close( font->cd );
         free( font );
         return 0;
     }
@@ -177,27 +177,27 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     FT_Select_Charmap( font->face, ft_encoding_unicode );
 
     /* Precache printable ASCII chars for better performance */
-
-    for (i = 32; i < 128; i++)
-        ft_cache_glyph (font, i, NULL);
+    for( i = 32; i < 128; i++ ) {
+        ft_cache_glyph( font, i, 0 );
+    }
 
     return font;
 }
 
 void ft_font_delete( ft_font_t *font )
 {
-    hashtable_iterator_t *iter = hashtable_iterator_init (font->glyphdata);
+    hashtable_iterator_t *iter = hashtable_iterator_init( font->glyphdata );
     ft_glyph_data_t *cur;
     int index;
 
-    while ((cur = hashtable_iterator_go (iter, 0, 1, &index)) != NULL) {
+    while( (cur = hashtable_iterator_go( iter, 0, 1, &index )) ) {
         FT_Done_Glyph( cur->glyph );
         FT_Done_Glyph( cur->bitmap );
         hashtable_delete( font->glyphdata, index );
     }
 
     FT_Done_Face( font->face );
-    hashtable_iterator_destroy (iter);
+    hashtable_iterator_destroy( iter );
     hashtable_destroy( font->glyphdata );
     iconv_close( font->cd );
     free( font );
@@ -206,6 +206,29 @@ void ft_font_delete( ft_font_t *font )
     if( !ft_lib_refcount ) {
         FT_Done_FreeType( ft_lib );
         ft_lib = 0;
+    }
+}
+
+void ft_font_set_pixel_aspect( ft_font_t *font, double pixel_aspect )
+{
+    hashtable_iterator_t *iter = hashtable_iterator_init( font->glyphdata );
+    ft_glyph_data_t *cur;
+    int index;
+    int i;
+
+    while( (cur = hashtable_iterator_go( iter, 0, 1, &index )) ) {
+        FT_Done_Glyph( cur->glyph );
+        FT_Done_Glyph( cur->bitmap );
+        hashtable_delete( font->glyphdata, index );
+    }
+    hashtable_iterator_destroy( iter );
+
+    font->xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
+    FT_Set_Char_Size( font->face, 0, font->fontsize * 64, font->xdpi, 72 );
+
+    /* Precache printable ASCII chars for better performance */
+    for( i = 32; i < 128; i++ ) {
+        ft_cache_glyph( font, i, 0 );
     }
 }
 
@@ -237,9 +260,9 @@ static FT_BBox prerender_text( ft_font_t *font, const wchar_t *wtext, int len )
     for( i = 0; i < len; i++ ) {
         wchar_t cur = wtext[ i ];
         ft_glyph_data_t *curdata;
-	int ret;
+        int ret;
 
-	ret = ft_cache_glyph( font, wtext[i], NULL );
+        ret = ft_cache_glyph( font, wtext[i], NULL );
         curdata = hashtable_lookup( font->glyphdata, cur );
 
         if( ret && curdata ) {

@@ -52,6 +52,11 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect );
 void ft_font_delete( ft_font_t *font );
 
 /**
+ * Updates the pixel aspect ratio of the font.
+ */
+void ft_font_set_pixel_aspect( ft_font_t *font, double pixel_aspect );
+
+/**
  * Returns the size of the font.
  */
 int ft_font_get_size( ft_font_t *font );

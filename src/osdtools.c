@@ -71,6 +71,11 @@ void osd_font_delete( osd_font_t *font )
     free( font );
 }
 
+void osd_font_set_pixel_aspect( osd_font_t *font, double pixel_aspect )
+{
+    ft_font_set_pixel_aspect( font->font, pixel_aspect );
+}
+
 static ft_font_t *osd_font_get_font( osd_font_t *font )
 {
     return font->font;
@@ -333,6 +338,15 @@ void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
         snprintf( osds->curtext, sizeof( osds->curtext ), "%s", text );
     }
     osds->frames_left = timeout;
+}
+
+void osd_string_rerender( osd_string_t *osds )
+{
+    if( osds->show_border ) {
+        osd_string_render_bordered_image4444( osds, osds->curtext );
+    } else {
+        osd_string_render_plain_image4444( osds, osds->curtext );
+    }
 }
 
 int osd_string_get_width( osd_string_t *osds )

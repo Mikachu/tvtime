@@ -1584,9 +1584,14 @@ int main( int argc, char **argv )
             if( output->toggle_aspect() ) {
                 if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
                 config_save( ct, "WideScreen", "1" );
+                pixel_aspect = ( (double) width ) / ( ( (double) height ) * (16.0 / 9.0) );
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
                 config_save( ct, "WideScreen", "0" );
+                pixel_aspect = ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
+            }
+            if( osd ) {
+                tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
         }
         if( commands_toggle_pulldown_detection( commands ) ) {

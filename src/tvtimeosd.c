@@ -321,6 +321,19 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     free( osd );
 }
 
+void tvtime_osd_set_pixel_aspect( tvtime_osd_t *osd, double pixel_aspect )
+{
+    int i;
+
+    osd_font_set_pixel_aspect( osd->smallfont, pixel_aspect );
+    osd_font_set_pixel_aspect( osd->medfont, pixel_aspect );
+    osd_font_set_pixel_aspect( osd->bigfont, pixel_aspect );
+
+    for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
+        osd_string_rerender( osd->strings[ i ].string );
+    }
+}
+
 void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
 {
     int i;

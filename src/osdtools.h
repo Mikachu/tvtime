@@ -49,6 +49,7 @@ typedef enum OSD_Shapes_e {
  */
 osd_font_t *osd_font_new( const char *fontfile, int fontsize, double pixel_aspect );
 void osd_font_delete( osd_font_t *font );
+void osd_font_set_pixel_aspect( osd_font_t *font, double pixel_aspect );
 
 /**
  * Creates a new string for a given font, with a given maximum width
@@ -74,6 +75,7 @@ void osd_string_set_colour_rgb( osd_string_t *osds, int r, int g, int b );
 void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma,
                                    int cb, int cr );
+void osd_string_rerender( osd_string_t *osds );
 void osd_string_advance_frame( osd_string_t *osds );
 
 /**
