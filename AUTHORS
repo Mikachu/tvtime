@@ -29,6 +29,9 @@ Authors and contributors
   Simon Law <sfllaw@engmail.uwaterloo.ca>
     - Work on the debian packages
 
+  Achim Schneider <batchall@mordor.ch>
+    - frequency table conversion script from xawtv's file format
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
