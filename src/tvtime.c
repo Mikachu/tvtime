@@ -607,9 +607,11 @@ int main( int argc, char **argv )
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
         fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
     }
+/* This is bad now. --Doug
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) && verbose ) {
         fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
     }
+*/
     if( !set_realtime_priority( 0 ) && verbose ) {
         fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
