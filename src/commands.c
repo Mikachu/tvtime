@@ -215,6 +215,7 @@ static void display_xmltv_description( commands_t *cmd, const char *title,
         cur = tvtime_osd_list_set_multitext( cmd->osd, cur, title, 1 );
     } else {
         tvtime_osd_list_set_text( cmd->osd, cur++,
+        /* TRANSLATORS: This refers to a TV program, not a computer program. */
                                   _("No program information available") );
     }
 
