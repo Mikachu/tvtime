@@ -38,4 +38,15 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
                                      int width, int height, int stride );
 void tvtime_osd_advance_frame( tvtime_osd_t *osd );
 
+/**
+ * Asks the OSD object to composite itself onto the given scanline.
+ * xpos indicates the x position that the output pointer points at,
+ * width is the maximum width we should composite to, and scanline
+ * is which scanline of the output frame this request is for.
+ */
+void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
+                                              unsigned char *output,
+                                              int width, int xpos,
+                                              int scanline );
+
 #endif /* TVTIMEOSD_H_INCLUDED */

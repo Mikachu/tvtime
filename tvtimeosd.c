@@ -23,12 +23,30 @@
 struct tvtime_osd_s
 {
     osd_string_t *channel_number;
+    int channel_number_xpos;
+    int channel_number_ypos;
+
     osd_string_t *volume_bar;
+    int volume_bar_xpos;
+    int volume_bar_ypos;
+
     osd_string_t *data_bar;
-    osd_string_t *muted_osd;
+    int data_bar_xpos;
+    int data_bar_ypos;
+
+    osd_string_t *muted;
+    int muted_xpos;
+    int muted_ypos;
+
     osd_string_t *channel_info;
+    int channel_info_xpos;
+    int channel_info_ypos;
+
     osd_graphic_t *channel_logo;
-    int muted;
+    int channel_logo_xpos;
+    int channel_logo_ypos;
+
+    int ismuted;
 };
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
@@ -42,28 +60,40 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
                                           height, frameaspect );
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
     osd_string_show_border( osd->channel_number, 1 );
+    osd->channel_number_xpos = 40;
+    osd->channel_number_ypos = 30;
 
     osd->channel_info = osd_string_new( "FreeSansBold.ttf", 30, width,
                                         height, frameaspect );
     osd_string_set_colour( osd->channel_info, 220, 12, 155 );
     osd_string_show_border( osd->channel_info, 1 );
+    osd->channel_info_xpos = width / 2;
+    osd->channel_info_ypos = 40;
 
     osd->volume_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
                                       height, frameaspect );
     osd_string_set_colour( osd->volume_bar, 200, 128, 128 );
+    osd->volume_bar_xpos = 20;
+    osd->volume_bar_ypos = height - 40;
 
     osd->data_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
                                     height, frameaspect );
     osd_string_set_colour( osd->data_bar, 200, 128, 128 );
+    osd->data_bar_xpos = 20;
+    osd->data_bar_ypos = height - 40;
 
-    osd->muted_osd = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                     height, frameaspect );
-    osd_string_set_colour( osd->muted_osd, 200, 128, 128 );
-    osd_string_show_text( osd->muted_osd, "Mute", 100 );
-    osd->muted = 0;
+    osd->muted = osd_string_new( "FreeSansBold.ttf", 15, width,
+                                 height, frameaspect );
+    osd_string_set_colour( osd->muted, 200, 128, 128 );
+    osd_string_show_text( osd->muted, "Mute", 100 );
+    osd->ismuted = 0;
+    osd->muted_xpos = 20;
+    osd->muted_ypos = height - 40;
 
     osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
                                          frameaspect, 256 );
+    osd->channel_logo_xpos = width / 2;
+    osd->channel_logo_ypos = 86;
 
     return osd;
 }
@@ -117,33 +147,33 @@ void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
 
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 {
-    osd->muted = mutestate;
+    osd->ismuted = mutestate;
 }
 
 void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
                                      int width, int height, int stride )
 {
+
     osd_string_composite_packed422( osd->channel_number, output, width,
                                     height, stride, 40, 30, 0 );
+    osd_string_composite_packed422( osd->channel_info, output, width,
+                                    height, stride, width/2, 40, 0 );
+    osd_graphic_composite_packed422( osd->channel_logo, output, width, 
+                                     height, stride, width/2, 86 );
 
-    if( osd_string_visible( osd->channel_info ) ) {
-        osd_string_composite_packed422( osd->channel_info, output, width,
-                                        height, stride, width/2, 40, 0 );
-    }
-
+    /**
+     * For the bottom info, the data bar has priority over the
+     * muted indicator which has priority over the volume bar.
+     */
     if( osd_string_visible( osd->data_bar ) ) {
         osd_string_composite_packed422( osd->data_bar, output, width, height,
                                         stride, 20, height - 40, 0 );
-    } else if( osd->muted ) {
-        osd_string_composite_packed422( osd->muted_osd, output, width, height,
+    } else if( osd->ismuted ) {
+        osd_string_composite_packed422( osd->muted, output, width, height,
                                         stride, 20, height - 40, 0 );
     } else if( osd_string_visible( osd->volume_bar ) ) {
         osd_string_composite_packed422( osd->volume_bar, output, width, height,
                                         stride, 20, height - 40, 0 );
-    } else if( osd_graphic_visible( osd->channel_logo ) ) {
-        osd_graphic_composite_packed422( osd->channel_logo, output, width, 
-                                         height, stride, width/2, 86 );
-
     }
 }
 
@@ -154,5 +184,12 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     osd_string_advance_frame( osd->volume_bar );
     osd_string_advance_frame( osd->data_bar );
     osd_graphic_advance_frame( osd->channel_logo );
+}
+
+void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
+                                              unsigned char *output,
+                                              int width, int xpos,
+                                              int scanline )
+{
 }
 
