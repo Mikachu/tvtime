@@ -1,0 +1,150 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans#
+#    Developers do not need to manually edit POT or PO files.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime_0.9.10-7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-10-20 22:06+0200\n"
+"PO-Revision-Date: 2003-10-22 09:52+0200\n"
+"Last-Translator: Michel Grentzinger <mic.grentz@online.fr>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Choices
+#: ../templates:3
+msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+
+#. Description
+#: ../templates:4
+msgid "Select the default television standard for your location"
+msgstr "Standard de télévision en vigueur dans votre région"
+
+#. Description
+#: ../templates:4
+msgid ""
+"North American users should select NTSC.  Most areas in the world use PAL."
+msgstr ""
+"Les utilisateurs français devraient choisir SECAM, les nord-américains NTSC. "
+"La plupart des autres zones utilisent le standard PAL."
+
+#. Choices
+#: ../templates:9
+msgid "Cable, Broadcast, Cable including channels 100+"
+msgstr "Câble, Hertzien, Câble comprenant plus de 100 canaux"
+
+#. Choices
+#: ../templates:17
+msgid "Cable, Broadcast"
+msgstr "Câble, Hertzien"
+
+#. Description
+#: ../templates:18
+msgid ""
+"The frequency table specifies which frequencies correspond to the familiar "
+"channel numbers.  Select broadcast if you use an antenna for over-the-air "
+"signals."
+msgstr ""
+"Le tableau des fréquences indique la correspondance entre les fréquences et "
+"les numéros des canaux habituels. Choisissez « Hertzien » si vous utilisez "
+"une antenne pour recevoir la télévision."
+
+#. Choices
+#: ../templates:25
+msgid ""
+"Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
+"Optus, Custom (must run tvtime-scanner first)"
+msgstr ""
+"Europe, France, Russie, Australie, Nouvelle-Zélande, Chine hertzien, "
+"Australie Optus, Personnalisé (vous devrez d'abord exécuter tvtime-scanner)"
+
+#. Description
+#: ../templates:26
+msgid "Select the default frequency table"
+msgstr "Table de fréquence par défaut"
+
+#. Description
+#: ../templates:26
+msgid ""
+"Users of the Optus cable company in Australia should select Australia "
+"Optus.  If you are a user of a cable company that does not use standard "
+"frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
+"the tvtime-scanner application before using tvtime."
+msgstr ""
+"Les utilisateurs de la compagnie Optus en Australie devraient choisir "
+"« Australie Optus ». Si vous êtes un utilisateur d'une compagnie de câble "
+"n'utilisant pas les fréquences standards, comme Casema, UPS ou Mixtics, "
+"veuillez choisir « Personnalisé » et exécutez l'application tvtime-scanner "
+"avant d'utiliser tvtime. "
+
+#. Description
+#: ../templates:35
+msgid "Specify your default television capture device"
+msgstr "Périphérique télévisuel de capture par défaut"
+
+#. Description
+#: ../templates:35
+msgid ""
+"This should be the video4linux device which corresponds to your capture card."
+msgstr ""
+"Il devrait s'agir du périphérique video4linux correspondant à votre carte "
+"d'acquisition."
+
+#. Description
+#: ../templates:42
+msgid "Specify a device to use for VBI decoding"
+msgstr "Périphérique à utiliser pour le décodage VBI"
+
+#. Description
+#: ../templates:42
+msgid ""
+"This will only be used in NTSC areas for decoding closed captions and XDS "
+"channel information."
+msgstr ""
+"Cela sera utilisé uniquement dans les zones NTSC pour le décodage des "
+"acquisitions fermées et les informations XDS des canaux."
+
+#. Description
+#: ../templates:49
+msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
+msgstr "Souhaitez-vous rendre /usr/bin/tvtime « setuid root » ?"
+
+#. Description
+#: ../templates:49
+msgid ""
+"This allows tvtime to run at a high priority to ensure smooth video and "
+"should be used for high quality video output even during high CPU load."
+msgstr ""
+"Autoriser l'exécution de tvtime avec les droits du super-utilisateur permet "
+"de faire tourner tvtime avec une priorité élevée pour assurer la fluidité de "
+"la vidéo et devrait être utilisé pour produire des sorties vidéo de haute "
+"qualité, même lors des fortes charges du processeur."
+
+#. Description
+#: ../templates:56
+msgid "Specify the process priority for the tvtime binary"
+msgstr "Veuillez indiquer la priorité du processus pour l'exécutable tvtime"
+
+#. Description
+#: ../templates:56
+msgid ""
+"This setting controls the priority of the tvtime process relative to other "
+"processes on the system.  The allowed range is from -19 to 19. Lower values "
+"indicate higher priority, and a value of 0 would give tvtime the same "
+"priority as a normal process."
+msgstr ""
+"Ce paramètre contrôle la priorité du processus tvtime par rapport aux autres "
+"processus du système. L'intervalle admis s'entend de -19 jusqu'à 19. Des "
+"valeurs négatives traduisent une priorité élevée tandis qu'une valeur 0 "
+"donne à tvtime la même priorité que les processus normaux."

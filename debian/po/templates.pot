@@ -1,0 +1,129 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-10-20 22:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Choices
+#: ../templates:3
+msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+msgstr ""
+
+#. Description
+#: ../templates:4
+msgid "Select the default television standard for your location"
+msgstr ""
+
+#. Description
+#: ../templates:4
+msgid ""
+"North American users should select NTSC.  Most areas in the world use PAL."
+msgstr ""
+
+#. Choices
+#: ../templates:9
+msgid "Cable, Broadcast, Cable including channels 100+"
+msgstr ""
+
+#. Choices
+#: ../templates:17
+msgid "Cable, Broadcast"
+msgstr ""
+
+#. Description
+#: ../templates:18
+msgid ""
+"The frequency table specifies which frequencies correspond to the familiar "
+"channel numbers.  Select broadcast if you use an antenna for over-the-air "
+"signals."
+msgstr ""
+
+#. Choices
+#: ../templates:25
+msgid ""
+"Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
+"Optus, Custom (must run tvtime-scanner first)"
+msgstr ""
+
+#. Description
+#: ../templates:26
+msgid "Select the default frequency table"
+msgstr ""
+
+#. Description
+#: ../templates:26
+msgid ""
+"Users of the Optus cable company in Australia should select Australia "
+"Optus.  If you are a user of a cable company that does not use standard "
+"frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
+"the tvtime-scanner application before using tvtime."
+msgstr ""
+
+#. Description
+#: ../templates:35
+msgid "Specify your default television capture device"
+msgstr ""
+
+#. Description
+#: ../templates:35
+msgid ""
+"This should be the video4linux device which corresponds to your capture card."
+msgstr ""
+
+#. Description
+#: ../templates:42
+msgid "Specify a device to use for VBI decoding"
+msgstr ""
+
+#. Description
+#: ../templates:42
+msgid ""
+"This will only be used in NTSC areas for decoding closed captions and XDS "
+"channel information."
+msgstr ""
+
+#. Description
+#: ../templates:49
+msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
+msgstr ""
+
+#. Description
+#: ../templates:49
+msgid ""
+"This allows tvtime to run at a high priority to ensure smooth video and "
+"should be used for high quality video output even during high CPU load."
+msgstr ""
+
+#. Description
+#: ../templates:56
+msgid "Specify the process priority for the tvtime binary"
+msgstr ""
+
+#. Description
+#: ../templates:56
+msgid ""
+"This setting controls the priority of the tvtime process relative to other "
+"processes on the system.  The allowed range is from -19 to 19. Lower values "
+"indicate higher priority, and a value of 0 would give tvtime the same "
+"priority as a normal process."
+msgstr ""
