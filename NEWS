@@ -6,11 +6,14 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.9
 
-  *  Added a menu system.
+  *  Added a full menu system for configuring tvtime.
+  *  Simplified deinterlacer names and provide online help for them.
+  *  Unified OSD appearance across all television standards.
   *  Support for saving picture settings both globally and per-channel.
-  *  Support for the V4L2 DVB driver and PAL-60.
-  *  Removed lirc support in favour of using tvtime-command
-     exclusively.
+  *  Finetune settings saved per-channel.
+  *  Support for the V4L2 DVB driver and bttv9 for PAL-60 support.
+  *  Native support for UYVY input from the rivatv driver.
+  *  Removed lirc support in favour of using tvtime-command.
   *  Fixed remaining screensaver, Xinerama and fullscreen issues.
 
 News for 0.9.8.5
