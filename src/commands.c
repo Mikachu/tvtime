@@ -2370,7 +2370,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_TOGGLE_XDS:
-        if( vidin && videoinput_get_height( cmd->vidin ) == 480 && cmd->vbi ) {
+        if( cmd->vidin && videoinput_get_height( cmd->vidin ) == 480 && cmd->vbi ) {
             cmd->usexds = !cmd->usexds;
             vbidata_capture_xds( cmd->vbi, cmd->usexds );
             if( cmd->osd ) {

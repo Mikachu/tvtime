@@ -39,9 +39,11 @@ install-data-local:
 	$(INSTALL) -d $(datadir)/icons/hicolor/16x16/apps
 	$(INSTALL) -d $(datadir)/icons/hicolor/32x32/apps
 	$(INSTALL) -d $(datadir)/icons/hicolor/48x48/apps
+	$(INSTALL) -d $(datadir)/pixmaps
 	$(INSTALL_DATA) $(srcdir)/tvtime.16x16.png $(datadir)/icons/hicolor/16x16/apps/tvtime.png
 	$(INSTALL_DATA) $(srcdir)/tvtime.32x32.png $(datadir)/icons/hicolor/32x32/apps/tvtime.png
 	$(INSTALL_DATA) $(srcdir)/tvtime.48x48.png $(datadir)/icons/hicolor/48x48/apps/tvtime.png
+	$(INSTALL_DATA) $(srcdir)/tvtime.48x48.png $(datadir)/pixmaps/tvtime.png
 
 .PHONY: install-exec-hook
 install-exec-hook:
@@ -68,3 +70,4 @@ uninstall-hook:
 	-rm -f $(datadir)/icons/hicolor/16x16/apps/tvtime.png
 	-rm -f $(datadir)/icons/hicolor/32x32/apps/tvtime.png
 	-rm -f $(datadir)/icons/hicolor/48x48/apps/tvtime.png
+	-rm -f $(datadir)/pixmaps/tvtime.png
