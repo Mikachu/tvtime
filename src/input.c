@@ -236,11 +236,6 @@ static void input_channel_change_relative( input_t *in, int offset )
         videoinput_set_tuner_freq( in->vidin, tvtuner[ cur_channel ].freq[ cur_freq_table ] +
                                    config_get_finetune( in->cfg ) );
 
-        if( config_get_mutetvcard( in->cfg ) && in->muted ) {
-            usleep( 80000 );
-            videoinput_mute( in->vidin, 1 );
-        }
-
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      tvtuner[ cur_channel ].name );
@@ -387,11 +382,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                            config_get_finetune( in->cfg ) +
                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
-                if( config_get_mutetvcard( in->cfg ) && in->muted ) {
-                    usleep( 80000 );
-                    videoinput_mute( in->vidin, 1 );
-                }
-
                 if( in->osd ) {
                     char message[ 200 ];
                     sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
@@ -420,12 +410,17 @@ void input_callback( input_t *in, InputEvent command, int arg )
             break;
 
         case TVTIME_MIXER_MUTE:
+            /*
             if( !config_get_mutetvcard( in->cfg ) ) {
                 mixer_toggle_mute();
             } else {
                 videoinput_mute( in->vidin, !in->muted );
                 in->muted = !in->muted;
             }
+            */
+            in->muted = !in->muted;
+            tvtime_osd_volume_muted( in->osd, !in->muted );
+            videoinput_mute( in->vidin, in->muted );
             break;
 
         case TVTIME_TV_VIDEO:
@@ -490,11 +485,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             tvtuner[ cur_channel ].freq[ cur_freq_table ] +
                             config_get_finetune( in->cfg ) );
 
-                        if( config_get_mutetvcard( in->cfg ) && in->muted ) {
-                            usleep( 80000 );
-                            videoinput_mute( in->vidin, 1 );
-                        }
-
                         if( verbose ) {
                             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                                      tvtuner[ cur_channel ].name );
@@ -533,6 +523,11 @@ int input_quit( input_t *in )
 int input_print_debug( input_t *in )
 {
     return in->printdebug;
+}
+
+int input_get_muted( input_t *in )
+{
+    return in->muted;
 }
 
 int input_show_bars( input_t *in )

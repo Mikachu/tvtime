@@ -74,3 +74,65 @@ Initialization
  * current frame contains both Field 3 and Field 4.
  */
 
+
+
+Tuner state
+
+  Happy State  - Tuner signal is high, input unheld
+
+1)              Happy
+                  |
+     Fine       ChChange     Lose Signal
+                  |
+          Save last input frame
+        Interpolate to field height
+2)   Hold that frame as input, last and secondlast
+
+                |
+3)  a) Signal detected
+        - Wait for 2 input frames, then show input
+
+   b) No signal for four frames, begin fade to colour bars
+
+
+HAS_SIGNAL
+SIGNAL_DETECTED
+SIGNAL_LOST
+NO_SIGNAL
+
+if signal
+  switch state
+      case NO_SIGNAL
+      case LOST_SIGNAL
+          state = SIGNAL_DETECTED
+          aquire_wait = AQUIRE_DELAY
+          recover_wait = 0
+
+      case SIGNAL_DETECTED
+          if aquire_wait
+              aquire_wait--
+          else
+             state = HAVE_SIGNAL
+
+else no signal
+  switch state
+      case HAVE_SIGNAL
+          save last frame
+      case SIGNAL_DETECTED
+          state = LOST_SIGNAL
+          recover_wait = RECOVER_DELAY
+
+      case LOST_SIGNAL
+          if recover_wait
+              recover_wait--
+          else
+              state = NO_SIGNAL
+              osd says no signal
+  fade bars
+
+
+if state = HAVE_SIGNAL
+  show_frame
+else
+  show (current bars/save fade)
+

@@ -407,26 +407,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
     vidin->width = capwidth;
 
-
-
-    /* Upon creation, unmute the audio from the card. */
-    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
-        fprintf( stderr, "videoinput: Please post a bug report on "
-                 "http://www.sourceforge.net/projects/tvtime/ and indicate which card/driver you have.\n" );
-        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-    } else {
-        vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
-                     "might cause this.  Post a bug report with your driver info to "
-                     "http://www.sourceforge.net/projects/tvtime/\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-        }
-    }
-
-
-
     /* Try to set up mmap-based capture. */
     if( ioctl( vidin->grab_fd, VIDIOCGMBUF, &(vidin->gb_buffers) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get capture buffer properties.  No mmap support?\n"
@@ -632,6 +612,13 @@ int videoinput_has_tuner( videoinput_t *vidin )
 
 void videoinput_mute( videoinput_t *vidin, int mute )
 {
+    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
+        fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
+        fprintf( stderr, "videoinput: Please post a bug report on "
+                 "http://www.sourceforge.net/projects/tvtime/ and indicate which card/driver you have.\n" );
+        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+    }
+
     if( mute ) {
         vidin->audio.flags |= VIDEO_AUDIO_MUTE;
         if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
@@ -667,18 +654,11 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
             frequency /= 1000; /* switch to MHz */
         }
 
-        mute = mixer_conditional_mute();
+        videoinput_mute( vidin, 1 );
 
         if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
         }
-
-        usleep( 20000 );
-
-        if( mute ) {
-            mixer_mute( 0 );
-        }
-
     } else if( vidin->verbose ) {
         fprintf( stderr, "videoinput: cannot set tuner freq on a channel without a tuner\n" );
     }
@@ -720,25 +700,6 @@ int videoinput_freq_present( videoinput_t *vidin )
         }
     }
     return 1;
-/*
-    if (vidin->tuner.tuner > -1) {
-
-        usleep( 100000 );
-
-        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
-            perror( "ioctl VIDIOCGTUNER" );
-            return 0;
-        }
-
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: strength %d\n", vidin->tuner.signal );
-        }
-
-        return( vidin->tuner.signal );
-    }
-
-    return 0;
-*/
 }
 
 int videoinput_get_input_num( videoinput_t *vidin )

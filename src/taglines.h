@@ -43,7 +43,12 @@ static const char *taglines[] = {
 "tvtime: the best part of waking up",
 "tvtime: smooth like butter",
 "tvtime: those who like it, like it alot",
-"tvtime: best on the box", };
+"tvtime: best on the box",
+"tvtime: bringing you what you've always wanted",
+"tvtime: with great power comes great responsibility",
+"tvtime: adult assembly required",
+"tvtime: batteries not included",
+"tvtime: parental guidance suggested", };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 

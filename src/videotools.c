@@ -39,7 +39,8 @@ static inline unsigned char clip255( int x )
              *        =  B + alpha*(F - B)
              */
 
-static inline int multiply_alpha( int a, int r )
+//static inline int multiply_alpha( int a, int r ) __attribute__ (always_inline);
+static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
     int temp;
     temp = (r * a) + 0x80;
@@ -747,52 +748,52 @@ void packed444_to_rgb24_rec601_scanline( unsigned char *output,
 }
 
 /*
- * Color Bars:
+ * 100% SMPTE Color Bars:
  *
- *     top 2/3:  75% white, followed by 75% binary combinations
- *                of R', G', and B' with decreasing luma
+ *     top 2/3:  100% white, followed by 100% binary combinations
+ *               of R', G', and B' with decreasing luma
  *
  * middle 1/12:  reverse order of above, but with 75% white and
- *                alternating black
+ *               alternating black
  *
  *  bottom 1/4:  -I, 100% white, +Q, black, PLUGE, black,
  *                where PLUGE is (black - 4 IRE), black, (black + 4 IRE)
  *
  */
 
-/*  75% white   */
-/*  75% yellow  */
-/*  75% cyan    */
-/*  75% green   */
-/*  75% magenta */
-/*  75% red     */
-/*  75% blue    */
+/* 100% white   */
+/* 100% yellow  */
+/* 100% cyan    */
+/* 100% green   */
+/* 100% magenta */
+/* 100% red     */
+/* 100% blue    */
 static unsigned char rainbowRGB[] = {
-  191, 191, 191,
-  191, 191,   0,
-    0, 191, 191,
-    0, 191,   0,
-  191,   0, 191,
-  191,   0,   0,
-    0,   0, 191 };
+  255, 255, 255,
+  255, 255,   0,
+    0, 255, 255,
+    0, 255,   0,
+  255,   0, 255,
+  255,   0,   0,
+    0,   0, 255 };
 static unsigned char rainbowYCbCr[ 21 ];
 
 
-/*  75% blue    */
+/* 100% blue    */
 /*      black   */
-/*  75% magenta */
+/* 100% magenta */
 /*      black   */
-/*  75% cyan    */
+/* 100% cyan    */
 /*      black   */
-/*  75% white   */
+/* 100% white   */
 static unsigned char wobnairRGB[] = {
-    0,   0, 191,
+    0,   0, 255,
     0,   0,   0,
-  191,   0, 191,
+  255,   0, 255,
     0,   0,   0,
-    0, 191, 191,
+    0, 255, 255,
     0,   0,   0,
-  191, 191, 191 };
+  255, 255, 255 };
 static unsigned char wobnairYCbCr[ 21 ];
 
 
@@ -839,11 +840,11 @@ void create_colourbars_packed444( unsigned char *output,
     for(; y < height; y++ ) {
         /* Bottom:  PLUGE */
         pl_width = 5 * stripe_width / 4;
-        /* -I -- well, we use -Cb here */
+        /* -I -- [ 0 -1 0 ] == [ 0 0.54464 -0.83867 ] */
         for (x = 0; x < pl_width; x++) {
             output[ (y*stride) + (x*3) + 0 ] = 0;
-            output[ (y*stride) + (x*3) + 1 ] = 16;
-            output[ (y*stride) + (x*3) + 2 ] = 128;
+            output[ (y*stride) + (x*3) + 1 ] = 189;
+            output[ (y*stride) + (x*3) + 2 ] = 34;
         }
         /* white */
         for (; x < (2 * pl_width); x++) {
@@ -852,10 +853,11 @@ void create_colourbars_packed444( unsigned char *output,
             output[ (y*stride) + (x*3) + 2 ] = 128;
         }
         /* +Q -- well, we use +Cr here */
+        /* +Q -- [ 0 0 1 ] == [ 0 0.83867 0.54464 ] */
         for (; x < (3 * pl_width); x++) {
             output[ (y*stride) + (x*3) + 0 ] = 0;
-            output[ (y*stride) + (x*3) + 1 ] = 128;
-            output[ (y*stride) + (x*3) + 2 ] = 240;
+            output[ (y*stride) + (x*3) + 1 ] = 222;
+            output[ (y*stride) + (x*3) + 2 ] = 189;
         }
         /* black */
         for (; x < (5 * stripe_width); x++) {

@@ -394,6 +394,7 @@ void xv_show_frame( void )
                    video_area.width, video_area.height, False );
     XFlush( display );
     XUnlockDisplay( display );
+    XSync( display, False );
 }
 
 void xv_poll_events( input_t *in )

@@ -66,7 +66,7 @@ static double fadespeed = 65.0;
 #define TUNER_STATE_SIGNAL_DETECTED 1
 #define TUNER_STATE_SIGNAL_LOST     2
 #define TUNER_STATE_NO_SIGNAL       3
-static int cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+static int cur_tuner_state = TUNER_STATE_NO_SIGNAL;
 static int signal_recover_wait = 0;
 static int signal_aquire_wait = 0;
 
@@ -663,9 +663,6 @@ int main( int argc, char **argv )
                 tvtime_osd_show_info( osd );
             }
         }
-        if( osd ) {
-            tvtime_osd_volume_muted( osd, mixer_ismute() );
-        }
         input_next_frame( in );
 
 
@@ -682,6 +679,7 @@ int main( int argc, char **argv )
                     signal_aquire_wait--;
                 } else {
                     cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+                    videoinput_mute( vidin, input_get_muted( in ) );
                 }
             default: break;
             }
