@@ -39,6 +39,7 @@ struct station_info_s
     char network_name[ 33 ];
     char network_call_letters[ 7 ];
     char norm[ 10 ];
+    char xmltvid[ 128 ];
     const band_t *band;
     const band_entry_t *channel;
     int brightness;
@@ -113,6 +114,7 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
         memset( i->network_name, 0, sizeof( i->network_name ) );
         memset( i->network_call_letters, 0, sizeof( i->network_call_letters ) );
         memset( i->norm, 0, sizeof( i->norm ) );
+        memset( i->xmltvid, 0, sizeof( i->xmltvid ) );
         i->brightness = -1;
         i->contrast = -1;
         i->colour = -1;
@@ -280,6 +282,7 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *colour = xmlGetProp( station, BAD_CAST "colour" );
             xmlChar *hue = xmlGetProp( station, BAD_CAST "hue" );
             xmlChar *finetune = xmlGetProp( station, BAD_CAST "finetune" );
+            xmlChar *xmltvid = xmlGetProp( station, BAD_CAST "xmltvid" );
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -308,8 +311,10 @@ int station_readconfig( station_mgr_t *mgr )
                 if( colour ) station_set_current_colour( mgr, atoi( (char *) colour ) );
                 if( hue ) station_set_current_hue( mgr, atoi( (char *) hue ) );
                 if( finetune ) station_set_current_finetune( mgr, atoi( (char *) finetune ) );
+                if( xmltvid ) station_set_current_xmltv_id( mgr, (char *) xmltvid );
             }
 
+            if( xmltvid ) xmlFree( xmltvid );
             if( finetune ) xmlFree( finetune );
             if( brightness ) xmlFree( brightness );
             if( contrast ) xmlFree( contrast );
@@ -674,6 +679,22 @@ void station_set_current_network_name( station_mgr_t *mgr, const char *network_n
     if( mgr->current ) {
         snprintf( mgr->current->network_name,
                   sizeof( mgr->current->network_name ), "%s", network_name );
+    }
+}
+
+const char *station_get_current_xmltv_id( station_mgr_t *mgr )
+{
+    if( mgr->current && *mgr->current->xmltvid ) {
+        return mgr->current->xmltvid;
+    } else {
+        return 0;
+    }
+}
+
+void station_set_current_xmltv_id( station_mgr_t *mgr, const char *xmltvid )
+{
+    if( mgr->current ) {
+        snprintf( mgr->current->xmltvid, sizeof( mgr->current->xmltvid ), "%s", xmltvid );
     }
 }
 

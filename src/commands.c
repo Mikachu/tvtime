@@ -185,7 +185,11 @@ static void menu_set_value( menu_t *menu, int newval, int a, int b, int c )
 static void update_xmltv_channel( commands_t *cmd )
 {
     if( cmd->xmltv && cmd->osd ) {
-        xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv, station_get_current_channel_name( cmd->stationmgr ) ) );
+        if( station_get_current_xmltv_id( cmd->stationmgr ) ) {
+            xmltv_set_channel( cmd->xmltv, station_get_current_xmltv_id( cmd->stationmgr ) );
+        } else {
+            xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv, station_get_current_channel_name( cmd->stationmgr ) ) );
+        }
     } else if( cmd->osd ) {
         tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0 );
     }
