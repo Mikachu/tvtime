@@ -1,5 +1,8 @@
 
 0.9.9 -
+  * vektor: Changed the TOGGLE_COMPATIBLE_NORM command to now
+      be called TOGGLE_PAL_SECAM.  This is both clearer and
+      more honest about what actually worked.
   * vektor: Added a us-cable100 frequency list, which includes
       channels over 99.
   * vektor: Removed lirc support in favour of just using
