@@ -373,40 +373,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
     vidin->width = capwidth;
 
-    /**
-     * I'm going to set up the framebuffer to whatever it's currently set to, and
-     * see if this fixes annoying problems with like the SAA7134 driver.  Argh!
-     */
-    /**
-     * This code didn't work as planned, so screw it for 0.9.7, it's too dangerous
-     * to leave in. -Billy
-    if( ioctl( vidin->grab_fd, VIDIOCGFBUF, &fbuf ) < 0 ) {
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Can't get framebuffer settings, which I don't need anyway: %s\n",
-                     strerror( errno ) );
-        }
-    } else {
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Framebuffer settings are base 0x%p, %xx%d, depth %d, and %d bpl.\n",
-                     fbuf.base, fbuf.width, fbuf.height, fbuf.depth, fbuf.bytesperline );
-        }
-        if( !fbuf.width ) {
-            // Just set some fake settings.
-            fbuf.width = 1024;
-            fbuf.height = 768;
-            fbuf.depth = 16;
-            fbuf.bytesperline = 0;
-            fbuf.base = 0;
-        }
-        if( ioctl( vidin->grab_fd, VIDIOCSFBUF, &fbuf ) < 0 ) {
-            if( vidin->verbose ) {
-                fprintf( stderr, "videoinput: Can't set framebuffer settings, which I don't need anyway: %s\n",
-                         strerror( errno ) );
-            }
-        }
-    }
-    */
-
     /* Set the format using the SPICT ioctl. */
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
