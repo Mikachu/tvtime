@@ -89,11 +89,23 @@ static char *check_path( const char *path, const char *filename )
 
 const char *get_tvtime_paths( void )
 {
+#ifdef TVFONTDIR
+
+#ifdef FONTDIR
+    return TVFONTDIR ":" FONTDIR ":" DATADIR ":../data:./data";
+#else /* FONTDIR */
+    return TVFONTDIR ":" DATADIR ":../data:./data";
+#endif /* FONTDIR */
+
+#else /* TVFONTDIR */
+
 #ifdef FONTDIR
     return FONTDIR ":" DATADIR ":../data:./data";
-#else
+#else /* FONTDIR */
     return DATADIR ":../data:./data";
-#endif
+#endif /* FONTDIR */
+
+#endif /* TVFONTDIR */
 }
 
 const char *get_tvtime_fifodir( uid_t uid )
@@ -251,6 +263,14 @@ const char *get_tvtime_fifo( uid_t uid )
 char *get_tvtime_file( const char *filename )
 {
     char *cur;
+
+#ifdef TVFONTDIR
+    /* If TVFONTDIR is defined, we'll look for files there first.
+     * This is designed for distributions that have a defined place
+     * for fonts. */
+    cur = check_path( TVFONTDIR, filename );
+    if( cur ) return cur;
+#endif
 
 #ifdef FONTDIR
     /* If FONTDIR is defined, we'll look for files there first.

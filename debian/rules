@@ -60,7 +60,7 @@ build-stamp:  config.status
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) FONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont\""'
+	$(MAKE) FONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont\"" -DTVFONTDIR="\"/usr/share/fonts/truetype/tvtime\""'
 
 	touch build-stamp
 
@@ -90,6 +90,9 @@ install: build
 			localstatedir=$(CURDIR)/debian/tvtime/var
 	# Remove the freefont TTF.
 	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/FreeMonoBold.ttf
+	# Move the tvtime TTF to the right placee.
+	-mkdir -p $(CURDIR)/debian/tvtime/usr/share/fonts/truetype/tvtime/
+	-mv -f $(CURDIR)/debian/tvtime/usr/share/tvtime/tvtimeSansBold.ttf $(CURDIR)/debian/tvtime/usr/share/fonts/truetype/tvtime/
 	# Remove the configuration file.
 	-rm -f $(CURDIR)/debian/tvtime/etc/tvtime/tvtime.xml
 	# Copy HTML documentation.
