@@ -45,7 +45,7 @@ Description: Specify the VBI device.
 Template: tvtime/deinterlacemethod-menu
 Type: select
 Choices: Linear, LinearBlend, LineDoubler, Greedy, Greedy2Frame, GreedyH, TomsMoComp, TwoFrame, Vertical, VideoBob, VideoWeave, Weave, Other
-Default: Linear
+Default: GreedyH
 Description: Select the deinterlacing method to use.
 
 Template: tvtime/deinterlacemethod
