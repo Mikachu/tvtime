@@ -413,13 +413,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         fprintf( stderr, "videoinput: Not important, but please send a bug report including what driver "
                          "you're using and output of 'tvtime -v' to our bug report page off of "
                          "http://tvtime.sourceforge.net/\n" );
-    } else {
-        if( !(vidin->grab_win.flags & 1) ) {
-            fprintf( stderr, "videoinput: Capture card claims the frames provided aren't "
-                             "interlaced.  Is that true?\n" );
-            fprintf( stderr, "videoinput: Please send a log of 'tvtime -v' along with what driver you're "
-                             "using to http://tvtime.sourceforge.net/ under 'report bugs'.\n" );
-        }
     }
 
     if( vidin->verbose ) {
