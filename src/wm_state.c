@@ -258,6 +258,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
+    XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     
     remove_motif_decorations(dpy, win);
     
@@ -457,6 +458,7 @@ static void switch_to_normal_state(Display *dpy, Window win)
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
+    XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     
     disable_motif_decorations(dpy, win);
     
@@ -1061,6 +1063,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     }
 
     EWMH_wm = check_for_EWMH_wm(dpy, &wm_name);
+/* Billy: This is my nasty ass hack.
     if( wm_name && !strcmp( wm_name, "KWin" ) && !getenv( "TVTIME_USE_OGLE_KWIN_CODE" ) ) {
         XEvent ev;
         XSizeHints vo_hint;
@@ -1122,6 +1125,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
         XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureNotifyMask, &ev);
         XFlush( dpy );
     } else {
+*/
     if(EWMH_wm) {
       if(DpyInfoGetEWMHFullscreen()) {
 	has_ewmh_state_fullscreen = check_for_state_fullscreen(dpy);
@@ -1150,7 +1154,9 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
       ERROR("%s", "unknown window state\n");
       break;
     }
+/*
     }
+*/
     if(wm_name != NULL) {
       free(wm_name);
       wm_name = NULL;
