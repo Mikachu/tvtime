@@ -33,7 +33,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	input.h menu.h mixer.h mm_accel.h mmx.h osdtools.h parser.h pnginput.h \
 	pngoutput.h rtctimer.h speedy.h taglines.h ttfont.h \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
-	outputapi.h performance.h performance.c \
+	outputapi.h performance.h performance.c vbidata.h vbidata.c \
 	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
 	wm_state.h wm_state.c console.h console.c speedtools.h
 

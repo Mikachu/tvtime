@@ -46,6 +46,7 @@
 #include "taglines.h"
 #include "xvoutput.h"
 #include "console.h"
+#include "vbidata.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -418,6 +419,7 @@ int main( int argc, char **argv )
     performance_t *perf;
     console_t *con;
     int has_signal = 0;
+    vbidata_t *vbidata;
 
     setup_speedy_calls();
 
@@ -646,6 +648,8 @@ int main( int argc, char **argv )
         input_set_console( in, con );
     }
 
+    /* Open the VBI device. */
+    vbidata = vbidata_new( "/dev/vbi0" );
 
     /* Setup the output. */
     output = get_xv_output();
@@ -860,6 +864,7 @@ int main( int argc, char **argv )
             } else {
                 videoinput_free_frame( vidin, curframeid );
             }
+            if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
 
@@ -897,6 +902,9 @@ int main( int argc, char **argv )
     videoinput_delete( vidin );
     config_delete( ct );
     input_delete( in );
+    if( vbidata ) {
+        vbidata_delete( vbidata );
+    }
     if( vc ) {
         video_correction_delete( vc );
     }

@@ -361,6 +361,7 @@ void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned c
         }
         i = (width * 2) & 63;
         if( i ) __memcpy( dest, src, i );
+        sfence();
         emms();
     }
 
