@@ -135,4 +135,9 @@ Authors and contributors
   Billy Biggs <vektor@dumbterm.net>
   Doug Bell <drbell@users.sourceforge.net>
   Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
+  Font routines and compositing ideas: http://mythtv.sourceforge.net.
+    The ttfont.[h,c] is from mythtv, but they apparently got it from FreeAmp.
+    Copyright (C) 1999 EMusic.  It also lists some code from Carsten Haitzler,
+    Copyright (C) 1999 Carsten Haitzler and various contributors.
+  Alot of that will be cleaned up/merged to be common with mythtv, I hope.
 
