@@ -195,14 +195,14 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     osd->credits = credits_new( creditsfile, height );
     osd->show_credits = 0;
     if( !osd->credits ) {
-        creditsfile = "./credits.png";
+        creditsfile = "../data/credits.png";
         osd->credits = credits_new( creditsfile, height );
     }
 
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
     if( !osd->strings[ OSD_CHANNEL_NUM ].string ) {
-        fontfile = "./FreeSansBold.ttf";
-        logofile = "./testlogo.png";
+        fontfile = "../data/FreeSansBold.ttf";
+        logofile = "../data/testlogo.png";
         osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
     }
     osd->strings[ OSD_CHANNEL_INFO ].string = osd_string_new( fontfile, 30, width, height, frameaspect );
@@ -236,8 +236,6 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     osd->strings[ OSD_SHOW_START ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
     osd->strings[ OSD_NETWORK_CALL ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
-
-
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_CHANNEL_INFO ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -373,22 +371,22 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
 {
-    snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, norm );
+    if( osd->tv_norm_text ) snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, norm );
 }
 
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
 {
-    snprintf( osd->input_text, sizeof( osd->input_text ) - 1, norm );
+    if( osd->input_text ) snprintf( osd->input_text, sizeof( osd->input_text ) - 1, norm );
 }
 
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
 {
-    snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
+    if( osd->freqtable_text ) snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
 }
 
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
 {
-    snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
+    if( osd->channel_number_text ) snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
 }
 
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )

@@ -120,7 +120,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
                                   video_aspect );
 
     if( !vs->line[0] ) {
-        vs->fontfile = "./FreeMonoBold.ttf";
+        vs->fontfile = "../data/FreeMonoBold.ttf";
 
         vs->line[0] = osd_string_new( vs->fontfile, fontsize, 
                                        video_width, 

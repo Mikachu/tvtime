@@ -148,7 +148,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
                                    video_aspect );
 
     if( !con->line[0] ) {
-        con->fontfile = "./FreeSansBold.ttf";
+        con->fontfile = "../data/FreeSansBold.ttf";
 
         con->line[0] = osd_string_new( con->fontfile, fontsize, 
                                        video_width, 
