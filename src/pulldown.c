@@ -110,7 +110,7 @@ static int bothistory_diff[ 5 ];
 
 static int histpos = 0;
 
-void fill_history( int tff )
+static void fill_history( int tff )
 {
     if( tff ) {
         tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
