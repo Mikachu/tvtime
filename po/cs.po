@@ -1,0 +1,458 @@
+# This is the Czech locale for tvtime.
+# Copyright (C) 2003 Billy Biggs, Lukáš Slánský
+# This file is distributed under the same license as the tvtime package.
+# Lukáš Slánský <lukas@schnauzer.cz>, 2003.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime 0.9.10\n"
+"Report-Msgid-Bugs-To: http://tvtime.net/\n"
+"POT-Creation-Date: 2003-09-11 00:24-0300\n"
+"PO-Revision-Date: 2003-10-10 10:00+0200\n"
+"Last-Translator: Lukáš Slánský <lukas@schnauzer.cz>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/tvtime.c:1817
+msgid "Fullscreen mode active."
+msgstr "Aktivován celoobrazovkový mód"
+
+#: src/tvtime.c:1820
+msgid "Windowed mode active."
+msgstr "Aktivován okenní mód"
+
+#: src/tvtime.c:1830
+msgid "Window set as always-on-top."
+msgstr "Okno je zobrazováno stále na vrchu"
+
+#: src/tvtime.c:1832
+msgid "Window set to normal stacking."
+msgstr "Okno není zobrazováno stále na vrchu"
+
+#: src/tvtime.c:1845
+msgid "16:9 display mode active."
+msgstr "Aktivován obrazový mód 16:9"
+
+#: src/tvtime.c:1850
+msgid "4:3 display mode active."
+msgstr "Aktivován obrazový mód 4:3"
+
+#: src/tvtime.c:1927
+msgid "2-3 Pulldown detection disabled."
+msgstr ""
+
+#: src/tvtime.c:1929
+msgid "2-3 Pulldown detection enabled."
+msgstr ""
+
+#: src/tvtime.c:1934
+msgid "2-3 Pulldown detection is not valid with your TV norm."
+msgstr ""
+
+#: src/tvtime.c:2248 src/tvtime.c:2365
+#, c-format
+msgid "Screenshot: %s"
+msgstr "Snímek obrazovky: %s"
+
+#: src/commands.c:1985
+#, c-format
+msgid "Sleep in %d minutes."
+msgstr "Usínám za %d minut."
+
+#: src/commands.c:1988
+msgid "Sleep off."
+msgstr "Usínání vypnuto."
+
+#: src/commands.c:2039
+msgid "Channel marked as active in the browse list."
+msgstr "V procházecím seznamu byl kanál označen jako aktivní"
+
+#: src/commands.c:2041
+msgid "Channel disabled from the browse list."
+msgstr "V procházecím seznamu byl kanál deaktivován."
+
+#: src/commands.c:2083
+msgid "Processing every input field."
+msgstr "Zpracovávám každý snímek."
+
+#: src/commands.c:2085
+msgid "Processing every top field."
+msgstr "Zpracovávám každý horní snímek."
+
+#: src/commands.c:2087
+msgid "Processing every bottom field."
+msgstr "Zpracovávám každý spodní snímek."
+
+#: src/commands.c:2099
+#, c-format
+msgid "Sharpness will be %d on restart."
+msgstr "Po restartu bude ostrost %d."
+
+#: src/commands.c:2137
+#, c-format
+msgid "Television standard will be %s on restart."
+msgstr "Po restartu bude televizní standard %s."
+
+#: src/commands.c:2165
+msgid "All channels re-activated."
+msgstr "Všechny kanály byly aktivovány."
+
+#: src/commands.c:2185
+#, c-format
+msgid "Remapping %d.  Enter new channel number."
+msgstr "Přemapovávám %d. Vložte nové číslo kanálu."
+
+#: src/commands.c:2196
+msgid "Scanner unavailable: Signal checking disabled."
+msgstr "Skener není dostupný: Kontrola signálu byla vypnuta."
+
+#: src/commands.c:2222
+msgid "Scanning for active channels."
+msgstr "Hledám aktivní kanály."
+
+#: src/commands.c:2238
+msgid "Closed captions disabled."
+msgstr ""
+
+#: src/commands.c:2241
+msgid "Closed captions enabled."
+msgstr ""
+
+#: src/commands.c:2245
+msgid "No VBI device configured for CC decoding."
+msgstr "Nebylo konfigurováno zařízení pro dekódování CC."
+
+#: src/commands.c:2259
+#, c-format
+msgid "Colour decoding for this channel set to %s."
+msgstr "Dekódování barev tohoto kanálu bylo nastaveno na %s."
+
+#: src/commands.c:2288
+#, c-format
+msgid "Running: %s"
+msgstr "Spouštím: %s"
+
+#: src/commands.c:2364
+msgid "Signal detection enabled."
+msgstr "Detekce signálu povolena."
+
+#: src/commands.c:2366
+msgid "Signal detection disabled."
+msgstr "Detekce signálu zakázána."
+
+#: src/commands.c:2378
+msgid "XDS decoding enabled."
+msgstr "Dekódování XDS povoleno."
+
+#: src/commands.c:2380
+msgid "XDS decoding disabled."
+msgstr "Dekódování XDS zakázáno."
+
+#: src/commands.c:2426
+msgid "Colour invert enabled."
+msgstr "Inverze barev povolena."
+
+#: src/commands.c:2428
+msgid "Colour invert disabled."
+msgstr "Inverze barev zakázána."
+
+#: src/commands.c:2445
+msgid "Mirror enabled."
+msgstr "Zrcadleni povoleno."
+
+#: src/commands.c:2447
+msgid "Mirror disabled."
+msgstr "Zrcadleni zakázáno."
+
+#: src/commands.c:2464
+msgid "Chroma kill enabled."
+msgstr "Odstranění barev povoleno."
+
+#: src/commands.c:2466
+msgid "Chroma kill disabled."
+msgstr "Odstranění barev zakázáno."
+
+#: src/commands.c:2483
+msgid "Luma correction enabled."
+msgstr ""
+
+#: src/commands.c:2486
+msgid "Luma correction disabled."
+msgstr ""
+
+#: src/commands.c:2499
+#, c-format
+msgid "Overscan: %.1f%%"
+msgstr "Overscan: %.1f%%"
+
+#: src/commands.c:2524
+#, c-format
+msgid "Luma correction value: %.1f"
+msgstr ""
+
+#: src/commands.c:2554
+msgid "Picture settings reset to defaults."
+msgstr "Nastavení obrazu nastaveno na předdefinované hodnoty."
+
+#: src/commands.c:2806
+msgid "Saved current picture settings as global defaults.\n"
+msgstr "Nastavení obrazu bylo uloženo jako globální předdefinované nastavení.\n"
+
+#: src/commands.c:2818
+#, c-format
+msgid "Saved current picture settings on channel %d.\n"
+msgstr "Nastavení obrazu pro kanál %d bylo uloženo."
+
+#: src/commands.c:2900
+msgid "Paused."
+msgstr "Pauza."
+
+#: src/commands.c:2900
+msgid "Resumed."
+msgstr "Obnoveno."
+
+#: src/tvtimeconf.c:611
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (first run tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -k, --slave                Disables input handling in tvtime (slave "
+"mode).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+"  -S, --saveoptions          Save command line options to the config file.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -v, --verbose              Print debugging messages to stderr.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"použití: %s [VOLBA]...\n"
+"\n"
+"  -a, --widescreen           Mód 16:9.\n"
+"  -b, --vbidevice=ZAŘÍZENÍ   VBI zařízení (standardně /dev/vbi0).\n"
+"  -c, --channel=KANÁL        Při spuštění naladit vybraný kanál.\n"
+"  -d, --device=ZAŘÍZENÍ      video4linux zařízení (standardně /dev/video0).\n"
+"  -D, --driver=JMÉNO         Použití výstupního ovladače: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (standardně Xv).\n"
+"  -f, --frequencies=JMÉNO    Frekvenční tabulka používaná tunerem.\n"
+"                             (standardně us-cable).\n"
+"\n"
+"                             Použitelné hodnoty jsou:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (najprvě je třeba spustit tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=SOUBOR    Konfigurační soubor, ze kterého se čtou dodatečná nastavení.\n"
+"  -h, --help                 Zobraz tuto nápovědu.\n"
+"  -H, --height=VÝŠKA         Výška výstupního okna (standardně 576).\n"
+"  -i, --input=ČÍSLO          Číslo vstupu video4linux (standardně 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -k, --slave                Disables input handling in tvtime (slave mode).\n"
+"  -m, --fullscreen           Zapne tvtime v celoobrazovkovém módu.\n"
+"  -M, --window               Zapně tvti v okenním módu.\n"
+"  -n, --norm=NORM            Norma použitá pro vstup.  tvtime podporuje:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N a PAL-60 (standardně NTSC).\n"
+"  -p, --fspos=POS            Nastaví pozici celoobrazovkového módu: top (nahoře),\n"
+                              "bottom(dole) nebo centre (střed - standardně).\n"
+"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+"  -S, --saveoptions          Uloží volby z příkazové řádky do konfiguračního souboru.\n"
+"  -t, --xmltv=SOUBOR         Načte seznam XMLTV ze souboru.\n"
+"  -v, --verbose              Vypisuje ladící hlášky na stderr.\n"
+"  -x, --mixer=ZAŘÍZENÍ[:K]   Směšovací zařízení a kanál pro audio.\n"
+"                             (standardně /dev/mixer:line)\n"
+"\n"
+"                             Možné kanály jsou:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:665
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           Mód 16:9.\n"
+"  -b, --vbidevice=ZAŘÍZENÍ   VBI zařízení (standardně /dev/vbi0).\n"
+"  -c, --channel=KANÁL        Při spuštění naladit vybraný kanál.\n"
+"  -d, --device=ZAŘÍZENÍ      video4linux zařízení (standardně /dev/video0).\n"
+"  -D, --driver=JMÉNO         Použití výstupního ovladače: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (standardně Xv).\n"
+"  -f, --frequencies=JMÉNO    Frekvenční tabulka používaná tunerem.\n"
+"                             (standardně us-cable).\n"
+"\n"
+"                             Použitelné hodnoty jsou:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"\n"
+"  -F, --configfile=SOUBOR    Konfigurační soubor, ze kterého se čtou dodatečná nastavení.\n"
+"  -h, --help                 Zobraz tuto nápovědu.\n"
+"  -H, --height=VÝŠKA         Výška výstupního okna (standardně 576).\n"
+"  -i, --input=ČÍSLO          Číslo vstupu video4linux (standardně 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -m, --fullscreen           Zapne tvtime v celoobrazovkovém módu.\n"
+"  -M, --window               Zapně tvti v okenním módu.\n"
+"  -n, --norm=NORM            Norma použitá pro vstup.  tvtime podporuje:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N a PAL-60 (standardně NTSC).\n"
+"  -p, --fspos=POS            Nastaví pozici celoobrazovkového módu: top (nahoře),\n"
+                              "bottom(dole) nebo centre (střed - standardně).\n"
+"  -R, --priority=PRI         Nastaví prioritu na které má proces tvtime běžet.\n"
+"  -t, --xmltv=SOUBOR         Načte seznam XMLTV ze souboru.\n"
+"  -X, --display=DISPLAY      Připojí se k vybranému displej Xek.\n"
+"  -x, --mixer=ZAŘÍZENÍ[:K]   Směšovací zařízení a kanál pro audio.\n"
+"                             (standardně /dev/mixer:line)\n"
+"\n"
+"                             Možné kanály jsou:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:715
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -d, --device=ZAŘÍZENÍ      video4linux zařízení (standardně /dev/video0).\n"
+"  -F, --configfile=SOUBOR    Konfigurační soubor, ze kterého se čtou dodatečná nastavení.\n"
+"  -h, --help                 Zobraz tuto nápovědu.\n"
+"  -i, --input=ČÍSLO          Číslo vstupu video4linux (standardně 0).\n"
+"  -n, --norm=NORM            Norma použitá pro vstup.  tvtime podporuje:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N a PAL-60 (standardně NTSC).\n"
+msgstr ""
