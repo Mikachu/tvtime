@@ -543,6 +543,15 @@ tvtime.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
+<tr><th class="docboxleft">DOWN
+<tr><td class="docentry"><p>
+This command provides the dual functionality of channel down or menu arrow
+down, depending on whether the menu is currently active.  This command is
+to be used together with the <b>LEFT</b>, <b>RIGHT</b> and <b>UP</b> commands.
+</p><p>The <b>DOWN</b> command was added in tvtime 0.9.11.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
 <tr><th class="docboxleft">ENTER
 <tr><td class="docentry"><p>
 Sends a virtual enter command.  Use this when changing the channel:</p>
@@ -583,6 +592,16 @@ Sends a fake keystroke event to tvtime.  This is useful for
 doing complex operations via a remote control, as you can
 indirect events to tvtime's internal key binding system.
 </p><p>The <b>KEY_EVENT</b> command was added in tvtime 0.9.9.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
+<tr><th class="docboxleft">LEFT
+<tr><td class="docentry"><p>
+This command provides the dual functionality of mixer volume down or
+menu back command, depending on whether the menu is currently active.
+This command is to be used together with the <B>RIGHT</b>, <b>UP</b>
+and <b>DOWN</b> commands.
+</p><p>The <b>LEFT</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -664,6 +683,14 @@ Increases the volume setting for the Line In device from
 </p></table><p></p>
 
 <table width="90%" class="doclist">
+<tr><th class="docboxleft">NOOP
+<tr><td class="docentry"><p>
+The command to do nothing.  Useful for when you want to blank out one of
+the default key bindings in tvtime.
+</p><p>The <b>NOOP</b> command was added in tvtime 0.9.11.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
 <tr><th class="docboxleft">OVERSCAN_DOWN
 <tr><td class="docentry"><p>
 Decreases the overscan compensation amount.  This will show more of the
@@ -709,6 +736,16 @@ Decreases the current picture setting value (brightness/contrast/colour/hue).
 Asks tvtime to restart itself.  This is used in the menu when we have changed
 a value that we can't yet change at runtime.
 </p><p>The <b>RESTART</b> command was added in tvtime 0.9.9.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
+<tr><th class="docboxleft">RIGHT
+<tr><td class="docentry"><p>
+This command provides the dual functionality of mixer volume up or
+menu enter command, depending on whether the menu is currently active.
+This command is to be used together with the <b>LEFT</b>, <b>UP</b>
+and <b>DOWN</b> commands.
+</p><p>The <b>RIGHT</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -799,6 +836,14 @@ mode, either top for the top of the screen, center, or bottom.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
+<tr><th class="docboxleft">SET_INPUT_WIDTH
+<tr><td class="docentry"><p>
+This command takes a parameter and sets the current input width in pixels.
+It will be used in tvtime after a restart.
+</p><p>The <b>SET_INPUT_WIDTH</b> command was added in tvtime 0.9.11.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
 <tr><th class="docboxleft">SET_MATTE
 <tr><td class="docentry"><p>
 This command sets the matte to apply to the output.  This changes the
@@ -822,7 +867,8 @@ It will be used in tvtime after a restart.
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current sharpness in pixels.
 It will be used in tvtime after a restart.
-</p><p>The <b>SET_SHARPNESS</b> command was added in tvtime 0.9.9.
+</p><p>The <b>SET_SHARPNESS</b> command was added in tvtime 0.9.9 and
+replaced by <b>SET_INPUT_WIDTH</b> in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1057,6 +1103,15 @@ about the channel including the network name and call letters, and
 sometimes information about the current show.  This information is then shown
 on the OSD and saved to the stationlist.xml file.
 </p><p>The <b>TOGGLE_XDS</b> command was added in tvtime 0.9.10.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
+<tr><th class="docboxleft">UP
+<tr><td class="docentry"><p>
+This command provides the dual functionality of channel up or menu arrow up,
+depending on whether the menu is currently active.  This command is to be
+used together with the <b>LEFT</b>, <b>RIGHT</b> and <b>DOWN</b> commands.
+</p><p>The <b>UP</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">

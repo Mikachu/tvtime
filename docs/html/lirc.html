@@ -80,7 +80,6 @@
         <h4 class="center"><a href="http://www.billybiggs.com/">Billy Biggs</a>,
         21 Sep 2003</h4>
 
-
         <p><a href="http://www.lirc.org/">lirc</a> is a driver, client library and set
         of utilities for using infrared remote controls with Linux applications.
         This document describes how to configure lirc to work with tvtime.
@@ -191,15 +190,35 @@
         moving the cursor up in the menu, while when the menu is not visible,
         this changes the channel.</p>
 
-        <h3>7. Bugs and suggestions</h3>
+        <h3>7. Problems when tvtime runs at realtime priority</h3>
+        <p>You may experience some missed events if you run tvtime as
+        root or have set tvtime setuid root and have one of
+        the following capture cards:</p>
+        <ul>
+        <li>Prolink PixelView Pro
+        <li>Avermedia and Avermedia 98 cards
+        <li>Leadtek Winfast TV 2000 and 2000 XP
+        <li>Flyvideo cards (98, 98FM)
+        <li>Typhoon TView
+        <li>BestBuy EasyTV
+        <li>KWorld
+        </ul>
+        <p>Running tvtime as a user prevents tvtime from aquiring
+        realtime priority, allowing the lirc driver for these cards to
+        poll more frequently for events.  This problem may also be fixed
+        by using a low-latency patched kernel.  We hope to provide a
+        better solution to this problem when we understand it better.</p>
+
+        <h3>8. Bugs and suggestions</h3>
 
         <p>If you have any suggestions on how we can simplify or better
         automate the setup process of using tvtime and lirc, please
         send an email to
         <a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>.</p>
 
-        <h3>8. ChangeLog</h3>
+        <h3>9. ChangeLog</h3>
         <ul>
+        <li>Nov 4, 2003: Added a section about realtime priority problems.
         <li>Oct 9, 2003: Added a section with an example lircrc file.
         </ul>
 
