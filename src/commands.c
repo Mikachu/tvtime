@@ -266,16 +266,18 @@ static void update_xmltv_listings( commands_t *cmd )
 
             if( xmltv_get_next_title( cmd->xmltv ) ) {
                 sprintf( next_title, "Next: " );
-                snprintf( next_title + 6, sizeof( next_title ), "%s", xmltv_get_next_title( cmd->xmltv ) );
+                snprintf( next_title + 6, sizeof( next_title ) - 6, "%s", xmltv_get_next_title( cmd->xmltv ) );
                 if( strlen( next_title ) > 40 ) {
                     sprintf( next_title + 40, "..." );
                 }
+                if( !line1 ) {
+                    line1 = next_title;
+                } else if( !line2 ) {
+                    line2 = next_title;
+                } else {
+                    line3 = next_title;
+                }
             }
-            if ( !line1 )
-                line1 = next_title;
-            else if ( !line2 )
-                line2 = next_title;
-            else line3 = next_title;
 
             tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2, line3 );
         }

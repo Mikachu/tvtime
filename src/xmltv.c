@@ -298,7 +298,7 @@ void xmltv_refresh( xmltv_t *xmltv, int year, int month, int day,
     if( xmltv->subtitle ) xmlFree( xmltv->subtitle );
     if( xmltv->description ) xmlFree( xmltv->description );
     if( xmltv->next_title ) xmlFree ( xmltv->next_title );
-    xmltv->title = xmltv->subtitle = xmltv->description = 0;
+    xmltv->title = xmltv->subtitle = xmltv->description = xmltv->next_title = 0;
     *xmltv->times = 0;
 
     if( *xmltv->curchannel ) {
@@ -311,8 +311,9 @@ void xmltv_refresh( xmltv_t *xmltv, int year, int month, int day,
             next_program = get_program( xmltv->doc, xmltv->root, xmltv->curchannel,
                                         xmltv->end_year, xmltv->end_month, xmltv->end_day,
                                         xmltv->end_hour, xmltv->end_min );
-            if ( next_program )
+            if( next_program ) {
                 get_next_title( xmltv, next_program );
+            }
         } else {
             xmltv->end_year = year;
             xmltv->end_month = month;
