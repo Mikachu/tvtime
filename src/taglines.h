@@ -88,7 +88,7 @@ static const char *taglines[] = {
 "tvtime: the most trusted name in news",
 "tvtime: it's better than bad, it's good",
 "tvtime: the more you use it, the more you love it",
-"tvtime: om katten sj‰lv fÂr v‰lja",
+"tvtime: om katten sj√§lv f√•r v√§lja",
 "tvtime: it's finger-licking good",
 "tvtime: have you had your break today?",
 "tvtime: mmmmm, I love tvtime",
@@ -103,7 +103,7 @@ static const char *taglines[] = {
 "tvtime: like a rock",
 "tvtime: can you see the difference?",
 "tvtime: Trusted.  Connected.  Canadian.",
-"tvtime: lita pÂ kraften.",
+"tvtime: lita p√• kraften.",
 "tvtime: how are you?",
 "by the power of tvtime, i have the Power!",
 "tvtime: and knowing's half the battle",
@@ -165,7 +165,10 @@ static const char *taglines[] = {
 "tvtime: double your pleasure, double your fun with tvtime, tvtime, tvtime, gum",
 "tvtime: everything you want, nothing you don't",
 "tvtime: the night-time sniffling, sneezing, coughing, aching, stuffy head, fever, so-you-can-rest deinterlacer",
-"tvtime: i don't want to grow up, i'm a tvtime kid"
+"tvtime: i don't want to grow up, i'm a tvtime kid",
+"tvtime: extra starka, extra friska",
+"tvtime: grillat √§r godast",
+"tvtime: i'm lovin' it"
 };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
