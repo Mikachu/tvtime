@@ -41,6 +41,10 @@ struct station_info_s
     char norm[ 10 ];
     const band_t *band;
     const band_entry_t *channel;
+    int brightness;
+    int contrast;
+    int colour;
+    int hue;
 
     station_info_t *next;
     station_info_t *prev;
@@ -108,6 +112,10 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
         memset( i->network_name, 0, sizeof( i->network_name ) );
         memset( i->network_call_letters, 0, sizeof( i->network_call_letters ) );
         memset( i->norm, 0, sizeof( i->norm ) );
+        i->brightness = -1;
+        i->contrast = -1;
+        i->colour = -1;
+        i->hue = -1;
 
         if( name ) {
             snprintf( i->name, sizeof( i->name ), "%s", name );
@@ -263,6 +271,10 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *network = xmlGetProp( station, BAD_CAST "network" );
             xmlChar *call = xmlGetProp( station, BAD_CAST "call" );
             xmlChar *norm = xmlGetProp( station, BAD_CAST "norm" );
+            xmlChar *brightness = xmlGetProp( station, BAD_CAST "brightness" );
+            xmlChar *contrast = xmlGetProp( station, BAD_CAST "contrast" );
+            xmlChar *colour = xmlGetProp( station, BAD_CAST "colour" );
+            xmlChar *hue = xmlGetProp( station, BAD_CAST "hue" );
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -286,8 +298,16 @@ int station_readconfig( station_mgr_t *mgr )
                 } else {
                     station_set_current_norm( mgr, mgr->norm );
                 }
+                if( brightness ) station_set_current_brightness( mgr, atoi( (char *) brightness ) );
+                if( contrast ) station_set_current_contrast( mgr, atoi( (char *) contrast ) );
+                if( colour ) station_set_current_colour( mgr, atoi( (char *) colour ) );
+                if( hue ) station_set_current_hue( mgr, atoi( (char *) hue ) );
             }
 
+            if( brightness ) xmlFree( brightness );
+            if( contrast ) xmlFree( contrast );
+            if( colour ) xmlFree( colour );
+            if( hue ) xmlFree( hue );
             if( norm ) xmlFree( norm );
             if( network ) xmlFree( network );
             if( call ) xmlFree( call );
@@ -682,6 +702,71 @@ void station_set_current_norm( station_mgr_t *mgr, const char *norm )
         snprintf( mgr->current->norm, sizeof( mgr->current->norm ), "%s", norm );
     }
 }
+
+void station_set_current_brightness( station_mgr_t *mgr, int val )
+{
+    if( mgr->current ) {
+        mgr->current->brightness = val;
+    }
+}
+
+void station_set_current_contrast( station_mgr_t *mgr, int val )
+{
+    if( mgr->current ) {
+        mgr->current->contrast = val;
+    }
+}
+
+void station_set_current_colour( station_mgr_t *mgr, int val )
+{
+    if( mgr->current ) {
+        mgr->current->colour = val;
+    }
+}
+
+void station_set_current_hue( station_mgr_t *mgr, int val )
+{
+    if( mgr->current ) {
+        mgr->current->hue = val;
+    }
+}
+
+int station_get_current_brightness( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->brightness;
+    } else {
+        return -1;
+    }
+}
+
+int station_get_current_contrast( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->contrast;
+    } else {
+        return -1;
+    }
+}
+
+int station_get_current_colour( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->colour;
+    } else {
+        return -1;
+    }
+}
+
+int station_get_current_hue( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->hue;
+    } else {
+        return -1;
+    }
+}
+
 
 void station_activate_all_channels( station_mgr_t *mgr )
 {

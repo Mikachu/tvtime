@@ -140,6 +140,14 @@ const char *station_get_current_network_call_letters( station_mgr_t *mgr );
 const char *station_get_current_norm( station_mgr_t *mgr );
 
 /**
+ * Returns picture settings for this channel.
+ */
+int station_get_current_brightness( station_mgr_t *mgr );
+int station_get_current_contrast( station_mgr_t *mgr );
+int station_get_current_colour( station_mgr_t *mgr );
+int station_get_current_hue( station_mgr_t *mgr );
+
+/**
  * The last channel we were at, before the current one.
  */
 int station_get_prev_id( station_mgr_t *mgr );
@@ -193,6 +201,14 @@ void station_set_current_network_call_letters( station_mgr_t *mgr, const char *c
  * Sets the norm for this channel.
  */
 void station_set_current_norm( station_mgr_t *mgr, const char *norm );
+
+/**
+ * Sets picture settings for this channel.
+ */
+void station_set_current_brightness( station_mgr_t *mgr, int val );
+void station_set_current_contrast( station_mgr_t *mgr, int val );
+void station_set_current_colour( station_mgr_t *mgr, int val );
+void station_set_current_hue( station_mgr_t *mgr, int val );
 
 /**
  * Writes out the current station config.
