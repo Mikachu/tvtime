@@ -128,7 +128,6 @@ static command_names_t command_table[] = {
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_COLOR_INVERT", TVTIME_TOGGLE_COLOUR_INVERT },
     { "TOGGLE_COLOUR_INVERT", TVTIME_TOGGLE_COLOUR_INVERT },
-    { "TOGGLE_COMPATIBLE_NORM", TVTIME_TOGGLE_COMPATIBLE_NORM },
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
     /* { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS }, Disabled for 0.9.8 */
     { "TOGGLE_DEINTERLACER", TVTIME_TOGGLE_DEINTERLACER },
@@ -141,6 +140,7 @@ static command_names_t command_table[] = {
     { "TOGGLE_MODE", TVTIME_TOGGLE_MODE },
     { "TOGGLE_MUTE", TVTIME_TOGGLE_MUTE },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
+    { "TOGGLE_PAL_SECAM", TVTIME_TOGGLE_PAL_SECAM },
     { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
 
@@ -320,7 +320,7 @@ static void reinit_tuner( commands_t *cmd )
 
         norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
         if( norm >= 0 ) {
-            videoinput_switch_to_compatible_norm( cmd->vidin, norm );
+            videoinput_switch_pal_secam( cmd->vidin, norm );
         }
 
         if( cmd->osd ) {
@@ -1342,8 +1342,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
-    case TVTIME_TOGGLE_COMPATIBLE_NORM:
-        videoinput_switch_to_next_compatible_norm( cmd->vidin );
+    case TVTIME_TOGGLE_PAL_SECAM:
+        videoinput_toggle_pal_secam( cmd->vidin );
         if( videoinput_has_tuner( cmd->vidin ) ) {
             station_set_current_norm( cmd->stationmgr, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
             station_writeconfig( cmd->stationmgr );

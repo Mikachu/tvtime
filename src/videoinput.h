@@ -239,12 +239,12 @@ int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present );
 /**
  * Switches to the next 'compatible' norm.
  */
-void videoinput_switch_to_next_compatible_norm( videoinput_t *vidin );
+void videoinput_toggle_pal_secam( videoinput_t *vidin );
 
 /**
  * Switches to a specific norm.
  */
-void videoinput_switch_to_compatible_norm( videoinput_t *vidin, int norm );
+void videoinput_switch_pal_secam( videoinput_t *vidin, int norm );
 
 #ifdef __cplusplus
 };

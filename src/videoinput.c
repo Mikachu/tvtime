@@ -1614,15 +1614,19 @@ int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
     return vidin->cur_tuner_state;
 }
 
-void videoinput_switch_to_next_compatible_norm( videoinput_t *vidin )
+void videoinput_toggle_pal_secam( videoinput_t *vidin )
 {
-    vidin->norm = videoinput_next_compatible_norm( vidin->norm, vidin->isbttv );
+    if( vidin->norm == VIDEOINPUT_PAL ) {
+        vidin->norm = VIDEOINPUT_SECAM;
+    } else {
+        vidin->norm = VIDEOINPUT_PAL;
+    }
     videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
 }
 
-void videoinput_switch_to_compatible_norm( videoinput_t *vidin, int norm )
+void videoinput_switch_pal_secam( videoinput_t *vidin, int norm )
 {
-    if( norm != vidin->norm && (videoinput_get_norm_height( norm ) == videoinput_get_norm_height( vidin->norm )) ) {
+    if( norm != vidin->norm && (norm == VIDEOINPUT_PAL || norm == VIDEOINPUT_SECAM) ) {
         vidin->norm = norm;
         videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
     }

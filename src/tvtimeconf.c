@@ -755,7 +755,7 @@ config_t *config_new( void )
     ct->keymap[ 'b' ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
-    ct->keymap[ 'n' ] = TVTIME_TOGGLE_COMPATIBLE_NORM;
+    ct->keymap[ 'n' ] = TVTIME_TOGGLE_PAL_SECAM;
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
     ct->keymap[ 'y' ] = TVTIME_SHOW_DEINTERLACER_INFO;
