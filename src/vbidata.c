@@ -235,7 +235,60 @@ static void parse_xds_packet( const char *packet, int length )
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
         fprintf( stderr, "Network name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
-        fprintf( stderr, "Show rating: 0x%02x 0x%02x\n", packet[ 3 ], packet[ 4 ] );
+        static char *movies[] = { "N/A", "G", "PG", "PG-13", "R", 
+                                  "NC-17", "X", "Not Rated" };
+        static char *usa_tv[] = { "Not Rated", "TV-Y", "TV-Y7", "TV-G", 
+                                  "TV-PG", "TV-14", "TV-MA", "Not Rated" };
+        static char *cane_tv[] = { "Exempt", "C", "C8+", "G", "PG", 
+                                   "14+", "18+", "Reserved" };
+        static char *canf_tv[] = { "Exempt", "G", "8 ans +", "13 ans +", 
+                                   "16 ans +", "18 ans +", "Reserved", 
+                                   "Reserved" };
+
+        int movie_rating = packet[ 2 ] & 7;
+        int scheme = (packet[ 2 ] & 56) >> 3;
+        int tv_rating = packet[ 3 ] & 7;
+        int VSL = packet[ 3 ] & 56;
+        char * str;
+
+        switch( VSL | scheme ) {
+        case 3: /* Canadian English TV */
+            str = cane_tv[ tv_rating ];
+            break;
+        case 7: /* Canadian French TV */
+            str = canf_tv[ tv_rating ];
+            break;
+        case 19: /* Reserved */
+        case 31:
+            str = "";
+            break;
+        default:
+            if( ((VSL | scheme) & 3) == 1 ) {
+                /* USA TV */
+                str = usa_tv[ tv_rating ];
+            } else {
+                /* MPAA Movie Rating */
+                str = movies[ movie_rating ];
+            }
+            break;
+        }
+        fprintf( stderr, "Show rating: %s", str );
+        if( ((VSL | scheme) & 3) == 1 || ((VSL | scheme) & 3) == 0 ) {
+            /* show VSLD for the americans */
+            if( (VSL | scheme) & 32 ) {
+                fprintf( stderr, " V" );
+            }
+            if( (VSL | scheme) & 16 ) {
+                fprintf( stderr, " S" );
+            }
+            if( (VSL | scheme) & 8 ) {
+                fprintf( stderr, " L" );
+            }
+            if( (VSL | scheme) & 4 ) {
+                fprintf( stderr, " D" );
+            }
+        }
+        fprintf( stderr, "\n" );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
         fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
