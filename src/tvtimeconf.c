@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <langinfo.h>
 #include "videotools.h"
 #include "parser.h"
 #include "tvtimeconf.h"
@@ -482,7 +483,7 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     strncpy( ct->command_pipe, getenv( "HOME" ), 235 );
     strncat( ct->command_pipe, "/.tvtime/tvtimefifo", 255 );
-    ct->timeformat = strdup( "%r" );
+    ct->timeformat = strdup( nl_langinfo( T_FMT ) );
     ct->finetune = 0;
     ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
