@@ -477,34 +477,40 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_CHANNEL_SCAN:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            in->scan_channels = !in->scan_channels;
+            if( !config_get_check_freq_present( in->cfg ) ) {
+                if( in->osd ) {
+                    tvtime_osd_show_message( in->osd, "Scanner unavailable: Signal checking disabled." );
+                }
+            } else {
+                in->scan_channels = !in->scan_channels;
 
-            if( in->scan_channels && in->renumbering ) {
-                memset( in->next_chan_buffer, 0, 5 );
-                in->digit_counter = 0;
-                in->frame_counter = 0;
-                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
-                in->renumbering = 0;
-            }
+                if( in->scan_channels && in->renumbering ) {
+                    memset( in->next_chan_buffer, 0, 5 );
+                    in->digit_counter = 0;
+                    in->frame_counter = 0;
+                    if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+                    in->renumbering = 0;
+                }
 
-            if( in->osd ) {
-                if( in->scan_channels ) {
-                    int keycode = config_command_to_key( in->cfg, TVTIME_CHANNEL_SCAN );
-                    if( keycode ) {
-                        const char *special = input_special_key_to_string( keycode );
-                        char message[ 256 ];
+                if( in->osd ) {
+                    if( in->scan_channels ) {
+                        int keycode = config_command_to_key( in->cfg, TVTIME_CHANNEL_SCAN );
+                        if( keycode ) {
+                            const char *special = input_special_key_to_string( keycode );
+                            char message[ 256 ];
 
-                        if( special ) {
-                            snprintf( message, sizeof( message ), "Scanning (hit %s to stop).", special );
-                        } else {
-                            snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
+                            if( special ) {
+                                snprintf( message, sizeof( message ), "Scanning (hit %s to stop).", special );
+                            } else {
+                                snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
+                            }
+                            tvtime_osd_set_hold_message( in->osd, message );
+                            tvtime_osd_show_info( in->osd );
                         }
-                        tvtime_osd_set_hold_message( in->osd, message );
+                    } else {
+                        tvtime_osd_set_hold_message( in->osd, "" );
                         tvtime_osd_show_info( in->osd );
                     }
-                } else {
-                    tvtime_osd_set_hold_message( in->osd, "" );
-                    tvtime_osd_show_info( in->osd );
                 }
             }
         }
