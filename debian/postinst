@@ -5,56 +5,13 @@ set -e
 
 action=$1
 
+CONFIGFILE=/etc/tvtime/tvtime.xml
+
 if [ "$action" = "configure" ]; then
     # Source debconf library.
     . /usr/share/debconf/confmodule
 
-    if [ ! -e /etc/tvtime/tvtime.xml ]; then
-        gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz > /etc/tvtime/tvtime.xml
-    fi
-
-    db_get tvtime/norm
-    tvtime-configure --configfile=/etc/tvtime/tvtime.xml --norm=$RET
-    case "$RET" in
-        NTSC|PAL-M|PAL-Nc)
-            db_get tvtime/frequencies-ntsc
-            case "$RET" in
-                Cable) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=us-cable ;;
-                Broadcast) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=us-broadcast ;;
-                *) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=us-cable100 ;;
-            esac
-            ;;
-        NTSC-JP)
-            db_get tvtime/frequencies-jp
-            case "$RET" in
-                Cable) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=japan-cable ;;
-                *) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=japan-broadcast ;;
-            esac
-            ;;
-        *)
-            db_get tvtime/frequencies-pal
-            case "$RET" in
-                Europe) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=europe ;;
-                France) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=france ;;
-                Russia) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=russia ;;
-                Australia) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=australia ;;
-                "New Zealand") tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=newzealand ;;
-                "China Broadcast") tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=china-broadcast ;;
-                "Australia Optus cable") tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=australia-optus ;;
-                *) tvtime-configure --configfile=/etc/tvtime/tvtime.xml --frequencies=custom ;;
-            esac
-            ;;
-    esac
-
-    db_get tvtime/v4ldevice
-    tvtime-configure --configfile=/etc/tvtime/tvtime.xml --device=$RET
-
-    db_get tvtime/vbidevice
-    tvtime-configure --configfile=/etc/tvtime/tvtime.xml --vbidevice=$RET
-
-    db_get tvtime/processpriority
-    tvtime-configure --configfile=/etc/tvtime/tvtime.xml --priority=$RET
-
+    # Handle the setuid bit.
     db_get tvtime/setuid
     if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
         if [ ! -x /usr/sbin/dpkg-statoverride ] || \
@@ -68,11 +25,56 @@ if [ "$action" = "configure" ]; then
         fi
     fi
 
-    if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
-        chmod u-s /usr/bin/tvtime
-    else
-        chmod u+s /usr/bin/tvtime
-    fi
+    # Start with the new default config file.
+    gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz > $CONFIGFILE.new
+
+    db_get tvtime/norm
+    tvtime-configure --configfile=$CONFIGFILE.new --norm=$RET
+    case "$RET" in
+        NTSC|PAL-M|PAL-Nc)
+            db_get tvtime/frequencies-ntsc
+            case "$RET" in
+                Cable) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-cable ;;
+                Broadcast) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-broadcast ;;
+                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-cable100 ;;
+            esac
+            ;;
+        NTSC-JP)
+            db_get tvtime/frequencies-jp
+            case "$RET" in
+                Cable) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=japan-cable ;;
+                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=japan-broadcast ;;
+            esac
+            ;;
+        *)
+            db_get tvtime/frequencies-pal
+            case "$RET" in
+                Europe) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=europe ;;
+                France) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=france ;;
+                Russia) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=russia ;;
+                Australia) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=australia ;;
+                "New Zealand") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=newzealand ;;
+                "China Broadcast") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=china-broadcast ;;
+                "Australia Optus cable") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=australia-optus ;;
+                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=custom ;;
+            esac
+            ;;
+    esac
+
+    db_get tvtime/v4ldevice
+    tvtime-configure --configfile=$CONFIGFILE.new --device=$RET
+
+    db_get tvtime/vbidevice
+    tvtime-configure --configfile=$CONFIGFILE.new --vbidevice=$RET
+
+    db_get tvtime/processpriority
+    tvtime-configure --configfile=$CONFIGFILE.new --priority=$RET
+
+    # Now run ucf on our new config file.
+    db_stop
+
+    ucf $CONFIGFILE.new $CONFIGFILE </dev/tty
+    rm -f $CONFIGFILE.new
 
     # Create the video devices if they don't exist.
     if [ ! -c '/dev/video0' ]; then

@@ -17,24 +17,21 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-
 case "$1" in
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-    
-
-    ;;
+        ;;
 
     purge)
-    if [ -d /etc/tvtime ]; then
-      echo "removing directory \`/etc/tvtime'." >&2
-      rm -rf /etc/tvtime
-    fi
-    ;;
+        if [ -d /etc/tvtime ]; then
+            echo "removing directory \`/etc/tvtime'." >&2
+            rm -rf /etc/tvtime
+            ucf -p /etc/tvtime/tvtime.xml
+        fi
+        ;;
 
     *)
         echo "postrm called with unknown argument \`$1'" >&2
         exit 1
-
 esac
 
 # dh_installdeb will replace this with shell code automatically
