@@ -28,7 +28,6 @@ typedef struct fifo_s fifo_t;
 fifo_t *fifo_new( const char *filename );
 void fifo_delete( fifo_t *fifo );
 
-const char *fifo_get_filename( fifo_t *fifo );
 int fifo_get_next_command( fifo_t *fifo );
 const char *fifo_get_arguments( fifo_t *fifo );
 

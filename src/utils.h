@@ -40,6 +40,13 @@ extern "C" {
 int file_is_openable_for_read( const char *filename );
 
 /**
+ * Attempts to create the given directory if it does not already
+ * exist.  Returns 0 on a failure to create the directory, or if
+ * it is not owned by uid / gid.
+ */
+int mkdir_and_force_owner( const char *path, uid_t uid, gid_t gid );
+
+/**
  * Returns a string for the location of the given file, checking
  * paths that may be used before make install.  Returns 0 if the
  * file is not found, otherwise returns a new string that must be
@@ -53,14 +60,10 @@ char *get_tvtime_file( const char *filename );
 const char *get_tvtime_paths( void );
 
 /**
- * Returns a FIFO directory name.
+ * Returns the filename of the tvtime fifo.  This memory must be
+ * freed by the caller using free().
  */
-const char *get_tvtime_fifodir( uid_t uid );
-
-/**
- * Returns a FIFO file name.
- */
-const char *get_tvtime_fifo( uid_t uid );
+char *get_tvtime_fifo_filename( uid_t uid );
 
 /**
  * Expands a pathname using wordexp.  This expands ~/foo

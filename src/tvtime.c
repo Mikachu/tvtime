@@ -1165,8 +1165,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int has_signal = 0;
     vbidata_t *vbidata = 0;
     vbiscreen_t *vs = 0;
-    DIR *fifodir = 0;
     fifo_t *fifo = 0;
+    char *fifofile = 0;
     commands_t *commands = 0;
     int fadepos = 0;
     int scanwait = scan_delay;
@@ -1549,63 +1549,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         videofilter_enable_uyvy_conversion( tvtime->inputfilter );
     }
 
-    /* Create the user's FIFO directory */
-    if( !get_tvtime_fifodir( config_get_uid( ct ) ) ) {
-        lfputs( _("tvtime: Cannot find FIFO directory.  FIFO disabled.\n"),
-                stderr );
+    fifofile = get_tvtime_fifo_filename( config_get_uid( ct ) );
+    if( !fifofile ) {
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
     } else {
-        int success = 0;
-        if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU )
-            < 0 ) {
-            if( errno != EEXIST ) {
-                lfprintf( stderr, _("tvtime: Cannot create directory %s: %s\n"
-                                    "tvtime: FIFO disabled.\n"), 
-                         get_tvtime_fifodir( config_get_uid( ct ) ),
-                         strerror( errno ) );
-            } else {
-                fifodir = opendir
-                    ( get_tvtime_fifodir( config_get_uid( ct ) ) );
-                if( !fifodir ) {
-                    lfprintf( stderr, _("tvtime: %s is not a directory.  "
-                                       "FIFO disabled.\n"), 
-                             get_tvtime_fifodir( config_get_uid( ct ) ) );
-                } else {
-                    struct stat dirstat;
-                    closedir( fifodir );
-                    /* Ensure the FIFO directory is owned by the user. */
-                    if( !stat( get_tvtime_fifodir( config_get_uid( ct ) ),
-                               &dirstat ) ) {
-                        if( dirstat.st_uid == config_get_uid( ct ) ) {
-                            success = 1;
-                        } else {
-                            lfprintf( stderr, _("tvtime: You do not own %s.  "
-                                                "FIFO disabled.\n"),
-                                      get_tvtime_fifodir( config_get_uid( ct ) ) );
-                        }
-                    } else {
-                        lfprintf( stderr, _("tvtime: Cannot stat %s: %s\n"
-                                            "tvtime: FIFO disabled.\n"),
-                                  get_tvtime_fifodir( config_get_uid( ct ) ),
-                                  strerror( errno ) );
-                    }
-                }
-            }
-        } else {
-            success = 1;
-        }
-
-        if( success ) {
-            /* Setup the FIFO */
-            if( !get_tvtime_fifo( config_get_uid( ct ) ) ) {
-                lfputs( _("tvtime: Cannot find FIFO file.  "
-                          "Failed to create FIFO object.\n"), stderr );
-            } else {
-                fifo = fifo_new( get_tvtime_fifo( config_get_uid( ct ) ) );
-                if( !fifo && verbose ) {
-                    lfputs( _("tvtime: Not reading input from FIFO."
-                              "  Failed to create FIFO object.\n"), stderr );
-                }
-            }
+        fifo = fifo_new( fifofile );
+        if( !fifo && verbose ) {
+            lfputs( _("tvtime: Failed to create FIFO, disabled.\n"), stderr );
         }
     }
 
@@ -1620,7 +1570,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
     } else {
         if( fifo ) {
-            console_setup_pipe( con, fifo_get_filename( fifo ) );
+            console_setup_pipe( con, fifofile );
         }
         commands_set_console( commands, con );
     }
@@ -1628,6 +1578,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         outputfilter_set_console( tvtime->outputfilter, con );
         outputfilter_set_pixel_aspect( tvtime->outputfilter, pixel_aspect );
     }
+
+    /* We no longer need the fifo filename. */
+    if( fifofile ) free( fifofile );
 
     in = input_new( ct, commands, con, verbose );
     if( !in ) {

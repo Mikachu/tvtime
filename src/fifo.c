@@ -33,7 +33,6 @@ struct fifo_s {
     int fd;
     char buf[ 256 ];
     int bufpos;
-    char *filename;
     char arg[ 256 ];
 };
 
@@ -50,7 +49,6 @@ fifo_t *fifo_new( const char *filename )
 
     fifo->fd = open( filename, O_RDONLY | O_NONBLOCK );
     if( fifo->fd == -1 ) {
-
         /* attempt to create it */
         if( mkfifo( filename, S_IREAD | S_IWRITE ) == -1 ) {
             /* failed */
@@ -65,8 +63,6 @@ fifo_t *fifo_new( const char *filename )
             return 0;
         }
     }
-
-    fifo->filename = strdup( filename );
 
     /* our fifo is open for reading */
     return fifo;
@@ -126,14 +122,7 @@ const char *fifo_get_arguments( fifo_t *fifo )
 
 void fifo_delete( fifo_t *fifo )
 {
-    free( fifo->filename );
     close( fifo->fd );
     free( fifo );
-}
-
-const char *fifo_get_filename( fifo_t *fifo )
-{
-    if( !fifo ) return 0;
-    return fifo->filename;
 }
 

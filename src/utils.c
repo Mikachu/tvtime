@@ -108,155 +108,73 @@ const char *get_tvtime_paths( void )
 #endif
 }
 
-const char *get_tvtime_fifodir( uid_t uid )
+int mkdir_and_force_owner( const char *path, uid_t uid, gid_t gid )
 {
-    static char *fifodir = 0;
-
-    if( !fifodir ) {
-        /* We have nothing in our cache. */
-        struct passwd *pwuid = 0;
-        char *user = 0;
-        DIR *dirhandle = 0;
-
-        /* Check for the user's existance. */
-        pwuid = getpwuid( uid );
-        if( pwuid ) {
-            if( asprintf( &user, "%s", pwuid->pw_name) < 0 ) {
-                fprintf( stderr, "utils: Out of memory.\n" );
-                return 0;
-            }
+    if( mkdir( path, S_IRWXU ) < 0 ) {
+        if( errno != EEXIST ) {
+            lfprintf( stderr, _("Cannot create %s: %s.\n"),
+                      path, strerror( errno ) );
         } else {
-            if( asprintf( &user, "%u", uid ) < 0 ) {
-                fprintf( stderr, "utils: Out of memory.\n" );
-                return 0;
+            /* It exists, make sure it's a directory. */
+            DIR *temp_dir = opendir( path );
+            if( !path ) {
+                lfprintf( stderr, _("Cannot open %s: %s\n"), 
+                          path, strerror( errno ) );
+            } else {
+                closedir( temp_dir );
+                return 1;
             }
         }
-
-        /* First try the FIFODIR. */
-        if( asprintf( &fifodir, "%s/.TV-%s", FIFODIR, user ) < 0 ) {
-            free( user );
-            fprintf( stderr, "utils: Out of memory.\n" );
-            return 0;
+    } else {
+        /* We created the directory, now force it to be owned by the user. */
+        if( chown( path, uid, gid ) < 0 ) {
+            lfprintf( stderr, _("Cannot change owner of %s: %s.\n"),
+                      path, strerror( errno ) );
+        } else {
+            return 1;
         }
-        free( user );
-
-        /* We will try to ensure that the FIFO directory exists,
-         * and create the user's subdirectory while we're at it. */
-        errno = 0;
-        if( mkdir( fifodir, S_IRWXU ) < 0 ) {
-            if( errno == EEXIST ) {
-                dirhandle = opendir( fifodir );
-                if( dirhandle ) {
-                    struct stat dirstat;
-                    closedir( dirhandle );
-                    if( !stat( fifodir, &dirstat ) ) {
-                        if( dirstat.st_uid == uid ) {
-                            return fifodir;
-                        }
-                    }
-                }
-            }
-        }
-
-        /* We will now resort to using the home directory. */
-        free( fifodir );
-        user = getenv( "HOME" );
-        if( !user ) {
-            fprintf( stderr, "utils: You're HOMEless, go away!\n" );
-            return 0;
-        }
-        if( asprintf( &fifodir, "%s/.tvtime", user ) < 0 ) {
-            fprintf( stderr, "utils: Out of memory.\n" );
-            return 0;
-        }
-
-        /* We will try to ensure that the FIFO directory exists. */
-        errno = 0;
-        if( mkdir( fifodir, S_IRWXU ) < 0 ) {
-            if( errno == EEXIST ) {
-                dirhandle = opendir( fifodir );
-                if( dirhandle ) {
-                    struct stat dirstat;
-                    closedir( dirhandle );
-                    if( !stat( fifodir, &dirstat ) ) {
-                        if( dirstat.st_uid == uid ) {
-                            return fifodir;
-                        }
-                    }
-                }
-            }
-        }
-
-        /* It appears we failed.  Bail out. */
-        free( fifodir );
-        return 0;
     }
 
-    /* Return the value in the cache. */
-    return fifodir;
+    return 0;
 }
 
-const char *get_tvtime_fifo( uid_t uid )
+char *get_tvtime_fifo_filename( uid_t uid )
 {
-    static char *fifo = 0;
+    /* SUSv2 guarantees that 'Host names are limited to 255  bytes'. */
+    static char hostname[ 256 ];
+    struct passwd *pwuid = 0;
+    char *fifodir;
+    char *fifo;
 
-    if( !fifo ) {
-        /* We have nothing in our cache. */
-        const char *fifodir = 0;
-        char *hostname = 0;
-        size_t hostenv_size = 256; 
-        char *hostenv = 0;
-        char *hostenv_realloc = 0;
+    if( gethostname( hostname, sizeof( hostname ) ) == -1 ) {
+        /* Put errno in the filename for interest. */
+        snprintf( hostname, sizeof( hostname ), "unknown%d", errno );
+    }
 
-        /* Get the FIFO directory. */
-        fifodir = get_tvtime_fifodir( uid );
-        if( !fifodir ) {
-            fprintf( stderr, "utils: No FIFO directory found.!\n" );
-            return NULL;
+    /* Create string for the directory in FIFODIR */
+    pwuid = getpwuid( uid );
+    if( pwuid ) {
+        if( asprintf( &fifodir, FIFODIR "/.TV-%s", pwuid->pw_name ) < 0 ) {
+            return 0;
         }
-
-        /* Try to get a hostname. */
-        hostenv = malloc( hostenv_size );
-        while( gethostname( hostenv, hostenv_size ) < 0 ) {
-            hostenv_size *= 2;
-            hostenv_realloc = realloc( hostenv, hostenv_size );
-            if( !hostenv_realloc ) {
-                /* Use a partial hostname. */
-                hostenv_size /= 2;
-                break;
-            } else {
-                hostenv = hostenv_realloc;
-            }
-        }
-
-        /* Use this hostname as a suffix to the FIFO */
-        if( hostenv ) {
-            if( asprintf( &hostname, "-%s", hostenv ) < 0 ) {
-                fprintf( stderr, "utils: Out of memory.\n" );
-                /* Try to get away with no hostname. */
-                if( asprintf( &hostname, "%s", "" ) < 0 ) {
-                    fprintf( stderr, "utils: Really out of memory.\n" );
-                    return 0;
-                }
-            }
-        } else {
-            if( asprintf( &hostname, "%s", "" ) < 0 ) {
-                fprintf( stderr, "utils: Really out of memory.\n" );
-                return 0;
-            }
-        }
-
-        if( asprintf( &fifo, "%s/tvtimefifo%s", fifodir,
-                      hostname ) < 0 ) {
-            fprintf( stderr, "utils: Out of memory.\n" );
-            if( asprintf( &fifo, "%s", "" ) < 0 ) {
-                fprintf( stderr, "utils: Really out of memory.\n" );
-                return 0;
-            }
+    } else {
+        if( asprintf( &fifodir, FIFODIR "/.TV-%u", uid ) < 0 ) {
+            return 0;
         }
     }
 
-    /* Return the value in the cache. */
+    /* If we can't use our /tmp directory, put the fifo in $HOME. */
+    if( !mkdir_and_force_owner( fifodir, uid, getgid() ) ) {
+        if( asprintf( &fifo, "%s/.tvtime/tvtimefifo-%s",
+                      getenv( "HOME" ), hostname ) < 0 ) {
+            fifo = 0;
+        }
+    } else {
+        if( asprintf( &fifo, "%s/tvtimefifo-%s", fifodir, hostname ) < 0 ) {
+            fifo = 0;
+        }
+    }
+    free( fifodir );
     return fifo;
 }
 

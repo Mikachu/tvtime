@@ -919,28 +919,7 @@ config_t *config_new( void )
         /* FIXME: Clean up ?? */
         return 0;
     }
-
-    if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
-        if( errno != EEXIST ) {
-            lfprintf( stderr, _("Cannot create %s: %s.\n"),
-                      temp_dirname, strerror( errno ) );
-        } else {
-            DIR *temp_dir = opendir( temp_dirname );
-            if( !temp_dir ) {
-                lfprintf( stderr, _("%s is not a directory.\n"), 
-                          temp_dirname );
-            } else {
-                closedir( temp_dir );
-            }
-        }
-        /* If the directory already exists, we didn't need to create it. */
-    } else {
-        /* We created the directory, now force it to be owned by the user. */
-        if( chown( temp_dirname, getuid(), getgid() ) < 0 ) {
-            lfprintf( stderr, _("Cannot change owner of %s: %s.\n"),
-                      temp_dirname, strerror( errno ) );
-        }
-    }
+    mkdir_and_force_owner( temp_dirname, ct->uid, getgid() );
     free( temp_dirname );
 
     /* First read in global settings. */
