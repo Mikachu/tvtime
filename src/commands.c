@@ -237,11 +237,13 @@ static void reinit_tuner( commands_t *in )
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
+            tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
         }
     } else if( in->osd ) {
         tvtime_osd_set_audio_mode( in->osd, "" );
         tvtime_osd_set_freq_table( in->osd, "" );
         tvtime_osd_set_channel_number( in->osd, "" );
+        tvtime_osd_set_channel_name( in->osd, "" );
         tvtime_osd_set_network_call( in->osd, "" );
         tvtime_osd_set_network_name( in->osd, "" );
         tvtime_osd_set_show_name( in->osd, "" );
@@ -359,6 +361,7 @@ static void commands_station_change( commands_t *in )
             sprintf( channel_display, "%d", station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
+            tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
