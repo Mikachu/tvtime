@@ -195,15 +195,11 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
 
     fontfile = "FreeSansBold.ttf";
-    logofile = DATADIR "/testlogo.png";
-    creditsfile = DATADIR "/credits.png";
+    logofile = "testlogo.png";
+    creditsfile = "credits.png";
 
     osd->credits = credits_new( creditsfile, height );
     osd->show_credits = 0;
-    if( !osd->credits ) {
-        creditsfile = "../data/credits.png";
-        osd->credits = credits_new( creditsfile, height );
-    }
 
     osd->strings[ OSD_CHANNEL_NUM ].rightjustified = 0;
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 30, width, height, frameaspect );
