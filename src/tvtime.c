@@ -1226,7 +1226,7 @@ int main( int argc, char **argv )
 
     /* Initialize our timestamps. */
     for(;;) {
-        const char *fifo_args = "";
+        const char *fifo_args = 0;
         unsigned char *curframe = 0;
         int curframeid;
         int printdebug = 0;
@@ -1414,7 +1414,8 @@ int main( int argc, char **argv )
                     char filename[ 256 ];
                     char timestamp[ 50 ];
                     time_t tm = time( 0 );
-                    if(fifo && strlen(fifo_args) > 0) {
+
+                    if( fifo_args && strlen( fifo_args ) ) {
                         outfile = fifo_args;
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
