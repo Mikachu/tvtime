@@ -24,89 +24,11 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include "utils.h"
 #include "input.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
-
-
-/* Key names. */
-typedef struct key_name_s key_name_t;
-struct key_name_s
-{
-    char *name;
-    int key;
-};
-
-static key_name_t key_names[] = {
-    { "Up", I_UP },
-    { "Down", I_DOWN },
-    { "Left", I_LEFT },
-    { "Right", I_RIGHT },
-    { "Insert", I_INSERT },
-    { "Home", I_HOME },
-    { "End", I_END },
-    { "pgup", I_PGUP },
-    { "pgdn", I_PGDN },
-    { "pg up", I_PGUP },
-    { "pg dn", I_PGDN },
-    { "PageUp", I_PGUP },
-    { "PageDown", I_PGDN },
-    { "Page Up", I_PGUP },
-    { "Page Down", I_PGDN },
-    { "F1", I_F1 },
-    { "F2", I_F2 },
-    { "F3", I_F3 },
-    { "F4", I_F4 },
-    { "F5", I_F5 },
-    { "F6", I_F6 },
-    { "F7", I_F7 },
-    { "F8", I_F8 },
-    { "F9", I_F9 },
-    { "F10", I_F10 },
-    { "F11", I_F11 },
-    { "F12", I_F12 },
-    { "F13", I_F13 },
-    { "F14", I_F14 },
-    { "F15", I_F15 },
-    { "Backspace", I_BACKSPACE },
-    { "bs", I_BACKSPACE },
-    { "Del", I_BACKSPACE },
-    { "Delete", I_BACKSPACE },
-    { "Escape", I_ESCAPE },
-    { "Esc", I_ESCAPE },
-    { "Enter", I_ENTER },
-    { "Print", I_PRINT },
-    { "Menu", I_MENU },
-    { 0, 0 }
-};
-
-
-int input_string_to_special_key( const char *str )
-{
-    int count;
-
-    for( count = 0; key_names[ count ].name; count++ ) {
-        if( !strcasecmp( str, key_names[ count ].name ) ) {
-            return key_names[ count ].key;
-        }
-    }
-
-    return 0;
-}
-
-const char *input_special_key_to_string( int key )
-{
-    int count;
-
-    for( count = 0; key_names[ count ].name; count++ ) {
-        if( key == key_names[ count ].key ) {
-            return key_names[ count ].name;
-        }
-    }
-
-    return 0;
-}
 
 struct input_s {
     config_t *cfg;

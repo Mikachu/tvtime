@@ -22,8 +22,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "commands.h"
 #include "utils.h"
+#include "tvtimeconf.h"
 
 int main( int argc, char **argv )
 {

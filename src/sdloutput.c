@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <SDL/SDL.h>
-#include "videoinput.h"
+#include "utils.h"
 #include "input.h"
 
 const int resize_frame_delay = 10;

@@ -364,3 +364,265 @@ error:
     return 0;
 }
 
+/* Key names. */
+typedef struct key_name_s key_name_t;
+struct key_name_s
+{
+    char *name;
+    int key;
+};
+
+static key_name_t key_names[] = {
+    { "Up", I_UP },
+    { "Down", I_DOWN },
+    { "Left", I_LEFT },
+    { "Right", I_RIGHT },
+    { "Insert", I_INSERT },
+    { "Home", I_HOME },
+    { "End", I_END },
+    { "pgup", I_PGUP },
+    { "pgdn", I_PGDN },
+    { "pg up", I_PGUP },
+    { "pg dn", I_PGDN },
+    { "PageUp", I_PGUP },
+    { "PageDown", I_PGDN },
+    { "Page Up", I_PGUP },
+    { "Page Down", I_PGDN },
+    { "F1", I_F1 },
+    { "F2", I_F2 },
+    { "F3", I_F3 },
+    { "F4", I_F4 },
+    { "F5", I_F5 },
+    { "F6", I_F6 },
+    { "F7", I_F7 },
+    { "F8", I_F8 },
+    { "F9", I_F9 },
+    { "F10", I_F10 },
+    { "F11", I_F11 },
+    { "F12", I_F12 },
+    { "F13", I_F13 },
+    { "F14", I_F14 },
+    { "F15", I_F15 },
+    { "Backspace", I_BACKSPACE },
+    { "bs", I_BACKSPACE },
+    { "Del", I_BACKSPACE },
+    { "Delete", I_BACKSPACE },
+    { "Escape", I_ESCAPE },
+    { "Esc", I_ESCAPE },
+    { "Enter", I_ENTER },
+    { "Print", I_PRINT },
+    { "Menu", I_MENU },
+    { 0, 0 }
+};
+
+
+int input_string_to_special_key( const char *str )
+{
+    int count;
+
+    for( count = 0; key_names[ count ].name; count++ ) {
+        if( !strcasecmp( str, key_names[ count ].name ) ) {
+            return key_names[ count ].key;
+        }
+    }
+
+    return 0;
+}
+
+const char *input_special_key_to_string( int key )
+{
+    int count;
+
+    for( count = 0; key_names[ count ].name; count++ ) {
+        if( key == key_names[ count ].key ) {
+            return key_names[ count ].name;
+        }
+    }
+
+    return 0;
+}
+
+typedef struct command_names_s {
+    const char *name;
+    int command;
+} command_names_t;
+
+static command_names_t command_table[] = {
+
+    { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
+    { "AUTO_ADJUST_WINDOW", TVTIME_AUTO_ADJUST_WINDOW },
+
+    { "BRIGHTNESS_DOWN", TVTIME_BRIGHTNESS_DOWN },
+    { "BRIGHTNESS_UP", TVTIME_BRIGHTNESS_UP },
+
+    { "CHANNEL_1", TVTIME_CHANNEL_1 },
+    { "CHANNEL_2", TVTIME_CHANNEL_2 },
+    { "CHANNEL_3", TVTIME_CHANNEL_3 },
+    { "CHANNEL_4", TVTIME_CHANNEL_4 },
+    { "CHANNEL_5", TVTIME_CHANNEL_5 },
+    { "CHANNEL_6", TVTIME_CHANNEL_6 },
+    { "CHANNEL_7", TVTIME_CHANNEL_7 },
+    { "CHANNEL_8", TVTIME_CHANNEL_8 },
+    { "CHANNEL_9", TVTIME_CHANNEL_9 },
+    { "CHANNEL_0", TVTIME_CHANNEL_0 },
+
+    { "CHANNEL_ACTIVATE_ALL", TVTIME_CHANNEL_ACTIVATE_ALL },
+    { "CHANNEL_DEC", TVTIME_CHANNEL_DEC },
+    { "CHANNEL_DOWN", TVTIME_CHANNEL_DEC },
+    { "CHANNEL_INC", TVTIME_CHANNEL_INC },
+    { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
+    { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
+    { "CHANNEL_SAVE_TUNING", TVTIME_CHANNEL_SAVE_TUNING },
+    { "CHANNEL_SCAN", TVTIME_CHANNEL_SCAN },
+    { "CHANNEL_SKIP", TVTIME_CHANNEL_SKIP },
+    { "CHANNEL_UP", TVTIME_CHANNEL_INC },
+
+    { "COLOR_DOWN", TVTIME_COLOUR_DOWN },
+    { "COLOR_UP", TVTIME_COLOUR_UP },
+
+    { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
+    { "COLOUR_UP", TVTIME_COLOUR_UP },
+
+    { "CONTRAST_DOWN", TVTIME_CONTRAST_DOWN },
+    { "CONTRAST_UP", TVTIME_CONTRAST_UP },
+
+    { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
+    { "DISPLAY_MESSAGE", TVTIME_DISPLAY_MESSAGE },
+
+    { "ENTER", TVTIME_ENTER },
+
+    { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
+    { "FINETUNE_UP", TVTIME_FINETUNE_UP },
+
+    { "HUE_DOWN", TVTIME_HUE_DOWN },
+    { "HUE_UP", TVTIME_HUE_UP },
+
+    { "KEY_EVENT", TVTIME_KEY_EVENT },
+
+    { "LUMA_DOWN", TVTIME_LUMA_DOWN },
+    { "LUMA_UP", TVTIME_LUMA_UP },
+
+    { "MENU_DOWN", TVTIME_MENU_DOWN },
+    { "MENU_ENTER", TVTIME_MENU_ENTER },
+    { "MENU_EXIT", TVTIME_MENU_EXIT },
+    { "MENU_LEFT", TVTIME_MENU_LEFT },
+    { "MENU_RIGHT", TVTIME_MENU_RIGHT },
+    { "MENU_UP", TVTIME_MENU_UP },
+
+    { "MIXER_DOWN", TVTIME_MIXER_DOWN },
+    { "MIXER_TOGGLE_MUTE", TVTIME_MIXER_TOGGLE_MUTE },
+    { "MIXER_UP", TVTIME_MIXER_UP },
+
+    { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
+    { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
+
+    { "PICTURE", TVTIME_PICTURE },
+    { "PICTURE_UP", TVTIME_PICTURE_UP },
+    { "PICTURE_DOWN", TVTIME_PICTURE_DOWN },
+
+    { "RESTART", TVTIME_RESTART },
+    { "RUN_COMMAND", TVTIME_RUN_COMMAND },
+
+    { "SAVE_PICTURE_GLOBAL", TVTIME_SAVE_PICTURE_GLOBAL },
+    { "SAVE_PICTURE_CHANNEL", TVTIME_SAVE_PICTURE_CHANNEL },
+
+    { "SCREENSHOT", TVTIME_SCREENSHOT },
+    { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
+    { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
+
+    { "SET_AUDIO_MODE", TVTIME_SET_AUDIO_MODE },
+    { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
+    { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
+    { "SET_FREQUENCY_TABLE", TVTIME_SET_FREQUENCY_TABLE },
+    { "SET_NORM", TVTIME_SET_NORM },
+    { "SET_SHARPNESS", TVTIME_SET_SHARPNESS },
+
+    { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
+    { "SHOW_MENU", TVTIME_SHOW_MENU },
+    { "SHOW_STATS", TVTIME_SHOW_STATS },
+
+    { "TOGGLE_ALWAYSONTOP", TVTIME_TOGGLE_ALWAYSONTOP },
+    { "TOGGLE_ASPECT", TVTIME_TOGGLE_ASPECT },
+    { "TOGGLE_AUDIO_MODE", TVTIME_TOGGLE_AUDIO_MODE },
+    { "TOGGLE_BARS", TVTIME_TOGGLE_BARS },
+    { "TOGGLE_CC", TVTIME_TOGGLE_CC },
+    { "TOGGLE_COLOR_INVERT", TVTIME_TOGGLE_COLOUR_INVERT },
+    { "TOGGLE_COLOUR_INVERT", TVTIME_TOGGLE_COLOUR_INVERT },
+    { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
+    /* { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS }, Disabled for 0.9.8 */
+    { "TOGGLE_DEINTERLACER", TVTIME_TOGGLE_DEINTERLACER },
+    { "TOGGLE_FULLSCREEN", TVTIME_TOGGLE_FULLSCREEN },
+    { "TOGGLE_FRAMERATE", TVTIME_TOGGLE_FRAMERATE },
+    { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
+    { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
+    { "TOGGLE_MATTE", TVTIME_TOGGLE_MATTE },
+    { "TOGGLE_MIRROR", TVTIME_TOGGLE_MIRROR },
+    { "TOGGLE_MODE", TVTIME_TOGGLE_MODE },
+    { "TOGGLE_MUTE", TVTIME_TOGGLE_MUTE },
+    { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
+    { "TOGGLE_PAL_SECAM", TVTIME_TOGGLE_PAL_SECAM },
+    { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
+    { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
+    { "TOGGLE_SIGNAL_DETECTION", TVTIME_TOGGLE_SIGNAL_DETECTION },
+
+    { "QUIT", TVTIME_QUIT },
+};
+
+int tvtime_num_commands( void )
+{
+    return ( sizeof( command_table ) / sizeof( command_names_t ) );
+}
+
+const char *tvtime_get_command( int pos )
+{
+    return command_table[ pos ].name;
+}
+
+int tvtime_get_command_id( int pos )
+{
+    return command_table[ pos ].command;
+}
+
+int tvtime_string_to_command( const char *str )
+{
+    if( str ) {
+        int i;
+
+        for( i = 0; i < tvtime_num_commands(); i++ ) {
+            if( !strcasecmp( str, tvtime_get_command( i ) ) ) {
+                return tvtime_get_command_id( i );
+            }
+        }
+    }
+
+    return TVTIME_NOCOMMAND;
+}
+
+const char *tvtime_command_to_string( int command )
+{
+    int i;
+
+    for( i = 0; i < tvtime_num_commands(); i++ ) {
+        if( tvtime_get_command_id( i ) == command ) {
+            return tvtime_get_command( i );
+        }
+    }
+
+    return "ERROR";
+}
+
+int tvtime_is_menu_command( int command )
+{
+    return (command >= TVTIME_MENU_UP);
+}
+
+int tvtime_command_takes_arguments( int command )
+{
+    return (command == TVTIME_DISPLAY_MESSAGE || command == TVTIME_SCREENSHOT ||
+            command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
+            command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE ||
+            command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_SHARPNESS ||
+            command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE ||
+            command == TVTIME_RUN_COMMAND);
+}
+

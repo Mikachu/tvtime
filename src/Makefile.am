@@ -73,13 +73,13 @@ EXTRA_PROGRAMS = expandpng timingtest rvr
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-tvtime_command_SOURCES = $(COMMON_SRCS) tvtime-command.c
+tvtime_command_SOURCES = utils.c tvtimeconf.c tvtime-command.c
 tvtime_command_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-tvtime_configure_SOURCES = $(COMMON_SRCS) tvtime-configure.c
+tvtime_configure_SOURCES = utils.c tvtimeconf.c tvtime-configure.c
 tvtime_configure_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-tvtime_scanner_SOURCES = $(COMMON_SRCS) tvtime-scanner.c
+tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.c station.c tvtime-scanner.c
 tvtime_scanner_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c

@@ -50,8 +50,8 @@
 #endif
 
 #include "display.h"
-#include "input.h"
 #include "speedy.h"
+#include "utils.h"
 #include "xcommon.h"
 
 /* Every 30 seconds, ping the screensaver. */

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <directfb.h>
 
+#include "utils.h"
 #include "input.h"
 
 static void *image_data;

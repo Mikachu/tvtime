@@ -28,7 +28,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "videoinput.h"
-#include "commands.h"
+#include "tvtimeconf.h"
+#include "station.h"
+// #include "commands.h"
 #include "utils.h"
 
 int main( int argc, char **argv )

@@ -42,6 +42,7 @@
 #include <sys/ioctl.h>
 #include <sys/kd.h>
 #include <linux/fb.h>
+#include "utils.h"
 
 static IDirectFB             *dfb;
 static IDirectFBDisplayLayer *crtc2;

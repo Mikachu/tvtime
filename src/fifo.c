@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include "commands.h"
+#include "utils.h"
 #include "fifo.h"
 
 struct fifo_s {
