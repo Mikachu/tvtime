@@ -93,6 +93,7 @@ struct config_s
     int aspect;
     int debug;
     int finetune;
+    int fullscreen;
 
     int ntsc_mode;
 
@@ -178,6 +179,7 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
+    ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
     ct->channel_text_rgb = 4294967040U; /* opaque yellow */
     ct->other_text_rgb = 4294303411U; /* opaque wheat */
@@ -256,7 +258,7 @@ config_t *config_new( int argc, char **argv )
         config_init( ct );
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcsd:i:l:n:f:t:F:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
@@ -271,6 +273,7 @@ config_t *config_new( int argc, char **argv )
         case 'n': ct->norm = strdup( optarg ); break;
         case 'f': ct->freq = strdup( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
+        case 'm': ct->fullscreen = 1; break;
         default:
             print_usage( argv );
             return 0;
@@ -350,6 +353,10 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "CaptureSource", 1 )) ) {
         ct->inputnum = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "FullScreen", 1 )) ) {
+        ct->fullscreen = atoi( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "Norm", 1 )) ) {
@@ -666,6 +673,11 @@ const char *config_get_v4l_device( config_t *ct )
 const char *config_get_v4l_norm( config_t *ct )
 {
     return ct->norm;
+}
+
+int config_get_fullscreen( config_t *ct )
+{
+    return ct->fullscreen;
 }
 
 const char *config_get_v4l_freq( config_t *ct )

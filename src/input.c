@@ -416,7 +416,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
         case TVTIME_SKIP_CHANNEL:
             tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled = !tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled;
-            fprintf( stderr, "channel = %s %s %d\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ cur_channel ].name, tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled );
+            fprintf( stderr, "channel = %s %s %d\n", 
+                     freq_table_names[ cur_freq_table ].short_name, 
+                     tvtuner[ cur_channel ].name, 
+                     tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled );
             break;
             
         case TVTIME_ASPECT:

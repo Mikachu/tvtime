@@ -635,6 +635,10 @@ int main( int argc, char **argv )
     tagline = taglines[ rand() % numtaglines ];
     output->set_window_caption( tagline );
 
+    if( config_get_fullscreen( ct ) ) {
+        output->toggle_fullscreen( 0, 0 );
+    }
+
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
 

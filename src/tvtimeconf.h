@@ -103,6 +103,7 @@ const char *config_get_timeformat( config_t *ct );
 unsigned int config_get_menu_bg_rgb( config_t *ct );
 unsigned int config_get_channel_text_rgb( config_t *ct );
 unsigned int config_get_other_text_rgb( config_t *ct );
+int config_get_fullscreen( config_t *ct );
 
 #include "parser.h"
 parser_file_t *config_get_parsed_file( config_t *ct );
