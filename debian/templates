@@ -1,50 +1,40 @@
 Template: tvtime/norm
 Type: select
-Choices: NTSC, NTSC-JP, SECAM, PAL, PAL-NC, PAL-M, PAL-N, PAL-60
-Description: Select the `Norm' of your television feed?
+Choices: NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60
+Description: Select the default television standard for your location.  If you are in North America, you likely want to select NTSC here.  Most other areas in the world use PAL.
 
-Template: tvtime/frequencies-menu
+Template: tvtime/frequencies-ntsc
 Type: select
-Choices: Australia, Australia-Optus, Europe, France, Japan-Cable, Japan-Broadcast, NewZealand, Russia, US-Cable, US-Broadcast, Other
+Choices: Cable, Broadcast, Cable including channels 100+
 Description: Select the default frequency table.
 
-Template: tvtime/frequencies
-Type: string
-Description: Specify the default frequency table.
+Template: tvtime/frequencies-jp
+Type: select
+Choices: Cable, Broadcast
+Description: Select the default frequency table.
+
+Template: tvtime/frequencies-pal
+Type: select
+Choices: Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia Optus, Custom (must run tvtime-scanner first)
+Description: Select the default frequency table.  Users of the Optus cable company in australia should select Australia Optus.  If you are a user of a cable company that does not use standard frequencies, such as Casema, UPC or Mixtics, please select Custom and run the tvtime-scanner application before using tvtime.
 
 Template: tvtime/v4ldevice
 Type: string
 Default: /dev/video0
 Description: Specify your television capture device.
 
-Template: tvtime/ntsccablemode
-Type: select
-Choices: Standard, IRC, HRC
-Default: Standard
-Description: Select the NTSC cable standard for your television feed.
-
-Template: tvtime/usevbi
-Type: boolean
-Default: false
-Description: Do you wish to use VBI?
-
 Template: tvtime/vbidevice
 Type: string
 Default: /dev/vbi0
-Description: Specify the VBI device.
-
-Template: tvtime/deinterlacemethod
-Type: select
-Choices: Linear, LinearBlend, LineDoubler, Greedy, Greedy2Frame, GreedyH, TomsMoComp, TwoFrame, Vertical, VideoBob, VideoWeave, Weave
-Default: GreedyH
-Description: Select the deinterlacing method to use.
+Description: Specify a device to use for VBI decoding.  This will only be used in NTSC areas for decoding closed captions and XDS channel information.
 
 Template: tvtime/setuid
 Type: boolean
 Default: false
-Description: Do you wish to make `/usr/bin/tvtime' setuid root?
+Description: Do you wish to make `/usr/bin/tvtime' setuid root?  This allows tvtime to run at a high priority to ensure smooth video and should be used for high quality video output even during high CPU load.
 
 Template: tvtime/processpriority
 Type: string
 Default: -19
 Description: Specify the process priority for the tvtime binary.
+
