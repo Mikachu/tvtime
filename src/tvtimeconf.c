@@ -562,8 +562,6 @@ static void print_usage( char **argv )
     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
-    lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-              "                             matroxtv or SDL (defaults to Xv).\n"), stderr );
     lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
               "                             (defaults to us-cable).\n\n"
               "                             Valid values are:\n"
@@ -592,13 +590,12 @@ static void print_usage( char **argv )
     lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
               "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
               "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
-    lfputs( _("  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-              "                             centre (default).\n"), stderr );
     lfputs( _("  -s, --showdrops            Print stats on frame drops (for debugging).\n"), stderr );
     lfputs( _("  -S, --saveoptions          Save command line options to the config file.\n"), stderr );
     lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
     lfputs( _("  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if available.\n"), stderr );
     lfputs( _("  -v, --verbose              Print debugging messages to stderr.\n"), stderr );
+    lfputs( _("  -X, --display=DISPLAY      Use the given X display to connect to.\n"), stderr );
     lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
               "                             (defaults to /dev/mixer:line)\n\n"
               "                             Valid channels are:\n"
@@ -615,8 +612,6 @@ static void print_config_usage( char **argv )
     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
-    lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-              "                             matroxtv or SDL (defaults to Xv).\n"), stderr );
     lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
               "                             (defaults to us-cable).\n\n"
               "                             Valid values are:\n"
@@ -644,12 +639,9 @@ static void print_config_usage( char **argv )
     lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
               "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
               "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
-    lfputs( _("  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-              "                             centre (default).\n"), stderr );
     lfputs( _("  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"), stderr );
     lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
     lfputs( _("  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if available.\n"), stderr );
-    lfputs( _("  -X, --display=DISPLAY      Use the given X display to connect to.\n"), stderr );
     lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
               "                             (defaults to /dev/mixer:line)\n\n"
               "                             Valid channels are:\n"
@@ -873,7 +865,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "window", 0, 0, 'M' },
         { "slave", 0, 0, 'k' },
         { "widescreen", 0, 0, 'a' },
-        { "fspos", 1, 0, 'p' },
         { "xmltv", 1, 0, 't' },
         { "xmltvlanguage", 1, 0, 'l' },
         { "display", 1, 0, 'X' },
@@ -885,7 +876,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     char c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:p:X:t:l:Qg:",
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
@@ -921,14 +912,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'c': ct->prev_channel = ct->start_channel;
                       ct->start_channel = atoi( optarg ); break;
             case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
-            case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
-                          ct->fspos = 1;
-                      } else if( tolower( optarg[ 0 ] ) == 'b' ) {
-                          ct->fspos = 2;
-                      } else {
-                          ct->fspos = 0;
-                      }
-                      break;
             case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
             case 'Q': print_copyright(); return 0;
             default:
@@ -957,14 +940,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
-
-        if( ct->fspos == 0 ) {
-            config_save( ct, "FullscreenPosition", "Centre" );
-        } else if( ct->fspos == 1 ) {
-            config_save( ct, "FullscreenPosition", "Top" );
-        } else if( ct->fspos == 2 ) {
-            config_save( ct, "FullscreenPosition", "Bottom" );
-        }
 
         config_save( ct, "WindowGeometry", ct->geometry );
 
@@ -1007,7 +982,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "fullscreen", 0, 0, 'm' },
         { "window", 0, 0, 'M' },
         { "widescreen", 0, 0, 'a' },
-        { "fspos", 1, 0, 'p' },
         { "xmltv", 2, 0, 't' },
         { "xmltvlanguage", 2, 0, 'l' },
         { "priority", 2, 0, 'R' },
@@ -1021,7 +995,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:g:I:d:b:i:c:n:D:f:x:p:t:l:R:",
+    while( (c = getopt_long( argc, argv, "ahmMF:g:I:d:b:i:c:n:D:f:x:t:l:R:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -1089,14 +1063,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                       ct->norm = strdup( optarg );
                   }
                   break;
-        case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
-                      ct->fspos = 1;
-                  } else if( tolower( optarg[ 0 ] ) == 'b' ) {
-                      ct->fspos = 2;
-                  } else {
-                      ct->fspos = 0;
-                  }
-                  break;
         case 'f': if( !optarg ) {
                       fprintf( stdout, "Frequencies:%s\n",
                                config_get_v4l_freq( ct ) );
@@ -1136,14 +1102,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
-
-        if( ct->fspos == 0 ) {
-            config_save( ct, "FullscreenPosition", "Centre" );
-        } else if( ct->fspos == 1 ) {
-            config_save( ct, "FullscreenPosition", "Top" );
-        } else if( ct->fspos == 2 ) {
-            config_save( ct, "FullscreenPosition", "Bottom" );
-        }
 
         config_save( ct, "WindowGeometry", ct->geometry );
 

@@ -182,21 +182,6 @@ Start
 in windowed mode.
 
 .TP
-.B \-p, \-\-fspos=POS
-Set the fullscreen window position.  Use this if you
-have a projector to help
-.B tvtime
-fit properly onto your screen.
-.TS
-nokeep tab (@);
-l l.
-\(bu@top
-\(bu@bottom
-\(bu@centre (default)
-.TE
-
-
-.TP
 .B \-s, \-\-showdrops
 Print frame skip information (for debugging).
 
@@ -219,11 +204,13 @@ only critical errors will be printed to the output.
 Additional config file to load settings from.
 
 .TP
-.B \-H, \-\-height=HEIGHT
-Sets the height of the output window to start up at in scanlines.  The
-default output window size is
-.I 576
-scanlines.
+.B \-g, \-\-geometry=GEOMETRY
+Sets the geometry of the window, for example, 400x300 for a window 400
+pixels wide and 300 pixels tall.  A width value of 0 signifies that the
+appropriate width for the given height will be used.  For 4:3 content
+on a square pixel display, this defaults to a 
+.RI 768\[mu] 576
+window.
 
 .TP
 .B -I, \-\-inputwidth=SAMPLING
