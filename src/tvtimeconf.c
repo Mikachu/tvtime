@@ -790,6 +790,7 @@ config_t *config_new( void )
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
+    ct->keymap[ 'o' ] = TVTIME_TOGGLE_COLOUR_INVERT;
 
     memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );

@@ -177,6 +177,16 @@
   <option name="SaveAndRestorePictureSettings" value="1"/>
 
   <!--
+    If Save/Restore is turned on, this is where we store the global
+    default settings.  Each value is from 0-100.  If the value is -1, then
+    we don't set that setting on startup.
+  -->
+  <option name="DefaultBrightness" value="-1"/>
+  <option name="DefaultContrast" value="-1"/>
+  <option name="DefaultColour" value="-1"/>
+  <option name="DefaultHue" value="-1"/>
+
+  <!--
     This indicates whether the luma correction option should be enabled by
     default when starting the application.  Luma correction can be turned
     on or off within the application using the "c" key.
@@ -546,5 +556,6 @@
   <bind command="scroll_console_down"> <keyboard key="pgdn"/> </bind>
   <bind command="mixer_toggle_mute">   <keyboard key=","/>    </bind>
   <bind command="auto_adjust_pict">    <keyboard key=" "/>    </bind>
+  <bind command="toggle_colour_invert"><keyboard key="o"/>    </bind>
 
 </tvtime>
