@@ -16,9 +16,6 @@ DIRECTFB_CFLAGS =
 DIRECTFB_LIBS = 
 endif
 
-VIDMODE_CFLAGS =
-VIDMODE_LIBS = -lX11 -lXext -lXxf86vm
-
 OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic -DDATADIR="\"$(tvtimedatadir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
@@ -26,7 +23,7 @@ AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS)
 AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(VIDMODE_LIBS) -lm
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(VIDMODE_LIBS) -lm
 
 COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	rtctimer.c ttfont.cpp efs.cpp osdtools.c parser.c tvtimeconf.c \

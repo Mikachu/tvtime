@@ -3,9 +3,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+#include "config.h"
+#include "vidmode.h"
+
+#ifdef HAVE_VIDMODE
+
 #include <X11/Xlib.h>
 #include <X11/extensions/xf86vmode.h>
-#include "vidmode.h"
 
 /* Why aren't these in the damn header??? */
 /* Mode flags -- ignore flags not in V_FLAG_MASK */
@@ -93,4 +98,25 @@ void vidmode_print_modeline( vidmode_t *vm )
     fprintf( stderr, "vidmode: vsync hi %f lo %f\n",
              monitor.vsync->hi, monitor.vsync->lo );
 }
+
+#else /* No vidmode support */
+
+struct vidmode_s
+{
+};
+
+vidmode_t *vidmode_new( void )
+{
+    return 0;
+}
+
+void vidmode_delete( vidmode_t *vm )
+{
+}
+
+void vidmode_print_modeline( vidmode_t *vm )
+{
+}
+
+#endif
 
