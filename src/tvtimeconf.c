@@ -691,6 +691,7 @@ static void print_config_usage( char **argv )
              "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
              "                             centre (default).\n"
              "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+             "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
              "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
              "                             (defaults to /dev/mixer:line)\n\n"
              "                             Valid channels are:\n"
@@ -927,6 +928,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "rvr", 1, 0, 'r' },
         { "fspos", 1, 0, 'p' },
         { "xmltv", 1, 0, 't' },
+        { "display", 1, 0, 'X' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -934,7 +936,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:",
+    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -952,6 +954,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                   ct->rvr_filename = strdup( optarg ); break;
         case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                   ct->mixerdev = strdup( optarg ); break;
+        case 'X': setenv( "DISPLAY", optarg, 1 ); break;
         case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
                       ct->outputheight = -1;
                   } else {

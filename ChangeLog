@@ -1,5 +1,6 @@
 
 0.9.9.1
+  * vektor: Added a --display command line option.
   * vektor: Added XMLTV listings support.  Use --xmltv to specify the
       name.
   * vektor: We now search /usr/lib/win32 for DLLs to be more compatible
