@@ -980,6 +980,8 @@ void blend_packed422_scanline_c( unsigned char *output, unsigned char *src1,
         blit_packed422_scanline( output, src1, width );
     } else if( pos == 256 ) {
         blit_packed422_scanline( output, src2, width );
+    } else if( pos == 128 ) {
+        interpolate_packed422_scanline( output, src1, src2, width );
     } else {
         width *= 2;
         while( width-- ) {
@@ -995,6 +997,8 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
         blit_packed422_scanline( output, src1, width );
     } else if( pos >= 256 ) {
         blit_packed422_scanline( output, src2, width );
+    } else if( pos == 128 ) {
+        interpolate_packed422_scanline( output, src1, src2, width );
     } else {
         const mmx_t all256 = { 0x0100010001000100ULL };
         const mmx_t round  = { 0x0080008000800080ULL };

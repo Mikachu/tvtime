@@ -94,7 +94,7 @@ int main( int argc, char **argv )
     }
 
     mhz = speedy_measure_cpu_mhz();
-    fprintf( stderr, "timingtest: CPU MHz %.3f\n", mhz );
+    fprintf( stderr, "timingtest: Using CPU MHz %.3f for calculations.\n", mhz );
 
     /* Always use the same random seed. */
     srandom( seed );
