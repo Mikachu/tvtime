@@ -41,7 +41,6 @@ static const char *taglines[] = {
 "tvtime: for all your 2000 parts",
 "tvtime: more than meets the eye",
 "tvtime: think different",
-"tvtime: eat your darts",
 "tvtime: truly outrageous",
 "tvtime: bouncing here and there and everywhere",
 "tvtime: Must See TV",
