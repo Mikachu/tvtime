@@ -1,5 +1,7 @@
 
 0.9.8
+  * (mrallen) Previous channel info not lost when you change to the same
+    channel you're already on.
   * (vektor) Text rendering is now subpixel correct (fixes bug 632781).
   * (vektor) Rewrote the text rendering code (fixes bug 693642).
   * (vektor) tvtime now doesn't render output when the window is obscured or
