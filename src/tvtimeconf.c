@@ -32,6 +32,15 @@
 #include <pwd.h>
 #include <errno.h>
 #include <libxml/parser.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#else
+# define _(string) string
+#endif
 #include "tvtimeconf.h"
 #include "input.h"
 #include "station.h"
@@ -598,9 +607,8 @@ static xmlDocPtr configsave_open( const char *config_filename )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
-
     fprintf( stderr,
+             _("usage: %s [OPTION]...\n\n"
              "  -a, --widescreen           16:9 mode.\n"
              "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
              "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
@@ -648,14 +656,13 @@ static void print_usage( char **argv )
              "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
              "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
              "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
-             "                                 video, radio, monitor\n" );
+             "                                 video, radio, monitor\n"), argv[ 0 ] );
 }
 
 static void print_config_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
-
     fprintf( stderr,
+             _("usage: %s [OPTION]...\n\n"
              "  -a, --widescreen           16:9 mode.\n"
              "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
              "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
@@ -698,21 +705,20 @@ static void print_config_usage( char **argv )
              "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
              "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
              "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
-             "                                 video, radio, monitor\n" );
+             "                                 video, radio, monitor\n"), argv[ 0 ] );
 }
 
 static void print_scanner_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
-
     fprintf( stderr,
+             _("usage: %s [OPTION]...\n\n"
              "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
              "  -F, --configfile=FILE      Additional config file to load settings from.\n"
              "  -h, --help                 Show this help message.\n"
              "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
              "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
              "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-             "                             PAL-N or PAL-60 (defaults to NTSC).\n" );
+             "                             PAL-N or PAL-60 (defaults to NTSC).\n"), argv[ 0 ] );
 }
 
 config_t *config_new( void )
