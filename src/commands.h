@@ -115,6 +115,7 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_PAUSE,
 
+    TVTIME_TOGGLE_ALWAYSONTOP,
     TVTIME_TOGGLE_MATTE,
     TVTIME_TOGGLE_MODE,
     TVTIME_TOGGLE_COMPATIBLE_NORM
@@ -149,6 +150,7 @@ int commands_toggle_deinterlacer( commands_t *in );
 int commands_toggle_pulldown_detection( commands_t *in );
 int commands_toggle_mode( commands_t *in );
 int commands_toggle_matte( commands_t *in );
+int commands_toggle_alwaysontop( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );
 int commands_resize_window( commands_t *in );
 int commands_update_luma_power( commands_t *in );

@@ -477,6 +477,11 @@ static void dfb_set_matte( int width, int height )
 {
 }
 
+static int dfb_toggle_alwaysontop( void )
+{
+    return 0;
+}
+
 static output_api_t dfboutput =
 {
     dfb_init,
@@ -499,6 +504,7 @@ static output_api_t dfboutput =
     dfb_show_frame,
 
     dfb_toggle_aspect,
+    dfb_toggle_alwaysontop,
     dfb_toggle_fullscreen,
     dfb_resize_window_fullscreen,
     dfb_set_window_caption,

@@ -1556,6 +1556,13 @@ int main( int argc, char **argv )
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
         }
+        if( commands_toggle_alwaysontop( commands ) ) {
+            if( output->toggle_alwaysontop() ) {
+                if( osd ) tvtime_osd_show_message( osd, "Window set as always-on-top." );
+            } else {
+                if( osd ) tvtime_osd_show_message( osd, "Window not set always-on-top." );
+            }
+        }
         if( commands_toggle_aspect( commands ) ) {
             matte_mode = 0;
             output->set_matte( 0, 0 );

@@ -322,25 +322,26 @@
       CHANNEL_8                  SCROLL_CONSOLE_DOWN      
       CHANNEL_9                  SCROLL_CONSOLE_UP        
       CHANNEL_0                  SHOW_STATS               
-      CHANNEL_ACTIVATE_ALL       TOGGLE_ASPECT            
-      CHANNEL_DEC                TOGGLE_AUDIO_MODE        
-      CHANNEL_DOWN               TOGGLE_BARS              
-      CHANNEL_INC                TOGGLE_CC                
-      CHANNEL_PREV               TOGGLE_COMPATIBLE_NORM   
-      CHANNEL_RENUMBER           TOGGLE_CONSOLE           
-      CHANNEL_SAVE_TUNING        TOGGLE_DEINTERLACER      
-      CHANNEL_SCAN               TOGGLE_FULLSCREEN        
-      CHANNEL_SKIP               TOGGLE_FRAMERATE         
-      CHANNEL_UP                 TOGGLE_INPUT             
-      COLOUR_DOWN                TOGGLE_LUMA_CORRECTION   
-      COLOUR_UP                  TOGGLE_MATTE
-      COLOR_DOWN                 TOGGLE_MODE              
-      COLOR_UP                   TOGGLE_MUTE              
-      CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE   
-      CONTRAST_UP                TOGGLE_PAUSE             
-      DISPLAY_INFO               TOGGLE_PULLDOWN_DETECTION
-      ENTER                      QUIT                     
-      FINETUNE_DOWN                                       
+      CHANNEL_ACTIVATE_ALL       TOGGLE_ALWAYSONTOP       
+      CHANNEL_DEC                TOGGLE_ASPECT            
+      CHANNEL_DOWN               TOGGLE_AUDIO_MODE        
+      CHANNEL_INC                TOGGLE_BARS              
+      CHANNEL_PREV               TOGGLE_CC                
+      CHANNEL_RENUMBER           TOGGLE_COMPATIBLE_NORM   
+      CHANNEL_SAVE_TUNING        TOGGLE_CONSOLE           
+      CHANNEL_SCAN               TOGGLE_DEINTERLACER      
+      CHANNEL_SKIP               TOGGLE_FULLSCREEN        
+      CHANNEL_UP                 TOGGLE_FRAMERATE         
+      COLOUR_DOWN                TOGGLE_INPUT             
+      COLOUR_UP                  TOGGLE_LUMA_CORRECTION   
+      COLOR_DOWN                 TOGGLE_MATTE             
+      COLOR_UP                   TOGGLE_MODE              
+      CONTRAST_DOWN              TOGGLE_MUTE              
+      CONTRAST_UP                TOGGLE_NTSC_CABLE_MODE   
+      DISPLAY_INFO               TOGGLE_PAUSE             
+      ENTER                      TOGGLE_PULLDOWN_DETECTION
+      FINETUNE_DOWN              QUIT                     
+
 
     Special keys known by tvtime:
 
@@ -547,6 +548,10 @@
 
   <bind command="toggle_matte">
     <keyboard key="insert"/>
+  </bind>
+
+  <bind command="toggle_alwaysontop">
+    <keyboard key="v"/>
   </bind>
 
 </tvtime>

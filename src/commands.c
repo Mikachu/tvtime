@@ -109,6 +109,7 @@ static Cmd_Names cmd_table[] = {
 
     { "SHOW_STATS", TVTIME_SHOW_STATS },
 
+    { "TOGGLE_ALWAYSONTOP", TVTIME_TOGGLE_ALWAYSONTOP },
     { "TOGGLE_ASPECT", TVTIME_TOGGLE_ASPECT },
     { "TOGGLE_AUDIO_MODE", TVTIME_TOGGLE_AUDIO_MODE },
     { "TOGGLE_BARS", TVTIME_TOGGLE_BARS },
@@ -189,6 +190,7 @@ struct commands_s {
     int showbars;
     int togglefullscreen;
     int toggleaspect;
+    int togglealwaysontop;
     int toggledeinterlacer;
     int togglepulldowndetection;
     int togglemode;
@@ -296,6 +298,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
+    in->togglealwaysontop = 0;
     in->toggledeinterlacer = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
@@ -402,6 +405,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             
     case TVTIME_TOGGLE_ASPECT:
         in->toggleaspect = 1;
+        break;
+
+    case TVTIME_TOGGLE_ALWAYSONTOP:
+        in->togglealwaysontop = 1;
         break;
 
     case TVTIME_CHANNEL_SAVE_TUNING:
@@ -976,6 +983,7 @@ void commands_next_frame( commands_t *in )
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
+    in->togglealwaysontop = 0;
     in->toggledeinterlacer = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
@@ -1017,6 +1025,11 @@ int commands_get_framerate( commands_t *in )
 int commands_toggle_aspect( commands_t *in )
 {
     return in->toggleaspect;
+}
+
+int commands_toggle_alwaysontop( commands_t *in )
+{
+    return in->togglealwaysontop;
 }
 
 int commands_toggle_deinterlacer( commands_t *in )

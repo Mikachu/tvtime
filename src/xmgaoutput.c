@@ -204,6 +204,7 @@ static output_api_t mgaoutput =
     mga_show_frame,
 
     xcommon_toggle_aspect,
+    xcommon_toggle_alwaysontop,
     xcommon_toggle_fullscreen,
     xcommon_resize_window_fullscreen,
     xcommon_set_window_caption,

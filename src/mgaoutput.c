@@ -209,6 +209,11 @@ static void mga_shutdown( void )
     close( mga_fd );
 }
 
+static int mga_toggle_alwaysontop( void )
+{
+    return 0;
+}
+
 static output_api_t mgaoutput =
 {
     mga_init,
@@ -231,6 +236,7 @@ static output_api_t mgaoutput =
     mga_show_frame,
 
     mga_toggle_aspect,
+    mga_toggle_alwaysontop,
     mga_toggle_fullscreen,
     mga_resize_window_fullscreen,
     mga_set_window_caption,

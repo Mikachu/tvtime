@@ -81,10 +81,16 @@ static int fullscreen_position = 0;
 static int matte_width = 0;
 static int matte_height = 0;
 
+static int alwaysontop = 0;
 static int has_focus = 0;
 
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
+static Atom net_supported;
+static Atom net_wm_state;
+static Atom net_wm_state_above;
+static Atom net_wm_state_below;
+static Atom net_wm_state_fullscreen;
 
 static int wm_is_metacity = 0;
 
@@ -423,7 +429,6 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
  */
 static int check_for_state_fullscreen( Display *dpy )
 {
-    Atom net_supported, net_wm_state, net_wm_state_fullscreen;
     Atom type_return;
     int format_return;
     unsigned long nitems_return;
@@ -510,7 +515,6 @@ static int check_for_state_fullscreen( Display *dpy )
  */
 static int check_for_state_above( Display *dpy )
 {
-    Atom net_supported, net_wm_state, net_wm_state_above;
     Atom type_return;
     int format_return;
     unsigned long nitems_return;
@@ -597,7 +601,6 @@ static int check_for_state_above( Display *dpy )
  */
 static int check_for_state_below( Display *dpy )
 {
-    Atom net_supported, net_wm_state, net_wm_state_below;
     Atom type_return;
     int format_return;
     unsigned long nitems_return;
@@ -1085,6 +1088,28 @@ static void x11_wait_unmapped( Display *dpy, Window win )
     do {
         XMaskEvent( dpy, StructureNotifyMask, &event );
     } while ( (event.type != UnmapNotify) || (event.xunmap.event != win) );
+}
+
+int xcommon_toggle_alwaysontop( void )
+{
+    if( has_ewmh_state_above && !output_fullscreen ) {
+        XEvent ev;
+
+        alwaysontop = !alwaysontop;
+
+        ev.type = ClientMessage;
+        ev.xclient.window = wm_window;
+        ev.xclient.message_type = net_wm_state;
+        ev.xclient.format = 32;
+        ev.xclient.data.l[ 0 ] = alwaysontop ? 1 : 0;
+        ev.xclient.data.l[ 1 ] = net_wm_state_above;
+        ev.xclient.data.l[ 2 ] = 0;
+
+        XSendEvent( display, DefaultRootWindow( display ), False,
+                    SubstructureNotifyMask|SubstructureRedirectMask, &ev );
+    }
+
+    return alwaysontop;
 }
 
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
