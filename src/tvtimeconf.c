@@ -497,7 +497,7 @@ void config_init_keymap( config_t *ct )
         for(i=1;;i++)
             if( (tmp = parser_get( &(ct->pf), keystr, i )) ) {
                 key = string_to_key( tmp );
-                ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ] = cmd_table[cmd].command;
+                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = cmd_table[ cmd ].command;
             } else { break; }
     }   
 }
@@ -512,8 +512,8 @@ int config_key_to_command( config_t *ct, int key )
 
     if( !key ) return TVTIME_NOCOMMAND;
 
-    if( ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ] ) 
-        return ct->keymap[ MAX_KEYSYMS*(key & 0x70000) + (key & 0x1ff) ];
+    if( ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) 
+        return ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
 
     if( isalnum(key) ) return TVTIME_CHANNEL_CHAR;
         

@@ -43,7 +43,8 @@
 #include "videocorrection.h"
 #include "plugins.h"
 #include "performance.h"
-// #include "dfboutput.h"
+#include "dfboutput.h"
+#include "vidmode.h"
 
 /**
  * Current deinterlacing method.
@@ -320,6 +321,7 @@ int main( int argc, char **argv )
     video_correction_t *vc = 0;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
+    vidmode_t *vidmode;
     int width, height;
     int norm = 0;
     int fieldtime;
@@ -589,6 +591,9 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    /* Start up our vidmode object. */
+    vidmode = vidmode_new();
+
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
 
@@ -656,6 +661,7 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
+            if( vidmode ) vidmode_print_modeline( vidmode );
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );
