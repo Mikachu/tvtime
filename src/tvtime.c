@@ -783,7 +783,7 @@ static void tvtime_build_copied_field( unsigned char *output,
         videofilter_packed422_scanline( filter, curframe, width, 0, scanline + bottom_field );
     }
     // blit_packed422_scanline( output, curframe, width );
-    quarter_blit_vertical_packed422_scanline( output, curframe, curframe + (instride*2), width );
+    quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
 
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
@@ -807,7 +807,7 @@ static void tvtime_build_copied_field( unsigned char *output,
             }
             // blit_packed422_scanline( output, curframe, width );
             if( i > 1 ) {
-                quarter_blit_vertical_packed422_scanline( output, curframe, curframe + (instride*2), width );
+                quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
             } else {
                 blit_packed422_scanline( output, curframe, width );
             }
