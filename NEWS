@@ -5,6 +5,31 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.8
 
+  *  New XML config file format for both the tvtime configuration,
+     and the station list.
+  *  tvtime now has two distinct half-framerate modes: top-field-first
+     frames, and bottom-field-first frames.  This helps with manually
+     deinterlacing 2-2 pulldown or progressive content.
+  *  Added support for preset 'modes', which can set the deinterlacer,
+     window size, fullscreen setting and framerate mode.
+  *  Added support for custom frequencies in the stationlist.xml file,
+     and a runtime command to add a new station from the current
+     fine-tuning settings.
+  *  Added the ffmpeg vertical deinterlacer filter.
+  *  Added some DScaler DLLs and a wine layer to load these deinterlacer
+     plugins directly without porting to Linux.  This gives us the
+     following new deinterlacers:
+       GreedyH        DScaler: Greedy - High Motion
+       Greedy2Frame   DScaler: Greedy - 2-frame
+       TwoFrame       DScaler: TwoFrame
+       TomsMoComp     DScaler: TomsMoComp
+       VideoWeave     DScaler: Video Weave
+     We had our own ports of twoframe and greedy2frame, but they were
+     found to be buggy.  Our ports will be disabled until fixed.
+  *  Support for multiple audio channels (stereo, mono, lang1, lang2).
+  *  Included a bunch of fixes for PAL-M support.
+  *  Various speedups, quality improvements, and bugfixes.
+
 News for 0.9.7
 
   *  Moved config files into a new config file directory ~/.tvtime
