@@ -611,8 +611,13 @@ void xv_poll_events( input_t *in )
             }
             break;
         case KeyPress:
-            mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
-            if( event.xkey.state & ShiftMask ) arg |= I_SHIFT;
+            /* if( event.xkey.state & ShiftMask ) arg |= I_SHIFT; */
+            /* this alternate approach allows handling of keys like '<' and '>' -- mrallen */
+            if( event.xkey.state & ShiftMask ) {
+                mykey = XKeycodeToKeysym( display, event.xkey.keycode, 1 );
+            } else {
+                mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
+            }
             if( event.xkey.state & ControlMask ) arg |= I_CTRL;
             if( event.xkey.state & Mod1Mask ) arg |= I_META;
 
