@@ -131,7 +131,7 @@ console_t *console_new( int x, int y, int width, int height,
         return NULL;
     }
 
-    con->fontfile = "FreeSansBold.ttf";
+    con->fontfile = "FreeMonoBold.ttf";
     con->fontsize = fontsize;
 
 #if 0
