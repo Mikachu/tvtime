@@ -77,26 +77,17 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
     FT_Set_Char_Size( font->face, 0, font->fontsize * 64, xdpi, 72 );
 
-    FT_Set_Charmap( font->face, font->face->charmaps[ 0 ] );
-    for( i = 0; i < font->face->num_charmaps; i++ ) {
-        FT_CharMap char_map;
-        char_map = font->face->charmaps[ i ];
-        if( ( char_map->platform_id == 3 && char_map->encoding_id == 1 ) ||
-            ( char_map->platform_id == 0 && char_map->encoding_id == 0 ) ) {
-            FT_Set_Charmap( font->face, char_map );
-            break;
-        }
-    }
+    FT_Select_Charmap( font->face, FT_ENCODING_UNICODE );
 
-    /* Load glyphs. */
     for( i = 0; i < 256; i++ ) {
         FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
+        font->glyphs[ i ] = 0;
 
-        error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
-        if( error ) {
-            font->glyphs[ i ] = 0;
-        } else {
-            FT_Get_Glyph( font->face->glyph, &(font->glyphs[ i ]) );
+        if( glyph_index ) {
+            error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
+            if( !error ) {
+                FT_Get_Glyph( font->face->glyph, &(font->glyphs[ i ]) );
+            }
         }
     }
 
@@ -129,7 +120,7 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
     FT_UInt previous;
     FT_BBox bbox;
     int pen_x, i;
-    int prev = 0;
+    int prevchar = 0;
 
     bbox.xMin = bbox.yMin = INT_MAX;
     bbox.xMax = bbox.yMax = -INT_MAX;
@@ -149,16 +140,20 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
             if( use_kerning && previous && glyphindex[ i ] ) {
                 FT_Vector  delta;
                 FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_unfitted, &delta );
-                pen_x += ( delta.x * 1024 );
+
+                /* Ignore kerning on numbers for now. */
+                if( !((prevchar >= '0' && prevchar <= '9') && (text[ i ] >= '0' && text[ i ] <= '9')) ) {
+                    pen_x += ( delta.x * 1024 );
+                }
             }
-            prev = text[ i ];
+            prevchar = text[ i ];
+            previous = glyphindex[ i ];
 
             /* Save the current pen position. */
             glyphpos[ i ] = pen_x;
 
             /* Advance is in 16.16 format. */
             pen_x += glyphs[ cur ]->advance.x;
-            previous = glyphindex[ i ];
 
 
             FT_Glyph_Get_CBox( glyphs[ cur ], ft_glyph_bbox_subpixels, &glyph_bbox );
@@ -293,19 +288,24 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
         FT_Error error;
         int cur = text[ i ];
 
-        /* Create a copy of the original glyph. */
-        error = FT_Glyph_Copy( font->glyphs[ cur ], &image );
-        if( !error ) {
-            /* Convert glyph image to bitmap, overwriting the glyph copy. */
-            error = FT_Glyph_To_Bitmap( &image, ft_render_mode_normal, 0, 1 );
+        if( glyphs[ cur ] ) {
+
+            /* Create a copy of the original glyph. */
+            error = FT_Glyph_Copy( font->glyphs[ cur ], &image );
             if( !error ) {
-                FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
+                /* Convert glyph image to bitmap, overwriting the glyph copy. */
+                error = FT_Glyph_To_Bitmap( &image, ft_render_mode_normal, 0, 1 );
+                if( !error ) {
+                    FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
 
-                blit_stuff_subpix( output, *width, *height, *width,
-                                   bit->bitmap.buffer, bit->bitmap.width, bit->bitmap.rows, bit->bitmap.pitch,
-                            (push_x*0xffff) + font->glyphpos[ i ] + (bit->left*65536), font->fontsize - bit->top );
+                    blit_stuff_subpix( output, *width, *height, *width,
+                                       bit->bitmap.buffer, bit->bitmap.width,
+                                       bit->bitmap.rows, bit->bitmap.pitch,
+                                       (push_x*0xffff) + font->glyphpos[ i ] + (bit->left*65536),
+                                       font->fontsize - bit->top );
 
-                FT_Done_Glyph( image );
+                    FT_Done_Glyph( image );
+                }
             }
         }
     }
