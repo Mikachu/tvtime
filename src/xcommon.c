@@ -77,8 +77,6 @@ static int xcommon_verbose = 0;
 static int xcommon_exposed = 0;
 static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
-static int kicked_out_of_fullscreen = 0;
-static int going_fullscreen = 0;
 
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
@@ -176,6 +174,26 @@ static void x11_northwest_gravity( Display *dpy, Window win )
     hints.flags = PWinGravity;
     hints.win_gravity = NorthWestGravity;
     XSetWMNormalHints( dpy, win, &hints );
+}
+
+static void x11_grab_fullscreen_input( Display *dpy, Window win )
+{
+    int tries = 10;
+    int result = -1;
+
+    while( tries && result != GrabSuccess ) {
+        result = XGrabPointer( dpy, win, True, 0, GrabModeAsync, GrabModeAsync,
+                               win, None, CurrentTime );
+        tries--;
+    }
+    XGrabKeyboard( dpy, win, True, GrabModeAsync, GrabModeAsync, CurrentTime );
+    XSync( dpy, False );
+}
+
+static void x11_ungrab_fullscreen_input( Display *dpy )
+{
+    XUngrabPointer( dpy, CurrentTime );
+    XUngrabKeyboard( dpy, CurrentTime );
 }
 
 /* Used for error handling. */
@@ -1075,58 +1093,22 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             /* Show our fullscreen window. */
             XMoveResizeWindow( display, fs_window, x, y, w, h );
-
-            XMapWindow( display, fs_window );
-            {   /* stack the window on top or below the four windows 
-                   used to change desktops, if detected. */
-                Window root;
-                Window parent;
-                Window *children;
-                Window stacking[2];
-                unsigned int nchildren;
-                int x1, y1;
-                unsigned int width, height;
-                unsigned int border;
-                unsigned int depth;
-                int i, score= 0;
-                
-                XLowerWindow( display, fs_window );
-                XQueryTree(display, wm_window, &root, &parent, &children, &nchildren);
-                XFree( children );
-                XQueryTree(display, root, &root, &parent, &children, &nchildren);
-                if( nchildren > 4 ) {
-                    for( i= 1; i <= 4; ++i ) {
-                        XGetGeometry( display, children[nchildren-i], &root, &x1, &y1, 
-                                &width, &height, &border, &depth);
-                        if( ( ( width == w ) && ( height < 10 ) && ( x1 == 0 ) ) 
-                                || ( ( height == h ) && ( width < 10 ) && ( y1 == 0 ) ) ) {
-                            ++score;
-                        }
-                    }
-                } 
-
-                if( score == 4 ) {
-                    stacking[0]= children[nchildren-4];
-                    stacking[1]= fs_window;
-                    XRestackWindows( display, stacking, 2 );
-                } else {
-                    XRaiseWindow( display, fs_window );
-                }
-                XFree( children );
-            }
+            XMapRaised( display, fs_window );
             x11_wait_mapped( display, fs_window );
+            XRaiseWindow( display, fs_window );
 
             /* Since we just mapped the window and got our
              * Map event, we mark this here. */
             xcommon_exposed = 1;
 
             XReparentWindow( display, output_window, fs_window, 0, 0);
-            XMoveWindow( display, fs_window, x, y );
             output_width = w;
             output_height = h;
 
-            /* Note that we are going fullscreen. */
-            going_fullscreen = 1;
+            /* Grab the pointer, grab input focus, then ungrab. */
+            x11_grab_fullscreen_input( display, fs_window );
+            XSetInputFocus( display, fs_window, RevertToPointerRoot, CurrentTime );
+            x11_ungrab_fullscreen_input( display );
         }
     } else {
         if( has_ewmh_state_fullscreen ) {
@@ -1385,13 +1367,7 @@ void xcommon_poll_events( input_t *in )
         }
     }
 
-    if( going_fullscreen ) {
-        /* We're entering fullscreen mode, make sure we get focus. */
-        XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
-        XFlush( display );
-        XSync( display, False );
-        going_fullscreen = 0;
-    } else if( !has_ewmh_state_fullscreen ) {
+    if( !has_ewmh_state_fullscreen ) {
         Window focus_win;
         int focus_revert;
 
@@ -1400,13 +1376,7 @@ void xcommon_poll_events( input_t *in )
             if( reconfigure || !xcommon_exposed || (focus_win != wm_window && focus_win != fs_window) ) {
                 /* Switch back to windowed mode if we've lost focus or visibility. */
                 xcommon_toggle_fullscreen( 0, 0 );
-                kicked_out_of_fullscreen = 1;
             }
-        } else if( kicked_out_of_fullscreen && ( xcommon_exposed && (focus_win == wm_window || focus_win == fs_window)) ) {
-            /* Switch back to fullscreen mode if we regain visibility
-             * after being kicked out of fullscreen mode. */
-            xcommon_toggle_fullscreen( 0, 0 );
-            kicked_out_of_fullscreen = 0;
         }
     }
 
