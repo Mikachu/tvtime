@@ -691,6 +691,17 @@ int osd_animation_get_height( osd_animation_t *osda )
     return osda->image_height;
 }
 
+void osd_animation_pause( osd_animation_t *osda, int pause )
+{
+    osda->paused = pause;
+}
+
+void osd_animation_seek( osd_animation_t *osda, double pos )
+{
+    osda->curtime = osda->frametime * ((int) ((pos * (double) osda->numframes) + 0.5));
+    osda->curframe = osda->frames4444 + ((osda->curtime / osda->frametime) * osda->image_size);
+}
+
 void osd_animation_set_timeout( osd_animation_t *osda, int timeout )
 {
     osda->frames_left = timeout;

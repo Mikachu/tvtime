@@ -234,6 +234,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         tvtime_osd_delete( osd );
         return 0;
     }
+    osd_animation_pause( osd->channel_logo, 1 );
 
     osd_string_set_colour_rgb( osd->strings[ OSD_TUNER_INFO ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
@@ -498,9 +499,11 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     time_t tm = time( 0 );
     char text[ 200 ];
     int delay = OSD_FADE_DELAY;
+    struct tm *curtime = localtime( &tm );
     int i;
 
-    strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
+    strftime( timestamp, 50, osd->timeformat, curtime );
+    osd_animation_seek( osd->channel_logo, ((double) curtime->tm_sec) / 60.0 );
     /* Yes, we're showing the name in the NUM spot and the number in the NAME spot. */
     /* I will fix this up when I get a chance. -Billy */
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
@@ -672,8 +675,10 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     int i;
 
     if( (chinfo_left = osd_string_get_frames_left( osd->strings[ OSD_TIME_STRING ].string)) ) {
-        strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
+        struct tm *curtime = localtime( &tm );
+        strftime( timestamp, 50, osd->timeformat, curtime );
         osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, chinfo_left );
+        osd_animation_seek( osd->channel_logo, ((double) curtime->tm_sec) / 60.0 );
     }
 
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {

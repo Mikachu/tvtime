@@ -122,6 +122,8 @@ osd_animation_t *osd_animation_new( const char *filename_base,
 void osd_animation_delete( osd_animation_t *osda );
 int osd_animation_get_width( osd_animation_t *osda );
 int osd_animation_get_height( osd_animation_t *osda );
+void osd_animation_pause( osd_animation_t *osda, int pause );
+void osd_animation_seek( osd_animation_t *osda, double pos );
 void osd_animation_set_timeout( osd_animation_t *osda, int timeout );
 int osd_animation_visible( osd_animation_t *osda );
 void osd_animation_advance_frame( osd_animation_t *osda );
