@@ -2,3 +2,4 @@
 
 # Package source files
 src/tvtime.c
+src/commands.c

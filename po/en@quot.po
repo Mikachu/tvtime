@@ -3,34 +3,12 @@
 # This file is distributed under the same license as the tvtime package.
 # Automatically generated, 2003.
 #
-# All this catalog "translates" are quotation characters.
-# The msgids must be ASCII and therefore cannot contain real quotation
-# characters, only substitutes like grave accent (0x60), apostrophe (0x27)
-# and double quote (0x22). These substitutes look strange; see
-# http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
-#
-# This catalog translates grave accent (0x60) and apostrophe (0x27) to
-# left single quotation mark (U+2018) and right single quotation mark (U+2019).
-# It also translates pairs of apostrophe (0x27) to
-# left single quotation mark (U+2018) and right single quotation mark (U+2019)
-# and pairs of quotation mark (0x22) to
-# left double quotation mark (U+201C) and right double quotation mark (U+201D).
-#
-# When output to an UTF-8 terminal, the quotation characters appear perfectly.
-# When output to an ISO-8859-1 terminal, the single quotation marks are
-# transliterated to apostrophes (by iconv in glibc 2.2 or newer) or to
-# grave/acute accent (by libiconv), and the double quotation marks are
-# transliterated to 0x22.
-# When output to an ASCII terminal, the single quotation marks are
-# transliterated to apostrophes, and the double quotation marks are
-# transliterated to 0x22.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.9.1\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-09-07 21:43-0300\n"
-"PO-Revision-Date: 2003-09-07 21:43-0300\n"
+"POT-Creation-Date: 2003-09-07 23:00-0300\n"
+"PO-Revision-Date: 2003-09-07 23:00-0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -78,3 +56,152 @@ msgstr "2-3 Pulldown detection is not valid with your TV norm."
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Screenshot: %s"
+
+#: src/commands.c:1904
+#, c-format
+msgid "Sleep in %d minutes."
+msgstr "Sleep in %d minutes."
+
+#: src/commands.c:1907
+msgid "Sleep off."
+msgstr "Sleep off."
+
+#: src/commands.c:1958
+msgid "Channel marked as active in the browse list."
+msgstr "Channel marked as active in the browse list."
+
+#: src/commands.c:1960
+msgid "Channel disabled from the browse list."
+msgstr "Channel disabled from the browse list."
+
+#: src/commands.c:2002
+msgid "Processing every input field."
+msgstr "Processing every input field."
+
+#: src/commands.c:2004
+msgid "Processing every top field."
+msgstr "Processing every top field."
+
+#: src/commands.c:2006
+msgid "Processing every bottom field."
+msgstr "Processing every bottom field."
+
+#: src/commands.c:2018
+#, c-format
+msgid "Sharpness will be %d on restart."
+msgstr "Sharpness will be %d on restart."
+
+#: src/commands.c:2050
+#, c-format
+msgid "Television standard will be %s on restart."
+msgstr "Television standard will be %s on restart."
+
+#: src/commands.c:2078
+msgid "All channels re-activated."
+msgstr "All channels re-activated."
+
+#: src/commands.c:2098
+#, c-format
+msgid "Remapping %d.  Enter new channel number."
+msgstr "Remapping %d.  Enter new channel number."
+
+#: src/commands.c:2109
+msgid "Scanner unavailable: Signal checking disabled."
+msgstr "Scanner unavailable: Signal checking disabled."
+
+#: src/commands.c:2135
+msgid "Scanning for active channels."
+msgstr "Scanning for active channels."
+
+#: src/commands.c:2151
+msgid "Closed captions disabled."
+msgstr "Closed captions disabled."
+
+#: src/commands.c:2154
+msgid "Closed captions enabled."
+msgstr "Closed captions enabled."
+
+#: src/commands.c:2158
+msgid "No VBI device configured for CC decoding."
+msgstr "No VBI device configured for CC decoding."
+
+#: src/commands.c:2172
+#, c-format
+msgid "Colour decoding for this channel set to %s."
+msgstr "Colour decoding for this channel set to %s."
+
+#: src/commands.c:2201
+#, c-format
+msgid "Running: %s"
+msgstr "Running: %s"
+
+#: src/commands.c:2277
+msgid "Signal detection enabled."
+msgstr "Signal detection enabled."
+
+#: src/commands.c:2279
+msgid "Signal detection disabled."
+msgstr "Signal detection disabled."
+
+#: src/commands.c:2328
+msgid "Colour invert enabled."
+msgstr "Colour invert enabled."
+
+#: src/commands.c:2330
+msgid "Colour invert disabled."
+msgstr "Colour invert disabled."
+
+#: src/commands.c:2350
+msgid "Mirror enabled."
+msgstr "Mirror enabled."
+
+#: src/commands.c:2352
+msgid "Mirror disabled."
+msgstr "Mirror disabled."
+
+#: src/commands.c:2372
+msgid "Chroma kill enabled."
+msgstr "Chroma kill enabled."
+
+#: src/commands.c:2374
+msgid "Chroma kill disabled."
+msgstr "Chroma kill disabled."
+
+#: src/commands.c:2394
+msgid "Luma correction enabled."
+msgstr "Luma correction enabled."
+
+#: src/commands.c:2397
+msgid "Luma correction disabled."
+msgstr "Luma correction disabled."
+
+#: src/commands.c:2410
+#, c-format
+msgid "Overscan: %.1f%%"
+msgstr "Overscan: %.1f%%"
+
+#: src/commands.c:2435
+#, c-format
+msgid "Luma correction value: %.1f"
+msgstr "Luma correction value: %.1f"
+
+#: src/commands.c:2465
+msgid "Picture settings reset to defaults."
+msgstr "Picture settings reset to defaults."
+
+#: src/commands.c:2717
+msgid "Saved current picture settings as global defaults.\n"
+msgstr "Saved current picture settings as global defaults.\n"
+
+#: src/commands.c:2729
+#, c-format
+msgid "Saved current picture settings on channel %d.\n"
+msgstr "Saved current picture settings on channel %d.\n"
+
+#: src/commands.c:2811
+msgid "Paused."
+msgstr "Paused."
+
+#: src/commands.c:2811
+msgid "Resumed."
+msgstr "Resumed."

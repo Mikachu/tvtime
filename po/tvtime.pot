@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-09-07 21:43-0300\n"
+"POT-Creation-Date: 2003-09-07 23:00-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,4 +55,153 @@ msgstr ""
 #: src/tvtime.c:2252 src/tvtime.c:2369
 #, c-format
 msgid "Screenshot: %s"
+msgstr ""
+
+#: src/commands.c:1904
+#, c-format
+msgid "Sleep in %d minutes."
+msgstr ""
+
+#: src/commands.c:1907
+msgid "Sleep off."
+msgstr ""
+
+#: src/commands.c:1958
+msgid "Channel marked as active in the browse list."
+msgstr ""
+
+#: src/commands.c:1960
+msgid "Channel disabled from the browse list."
+msgstr ""
+
+#: src/commands.c:2002
+msgid "Processing every input field."
+msgstr ""
+
+#: src/commands.c:2004
+msgid "Processing every top field."
+msgstr ""
+
+#: src/commands.c:2006
+msgid "Processing every bottom field."
+msgstr ""
+
+#: src/commands.c:2018
+#, c-format
+msgid "Sharpness will be %d on restart."
+msgstr ""
+
+#: src/commands.c:2050
+#, c-format
+msgid "Television standard will be %s on restart."
+msgstr ""
+
+#: src/commands.c:2078
+msgid "All channels re-activated."
+msgstr ""
+
+#: src/commands.c:2098
+#, c-format
+msgid "Remapping %d.  Enter new channel number."
+msgstr ""
+
+#: src/commands.c:2109
+msgid "Scanner unavailable: Signal checking disabled."
+msgstr ""
+
+#: src/commands.c:2135
+msgid "Scanning for active channels."
+msgstr ""
+
+#: src/commands.c:2151
+msgid "Closed captions disabled."
+msgstr ""
+
+#: src/commands.c:2154
+msgid "Closed captions enabled."
+msgstr ""
+
+#: src/commands.c:2158
+msgid "No VBI device configured for CC decoding."
+msgstr ""
+
+#: src/commands.c:2172
+#, c-format
+msgid "Colour decoding for this channel set to %s."
+msgstr ""
+
+#: src/commands.c:2201
+#, c-format
+msgid "Running: %s"
+msgstr ""
+
+#: src/commands.c:2277
+msgid "Signal detection enabled."
+msgstr ""
+
+#: src/commands.c:2279
+msgid "Signal detection disabled."
+msgstr ""
+
+#: src/commands.c:2328
+msgid "Colour invert enabled."
+msgstr ""
+
+#: src/commands.c:2330
+msgid "Colour invert disabled."
+msgstr ""
+
+#: src/commands.c:2350
+msgid "Mirror enabled."
+msgstr ""
+
+#: src/commands.c:2352
+msgid "Mirror disabled."
+msgstr ""
+
+#: src/commands.c:2372
+msgid "Chroma kill enabled."
+msgstr ""
+
+#: src/commands.c:2374
+msgid "Chroma kill disabled."
+msgstr ""
+
+#: src/commands.c:2394
+msgid "Luma correction enabled."
+msgstr ""
+
+#: src/commands.c:2397
+msgid "Luma correction disabled."
+msgstr ""
+
+#: src/commands.c:2410
+#, c-format
+msgid "Overscan: %.1f%%"
+msgstr ""
+
+#: src/commands.c:2435
+#, c-format
+msgid "Luma correction value: %.1f"
+msgstr ""
+
+#: src/commands.c:2465
+msgid "Picture settings reset to defaults."
+msgstr ""
+
+#: src/commands.c:2717
+msgid "Saved current picture settings as global defaults.\n"
+msgstr ""
+
+#: src/commands.c:2729
+#, c-format
+msgid "Saved current picture settings on channel %d.\n"
+msgstr ""
+
+#: src/commands.c:2811
+msgid "Paused."
+msgstr ""
+
+#: src/commands.c:2811
+msgid "Resumed."
 msgstr ""
