@@ -398,8 +398,23 @@ void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
 
     osd->hold = hold;
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
-        osd_string_set_hold( osd->strings[ i ].string, hold );
+        if( i != OSD_VOLUME_BAR && i != OSD_DATA_BAR ) {
+            osd_string_set_hold( osd->strings[ i ].string, hold );
+        }
     }
+    if( osd->channel_logo ) osd_animation_set_hold( osd->channel_logo, hold );
+    if( osd->film_logo ) osd_animation_set_hold( osd->film_logo, hold );
+}
+
+void tvtime_osd_clear( tvtime_osd_t *osd )
+{
+    int i;
+
+    for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
+        osd_string_set_timeout( osd->strings[ i ].string, 0 );
+    }
+    if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, 0 );
+    if( osd->film_logo ) osd_animation_set_timeout( osd->film_logo, 0 );
 }
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
@@ -531,6 +546,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     strftime( timestamp, 50, osd->timeformat, curtime );
     gettimeofday( &tv, 0 );
     osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
+
     /* Yes, we're showing the name in the NUM spot and the number in the NAME spot. */
     /* I will fix this up when I get a chance. -Billy */
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
@@ -549,34 +565,13 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     }
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
 
-/*
     if( *(osd->hold_message) ) {
         snprintf( text, sizeof( text ), "%s", osd->hold_message );
-    } else {
-        const char *rate_mode = "";
-        const char *film_mode = "";
-        if( osd->framerate_mode == FRAMERATE_HALF_TFF ) {
-            rate_mode = " TFF";
-        } else if( osd->framerate_mode == FRAMERATE_HALF_BFF ) {
-            rate_mode = " BFF";
-        }
-        switch( osd->film_mode ) {
-            case 0: film_mode = ", DFilm"; break;
-            case PULLDOWN_SEQ_AA: film_mode = ", Film1"; break;
-            case PULLDOWN_SEQ_AB: film_mode = ", Film2"; break;
-            case PULLDOWN_SEQ_BC: film_mode = ", Film3"; break;
-            case PULLDOWN_SEQ_CC: film_mode = ", Film4"; break;
-            case PULLDOWN_SEQ_DD: film_mode = ", Film5"; break;
-            default: film_mode = ""; break;
-        }
-        snprintf( text, sizeof( text ), "%s - %s [%.2ffps%s%s]", osd->input_text,
-                  osd->deinterlace_text, osd->framerate, rate_mode, film_mode );
+        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
+        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+        osd_rect_set_timeout( osd->databar, 0 );
+        osd_rect_set_timeout( osd->databarbg, 0 );
     }
-    osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
-    osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
-    osd_rect_set_timeout( osd->databar, 0 );
-    osd_rect_set_timeout( osd->databarbg, 0 );
-*/
 
     /* Billy: What's up?  Are we ditching the logo for XDS? */
     if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, delay );

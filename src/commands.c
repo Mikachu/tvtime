@@ -185,6 +185,8 @@ struct commands_s {
     int quit;
     int inputnum;
 
+    int displayinfo;
+
     int screenshot;
     int printdebug;
     int showbars;
@@ -291,6 +293,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->stationmgr = mgr;
     in->frame_counter = 0;
     in->digit_counter = 0;
+
+    in->displayinfo = 0;
 
     in->quit = 0;
     in->showbars = 0;
@@ -522,8 +526,15 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_DISPLAY_INFO:
+        in->displayinfo = !in->displayinfo;
         if( in->osd ) {
-            tvtime_osd_show_info( in->osd );
+            if( in->displayinfo ) {
+                tvtime_osd_hold( in->osd, 1 );
+                tvtime_osd_show_info( in->osd );
+            } else {
+                tvtime_osd_hold( in->osd, 0 );
+                tvtime_osd_clear( in->osd );
+            }
         }
         break;
 
@@ -664,6 +675,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                           ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
                 tvtime_osd_show_message( in->osd, message );
             }
+        } else if( in->osd ) {
+            tvtime_osd_show_info( in->osd );
         }
         break;
 
@@ -680,6 +693,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
             station_inc( in->stationmgr );
             in->change_channel = 1;
+        } else if( in->osd ) {
+            tvtime_osd_show_info( in->osd );
         }
         break;
     case TVTIME_CHANNEL_DEC:
@@ -692,6 +707,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
             station_dec( in->stationmgr );
             in->change_channel = 1;
+        } else if( in->osd ) {
+            tvtime_osd_show_info( in->osd );
         }
         break;
 
@@ -705,6 +722,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
             station_prev( in->stationmgr );
             in->change_channel = 1;
+        } else if( in->osd ) {
+            tvtime_osd_show_info( in->osd );
         }
         break;
 

@@ -584,6 +584,7 @@ struct osd_animation_s
     int frames_left;
     int alpha;
     int frametime;
+    int hold;
     uint8_t *curframe;
 };
 
@@ -636,6 +637,7 @@ osd_animation_t *osd_animation_new( const char *filename_base,
         return 0;
     }
 
+    osda->hold = 0;
     osda->curtime = 0;
     osda->paused = 0;
     osda->frametime = frametime;
@@ -702,6 +704,11 @@ void osd_animation_seek( osd_animation_t *osda, double pos )
     osda->curframe = osda->frames4444 + ((osda->curtime / osda->frametime) * osda->image_size);
 }
 
+void osd_animation_set_hold( osd_animation_t *osda, int hold )
+{
+    osda->hold = hold;
+}
+
 void osd_animation_set_timeout( osd_animation_t *osda, int timeout )
 {
     osda->frames_left = timeout;
@@ -714,12 +721,12 @@ int osd_animation_visible( osd_animation_t *osda )
 
 void osd_animation_advance_frame( osd_animation_t *osda )
 {
-    if( osda->frames_left > 0) {
+    if( osda->frames_left > 0 ) {
         if( !osda->paused ) {
             osda->curtime = (osda->curtime + 1) % (osda->frametime * osda->numframes);
             osda->curframe = osda->frames4444 + ((osda->curtime / osda->frametime) * osda->image_size);
         }
-        osda->frames_left--;
+        if( !osda->hold ) osda->frames_left--;
     }
 }
 

@@ -1,5 +1,7 @@
 
 0.9.9 -
+  * vektor: Display command now holds the information on
+      the screen until you click a second time.
   * vektor: Added a logo for film mode, visible when pulldown
       detection is enabled, and animating when we have
       succesfully detected pulldown.
