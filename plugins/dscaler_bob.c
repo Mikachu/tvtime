@@ -119,7 +119,7 @@ void deinterlace_plugin_init( void )
 void dscaler_bob_plugin_init( void )
 #endif
 {
-    di_bob = LoadDeintPlugin( "../data/DI_Bob.dll" );
+    di_bob = load_dscaler_deinterlacer( "../data/DI_Bob.dll" );
     if( di_bob ) {
         register_deinterlace_method( &bobmethod );
     }

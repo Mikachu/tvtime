@@ -119,7 +119,7 @@ void deinterlace_plugin_init( void )
 void dscaler_weave_plugin_init( void )
 #endif
 {
-    di_weave = LoadDeintPlugin( "../data/DI_Weave.dll" );
+    di_weave = load_dscaler_deinterlacer( "../data/DI_Weave.dll" );
     if( di_weave ) {
         register_deinterlace_method( &weavemethod );
     }

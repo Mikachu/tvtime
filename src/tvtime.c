@@ -253,14 +253,12 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     int i;
 
     if( !curmethod->scanlinemode ) {
-        /* Call deinterlacer here.
-        tvtime_just_deinterlace_frame( output, curframe, lastframe, secondlastframe,
-                                       bottom_field, width, frame_height, instride, outstride );
-         */
         deinterlace_frame_data_t data;
+
         data.f0 = curframe;
         data.f1 = lastframe;
         data.f2 = secondlastframe;
+
         curmethod->deinterlace_frame( output, &data, bottom_field, width, frame_height );
 
         for( i = 0; i < frame_height; i++ ) {

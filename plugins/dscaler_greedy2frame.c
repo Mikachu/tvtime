@@ -118,7 +118,7 @@ void deinterlace_plugin_init( void )
 void dscaler_greedy2frame_plugin_init( void )
 #endif
 {
-    di_greedy2frame = LoadDeintPlugin( "../data/DI_Greedy2Frame.dll" );
+    di_greedy2frame = load_dscaler_deinterlacer( "../data/DI_Greedy2Frame.dll" );
     if( di_greedy2frame ) {
         register_deinterlace_method( &greedymethod );
     }

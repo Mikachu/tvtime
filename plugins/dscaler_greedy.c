@@ -119,7 +119,7 @@ void deinterlace_plugin_init( void )
 void dscaler_greedy_plugin_init( void )
 #endif
 {
-    di_greedy = LoadDeintPlugin( "../data/DI_Greedy.dll" );
+    di_greedy = load_dscaler_deinterlacer( "../data/DI_Greedy.dll" );
     if( di_greedy ) {
         register_deinterlace_method( &greedymethod );
     }

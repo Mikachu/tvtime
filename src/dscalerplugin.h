@@ -4,6 +4,10 @@
 
 #include "DS_Deinterlace.h"
 
-DEINTERLACE_METHOD *LoadDeintPlugin( char *filename );
+FILTER_METHOD *load_dscaler_filter( char *filename );
+void unload_dscaler_filter( FILTER_METHOD *method );
+
+DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename );
+void unload_dscaler_deinterlacer( DEINTERLACE_METHOD *method );
 
 #endif /* DSCALERPLUGIN_H_INCLUDED */
