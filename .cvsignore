@@ -1,5 +1,7 @@
 stamp-h.in
 stamp-h
+tvtime/stamp-h1
+tvtime/depcomp
 mkinstalldirs
 missing
 ltmain.sh
