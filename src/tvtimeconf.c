@@ -62,6 +62,10 @@ struct config_s
     int x;
     int y;
     int picsaverestore;
+    int brightness;
+    int contrast;
+    int colour;
+    int hue;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     int keymapmenu[ 8 * MAX_KEYSYMS ];
@@ -223,6 +227,22 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "SaveAndRestorePictureSettings" ) ) {
             ct->picsaverestore = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DefaultBrightness" ) ) {
+            ct->brightness = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DefaultContrast" ) ) {
+            ct->contrast = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DefaultColour" ) ) {
+            ct->colour = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DefaultHue" ) ) {
+            ct->hue = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
@@ -711,6 +731,10 @@ config_t *config_new( void )
     ct->timeformat = strdup( "%X" );
     ct->mixerdev = strdup( "/dev/mixer:line" );
     ct->picsaverestore = 1;
+    ct->brightness = -1;
+    ct->contrast = -1;
+    ct->colour = -1;
+    ct->hue = -1;
 
     /* We set these to 0 so we can delete safely if necessary. */
     ct->rvr_filename = 0;
@@ -1525,5 +1549,25 @@ int config_get_fullscreen_position( config_t *ct )
 int config_get_save_restore_picture( config_t *ct )
 {
     return ct->picsaverestore;
+}
+
+int config_get_global_brightness( config_t *ct )
+{
+    return ct->brightness;
+}
+
+int config_get_global_contrast( config_t *ct )
+{
+    return ct->contrast;
+}
+
+int config_get_global_colour( config_t *ct )
+{
+    return ct->colour;
+}
+
+int config_get_global_hue( config_t *ct )
+{
+    return ct->hue;
 }
 

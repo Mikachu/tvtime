@@ -971,6 +971,22 @@ int station_writeconfig( station_mgr_t *mgr )
         if( *(rp->norm) ) {
             xmlSetProp( node, BAD_CAST "norm", BAD_CAST rp->norm );
         }
+        if( rp->brightness >= 0 ) {
+            snprintf( buf, sizeof( buf ), "%d", rp->brightness );
+            xmlSetProp( node, BAD_CAST "brightness", BAD_CAST buf );
+        }
+        if( rp->contrast >= 0 ) {
+            snprintf( buf, sizeof( buf ), "%d", rp->contrast );
+            xmlSetProp( node, BAD_CAST "contrast", BAD_CAST buf );
+        }
+        if( rp->colour >= 0 ) {
+            snprintf( buf, sizeof( buf ), "%d", rp->colour );
+            xmlSetProp( node, BAD_CAST "colour", BAD_CAST buf );
+        }
+        if( rp->hue >= 0 ) {
+            snprintf( buf, sizeof( buf ), "%d", rp->hue );
+            xmlSetProp( node, BAD_CAST "hue", BAD_CAST buf );
+        }
 
         rp = rp->next;
     } while( rp != mgr->first );

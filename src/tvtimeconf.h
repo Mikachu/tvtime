@@ -77,6 +77,10 @@ int config_get_framerate_mode( config_t *ct );
 int config_get_slave_mode( config_t *ct );
 const char *config_get_mixer_device( config_t *ct );
 int config_get_save_restore_picture( config_t *ct );
+int config_get_global_brightness( config_t *ct );
+int config_get_global_contrast( config_t *ct );
+int config_get_global_colour( config_t *ct );
+int config_get_global_hue( config_t *ct );
 
 double config_get_overscan( config_t *ct );
 

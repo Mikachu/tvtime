@@ -7,6 +7,7 @@ For news and updates on tvtime, please visit our website at:
 News for 0.9.9
 
   *  Added a menu system.
+  *  Support for saving picture settings both globally and per-channel.
   *  Support for the V4L2 DVB driver and PAL-60.
   *  Removed lirc support in favour of using tvtime-command
      exclusively.

@@ -1,5 +1,7 @@
 
 0.9.9 -
+  * vektor: Added save/restore for per-channel and global picture
+      settings.
   * vektor: Changed the TOGGLE_COMPATIBLE_NORM command to now
       be called TOGGLE_PAL_SECAM.  This is both clearer and
       more honest about what actually worked.

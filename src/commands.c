@@ -172,6 +172,7 @@ typedef struct menu_names_s {
 
 static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
+    { "picture", MENU_REDIRECT, "picture-tuner" },
     { "input", MENU_REDIRECT, "input-ntsc" },
     { "stations", MENU_REDIRECT, "stations-general" },
     { "favorites", MENU_FAVORITES, 0 },
@@ -261,6 +262,10 @@ struct commands_s {
     int inputnum;
 
     int picturemode;
+    int brightness;
+    int contrast;
+    int colour;
+    int hue;
 
     int displayinfo;
     int screenshot;
@@ -324,6 +329,13 @@ struct commands_s {
     menu_t *root_notuner;
 };
 
+static void menu_set_value( menu_t *menu, int newval )
+{
+    char string[ 128 ];
+    sprintf( string, "%c%c%c  Current: %d", 0xee, 0x80, 0x80, newval );
+    menu_set_text( menu, 1, string );
+}
+
 static void reinit_tuner( commands_t *cmd )
 {
     /* Setup the tuner if available. */
@@ -333,17 +345,47 @@ static void reinit_tuner( commands_t *cmd )
     }
 
     set_redirect( "root", "root-notuner" );
+    set_redirect( "picture", "picture-notuner" );
 
     if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
         int norm;
 
         set_redirect( "root", "root-tuner" );
+        set_redirect( "picture", "picture-tuner" );
 
         videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr ) );
 
         norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
         if( norm >= 0 ) {
             videoinput_switch_pal_secam( cmd->vidin, norm );
+        }
+
+        if( config_get_save_restore_picture( cmd->cfg ) ) {
+            int brightness = station_get_current_brightness( cmd->stationmgr );
+            int contrast = station_get_current_contrast( cmd->stationmgr );
+            int colour = station_get_current_colour( cmd->stationmgr );
+            int hue = station_get_current_hue( cmd->stationmgr );
+
+            if( brightness >= 0 ) {
+                videoinput_set_brightness( cmd->vidin, brightness );
+            } else if( cmd->brightness >= 0 ) {
+                videoinput_set_brightness( cmd->vidin, cmd->brightness );
+            }
+            if( contrast >= 0 ) {
+                videoinput_set_contrast( cmd->vidin, contrast );
+            } else if( cmd->contrast >= 0 ) {
+                videoinput_set_contrast( cmd->vidin, cmd->contrast );
+            }
+            if( colour >= 0 ) {
+                videoinput_set_colour( cmd->vidin, colour );
+            } else if( cmd->colour >= 0 ) {
+                videoinput_set_colour( cmd->vidin, cmd->colour );
+            }
+            if( hue >= 0 ) {
+                videoinput_set_hue( cmd->vidin, hue );
+            } else if( cmd->hue >= 0 ) {
+                videoinput_set_hue( cmd->vidin, cmd->hue );
+            }
         }
 
         if( cmd->osd ) {
@@ -375,7 +417,6 @@ static void reinit_tuner( commands_t *cmd )
             commands_refresh_menu( cmd );
         }
         cmd->frame_counter = 0;
-
     } else if( cmd->osd ) {
         tvtime_osd_set_audio_mode( cmd->osd, "" );
         tvtime_osd_set_freq_table( cmd->osd, "" );
@@ -389,6 +430,26 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_length( cmd->osd, "" );
         tvtime_osd_show_info( cmd->osd );
     }
+
+    if( config_get_save_restore_picture( cmd->cfg ) && cmd->vidin && !videoinput_has_tuner( cmd->vidin ) ) {
+        if( cmd->brightness >= 0 ) {
+            videoinput_set_brightness( cmd->vidin, cmd->brightness );
+        }
+        if( cmd->contrast >= 0 ) {
+            videoinput_set_contrast( cmd->vidin, cmd->contrast );
+        }
+        if( cmd->colour >= 0 ) {
+            videoinput_set_colour( cmd->vidin, cmd->colour );
+        }
+        if( cmd->hue >= 0 ) {
+            videoinput_set_hue( cmd->vidin, cmd->hue );
+        }
+    }
+
+    menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
+    menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
+    menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
+    menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
 }
 
 static void reset_sharpness_menu( menu_t *menu, int sharpness )
@@ -635,13 +696,6 @@ static void reset_overscan_menu( menu_t *menu, double overscan )
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
-static void menu_set_value( menu_t *menu, int newval )
-{
-    char string[ 128 ];
-    sprintf( string, "%c%c%c  Current: %d", 0xee, 0x80, 0x80, newval );
-    menu_set_text( menu, 1, string );
-}
-
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime )
@@ -691,6 +745,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->restarttvtime = 0;
     cmd->setdeinterlacer = 0;
     cmd->newsharpness = 0;
+    cmd->brightness = config_get_global_brightness( cfg );
+    cmd->contrast = config_get_global_contrast( cfg );
+    cmd->colour = config_get_global_colour( cfg );
+    cmd->hue = config_get_global_hue( cfg );
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
@@ -1107,7 +1165,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "picture" );
+    menu = menu_new( "picture-notuner" );
     menu_set_text( menu, 0, "Setup - Picture" );
     sprintf( string, "%c%c%c  Brightness", 0xe2, 0x98, 0x80 );
     menu_set_text( menu, 1, string );
@@ -1129,17 +1187,95 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Reset to defaults", 0xee, 0x80, 0x80 );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-    menu_set_right_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
+    if( config_get_save_restore_picture( cfg ) ) {
+        sprintf( string, "%c%c%c  Save current settings as defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_right_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 6, string );
+        menu_set_enter_command( menu, 6, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_right_command( menu, 6, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 7, string );
+        menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+        menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( cmd, menu );
+    } else {
+        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_right_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 6, string );
+        menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( cmd, menu );
+    }
+
+    menu = menu_new( "picture-tuner" );
+    menu_set_text( menu, 0, "Setup - Picture" );
+    sprintf( string, "%c%c%c  Brightness", 0xe2, 0x98, 0x80 );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Contrast", 0xe2, 0x97, 0x90 );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Colour", 0xe2, 0x98, 0xB0 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Hue", 0xe2, 0x97, 0xaf );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    if( config_get_save_restore_picture( cfg ) ) {
+        sprintf( string, "%c%c%c  Save current settings as global defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_right_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Save current settings as channel defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 6, string );
+        menu_set_enter_command( menu, 6, TVTIME_SAVE_PICTURE_CHANNEL, "" );
+        menu_set_right_command( menu, 6, TVTIME_SAVE_PICTURE_CHANNEL, "" );
+        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 7, string );
+        menu_set_enter_command( menu, 7, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_right_command( menu, 7, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 8, string );
+        menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+        menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+        menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( cmd, menu );
+    } else {
+        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0x80 );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_right_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 6, string );
+        menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( cmd, menu );
+    }
+
 
     menu = menu_new( "brightness" );
     menu_set_text( menu, 0, "Setup - Picture - Brightness" );
@@ -2034,7 +2170,26 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_AUTO_ADJUST_PICT:
         if( cmd->vidin ) {
-            videoinput_reset_default_settings( cmd->vidin );
+            if( cmd->brightness >= 0 ) {
+                videoinput_set_brightness( cmd->vidin, cmd->brightness );
+            } else {
+                videoinput_set_brightness( cmd->vidin, 50 );
+            }
+            if( cmd->contrast >= 0 ) {
+                videoinput_set_contrast( cmd->vidin, cmd->contrast );
+            } else {
+                videoinput_set_contrast( cmd->vidin, 50 );
+            }
+            if( cmd->colour >= 0 ) {
+                videoinput_set_colour( cmd->vidin, cmd->colour );
+            } else {
+                videoinput_set_colour( cmd->vidin, 50 );
+            }
+            if( cmd->hue >= 0 ) {
+                videoinput_set_hue( cmd->vidin, cmd->hue );
+            } else {
+                videoinput_set_hue( cmd->vidin, 50 );
+            }
             if( cmd->osd ) {
                 tvtime_osd_show_message( cmd->osd, "Picture settings reset to defaults." );
                 menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
@@ -2271,6 +2426,34 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             commands_handle( cmd, TVTIME_COLOUR_DOWN, "" );
         } else if( cmd->picturemode == 3 ) {
             commands_handle( cmd, TVTIME_HUE_DOWN, "" );
+        }
+        break;
+
+    case TVTIME_SAVE_PICTURE_GLOBAL:
+        if( cmd->vidin && config_get_save_restore_picture( cmd->cfg ) ) {
+            cmd->brightness = videoinput_get_brightness( cmd->vidin );
+            cmd->contrast = videoinput_get_contrast( cmd->vidin );
+            cmd->colour = videoinput_get_colour( cmd->vidin );
+            cmd->hue = videoinput_get_hue( cmd->vidin );
+            if( cmd->osd ) {
+                char message[ 128 ];
+                sprintf( message, "Saved current picture settings as global defaults.\n" );
+                tvtime_osd_show_message( cmd->osd, message );
+            }
+        }
+        break;
+    case TVTIME_SAVE_PICTURE_CHANNEL:
+        if( cmd->stationmgr && cmd->vidin && config_get_save_restore_picture( cmd->cfg ) ) {
+            station_set_current_brightness( cmd->stationmgr, videoinput_get_brightness( cmd->vidin ) );
+            station_set_current_contrast( cmd->stationmgr, videoinput_get_contrast( cmd->vidin ) );
+            station_set_current_colour( cmd->stationmgr, videoinput_get_colour( cmd->vidin ) );
+            station_set_current_hue( cmd->stationmgr, videoinput_get_hue( cmd->vidin ) );
+            if( cmd->osd ) {
+                char message[ 128 ];
+                sprintf( message, "Saved current picture settings on channel %d.\n",
+                         station_get_current_id( cmd->stationmgr ) );
+                tvtime_osd_show_message( cmd->osd, message );
+            }
         }
         break;
 
@@ -2618,4 +2801,25 @@ int commands_get_new_sharpness( commands_t *cmd )
 {
     return cmd->newsharpness;
 }
+
+int commands_get_global_brightness( commands_t *cmd )
+{
+    return cmd->brightness;
+}
+
+int commands_get_global_contrast( commands_t *cmd )
+{
+    return cmd->contrast;
+}
+
+int commands_get_global_colour( commands_t *cmd )
+{
+    return cmd->colour;
+}
+
+int commands_get_global_hue( commands_t *cmd )
+{
+    return cmd->hue;
+}
+
 

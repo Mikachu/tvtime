@@ -2310,6 +2310,15 @@ int main( int argc, char **argv )
         config_save( ct, "InputWidth", number );
     }
 
+    snprintf( number, 4, "%d", commands_get_global_brightness( commands ) );
+    config_save( ct, "DefaultBrightness", number );
+    snprintf( number, 4, "%d", commands_get_global_contrast( commands ) );
+    config_save( ct, "DefaultContrast", number );
+    snprintf( number, 4, "%d", commands_get_global_colour( commands ) );
+    config_save( ct, "DefaultColour", number );
+    snprintf( number, 4, "%d", commands_get_global_hue( commands ) );
+    config_save( ct, "DefaultHue", number );
+
     config_save( ct, "Norm", commands_get_new_norm( commands ) );
 
     snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );

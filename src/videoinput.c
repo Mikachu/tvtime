@@ -39,36 +39,6 @@
 #include "videoinput.h"
 #include "mixer.h"
 
-
-/**
- * Default values below for bttv from dScaler.
- * See http://deinterlace.sf.net/
- */
-
-/* 10/19/2000 Mark Rejhon
- * Better NTSC defaults
- */
-
-/* range -128,127 */
-#define DEFAULT_HUE_NTSC 0
-
-/* range -128,127 */
-#define DEFAULT_BRIGHTNESS_NTSC 20
-
-/* range 0,511 */
-#define DEFAULT_CONTRAST_NTSC 207
-
-/* range 0,511 */
-#define DEFAULT_SAT_U_NTSC 254
-#define DEFAULT_SAT_V_NTSC 219
-
-/* PAL defaults these work for OTA PAL signals */
-#define DEFAULT_HUE_PAL 0
-#define DEFAULT_BRIGHTNESS_PAL 0
-#define DEFAULT_CONTRAST_PAL 219
-#define DEFAULT_SAT_U_PAL 254
-#define DEFAULT_SAT_V_PAL 219
-
 /**
  * How long to wait when we lose a signal, or acquire a signal.
  */
@@ -1552,21 +1522,6 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
 
     /* Once we've set the input, go look for a tuner. */
     videoinput_find_and_set_tuner( vidin );
-}
-
-void videoinput_reset_default_settings( videoinput_t *vidin )
-{
-    if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
-        videoinput_set_hue( vidin, (int) ((((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 100.0) + 0.5) );
-        videoinput_set_brightness( vidin, (int) ((((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 100.0) + 0.5) );
-        videoinput_set_contrast( vidin, (int) (((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 100.0) + 0.5) );
-        videoinput_set_colour( vidin, (int) (((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 100.0) + 0.5) );
-    } else {
-        videoinput_set_hue( vidin, (int) ((((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 100.0) + 0.5) );
-        videoinput_set_brightness( vidin, (int) ((((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 100.0) + 0.5) );
-        videoinput_set_contrast( vidin, (int) (((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 100.0) + 0.5) );
-        videoinput_set_colour( vidin, (int) (((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 100.0) + 0.5) );
-    }
 }
 
 int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
