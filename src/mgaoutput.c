@@ -146,9 +146,6 @@ static void mga_wait_for_sync( int field )
 
 static int mga_show_frame( int x, int y, int width, int height )
 {
-    uint8_t *base = mga_vid_base + (curframe*mga_frame_size);
-    int i;
-
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
     return 1;
@@ -176,6 +173,11 @@ static void mga_poll_events( input_t *in )
 {
 }
 
+static int mga_can_read_from_buffer( void )
+{
+    return 0;
+}
+
 static void mga_shutdown( void )
 {
     ioctl( mga_fd, MGA_VID_OFF, 0 );
@@ -191,6 +193,7 @@ static output_api_t mgaoutput =
     mga_lock_output_buffer,
     mga_get_output_buffer,
     mga_get_output_stride,
+    mga_can_read_from_buffer,
     mga_unlock_output_buffer,
 
     mga_is_exposed, 

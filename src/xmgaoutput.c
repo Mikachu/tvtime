@@ -140,9 +140,6 @@ static int mga_show_frame( int x, int y, int width, int height )
 {
     area_t newvidarea = xcommon_get_video_area();
     area_t newwinarea = xcommon_get_window_area();
-    uint8_t *base = mga_vid_base + (curframe*mga_frame_size);
-    static int foobar = 0;
-    int i;
 
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
@@ -163,6 +160,11 @@ static int mga_show_frame( int x, int y, int width, int height )
     return 1;
 }
 
+static int mga_can_read_from_buffer( void )
+{
+    return 0;
+}
+
 static void mga_shutdown( void )
 {
     ioctl( mga_fd, MGA_VID_OFF, 0 );
@@ -179,6 +181,7 @@ static output_api_t mgaoutput =
     mga_lock_output_buffer,
     mga_get_output_buffer,
     mga_get_output_stride,
+    mga_can_read_from_buffer,
     mga_unlock_output_buffer,
 
     xcommon_is_exposed, 

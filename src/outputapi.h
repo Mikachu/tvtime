@@ -32,6 +32,7 @@ typedef struct output_api_s
     void (* lock_output_buffer)( void );
     uint8_t *(* get_output_buffer)( void );
     int (* get_output_stride)( void );
+    int (* can_read_from_buffer)( void );
     void (* unlock_output_buffer)( void );
 
     /* Some useful functions for windowed outputs. */

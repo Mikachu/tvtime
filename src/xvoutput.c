@@ -334,6 +334,11 @@ static uint8_t *xv_get_output( void )
     return image_data;
 }
 
+static int xv_can_read_from_buffer( void )
+{
+    return 1;
+}
+
 static output_api_t xvoutput =
 {
     xv_init,
@@ -343,6 +348,7 @@ static output_api_t xvoutput =
     xv_lock_output,
     xv_get_output,
     xv_get_stride,
+    xv_can_read_from_buffer,
     xv_unlock_output,
 
     xcommon_is_exposed,

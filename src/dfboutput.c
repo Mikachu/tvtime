@@ -403,6 +403,11 @@ void dfb_set_window_height( int window_height )
     /* Dfb Tv-out does not support height modifications */
 }
 
+int dfb_can_read_from_buffer( void )
+{
+    return 0;
+}
+
 output_api_t dfboutput =
 {
     dfb_init,
@@ -412,6 +417,7 @@ output_api_t dfboutput =
     dfb_lock_output_buffer,
     dfb_get_output_buffer,
     dfb_get_output_stride,
+    dfb_can_read_from_buffer,
     dfb_unlock_output_buffer,
 
     dfb_is_exposed, 
