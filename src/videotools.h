@@ -73,6 +73,9 @@ void blit_colour_packed4444( uint8_t *output, int width, int height,
                              int stride, int alpha, int luma, int cb, int cr );
 void blit_colour_packed422( uint8_t *output, int width, int height,
                             int stride, int luma, int cb, int cr );
+void crossfade_frame( uint8_t *output, uint8_t *src1, uint8_t *src2,
+                      int width, int height, int outstride,
+                      int src1stride, int src2stride, int pos );
 
 #ifdef __cplusplus
 };

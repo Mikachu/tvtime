@@ -68,6 +68,18 @@ void blit_colour_packed422( uint8_t *output, int width, int height,
     }
 }
 
+void crossfade_frame( uint8_t *output, uint8_t *src1, uint8_t *src2,
+                      int width, int height, int outstride,
+                      int src1stride, int src2stride, int pos )
+{
+    while( height-- ) {
+        blend_packed422_scanline( output, src1, src2, width, pos );
+        output += outstride;
+        src1 += src1stride;
+        src2 += src2stride;
+    }
+}
+
 void composite_alphamask_to_packed4444( uint8_t *output, int owidth,
                                         int oheight, int ostride,
                                         uint8_t *mask, int mwidth,

@@ -172,18 +172,6 @@ static void save_last_frame( uint8_t *saveframe, uint8_t *curframe,
     saveframe += savestride;
 }
 
-static void crossfade_frame( uint8_t *output, uint8_t *src1, uint8_t *src2,
-                             int width, int height, int outstride,
-                             int src1stride, int src2stride, int pos )
-{
-    while( height-- ) {
-        blend_packed422_scanline( output, src1, src2, width, pos );
-        output += outstride;
-        src1 += src1stride;
-        src2 += src2stride;
-    }
-}
-
 static void pngscreenshot( const char *filename, uint8_t *frame422,
                            int width, int height, int stride )
 {
