@@ -42,7 +42,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
     int64_t qwGreedyTwoFrameThreshold;
 
     qwGreedyTwoFrameThreshold = (int64_t) GreedyTwoFrameThreshold;
-    qwGreedyTwoFrameThreshold += ((int64_t) GreedyTwoFrameThreshold2 << 8);
+    qwGreedyTwoFrameThreshold += (((int64_t) GreedyTwoFrameThreshold2) << 8);
     qwGreedyTwoFrameThreshold += (qwGreedyTwoFrameThreshold << 48) +
                                 (qwGreedyTwoFrameThreshold << 32) + 
                                 (qwGreedyTwoFrameThreshold << 16);
