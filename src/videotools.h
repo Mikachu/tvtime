@@ -31,35 +31,6 @@ extern "C" {
  */
 
 /**
- * Scanline functions.
- */
-
-/**
- * Create a packed 4:2:2 scanline from a (planar) luma scanline and
- * both associated cb and cr scanlines.
- */
-void create_packed422_from_planar422_scanline( unsigned char *output,
-                                               unsigned char *luma,
-                                               unsigned char *cb,
-                                               unsigned char *cr, int width );
-
-/**
- * This function was useful when I was doing linear interpolation from
- * a 4:2:0 planar image to a 4:2:2 surface.
- */
-void interpolate_packed422_from_planar422_scanline( unsigned char *output,
-                                                    unsigned char *topluma,
-                                                    unsigned char *topcb,
-                                                    unsigned char *topcr,
-                                                    unsigned char *botluma,
-                                                    unsigned char *botcb,
-                                                    unsigned char *botcr,
-                                                    int width );
-
-
-void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width );
-
-/**
  * Sub-pixel data bar renderer.  There are 128 bars.
  */
 void composite_bars_packed4444_scanline( unsigned char *output,

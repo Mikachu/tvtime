@@ -92,6 +92,18 @@ dnl   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
 dnl fi
 
 dnl ---------------------------------------------
+dnl LIRC
+dnl ---------------------------------------------
+
+have_lirc=yes
+AC_REQUIRE_CPP
+AC_CHECK_HEADER(lirc/lirc_client.h,
+  [AC_CHECK_LIB(lirc_client,lirc_init,,have_lirc=no)],have_lirc=no)
+if test "$have_lirc" = "yes"; then
+  AC_DEFINE(HAVE_LIRC,,[LIRC support])
+fi
+
+dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension
 dnl ---------------------------------------------
 AC_PATH_XTRA

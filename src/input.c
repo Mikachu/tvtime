@@ -20,6 +20,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "config.h"
+
+#ifdef HAVE_LIRC
+#include <lirc/lirc_client.h>
+#endif
+
+#include "config.h"
 #include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
@@ -53,6 +60,12 @@ struct input_s {
     
     int togglemenumode;
     menu_t *menu;
+
+    int lirc_used;
+#ifdef HAVE_LIRC
+    int lirc_fd;
+    struct lirc_config *lirc_conf;
+#endif
 };
 
 /**
@@ -309,6 +322,22 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->togglemenumode = 0;
     in->toggleconsole = 0;
     in->scrollconsole = 0;
+    in->lirc_used = 0;
+
+#ifdef HAVE_LIRC
+    in->lirc_fd = lirc_init( "tvtime", 1 ); /* Initialize lirc and let it be verbose. */
+    
+    if( in->lirc_fd < 0 )
+        fprintf( stderr, "tvtime: Can't connect to lircd. Lirc disabled.\n" );
+    else {
+        fcntl( in->lirc_fd, F_SETFL, O_NONBLOCK );
+        if ( lirc_readconfig( NULL, &in->lirc_conf, NULL ) == 0 )
+            in->lirc_used = 1;
+        else
+            fprintf( stderr, "tvtime: Can't read lirc config file. "
+                     "Lirc disabled.\n" );
+    }
+#endif
 
     /**
      * Set the current channel list.
@@ -383,8 +412,11 @@ void input_callback( input_t *in, InputEvent command, int arg )
         break;
 
     case I_BUTTONPRESS:
+    case I_REMOTE:
     case I_KEYDOWN:
-        if( command == I_BUTTONPRESS ) {
+        if( command == I_REMOTE ) {
+            tvtime_cmd = arg;
+        } else if( command == I_BUTTONPRESS ) {
             tvtime_cmd = config_button_to_command( in->cfg, arg );
         } else {
             tvtime_cmd = config_key_to_command( in->cfg, arg );
@@ -706,8 +738,41 @@ int input_toggle_menu( input_t *in )
     return in->togglemenumode;
 }
 
+#ifdef HAVE_LIRC
+static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
+{
+    char *code;
+    char *string;
+    int cmd;
+    
+    if( lirc_nextcode( &code ) != 0 ) /* Can not connect to lircd. */
+        return;
+
+    if( code == NULL ) /* No remote control code available. */
+        return;
+
+    lirc_code2char( lirc_conf, code, &string );
+
+    if( string == NULL ) /* No tvtime action for this code. */
+        return;
+
+    cmd = string_to_command(string);
+        
+    if( cmd != -1 )
+        input_callback( in, I_REMOTE, cmd );
+    else
+        fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
+}
+#endif
+
 void input_next_frame( input_t *in )
 {
+    if( in->lirc_used ) {
+#ifdef HAVE_LIRC
+        poll_lirc( in, lirc_conf );
+#endif
+    }
+
     /* Decrement the frame counter if user is typing digits */
     if( in->frame_counter > 0 ) in->frame_counter--;
 

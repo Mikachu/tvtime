@@ -111,6 +111,7 @@ extern void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *
                                                        unsigned char *mask, int width,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
+extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 
 /**
  * Sets up the function pointers to point at the fastest function available.

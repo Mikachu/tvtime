@@ -35,6 +35,7 @@ void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
                                                        unsigned char *mask, int width,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
+void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 
 
 static unsigned int speedy_time = 0;
@@ -84,8 +85,8 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
 void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
                                      unsigned char *bot, int width )
 {
-    const uint64_t qwYMask = 0x00ff00ff00ff00ff;
-    const uint64_t qwOnes = 0x0001000100010001;
+    const uint64_t qwYMask = 0x00ff00ff00ff00ffULL;
+    const uint64_t qwOnes = 0x0001000100010001ULL;
     uint64_t qwThreshold;
 
     SPEEDY_START();
@@ -900,6 +901,43 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
+void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width )
+{
+    SPEEDY_START();
+
+    while( width-- ) {
+        unsigned int cur_a = input[ 0 ];
+
+        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
+                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
+                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
+                                   | cur_a;
+
+        output += 4;
+        input += 4;
+    }
+
+    SPEEDY_END();
+}
+
+void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width )
+{
+    SPEEDY_START();
+
+    while( width-- ) {
+        unsigned int cur_a = input[ 0 ];
+
+        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
+                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
+                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
+                                   | cur_a;
+
+        output += 4;
+        input += 4;
+    }
+
+    SPEEDY_END();
+}
 
 
 static uint32_t speedy_accel;
@@ -916,6 +954,7 @@ void setup_speedy_calls( void )
     composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_c;
     composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_c;
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
+    premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );

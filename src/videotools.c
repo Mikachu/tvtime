@@ -33,33 +33,17 @@ static inline unsigned char clip255( int x )
     }
 }
 
-            /**
-             * result = (1 - alpha)B + alpha*F
-             *        =  B - alpha*B + alpha*F
-             *        =  B + alpha*(F - B)
-             */
+/**
+ * result = (1 - alpha)B + alpha*F
+ *        =  B - alpha*B + alpha*F
+ *        =  B + alpha*(F - B)
+ */
 
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
     int temp;
     temp = (r * a) + 0x80;
     return ((temp + (temp >> 8)) >> 8);
-}
-
-void create_packed422_from_planar422_scanline( unsigned char *output,
-                                               unsigned char *luma,
-                                               unsigned char *cb,
-                                               unsigned char *cr, int width )
-{
-    unsigned int *o = (unsigned int *) output;
-
-    for( width /= 2; width; --width ) {
-        *o = (*cr << 24) | (*(luma + 1) << 16) | (*cb << 8) | (*luma);
-        o++;
-        luma += 2;
-        cb++;
-        cr++;
-    }
 }
 
 void blit_colour_packed4444( unsigned char *output, int width, int height,
@@ -114,25 +98,6 @@ void cheap_packed422_to_packed444_scanline( unsigned char *output,
     }
 }
 
-void interpolate_packed422_from_planar422_scanline( unsigned char *output,
-                                                    unsigned char *topluma,
-                                                    unsigned char *topcb,
-                                                    unsigned char *topcr,
-                                                    unsigned char *botluma,
-                                                    unsigned char *botcb,
-                                                    unsigned char *botcr,
-                                                    int width )
-{
-    int i;
-
-    for( i = 0; i < width; i += 2 ) {
-        output[ (i*2)     ] = (topluma[ i ] + botluma[ i ]) >> 1;
-        output[ (i*2) + 1 ] = ((topcb[ i/2 ] + botcb[ i/2 ] - 256) >> 1) + 128;
-        output[ (i*2) + 2 ] = (topluma[ i+1 ] + botluma[ i+1 ]) >> 1;
-        output[ (i*2) + 3 ] = ((topcr[ i/2 ] + botcr[ i/2 ] - 256) >> 1) + 128;
-    }
-}
-
 void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
                                    unsigned char *src2, int width, int pos )
 {
@@ -145,21 +110,6 @@ void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
         while( width-- ) {
             *output++ = ( (*src1++ * ( 256 - pos )) + (*src2++ * pos) + 0x80 ) >> 8;
         }
-    }
-}
-
-void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width )
-{
-    while( width-- ) {
-        unsigned int cur_a = input[ 0 ];
-
-        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
-                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
-                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
-                                   | cur_a;
-
-        output += 4;
-        input += 4;
     }
 }
 
