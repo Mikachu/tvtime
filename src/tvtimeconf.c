@@ -60,6 +60,7 @@ static void print_usage( char **argv )
                      "\t-s\tPrint frame skip information (for debugging).\n"
                      "\t-I\tV4L input scanline sampling, defaults to 720.\n"
                      "\t-w\tOutput window width, defaults to 800.\n"
+
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
                      "\t-i\tvideo4linux input number (defaults to 0).\n"
 

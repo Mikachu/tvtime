@@ -165,7 +165,7 @@ static deinterlace_setting_t settings[] =
 static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Greedy 2-Frame (DScaler)",
+    "Greedy - 2-frame (DScaler)",
     "Greedy2Frame",
     4,
     MM_ACCEL_X86_MMXEXT,
@@ -181,8 +181,6 @@ void deinterlace_plugin_init( void )
 void greedy2frame_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "greedy2frame: Registering Greedy 2-Frame "
-             "deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &greedymethod );
 }
 

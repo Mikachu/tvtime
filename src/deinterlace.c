@@ -18,6 +18,8 @@ void register_deinterlace_method( deinterlace_method_t *method )
 {
     methodlist_item_t **dest;
 
+    fprintf( stderr, "deinterlace: Registering '%s' deinterlacing algorithm.\n", method->name );
+
     if( !methodlist ) {
         dest = &methodlist;
     } else {
@@ -87,7 +89,7 @@ void filter_deinterlace_methods( int accel, int fields_available )
         if( (cur->method->accelrequired & accel) != cur->method->accelrequired ) {
             /* This method is no good, drop it from the list. */
             fprintf( stderr, "deinterlace: Removing '%s': required "
-                     "accelleration features unavailable.\n",
+                     "CPU accelleration features unavailable.\n",
                      cur->method->name );
             drop = 1;
         }

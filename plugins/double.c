@@ -44,7 +44,6 @@ void deinterlace_plugin_init( void )
 void double_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "double: Registering line doubler deinterlacing algorithm.\n" );
     register_deinterlace_method( &doublemethod );
 }
 

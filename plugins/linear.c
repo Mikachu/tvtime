@@ -40,7 +40,6 @@ void deinterlace_plugin_init( void )
 void linear_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "linear: Registering linear interpolation deinterlacing algorithm.\n" );
     register_deinterlace_method( &linearmethod );
 }
 

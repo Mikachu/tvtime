@@ -166,8 +166,6 @@ void deinterlace_plugin_init( void )
 void videobob_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "videobob: Registering Video Bob "
-             "deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &bobmethod );
 }
 

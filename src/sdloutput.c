@@ -52,7 +52,7 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
 
-    aspect = sdlaspect;
+    sdlaspect = aspect;
     outwidth = outputwidth;
 
     /* Initialize SDL. */

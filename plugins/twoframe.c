@@ -256,7 +256,6 @@ void deinterlace_plugin_init( void )
 void twoframe_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "twoframe: Registering 2-Frame deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &twoframe );
 }
 

@@ -142,7 +142,7 @@ static deinterlace_setting_t settings[] =
 static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Video (Greedy, Low Motion)",
+    "Greedy - Low motion (DScaler)",
     "Greedy",
     3,
     MM_ACCEL_X86_MMXEXT,
@@ -158,7 +158,6 @@ void deinterlace_plugin_init( void )
 void greedy_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "greedy: Registering greedy deinterlacing algorithm.\n" );
     register_deinterlace_method( &greedymethod );
 }
 

@@ -445,8 +445,9 @@ int main( int argc, char **argv )
     }
     build_colourbars( colourbars, width, height );
 
+
     /* Setup OSD stuff. */
-    osd = tvtime_osd_new( width, height, 4.0 / 3.0 );
+    osd = tvtime_osd_new( width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !osd ) {
         fprintf( stderr, "Can't initialize OSD object.\n" );
     } else {
@@ -530,12 +531,15 @@ int main( int argc, char **argv )
         return 1;
     }
 
+/* Billy - menu code disabled for now.
     menu = menu_new( in, ct, width, height, 
-                     config_get_aspect( ct ) ? 16.0 / 9.0 : 4.0 / 3.0 );
+                     config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
     }
     if( menu ) input_set_menu( in, menu );
+*/
+    menu = 0;
 
 
     /* Steal system resources in the name of performance. */
