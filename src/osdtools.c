@@ -153,8 +153,8 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
 
 void osd_string_render_image4444( osd_string_t *osds )
 {
-    osds->image_textwidth = ft_string_get_width( osds->fts ) + 2;
-    osds->image_textheight = ft_string_get_height( osds->fts ) + 3;
+    osds->image_textwidth = ft_string_get_width( osds->fts ) + 4;
+    osds->image_textheight = ft_string_get_height( osds->fts ) + 6;
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
                             osds->image_textheight, osds->image_width * 4,
