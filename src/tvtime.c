@@ -862,7 +862,6 @@ int main( int argc, char **argv )
     commands_t *commands = 0;
     int usevbi = 1;
     int fadepos = 0;
-    char number[4];
     int scanwait = scan_delay;
     int scanning = 0;
     int numscanned = 0;
@@ -1897,17 +1896,19 @@ int main( int argc, char **argv )
     }
 
     if( config_get_configsave( ct ) ) {
-        snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
+        char number[ 4 ];
+
+        snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );
         configsave( config_get_configsave( ct ), "PrevChannel", number );
 
-        snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
+        snprintf( number, 4, "%d", station_get_current_id( stationmgr ) );
         configsave( config_get_configsave( ct ), "Channel", number );
 
-        snprintf( number, 3, "%d", framerate_mode );
+        snprintf( number, 4, "%d", framerate_mode );
         configsave( config_get_configsave( ct ), "FramerateMode", number );
 
         if( vidin ) {
-            snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
+            snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
             configsave( config_get_configsave( ct ), "V4LInput", number );
         }
     }
