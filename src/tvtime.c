@@ -873,7 +873,7 @@ int main( int argc, char **argv )
 
     greedy_plugin_init();
     // videobob_plugin_init();
-    greedy2frame_plugin_init();
+    // greedy2frame_plugin_init();
     // twoframe_plugin_init();
     linearblend_plugin_init();
     linear_plugin_init();
