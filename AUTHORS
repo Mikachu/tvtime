@@ -13,6 +13,9 @@ Authors and contributors
     - Station list management code.
     - Frequency table conversion script from xawtv's file format.
 
+  Joachim Koenig <Joachim.Koenig@tecnomen.fi>
+    - Wrote the dscaler plugin loader using the wine code.
+
   David I. Lehn <dlehn@users.sourceforge.net>
     - autoconf setup, taken from his autoconf'ing of movietime.
 
@@ -31,14 +34,12 @@ Authors and contributors
 
   Bart Dorsey <echo@thebucket.org>
   Nicolas Boos <nicolaxx@free.fr>
+  Matt Zimmerman <mdz@debian.org>
   Simon Law <sfllaw@debian.org>
     - Work on the debian packages.
 
   Mark Trolley <mtrolley@scs.carleton.ca>
     - Added the numeric channel commands for better lirc support.
-
-  Joachim Koenig <Joachim.Koenig@tecnomen.fi>
-    - Wrote the dscaler plugin loader using the wine code.
 
   Stewart Allen <stewart@neuron.com>
     - Cleanup of the command names, various bugfixes.
@@ -95,7 +96,7 @@ Code we stole (well, used under the GPL)
     Being a reasonable 'port' of much of the DScaler code is definitely
     one of our goals.
 
-  Original Freetype2 code and compositing ideas from mythtv
+  Original Freetype2 code and compositing ideas from MythTV
     http://mythtv.sourceforge.net/
     We since rewrote our font renderer, but originally we borrowed from
     this great project.  It would be nice to re-sync some of our rendering
