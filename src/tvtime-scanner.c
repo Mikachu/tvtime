@@ -24,120 +24,139 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "videoinput.h"
 #include "commands.h"
 #include "utils.h"
 
 int main( int argc, char **argv )
 {
     config_t *cfg = config_new();
-    FILE *fifo;
-    int fi, on, tuned, i;
+    station_mgr_t *stationmgr = 0;
+    videoinput_t *vidin;
+    int fi, on, tuned;
     int f, f1, f2, fc;
+    int verbose, norm;
+    int curstation = 1;
 
     if( !cfg ) {
-        fprintf( stderr, "tvtime-command: Can't initialize tvtime configuration, exiting.\n" );
+        fprintf( stderr, "tvtime-scanner: Can't initialize tvtime configuration, exiting.\n" );
         return 1;
     }
 
-    for( f = 44*16; f <= 958*16; f+= 4 ) {
+    verbose = config_get_verbose( cfg );
 
-        /* Scan freqnencies */
-        fprintf( stderr, "\nscanning freqencies...\n" );
+    if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {
+        norm = VIDEOINPUT_PAL;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "secam" ) ) {
+        norm = VIDEOINPUT_SECAM;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-nc" ) ) {
+        norm = VIDEOINPUT_PAL_NC;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-m" ) ) {
+        norm = VIDEOINPUT_PAL_M;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-n" ) ) {
+        norm = VIDEOINPUT_PAL_N;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "ntsc-jp" ) ) {
+        norm = VIDEOINPUT_NTSC_JP;
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-60" ) ) {
+        norm = VIDEOINPUT_PAL_60;
+    } else {
+        /* Only allow NTSC otherwise. */
+        norm = VIDEOINPUT_NTSC;
+    }
+
+    fprintf( stderr, "tvtime-scanner: Scanning using TV standard '%s'\n",
+             videoinput_get_norm_name( norm ) );
+
+    stationmgr = station_new( videoinput_get_norm_name( norm ), "Custom", 0, verbose );
+    if( !stationmgr ) {
+        fprintf( stderr, "tvtime-scanner: Can't create station manager (no memory?), exiting.\n" );
+        config_delete( cfg );
+        return 1;
+    }
+
+    vidin = videoinput_new( config_get_v4l_device( cfg ), 
+                            config_get_inputwidth( cfg ), 
+                            norm, verbose );
+    if( !vidin ) {
+        fprintf( stderr, "tvtime-scanner: Can't open video4linux device '%s'.",
+                config_get_v4l_device( cfg ) );
+        station_delete( stationmgr );
+        config_delete( cfg );
+        return 1;
+    } else {
+        videoinput_set_input_num( vidin, config_get_inputnum( cfg ) );
+    }
+
+    if( !videoinput_has_tuner( vidin ) ) {
+        fprintf( stderr, "tvtime-scanner: No tuner found on input %d.\n"
+                 "tvtime-scanner: If you have a tuner, select a different input using --input=<num>.\n",
+                 config_get_inputnum( cfg ) );
+        videoinput_delete( vidin );
+        station_delete( stationmgr );
+        config_delete( cfg );
+        return 1;
+    }
+
+    /* Scan freqnencies */
+    fprintf( stderr, "tvtime-scanner: Scanning from %6.2fMHz to %6.2fMHz.\n",
+             44.0, 958.0 );
+    on = 0;
+    fc = 0;
+    f1 = 0;
+    f2 = 0;
+    fi = -1;
+
+    for( f = 44*16; f <= 958*16; f += 4 ) {
+        char stationmhz[ 128 ];
+
+        videoinput_set_tuner_freq( vidin, (f * 1000) / 16 );
+        fprintf( stderr, "tvtime-scanner: Checking %6.2fMHz: ", ((double) f) / 16.0 );
+        usleep( 200000 ); /* 0.2 sec */
+        tuned = videoinput_freq_present( vidin );
+
+        /* state machine */
+        if( 0 == on && 0 == tuned ) {
+            fprintf( stderr, "|   no\r" );
+            continue;
+        }
+        if( 0 == on && 0 != tuned ) {
+            fprintf( stderr, " \\  raise\r" );
+            f1 = f;
+            /* if( i != chancount ) { fi = i; fc = f; } */
+            on = 1;
+            continue;
+        }
+        if( 0 != on && 0 != tuned ) {
+            fprintf( stderr, "  | yes\r" );
+            /* if( i != chancount ) { fi = i; fc = f; } */
+            continue;
+        }
+        /* if (on != 0 && 0 == tuned)  --  found one, read name from vbi */
+        fprintf( stderr," /  fall\r" );
+        f2 = f;
+        if( 0 == fc ) {
+            fc = (f1+f2)/2;
+        }
+
+        fprintf( stderr, "tvtime-scanner: Found a channel at %6.2fMHz, addint to stationlist.\n",
+                 ((double) fc) / 16.0 );
+
+        sprintf( stationmhz, "%.2fMHz", ((double) fc) / 16.0 );
+        station_add( stationmgr, curstation, "Custom", stationmhz, stationmhz );
+        station_writeconfig( stationmgr );
+        curstation++;
+
         on = 0;
         fc = 0;
         f1 = 0;
         f2 = 0;
         fi = -1;
-
-        for( f = 44*16; f <= 958*16; f += 4 ) {
-/*
-            for( i = 0; i < chancount; i++ ) {
-                if( chanlist[ i ].freq * 16 == f * 1000 ) {
-                    break;
-                }
-            }
-            fprintf( stderr,"?? %6.2f MHz (%-4s): ", f / 16.0,
-                     (i == chancount) ? "-" : chanlist[i].name );
-            drv->setfreq( h_drv, f );
-*/
-            usleep( 200000 ); /* 0.2 sec */
-            // tuned = drv->is_tuned( h_drv);
-            tuned = 1;
-
-            /* state machine */
-            if( 0 == on && 0 == tuned ) {
-                fprintf( stderr, "|   no\n" );
-                continue;
-            }
-            if( 0 == on && 0 != tuned ) {
-                fprintf( stderr, " \\  raise\n" );
-                f1 = f;
-/*
-                if( i != chancount ) {
-                    fi = i;
-                    fc = f;
-                }
-*/
-                on = 1;
-                continue;
-            }
-            if( 0 != on && 0 != tuned ) {
-                fprintf( stderr, "  | yes\n" );
-/*
-                if( i != chancount ) {
-                    fi = i;
-                    fc = f;
-                }
-*/
-                continue;
-            }
-            /* if (on != 0 && 0 == tuned)  --  found one, read name from vbi */
-            fprintf( stderr," /  fall\n" );
-            f2 = f;
-            if( 0 == fc ) {
-                fc = (f1+f2)/2;
-            }
-
-/*
-            fprintf( stderr, "=> %6.2f MHz (%-4s): ", fc/16.0,
-                     (-1 != fi) ? chanlist[fi].name : "-" );
-            drv->setfreq( h_drv, fc );
-*/
-           
-/* 
-            // name = get_vbi_name( vbi );
-            fprintf(stderr,"%s\n",name ? name : "???");
-            if (NULL == name) {
-                sprintf(dummy,"unknown (%s)",chanlist[fi].name);
-                name = dummy;
-            }
-            if (-1 != fi) {
-                if (NULL == name) {
-                    sprintf(dummy,"unknown (%s)",chanlist[fi].name);
-                    name = dummy;
-                }
-                fprintf(conf,"[%s]\nchannel = %s\n\n",name,chanlist[fi].name);
-            } else {
-                if (NULL == name) {
-                    sprintf(dummy,"unknown (%.3f)", fc/16.0);
-                    name = dummy;
-                }
-                fprintf(conf,"[%s]\nfreq = %.3f\n\n", name, fc/16.0);
-            }
-            fflush(conf);
-*/
-
-            on = 0;
-            fc = 0;
-            f1 = 0;
-            f2 = 0;
-            fi = -1;
-        }
     }
 
-    fclose( fifo );
+    station_delete( stationmgr );
     config_delete( cfg );
     return 0;
 }
