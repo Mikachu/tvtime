@@ -148,6 +148,7 @@ const char *next_deinterlacing_method( void )
         curmethod = get_deinterlace_method( curmethodid );
     }
     if( curmethod ) {
+        deinterlace_scanline = curmethod->function;
         return curmethod->name;
     } else {
         return 0;
@@ -289,6 +290,7 @@ int main( int argc, char **argv )
     register_deinterlace_plugin( "plugins/linear.so" );
     register_deinterlace_plugin( "plugins/twoframe.so" );
     register_deinterlace_plugin( "plugins/greedy2frame.so" );
+    next_deinterlacing_method();
 
     ct = config_new( argc, argv );
     if( !ct ) {
