@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) Removed the mlockall() call, I don't want to bother with
+    that right now.
   * (vektor) Added the 'XVideo Bob' equivalent to DScaler's 'scalerbob'
     plugin (feature request 642661).
   * (vektor) Added the SECAM-DK frequencies ("russia").
