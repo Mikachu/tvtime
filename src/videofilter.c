@@ -28,7 +28,7 @@ struct videofilter_s
     video_correction_t *vc;
     int bt8x8_correction;
 
-    unsigned char tempscanline[ 2048 ];
+    uint8_t tempscanline[ 2048 ];
 };
 
 videofilter_t *videofilter_new( void )
@@ -71,7 +71,7 @@ int videofilter_active_on_scanline( videofilter_t *vf, int scanline )
     }
 }
 
-void videofilter_packed422_scanline( videofilter_t *vf, unsigned char *data,
+void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
                                      int width, int xpos, int scanline )
 {
     if( vf->vc && vf->bt8x8_correction ) {

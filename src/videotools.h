@@ -20,6 +20,8 @@
 #ifndef VIDEOTOOLS_H_INCLUDED
 #define VIDEOTOOLS_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,53 +35,48 @@ extern "C" {
 /**
  * Sub-pixel data bar renderer.  There are 128 bars.
  */
-void composite_bars_packed4444_scanline( unsigned char *output,
-                                         unsigned char *background, int width,
+void composite_bars_packed4444_scanline( uint8_t *output,
+                                         uint8_t *background, int width,
                                          int a, int luma, int cb, int cr,
                                          int percentage );
 
 
-void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
-                                                   unsigned char *input, int width );
-void packed444_to_rgb24_rec601_scanline( unsigned char *output,
-                                         unsigned char *input, int width );
-void rgb24_to_packed444_rec601_scanline( unsigned char *output,
-                                         unsigned char *input, int width );
-void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
-                                           unsigned char *input, int width );
+void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width );
+void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width );
+void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
+void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
 
 /**
  * Frame functions.
  */
-void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
+void composite_alphamask_to_packed4444( uint8_t *output, int owidth,
                                         int oheight, int ostride,
-                                        unsigned char *mask, int mwidth,
+                                        uint8_t *mask, int mwidth,
                                         int mheight, int mstride,
                                         int luma, int cb, int cr,
                                         int xpos, int ypos );
-void composite_alphamask_alpha_to_packed4444( unsigned char *output, int owidth,
+void composite_alphamask_alpha_to_packed4444( uint8_t *output, int owidth,
                                               int oheight, int ostride,
-                                              unsigned char *mask, int mwidth,
+                                              uint8_t *mask, int mwidth,
                                               int mheight, int mstride,
                                               int luma, int cb, int cr, int alpha,
                                               int xpos, int ypos );
-void composite_packed4444_to_packed422( unsigned char *output, int owidth,
+void composite_packed4444_to_packed422( uint8_t *output, int owidth,
                                         int oheight, int ostride,
-                                        unsigned char *foreground, int fwidth,
+                                        uint8_t *foreground, int fwidth,
                                         int fheight, int fstride,
                                         int xpos, int ypos );
-void composite_packed4444_alpha_to_packed422( unsigned char *output,
+void composite_packed4444_alpha_to_packed422( uint8_t *output,
                                               int owidth, int oheight,
                                               int ostride,
-                                              unsigned char *foreground,
+                                              uint8_t *foreground,
                                               int fwidth, int fheight,
                                               int fstride,
                                               int xpos, int ypos, int alpha );
-void create_colourbars_packed444( unsigned char *output,
-                                  int width, int height, int stride );
-void blit_colour_packed4444( unsigned char *output, int width, int height,
+void create_colourbars_packed444( uint8_t *output, int width, int height, int stride );
+void blit_colour_packed4444( uint8_t *output, int width, int height,
                              int stride, int alpha, int luma, int cb, int cr );
-void blit_colour_packed422( unsigned char *output, int width, int height,
+void blit_colour_packed422( uint8_t *output, int width, int height,
                             int stride, int luma, int cb, int cr );
 
 #ifdef __cplusplus

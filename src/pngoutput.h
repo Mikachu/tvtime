@@ -19,6 +19,8 @@
 #ifndef PNGOUTPUT_H_INCLUDED
 #define PNGOUTPUT_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,7 +42,7 @@ void pngoutput_delete( pngoutput_t *pngoutput );
 /**
  * Writes a scanline (of the appropriate width) to the PNG file.
  */
-void pngoutput_scanline( pngoutput_t *pngoutput, unsigned char *scanline );
+void pngoutput_scanline( pngoutput_t *pngoutput, uint8_t *scanline );
 
 #ifdef __cplusplus
 };

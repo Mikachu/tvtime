@@ -90,8 +90,8 @@ struct videoinput_s
     int norm;
     int isbttv;
 
-    unsigned char *grab_data;
-    unsigned char *map;
+    uint8_t *grab_data;
+    uint8_t *map;
     struct video_mmap *grab_buf;
     struct video_window grab_win;
     struct video_audio audio;
@@ -154,10 +154,10 @@ static void wait_for_frame( videoinput_t *vidin, int frameid )
     alarm( 0 );
 }
 
-unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
+uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
 {
     if( vidin->have_mmap ) {
-        unsigned char *cur;
+        uint8_t *cur;
         wait_for_frame( vidin, vidin->curframe );
         cur = vidin->map + vidin->gb_buffers.offsets[ vidin->curframe ];
         *frameid = vidin->curframe;
@@ -481,8 +481,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             vidin->grab_buf[ i ].height = vidin->height;
         }
 
-        vidin->map = (unsigned char *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
-                                             MAP_SHARED, vidin->grab_fd, 0 );
+        vidin->map = (uint8_t *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
+                                       MAP_SHARED, vidin->grab_fd, 0 );
         if( (int) (vidin->map) != -1 ) {
             vidin->have_mmap = 1;
             videoinput_free_all_frames( vidin );
@@ -500,7 +500,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     vidin->have_mmap = 0;
     vidin->grab_size = (vidin->grab_win.width * vidin->grab_win.height * 2);
-    vidin->grab_data = (unsigned char *) malloc( vidin->grab_size );
+    vidin->grab_data = (uint8_t *) malloc( vidin->grab_size );
     vidin->numframes = 2;
 
     return vidin;

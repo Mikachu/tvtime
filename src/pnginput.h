@@ -19,6 +19,8 @@
 #ifndef PNGINPUT_H_INCLUDED
 #define PNGINPUT_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +31,7 @@ pnginput_t *pnginput_new( const char *filename );
 void pnginput_delete( pnginput_t *pnginput );
 unsigned int pnginput_get_width( pnginput_t *pnginput );
 unsigned int pnginput_get_height( pnginput_t *pnginput );
-unsigned char *pnginput_get_scanline( pnginput_t *pnginput, int num );
+uint8_t *pnginput_get_scanline( pnginput_t *pnginput, int num );
 int pnginput_has_alpha( pnginput_t *pnginput );
 
 #ifdef __cplusplus

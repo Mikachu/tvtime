@@ -52,7 +52,7 @@
 #define FOURCC_YUY2 0x32595559
 
 static XvImage *image;
-static unsigned char *image_data;
+static uint8_t *image_data;
 static XShmSegmentInfo shminfo;
 static Window window;
 static Display *display;
@@ -385,10 +385,10 @@ static void *create_shm( int size )
 static void xv_alloc_frame( void )
 {
     int size;
-    unsigned char *alloc;
+    uint8_t *alloc;
 
     size = input_width * input_height * 2;
-    alloc = (unsigned char *) create_shm( size);
+    alloc = (uint8_t *) create_shm( size);
     if( alloc ) {
         image = XvShmCreateImage( display, xv_port, FOURCC_YUY2, (char *) alloc,
                                   input_width, input_height, &shminfo );
@@ -787,7 +787,7 @@ void xv_set_window_caption( const char *caption )
     XSetIconName( display, window, caption );
 }
 
-unsigned char *xv_get_output( void )
+uint8_t *xv_get_output( void )
 {
     return image_data;
 }

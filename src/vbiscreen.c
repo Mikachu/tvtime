@@ -583,7 +583,7 @@ int vbiscreen_active_on_scanline( vbiscreen_t *vs, int scanline )
 }
 
 void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
-                                             unsigned char *output,
+                                             uint8_t *output,
                                              int width, int xpos, 
                                              int scanline )
 {

@@ -32,7 +32,7 @@ struct reepktq_s
 
     int itemwaiting;
 
-    unsigned char *data;
+    uint8_t *data;
     pthread_mutex_t lock;
 };
 
@@ -51,7 +51,7 @@ reepktq_t *reepktq_new( int numframes, int framesize )
     pktq->itemwaiting = 0;
     pthread_mutex_init( &(pktq->lock), 0 );
 
-    pktq->data = (unsigned char *) malloc( pktq->numframes * pktq->framesize );
+    pktq->data = (uint8_t *) malloc( pktq->numframes * pktq->framesize );
     if( !pktq->data ) { free( pktq ); return 0; }
 
     for( i = 0; i < numframes * framesize; i++ ) pktq->data[ i ] = 0;
@@ -67,9 +67,9 @@ void reepktq_delete( reepktq_t *pktq )
     free( pktq );
 }
 
-unsigned char *reepktq_enqueue( reepktq_t *pktq )
+uint8_t *reepktq_enqueue( reepktq_t *pktq )
 {
-    unsigned char *data = &(pktq->data[ pktq->tail * pktq->framesize ]);
+    uint8_t *data = &(pktq->data[ pktq->tail * pktq->framesize ]);
 
     pthread_mutex_lock( &(pktq->lock) );
     if( pktq->size == pktq->numframes - 2 ) {
@@ -95,7 +95,7 @@ void reepktq_complete_enqueue( reepktq_t *pktq )
     pthread_mutex_unlock( &(pktq->lock) );
 }
 
-unsigned char *reepktq_head( reepktq_t *pktq )
+uint8_t *reepktq_head( reepktq_t *pktq )
 {
     pthread_mutex_lock( &(pktq->lock) );
     if( !pktq->size || ( pktq->size == 1 && pktq->itemwaiting == 1 ) ) {

@@ -29,8 +29,8 @@
 
 #define OSD_FADEOUT_TIME 15
 
-int aspect_adjust_packed4444_scanline( unsigned char *output,
-                                       unsigned char *input, 
+int aspect_adjust_packed4444_scanline( uint8_t *output,
+                                       uint8_t *input, 
                                        int width,
                                        double aspectratio );
 
@@ -100,7 +100,7 @@ struct osd_string_s
     int border_cb;
     int border_cr;
 
-    unsigned char *image4444;
+    uint8_t *image4444;
     int image_width;
     int image_height;
     int image_textwidth;
@@ -117,7 +117,7 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
     }
 
     osds->font = font;
-    osds->image4444 = (unsigned char *) malloc( video_width * max_height * 4 );
+    osds->image4444 = (uint8_t *) malloc( video_width * max_height * 4 );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
@@ -173,8 +173,8 @@ void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr )
 
 void osd_string_set_colour_rgb( osd_string_t *osds, int r, int g, int b )
 {
-    unsigned char rgb[ 3 ];
-    unsigned char ycbcr[ 3 ];
+    uint8_t rgb[ 3 ];
+    uint8_t ycbcr[ 3 ];
 
     rgb[ 0 ] = r; rgb[ 1 ] = g; rgb[ 2 ] = b;
     rgb24_to_packed444_rec601_scanline( ycbcr, rgb, 1 );
@@ -383,8 +383,8 @@ int osd_string_get_frames_left( osd_string_t *osds )
 }
 
 void osd_string_composite_packed422_scanline( osd_string_t *osds,
-                                              unsigned char *output,
-                                              unsigned char *background,
+                                              uint8_t *output,
+                                              uint8_t *background,
                                               int width, int xpos,
                                               int scanline )
 {
@@ -413,7 +413,7 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
 /* databars */
 struct osd_databars_s
 {
-    unsigned char *data;
+    uint8_t *data;
     int width;
     int alpha;
     int luma;
@@ -430,7 +430,7 @@ osd_databars_t *osd_databars_new( int width )
         return 0;
     }
 
-    osdd->data = (unsigned char *) malloc( width * 4 );
+    osdd->data = (uint8_t *) malloc( width * 4 );
     if( !osdd->data ) {
         free( osdd );
         return 0;
@@ -482,8 +482,8 @@ void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames )
 }
 
 void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
-                                                unsigned char *output,
-                                                unsigned char *background,
+                                                uint8_t *output,
+                                                uint8_t *background,
                                                 int width )
 {
     if( !osdd->frames_left ) return;
@@ -515,7 +515,7 @@ struct osd_shape_s
     int image_height;
     double aspect_ratio;
     int alpha;
-    unsigned char *image4444;
+    uint8_t *image4444;
 };
 
 osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
@@ -536,7 +536,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->shape_adjusted_width = shape_width;
     osds->type = shape_type;
 
-    osds->image4444 = (unsigned char *) malloc( video_width * video_height * 4);
+    osds->image4444 = (uint8_t *) malloc( video_width * video_height * 4);
     if( !osds ) {
         free( osds );
         return 0;
@@ -634,7 +634,7 @@ void osd_shape_render_image4444( osd_shape_t *osds )
 }
 
 void osd_shape_composite_packed422( osd_shape_t *osds, 
-                                    unsigned char *output,
+                                    uint8_t *output,
                                     int width, int height, int stride,
                                     int xpos, int ypos )
 {
@@ -657,8 +657,8 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
 }
 
 void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
-                                             unsigned char *output,
-                                             unsigned char *background,
+                                             uint8_t *output,
+                                             uint8_t *background,
                                              int width, int xpos,
                                              int scanline )
 {
@@ -692,7 +692,7 @@ struct osd_graphic_s
     pnginput_t *png;
     int frames_left;
 
-    unsigned char *image4444;
+    uint8_t *image4444;
     int image_width;
     int image_height;
     double image_aspect;
@@ -730,7 +730,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
     }
 
     osdg->frames_left = 0;
-    osdg->image4444 = (unsigned char *) malloc( video_width * video_height * 4);
+    osdg->image4444 = (uint8_t *) malloc( video_width * video_height * 4);
     if( !osdg->image4444 ) {
         pnginput_delete( osdg->png );
         free( osdg );
@@ -755,8 +755,8 @@ void osd_graphic_delete( osd_graphic_t *osdg )
     free( osdg );
 }
 
-void composite_packed444_to_packed4444_alpha_scanline( unsigned char *output, 
-                                                       unsigned char *input,
+void composite_packed444_to_packed4444_alpha_scanline( uint8_t *output, 
+                                                       uint8_t *input,
                                                        int width, int alpha )
 {
     int i;
@@ -775,15 +775,15 @@ void composite_packed444_to_packed4444_alpha_scanline( unsigned char *output,
 
 }
 
-int aspect_adjust_packed4444_scanline( unsigned char *output,
-                                       unsigned char *input, 
+int aspect_adjust_packed4444_scanline( uint8_t *output,
+                                       uint8_t *input, 
                                        int width,
                                        double aspectratio )
 {
     double i;
     int w=0, prev_i=0, j, pos;
     int avg_a=0, avg_y=0, avg_cb=0, avg_cr=0, c=0;
-    unsigned char *curin;
+    uint8_t *curin;
 
     for( i=0; i < width; i += aspectratio ) {
         curin = input + ((int)i)*4;
@@ -820,20 +820,20 @@ int aspect_adjust_packed4444_scanline( unsigned char *output,
 void osd_graphic_render_image4444( osd_graphic_t *osdg )
 {
     int i, width, height;
-    unsigned char *scanline;
-    unsigned char *cb444;
-    unsigned char *curout;
+    uint8_t *scanline;
+    uint8_t *cb444;
+    uint8_t *curout;
     int has_alpha = pnginput_has_alpha( osdg->png );
 
     width = pnginput_get_width( osdg->png );
     height = pnginput_get_height( osdg->png );
     osdg->image_graphic_height = height;
 
-    cb444 = (unsigned char *) malloc( (width * 3) );
+    cb444 = (uint8_t *) malloc( (width * 3) );
     if( !cb444 ) return;
 
 
-    curout = (unsigned char *)malloc( width*4 );
+    curout = (uint8_t *)malloc( width*4 );
     if( !curout) return;
 
 
@@ -893,8 +893,8 @@ void osd_graphic_advance_frame( osd_graphic_t *osdg )
 }
 
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
-                                               unsigned char *output,
-                                               unsigned char *background,
+                                               uint8_t *output,
+                                               uint8_t *background,
                                                int width, int xpos,
                                                int scanline )
 {
@@ -943,7 +943,7 @@ int osd_fixedfont_get_char_height( osd_fixedfont_t *fixed )
     return 0;
 }
 
-void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, unsigned char *output, int width,
+void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, uint8_t *output, int width,
                                    int scanline, char c, unsigned int fg, unsigned int bg, int alpha )
 {
 }

@@ -20,7 +20,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -77,7 +77,7 @@
 static int TwoFrameTemporalTolerance = 300;
 static int TwoFrameSpatialTolerance = 600;
 
-static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *output,
+static void deinterlace_twoframe_packed422_scanline_mmxext( uint8_t *output,
                                                             deinterlace_scanline_data_t *data,
                                                             int width )
 {
@@ -215,10 +215,10 @@ static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *outpu
     emms();
 }
 
-static void copy_scanline( unsigned char *output, unsigned char *m2,
-                           unsigned char *t1, unsigned char *m1,
-                           unsigned char *b1, unsigned char *t0,
-                           unsigned char *b0, int width )
+static void copy_scanline( uint8_t *output, uint8_t *m2,
+                           uint8_t *t1, uint8_t *m1,
+                           uint8_t *b1, uint8_t *t0,
+                           uint8_t *b0, int width )
 {
     blit_packed422_scanline( output, m2, width );
 }

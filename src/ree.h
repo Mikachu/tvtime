@@ -19,7 +19,7 @@
 #ifndef REE_H_INCLUDED
 #define REE_H_INCLUDED
 
-#include <inttypes.h>
+#include <stdint.h>
 
 /**
  * 'ree' is short for 'reet'.
@@ -85,6 +85,6 @@ int ree_is_audio_packet( ree_packet_t *pkt );
 /**
  * Decodes the given video packet into the given buffers.
  */
-void ree_decode_video_packet( ree_packet_t *pkt, unsigned char *data, int width, int height );
+void ree_decode_video_packet( ree_packet_t *pkt, uint8_t *data, int width, int height );
 
 #endif /* REE_H_INCLUDED */

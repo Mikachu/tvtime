@@ -578,7 +578,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 }
 
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
-                                              unsigned char *output,
+                                              uint8_t *output,
                                               int width, int xpos,
                                               int scanline )
 {

@@ -26,7 +26,7 @@
 
 struct credits_s
 {
-    unsigned char *data;
+    uint8_t *data;
     int *blanks;
     int width;
     int height;
@@ -78,7 +78,7 @@ credits_t *credits_new( const char *filename, int output_height )
     credits->height = pnginput_get_height( pngin );
     credits->stride = credits->width * 4;
     credits->curspeed = 0;
-    credits->data = (unsigned char *) malloc( credits->stride * credits->height );
+    credits->data = (uint8_t *) malloc( credits->stride * credits->height );
     credits->blanks = (int *) malloc( credits->height * sizeof( int ) );
     if( !credits->data || !credits->blanks ) {
         pnginput_delete( pngin );
@@ -87,8 +87,8 @@ credits_t *credits_new( const char *filename, int output_height )
     }
 
     for( i = 0; i < credits->height; i++ ) {
-        unsigned char *cur = credits->data + (i * credits->stride);
-        unsigned char *scanline = pnginput_get_scanline( pngin, i );
+        uint8_t *cur = credits->data + (i * credits->stride);
+        uint8_t *scanline = pnginput_get_scanline( pngin, i );
         int j;
 
         rgba32_to_packed4444_rec601_scanline( cur, scanline, credits->width );
@@ -128,14 +128,14 @@ void credits_advance_frame( credits_t *credits )
 }
 
 void credits_composite_packed422_scanline( credits_t *credits,
-                                           unsigned char *output,
+                                           uint8_t *output,
                                            int width, int xpos,
                                            int scanline )
 {
     int cur = ( (int) credits->vpos ) + scanline;
 
     if( cur >= 0 && cur < credits->height && !credits->blanks[ cur ] ) {
-        unsigned char *input = credits->data + (cur * credits->stride);
+        uint8_t *input = credits->data + (cur * credits->stride);
 
         if( xpos < 0 ) {
             width += xpos;

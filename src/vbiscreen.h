@@ -20,6 +20,8 @@
 #ifndef VBISCREEN_H_INCLUDED
 #define VBISCREEN_H_INCLUDED
 
+#include <stdint.h>
+
 typedef struct vbiscreen_s vbiscreen_t;
 
 vbiscreen_t *vbiscreen_new( int video_width, int video_height, 
@@ -38,7 +40,7 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs );
 void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 );
 int vbiscreen_active_on_scanline( vbiscreen_t *vs, int scanline );
 void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
-                                             unsigned char *output,
+                                             uint8_t *output,
                                              int width, int xpos, 
                                              int scanline );
 void vbiscreen_dump_screen_text( vbiscreen_t *vs );

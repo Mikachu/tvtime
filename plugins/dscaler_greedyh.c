@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "wine/driver.h"
@@ -43,7 +43,7 @@
 
 static DEINTERLACE_METHOD *di_greedyh;
 
-static void deinterlace_frame_di_greedyh( unsigned char *output,
+static void deinterlace_frame_di_greedyh( uint8_t *output,
                                            deinterlace_frame_data_t *data,
                                            int bottom_field, int width, int height )
 {

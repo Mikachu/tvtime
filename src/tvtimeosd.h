@@ -19,6 +19,8 @@
 #ifndef TVTIMEOSD_H_INCLUDED
 #define TVTIMEOSD_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -87,7 +89,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd );
  * is which scanline of the output frame this request is for.
  */
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
-                                              unsigned char *output,
+                                              uint8_t *output,
                                               int width, int xpos,
                                               int scanline );
 

@@ -46,7 +46,7 @@ struct vbidata_s
     int fd;
     vbiscreen_t *vs;
     tvtime_osd_t *osd;
-    unsigned char buf[ 65536 ];
+    uint8_t buf[ 65536 ];
     int wanttop;
     int wanttext;
 
@@ -127,13 +127,13 @@ int parityok( int n )
     return 1;
 }
 
-int decodebit(unsigned char *data, int threshold)
+int decodebit( uint8_t *data, int threshold )
 {
     return (data[0] > threshold);
 }
 
 
-int ccdecode(unsigned char *vbiline)
+int ccdecode( uint8_t *vbiline )
 {
     int max = 48, maxval = 128, minval = 255, i = 0, clk = 0, tmp = 0;
     int sample, packedbits = 0;
@@ -510,7 +510,7 @@ const int rows[] = {
 #define PAINT_ON    10
 
 
-int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
+int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
 {
     int w1, b1, b2;
 

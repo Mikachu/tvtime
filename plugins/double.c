@@ -19,17 +19,18 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline_double( unsigned char *output,
+static void deinterlace_scanline_double( uint8_t *output,
                                          deinterlace_scanline_data_t *data,
                                          int width )
 {
     blit_packed422_scanline( output, data->t0, width );
 }
 
-static void copy_scanline( unsigned char *output,
+static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {

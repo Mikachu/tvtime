@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <termio.h>
+#include <stdint.h>
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
@@ -118,26 +119,26 @@ const int scan_delay = 10;
 char *program_name = "tvtime";
 int dlevel = 3;
 
-static void build_colourbars( unsigned char *output, int width, int height )
+static void build_colourbars( uint8_t *output, int width, int height )
 {
-    unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
+    uint8_t *cb444 = (uint8_t *) malloc( width * height * 3 );
     int i;
     if( !cb444 ) { memset( output, 255, width * height * 2 ); return; }
 
     create_colourbars_packed444( cb444, width, height, width*3 );
     for( i = 0; i < height; i++ ) {
-        unsigned char *curout = output + (i * width * 2);
-        unsigned char *curin = cb444 + (i * width * 3);
+        uint8_t *curout = output + (i * width * 2);
+        uint8_t *curin = cb444 + (i * width * 3);
         cheap_packed444_to_packed422_scanline( curout, curin, width );
     }
 
     free( cb444 );
 }
 
-static void build_blue_frame( unsigned char *output, int width, int height )
+static void build_blue_frame( uint8_t *output, int width, int height )
 {
-    unsigned char bluergb[ 3 ];
-    unsigned char blueycbcr[ 3 ];
+    uint8_t bluergb[ 3 ];
+    uint8_t blueycbcr[ 3 ];
 
     bluergb[ 0 ] = 0;
     bluergb[ 1 ] = 0;
@@ -147,7 +148,7 @@ static void build_blue_frame( unsigned char *output, int width, int height )
                                     blueycbcr[ 1 ], blueycbcr[ 2 ] );
 }
 
-static void save_last_frame( unsigned char *saveframe, unsigned char *curframe,
+static void save_last_frame( uint8_t *saveframe, uint8_t *curframe,
                              int width, int height, int savestride, int curstride )
 {
     height /= 2;
@@ -165,9 +166,7 @@ static void save_last_frame( unsigned char *saveframe, unsigned char *curframe,
     saveframe += savestride;
 }
 
-static void crossfade_frame( unsigned char *output,
-                             unsigned char *src1,
-                             unsigned char *src2,
+static void crossfade_frame( uint8_t *output, uint8_t *src1, uint8_t *src2,
                              int width, int height, int outstride,
                              int src1stride, int src2stride, int pos )
 {
@@ -179,11 +178,11 @@ static void crossfade_frame( unsigned char *output,
     }
 }
 
-static void pngscreenshot( const char *filename, unsigned char *frame422,
+static void pngscreenshot( const char *filename, uint8_t *frame422,
                            int width, int height, int stride )
 {
     pngoutput_t *pngout = pngoutput_new( filename, width, height, 0, 0.45, 0 );
-    unsigned char *tempscanline = (unsigned char *) malloc( width * 3 );
+    uint8_t *tempscanline = (uint8_t *) malloc( width * 3 );
     int i;
 
     if( !tempscanline ) {
@@ -197,7 +196,7 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     }
 
     for( i = 0; i < height; i++ ) {
-        unsigned char *input422 = frame422 + (i * stride);
+        uint8_t *input422 = frame422 + (i * stride);
         packed422_to_packed444_rec601_scanline( tempscanline, input422, width );
         packed444_to_rgb24_rec601_scanline( tempscanline, tempscanline, width );
         pngoutput_scanline( pngout, tempscanline );
@@ -297,10 +296,10 @@ static int pulldown_copy = 0;
 static int did_copy_top = 0;
 static int last_fieldcount = 0;
 
-static void tvtime_do_pulldown_action( unsigned char *output,
-                                       unsigned char *curframe,
-                                       unsigned char *lastframe,
-                                       unsigned char *secondlastframe,
+static void tvtime_do_pulldown_action( uint8_t *output,
+                                       uint8_t *curframe,
+                                       uint8_t *lastframe,
+                                       uint8_t *secondlastframe,
                                        tvtime_osd_t *osd,
                                        console_t *con,
                                        vbiscreen_t *vs,
@@ -316,7 +315,7 @@ static void tvtime_do_pulldown_action( unsigned char *output,
     int i;
 
     for( i = 0; i < frame_height; i++ ) {
-        unsigned char *curoutput = output + (i * outstride);
+        uint8_t *curoutput = output + (i * outstride);
 
         if( filter && !filtered_cur && videofilter_active_on_scanline( filter, i ) ) {
             videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
@@ -349,10 +348,10 @@ static void tvtime_do_pulldown_action( unsigned char *output,
     filtered_cur = 1;
 }
 
-static void tvtime_build_deinterlaced_frame( unsigned char *output,
-                                             unsigned char *curframe,
-                                             unsigned char *lastframe,
-                                             unsigned char *secondlastframe,
+static void tvtime_build_deinterlaced_frame( uint8_t *output,
+                                             uint8_t *curframe,
+                                             uint8_t *lastframe,
+                                             uint8_t *secondlastframe,
                                              tvtime_osd_t *osd,
                                              console_t *con,
                                              vbiscreen_t *vs,
@@ -571,7 +570,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         curmethod->deinterlace_frame( output, &data, bottom_field, width, frame_height );
 
         for( i = 0; i < frame_height; i++ ) {
-            unsigned char *curoutput = output + (i * outstride);
+            uint8_t *curoutput = output + (i * outstride);
             if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
             if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
             if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
@@ -715,8 +714,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     filtered_cur = 1;
 }
 
-static void tvtime_build_interlaced_frame( unsigned char *output,
-                                           unsigned char *curframe,
+static void tvtime_build_interlaced_frame( uint8_t *output,
+                                           uint8_t *curframe,
                                            tvtime_osd_t *osd,
                                            console_t *con,
                                            vbiscreen_t *vs,
@@ -726,7 +725,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            int instride,
                                            int outstride )
 {
-    /* unsigned char tempscanline[ 768*2 ]; */
+    /* uint8_t tempscanline[ 768*2 ]; */
     int scanline = 0;
     int i;
 
@@ -766,8 +765,8 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 }
 
 
-static void tvtime_build_copied_field( unsigned char *output,
-                                       unsigned char *curframe,
+static void tvtime_build_copied_field( uint8_t *output,
+                                       uint8_t *curframe,
                                        tvtime_osd_t *osd,
                                        console_t *con,
                                        vbiscreen_t *vs,
@@ -845,13 +844,13 @@ int main( int argc, char **argv )
     int fieldsavailable = 0;
     int verbose;
     tvtime_osd_t *osd = 0;
-    unsigned char *colourbars;
-    unsigned char *lastframe = 0;
-    unsigned char *secondlastframe = 0;
-    unsigned char *saveframe = 0;
-    unsigned char *fadeframe = 0;
-    unsigned char *blueframe = 0;
-    unsigned char *curframe = 0;
+    uint8_t *colourbars;
+    uint8_t *lastframe = 0;
+    uint8_t *secondlastframe = 0;
+    uint8_t *saveframe = 0;
+    uint8_t *fadeframe = 0;
+    uint8_t *blueframe = 0;
+    uint8_t *curframe = 0;
     const char *tagline;
     int curframeid;
     int lastframeid;
@@ -1181,10 +1180,10 @@ int main( int argc, char **argv )
     }
 
     /* Build colourbars. */
-    colourbars = (unsigned char *) malloc( width * height * 2 );
-    saveframe = (unsigned char *) malloc( width * height * 2 );
-    fadeframe = (unsigned char *) malloc( width * height * 2 );
-    blueframe = (unsigned char *) malloc( width * height * 2 );
+    colourbars = (uint8_t *) malloc( width * height * 2 );
+    saveframe = (uint8_t *) malloc( width * height * 2 );
+    fadeframe = (uint8_t *) malloc( width * height * 2 );
+    blueframe = (uint8_t *) malloc( width * height * 2 );
     if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
         fprintf( stderr, "tvtime: Can't allocate extra frame storage memory.\n" );
         return 1;

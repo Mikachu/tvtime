@@ -22,7 +22,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -35,13 +35,13 @@
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline_linear_blend( unsigned char *output,
+static void deinterlace_scanline_linear_blend( uint8_t *output,
                                                deinterlace_scanline_data_t *data,
                                                int width )
 {
-    unsigned char *t0 = data->t0;
-    unsigned char *b0 = data->b0;
-    unsigned char *m1 = data->m1;
+    uint8_t *t0 = data->t0;
+    uint8_t *b0 = data->b0;
+    uint8_t *m1 = data->m1;
     int i;
 
     // Get width in bytes.
@@ -92,13 +92,13 @@ static void deinterlace_scanline_linear_blend( unsigned char *output,
     emms();
 }
 
-static void deinterlace_scanline_linear_blend2( unsigned char *output,
+static void deinterlace_scanline_linear_blend2( uint8_t *output,
                                                 deinterlace_scanline_data_t *data,
                                                 int width )
 {
-    unsigned char *m0 = data->m0;
-    unsigned char *t1 = data->t1;
-    unsigned char *b1 = data->b1;
+    uint8_t *m0 = data->m0;
+    uint8_t *t1 = data->t1;
+    uint8_t *b1 = data->b1;
     int i;
 
     // Get width in bytes.

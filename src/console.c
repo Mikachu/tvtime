@@ -610,7 +610,7 @@ void console_setup_pipe( console_t *con, const char *pipename )
 }
 
 void console_composite_packed422_scanline( console_t *con, 
-                                           unsigned char *output,
+                                           uint8_t *output,
                                            int width, int xpos, int scanline )
 {
     int i;

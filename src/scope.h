@@ -23,10 +23,9 @@ typedef struct scope_s scope_t;
 
 scope_t *scope_new( int width, int height );
 void scope_delete( scope_t *scope );
-void scope_set_scanline( scope_t *scope, unsigned char *scanline, int id );
+void scope_set_scanline( scope_t *scope, uint8_t *scanline, int id );
 int scope_active_on_scanline( scope_t *scope, int scanline );
-void scope_composite_packed422_scanline( scope_t *scope,
-                                         unsigned char *output,
+void scope_composite_packed422_scanline( scope_t *scope, uint8_t *output,
                                          int width, int xpos, int scanline );
 
 

@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -34,9 +34,9 @@ struct rvrreader_s
     ree_packet_t *pkt;
     int dataread;
     int curframe;
-    unsigned char *framebuf[ 3 ];
+    uint8_t *framebuf[ 3 ];
     int curdecoded;
-    unsigned char *decoded[ 3 ];
+    uint8_t *decoded[ 3 ];
 };
 
 rvrreader_t *rvrreader_new( const char *filename )
@@ -78,9 +78,9 @@ rvrreader_t *rvrreader_new( const char *filename )
 
     width = rvrreader_get_width( reader );
     height = rvrreader_get_height( reader );
-    reader->decoded[ 0 ] = (unsigned char *) malloc( width * height * 2 );
-    reader->decoded[ 1 ] = (unsigned char *) malloc( width * height * 2 );
-    reader->decoded[ 2 ] = (unsigned char *) malloc( width * height * 2 );
+    reader->decoded[ 0 ] = (uint8_t *) malloc( width * height * 2 );
+    reader->decoded[ 1 ] = (uint8_t *) malloc( width * height * 2 );
+    reader->decoded[ 2 ] = (uint8_t *) malloc( width * height * 2 );
     reader->curdecoded = 0;
 
     if( !reader->decoded[ 0 ] || !reader->decoded[ 1 ] || !reader->decoded[ 2 ] ) {
@@ -161,17 +161,17 @@ int rvrreader_next_frame( rvrreader_t *reader )
     return 0;
 }
 
-unsigned char *rvrreader_get_curframe( rvrreader_t *reader )
+uint8_t *rvrreader_get_curframe( rvrreader_t *reader )
 {
     return reader->framebuf[ 0 ];
 }
 
-unsigned char *rvrreader_get_lastframe( rvrreader_t *reader )
+uint8_t *rvrreader_get_lastframe( rvrreader_t *reader )
 {
     return reader->framebuf[ 1 ];
 }
 
-unsigned char *rvrreader_get_secondlastframe( rvrreader_t *reader )
+uint8_t *rvrreader_get_secondlastframe( rvrreader_t *reader )
 {
     return reader->framebuf[ 2 ];
 }

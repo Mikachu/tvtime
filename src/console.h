@@ -19,6 +19,8 @@
 #ifndef CONSOLE_H_INCLUDED
 #define CONSOLE_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,8 +41,7 @@ void console_scroll_n( console_t *con, int n );
 void console_setup_pipe( console_t *con, const char *pipename );
 int console_scanf( console_t *con, char *format, ... );
 void console_pipe_printf( console_t *con, char * format, ... );
-void console_composite_packed422_scanline( console_t *con, 
-                                           unsigned char *output,
+void console_composite_packed422_scanline( console_t *con, uint8_t *output,
                                            int width, int xpos, int scanline );
 
 #ifdef __cplusplus

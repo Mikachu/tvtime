@@ -19,6 +19,7 @@
 #ifndef OUTPUTAPI_H_INCLUDED
 #define OUTPUTAPI_H_INCLUDED
 
+#include <stdint.h>
 #include "input.h"
 
 typedef struct output_api_s
@@ -29,7 +30,7 @@ typedef struct output_api_s
 
     /* Returns pointers to the next output buffer. */
     void (* lock_output_buffer)( void );
-    unsigned char *(* get_output_buffer)( void );
+    uint8_t *(* get_output_buffer)( void );
     int (* get_output_stride)( void );
     void (* unlock_output_buffer)( void );
 

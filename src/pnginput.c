@@ -119,7 +119,7 @@ void pnginput_delete( pnginput_t *pnginput )
     free( pnginput );
 }
 
-unsigned char *pnginput_get_scanline( pnginput_t *pnginput, int num )
+uint8_t *pnginput_get_scanline( pnginput_t *pnginput, int num )
 {
     return png_get_rows( pnginput->png_ptr, pnginput->info_ptr )[ num ];
 }

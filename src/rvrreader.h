@@ -19,6 +19,7 @@
 #ifndef RVRREADER_H_INCLUDED
 #define RVRREADER_H_INCLUDED
 
+#include <stdint.h>
 #include <ree.h>
 
 typedef struct rvrreader_s rvrreader_t;
@@ -32,8 +33,8 @@ int rvrreader_get_height( rvrreader_t *reader );
 
 int rvrreader_next_frame( rvrreader_t *reader );
 
-unsigned char *rvrreader_get_curframe( rvrreader_t *reader );
-unsigned char *rvrreader_get_lastframe( rvrreader_t *reader );
-unsigned char *rvrreader_get_secondlastframe( rvrreader_t *reader );
+uint8_t *rvrreader_get_curframe( rvrreader_t *reader );
+uint8_t *rvrreader_get_lastframe( rvrreader_t *reader );
+uint8_t *rvrreader_get_secondlastframe( rvrreader_t *reader );
 
 #endif /* RVRREADER_H_INCLUDED */

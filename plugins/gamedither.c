@@ -17,17 +17,18 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline_past_linear_interp( unsigned char *output,
+static void deinterlace_scanline_past_linear_interp( uint8_t *output,
                                                      deinterlace_scanline_data_t *data,
                                                      int width )
 {
     interpolate_packed422_scanline( output, data->t0, data->m1, width );
 }
 
-static void deinterlace_scanline_past_linear_copy( unsigned char *output,
+static void deinterlace_scanline_past_linear_copy( uint8_t *output,
                                                    deinterlace_scanline_data_t *data,
                                                    int width )
 {

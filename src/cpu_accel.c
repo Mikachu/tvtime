@@ -25,8 +25,7 @@
 # include "config.h"
 #endif
 
-#include <inttypes.h>
-
+#include <stdint.h>
 #include "mm_accel.h"
 
 #ifdef ARCH_X86

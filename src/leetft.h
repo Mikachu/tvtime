@@ -19,6 +19,12 @@
 #ifndef LEETFT_H_INCLUDED
 #define LEETFT_H_INCLUDED
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Simple font object.
  * 
@@ -63,7 +69,7 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points );
 /**
  * Renders a given string with this font to the given buffer.
  */
-void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
+void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
                      int subpix_pos, int *width, int *height, int outsize );
 
 /**
@@ -101,6 +107,9 @@ int ft_string_get_stride( ft_string_t *efs );
  * Returns the buffer.  The buffer is a 1-byte-per-pixel alphamap with
  * values from 0-255.
  */
-unsigned char *ft_string_get_buffer( ft_string_t *efs );
+uint8_t *ft_string_get_buffer( ft_string_t *efs );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* LEETFT_H_INCLUDED */

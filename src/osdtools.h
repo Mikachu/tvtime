@@ -19,6 +19,8 @@
 #ifndef OSDTOOLS_H_INCLUDED
 #define OSDTOOLS_H_INCLUDED
 
+#include <stdint.h>
+
 /**
  * This file defines some simple primitives needed for the on screen
  * display.  Each primitive can composite itself onto a packed 4:2:2
@@ -82,8 +84,8 @@ void osd_string_advance_frame( osd_string_t *osds );
  * the same.
  */
 void osd_string_composite_packed422_scanline( osd_string_t *osds,
-                                              unsigned char *output,
-                                              unsigned char *background,
+                                              uint8_t *output,
+                                              uint8_t *background,
                                               int width, int xpos,
                                               int scanline );
 
@@ -99,8 +101,8 @@ int osd_databars_get_frames_left( osd_databars_t *osdd );
 void osd_databars_prerender( osd_databars_t *osdd, int num_filled );
 void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames );
 void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
-                                                unsigned char *output,
-                                                unsigned char *background,
+                                                uint8_t *output,
+                                                uint8_t *background,
                                                 int width );
 
 osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
@@ -114,12 +116,12 @@ int osd_shape_visible( osd_shape_t *osds );
 void osd_shape_set_timeout( osd_shape_t *osds, int timeout );
 void osd_shape_advance_frame( osd_shape_t *osds );
 void osd_shape_composite_packed422( osd_shape_t *osds, 
-                                    unsigned char *output,
+                                    uint8_t *output,
                                     int width, int height, int stride,
                                     int xpos, int ypos );
 void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
-                                             unsigned char *output,
-                                             unsigned char *background,
+                                             uint8_t *output,
+                                             uint8_t *background,
                                              int width, int xpos,
                                              int scanline );
 
@@ -134,8 +136,8 @@ void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
 int osd_graphic_visible( osd_graphic_t *osdg );
 void osd_graphic_advance_frame( osd_graphic_t *osdg );
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
-                                               unsigned char *output,
-                                               unsigned char *background,
+                                               uint8_t *output,
+                                               uint8_t *background,
                                                int width, int xpos,
                                                int scanline );
 
@@ -143,7 +145,7 @@ osd_fixedfont_t *osd_fixedfont_new( const char *filename, double pixel_aspect );
 void osd_fixedfont_delete( osd_fixedfont_t *fixed );
 int osd_fixedfont_get_char_width( osd_fixedfont_t *fixed );
 int osd_fixedfont_get_char_height( osd_fixedfont_t *fixed );
-void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, unsigned char *output, int width,
+void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, uint8_t *output, int width,
                                    int scanline, char c, unsigned int fg, unsigned int bg, int alpha );
 
 #endif /* OSDTOOLS_H_INCLUDED */

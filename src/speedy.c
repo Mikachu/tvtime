@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <ctype.h>
 
@@ -48,51 +48,50 @@
 #define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
 /* Function pointer definitions. */
-void (*interpolate_packed422_scanline)( unsigned char *output,
-                                        unsigned char *top,
-                                        unsigned char *bot, int width );
-void (*blit_colour_packed422_scanline)( unsigned char *output,
+void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
+                                        uint8_t *bot, int width );
+void (*blit_colour_packed422_scanline)( uint8_t *output,
                                         int width, int y, int cb, int cr );
-void (*blit_colour_packed4444_scanline)( unsigned char *output,
+void (*blit_colour_packed4444_scanline)( uint8_t *output,
                                          int width, int alpha, int luma,
                                          int cb, int cr );
-void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
-void (*composite_packed4444_to_packed422_scanline)( unsigned char *output, unsigned char *input,
-                                                    unsigned char *foreground, int width );
-void (*composite_packed4444_alpha_to_packed422_scanline)( unsigned char *output,
-                                                          unsigned char *input,
-                                                          unsigned char *foreground,
+void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src, int width );
+void (*composite_packed4444_to_packed422_scanline)( uint8_t *output, uint8_t *input,
+                                                    uint8_t *foreground, int width );
+void (*composite_packed4444_alpha_to_packed422_scanline)( uint8_t *output,
+                                                          uint8_t *input,
+                                                          uint8_t *foreground,
                                                           int width, int alpha );
-void (*composite_alphamask_to_packed4444_scanline)( unsigned char *output,
-                                                unsigned char *input,
-                                                unsigned char *mask, int width,
+void (*composite_alphamask_to_packed4444_scanline)( uint8_t *output,
+                                                uint8_t *input,
+                                                uint8_t *mask, int width,
                                                 int textluma, int textcb,
                                                 int textcr );
-void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
-                                                       unsigned char *input,
-                                                       unsigned char *mask, int width,
+void (*composite_alphamask_alpha_to_packed4444_scanline)( uint8_t *output,
+                                                       uint8_t *input,
+                                                       uint8_t *mask, int width,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
-void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
-void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
-                                  unsigned char *src2, int width, int pos );
-void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int width );
-void (*filter_luma_14641_packed422_inplace_scanline)( unsigned char *data, int width );
-unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
-unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
-                                                unsigned char *bot, int width );
-void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width );
-void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
-void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
+void (*premultiply_packed4444_scanline)( uint8_t *output, uint8_t *input, int width );
+void (*blend_packed422_scanline)( uint8_t *output, uint8_t *src1,
+                                  uint8_t *src2, int width, int pos );
+void (*filter_luma_121_packed422_inplace_scanline)( uint8_t *data, int width );
+void (*filter_luma_14641_packed422_inplace_scanline)( uint8_t *data, int width );
+unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *old, int width );
+unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
+                                                uint8_t *bot, int width );
+void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
+void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
+void (*halfmirror_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
-void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
-                                 unsigned char *new, int os, int ns );
-void (*a8_subpix_blit_scanline)( unsigned char *output, unsigned char *input,
+void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
+                                 uint8_t *new, int os, int ns );
+void (*a8_subpix_blit_scanline)( uint8_t *output, uint8_t *input,
                                  int lasta, int startpos, int width );
-void (*quarter_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *one,
-                                                  unsigned char *three, int width );
-void (*subpix_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *top,
-                                                 unsigned char *bot, int subpixpos, int width );
+void (*quarter_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *one,
+                                                  uint8_t *three, int width );
+void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
+                                                 uint8_t *bot, int subpixpos, int width );
 
 
 static uint64_t speedy_time = 0;
@@ -112,7 +111,7 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
     return ((temp + (temp >> 8)) >> 8);
 }
 
-static inline __attribute__ ((always_inline,const)) unsigned char clip255( int x )
+static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
 {
     if( x > 255 ) {
         return 255;
@@ -125,8 +124,8 @@ static inline __attribute__ ((always_inline,const)) unsigned char clip255( int x
 
 unsigned long CombJaggieThreshold = 73;
 
-unsigned int comb_factor_packed422_scanline_mmx( unsigned char *top, unsigned char *mid,
-                                                 unsigned char *bot, int width )
+unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
+                                                 uint8_t *bot, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     const mmx_t qwOnes = { 0x0001000100010001ULL };
@@ -211,7 +210,7 @@ unsigned int comb_factor_packed422_scanline_mmx( unsigned char *top, unsigned ch
 
 static unsigned long BitShift = 6;
 
-unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char *old, int width )
+unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
 
@@ -234,7 +233,7 @@ unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char
     return ret;
 }
 
-unsigned int diff_factor_packed422_scanline_test_c( unsigned char *cur, unsigned char *old, int width )
+unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
 
@@ -258,7 +257,7 @@ unsigned int diff_factor_packed422_scanline_test_c( unsigned char *cur, unsigned
 }
 
 
-unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned char *old, int width )
+unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     unsigned int temp1, temp2;
@@ -301,13 +300,13 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
 
 #define ABS(a) (((a) < 0)?-(a):(a))
 
-void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
-                                  unsigned char *new, int os, int ns )
+void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
+                                  uint8_t *new, int os, int ns )
 {
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     short out[ 24 ]; /* Output buffer for the partial metrics from the mmx code. */
-    unsigned char *outdata = (unsigned char *) out;
-    unsigned char *oldp, *newp;
+    uint8_t *outdata = (uint8_t *) out;
+    uint8_t *oldp, *newp;
     int i;
 
     SPEEDY_START();
@@ -448,11 +447,11 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
     SPEEDY_END();
 }
 
-void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
-                                unsigned char *new, int os, int ns )
+void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
+                                uint8_t *new, int os, int ns )
 {
     int x, y, e=0, o=0, s=0, p=0, t=0;
-    unsigned char *oldp, *newp;
+    uint8_t *oldp, *newp;
 
     SPEEDY_START();
     m->s = m->p = m->t = 0;
@@ -481,8 +480,7 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
 
 
 
-void cheap_packed444_to_packed422_scanline( unsigned char *output,
-                                            unsigned char *input, int width )
+void cheap_packed444_to_packed422_scanline( uint8_t *output, uint8_t *input, int width )
 {
     SPEEDY_START();
     width /= 2;
@@ -497,8 +495,7 @@ void cheap_packed444_to_packed422_scanline( unsigned char *output,
     SPEEDY_END();
 }
 
-void cheap_packed422_to_packed444_scanline( unsigned char *output,
-                                            unsigned char *input, int width )
+void cheap_packed422_to_packed444_scanline( uint8_t *output, uint8_t *input, int width )
 {
     SPEEDY_START();
     width /= 2;
@@ -520,7 +517,7 @@ void cheap_packed422_to_packed444_scanline( unsigned char *output,
  *
  * [-1 3 -6 12 -24 80 80 -24 12 -6 3 -1]
  */
-void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char *src, int width )
+void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int width )
 {
     int i;
 
@@ -556,7 +553,7 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
     SPEEDY_END();
 }
 
-void kill_chroma_packed422_inplace_scanline_mmx( unsigned char *data, int width )
+void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
 {
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     const mmx_t nullchroma = { 0x8000800080008000ULL };
@@ -581,7 +578,7 @@ void kill_chroma_packed422_inplace_scanline_mmx( unsigned char *data, int width 
     SPEEDY_END();
 }
 
-void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
+void kill_chroma_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     SPEEDY_START();
     while( width-- ) {
@@ -595,10 +592,10 @@ void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
 // this duplicates alternate lines in alternate frames to highlight or mute
 // the effects of chroma crawl. it is not a solution or proper filter. it's
 // only for testing.
-void testing_packed422_inplace_scanline_c( unsigned char *data, int width, int scanline )
+void testing_packed422_inplace_scanline_c( uint8_t *data, int width, int scanline )
 {
     volatile static int topbottom = 0;
-    static unsigned char scanbuffer[2048];
+    static uint8_t scanbuffer[2048];
 
     SPEEDY_START();
     if( scanline <= 1 ) {
@@ -617,7 +614,7 @@ void testing_packed422_inplace_scanline_c( unsigned char *data, int width, int s
 }
 */
 
-void mirror_packed422_inplace_scanline_c( unsigned char *data, int width )
+void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x, tmp1, tmp2;
     int width2 = width*2;
@@ -634,7 +631,7 @@ void mirror_packed422_inplace_scanline_c( unsigned char *data, int width )
     SPEEDY_END();
 }
 
-void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width )
+void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x;
 
@@ -646,7 +643,7 @@ void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width )
     SPEEDY_END();
 }
 
-void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width )
+void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int r1 = 0;
     int r2 = 0;
@@ -664,7 +661,7 @@ void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int widt
     SPEEDY_END();
 }
 
-void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width )
+void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int r1 = 0;
     int r2 = 0;
@@ -686,9 +683,8 @@ void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int wi
     SPEEDY_END();
 }
 
-void interpolate_packed422_scanline_c( unsigned char *output,
-                                       unsigned char *top,
-                                       unsigned char *bot, int width )
+void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
+                                       uint8_t *bot, int width )
 {
     int i;
 
@@ -702,9 +698,8 @@ void interpolate_packed422_scanline_c( unsigned char *output,
 }
 
 
-void interpolate_packed422_scanline_mmxext( unsigned char *output,
-                                            unsigned char *top,
-                                            unsigned char *bot, int width )
+void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
+                                            uint8_t *bot, int width )
 {
     int i;
 
@@ -754,8 +749,7 @@ void interpolate_packed422_scanline_mmxext( unsigned char *output,
     SPEEDY_END();
 }
 
-void blit_colour_packed422_scanline_c( unsigned char *output,
-                                       int width, int y, int cb, int cr )
+void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
 {
     unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
     unsigned int *o = (unsigned int *) output;
@@ -769,8 +763,7 @@ void blit_colour_packed422_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void blit_colour_packed422_scanline_mmxext( unsigned char *output,
-                                            int width, int y, int cb, int cr )
+void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, int cb, int cr )
 {
     unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
@@ -812,7 +805,7 @@ void blit_colour_packed422_scanline_mmxext( unsigned char *output,
     SPEEDY_END();
 }
 
-void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
+void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
                                         int alpha, int luma, int cb, int cr )
 {
     int j;
@@ -829,7 +822,7 @@ void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
     SPEEDY_END();
 }
 
-void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
+void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr )
 {
@@ -913,7 +906,7 @@ __asm__ __volatile__(
 /**
  * Scanlines are assumed to be approximately 2048 bytes.
  */
-void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned char *src, int width )
+void blit_packed422_scanline_mmxext_billy( uint8_t *dest, const uint8_t *src, int width )
 {
     SPEEDY_START();
 
@@ -952,23 +945,22 @@ void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned c
 }
 
 
-void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width )
+void blit_packed422_scanline_i386_linux( uint8_t *dest, const uint8_t *src, int width )
 {
     SPEEDY_START();
     if( dest != src ) __memcpy( dest, src, width*2 );
     SPEEDY_END();
 }
 
-void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width )
+void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
 {
     SPEEDY_START();
     if( dest != src ) memcpy( dest, src, width*2 );
     SPEEDY_END();
 }
 
-void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
-                                                         unsigned char *input,
-                                                         unsigned char *foreground, int width, int alpha )
+void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
+                                                         uint8_t *foreground, int width, int alpha )
 {
     int i;
 
@@ -1027,9 +1019,9 @@ void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *output,
-                                                              unsigned char *input,
-                                                              unsigned char *foreground,
+void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
+                                                              uint8_t *input,
+                                                              uint8_t *foreground,
                                                               int width, int alpha )
 {
     const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
@@ -1129,9 +1121,8 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
     SPEEDY_END();
 }
 
-void composite_packed4444_to_packed422_scanline_c( unsigned char *output,
-                                                   unsigned char *input,
-                                                   unsigned char *foreground, int width )
+void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
+                                                   uint8_t *foreground, int width )
 {
     int i;
     SPEEDY_START();
@@ -1172,9 +1163,8 @@ void composite_packed4444_to_packed422_scanline_c( unsigned char *output,
 }
 
 
-void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
-                                                        unsigned char *input,
-                                                        unsigned char *foreground, int width )
+void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t *input,
+                                                        uint8_t *foreground, int width )
 {
     const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
     const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
@@ -1276,9 +1266,9 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
  *     = B + a*(textluma - B)
  *   Da = (1 - a)*b + a
  */
-void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
-                                                   unsigned char *input,
-                                                   unsigned char *mask,
+void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
+                                                   uint8_t *input,
+                                                   uint8_t *mask,
                                                    int width,
                                                    int textluma, int textcb,
                                                    int textcr )
@@ -1310,9 +1300,9 @@ void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
-                                                        unsigned char *input,
-                                                        unsigned char *mask,
+void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
+                                                        uint8_t *input,
+                                                        uint8_t *mask,
                                                         int width,
                                                         int textluma, int textcb,
                                                         int textcr )
@@ -1409,9 +1399,9 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
     SPEEDY_END();
 }
 
-void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
-                                                       unsigned char *input,
-                                                       unsigned char *mask, int width,
+void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
+                                                       uint8_t *input,
+                                                       uint8_t *mask, int width,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha )
 {
@@ -1447,7 +1437,7 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width )
+void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     SPEEDY_START();
 
@@ -1466,7 +1456,7 @@ void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *in
     SPEEDY_END();
 }
 
-void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width )
+void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, int width )
 {
     const mmx_t round  = { 0x0080008000800080ULL };
     const mmx_t alpha  = { 0x00000000000000ffULL };
@@ -1506,8 +1496,8 @@ void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned cha
     SPEEDY_END();
 }
 
-void blend_packed422_scanline_c( unsigned char *output, unsigned char *src1,
-                                 unsigned char *src2, int width, int pos )
+void blend_packed422_scanline_c( uint8_t *output, uint8_t *src1,
+                                 uint8_t *src2, int width, int pos )
 {
     if( pos == 0 ) {
         blit_packed422_scanline( output, src1, width );
@@ -1523,8 +1513,8 @@ void blend_packed422_scanline_c( unsigned char *output, unsigned char *src1,
     }
 }
 
-void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1,
-                                      unsigned char *src2, int width, int pos )
+void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
+                                      uint8_t *src2, int width, int pos )
 {
     if( pos <= 0 ) {
         blit_packed422_scanline( output, src1, width );
@@ -1569,8 +1559,8 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
     }
 }
 
-void quarter_blit_vertical_packed422_scanline_mmxext( unsigned char *output, unsigned char *one,
-                                                      unsigned char *three, int width )
+void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *one,
+                                                      uint8_t *three, int width )
 {
     int i;
 
@@ -1627,8 +1617,8 @@ void quarter_blit_vertical_packed422_scanline_mmxext( unsigned char *output, uns
 }
 
 
-void quarter_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *one,
-                                                 unsigned char *three, int width )
+void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *one,
+                                                 uint8_t *three, int width )
 {
     SPEEDY_START();
     width *= 2;
@@ -1640,8 +1630,8 @@ void quarter_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned
     SPEEDY_END();
 }
 
-void subpix_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *top,
-                                                unsigned char *bot, int subpixpos, int width )
+void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
+                                                uint8_t *bot, int subpixpos, int width )
 {
     if( subpixpos == 32768 ) {
         interpolate_packed422_scanline( output, top, bot, width );
@@ -1662,7 +1652,7 @@ void subpix_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned 
     }
 }
 
-void a8_subpix_blit_scanline_c( unsigned char *output, unsigned char *input,
+void a8_subpix_blit_scanline_c( uint8_t *output, uint8_t *input,
                                 int lasta, int startpos, int width )
 {
     int pos = 0xffff - (startpos & 0xffff);

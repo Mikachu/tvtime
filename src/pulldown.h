@@ -19,6 +19,7 @@
 #ifndef PULLDOWN_H_INCLUDED
 #define PULLDOWN_H_INCLUDED
 
+#include <stdint.h>
 #include "speedy.h"
 
 /**
@@ -49,6 +50,6 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak, pulldown_met
                                       pulldown_metrics_t *new_relative, pulldown_metrics_t *new_mean );
 
 void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
-                                  unsigned char *old, unsigned char *new, int w, int h, int os, int ns );
+                                  uint8_t *old, uint8_t *new, int w, int h, int os, int ns );
 
 #endif /* PULLDOWN_H_INCLUDED */

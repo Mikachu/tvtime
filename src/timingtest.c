@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <sys/time.h>
 #include <string.h>
 #include "rtctimer.h"
@@ -71,11 +71,11 @@ const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
 int main( int argc, char **argv )
 {
-    unsigned char *source422packed;
-    unsigned char *source422packed2;
-    unsigned char *source444packed;
-    unsigned char *dest422packed;
-    unsigned char *dest444packed;
+    uint8_t *source422packed;
+    uint8_t *source422packed2;
+    uint8_t *source444packed;
+    uint8_t *dest422packed;
+    uint8_t *dest444packed;
     ft_font_t *font = 0;
     ft_string_t *fts = 0;
     unsigned int datasize = 0;
@@ -132,11 +132,11 @@ int main( int argc, char **argv )
     /* Always use the same random seed. */
     srandom( seed );
 
-    source422packed = (unsigned char *) malloc( width * height * 2 );
-    source422packed2 = (unsigned char *) malloc( width * height * 2 );
-    source444packed = (unsigned char *) malloc( width * height * 3 );
-    dest422packed = (unsigned char *) malloc( width * height * 2 );
-    dest444packed = (unsigned char *) malloc( width * height * 3 );
+    source422packed = (uint8_t *) malloc( width * height * 2 );
+    source422packed2 = (uint8_t *) malloc( width * height * 2 );
+    source444packed = (uint8_t *) malloc( width * height * 3 );
+    dest422packed = (uint8_t *) malloc( width * height * 2 );
+    dest444packed = (uint8_t *) malloc( width * height * 3 );
 
     if( !source422packed || !source422packed2 || !dest422packed || !dest444packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );

@@ -20,7 +20,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -36,7 +36,7 @@
 static int GreedyTwoFrameThreshold = 4;
 static int GreedyTwoFrameThreshold2 = 8;
 
-static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char *output,
+static void deinterlace_greedytwoframe_packed422_scanline_mmxext( uint8_t *output,
                                                                   deinterlace_scanline_data_t *data,
                                                                   int width )
 {
@@ -44,12 +44,12 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
     const mmx_t DwordOne = { 0x0000000100000001ULL };    
     const mmx_t DwordTwo = { 0x0000000200000002ULL };    
     mmx_t qwGreedyTwoFrameThreshold;
-    unsigned char *m0 = data->m0;
-    unsigned char *t1 = data->t1;
-    unsigned char *b1 = data->b1;
-    unsigned char *m2 = data->m2;
-    unsigned char *t3 = data->t1;
-    unsigned char *b3 = data->b1;
+    uint8_t *m0 = data->m0;
+    uint8_t *t1 = data->t1;
+    uint8_t *b1 = data->b1;
+    uint8_t *m2 = data->m2;
+    uint8_t *t3 = data->t1;
+    uint8_t *b3 = data->b1;
 
     qwGreedyTwoFrameThreshold.b[ 0 ] = GreedyTwoFrameThreshold;
     qwGreedyTwoFrameThreshold.b[ 1 ] = GreedyTwoFrameThreshold2;
@@ -144,7 +144,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
     emms();
 }
 
-static void copy_scanline( unsigned char *output,
+static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {

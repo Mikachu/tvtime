@@ -22,7 +22,7 @@
 #include "speedy.h"
 #include "videotools.h"
 
-static inline __attribute__ ((always_inline,const)) unsigned char clip255( int x )
+static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
 {
     if( x > 255 ) {
         return 255;
@@ -46,7 +46,7 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
     return ((temp + (temp >> 8)) >> 8);
 }
 
-void blit_colour_packed4444( unsigned char *output, int width, int height,
+void blit_colour_packed4444( uint8_t *output, int width, int height,
                              int stride, int alpha, int luma, int cb, int cr )
 {
     int i;
@@ -57,7 +57,7 @@ void blit_colour_packed4444( unsigned char *output, int width, int height,
     }
 }
 
-void blit_colour_packed422( unsigned char *output, int width, int height,
+void blit_colour_packed422( uint8_t *output, int width, int height,
                             int stride, int luma, int cb, int cr )
 {
     int i;
@@ -68,9 +68,9 @@ void blit_colour_packed422( unsigned char *output, int width, int height,
     }
 }
 
-void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
+void composite_alphamask_to_packed4444( uint8_t *output, int owidth,
                                         int oheight, int ostride,
-                                        unsigned char *mask, int mwidth,
+                                        uint8_t *mask, int mwidth,
                                         int mheight, int mstride,
                                         int luma, int cb, int cr,
                                         int xpos, int ypos )
@@ -115,9 +115,9 @@ void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
     }
 }
 
-void composite_alphamask_alpha_to_packed4444( unsigned char *output, int owidth,
+void composite_alphamask_alpha_to_packed4444( uint8_t *output, int owidth,
                                               int oheight, int ostride,
-                                              unsigned char *mask, int mwidth,
+                                              uint8_t *mask, int mwidth,
                                               int mheight, int mstride,
                                               int luma, int cb, int cr, int alpha,
                                               int xpos, int ypos )
@@ -162,9 +162,9 @@ void composite_alphamask_alpha_to_packed4444( unsigned char *output, int owidth,
     }
 }
 
-void composite_packed4444_to_packed422( unsigned char *output, int owidth,
+void composite_packed4444_to_packed422( uint8_t *output, int owidth,
                                         int oheight, int ostride,
-                                        unsigned char *foreground, int fwidth,
+                                        uint8_t *foreground, int fwidth,
                                         int fheight, int fstride,
                                         int xpos, int ypos )
 {
@@ -207,10 +207,10 @@ void composite_packed4444_to_packed422( unsigned char *output, int owidth,
     }
 }
 
-void composite_packed4444_alpha_to_packed422( unsigned char *output,
+void composite_packed4444_alpha_to_packed422( uint8_t *output,
                                               int owidth, int oheight,
                                               int ostride,
-                                              unsigned char *foreground,
+                                              uint8_t *foreground,
                                               int fwidth, int fheight,
                                               int fstride,
                                               int xpos, int ypos, int alpha )
@@ -257,8 +257,8 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output,
 /**
  * Sub-pixel data bar renderer.  There are 128 bars.
  */
-void composite_bars_packed4444_scanline( unsigned char *output,
-                                         unsigned char *background, int width,
+void composite_bars_packed4444_scanline( uint8_t *output,
+                                         uint8_t *background, int width,
                                          int a, int luma, int cb, int cr,
                                          int percentage )
 {
@@ -278,8 +278,8 @@ void composite_bars_packed4444_scanline( unsigned char *output,
         int j;
 
         for( j = pixstart; j <= pixend; j++ ) {
-            unsigned char *curout = output + (j*4);
-            unsigned char *curin = background + (j*4);
+            uint8_t *curout = output + (j*4);
+            uint8_t *curin = background + (j*4);
             int curstart = j * 256;
             int curend = curstart + 256;
             int alpha;
@@ -436,8 +436,7 @@ static void init_YCbCr_to_RGB_tables(void)
   conv_YR_inited = 1;
 }
 
-void rgb24_to_packed444_rec601_scanline( unsigned char *output,
-                                         unsigned char *input, int width )
+void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
 
@@ -454,8 +453,7 @@ void rgb24_to_packed444_rec601_scanline( unsigned char *output,
     }
 }
 
-void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
-                                           unsigned char *input, int width )
+void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
 
@@ -474,8 +472,7 @@ void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
     }
 }
 
-void packed444_to_rgb24_rec601_scanline( unsigned char *output,
-                                         unsigned char *input, int width )
+void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_YR_inited ) init_YCbCr_to_RGB_tables();
 
@@ -511,8 +508,7 @@ void packed444_to_rgb24_rec601_scanline( unsigned char *output,
  * B-Y' = -0.299*R' - 0.587*G' + 0.886*B'
  * R-Y' =  0.701*R' - 0.587*G' - 0.114*B'
  */
-void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
-                                                   unsigned char *input, int width )
+void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width )
 {
     while( width-- ) {
         double yp = (((double) input[ 0 ]) - 16.0) / 255.0;
@@ -558,7 +554,7 @@ void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
 /* 100% magenta */
 /* 100% red     */
 /* 100% blue    */
-static unsigned char rainbowRGB[] = {
+static uint8_t rainbowRGB[] = {
   255, 255, 255,
   255, 255,   0,
     0, 255, 255,
@@ -566,7 +562,7 @@ static unsigned char rainbowRGB[] = {
   255,   0, 255,
   255,   0,   0,
     0,   0, 255 };
-static unsigned char rainbowYCbCr[ 21 ];
+static uint8_t rainbowYCbCr[ 21 ];
 
 
 /* 100% blue    */
@@ -576,7 +572,7 @@ static unsigned char rainbowYCbCr[ 21 ];
 /* 100% cyan    */
 /*      black   */
 /* 100% white   */
-static unsigned char wobnairRGB[] = {
+static uint8_t wobnairRGB[] = {
     0,   0, 255,
     0,   0,   0,
   255,   0, 255,
@@ -584,12 +580,11 @@ static unsigned char wobnairRGB[] = {
     0, 255, 255,
     0,   0,   0,
   255, 255, 255 };
-static unsigned char wobnairYCbCr[ 21 ];
+static uint8_t wobnairYCbCr[ 21 ];
 
 
 
-void create_colourbars_packed444( unsigned char *output,
-                                  int width, int height, int stride )
+void create_colourbars_packed444( uint8_t *output, int width, int height, int stride )
 {
     int i, x, y, w;
     int bnb_start;

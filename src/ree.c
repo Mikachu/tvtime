@@ -30,12 +30,10 @@ int ree_is_audio_packet( ree_packet_t *pkt )
     return ( pkt->hdr.id == 2 );
 }
 
-unsigned char *tmpimage = 0;
-
-void ree_decode_video_packet( ree_packet_t *pkt, unsigned char *data, int width, int height )
+void ree_decode_video_packet( ree_packet_t *pkt, uint8_t *data, int width, int height )
 {
     if( pkt->hdr.id == REE_VIDEO_YCBCR422 ) {
-        unsigned char *src = pkt->data;
+        uint8_t *src = pkt->data;
 
         memcpy( data, src, width * height * 2 );
 

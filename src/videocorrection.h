@@ -19,6 +19,8 @@
 #ifndef VIDEOCORRECTION_H_INCLUDED
 #define VIDEOCORRECTION_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,11 +37,10 @@ video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_
 void video_correction_delete( video_correction_t *vc );
 void video_correction_set_luma_power( video_correction_t *vc, double power );
 void video_correction_correct_luma_scanline( video_correction_t *vc,
-                                             unsigned char *output,
-                                             unsigned char *luma, int width );
+                                             uint8_t *output,
+                                             uint8_t *luma, int width );
 void video_correction_correct_packed422_scanline( video_correction_t *vc,
-                                                  unsigned char *output,
-                                                  unsigned char *input,
+                                                  uint8_t *output, uint8_t *input,
                                                   int width );
 
 #ifdef __cplusplus

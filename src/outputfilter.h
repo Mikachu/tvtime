@@ -19,6 +19,8 @@
 #ifndef OUTPUTFILTER_H_INCLUDED
 #define OUTPUTFILTER_H_INCLUDED
 
+#include <stdint.h>
+
 #include "vbiscreen.h"
 
 typedef struct outputfilter_s outputfilter_t;
@@ -30,7 +32,7 @@ vbiscreen_t *outputfilter_get_vbiscreen( outputfilter_t *of );
 
 int outputfilter_active_on_scanline( outputfilter_t *of, int scanline );
 void outputfilter_composite_packed422_scanline( outputfilter_t *of,
-                                                unsigned char *output,
+                                                uint8_t *output,
                                                 int width, int xpos,
                                                 int scanline );
 

@@ -19,6 +19,8 @@
 #ifndef MENU_H_INCLUDED
 #define MENU_H_INCLUDED
 
+#include <stdint.h>
+
 typedef struct menu_s menu_t;
 
 #include "input.h"
@@ -39,7 +41,7 @@ void menu_delete( menu_t *m );
 void menu_init( menu_t *m );
 void menu_refresh( menu_t *m );
 int menu_callback( menu_t *m, InputEvent command, int arg );
-void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
+void menu_composite_packed422_scanline( menu_t *m, uint8_t *output,
                                         int width, int xpos, int scanline );
 
 #ifdef __cplusplus

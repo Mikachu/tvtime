@@ -20,7 +20,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -45,7 +45,7 @@
 // I'd intended this to be part of a larger more elaborate method added to 
 // Blended Clip but this give too good results for the CPU to ignore here.
 
-static void copy_scanline( unsigned char *output,
+static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {
@@ -54,15 +54,15 @@ static void copy_scanline( unsigned char *output,
 
 static int GreedyMaxComb = 15;
 
-static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
+static void deinterlace_greedy_packed422_scanline_mmxext( uint8_t *output,
                                                           deinterlace_scanline_data_t *data,
                                                           int width )
 {
     mmx_t MaxComb;
-    unsigned char *m0 = data->m0;
-    unsigned char *t1 = data->t1;
-    unsigned char *b1 = data->b1;
-    unsigned char *m2 = data->m2;
+    uint8_t *m0 = data->m0;
+    uint8_t *t1 = data->t1;
+    uint8_t *b1 = data->b1;
+    uint8_t *m2 = data->m2;
 
     // How badly do we let it weave? 0-255
     MaxComb.ub[ 0 ] = GreedyMaxComb;

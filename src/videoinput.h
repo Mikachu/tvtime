@@ -19,6 +19,8 @@
 #ifndef VIDEOINPUT_H_INCLUDED
 #define VIDEOINPUT_H_INCLUDED
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -108,7 +110,7 @@ int videoinput_is_bttv( videoinput_t *vidin );
  * Returns a pointer to the next image buffer.  Also returns the last field
  * number captured.
  */
-unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid );
+uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid );
 
 /**
  * Signal to the videoinput device that we're done reading the last frame, to

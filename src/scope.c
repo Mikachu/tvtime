@@ -24,7 +24,7 @@ struct scope_s
     int width;
     int height;
     int id;
-    unsigned char *scanline;
+    uint8_t *scanline;
 };
 
 scope_t *scope_new( int width, int height )
@@ -47,7 +47,7 @@ void scope_delete( scope_t *scope )
     free( scope );
 }
 
-void scope_set_scanline( scope_t *scope, unsigned char *scanline, int id )
+void scope_set_scanline( scope_t *scope, uint8_t *scanline, int id )
 {
     scope->id = id;
     scope->scanline = scanline;
@@ -63,11 +63,11 @@ int scope_active_on_scanline( scope_t *scope, int scanline )
 }
 
 void scope_composite_packed422_scanline( scope_t *scope,
-                                         unsigned char *output,
+                                         uint8_t *output,
                                          int width, int xpos, int scanline )
 {
     if( scope->scanline && scanline >= (scope->height - 256) ) {
-        unsigned char *cur = scope->scanline + (xpos*2);
+        uint8_t *cur = scope->scanline + (xpos*2);
         int val = scanline - (scope->height - 256);
 
         while( width-- ) {

@@ -17,7 +17,6 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
 #include "diffcomp.h"
 
 /**
@@ -380,10 +379,10 @@ static void print_frequencies( void )
     }
 }
 
-int diffcomp_compress_plane( unsigned char *dst, unsigned char *src,
+int diffcomp_compress_plane( uint8_t *dst, uint8_t *src,
                              int width, int height )
 {
-    unsigned char lastcode = 0;
+    uint8_t lastcode = 0;
     uint32_t curout = 0;
     int bitsused = 0;
     int outsize = 0;
@@ -392,7 +391,7 @@ int diffcomp_compress_plane( unsigned char *dst, unsigned char *src,
     if( !codesgenerated ) generate_codes();
 
     for( i = 0; i < width * height; i++ ) {
-        unsigned char diff = ( *src - lastcode ) & 0xff;
+        uint8_t diff = ( *src - lastcode ) & 0xff;
         mytuple_t *nextout = &(codetable[ diff ]);
 
         /**
@@ -436,10 +435,10 @@ int diffcomp_compress_plane( unsigned char *dst, unsigned char *src,
     return outsize;
 }
 
-void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
+void diffcomp_decompress_plane( uint8_t *dst, uint8_t *src,
                                 int width, int height )
 {
-    unsigned char lastvalue = 0;
+    uint8_t lastvalue = 0;
     uint32_t curstuff = 0;
     int bitsused = 0;
     int i;
@@ -473,8 +472,8 @@ void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
     }
 }
 
-void compress_next_byte( unsigned char **dst, uint32_t *curout, int *bitsused, int *outsize,
-                         unsigned char diff )
+void compress_next_byte( uint8_t **dst, uint32_t *curout, int *bitsused, int *outsize,
+                         uint8_t diff )
 {
     mytuple_t *nextout = &(codetable[ diff ]);
 
@@ -497,12 +496,12 @@ void compress_next_byte( unsigned char **dst, uint32_t *curout, int *bitsused, i
     *bitsused += nextout->numbits;
 }
 
-int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
+int diffcomp_compress_packed422( uint8_t *dst, uint8_t *src,
                                  int width, int height )
 {
-    unsigned char lastcode_y = 0;
-    unsigned char lastcode_cb = 0;
-    unsigned char lastcode_cr = 0;
+    uint8_t lastcode_y = 0;
+    uint8_t lastcode_cb = 0;
+    uint8_t lastcode_cr = 0;
     uint32_t curout = 0;
     int bitsused = 0;
     int outsize = 0;
@@ -542,12 +541,12 @@ int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
     return outsize;
 }
 
-void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
+void diffcomp_decompress_packed422( uint8_t *dst, uint8_t *src,
                                     int width, int height )
 {
-    unsigned char lastvalue_y = 0;
-    unsigned char lastvalue_cb = 0;
-    unsigned char lastvalue_cr = 0;
+    uint8_t lastvalue_y = 0;
+    uint8_t lastvalue_cb = 0;
+    uint8_t lastvalue_cr = 0;
     uint32_t curstuff = 0;
     int bitsused = 0;
     int i;

@@ -22,7 +22,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -48,7 +48,7 @@ static int JaggieThreshold = 73;
  * Deinterlace - area based Vitual Dub Plug-in by
  * Gunnar Thalin
  */
-static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *output,
+static void deinterlace_videobob_packed422_scanline_mmxext( uint8_t *output,
                                                             deinterlace_scanline_data_t *data,
                                                             int width )
 {
@@ -133,7 +133,7 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
     emms();
 }
 
-static void copy_scanline( unsigned char *output,
+static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {

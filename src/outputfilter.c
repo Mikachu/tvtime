@@ -62,7 +62,7 @@ int outputfilter_active_on_scanline( outputfilter_t *of, int scanline )
 }
 
 void outputfilter_composite_packed422_scanline( outputfilter_t *of,
-                                                unsigned char *output,
+                                                uint8_t *output,
                                                 int width, int xpos,
                                                 int scanline )
 {

@@ -27,7 +27,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 
-#include <inttypes.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "debug_print.h"

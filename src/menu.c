@@ -143,7 +143,7 @@ void menu_delete( menu_t *m )
 }
 
 /* Menus */
-void (*menu_blit_scanline)( menu_t *m, unsigned char *output,
+void (*menu_blit_scanline)( menu_t *m, uint8_t *output,
                             int width, int xpos, int scanline );
 
 
@@ -258,7 +258,7 @@ struct pict_data {
     osd_databars_t *hue;
 };
 
-void pict_blit_scanline( menu_t *m, unsigned char *output,
+void pict_blit_scanline( menu_t *m, uint8_t *output,
                          int width, int xpos, int scanline );
 void menu_pict( menu_t *m, int key )
 {
@@ -442,7 +442,7 @@ void menu_pict( menu_t *m, int key )
     }
 }
 
-void pict_blit_scanline( menu_t *m, unsigned char *output,
+void pict_blit_scanline( menu_t *m, uint8_t *output,
                          int width, int xpos, int scanline )
 {
 
@@ -676,7 +676,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
     return 1;
 }
 
-void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
+void menu_composite_packed422_scanline( menu_t *m, uint8_t *output,
                                         int width, int xpos, int scanline )
 {
     int i;

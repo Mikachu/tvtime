@@ -29,7 +29,7 @@ void videofilter_set_full_extent_correction( videofilter_t *vf, int correct );
 void videofilter_set_luma_power( videofilter_t *vf, double power );
 
 int videofilter_active_on_scanline( videofilter_t *vf, int scanline );
-void videofilter_packed422_scanline( videofilter_t *vf, unsigned char *data,
+void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
                                      int width, int xpos, int scanline );
 
 #endif /* VIDEOFILTER_H_INCLUDED */

@@ -19,6 +19,8 @@
 #ifndef REEPKTQ_H_INCLUDED
 #define REEPKTQ_H_INCLUDED
 
+#include <stdint.h>
+
 typedef struct reepktq_s reepktq_t;
 
 /**
@@ -36,7 +38,7 @@ void reepktq_delete( reepktq_t *pktq );
  * Get a pointer to the next enqueue buffer.  Returns 0 if the queue
  * is full.
  */
-unsigned char *reepktq_enqueue( reepktq_t *pktq );
+uint8_t *reepktq_enqueue( reepktq_t *pktq );
 
 /**
  * Finish enquing an entry.  Increments the next pointer.
@@ -47,7 +49,7 @@ void reepktq_complete_enqueue( reepktq_t *pktq );
  * Returns a pointer to the head of the queue.  Returns 0 if no entries
  * are in the queue.
  */
-unsigned char *reepktq_head( reepktq_t *pktq );
+uint8_t *reepktq_head( reepktq_t *pktq );
 
 /**
  * Increments the head pointer for the queue.

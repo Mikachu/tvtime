@@ -505,7 +505,7 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak,
 #define MAXUP(a,b) ((a) = ((a)>(b)) ? (a) : (b))
 
 void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
-                                  unsigned char *old, unsigned char *new, int w, int h, int os, int ns )
+                                  uint8_t *old, uint8_t *new, int w, int h, int os, int ns )
 {
     int x, y;
     pulldown_metrics_t l;

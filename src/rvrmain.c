@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <sys/time.h>
 #include <pthread.h>
 #include <string.h>
@@ -83,7 +83,7 @@ static void *video_capture_thread_main( void *crap )
 
     for(;;) {
         ree_packet_t *vpkt;
-        unsigned char *curimage;
+        uint8_t *curimage;
         int outsize;
         struct timeval curtime;
         int ccframes;

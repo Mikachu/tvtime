@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <png.h>
-#include <pngoutput.h>
+#include "pngoutput.h"
 
 struct pngoutput_s
 {
@@ -117,7 +117,7 @@ void pngoutput_delete( pngoutput_t *pngoutput )
     free( pngoutput );
 }
 
-void pngoutput_scanline( pngoutput_t *pngoutput, unsigned char *scanline )
+void pngoutput_scanline( pngoutput_t *pngoutput, uint8_t *scanline )
 {
     png_write_row( pngoutput->png_ptr, scanline );
 }

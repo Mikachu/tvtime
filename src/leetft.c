@@ -286,8 +286,8 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphs, FT_UInt *glyph
     return bbox;
 }
 
-static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
-                               unsigned char *src, int src_width, int src_height, int src_stride,
+static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height, int dst_stride,
+                               uint8_t *src, int src_width, int src_height, int src_stride,
                                int dst_xpos_subpix, int dst_ypos )
 {
     int blit_width = dst_width - ( dst_xpos_subpix >> 16 );
@@ -300,8 +300,8 @@ static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height
         int y;
 
         for( y = 0; y < blit_height; y++ ) {
-            unsigned char *curdst = dst + ((dst_ypos + y)*dst_stride) + ( dst_xpos_subpix >> 16 );
-            unsigned char *cursrc = src + (y*src_stride);
+            uint8_t *curdst = dst + ((dst_ypos + y)*dst_stride) + ( dst_xpos_subpix >> 16 );
+            uint8_t *cursrc = src + (y*src_stride);
             int prev = 0;
             int pos = dst_xpos_subpix & 0xffff;
             int tmp;
@@ -320,7 +320,7 @@ static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height
     }
 }
 
-void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
+void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
                      int subpix_pos, int *width, int *height, int outsize )
 {
     FT_BBox string_bbox;
@@ -377,7 +377,7 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
 struct ft_string_s
 {
     ft_font_t *font;
-    unsigned char *data;
+    uint8_t *data;
     int datasize;
     int width;
     int height;
@@ -390,7 +390,7 @@ ft_string_t *ft_string_new( ft_font_t *font )
 
     fts->font = font;
     fts->datasize = 262144;
-    fts->data = (unsigned char *) malloc( fts->datasize );
+    fts->data = (uint8_t *) malloc( fts->datasize );
     if( !fts->data ) {
         free( fts );
         return 0;
@@ -426,7 +426,7 @@ int ft_string_get_stride( ft_string_t *fts )
     return fts->width;
 }
 
-unsigned char *ft_string_get_buffer( ft_string_t *fts )
+uint8_t *ft_string_get_buffer( ft_string_t *fts )
 {
     return fts->data;
 }

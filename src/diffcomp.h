@@ -19,6 +19,8 @@
 #ifndef DIFFCOMP_H_INCLUDED
 #define DIFFCOMP_H_INCLUDED
 
+#include <stdint.h>
+
 /**
  * Lossless Differential coding (prediction coding) based compression
  * algorithm.  Based on an idea from the 'Huffyuv' codec by Ben
@@ -34,22 +36,22 @@
  * buffer.  Theoretical max size of the destination image is twice as
  * large as the input image, although this is very unlikely.
  */
-int diffcomp_compress_plane( unsigned char *dst, unsigned char *src,
+int diffcomp_compress_plane( uint8_t *dst, uint8_t *src,
                              int width, int height );
 
 /**
  * Decompresses a single plane from src to dst.  The width and height
  * provided must match those used to encode the image.
  */
-void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
+void diffcomp_decompress_plane( uint8_t *dst, uint8_t *src,
                                 int width, int height );
 
 /**
  * Compress a 4:2:2 image.
  */
-int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
+int diffcomp_compress_packed422( uint8_t *dst, uint8_t *src,
                                  int width, int height );
-void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
+void diffcomp_decompress_packed422( uint8_t *dst, uint8_t *src,
                                     int width, int height );
 
 #endif /* DIFFCOMP_H_INCLUDED */

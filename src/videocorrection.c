@@ -35,7 +35,7 @@ struct video_correction_s
     double luma_correction;
     unsigned int *luma_table;
     unsigned int *chroma_table;
-    unsigned char *temp_scanline_data;
+    uint8_t *temp_scanline_data;
 };
 
 
@@ -126,7 +126,7 @@ video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_
     vc->luma_correction = 1.0;
     vc->luma_table = (unsigned int *) malloc( 256 * sizeof( int ) );
     vc->chroma_table = (unsigned int *) malloc( 256* sizeof( int ) );
-    vc->temp_scanline_data = (unsigned char *) malloc( 2048 * 2 );
+    vc->temp_scanline_data = (uint8_t *) malloc( 2048 * 2 );
     if( !vc->luma_table || !vc->chroma_table ) {
         if( vc->luma_table ) free( vc->luma_table );
         if( vc->chroma_table ) free( vc->chroma_table );
@@ -152,7 +152,7 @@ void video_correction_set_luma_power( video_correction_t *vc, double power )
     video_correction_update_table( vc );
 }
 
-void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned char *output, unsigned char *luma, int width )
+void video_correction_correct_luma_scanline( video_correction_t *vc, uint8_t *output, uint8_t *luma, int width )
 {
     while( width-- ) {
         *output++ = vc->luma_table[ *luma++ ];
@@ -160,8 +160,7 @@ void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned ch
 }
 
 void video_correction_correct_packed422_scanline( video_correction_t *vc,
-                                                  unsigned char *output,
-                                                  unsigned char *input, int width )
+                                                  uint8_t *output, uint8_t *input, int width )
 {
     unsigned int *table = vc->luma_table;
     while( width-- ) {

@@ -22,7 +22,7 @@
  */
 
 #include <stdio.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -41,9 +41,9 @@
  * filter taps here are: [-1 4 2 4 -1].
  */
 
-static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
-                              unsigned char *lum_m3, unsigned char *lum_m2,
-                              unsigned char *lum_m1, unsigned char *lum, int size )
+static void deinterlace_line( uint8_t *dst, uint8_t *lum_m4,
+                              uint8_t *lum_m3, uint8_t *lum_m2,
+                              uint8_t *lum_m1, uint8_t *lum, int size )
 {
     /**
      * C implementation.
@@ -112,7 +112,7 @@ static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
  * have the desired effect.
  */
 
-static void deinterlace_scanline_vfir( unsigned char *output,
+static void deinterlace_scanline_vfir( uint8_t *output,
                                        deinterlace_scanline_data_t *data,
                                        int width )
 {
@@ -120,7 +120,7 @@ static void deinterlace_scanline_vfir( unsigned char *output,
     // blit_packed422_scanline( output, data->m1, width );
 }
 
-static void copy_scanline( unsigned char *output,
+static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {
