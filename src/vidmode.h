@@ -26,4 +26,8 @@ void vidmode_delete( vidmode_t *vm );
 
 void vidmode_print_modeline( vidmode_t *vm );
 
+int vidmode_get_current_width( vidmode_t *vm );
+int vidmode_get_current_height( vidmode_t *vm );
+double vidmode_get_current_refresh_rate( vidmode_t *vm );
+
 #endif /* VIDMODE_H_INCLUDED */

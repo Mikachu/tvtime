@@ -30,6 +30,8 @@
 #include "input.h"
 #include "taglines.h"
 
+const int resize_frame_delay = 10;
+
 static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;
 static int sdlaspect = 0;
@@ -37,10 +39,19 @@ static int outwidth = 0;
 static int outheight = 0;
 static int fs = 0;
 static int sdlflags = SDL_HWSURFACE | SDL_RESIZABLE;
+static int needresize = 0;
+
+static int window_width = 0;
+static int window_height = 0;
 
 unsigned char *sdl_get_output( void )
 {
     return frame->pixels[ 0 ];
+}
+
+static void sdl_reset_display( void )
+{
+    screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
 }
 
 int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
@@ -109,17 +120,28 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     return 1;
 }
 
-
-int sdl_toggle_fullscreen( void )
+int sdl_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
+    if( !fs && fullscreen_width && fullscreen_height ) {
+        screen = SDL_SetVideoMode( fullscreen_width, fullscreen_height, 0, sdlflags );
+        window_width = outwidth;
+        window_height = outheight;
+        outwidth = fullscreen_width;
+        outheight = fullscreen_height;
+    }
+
     SDL_WM_ToggleFullScreen( screen );
+
+    if( fs ) {
+        if( window_width && window_height ) {
+            outwidth = window_width;
+            outheight = window_height;
+        }
+        sdl_reset_display();
+    }
+
     fs = !fs;
     return fs;
-}
-
-static void sdl_reset_display( void )
-{
-    screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
 }
 
 int sdl_toggle_aspect( void )
@@ -129,7 +151,6 @@ int sdl_toggle_aspect( void )
     return sdlaspect;
 }
 
-
 void sdl_show_frame( void )
 {
     SDL_Rect r;
@@ -138,15 +159,20 @@ void sdl_show_frame( void )
     int widthratio = sdlaspect ? 16 : 4;
     int heightratio = sdlaspect ? 9 : 3;
 
-    curwidth = screen->w;
-    curheight = ( screen->w / widthratio ) * heightratio;
-    if( curheight > screen->h ) {
-        curheight = screen->h;
-        curwidth = ( screen->h / heightratio ) * widthratio;
+    if( needresize == 1 ) {
+        sdl_reset_display();
+    }
+    if( needresize ) needresize--;
+
+    curwidth = outwidth;
+    curheight = ( outwidth / widthratio ) * heightratio;
+    if( curheight > outheight ) {
+        curheight = outheight;
+        curwidth = ( outheight / heightratio ) * widthratio;
     }
 
-    r.x = ( screen->w - curwidth ) / 2;
-    r.y = ( screen->h - curheight ) / 2;
+    r.x = ( outwidth - curwidth ) / 2;
+    r.y = ( outheight - curheight ) / 2;
     r.w = curwidth;
     r.h = curheight;
 
@@ -169,7 +195,7 @@ void sdl_poll_events( input_t *in )
         if( event.type == SDL_VIDEORESIZE ) {
             outwidth = event.resize.w;
             outheight = event.resize.h;
-            sdl_reset_display();
+            needresize = resize_frame_delay;
         }
 
         if( event.type == SDL_KEYDOWN ) {

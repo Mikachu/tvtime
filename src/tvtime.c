@@ -620,7 +620,12 @@ int main( int argc, char **argv )
         showbars = input_show_bars( in );
         screenshot = input_take_screenshot( in );
         if( input_toggle_fullscreen( in ) ) {
-            output->toggle_fullscreen();
+            if( vidmode ) {
+                output->toggle_fullscreen( vidmode_get_current_width( vidmode ),
+                                           vidmode_get_current_height( vidmode ) );
+            } else {
+                output->toggle_fullscreen( 0, 0 );
+            }
         }
         if( input_toggle_aspect( in ) ) {
             if( output->toggle_aspect() ) {

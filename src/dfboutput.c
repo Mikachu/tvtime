@@ -199,7 +199,7 @@ int dfb_toggle_aspect( void )
     return 0;
 }
 
-int dfb_toggle_fullscreen( void )
+int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
     return 1;
 }

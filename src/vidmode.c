@@ -99,6 +99,49 @@ void vidmode_print_modeline( vidmode_t *vm )
              monitor.vsync->hi, monitor.vsync->lo );
 }
 
+int vidmode_get_current_width( vidmode_t *vm )
+{
+    XF86VidModeModeLine mode_line;
+    int dot_clock;
+
+    if( !XF86VidModeGetModeLine( vm->display, vm->screen,
+                                 &dot_clock, &mode_line ) ) {
+        fprintf( stderr, "vidmode: Can't get current modeline.\n" );
+        return 0;
+    }
+
+    return mode_line.hdisplay;
+}
+
+int vidmode_get_current_height( vidmode_t *vm )
+{
+    XF86VidModeModeLine mode_line;
+    int dot_clock;
+
+    if( !XF86VidModeGetModeLine( vm->display, vm->screen,
+                                 &dot_clock, &mode_line ) ) {
+        fprintf( stderr, "vidmode: Can't get current modeline.\n" );
+        return 0;
+    }
+
+    return mode_line.vdisplay;
+}
+
+double vidmode_get_current_refresh_rate( vidmode_t *vm )
+{
+    XF86VidModeModeLine mode_line;
+    int dot_clock;
+
+    if( !XF86VidModeGetModeLine( vm->display, vm->screen,
+                                 &dot_clock, &mode_line ) ) {
+        fprintf( stderr, "vidmode: Can't get current modeline.\n" );
+        return 0;
+    }
+
+    return ( (double) ( (double) dot_clock * 1000.0 ) ) /
+           ( (double) ( mode_line.htotal * mode_line.vtotal ) );
+}
+
 #else /* No vidmode support */
 
 struct vidmode_s
@@ -116,6 +159,21 @@ void vidmode_delete( vidmode_t *vm )
 
 void vidmode_print_modeline( vidmode_t *vm )
 {
+}
+
+int vidmode_get_current_width( vidmode_t *vm )
+{
+    return 0;
+}
+
+int vidmode_get_current_height( vidmode_t *vm )
+{
+    return 0;
+}
+
+double vidmode_get_current_refresh_rate( vidmode_t *vm )
+{
+    return 0.0;
 }
 
 #endif

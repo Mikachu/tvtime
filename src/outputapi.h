@@ -40,7 +40,7 @@ typedef struct output_api_s
 
     /* Functions for all outputs. */
     int (* toggle_aspect)( void );
-    int (* toggle_fullscreen)( void );
+    int (* toggle_fullscreen)( int fullscreen_width, int fullscreen_height );
     void (* set_window_caption)( const char *caption );
 
     void (* poll_events)( input_t *in );
