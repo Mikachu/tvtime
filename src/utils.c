@@ -68,6 +68,8 @@ ings in this Software without prior written authorization from him.
 # include <locale.h>
 # include <langinfo.h>
 # include <iconv.h>
+#else
+# define _(string) string
 #endif
 #include "tvtimeconf.h"
 #include "utils.h"
