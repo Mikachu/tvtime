@@ -698,6 +698,7 @@ Public License instead of this License.
         int showbars, screenshot;
         int aquired = 0;
         int tuner_state;
+        int we_were_late = 0;
 
         output->poll_events( in );
 
@@ -825,11 +826,13 @@ Public License instead of this License.
             /* Wait until it's time to blit the first field. */
             if( rtctimer ) {
 
+                we_were_late = 1;
                 while( performance_get_usecs_since_frame_aquired( perf )
                        < ( fieldtime - safetytime
                            - performance_get_usecs_of_last_blit( perf )
                            - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
+                    we_were_late = 0;
                 }
 
             }
@@ -888,7 +891,7 @@ Public License instead of this License.
 
         if( !output->is_interlaced() ) {
             /* Wait for the next field time. */
-            if( rtctimer ) {
+            if( rtctimer && !we_were_late ) {
 
                 while( performance_get_usecs_since_last_field( perf )
                        < ( fieldtime
