@@ -121,6 +121,7 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
 void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width );
 void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width );
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
+void mirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 
 /**
  * Here are the function pointers which will be initialized to point at the
@@ -162,6 +163,7 @@ extern unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsig
 extern unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
                                                        unsigned char *bot, int width );
 extern void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width );
+extern void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
 extern void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 /**
