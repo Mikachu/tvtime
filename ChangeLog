@@ -1,5 +1,7 @@
 
 0.9.8
+  * (vektor) Added console app 'tvtime-command' to send commands to a running
+    tvtime instance using the fifo.
   * (vektor) configure.ac now fails if X isn't found.
   * (vektor) Enabled DScaler DLL filters, added the wine directory.
   * (vektor) Completely removed the scanline bias code, I don't think it's

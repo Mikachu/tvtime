@@ -40,11 +40,14 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
 	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h
 
-bin_PROGRAMS = tvtime 
+bin_PROGRAMS = tvtime tvtime-command
 EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+
+tvtime_command_SOURCES = $(COMMON_SRCS) tvtime-command.c
+tvtime_command_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la

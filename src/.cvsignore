@@ -4,9 +4,9 @@ Makefile
 Makefile.in
 *.o
 tvtime
+tvtime-command
 expandpng
 timingtest
-tvscanner
 *.swp
 .xvpics
 *.xcf
