@@ -1343,14 +1343,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 error_string = 0;
             }
             /*
-             * The two following commands should NOT be reassembled into
+             * The three following commands should NOT be reassembled into
              * a single command -- since we don't want unneccecary string
              * duplication for translators. (See asprintf() above for the
              * exact same string.
              */
             fputs ("tvtime: ", stderr );
-            fprintf( stderr, _("Can't open rvr file '%s'.\n"),
+            fprintf( stderr, _("Can't open rvr file '%s'."),
                      config_get_rvr_filename( ct ) );
+            fputc( '\n', stderr );
         } else {
             width = rvrreader_get_width( rvrreader );
             height = rvrreader_get_height( rvrreader );
