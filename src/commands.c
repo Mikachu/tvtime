@@ -30,6 +30,7 @@
 #include "parser.h"
 #include "console.h"
 #include "vbidata.h"
+#include "configsave.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -65,7 +66,6 @@ struct commands_s {
     vbidata_t *vbi;
     int capturemode;
 };
-
 
 static void reinit_tuner( commands_t *in )
 {
@@ -291,6 +291,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             fprintf( stderr, "tvtime: Luma correction disabled.  "
                      "Run with -c to use it.\n" );
         } else {
+            char message[ 200 ];
             config_set_luma_correction( 
                 in->cfg, 
                 config_get_luma_correction( in->cfg ) + 
@@ -309,8 +310,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             video_correction_set_luma_power( in->vc,
                                              config_get_luma_correction( in->cfg ) );
 
+	    sprintf( message, "%.1f", config_get_luma_correction( in->cfg ) );
+	    configsave("LumaCorrection", message, 1);
             if( in->osd ) {
-                char message[ 200 ];
                 sprintf( message, "Luma correction value: %.1f", 
                          config_get_luma_correction( in->cfg ) );
                 tvtime_osd_show_message( in->osd, message );

@@ -17,9 +17,8 @@
  */
  
 /* For saving configuration in file use function 
-   int config_save(char *filename, char *INIT_name, char *INIT_val, int INIT_num).
+   int config_save(const char *INIT_name, const char *INIT_val, const int INIT_num).
    
-   filename - Name of config file.
    INIT_name - Parameter name
    INIT_val - Parameter value
    INIT_num - number of parameter (f.e. for key_quit)
@@ -29,24 +28,34 @@
    for compile use gcc configsave.c && ./a.out
 */
 
-#define CFGFILE "/home/asbel/.tvtime/tvtimerc"
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-#define BUFSIZE 256
+#define BUFSIZE 80
+#define _strncpy(A,B,C) strncpy(A,B,C), *(A+(C)-1)='\0'
+
+static int FD = -1;
 
 /* small wrapper for fgets(3) */
-static char *_fgets(FILE *F)
+static char *_fgets(int F)
 {
     char arr[BUFSIZE];
     char *ptr1, *ptr2, *str = arr;
+    int i;
+    ssize_t cnt;
 
-    if(fgets(str, BUFSIZE, F) == NULL) return NULL;
-
+    for(i=0; (cnt=read(F, &arr[i], 1)) == 1 && arr[i] != '\n' && i<BUFSIZE; i++);
+    if(cnt != 1 && !i) return NULL;
+    if(arr[i] == '\n') arr[i+1] = '\0';
+    else arr[i] = '\0';
+    
     if (*(str+strlen(str)-1) != '\n')
     {
         ptr1=_fgets(F);
@@ -59,39 +68,55 @@ static char *_fgets(FILE *F)
             return ptr2;
         }
     }
-    ptr2 = malloc(strlen(str)+1);
+    
+    /* Not +1!!! This need for error string in config file:
+       Name = 
+    */
+    ptr2 = malloc(strlen(str)+2);
     if(ptr2 == NULL) return NULL;
     strcpy(ptr2, str);
     return ptr2;
 }
 
-
-int config_save(char *filename, char *INIT_name, char *INIT_val, int INIT_num)
+int configsave_open(const char *filename)
 {
-    FILE *F;
-    char *str, *nstr, *name, *val, *ptr, c;
-    int num = 1;
-    long offset = 0, delta = 0;
-    
-    if( filename == NULL  || 
-	INIT_name == NULL ||
-	INIT_val == NULL  ||
-	INIT_num          < 1 ) return 0;
-    
-    if((F=fopen(filename, "r+")) == NULL)
+    if( filename == NULL ||
+	(FD=open(filename, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)) == -1 )
     {
 	fprintf(stderr, "Can't open file %s for saving configuration: ", filename);
 	perror("");
 	return 0;
     }
+    return 1;
+}
+
+void configsave_close(void)
+{
+    if( FD != -1 ) close(FD);
+    FD = -1;
+}
+
+int configsave(const char *INIT_name, const char *INIT_val, const int INIT_num)
+{
+    char *str, *namend, *name, *val, *ptr, c;
+    int num = 1;
+    off_t offset = 0L, delta = 0L;
+    
+    lseek(FD, 0L, SEEK_SET);
+    if( FD == -1 ||
+	INIT_name == NULL ||
+	INIT_val == NULL  ||
+	INIT_num          < 1 ) return 0;
     
     while(1)
     {
-	offset = ftell(F);
-	if((str = _fgets(F)) == NULL)
+	offset = lseek(FD, 0L, SEEK_CUR);
+	if((str = _fgets(FD)) == NULL)
 	{
-	    fprintf(F, "\n# Adding parameter %s\n%s = %s\n", INIT_name, INIT_name, INIT_val);
-	    fclose(F);
+	    offset=strlen("\n# Adding parameter \n = \n") + strlen(INIT_name)*2 + strlen(INIT_val)+1;
+	    str = malloc(sizeof(char)*offset);
+	    snprintf(str, offset,  "\n# Adding parameter %s\n%s = %s\n", INIT_name, INIT_name, INIT_val);
+	    write(FD, str, offset-1);
 	    return 1;
 	}
 
@@ -101,15 +126,15 @@ int config_save(char *filename, char *INIT_name, char *INIT_val, int INIT_num)
 	/* This line is not 'name = value' - skip it 
 	   or name is not = INIT_name
 	*/
-	if((val=strchr(str, '=')) == NULL)
+	if((val=strchr(str, '=')) == NULL || val == str)
 	{
 	    free(str);
 	    continue;
 	}
 	
 	for(name=str; isspace(*name); name++);
-	for(nstr=val; isspace(*nstr) || *nstr=='='; nstr--);
-	c=*(++nstr); *nstr='\0';
+	for(namend=val; isspace(*namend) || *namend=='='; namend--);
+	c=*(++namend); *namend='\0';
 	if(strcasecmp(name, INIT_name) != 0)
 	{
 	    free(str);
@@ -120,58 +145,53 @@ int config_save(char *filename, char *INIT_name, char *INIT_val, int INIT_num)
 	free(str);
     }
 
+/* Now we replacing the value in nv pair */
+    *namend=c;
     if(ptr != NULL) *ptr = '#';
-    *nstr=c;
+    else ptr = val+strlen(val)-1;
 
-    /* Now we change the value */
-    for(++val; isspace(*val); val++);
-    for(ptr=val; !isspace(*ptr) && *ptr && *ptr != '#'; ptr++);
+    while((*val == ' ' || *val == '\t' || *val == '=') && val<ptr) ++val;
+    while(isspace(*(ptr-1)) && ptr>val) --ptr;
 
-    delta=strlen(INIT_val)-(ptr-val+1)+1;
-    *val='\0';
-
+    if(isspace(*val) || *val == '#') delta=strlen(INIT_val);
+    else
+    {
+	if(ptr == val) delta=strlen(INIT_val)-strlen(val);
+	else delta=strlen(INIT_val)-(ptr-val);
+    }
+    
     if(delta > 0L)
     {
-	long pos;
-	fseek(F, -1L, SEEK_END);
-	for(pos = ftell(F); pos>offset; pos--)
+	off_t pos;
+	char c;
+	for(pos = lseek(FD, -1L, SEEK_END); pos>offset; pos--)
 	{
-	    num = fgetc(F);
-	    fseek(F, delta-1, SEEK_CUR);
-	    fputc(num, F);
-	    fseek(F, pos, SEEK_SET);
+	    num = read(FD, &c, 1);
+	    lseek(FD, delta-1L, SEEK_CUR);
+	    write(FD, &c, 1);
+	    lseek(FD, pos, SEEK_SET);
 	}
     }
 
-    fseek(F, offset, SEEK_SET);
-    fprintf(F, "%s%s%s", str, INIT_val, ptr);
+    lseek(FD, offset, SEEK_SET);
+    if(*val == '=') write(FD, str, val-str+1);
+    else write(FD, str, val-str);
+    write(FD, INIT_val, strlen(INIT_val));
+    if(ptr != val) write(FD, ptr, strlen(ptr));
     free(str);
 
     if(delta < 0L)
     {
-	fseek(F, -delta, SEEK_CUR);
-	while((num=fgetc(F)) != EOF)
+	char c;
+	lseek(FD, -delta, SEEK_CUR);
+	while(read(FD, &c, 1) != 0 )
 	{
-	    fseek(F, delta-1, SEEK_CUR);
-	    fputc(num, F);
-	    fseek(F, -delta, SEEK_CUR);
+	    lseek(FD, delta-1L, SEEK_CUR);
+	    write(FD, &c, 1);
+	    lseek(FD, -delta, SEEK_CUR);
 	}
-	truncate(filename, ftell(F)+delta);
+	ftruncate(FD, lseek(FD, 0L, SEEK_CUR)+delta);
     }
 
-    fclose(F);
-    return 1;
-}
-
-
-int main(int argc, char **argv)
-{
-    config_save(CFGFILE, "freQuencies", "italy", 1);
-    config_save(CFGFILE, "Frequencies", "europe-east", 1);
-    config_save(CFGFILE, "frequeNcies", "us-cable", 1);
-    config_save(CFGFILE, "frequencies", "france", 1);
-    config_save(CFGFILE, "Freq", "russia", 1);
-    config_save(CFGFILE, "key_quit", "qq", 2);
-    config_save(CFGFILE, "key_quit", "qq", 3);
     return 1;
 }

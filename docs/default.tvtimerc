@@ -60,7 +60,7 @@ FineTuneOffset = 0
 # Toggle whether tvtime should check if there is a signal present when
 # changing channels etc.  If your card doesn't such, you shouldn't need
 # to shut this off
-CheckFreqPresent = 1
+CheckForSignal = 1
 
 # This sets the initial width of the output window.
 OutputWidth = 800

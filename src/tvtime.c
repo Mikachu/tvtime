@@ -51,6 +51,7 @@
 #include "fifo.h"
 #include "commands.h"
 #include "station.h"
+#include "configsave.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -518,6 +519,10 @@ int main( int argc, char **argv )
     }
     verbose = config_get_verbose( ct );
 
+    if( !configsave_open(config_get_parsed_file(ct)->filename)) {
+        fprintf( stderr, "tvtime: Configuration options wasn't saving.\n" );
+    }
+
     station_init(ct);
     
     
@@ -828,22 +833,31 @@ int main( int argc, char **argv )
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
         if( commands_toggle_fullscreen( commands ) ) {
-            output->toggle_fullscreen( 0, 0 );
-        }
-        if( commands_toggle_aspect( commands ) ) {
+	    if( output->toggle_fullscreen( 0, 0 ) )
+		configsave("FullScreen", "1", 1);
+	    else
+		configsave("FullScreen", "0", 1);
+	}
+	if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
                 tvtime_osd_show_message( osd, "16:9 display mode" );
+		configsave("WideScreen", "1", 1);
             } else {
                 tvtime_osd_show_message( osd, "4:3 display mode" );
+		configsave("WideScreen", "0", 1);
             }
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
+	    char number[4];
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
+	    snprintf(number, 3, "%d", curmethodid);
+	    number[4] = '\0';
+	    configsave("PreferredDeinterlaceMethod", number, 1);
         }
         commands_next_frame( commands );
         input_next_frame( in );
@@ -1091,6 +1105,8 @@ int main( int argc, char **argv )
     if( vs ) {
         vbiscreen_delete( vs );
     }
+
+    configsave_close();
     return 0;
 }
 
