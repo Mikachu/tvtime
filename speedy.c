@@ -110,7 +110,7 @@ void blit_colour_packed4444_scanline_mmx( unsigned char *output, int width,
                                           int alpha, int luma,
                                           int cb, int cr )
 {
-    int colour = cr << 24 | cb << 16 | luma << 8 | alpha;
+    int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
 
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
@@ -129,18 +129,22 @@ void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr )
 {
-    int colour = cr << 24 | cb << 16 | luma << 8 | alpha;
+    int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    int i;
 
     movd_m2r( colour, mm1 );
     movd_m2r( colour, mm2 );
     psllq_i2r( 32, mm1 );
     por_r2r( mm1, mm2 );
 
-    for( width /= 2; width; --width ) {
-        movntq_r2m( mm2, *output );
+    i = (width*4)/8;
+    for(; i; --i ) {
+        movq_r2m( mm2, *output );
         output += 8;
     }
-
+    if( width & 1 ) {
+        *((unsigned int *) output) = colour;
+    }
     emms();
 }
 
@@ -465,6 +469,7 @@ void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *output,
         m1 += 8;
         b1 += 8;
     }
+    sfence();
     emms();
 }
 
@@ -574,6 +579,7 @@ void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char *output
         m1 += 8;
         b1 += 8;
     }
+    sfence();
     emms();
 }
 

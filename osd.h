@@ -60,8 +60,5 @@ void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr );
 void osd_shape_show_shape( osd_shape_t *osds, int timeout );
 int osd_shape_visible( osd_shape_t *osds );
 void osd_shape_advance_frame( osd_shape_t *osds );
-void osd_shape_composite_packed422( osd_shape_t *osds, unsigned char *output,
-                                    int width, int height, int stride, 
-                                    int xpos, int ypos );
 
 #endif /* OSD_H_INCLUDED */
