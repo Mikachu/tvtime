@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-30 10:33-0400\n"
+"POT-Creation-Date: 2003-10-30 21:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,37 +17,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/tvtime.c:831 src/tvtime.c:850 src/tvtime.c:885 src/tvtime.c:949
-#: src/tvtime.c:977 src/tvtime.c:1103 src/commands.c:378 src/commands.c:554
-#: src/commands.c:574 src/commands.c:636 src/commands.c:682 src/commands.c:757
-#: src/commands.c:774 src/commands.c:801 src/commands.c:862
-#: src/commands.c:1117 src/commands.c:1164 src/commands.c:1201
-#: src/commands.c:1240 src/commands.c:1312 src/commands.c:1383
-#: src/commands.c:1393 src/commands.c:1441 src/commands.c:1453
-#: src/commands.c:1483 src/commands.c:1516 src/commands.c:1549
-#: src/commands.c:1581
+#: src/tvtime.c:977 src/tvtime.c:1103 src/commands.c:379 src/commands.c:555
+#: src/commands.c:575 src/commands.c:637 src/commands.c:683 src/commands.c:758
+#: src/commands.c:775 src/commands.c:802 src/commands.c:863
+#: src/commands.c:1118 src/commands.c:1165 src/commands.c:1202
+#: src/commands.c:1241 src/commands.c:1313 src/commands.c:1384
+#: src/commands.c:1394 src/commands.c:1442 src/commands.c:1454
+#: src/commands.c:1484 src/commands.c:1517 src/commands.c:1550
+#: src/commands.c:1582
 msgid "Back"
 msgstr ""
 
 #: src/tvtime.c:863 src/tvtime.c:989
 #, c-format
-msgid "Full rate: %.2ffps"
+msgid "Full rate: %.2f fps"
 msgstr ""
 
 #: src/tvtime.c:871 src/tvtime.c:993
 #, c-format
-msgid "Half rate, deinterlace top fields: %.2ffps"
+msgid "Half rate, deinterlace top fields: %.2f fps"
 msgstr ""
 
 #: src/tvtime.c:878 src/tvtime.c:997
 #, c-format
-msgid "Half rate, deinterlace bottom fields: %.2ffps"
+msgid "Half rate, deinterlace bottom fields: %.2f fps"
 msgstr ""
 
 #: src/tvtime.c:901
 msgid "Overscan setting"
 msgstr ""
 
-#: src/tvtime.c:908 src/commands.c:1272
+#: src/tvtime.c:908 src/commands.c:1273
 msgid "Apply matte"
 msgstr ""
 
@@ -93,22 +93,22 @@ msgstr ""
 
 #: src/tvtime.c:1019
 #, c-format
-msgid "Input: %s at %dx%d"
+msgid "Input: %s at %dx%d pixels"
 msgstr ""
 
 #: src/tvtime.c:1023
 #, c-format
-msgid "Attempted framerate: %.2ffps"
+msgid "Attempted framerate: %.2f fps"
 msgstr ""
 
 #: src/tvtime.c:1027
 #, c-format
-msgid "Average blit time: %.2fms (%.0fMB/sec)"
+msgid "Average blit time: %.2f ms (%.0f MB/sec)"
 msgstr ""
 
 #: src/tvtime.c:1031
 #, c-format
-msgid "Average render time: %5.2fms"
+msgid "Average render time: %5.2f ms"
 msgstr ""
 
 #: src/tvtime.c:1035
@@ -118,7 +118,7 @@ msgstr ""
 
 #: src/tvtime.c:1041
 #, c-format
-msgid "Blit spacing: %4.1f/%4.1fms (want %4.1fms)"
+msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
 msgstr ""
 
 #: src/tvtime.c:1060 src/tvtime.c:1113
@@ -168,7 +168,7 @@ msgstr ""
 
 #: src/tvtime.c:1346
 #, c-format
-msgid "Can't open RVR file %s."
+msgid "Cannot open RVR file %s."
 msgstr ""
 
 #: src/tvtime.c:1360
@@ -228,11 +228,11 @@ msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr ""
 
 #: src/tvtime.c:1851
-msgid "Window set as always-on-top."
+msgid "Always-on-top enabled."
 msgstr ""
 
 #: src/tvtime.c:1856
-msgid "Window set to normal stacking."
+msgid "Always-on-top disabled."
 msgstr ""
 
 #: src/tvtime.c:1875
@@ -244,15 +244,15 @@ msgid "4:3 display mode active."
 msgstr ""
 
 #: src/tvtime.c:1991
-msgid "2-3 Pulldown detection disabled."
+msgid "2-3 pulldown inversion disabled."
 msgstr ""
 
 #: src/tvtime.c:1994
-msgid "2-3 Pulldown detection enabled."
+msgid "2-3 pulldown inversion enabled."
 msgstr ""
 
 #: src/tvtime.c:2000
-msgid "2-3 Pulldown detection is not valid with your TV norm."
+msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr ""
 
 #: src/tvtime.c:2385 src/tvtime.c:2526
@@ -304,525 +304,525 @@ msgstr ""
 msgid ""
 "\n"
 "    Failed to drop root privileges: %s.\n"
-"    tvtime will exit now to avoid security problems resulting from\n"
-"    an application running as root when it might not be allowed to.\n"
+"    tvtime will now exit to avoid security problems.\n"
 "\n"
 msgstr ""
 
-#: src/commands.c:187 src/commands.c:785 src/commands.c:1101
-#: src/commands.c:1467 src/commands.c:1500 src/commands.c:1533
-#: src/commands.c:1566
+#: src/commands.c:187 src/commands.c:786 src/commands.c:1102
+#: src/commands.c:1468 src/commands.c:1501 src/commands.c:1534
+#: src/commands.c:1567
 msgid "Current"
 msgstr ""
 
-#: src/commands.c:218 src/commands.c:225
+#. TRANSLATORS: This refers to a TV program, not a computer program.
+#: src/commands.c:219 src/commands.c:226
 msgid "No program information available"
 msgstr ""
 
-#: src/commands.c:264
+#: src/commands.c:265
 #, c-format
 msgid "Next: %s"
 msgstr ""
 
-#: src/commands.c:305
+#: src/commands.c:306
 msgid "Renumber current channel"
 msgstr ""
 
-#: src/commands.c:313 src/commands.c:316
+#: src/commands.c:314 src/commands.c:317
 msgid "Current channel active in list"
 msgstr ""
 
-#: src/commands.c:326
+#: src/commands.c:327
 msgid "Stop channel scan"
 msgstr ""
 
-#: src/commands.c:330
+#: src/commands.c:331
 msgid "Scan channels for signal"
 msgstr ""
 
-#: src/commands.c:338
+#: src/commands.c:339
 msgid "Reset all channels as active"
 msgstr ""
 
-#: src/commands.c:344
+#: src/commands.c:345
 msgid "Finetune current channel"
 msgstr ""
 
-#: src/commands.c:351
+#: src/commands.c:352
 msgid "Change NTSC cable mode"
 msgstr ""
 
-#: src/commands.c:357
+#: src/commands.c:358
 msgid "Set current channel as SECAM"
 msgstr ""
 
-#: src/commands.c:358
+#: src/commands.c:359
 msgid "Set current channel as PAL"
 msgstr ""
 
-#: src/commands.c:365
+#: src/commands.c:366
 msgid "Change frequency table"
 msgstr ""
 
-#: src/commands.c:371
+#: src/commands.c:372
 msgid "Disable signal detection"
 msgstr ""
 
-#: src/commands.c:372
+#: src/commands.c:373
 msgid "Enable signal detection"
 msgstr ""
 
-#: src/commands.c:534 src/commands.c:561
+#: src/commands.c:535 src/commands.c:562
 msgid "Cable"
 msgstr ""
 
-#: src/commands.c:542 src/commands.c:569
+#: src/commands.c:543 src/commands.c:570
 msgid "Broadcast"
 msgstr ""
 
-#: src/commands.c:549
+#: src/commands.c:550
 msgid "Cable with channels 100+"
 msgstr ""
 
-#: src/commands.c:581
+#: src/commands.c:582
 msgid "Europe"
 msgstr ""
 
-#: src/commands.c:589
+#: src/commands.c:590
 msgid "Russia"
 msgstr ""
 
-#: src/commands.c:596
+#: src/commands.c:597
 msgid "France"
 msgstr ""
 
-#: src/commands.c:603
+#: src/commands.c:604
 msgid "Australia"
 msgstr ""
 
-#: src/commands.c:610
+#: src/commands.c:611
 msgid "Australia (Optus)"
 msgstr ""
 
-#: src/commands.c:617
+#: src/commands.c:618
 msgid "New Zealand"
 msgstr ""
 
-#: src/commands.c:624
+#: src/commands.c:625
 msgid "China Broadcast"
 msgstr ""
 
-#: src/commands.c:631
+#: src/commands.c:632
 msgid "Custom (first run tvtime-scanner)"
 msgstr ""
 
-#: src/commands.c:647
+#: src/commands.c:648
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr ""
 
-#: src/commands.c:654
+#: src/commands.c:655
 msgid "Low (360 pixels)"
 msgstr ""
 
-#: src/commands.c:660
+#: src/commands.c:661
 msgid "Moderate (576 pixels)"
 msgstr ""
 
-#: src/commands.c:666
+#: src/commands.c:667
 msgid "Standard (720 pixels)"
 msgstr ""
 
-#: src/commands.c:672
+#: src/commands.c:673
 msgid "High (768 pixels)"
 msgstr ""
 
-#: src/commands.c:677 src/commands.c:1235
+#: src/commands.c:678 src/commands.c:1236
 msgid "Restart with new settings"
 msgstr ""
 
-#: src/commands.c:738 src/commands.c:1629
+#: src/commands.c:739 src/commands.c:1630
 msgid "Mono"
 msgstr ""
 
-#: src/commands.c:745 src/commands.c:1630
+#: src/commands.c:746 src/commands.c:1631
 msgid "Stereo"
 msgstr ""
 
-#: src/commands.c:753 src/commands.c:1632
+#: src/commands.c:754 src/commands.c:1633
 msgid "SAP"
 msgstr ""
 
-#: src/commands.c:764 src/commands.c:1632
+#: src/commands.c:765 src/commands.c:1633
 msgid "Primary Language"
 msgstr ""
 
-#: src/commands.c:769 src/commands.c:1633
+#: src/commands.c:770 src/commands.c:1634
 msgid "Secondary Language"
 msgstr ""
 
-#: src/commands.c:791 src/commands.c:1107 src/commands.c:1473
-#: src/commands.c:1506 src/commands.c:1539 src/commands.c:1571
+#: src/commands.c:792 src/commands.c:1108 src/commands.c:1474
+#: src/commands.c:1507 src/commands.c:1540 src/commands.c:1572
 msgid "Increase"
 msgstr ""
 
-#: src/commands.c:796 src/commands.c:1112 src/commands.c:1478
-#: src/commands.c:1511 src/commands.c:1544 src/commands.c:1576
+#: src/commands.c:797 src/commands.c:1113 src/commands.c:1479
+#: src/commands.c:1512 src/commands.c:1545 src/commands.c:1577
 msgid "Decrease"
 msgstr ""
 
-#: src/commands.c:821
+#: src/commands.c:822
 msgid "BT8x8 luma correction"
 msgstr ""
 
-#: src/commands.c:831
+#: src/commands.c:832
 msgid "2-3 pulldown inversion"
 msgstr ""
 
-#: src/commands.c:840
+#: src/commands.c:841
 msgid "Colour invert"
 msgstr ""
 
-#: src/commands.c:848
+#: src/commands.c:849
 msgid "Mirror"
 msgstr ""
 
-#: src/commands.c:856
+#: src/commands.c:857
 msgid "Chroma killer"
 msgstr ""
 
-#: src/commands.c:1001 src/commands.c:1036 src/commands.c:1068
-#: src/commands.c:1085 src/commands.c:1097 src/commands.c:1125
-#: src/commands.c:1173 src/commands.c:1209 src/commands.c:1218
-#: src/commands.c:1231 src/commands.c:1266 src/commands.c:1272
-#: src/commands.c:1278 src/commands.c:1285 src/commands.c:1291
-#: src/commands.c:1319 src/commands.c:1325 src/commands.c:1333
-#: src/commands.c:1339 src/commands.c:1351 src/commands.c:1400
-#: src/commands.c:1463 src/commands.c:1496 src/commands.c:1529
-#: src/commands.c:1562
+#: src/commands.c:1002 src/commands.c:1037 src/commands.c:1069
+#: src/commands.c:1086 src/commands.c:1098 src/commands.c:1126
+#: src/commands.c:1174 src/commands.c:1210 src/commands.c:1219
+#: src/commands.c:1232 src/commands.c:1267 src/commands.c:1273
+#: src/commands.c:1279 src/commands.c:1286 src/commands.c:1292
+#: src/commands.c:1320 src/commands.c:1326 src/commands.c:1334
+#: src/commands.c:1340 src/commands.c:1352 src/commands.c:1401
+#: src/commands.c:1464 src/commands.c:1497 src/commands.c:1530
+#: src/commands.c:1563
 msgid "Setup"
 msgstr ""
 
-#: src/commands.c:1004 src/commands.c:1068 src/commands.c:1086
-#: src/commands.c:1098
-msgid "Station management"
+#: src/commands.c:1005 src/commands.c:1069 src/commands.c:1087
+#: src/commands.c:1099
+msgid "Channel management"
 msgstr ""
 
-#: src/commands.c:1009 src/commands.c:1040 src/commands.c:1126
-#: src/commands.c:1173 src/commands.c:1209 src/commands.c:1218
-#: src/commands.c:1231
+#: src/commands.c:1010 src/commands.c:1041 src/commands.c:1127
+#: src/commands.c:1174 src/commands.c:1210 src/commands.c:1219
+#: src/commands.c:1232
 msgid "Input configuration"
 msgstr ""
 
-#: src/commands.c:1014 src/commands.c:1045
+#: src/commands.c:1015 src/commands.c:1046
 msgid "Picture settings"
 msgstr ""
 
-#: src/commands.c:1019 src/commands.c:1050 src/commands.c:1291
-#: src/commands.c:1320 src/commands.c:1326 src/commands.c:1334
-#: src/commands.c:1340
+#: src/commands.c:1020 src/commands.c:1051 src/commands.c:1292
+#: src/commands.c:1321 src/commands.c:1327 src/commands.c:1335
+#: src/commands.c:1341
 msgid "Video processing"
 msgstr ""
 
-#: src/commands.c:1024 src/commands.c:1055 src/commands.c:1266
-#: src/commands.c:1272 src/commands.c:1278 src/commands.c:1285
+#: src/commands.c:1025 src/commands.c:1056 src/commands.c:1267
+#: src/commands.c:1273 src/commands.c:1279 src/commands.c:1286
 msgid "Output configuration"
 msgstr ""
 
-#: src/commands.c:1029 src/commands.c:1060
+#: src/commands.c:1030 src/commands.c:1061
 msgid "Exit menu"
 msgstr ""
 
-#: src/commands.c:1086
+#: src/commands.c:1087
 msgid "Frequency table"
 msgstr ""
 
-#: src/commands.c:1098 src/commands.c:2684
+#: src/commands.c:1099 src/commands.c:2685
 msgid "Finetune"
 msgstr ""
 
-#: src/commands.c:1130 src/commands.c:1133 src/commands.c:1177
-#: src/commands.c:1180 src/commands.c:2790
+#: src/commands.c:1131 src/commands.c:1134 src/commands.c:1178
+#: src/commands.c:1181 src/commands.c:2791
 msgid "Change video source"
 msgstr ""
 
-#: src/commands.c:1139 src/commands.c:1186 src/commands.c:1218
-#: src/commands.c:1628
+#: src/commands.c:1140 src/commands.c:1187 src/commands.c:1219
+#: src/commands.c:1629
 msgid "Preferred audio mode"
 msgstr ""
 
-#: src/commands.c:1144 src/commands.c:1191 src/commands.c:1231
+#: src/commands.c:1145 src/commands.c:1192 src/commands.c:1232
 msgid "Television standard"
 msgstr ""
 
-#: src/commands.c:1149 src/commands.c:1196
+#: src/commands.c:1150 src/commands.c:1197
 msgid "Horizontal resolution"
 msgstr ""
 
-#: src/commands.c:1154
+#: src/commands.c:1155
 msgid "Toggle closed captions"
 msgstr ""
 
-#: src/commands.c:1159
+#: src/commands.c:1160
 msgid "Toggle XDS decoding"
 msgstr ""
 
-#: src/commands.c:1209
+#: src/commands.c:1210
 msgid "Horizontal Resolution"
 msgstr ""
 
-#: src/commands.c:1278
+#: src/commands.c:1279
 msgid "Overscan"
 msgstr ""
 
-#: src/commands.c:1285
+#: src/commands.c:1286
 msgid "Fullscreen position"
 msgstr ""
 
-#: src/commands.c:1295 src/commands.c:1320
+#: src/commands.c:1296 src/commands.c:1321
 msgid "Deinterlacer configuration"
 msgstr ""
 
-#: src/commands.c:1300
+#: src/commands.c:1301
 msgid "Current deinterlacer description"
 msgstr ""
 
-#: src/commands.c:1304 src/commands.c:1334
+#: src/commands.c:1305 src/commands.c:1335
 msgid "Attempted framerate"
 msgstr ""
 
-#: src/commands.c:1308 src/commands.c:1340
+#: src/commands.c:1309 src/commands.c:1341
 msgid "Input filters"
 msgstr ""
 
-#: src/commands.c:1326
+#: src/commands.c:1327
 msgid "Deinterlacer description"
 msgstr ""
 
-#: src/commands.c:1351 src/commands.c:1400 src/commands.c:1463
-#: src/commands.c:1496 src/commands.c:1529 src/commands.c:1562
+#: src/commands.c:1352 src/commands.c:1401 src/commands.c:1464
+#: src/commands.c:1497 src/commands.c:1530 src/commands.c:1563
 msgid "Picture"
 msgstr ""
 
-#: src/commands.c:1355 src/commands.c:1405 src/commands.c:1463
-#: src/commands.c:2820 src/commands.c:2861
+#: src/commands.c:1356 src/commands.c:1406 src/commands.c:1464
+#: src/commands.c:2821 src/commands.c:2862
 msgid "Brightness"
 msgstr ""
 
-#: src/commands.c:1360 src/commands.c:1410 src/commands.c:1496
-#: src/commands.c:2834 src/commands.c:2864
+#: src/commands.c:1361 src/commands.c:1411 src/commands.c:1497
+#: src/commands.c:2835 src/commands.c:2865
 msgid "Contrast"
 msgstr ""
 
-#: src/commands.c:1364 src/commands.c:1414 src/commands.c:1529
-#: src/commands.c:2848 src/commands.c:2867
+#: src/commands.c:1365 src/commands.c:1415 src/commands.c:1530
+#: src/commands.c:2849 src/commands.c:2868
 msgid "Colour"
 msgstr ""
 
-#: src/commands.c:1368 src/commands.c:1418 src/commands.c:1562
-#: src/commands.c:2806 src/commands.c:2870
+#: src/commands.c:1369 src/commands.c:1419 src/commands.c:1563
+#: src/commands.c:2807 src/commands.c:2871
 msgid "Hue"
 msgstr ""
 
-#: src/commands.c:1375
+#: src/commands.c:1376
 msgid "Save current settings as defaults"
 msgstr ""
 
-#: src/commands.c:1379 src/commands.c:1389 src/commands.c:1436
-#: src/commands.c:1448
+#: src/commands.c:1380 src/commands.c:1390 src/commands.c:1437
+#: src/commands.c:1449
 msgid "Reset to global defaults"
 msgstr ""
 
-#: src/commands.c:1425
+#: src/commands.c:1426
 msgid "Save current settings as global defaults"
 msgstr ""
 
-#: src/commands.c:1431
+#: src/commands.c:1432
 msgid "Save current settings as channel defaults"
 msgstr ""
 
-#: src/commands.c:1702
+#: src/commands.c:1703
 msgid "Favorites"
 msgstr ""
 
-#: src/commands.c:1709
-msgid "Add current station"
+#: src/commands.c:1710
+msgid "Add current channel"
 msgstr ""
 
-#: src/commands.c:1711
+#: src/commands.c:1712
 msgid "Exit"
 msgstr ""
 
-#: src/commands.c:1979
+#: src/commands.c:1980
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr ""
 
-#: src/commands.c:1982
+#: src/commands.c:1983
 msgid "Sleep off."
 msgstr ""
 
-#: src/commands.c:2040
+#: src/commands.c:2041
 msgid "Channel marked as active in the browse list."
 msgstr ""
 
-#: src/commands.c:2043
+#: src/commands.c:2044
 msgid "Channel disabled from the browse list."
 msgstr ""
 
-#: src/commands.c:2086
+#: src/commands.c:2087
 msgid "Processing every input field."
 msgstr ""
 
-#: src/commands.c:2089
+#: src/commands.c:2090
 msgid "Processing every top field."
 msgstr ""
 
-#: src/commands.c:2092
+#: src/commands.c:2093
 msgid "Processing every bottom field."
 msgstr ""
 
-#: src/commands.c:2107
+#: src/commands.c:2108
 #, c-format
-msgid "Horizontal Resolution will be %d on restart."
+msgid "Horizontal resolution will be %d pixels on restart."
 msgstr ""
 
-#: src/commands.c:2153
+#: src/commands.c:2154
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr ""
 
-#: src/commands.c:2184
+#: src/commands.c:2185
 msgid "All channels re-activated."
 msgstr ""
 
-#: src/commands.c:2205
+#: src/commands.c:2206
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr ""
 
-#: src/commands.c:2217
+#: src/commands.c:2218
 msgid "Scanner unavailable with signal checking disabled."
 msgstr ""
 
-#: src/commands.c:2244
+#: src/commands.c:2245
 msgid "Scanning for channels being broadcast."
 msgstr ""
 
-#: src/commands.c:2262
+#: src/commands.c:2263
 msgid "Closed captions disabled."
 msgstr ""
 
-#: src/commands.c:2268
+#: src/commands.c:2269
 msgid "Closed captions enabled."
 msgstr ""
 
-#: src/commands.c:2280
+#: src/commands.c:2281
 msgid "No VBI device configured for CC decoding."
 msgstr ""
 
-#: src/commands.c:2296
+#: src/commands.c:2297
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr ""
 
-#: src/commands.c:2338
+#: src/commands.c:2339
 #, c-format
 msgid "Running: %s"
 msgstr ""
 
-#: src/commands.c:2415
+#: src/commands.c:2416
 msgid "Signal detection enabled."
 msgstr ""
 
-#: src/commands.c:2418
+#: src/commands.c:2419
 msgid "Signal detection disabled."
 msgstr ""
 
-#: src/commands.c:2431
+#: src/commands.c:2432
 msgid "XDS decoding enabled."
 msgstr ""
 
-#: src/commands.c:2434
+#: src/commands.c:2435
 msgid "XDS decoding disabled."
 msgstr ""
 
-#: src/commands.c:2480
+#: src/commands.c:2481
 msgid "Colour invert enabled."
 msgstr ""
 
-#: src/commands.c:2482
+#: src/commands.c:2483
 msgid "Colour invert disabled."
 msgstr ""
 
-#: src/commands.c:2504
+#: src/commands.c:2505
 msgid "Mirror enabled."
 msgstr ""
 
-#: src/commands.c:2506
+#: src/commands.c:2507
 msgid "Mirror disabled."
 msgstr ""
 
-#: src/commands.c:2528
+#: src/commands.c:2529
 msgid "Chroma kill enabled."
 msgstr ""
 
-#: src/commands.c:2530
+#: src/commands.c:2531
 msgid "Chroma kill disabled."
 msgstr ""
 
-#: src/commands.c:2547
+#: src/commands.c:2548
 msgid "Luma correction enabled."
 msgstr ""
 
-#: src/commands.c:2549
+#: src/commands.c:2550
 msgid "Luma correction disabled."
 msgstr ""
 
-#: src/commands.c:2566
+#: src/commands.c:2567
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr ""
 
-#: src/commands.c:2589
+#: src/commands.c:2590
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr ""
 
-#: src/commands.c:2619
+#: src/commands.c:2620
 msgid "Picture settings reset to defaults."
 msgstr ""
 
-#: src/commands.c:2647
+#: src/commands.c:2648
 msgid "Using nominal NTSC cable frequencies."
 msgstr ""
 
-#: src/commands.c:2653
+#: src/commands.c:2654
 msgid "Using IRC cable frequencies."
 msgstr ""
 
-#: src/commands.c:2659
+#: src/commands.c:2660
 msgid "Using HRC cable frequencies."
 msgstr ""
 
-#: src/commands.c:2743 src/commands.c:2757
+#: src/commands.c:2744 src/commands.c:2758
 msgid "Volume"
 msgstr ""
 
-#: src/commands.c:2907
+#: src/commands.c:2908
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 
-#: src/commands.c:2920
+#: src/commands.c:2921
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr ""
 
-#: src/commands.c:3004
+#: src/commands.c:3005
 msgid "Paused."
 msgstr ""
 
-#: src/commands.c:3004
+#: src/commands.c:3005
 msgid "Resumed."
 msgstr ""
 
@@ -842,7 +842,7 @@ msgid "%s is not a tvtime configuration file.\n"
 msgstr ""
 
 #: src/tvtimeconf.c:570
-msgid "Config file cannot be parsed by tvtime. Settings will not be saved.\n"
+msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr ""
 
 #: src/tvtimeconf.c:577
@@ -932,7 +932,8 @@ msgid "  -h, --help                 Show this help message.\n"
 msgstr ""
 
 #: src/tvtimeconf.c:667 src/tvtimeconf.c:720
-msgid "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+msgid ""
+"  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"
 msgstr ""
 
 #: src/tvtimeconf.c:668 src/tvtimeconf.c:721 src/tvtimeconf.c:749
@@ -942,8 +943,8 @@ msgstr ""
 
 #: src/tvtimeconf.c:669 src/tvtimeconf.c:722
 msgid ""
-"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-"                             (defaults to 720).\n"
+"  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
+"                             (defaults to 720 pixels).\n"
 msgstr ""
 
 #: src/tvtimeconf.c:671
@@ -1116,7 +1117,7 @@ msgstr ""
 
 #: src/tvtime-scanner.c:136
 #, c-format
-msgid "Checking %6.2fMHz:"
+msgid "Checking %6.2f MHz:"
 msgstr ""
 
 #: src/tvtime-scanner.c:147 src/tvtime-scanner.c:154
@@ -1126,5 +1127,5 @@ msgstr ""
 #: src/tvtime-scanner.c:166
 #, c-format
 msgid ""
-"Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to stationlist.\n"
+"Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
