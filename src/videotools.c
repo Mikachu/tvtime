@@ -22,7 +22,7 @@
 #include "speedy.h"
 #include "videotools.h"
 
-static inline unsigned char clip255( int x )
+static inline __attribute__ ((always_inline,const))unsigned char clip255( int x )
 {
     if( x > 255 ) {
         return 255;
