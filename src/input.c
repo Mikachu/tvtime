@@ -31,10 +31,7 @@
 #include <lirc/lirc_client.h>
 #endif
 
-#include "tvtimeconf.h"
 #include "input.h"
-#include "commands.h"
-#include "console.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -42,8 +39,8 @@
 
 /* Key names. */
 typedef struct key_name_s key_name_t;
-
-struct key_name_s {
+struct key_name_s
+{
     char *name;
     int key;
 };
@@ -177,13 +174,17 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
     return in;
 }
 
+void input_delete( input_t *in )
+{
+    free( in );
+}
+
 void input_callback( input_t *in, int command, int arg )
 {
-    int tvtime_cmd, verbose;
+    int tvtime_cmd = 0;
 
+    /* Once we've been told to quit, ignore all commands. */
     if( in->quit ) return;
-
-    verbose = config_get_verbose( in->cfg );
 
     switch( command ) {
     case I_QUIT:
@@ -287,10 +288,5 @@ void input_next_frame( input_t *in )
         poll_lirc( in, in->lirc_conf );
 #endif
     }
-}
-
-void input_delete( input_t *in )
-{
-    free( in );
 }
 
