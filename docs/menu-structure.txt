@@ -1,0 +1,41 @@
+
+The tvtime menu should be small, simple,
+and sufficient.
+
+Setup
+  Station management
+    Renumber channel
+    Rename channel
+    Station favorites
+    Current channel   [active | inactive]
+    Reactivate all channels
+    Start scan
+    Back
+  Input configuration
+    Input sampling   [720]
+    VBI processing   [on | off]
+    Save settings
+    Restart with new settings
+    Back
+  Picture
+    Brightness
+      < Adjust >
+      Back
+    Contrast
+      < Adjust >
+      Back
+    Colour
+      < Adjust >
+      Back
+    Hue
+      < Adjust >
+      Back
+    Back
+  Video processing
+    Deinterlacer configuration
+    Attempted framerate
+    Input filters
+    Back
+  Exit
+
+
