@@ -16,6 +16,7 @@ Setup
       Television standard
       Sharpness
       Back
+    Audio mode
     Data services
     Restart with new settings
     Back

@@ -502,7 +502,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "input" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
-    menu_set_text( menu, 1, "Device setup" );
+    sprintf( string, "%c%c%c  Device setup", 0xee, 0x80, 0xa6 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "device" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "device" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
@@ -553,11 +554,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 3, "Attempted framerate" );
+    sprintf( string, "Attempted framerate" );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 4, "Input filters" );
+    sprintf( string, "Input filters" );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "filters" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "filters" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
