@@ -543,6 +543,31 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
     SPEEDY_END();
 }
 
+void kill_chroma_packed422_inplace_scanline_mmx( unsigned char *data, int width )
+{
+    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
+    const mmx_t nullchroma = { 0x8000800080008000ULL };
+
+    SPEEDY_START();
+
+    movq_m2r( ymask, mm7 );
+    movq_m2r( nullchroma, mm6 );
+    for(; width > 4; width -= 4 ) {
+        movq_m2r( *data, mm0 );
+        pand_r2r( mm7, mm0 );
+        paddb_r2r( mm6, mm0 );
+        movq_r2m( mm0, *data );
+        data += 8;
+    }
+    emms();
+
+    while( width-- ) {
+        data[ 1 ] = 128;
+        data += 2;
+    }
+    SPEEDY_END();
+}
+
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
     SPEEDY_START();
@@ -1562,6 +1587,7 @@ void setup_speedy_calls( int verbose )
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
         premultiply_packed4444_scanline = premultiply_packed4444_scanline_mmxext;
+        kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         blend_packed422_scanline = blend_packed422_scanline_mmxext;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
@@ -1572,6 +1598,7 @@ void setup_speedy_calls( int verbose )
         }
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
+        kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
     } else {
         if( verbose ) {

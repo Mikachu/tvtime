@@ -120,6 +120,7 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
 
 void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width );
 void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width );
+void kill_chroma_packed422_inplace_scanline_mmx( unsigned char *data, int width );
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width );
