@@ -1068,6 +1068,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             int x, y, w, h;
             double refresh;
 
+            DpyInfoUpdateResolution( display, XScreenNumberOfScreen( attrs.screen ), attrs.x, attrs.y );
             DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
             DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
 
