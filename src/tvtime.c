@@ -2036,7 +2036,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
-                    fprintf( stderr, "tvtime: Can't capture next frame, exiting.\n" );
+                    has_signal = 0;
+                    save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
+                    fadepos = 0;
                     tuner_state = TUNER_STATE_NO_SIGNAL;
                     acquired = 0;
                 } else {
