@@ -37,8 +37,9 @@ struct tvtime_mode_settings_s
     int framerate_mode;
 };
 
-config_t *config_new( int argc, char **argv );
+config_t *config_new( void );
 void config_delete( config_t *ct );
+int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv );
 int config_key_to_command( config_t *ct, int key );
 int config_button_to_command( config_t *ct, int button );
 

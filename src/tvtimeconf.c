@@ -518,15 +518,12 @@ static void print_usage( char **argv )
                      "\t  \t\trussia\n" );
 }
 
-config_t *config_new( int argc, char **argv )
+config_t *config_new( void )
 {
     DIR *temp_dir = 0;
     char temp_dirname[ 1024 ];
     char base[ 256 ];
-    char *configFile = 0;
-    char c;
     struct passwd *pwuid = 0;
-    int saveoptions = 0;
 
     config_t *ct = (config_t *) malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -691,8 +688,7 @@ config_t *config_new( int argc, char **argv )
     strcat( base, "/tvtime.xml" );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
-        configFile = base;
-        conf_xml_parse(ct, configFile);
+        conf_xml_parse( ct, base );
     }
 
     /* Then read in local settings. */
@@ -701,9 +697,17 @@ config_t *config_new( int argc, char **argv )
     sprintf( ct->config_filename, "%s", base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
-        configFile = base;
-        conf_xml_parse(ct, configFile);
+        conf_xml_parse( ct, base );
     }
+
+    return ct;
+}
+
+int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
+{
+    char *configFile = 0;
+    int saveoptions = 0;
+    char c;
 
     while( (c = getopt( argc, argv, "ahkmsSvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
         switch( c ) {
@@ -713,7 +717,8 @@ config_t *config_new( int argc, char **argv )
         case 's': ct->debug = 1; break;
         case 'S': saveoptions = 1; break;
         case 'v': ct->verbose = 1; break;
-        case 'F': configFile = strdup( optarg ); break;
+        case 'F': if( configFile ) { free( configFile ); }
+                  configFile = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
                   ct->rvr_filename = strdup( optarg ); break;
         case 'H': ct->outputheight = atoi( optarg ); break;
@@ -730,24 +735,12 @@ config_t *config_new( int argc, char **argv )
     }
 
     /* Then read in additional settings. */
-    if( configFile && configFile != base ) {
+    if( configFile ) {
         sprintf( ct->config_filename, "%s", configFile );
         fprintf( stderr, "config: Reading configuration from %s\n", configFile );
 
-        conf_xml_parse(ct, configFile);
+        conf_xml_parse( ct, configFile );
         free( configFile );
-    }
-
-    /* Sanity check parameters into reasonable ranges here. */
-    if( ct->inputwidth & 1 ) {
-        ct->inputwidth -= 1;
-        fprintf( stderr, "config: Odd values for input width not allowed, "
-                         "using %d instead.\n", ct->inputwidth );
-    }
-
-    /* I phear that users may want to know this. */
-    if( ct->verbose ) {
-        fprintf( stderr, "config: Screenshots saved to %s\n", ct->ssdir );
     }
 
     ct->configsave = configsave_open( ct->config_filename );
@@ -786,7 +779,7 @@ config_t *config_new( int argc, char **argv )
         configsave( ct->configsave, "Frequencies", ct->freq );
     }
 
-    return ct;
+    return 1;
 }
 
 void config_delete( config_t *ct )
