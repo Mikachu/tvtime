@@ -564,6 +564,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
     ct->keymap[ 'w' ] = TVTIME_TOGGLE_CC;
     ct->keymap[ '=' ] = TVTIME_TOGGLE_HALF_FRAMERATE;
+    ct->keymap[ I_END ] = TVTIME_TOGGLE_PAUSE;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

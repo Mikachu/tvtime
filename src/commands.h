@@ -108,7 +108,9 @@ enum tvtime_commands
     TVTIME_CHANNEL_7,
     TVTIME_CHANNEL_8,
     TVTIME_CHANNEL_9,
-    TVTIME_CHANNEL_0
+    TVTIME_CHANNEL_0,
+
+    TVTIME_TOGGLE_PAUSE
 };
 
 int tvtime_string_to_command( const char *str );
@@ -143,6 +145,7 @@ int commands_menu_on( commands_t *in );
 void commands_set_menu( commands_t *in, menu_t *m );
 
 void commands_next_frame( commands_t *in );
+int commands_pause( commands_t *in );
 
 #ifdef __cplusplus
 };

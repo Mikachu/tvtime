@@ -106,6 +106,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
+    { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
 
     { "QUIT", TVTIME_QUIT },
@@ -174,6 +175,7 @@ struct commands_s {
     int togglepulldowndetection;
     int halfrate;
     int scan_channels;
+	int pause;
     
     int menu_on;
     menu_t *menu;
@@ -261,6 +263,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->console_on = 0;
     in->scrollconsole = 0;
     in->scan_channels = 0;
+    in->pause = 0;
 
     in->console = 0;
     in->vbi = 0;
@@ -678,6 +681,17 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_CHANNEL_0:
         commands_handle(in, TVTIME_CHANNEL_CHAR, 48);
         break;
+
+    case TVTIME_TOGGLE_PAUSE:
+		if( in->pause ) {
+			if( in->osd ) tvtime_osd_show_message( in->osd, "Resumed" );
+			in->pause = 0;
+		} else {
+			if( in->osd ) tvtime_osd_show_message( in->osd, "Paused" );
+			in->pause = 1;
+		}
+        break;
+
     }
 }
 
@@ -786,5 +800,10 @@ int commands_menu_on( commands_t *in )
 int commands_scan_channels( commands_t *in )
 {
     return in->scan_channels;
+}
+
+int commands_pause( commands_t *in )
+{
+    return in->pause;
 }
 
