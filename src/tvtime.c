@@ -889,37 +889,43 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
 {
     char string[ 128 ];
 
+    snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "overscan" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+
     if( widescreen ) {
         snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa5 );
     } else {
         snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa4 );
     }
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_right_command( menu, 1, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_right_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
 
     if( fullscreen ) {
         snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa5 );
     } else {
         snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa4 );
     }
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_FULLSCREEN, "" );
-    menu_set_right_command( menu, 2, TVTIME_TOGGLE_FULLSCREEN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-
-    snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_ALWAYSONTOP, "" );
-    menu_set_right_command( menu, 3, TVTIME_TOGGLE_ALWAYSONTOP, "" );
+    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_FULLSCREEN, "" );
+    menu_set_right_command( menu, 3, TVTIME_TOGGLE_FULLSCREEN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_ALWAYSONTOP, "" );
+    menu_set_right_command( menu, 4, TVTIME_TOGGLE_ALWAYSONTOP, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
 }
 
 static void build_pulldown_menu( menu_t *menu, int pulldownactive )

@@ -608,10 +608,36 @@ static void reset_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
     }
 }
 
+static void reset_overscan_menu( menu_t *menu, double overscan )
+{
+    char string[ 128 ];
+
+    sprintf( string, "%c%c%c  Current: %.1f%%", 0xee, 0x80, 0x80, overscan * 2.0 * 100.0 );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
+    menu_set_right_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
+    menu_set_right_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+}
+
 static void menu_set_value( menu_t *menu, int newval )
 {
     char string[ 128 ];
-    sprintf( string, "%c%c%c  %d", 0xee, 0x80, 0x80, newval );
+    sprintf( string, "%c%c%c  Current: %d", 0xee, 0x80, 0x80, newval );
     menu_set_text( menu, 1, string );
 }
 
@@ -915,6 +941,11 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, "Setup - Output configuration" );
     commands_add_menu( cmd, menu );
 
+    menu = menu_new( "overscan" );
+    menu_set_text( menu, 0, "Setup - Output configuration - Overscan" );
+    commands_add_menu( cmd, menu );
+    reset_overscan_menu( commands_get_menu( cmd, "overscan" ), cmd->overscan );
+
     menu = menu_new( "processing" );
     menu_set_text( menu, 0, "Setup - Video processing" );
     sprintf( string, "%c%c%c  Deinterlacer configuration", 0xee, 0x80, 0xa1 );
@@ -1020,7 +1051,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "brightness" );
     menu_set_text( menu, 0, "Setup - Picture - Brightness" );
-    sprintf( string, "%c%c%c  ---", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
@@ -1047,7 +1078,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "contrast" );
     menu_set_text( menu, 0, "Setup - Picture - Contrast" );
-    sprintf( string, "%c%c%c  ---", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
@@ -1074,7 +1105,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "colour" );
     menu_set_text( menu, 0, "Setup - Picture - Colour" );
-    sprintf( string, "%c%c%c  ---", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
@@ -1101,7 +1132,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "hue" );
     menu_set_text( menu, 0, "Setup - Picture - Hue" );
-    sprintf( string, "%c%c%c  ---", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
@@ -1877,6 +1908,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             snprintf( message, sizeof( message ), "Overscan: %.1f%%",
                       cmd->overscan * 2.0 * 100.0 );
             tvtime_osd_show_message( cmd->osd, message );
+            reset_overscan_menu( commands_get_menu( cmd, "overscan" ), cmd->overscan );
+            commands_refresh_menu( cmd );
         }
         break;
 
