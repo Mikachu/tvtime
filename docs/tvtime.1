@@ -1,7 +1,7 @@
-.TH "tvtime" "1" "0.9.7" "Billy Biggs <vektor@dumbterm.net>" ""
+.TH tvtime 1 "February 2003" "tvtime 0.9.7"
 .SH "NAME"
 .LP 
-\fBtvtime\fR \- a high quality television application
+.B tvtime \- a high quality television application
 .SH "SYNTAX"
 .LP 
 tvtime [\-vamsb] [\-w <width>] [\-I <sampling>] [\-d <device>] [\-i <input>] [\-n <norm>] [\-f <frequencies>] [\-t <tuner>] [\-D <preferred deinterlace method>]
@@ -13,44 +13,44 @@ tvtime is a high quality television application for use with video capture cards
   tvtime supports:
 
 .TP
-\fBo\fR
+.B o
 Deinterlaced output at full interlaced rate of 59.94 frames per second for NTSC
 source, or 50 frames per second for PAL sources. This gives smoothness of
 motion and high visual quality.
 
 .TP
-\fBo\fR
+.B o
 Multiple deinterlacing algorithms for finding the optimal mode for the video
 content and available processor speed.
 
 .TP
-\fBo\fR
+.B o
 16:9 aspect ratio mode for the highest available resolution when processing
 input from an external DVD player or digital satellite receiver.
 
 .TP
-\fBo\fR
+.B o
 A super\-slick on\-screen\-display for the complete television experience.
 .SH "OPTIONS"
 .TP
-\fB\-h\fR
+.B \-h
 Show usage information.
 .TP
-\fB\-v\fR
+.B \-v
 The verbose setting indicates that we should print full informational and
 warning messages to stderr while running tvtime.  Otherwise, only fatal errors
 will be printed to the output.
 .TP
-\fB\-a\fR
+.B \-a
 This option starts tvtime in 16:9 aspect ratio mode.
 .TP
-\fB\-s\fR
+.B \-s
 Print frame skip information (for debugging).
 .TP
-\fB\-m\fR
+.B \-m
 Start tvtime in fullscreen mode.
 .TP
-\fB\-T\fR
+.B -T
 V4L input scanline sampling, defaults to 720.
 This sets how many pixels per scanline to request from the capture card.
 A higher setting gives better quality, while a lower setting means we do
@@ -59,33 +59,33 @@ less than 500Mhz or so), maybe values of 480 or 400 might suit you best.
 For best quality, choose a high value like 720 or 768.  Many capture
 cards cannot sample higher than 768 pixels per scanline.
 .TP
-\fB\-w\fR
+.B \-w
 This sets the initial width of the output window, defaults to 800.
 .TP
-\fB\-d\fR
+.B \-d
 video4linux device to use (defaults to /dev/video0).
 .TP
-\fB\-i\fR
+.B \-i
 video4linux input number (defaults to 0).  Cards commonly have a bunch of
 sources, for example, for my WinTV card source 0 is my tuner and source 1 is
 the composite input.
 .TP
-\fB\-c\fR
+.B \-c
 This turns on luma correction on startup.  Luma correction can be turned on or
 off within the application using the 'c' key.
 .TP
-\fB\-l\fR
+.B \-l
 Luma correction value (defaults to 1.0, use of this implies \-c).  This
 indicates the power for correction.  A value of 1.0 does nothing except apply
 Bt8x8 correction, if you have a Bt8x8-based capture card.  Values less than one
 make the output darker, and values greater than one make the output brighter.
 The valid range is 0.1 to 10.0 in increments of 0.1.
 .TP
-\fB\-n\fR
+.B \-n
 The mode to set the tuner to: PAL, NTSC, SECAM, PAL\-NC, PAL\-M, PAL\-N or
 NTSC\-JP (defaults to NTSC).
 .TP
-\fB\-f\fR
+.B \-f
 The channels you are receiving with the tuner (defaults to us\-cable).
 
 Valid values are:
@@ -98,7 +98,7 @@ Valid values are:
         france
         russia
 .TP
-\fB\-D\fR
+.B \-D
 Sets the deinterlace method that will be used when tvtime starts up (defaults to 0).
 .SH "FILES"
 .LP 
