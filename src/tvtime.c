@@ -1814,10 +1814,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 config_save( ct, "FullScreen", "1" );
-                if( osd ) tvtime_osd_show_message( osd, _("Fullscreen mode active.") );
             } else {
                 config_save( ct, "FullScreen", "0" );
-                if( osd ) tvtime_osd_show_message( osd, _("Windowed mode active.") );
             }
             build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                output->is_fullscreen(), output->is_alwaysontop(),
