@@ -24,7 +24,7 @@ typedef struct band_s band_t;
 typedef struct freqtable_s freqtable_t;
 
 struct band_entry_s {
-    const char *name;
+    const char *name;	/* ascii representation of frequency */
     unsigned int freq;
 };
 
