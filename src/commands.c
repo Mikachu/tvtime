@@ -864,7 +864,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         mixer_mute( !mixer_ismute() );
 
         if( in->osd ) {
-            tvtime_osd_show_volume_bar( in->osd, (mixer_get_volume()) & 0xff );
+            tvtime_osd_show_data_bar( in->osd, "Volume", (mixer_get_volume()) & 0xff );
         }
         break;
 
@@ -878,7 +878,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
 
         if( in->osd ) {
-            tvtime_osd_show_volume_bar( in->osd, volume & 0xff );
+            tvtime_osd_show_data_bar( in->osd, "Volume", volume & 0xff );
         }
         break;
 
@@ -919,7 +919,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         if( in->vidin ) {
             videoinput_set_hue_relative( in->vidin, (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
             if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Hue    ", videoinput_get_hue( in->vidin ) );
+                tvtime_osd_show_data_bar( in->osd, "Hue", videoinput_get_hue( in->vidin ) );
             }
         }
         break;
@@ -929,7 +929,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         if( in->vidin ) {
             videoinput_set_brightness_relative( in->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );
             if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
+                tvtime_osd_show_data_bar( in->osd, "Brightness", videoinput_get_brightness( in->vidin ) );
             }
         }
         break;
@@ -939,7 +939,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         if( in->vidin ) {
             videoinput_set_contrast_relative( in->vidin, (tvtime_cmd == TVTIME_CONTRAST_UP) ? 1 : -1 );
             if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
+                tvtime_osd_show_data_bar( in->osd, "Contrast", videoinput_get_contrast( in->vidin ) );
             }
         }
         break;
@@ -949,7 +949,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         if( in->vidin ) {
             videoinput_set_colour_relative( in->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
             if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Colour ", videoinput_get_colour( in->vidin ) );
+                tvtime_osd_show_data_bar( in->osd, "Colour", videoinput_get_colour( in->vidin ) );
             }
         }
         break;

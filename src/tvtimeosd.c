@@ -34,28 +34,28 @@ typedef struct string_object_s
     osd_string_t *string;
     int xpos;
     int ypos;
-    int rightjustified;
+    int align;
 } string_object_t;
+
+enum osd_align
+{
+    OSD_LEFT,
+    OSD_RIGHT,
+    OSD_CENTRE
+};
 
 enum osd_objects
 {
     OSD_CHANNEL_NUM = 0,
     OSD_CHANNEL_NAME,
+    OSD_INPUT_NAME,
     OSD_TUNER_INFO,
     OSD_SIGNAL_INFO,
-    OSD_VOLUME_BAR,
-    OSD_DATA_BAR,
+    OSD_MESSAGE1_BAR,
+    OSD_MESSAGE2_BAR,
+    OSD_DATA_VALUE,
     OSD_MUTED,
     OSD_TIME_STRING,
-
-    /* XDS data */
-    OSD_NETWORK_NAME,
-    OSD_NETWORK_CALL,
-    OSD_SHOW_NAME,
-    OSD_SHOW_RATING,
-    OSD_SHOW_START,
-    OSD_SHOW_LENGTH,
-
     OSD_MAX_STRING_OBJECTS
 };
 
@@ -108,6 +108,11 @@ struct tvtime_osd_s
     int pulldown_mode;
     int mutestate;
     int hold;
+
+    int margin_left;
+    int margin_right;
+    int margin_top;
+    int margin_bottom;
 };
 
 const int top_size = 7;
@@ -121,6 +126,12 @@ const int big_size_576 = 80;
 tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                               unsigned int channel_rgb, unsigned int other_rgb )
 {
+    int channel_r = (channel_rgb >> 16) & 0xff;
+    int channel_g = (channel_rgb >>  8) & 0xff;
+    int channel_b = (channel_rgb      ) & 0xff;
+    int other_r = (other_rgb >> 16) & 0xff;
+    int other_g = (other_rgb >>  8) & 0xff;
+    int other_b = (other_rgb      ) & 0xff;
     int smallsize, medsize, bigsize;
     char *fontfile;
     char *logofile;
@@ -137,9 +148,15 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->pulldown_mode = 0;
     osd->mutestate = 0;
     osd->hold = 0;
+
+    osd->margin_left = ((width * left_size) / 100) & ~1;
+    osd->margin_right = (width - ((width * left_size) / 100)) & ~1;
+    osd->margin_top = (height * top_size) / 100;
+    osd->margin_bottom = height - osd->margin_top;
+
     osd->listpos_x = width / 2;
     osd->listpos_y = (height * 30) / 100;
-    osd->databar_xend = (width * 90) / 100;
+    osd->databar_xend = osd->margin_right;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -211,47 +228,26 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         return 0;
     }
 
-    osd->strings[ OSD_CHANNEL_NUM ].rightjustified = 0;
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( osd->bigfont );
-    osd->strings[ OSD_CHANNEL_NAME ].rightjustified = 0;
     osd->strings[ OSD_CHANNEL_NAME ].string = osd_string_new( osd->medfont );
-    osd->strings[ OSD_TIME_STRING ].rightjustified = 1;
     osd->strings[ OSD_TIME_STRING ].string = osd_string_new( osd->medfont );
-    osd->strings[ OSD_TUNER_INFO ].rightjustified = 0;
+    osd->strings[ OSD_INPUT_NAME ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_TUNER_INFO ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_SIGNAL_INFO ].rightjustified = 0;
     osd->strings[ OSD_SIGNAL_INFO ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_VOLUME_BAR ].rightjustified = 0;
-    osd->strings[ OSD_VOLUME_BAR ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_DATA_BAR ].rightjustified = 0;
-    osd->strings[ OSD_DATA_BAR ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_MUTED ].rightjustified = 0;
+    osd->strings[ OSD_MESSAGE1_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_MESSAGE2_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_DATA_VALUE ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_MUTED ].string = osd_string_new( osd->smallfont );
 
-    osd->strings[ OSD_NETWORK_NAME ].rightjustified = 1;
-    osd->strings[ OSD_NETWORK_NAME ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_NETWORK_CALL ].rightjustified = 1;
-    osd->strings[ OSD_NETWORK_CALL ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_SHOW_NAME ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_NAME ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_SHOW_RATING ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_RATING ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_SHOW_START ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_START ].string = osd_string_new( osd->smallfont );
-    osd->strings[ OSD_SHOW_LENGTH ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont );
-
     /* We create the logos, but it's ok if they fail to load. */
-    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 1 );
-    osd->film_logo = osd_animation_new( "filmstrip", pixel_aspect, 256, 2 );
+    osd->channel_logo = 0; // osd_animation_new( logofile, pixel_aspect, 256, 1 );
+    osd->film_logo = 0; // osd_animation_new( "filmstrip", pixel_aspect, 256, 2 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
+        !osd->strings[ OSD_INPUT_NAME ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
-        !osd->strings[ OSD_VOLUME_BAR ].string || !osd->strings[ OSD_DATA_BAR ].string ||
-        !osd->strings[ OSD_MUTED ].string || !osd->strings[ OSD_SHOW_NAME ].string ||
-        !osd->strings[ OSD_SHOW_RATING ].string || !osd->strings[ OSD_SHOW_START ].string ||
-        !osd->strings[ OSD_SHOW_LENGTH ].string || !osd->strings[ OSD_NETWORK_NAME ].string ||
-        !osd->strings[ OSD_NETWORK_CALL ].string || !osd->strings[ OSD_CHANNEL_NAME ].string ) {
+        !osd->strings[ OSD_MESSAGE1_BAR ].string || !osd->strings[ OSD_MESSAGE2_BAR ].string ||
+        !osd->strings[ OSD_DATA_VALUE ].string || !osd->strings[ OSD_MUTED ].string ) {
 
         fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
         tvtime_osd_delete( osd );
@@ -259,118 +255,104 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     }
     if( osd->channel_logo ) osd_animation_pause( osd->channel_logo, 1 );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_TUNER_INFO ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_TUNER_INFO ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, "0", 0 );
-    osd->strings[ OSD_TUNER_INFO ].xpos = (( width * left_size ) / 100) & ~1;
-    osd->strings[ OSD_TUNER_INFO ].ypos = ( height * top_size ) / 100;
-
-    osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NUM ].string,
-                               (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
+    /* Left top. */
+    osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NUM ].string, channel_r, channel_g, channel_b );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NUM ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "0", 0 );
-    osd->strings[ OSD_CHANNEL_NUM ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
-    osd->strings[ OSD_CHANNEL_NUM ].ypos = osd->strings[ OSD_TUNER_INFO ].ypos
-                               + osd_string_get_height( osd->strings[ OSD_TUNER_INFO ].string );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "000", 0 );
+    osd->strings[ OSD_CHANNEL_NUM ].align = OSD_LEFT;
+    osd->strings[ OSD_CHANNEL_NUM ].xpos = osd->margin_left;
+    osd->strings[ OSD_CHANNEL_NUM ].ypos = osd->margin_top;
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NAME ].string,
-                               (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
+    osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NAME ].string, channel_r, channel_g, channel_b );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NAME ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "gY", 0 );
-    osd->strings[ OSD_CHANNEL_NAME ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
-    osd->strings[ OSD_CHANNEL_NAME ].ypos = osd->strings[ OSD_CHANNEL_NUM ].ypos
-                               + osd_string_get_height( osd->strings[ OSD_CHANNEL_NUM ].string );
+    osd->strings[ OSD_CHANNEL_NAME ].align = OSD_CENTRE;
+    osd->strings[ OSD_CHANNEL_NAME ].xpos = width / 2;
+    osd->strings[ OSD_CHANNEL_NAME ].ypos = osd->margin_top;
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_SIGNAL_INFO ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
+    osd_string_set_colour_rgb( osd->strings[ OSD_SIGNAL_INFO ].string, other_r, other_g, other_b );
     osd_string_show_border( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_SIGNAL_INFO ].string, "No signal", 0 );
     osd_string_set_hold( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
-    osd->strings[ OSD_SIGNAL_INFO ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
+    osd->strings[ OSD_SIGNAL_INFO ].align = OSD_CENTRE;
+    osd->strings[ OSD_SIGNAL_INFO ].xpos = width / 2;
     osd->strings[ OSD_SIGNAL_INFO ].ypos = osd->strings[ OSD_CHANNEL_NAME ].ypos
-                            + osd_string_get_height( osd->strings[ OSD_CHANNEL_NAME ].string );
+                                         + osd_string_get_height( osd->strings[ OSD_CHANNEL_NAME ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_TIME_STRING ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
+
+    /* Right top. */
+    osd_string_set_colour_rgb( osd->strings[ OSD_TIME_STRING ].string, other_r, other_g, other_b );
     osd_string_show_border( osd->strings[ OSD_TIME_STRING ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, "8", 0 );
-    osd->strings[ OSD_TIME_STRING ].xpos = width - ((( width * left_size ) / 100) & ~1); // (( width * 65 ) / 100) & ~1;
-    osd->strings[ OSD_TIME_STRING ].ypos = ( height * top_size ) / 100;
+    osd->strings[ OSD_TIME_STRING ].align = OSD_RIGHT;
+    osd->strings[ OSD_TIME_STRING ].xpos = osd->margin_right;
+    osd->strings[ OSD_TIME_STRING ].ypos = osd->margin_top;
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_VOLUME_BAR ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_VOLUME_BAR ].string, 1 );
-    osd->strings[ OSD_VOLUME_BAR ].xpos = (( width * left_size ) / 100) & ~1;
-    osd->strings[ OSD_VOLUME_BAR ].ypos = ( height * (100 - bottom_size) ) / 100;
+    osd_string_set_colour_rgb( osd->strings[ OSD_INPUT_NAME ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_INPUT_NAME ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_INPUT_NAME ].string, "0g", 0 );
+    osd->strings[ OSD_INPUT_NAME ].align = OSD_RIGHT;
+    osd->strings[ OSD_INPUT_NAME ].xpos = osd->margin_right;
+    osd->strings[ OSD_INPUT_NAME ].ypos = osd->strings[ OSD_TIME_STRING ].ypos
+                                        + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_DATA_BAR ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_DATA_BAR ].string, 1 );
-    osd->strings[ OSD_DATA_BAR ].xpos = osd->strings[ OSD_VOLUME_BAR ].xpos;
-    osd->strings[ OSD_DATA_BAR ].ypos = ( height * (100 - bottom_size) ) / 100;
+    osd_string_set_colour_rgb( osd->strings[ OSD_TUNER_INFO ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_TUNER_INFO ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, "0", 0 );
+    osd->strings[ OSD_TUNER_INFO ].align = OSD_RIGHT;
+    osd->strings[ OSD_TUNER_INFO ].xpos = osd->margin_right;
+    osd->strings[ OSD_TUNER_INFO ].ypos = osd->strings[ OSD_INPUT_NAME ].ypos
+                                        + osd_string_get_height( osd->strings[ OSD_INPUT_NAME ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_MUTED ].string,
-                               (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
+
+    /* Bottom. */
+    osd_string_set_colour_rgb( osd->strings[ OSD_MESSAGE2_BAR ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_MESSAGE2_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_MESSAGE2_BAR ].string, "8", 0 );
+    osd->strings[ OSD_MESSAGE2_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_MESSAGE2_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_MESSAGE2_BAR ].ypos = osd->margin_bottom
+                                          - osd_string_get_height( osd->strings[ OSD_MESSAGE2_BAR ].string );
+
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_DATA_VALUE ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_DATA_VALUE ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, "8", 0 );
+    osd->strings[ OSD_DATA_VALUE ].align = OSD_RIGHT;
+    osd->strings[ OSD_DATA_VALUE ].xpos = osd->margin_right;
+    osd->strings[ OSD_DATA_VALUE ].ypos = osd->margin_bottom
+                                        - osd_string_get_height( osd->strings[ OSD_DATA_VALUE ].string );
+
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_MESSAGE1_BAR ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_MESSAGE1_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, "8", 0 );
+    osd->strings[ OSD_MESSAGE1_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_MESSAGE1_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_MESSAGE1_BAR ].ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos
+                                          - osd_string_get_height( osd->strings[ OSD_MESSAGE1_BAR ].string );
+
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_MUTED ].string, other_r, other_g, other_b );
     osd_string_show_border( osd->strings[ OSD_MUTED ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_MUTED ].string, "Mute", 0 );
-    osd->strings[ OSD_MUTED ].xpos = osd->strings[ OSD_VOLUME_BAR ].xpos;
-    osd->strings[ OSD_MUTED ].ypos = osd->strings[ OSD_VOLUME_BAR ].ypos
-                                     - osd_string_get_height( osd->strings[ OSD_MUTED ].string );
+    osd->strings[ OSD_MUTED ].align = OSD_LEFT;
+    osd->strings[ OSD_MUTED ].xpos = osd->margin_left;
+    osd->strings[ OSD_MUTED ].ypos = osd->strings[ OSD_MESSAGE1_BAR ].ypos
+                                   - osd_string_get_height( osd->strings[ OSD_MESSAGE2_BAR ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_SHOW_RATING ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_SHOW_RATING ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, "Not Rated ", 0 );
-    osd->strings[ OSD_SHOW_RATING ].xpos = osd->strings[ OSD_DATA_BAR ].xpos;
-    osd->strings[ OSD_SHOW_RATING ].ypos = osd->strings[ OSD_DATA_BAR ].ypos - osd_string_get_height( osd->strings[ OSD_MUTED ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_SHOW_NAME ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_SHOW_NAME ].string, 1 );
-    osd->strings[ OSD_SHOW_NAME ].xpos = ( osd->strings[ OSD_DATA_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_SHOW_RATING ].string ) ) & ~1;
-    osd->strings[ OSD_SHOW_NAME ].ypos = osd->strings[ OSD_DATA_BAR ].ypos - osd_string_get_height( osd->strings[ OSD_MUTED ].string );
+    /* Images. */
+    osd->channel_logo_xpos = osd->margin_right;
+    osd->channel_logo_ypos = osd->strings[ OSD_TUNER_INFO ].ypos
+                           + osd_string_get_height( osd->strings[ OSD_TUNER_INFO ].string ) + 2;
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_SHOW_START ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_SHOW_START ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, "00, WWW 00:00", 0 );
-    osd->strings[ OSD_SHOW_START ].xpos = osd->strings[ OSD_DATA_BAR ].xpos;
-    osd->strings[ OSD_SHOW_START ].ypos = osd->strings[ OSD_SHOW_NAME ].ypos - osd_string_get_height( osd->strings[ OSD_MUTED ].string );
-
-    osd_string_set_colour_rgb( osd->strings[ OSD_SHOW_LENGTH ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_SHOW_LENGTH ].string, 1 );
-    osd->strings[ OSD_SHOW_LENGTH ].xpos = ( osd->strings[ OSD_SHOW_START ].xpos + osd_string_get_width( osd->strings[ OSD_SHOW_START ].string ) ) & ~1;
-    osd->strings[ OSD_SHOW_LENGTH ].ypos = osd->strings[ OSD_SHOW_START ].ypos;
-
-    osd->channel_logo_xpos = osd->strings[ OSD_TIME_STRING ].xpos;
-    osd->channel_logo_ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string ) + 2;
-
-    osd->film_logo_xpos = osd->channel_logo_xpos - ( osd->channel_logo ? osd_animation_get_width( osd->channel_logo ) : 0 );
-    osd->film_logo_ypos = osd->channel_logo_ypos;
-
-    osd_string_set_colour_rgb( osd->strings[ OSD_NETWORK_NAME ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_NETWORK_NAME ].string, 1 );
-    osd->strings[ OSD_NETWORK_NAME ].xpos = osd->strings[ OSD_TIME_STRING ].xpos;
     if( osd->channel_logo ) {
-        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->channel_logo_ypos + osd_animation_get_height( osd->channel_logo );
+        osd->film_logo_xpos = osd->channel_logo_xpos - osd_animation_get_width( osd->channel_logo );
     } else {
-        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
+        osd->film_logo_xpos = osd->margin_right;
     }
-
-    osd_string_set_colour_rgb( osd->strings[ OSD_NETWORK_CALL ].string,
-                               (other_rgb >> 16) & 0xff, 
-                               (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
-    osd_string_show_border( osd->strings[ OSD_NETWORK_CALL ].string, 1 );
-    osd->strings[ OSD_NETWORK_CALL ].xpos = osd->strings[ OSD_TIME_STRING ].xpos;
-    osd->strings[ OSD_NETWORK_CALL ].ypos = osd->strings[ OSD_NETWORK_NAME ].ypos + osd_string_get_height( osd->strings[ OSD_MUTED ].string );
+    osd->film_logo_ypos = osd->channel_logo_ypos;
 
     return osd;
 }
@@ -414,7 +396,7 @@ void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
 
     osd->hold = hold;
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
-        if( i != OSD_VOLUME_BAR && i != OSD_DATA_BAR ) {
+        if( i != OSD_MESSAGE1_BAR && i != OSD_MESSAGE2_BAR ) {
             osd_string_set_hold( osd->strings[ i ].string, hold );
         }
     }
@@ -510,43 +492,31 @@ void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
 {
     snprintf( osd->network_name, sizeof( osd->network_name ), "%s", str );
-    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, osd->network_name,
-                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_NAME ].string ) );
 }
 
 void tvtime_osd_set_show_name( tvtime_osd_t* osd, const char *str )
 {
     osd->show_name = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_NAME ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_NAME ].string ) );
 }
 
 void tvtime_osd_set_network_call( tvtime_osd_t* osd, const char *str )
 {
     snprintf( osd->network_call, sizeof( osd->network_call ), "%s", str );
-    osd_string_show_text( osd->strings[ OSD_NETWORK_CALL ].string, osd->network_call, 
-                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_CALL ].string ) );
 }
 
 void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str )
 {
     osd->show_rating = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_RATING ].string ) );
 }
 
 void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str )
 {
     osd->show_start = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_START ].string ) );
 }
 
 void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
 {
     osd->show_length = str;
-    osd_string_show_text( osd->strings[ OSD_SHOW_LENGTH ].string, str, 
-                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_LENGTH ].string ) );
 }
 
 void tvtime_osd_show_info( tvtime_osd_t *osd )
@@ -557,11 +527,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     int delay = OSD_FADE_DELAY;
     struct tm *curtime = localtime( &tm );
     struct timeval tv;
-    int i;
 
     strftime( timestamp, 50, osd->timeformat, curtime );
     gettimeofday( &tv, 0 );
-    osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
+    if( osd->channel_logo ) osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
 
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, delay );
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
@@ -572,17 +541,19 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
 
     if( strlen( osd->freqtable_text ) ) {
-        snprintf( text, sizeof( text ), "%s: %s",
-                  osd->input_text, osd->freqtable_text );
+        snprintf( text, sizeof( text ), "%s", osd->freqtable_text );
+        osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
     } else {
-        snprintf( text, sizeof( text ), "%s", osd->input_text );
+        osd_string_set_timeout( osd->strings[ OSD_TUNER_INFO ].string, 0 );
     }
-    osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
+    snprintf( text, sizeof( text ), "%s", osd->input_text );
+    osd_string_show_text( osd->strings[ OSD_INPUT_NAME ].string, text, delay );
 
     if( *(osd->hold_message) ) {
         snprintf( text, sizeof( text ), "%s", osd->hold_message );
-        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
-        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, text, delay );
+        osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
+        osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
         osd_rect_set_timeout( osd->databar, 0 );
         osd_rect_set_timeout( osd->databarbg, 0 );
     }
@@ -591,15 +562,12 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, delay );
     if( osd->film_logo && osd->pulldown_mode ) osd_animation_set_timeout( osd->film_logo, delay );
 
-    for( i = OSD_NETWORK_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
-        osd_string_set_timeout( osd->strings[ i ].string, delay );
-    }
     osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? delay : 0 );
 }
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
 {
-    return osd_string_visible( osd->strings[ OSD_DATA_BAR ].string );
+    return osd_string_visible( osd->strings[ OSD_MESSAGE1_BAR ].string );
 }
 
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
@@ -609,13 +577,17 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
         char bar[ 108 ];
         int maxwidth;
 
-        sprintf( bar, "%s (%d) ", barname, percentage );
-        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, bar, OSD_FADE_DELAY );
-        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+        sprintf( bar, "%s", barname );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
 
-        maxwidth = osd->databar_xend - (osd->strings[ OSD_DATA_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_DATA_BAR ].string ));
-        osd->databar_xstart = osd->strings[ OSD_DATA_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_DATA_BAR ].string );
-        osd->databar_ypos = osd->strings[ OSD_DATA_BAR ].ypos + 4;
+        sprintf( bar, " %d", percentage );
+        osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, OSD_FADE_DELAY );
+
+        osd->databar_xstart = osd->strings[ OSD_MESSAGE2_BAR ].xpos;
+        osd->databar_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos + 4;
+        maxwidth = osd->databar_xend
+                 - osd_string_get_width( osd->strings[ OSD_DATA_VALUE ].string ) - osd->databar_xstart;
         osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
         osd_rect_set_size( osd->databar, (maxwidth * percentage) / 100, 18 );
         osd_rect_set_timeout( osd->databar, OSD_FADE_DELAY );
@@ -628,8 +600,9 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 {
     if( !*(osd->hold_message) ) {
-        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, message, OSD_FADE_DELAY );
-        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, message, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
+        osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
         osd_rect_set_timeout( osd->databar, 0 );
         osd_rect_set_timeout( osd->databarbg, 0 );
     }
@@ -639,28 +612,6 @@ void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
     if( osd->channel_logo ) {
         osd_animation_set_timeout( osd->channel_logo, OSD_FADE_DELAY );
-    }
-}
-
-void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
-{
-    if( !*(osd->hold_message ) ) {
-        char bar[ 108 ];
-        int maxwidth;
-
-        sprintf( bar, "Volume (%d) ", percentage );
-        osd_string_show_text( osd->strings[ OSD_VOLUME_BAR ].string, bar, OSD_FADE_DELAY );
-        osd_string_set_timeout( osd->strings[ OSD_DATA_BAR ].string, 0 );
-
-        maxwidth = osd->databar_xend - (osd->strings[ OSD_VOLUME_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_VOLUME_BAR ].string ));
-        osd->databar_xstart = osd->strings[ OSD_VOLUME_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_VOLUME_BAR ].string );
-        osd->databar_ypos = osd->strings[ OSD_VOLUME_BAR ].ypos + 4;
-        osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
-        osd_rect_set_size( osd->databar, (maxwidth * percentage) / 100, 18 );
-        osd_rect_set_timeout( osd->databar, OSD_FADE_DELAY );
-        osd_rect_set_colour( osd->databarbg, 80, 80, 40, 40 );
-        osd_rect_set_size( osd->databarbg, maxwidth, 18 );
-        osd_rect_set_timeout( osd->databarbg, OSD_FADE_DELAY );
     }
 }
 
@@ -723,7 +674,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
         strftime( timestamp, 50, osd->timeformat, curtime );
         osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, chinfo_left );
         gettimeofday( &tv, 0 );
-        osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
+        if( osd->channel_logo ) osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
     }
 
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
@@ -753,8 +704,10 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                 int startx;
                 int strx = 0;
 
-                if( osd->strings[ i ].rightjustified ) {
+                if( osd->strings[ i ].align == OSD_RIGHT ) {
                     startx = osd->strings[ i ].xpos - osd_string_get_width( osd->strings[ i ].string ) - xpos;
+                } else if( osd->strings[ i ].align == OSD_CENTRE ) {
+                    startx = osd->strings[ i ].xpos - (osd_string_get_width( osd->strings[ i ].string ) / 2) - xpos;
                 } else {
                     startx = osd->strings[ i ].xpos - xpos;
                 }
@@ -795,10 +748,10 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
 
         osd_rect_composite_packed422_scanline( osd->databarbg, output + (startx*2),
                                                output + (startx*2), width - startx,
-                                               strx, scanline - osd->strings[ OSD_VOLUME_BAR ].ypos );
+                                               strx, scanline - osd->strings[ OSD_MESSAGE2_BAR ].ypos );
         osd_rect_composite_packed422_scanline( osd->databar, output + (startx*2),
                                                output + (startx*2), width - startx,
-                                               strx, scanline - osd->strings[ OSD_VOLUME_BAR ].ypos );
+                                               strx, scanline - osd->strings[ OSD_MESSAGE2_BAR ].ypos );
     }
 
     if( osd->channel_logo ) {
