@@ -53,6 +53,7 @@ static XvPortID xv_port;
 static int input_width, input_height;
 static int xvoutput_verbose;
 static int xvoutput_error = 0;
+static int use_shm = 1;
 
 static int HandleXError( Display *display, XErrorEvent *xevent )
 {
@@ -234,13 +235,25 @@ static int xv_alloc_frame( void )
     uint8_t *alloc;
 
     size = input_width * input_height * 2;
-    alloc = create_shm( size );
+    if( use_shm ) {
+        alloc = create_shm( size );
+    } else {
+        alloc = malloc( input_width * input_height * 2 );
+    }
+
     if( alloc ) {
         /* Initialize the input image to black. */
         blit_colour_packed422_scanline( alloc, input_width * input_height,
                                         16, 128, 128 );
-        image = XvShmCreateImage( display, xv_port, FOURCC_YUY2, (char *) alloc,
-                                  input_width, input_height, &shminfo );
+        if( use_shm ) {
+            image = XvShmCreateImage( display, xv_port, FOURCC_YUY2,
+                                      (char *) alloc, input_width,
+                                      input_height, &shminfo );
+        } else {
+            image = XvCreateImage( display, xv_port, FOURCC_YUY2,
+                                   (char *) alloc, input_width,
+                                   input_height );
+        }
         image_data = alloc;
         return 1;
     }
@@ -284,6 +297,11 @@ static int xv_init( int outputheight, int aspect, int verbose )
 {
     xvoutput_verbose = verbose;
 
+    if( getenv( "TVTIME_NO_SHM" ) ) {
+        use_shm = 0;
+        fprintf( stderr, "xvoutput: Not using shared memory XVIDEO.\n" );
+    }
+
     if( !xcommon_open_display( aspect, outputheight, verbose ) ) {
         return 0;
     }
@@ -308,10 +326,15 @@ static int xv_show_frame( int x, int y, int width, int height )
     xcommon_set_video_scale( scale_area );
 
     xcommon_ping_screensaver();
-    XvShmPutImage( display, xv_port, output_window, xcommon_get_gc(), image,
-                   x, y, width, height,
-                   video_area.x, video_area.y,
-                   video_area.width, video_area.height, False );
+    if( use_shm ) {
+        XvShmPutImage( display, xv_port, output_window, xcommon_get_gc(),
+                       image, x, y, width, height, video_area.x, video_area.y,
+                       video_area.width, video_area.height, False );
+    } else {
+        XvPutImage( display, xv_port, output_window, xcommon_get_gc(), image,
+                    x, y, width, height, video_area.x, video_area.y,
+                    video_area.width, video_area.height );
+    }
     xcommon_frame_drawn();
     XSync( display, False );
     if( xvoutput_error ) return 0;
@@ -334,8 +357,12 @@ static int xv_set_input_size( int inputwidth, int inputheight )
 
 static void xv_quit( void )
 {
-    XShmDetach( display, &shminfo );
-    shmdt( shminfo.shmaddr );
+    if( use_shm ) {
+        XShmDetach( display, &shminfo );
+        shmdt( shminfo.shmaddr );
+    } else {
+        free( image_data );
+    }
     xcommon_close_display();
 }
 
