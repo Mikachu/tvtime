@@ -52,7 +52,7 @@ static void deinterlace_scanline_linear_blend( uint8_t *output,
     // Get width in bytes.
     width *= 2;
     i = width / 8;
-//    width -= i * 8;
+    width -= i * 8;
 
     pxor_r2r( mm7, mm7 );
     while( i-- ) {
@@ -90,9 +90,9 @@ static void deinterlace_scanline_linear_blend( uint8_t *output,
         b0 += 8;
         m1 += 8;
     }
-//    while( width-- ) {
-//        *output++ = (*t0++ + *b0++ + (*m1++ << 1)) >> 2;
-//    }
+    while( width-- ) {
+        *output++ = (*t0++ + *b0++ + (*m1++ << 1)) >> 2;
+    }
     sfence();
     emms();
 #else
@@ -116,7 +116,7 @@ static void deinterlace_scanline_linear_blend2( uint8_t *output,
     // Get width in bytes.
     width *= 2;
     i = width / 8;
-//    width -= i * 8;
+    width -= i * 8;
 
     pxor_r2r( mm7, mm7 );
     while( i-- ) {
@@ -154,9 +154,9 @@ static void deinterlace_scanline_linear_blend2( uint8_t *output,
         b1 += 8;
         m0 += 8;
     }
-//    while( width-- ) {
-//        *output++ = (*t1++ + *b1++ + (*m0++ << 1)) >> 2;
-//    }
+    while( width-- ) {
+        *output++ = (*t1++ + *b1++ + (*m0++ << 1)) >> 2;
+    }
     sfence();
     emms();
 #else
