@@ -894,7 +894,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 }
 
 vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
-                        tvtime_osd_t* osd, int verbose )
+                        tvtime_osd_t *osd, int verbose )
 {
     vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
 
@@ -946,8 +946,8 @@ void vbidata_reset( vbidata_t *vbi )
     memset( vbi->program_name, 0, sizeof( vbi->program_name ) );
     memset( vbi->network_name, 0, sizeof( vbi->network_name ) );
     memset( vbi->call_letters, 0, sizeof( vbi->call_letters ) );
-    vbi->rating = 0;
-    vbi->program_type = 0;
+    vbi->rating = "";
+    vbi->program_type = "";
 
     memset( vbi->program_desc, 0, 8 * sizeof( char * ) );
     for( i = 0; i < 8; i++ ) {
@@ -1076,5 +1076,30 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
         }
     }
     ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
+}
+
+const char *vbidata_get_program_name( vbidata_t *vbi )
+{
+    return vbi->program_name;
+}
+
+const char *vbidata_get_program_type( vbidata_t *vbi )
+{
+    return vbi->program_type;
+}
+
+const char *vbidata_get_program_rating( vbidata_t *vbi )
+{
+    return vbi->rating;
+}
+
+const char *vbidata_get_network_name( vbidata_t *vbi )
+{
+    return vbi->network_name;
+}
+
+const char *vbidata_get_network_call_letters( vbidata_t *vbi )
+{
+    return vbi->call_letters;
 }
 
