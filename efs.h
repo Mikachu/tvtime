@@ -19,7 +19,6 @@ int efs_get_width( efont_string_t *efs );
 int efs_get_height( efont_string_t *efs );
 int efs_get_stride( efont_string_t *efs );
 unsigned char *efs_get_buffer( efont_string_t *efs );
-unsigned char *efs_get_scanline( efont_string_t *efs, int y );
 
 
 #ifdef __cplusplus

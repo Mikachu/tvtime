@@ -73,11 +73,6 @@ int efs_get_stride( efont_string_t *efs )
     return efs->stride;
 }
 
-unsigned char *efs_get_scanline( efont_string_t *efs, int y )
-{
-    return efs->data + (efs->stride * y);
-}
-
 unsigned char *efs_get_buffer( efont_string_t *efs )
 {
     return efs->data;
