@@ -625,6 +625,7 @@ config_t *config_new( void )
     ct->keymap[ I_F6 ] = TVTIME_CONTRAST_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
+    ct->keymap[ I_F9 ] = TVTIME_CHANNEL_SAVE_TUNING;
     ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
     ct->keymap[ I_F11 ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ I_F12 ] = TVTIME_TOGGLE_CREDITS;

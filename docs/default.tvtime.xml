@@ -351,6 +351,9 @@
     <keyboard key="F8"/>
   </bind>
 
+  <bind command="channel_save_tuning">
+    <keyboard key="F9"/>
+  </bind>
   <bind command="channel_scan">
     <keyboard key="F10"/>
   </bind>
