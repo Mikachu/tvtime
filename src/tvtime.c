@@ -939,6 +939,13 @@ static void build_output_menu( menu_t *menu, int widescreen,
         menu_set_right_command( menu, cur, TVTIME_TOGGLE_FULLSCREEN, "" );
         menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
+
+        snprintf( string, sizeof( string ), "%c%c%c  Set fullscreen position", 0xee, 0x81, 0x80 );
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "fspos" );
+        menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "fspos" );
+        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+        cur++;
     }
 
     if( alwaysontop_supported ) {
@@ -959,6 +966,47 @@ static void build_output_menu( menu_t *menu, int widescreen,
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+}
+
+static void build_fspos_menu( menu_t *menu, int fspos )
+{
+    char string[ 128 ];
+
+    if( fspos == 0 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xb7 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SET_FULLSCREEN_POSITION, "centre" );
+    menu_set_right_command( menu, 1, TVTIME_SET_FULLSCREEN_POSITION, "centre" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+
+    if( fspos == 1 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xb7 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_FULLSCREEN_POSITION, "top" );
+    menu_set_right_command( menu, 2, TVTIME_SET_FULLSCREEN_POSITION, "top" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
+
+    if( fspos == 2 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xb7 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_FULLSCREEN_POSITION, "bottom" );
+    menu_set_right_command( menu, 3, TVTIME_SET_FULLSCREEN_POSITION, "bottom" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
@@ -1666,6 +1714,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                        output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
                        output->is_overscan_supported() );
     build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
+    build_fspos_menu( commands_get_menu( commands, "fspos" ), config_get_fullscreen_position( ct ) );
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1873,6 +1922,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
             output->set_fullscreen_position( newpos );
             config_save( ct, "FullscreenPosition", commands_get_fs_pos( commands ) );
+            build_fspos_menu( commands_get_menu( commands, "fspos" ), newpos );
+            commands_refresh_menu( commands );
         }
         if( commands_toggle_matte( commands ) || commands_get_matte_mode( commands ) ) {
             double matte = 4.0 / 3.0;

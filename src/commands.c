@@ -1335,6 +1335,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_add_menu( cmd, menu );
     reset_overscan_menu( commands_get_menu( cmd, "overscan" ), cmd->overscan );
 
+    menu = menu_new( "fspos" );
+    menu_set_text( menu, 0, "Setup - Output configuration - Fullscreen position" );
+    commands_add_menu( cmd, menu );
+
     menu = menu_new( "processing" );
     menu_set_text( menu, 0, "Setup - Video processing" );
     sprintf( string, "%c%c%c  Deinterlacer configuration", 0xee, 0x80, 0xa1 );

@@ -1548,6 +1548,8 @@ area_t xcommon_get_window_area( void )
 void xcommon_set_fullscreen_position( int pos )
 {
     fullscreen_position = pos;
+    calculate_video_area();
+    xcommon_clear_screen();
 }
 
 void xcommon_set_matte( int width, int height )
