@@ -271,7 +271,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->image_width = video_width;
     osds->image_height = video_height;
     osds->alpha = alpha;
-    osds->aspect_ratio = aspect;
+    osds->aspect_ratio = aspect / (double)(((double)video_width)/((double)video_height));;
     osds->shape_width = shape_width;
     osds->shape_height = shape_height;
     osds->shape_adjusted_width = shape_width;
@@ -325,69 +325,50 @@ void osd_shape_advance_frame( osd_shape_t *osds )
 void osd_shape_render_image4444( osd_shape_t *osds )
 {
     double radius_sqrd,x0;
-    int x,y,i;
-    unsigned char *tmp;
-    int width = osds->shape_width;
+    int x,y;
+    int width = osds->shape_width/osds->aspect_ratio;
     int height = osds->shape_height;
-    
-    tmp = (unsigned char *)malloc( osds->image_width * height * 4 );
-    if( !tmp ) return;
-
-    blit_colour_packed4444( osds->image4444, width,
-                            height, osds->image_width * 4,
-                            0, 16, 128, 128 );
-
 
     switch( osds->type ) {
     case OSD_Rect:
-        blit_colour_packed4444( tmp, width,
+        blit_colour_packed4444( osds->image4444, width,
                                 height, osds->image_width * 4,
                                 osds->alpha, osds->shape_luma, osds->shape_cb,
                                 osds->shape_cr );
-
         break;
 
     case OSD_Circle:
+        osds->shape_height = osds->shape_width;
 
-        blit_colour_packed4444( tmp, width,
-                                width, osds->image_width * 4,
+        blit_colour_packed4444( osds->image4444, width,
+                                osds->shape_height, osds->image_width * 4,
                                 0, 16, 128, 128 );
 
-        x0 = width>>1;
+        x0 = osds->shape_width>>1;
         radius_sqrd = x0*x0;
-        for( x = 0; x < width; x++ ) {
-            for( y = 0; y < width; y++ ) {
+        for( x = 0; x < osds->shape_width; x++ ) {
+            for( y = 0; y < osds->shape_height; y++ ) {
                 int xoffset = x*4;
                 if( (x-x0)*(x-x0) + (y-x0)*(y-x0) <= radius_sqrd ) {
                     int offset = y*osds->image_width + xoffset;
-                    tmp[ offset ] = osds->alpha;
-                    tmp[ offset + 1 ] = osds->shape_luma;
-                    tmp[ offset + 2 ] = osds->shape_cb;
-                    tmp[ offset + 3 ] = osds->shape_cr;
+                    osds->image4444[ offset ] = osds->alpha;
+                    osds->image4444[ offset + 1 ] = osds->shape_luma;
+                    osds->image4444[ offset + 2 ] = osds->shape_cb;
+                    osds->image4444[ offset + 3 ] = osds->shape_cr;
                 }
             }
         }
-        
-        osds->shape_height = width;
         break;
 
     default:
-        blit_colour_packed4444( tmp, width,
+        blit_colour_packed4444( osds->image4444, width,
                                 height, osds->image_width * 4,
                                 0, 16, 128, 128 );
 
         break;
     }
 
-    for( i=0; i < osds->shape_height; i++ ) {
-        osds->shape_adjusted_width = aspect_adjust_packed4444_scanline( 
-            osds->image4444+(i*osds->image_width*4),
-            tmp+(i*osds->image_width*4), 
-            width,
-            osds->aspect_ratio );
-    }
-    free( tmp );
-
+    osds->shape_adjusted_width = width;
 }
 
 void osd_shape_composite_packed422( osd_shape_t *osds, 
