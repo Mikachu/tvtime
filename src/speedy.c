@@ -226,8 +226,8 @@ unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int w
     width /= 4;
 
     while( width-- ) {
-        unsigned int tmp1 = (cur[ 0 ] + cur[ 2 ] + cur[ 4 ] + cur[ 6 ])>>2;
-        unsigned int tmp2 = (old[ 0 ] + old[ 2 ] + old[ 4 ] + old[ 6 ])>>2;
+        unsigned int tmp1 = (cur[ 0 ] + cur[ 2 ] + cur[ 4 ] + cur[ 6 ] + 2)>>2;
+        unsigned int tmp2 = (old[ 0 ] + old[ 2 ] + old[ 4 ] + old[ 6 ] + 2)>>2;
         tmp1  = (tmp1 - tmp2);
         tmp1 *= tmp1;
         tmp1 >>= BitShift;
