@@ -161,6 +161,7 @@ double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
+const char *config_get_vbi_device( config_t *ct );
 int config_get_ntsc_cable_mode( config_t *ct );
 const char *config_get_timeformat( config_t *ct );
 unsigned int config_get_channel_text_rgb( config_t *ct );

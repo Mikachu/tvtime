@@ -1124,7 +1124,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "configfile", 1, 0, 'F' },
         { "norm", 2, 0, 'n' },
         { "frequencies", 2, 0, 'f' },
-        { "vbidevice", 1, 0, 'b' },
+        { "vbidevice", 2, 0, 'b' },
         { "device", 2, 0, 'd' },
         { "mixer", 1, 0, 'x' },
         { "fullscreen", 0, 0, 'm' },
@@ -1175,7 +1175,14 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                       ct->v4ldev = strdup( optarg );
                   }
                   break;
-        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'b': if( !optarg ) {
+                      fprintf( stdout, "VBIDevice:%s\n",
+                               config_get_vbi_device( ct ) );
+                  } else {
+                      free( ct->vbidev );
+                      ct->vbidev = strdup( optarg );
+                  }
+                  break;
         case 'i': if( !optarg ) {
                       fprintf( stdout, "V4LInput:%d\n",
                                config_get_inputnum( ct ) );
@@ -1637,6 +1644,11 @@ int config_get_priority( config_t *ct )
 const char *config_get_v4l_freq( config_t *ct )
 {
     return ct->freq;
+}
+
+const char *config_get_vbi_device( config_t *ct )
+{
+    return ct->vbidev;
 }
 
 const char *config_get_timeformat( config_t *ct )
