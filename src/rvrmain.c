@@ -21,6 +21,13 @@ static inline void get_time( int64_t *const ptime )
    asm volatile ( "rdtsc" : "=A" (*ptime) );
 }
 
+static int timediff( struct timeval *large, struct timeval *small )
+{
+    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
+             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
+}
+
+
 static const char *videodev = "/dev/video0";
 
 static const int block_size = 4096;
@@ -55,7 +62,7 @@ static void *video_capture_thread_main( void *crap )
     unsigned char *tmp420space;
     struct timeval starttime;
     int gotframes = 0;
-    int firstccfield = 0;
+    int frameid;
 
     pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, 0 );
 
@@ -78,6 +85,8 @@ static void *video_capture_thread_main( void *crap )
     pthread_cond_broadcast( &rec_start_cond );
     pthread_mutex_unlock( &rec_start_mut );
 
+    videoinput_next_frame( vidin, &frameid );
+    videoinput_free_frame( vidin, frameid );
     gettimeofday( &starttime, 0 );
 
     for(;;) {
@@ -85,18 +94,18 @@ static void *video_capture_thread_main( void *crap )
         unsigned char *curimage;
         int outsize;
         struct timeval curtime;
+        int ccframes;
         int full;
-        int ccfield = 0;
-        int ccframes = 0;
         int frameid;
 
 
         curimage = videoinput_next_frame( vidin, &frameid );
-        gettimeofday( &curtime, 0 ); /* ASAP ! */
+        gettimeofday( &curtime, 0 );
+
         vpkt = (ree_packet_t *) reepktq_enqueue( video_queue );
 
         gotframes++;
-        ccframes = ( ccfield - firstccfield ) / 2;
+        ccframes = timediff( &curtime, &starttime ) / (16666*2);
 
         // We may have to drop a frame if the queue is full.
         if( !vpkt ) {
@@ -201,7 +210,7 @@ static void *disk_writer_thread_main( void *crap )
 
 
         /* Throttle ourselves. */
-        // usleep( 20 );
+        usleep( 20 );
     }
 
     return 0;
@@ -232,6 +241,7 @@ int main( int argc, char **argv )
         close( outfd );
         return 1;
     }
+    videoinput_set_input_num( vidin, 1 );
 
     /* Create our file header. */
     fileheader = (ree_file_header_t *) malloc( sizeof( ree_file_header_t ) );
