@@ -1053,7 +1053,7 @@ void videoinput_set_contrast_relative( videoinput_t *vidin, int offset )
     videoinput_set_contrast( vidin, videoinput_get_contrast( vidin ) + offset );
 }
 
-int videoinput_get_colour( videoinput_t *vidin )
+int videoinput_get_saturation( videoinput_t *vidin )
 {
     if( vidin->isv4l2 ) {
         return (int) ((videoinput_get_control_v4l2( vidin, V4L2_CID_SATURATION ) * 100.0) + 0.5);
@@ -1068,26 +1068,26 @@ int videoinput_get_colour( videoinput_t *vidin )
     return 0;
 }
 
-void videoinput_set_colour( videoinput_t *vidin, int newcolour )
+void videoinput_set_saturation( videoinput_t *vidin, int newsaturation )
 {
-    if( newcolour > 100 ) newcolour = 100;
-    if( newcolour <   0 ) newcolour = 50;
+    if( newsaturation > 100 ) newsaturation = 100;
+    if( newsaturation <   0 ) newsaturation = 50;
 
     if( vidin->isv4l2 ) {
-        videoinput_set_control_v4l2( vidin, V4L2_CID_SATURATION, ((double) newcolour) / 100.0 );
+        videoinput_set_control_v4l2( vidin, V4L2_CID_SATURATION, ((double) newsaturation) / 100.0 );
     } else {
         struct video_picture grab_pict;
 
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) >= 0 ) {
-            grab_pict.colour = (int) (((((double) newcolour) / 100.0) * 65535.0) + 0.5);
+            grab_pict.colour = (int) (((((double) newsaturation) / 100.0) * 65535.0) + 0.5);
             ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
         }
     }
 }
 
-void videoinput_set_colour_relative( videoinput_t *vidin, int offset )
+void videoinput_set_saturation_relative( videoinput_t *vidin, int offset )
 {
-    videoinput_set_colour( vidin, videoinput_get_colour( vidin ) + offset );
+    videoinput_set_saturation( vidin, videoinput_get_saturation( vidin ) + offset );
 }
 
 static void videoinput_do_mute( videoinput_t *vidin, int mute )

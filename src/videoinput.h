@@ -173,9 +173,9 @@ void videoinput_set_brightness_relative( videoinput_t *vidin, int offset );
 int videoinput_get_contrast( videoinput_t *vidin );
 void videoinput_set_contrast( videoinput_t *vidin, int newcont );
 void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
-int videoinput_get_colour( videoinput_t *vidin );
-void videoinput_set_colour( videoinput_t *vidin, int newcolour );
-void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
+int videoinput_get_saturation( videoinput_t *vidin );
+void videoinput_set_saturation( videoinput_t *vidin, int newcolour );
+void videoinput_set_saturation_relative( videoinput_t *vidin, int offset );
 
 /**
  * Sets the frequency to tune in to. (ie. the station to watch)

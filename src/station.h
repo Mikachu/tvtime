@@ -174,7 +174,7 @@ int station_get_current_audio_norm( station_mgr_t *mgr );
  */
 int station_get_current_brightness( station_mgr_t *mgr );
 int station_get_current_contrast( station_mgr_t *mgr );
-int station_get_current_colour( station_mgr_t *mgr );
+int station_get_current_saturation( station_mgr_t *mgr );
 int station_get_current_hue( station_mgr_t *mgr );
 
 /**
@@ -252,7 +252,7 @@ void station_set_current_audio_norm( station_mgr_t *mgr, int dk );
  */
 void station_set_current_brightness( station_mgr_t *mgr, int val );
 void station_set_current_contrast( station_mgr_t *mgr, int val );
-void station_set_current_colour( station_mgr_t *mgr, int val );
+void station_set_current_saturation( station_mgr_t *mgr, int val );
 void station_set_current_hue( station_mgr_t *mgr, int val );
 
 /**

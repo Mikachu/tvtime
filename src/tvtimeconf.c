@@ -67,7 +67,7 @@ struct config_s
     int picsaverestore;
     int brightness;
     int contrast;
-    int colour;
+    int saturation;
     int hue;
     int invert;
     int cc;
@@ -205,7 +205,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DefaultColour" ) ) {
-            ct->colour = atoi( curval );
+            ct->saturation = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DefaultSaturation" ) ) {
+            ct->saturation = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DefaultHue" ) ) {
@@ -710,7 +714,7 @@ config_t *config_new( void )
     ct->picsaverestore = 1;
     ct->brightness = -1;
     ct->contrast = -1;
-    ct->colour = -1;
+    ct->saturation = -1;
     ct->hue = -1;
     ct->invert = 0;
     ct->cc = 0;
@@ -1587,9 +1591,9 @@ int config_get_global_contrast( config_t *ct )
     return ct->contrast;
 }
 
-int config_get_global_colour( config_t *ct )
+int config_get_global_saturation( config_t *ct )
 {
-    return ct->colour;
+    return ct->saturation;
 }
 
 int config_get_global_hue( config_t *ct )

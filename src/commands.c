@@ -64,7 +64,6 @@ static menu_names_t menu_table[] = {
     { "picture", MENU_REDIRECT, "picture-tuner" },
     { "input", MENU_REDIRECT, "input-ntsc" },
     { "favorites", MENU_FAVORITES, 0 },
-    { "color", MENU_REDIRECT, "colour" }
 };
 
 static int tvtime_num_builtin_menus( void )
@@ -111,7 +110,7 @@ struct commands_s {
     int picturemode;
     int brightness;
     int contrast;
-    int colour;
+    int saturation;
     int hue;
 
     int boost;
@@ -471,7 +470,7 @@ static void reinit_tuner( commands_t *cmd )
         if( config_get_save_restore_picture( cmd->cfg ) ) {
             int brightness = station_get_current_brightness( cmd->stationmgr );
             int contrast = station_get_current_contrast( cmd->stationmgr );
-            int colour = station_get_current_colour( cmd->stationmgr );
+            int saturation = station_get_current_saturation( cmd->stationmgr );
             int hue = station_get_current_hue( cmd->stationmgr );
 
             if( brightness >= 0 ) {
@@ -484,10 +483,10 @@ static void reinit_tuner( commands_t *cmd )
             } else {
                 videoinput_set_contrast( cmd->vidin, cmd->contrast );
             }
-            if( colour >= 0 ) {
-                videoinput_set_colour( cmd->vidin, colour );
+            if( saturation >= 0 ) {
+                videoinput_set_saturation( cmd->vidin, saturation );
             } else {
-                videoinput_set_colour( cmd->vidin, cmd->colour );
+                videoinput_set_saturation( cmd->vidin, cmd->saturation );
             }
             if( hue >= 0 ) {
                 videoinput_set_hue( cmd->vidin, hue );
@@ -561,8 +560,8 @@ static void reinit_tuner( commands_t *cmd )
         if( cmd->contrast >= 0 ) {
             videoinput_set_contrast( cmd->vidin, cmd->contrast );
         }
-        if( cmd->colour >= 0 ) {
-            videoinput_set_colour( cmd->vidin, cmd->colour );
+        if( cmd->saturation >= 0 ) {
+            videoinput_set_saturation( cmd->vidin, cmd->saturation );
         }
         if( cmd->hue >= 0 ) {
             videoinput_set_hue( cmd->vidin, cmd->hue );
@@ -576,9 +575,9 @@ static void reinit_tuner( commands_t *cmd )
         menu_set_value (commands_get_menu (cmd, "contrast"),
                         videoinput_get_contrast (cmd->vidin),
                         TVTIME_ICON_CONTRAST);
-        menu_set_value (commands_get_menu (cmd, "colour"),
-                        videoinput_get_colour (cmd->vidin),
-                        TVTIME_ICON_COLOUR);
+        menu_set_value (commands_get_menu (cmd, "saturation"),
+                        videoinput_get_saturation (cmd->vidin),
+                        TVTIME_ICON_SATURATION);
         menu_set_value (commands_get_menu (cmd, "hue"),
                         videoinput_get_hue (cmd->vidin),
                         TVTIME_ICON_HUE);
@@ -1043,7 +1042,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->picturemode = 3;
     cmd->brightness = config_get_global_brightness( cfg );
     cmd->contrast = config_get_global_contrast( cfg );
-    cmd->colour = config_get_global_colour( cfg );
+    cmd->saturation = config_get_global_saturation( cfg );
     cmd->hue = config_get_global_hue( cfg );
 
     cmd->displayinfo = 0;
@@ -1505,9 +1504,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_COLOUR "  %s", _("Colour") );
+    snprintf( string, sizeof( string ), TVTIME_ICON_SATURATION "  %s", _("Saturation") );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "saturation" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
     menu_set_text( menu, 4, string );
@@ -1555,9 +1554,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_COLOUR "  %s", _("Colour") );
+    snprintf( string, sizeof( string ), TVTIME_ICON_SATURATION "  %s", _("Saturation") );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "saturation" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
     menu_set_text( menu, 4, string );
@@ -1668,9 +1667,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                         TVTIME_ICON_CONTRAST);
     }
 
-    menu = menu_new( "colour" );
+    menu = menu_new( "saturation" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
-              _("Setup"), _("Picture"), _("Colour") );
+              _("Setup"), _("Picture"), _("Saturation") );
     menu_set_text( menu, 0, string );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "picture" );
     snprintf( string, sizeof( string ), TVTIME_ICON_TVLOGO "  %s: ---",
@@ -1682,12 +1681,12 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     snprintf( string, sizeof( string ), TVTIME_ICON_PLUSBUTTON "  %s",
               _("Increase") );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_COLOUR_UP, "" );
+    menu_set_enter_command( menu, 2, TVTIME_SATURATION_UP, "" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_MINUSBUTTON "  %s",
               _("Decrease") );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_COLOUR_DOWN, "" );
+    menu_set_enter_command( menu, 3, TVTIME_SATURATION_DOWN, "" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
@@ -1696,9 +1695,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value (commands_get_menu (cmd, "colour" ),
-                        videoinput_get_colour (cmd->vidin),
-                        TVTIME_ICON_COLOUR);
+        menu_set_value (commands_get_menu (cmd, "saturation" ),
+                        videoinput_get_saturation (cmd->vidin),
+                        TVTIME_ICON_SATURATION);
     }
 
     menu = menu_new( "hue" );
@@ -2903,10 +2902,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             } else {
                 videoinput_set_contrast( cmd->vidin, 50 );
             }
-            if( cmd->colour >= 0 ) {
-                videoinput_set_colour( cmd->vidin, cmd->colour );
+            if( cmd->saturation >= 0 ) {
+                videoinput_set_saturation( cmd->vidin, cmd->saturation );
             } else {
-                videoinput_set_colour( cmd->vidin, 50 );
+                videoinput_set_saturation( cmd->vidin, 50 );
             }
             if( cmd->hue >= 0 ) {
                 videoinput_set_hue( cmd->vidin, cmd->hue );
@@ -2922,9 +2921,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 menu_set_value( commands_get_menu( cmd, "contrast" ),
                                 videoinput_get_brightness( cmd->vidin ),
                                 TVTIME_ICON_CONTRAST );
-                menu_set_value( commands_get_menu( cmd, "colour" ),
+                menu_set_value( commands_get_menu( cmd, "saturation" ),
                                 videoinput_get_brightness( cmd->vidin ),
-                                TVTIME_ICON_COLOUR );
+                                TVTIME_ICON_SATURATION );
                 menu_set_value( commands_get_menu( cmd, "hue" ),
                                 videoinput_get_brightness( cmd->vidin ),
                                 TVTIME_ICON_HUE );
@@ -3144,15 +3143,15 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
-    case TVTIME_COLOUR_UP:
-    case TVTIME_COLOUR_DOWN:
+    case TVTIME_SATURATION_UP:
+    case TVTIME_SATURATION_DOWN:
         if( cmd->vidin ) {
-            videoinput_set_colour_relative( cmd->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
+            videoinput_set_saturation_relative( cmd->vidin, (tvtime_cmd == TVTIME_SATURATION_UP) ? 1 : -1 );
             if( cmd->osd ) {
-                int colour = videoinput_get_colour( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, _("Colour"), colour );
-                menu_set_value (commands_get_menu (cmd, "colour"),
-                                colour, TVTIME_ICON_COLOUR);
+                int saturation = videoinput_get_saturation( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, _("Saturation"), saturation );
+                menu_set_value (commands_get_menu (cmd, "saturation"),
+                                saturation, TVTIME_ICON_SATURATION);
                 commands_refresh_menu( cmd );
             }
         }
@@ -3168,8 +3167,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 int cur = videoinput_get_contrast( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Contrast"), cur );
             } else if( cmd->picturemode == 2 ) {
-                int cur = videoinput_get_colour( cmd->vidin );
-                tvtime_osd_show_data_bar( cmd->osd, _("Colour"), cur );
+                int cur = videoinput_get_saturation( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, _("Saturation"), cur );
             } else if( cmd->picturemode == 3 ) {
                 int cur = videoinput_get_hue( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Hue"), cur );
@@ -3183,7 +3182,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         } else if( cmd->picturemode == 1 ) {
             commands_handle( cmd, TVTIME_CONTRAST_UP, "" );
         } else if( cmd->picturemode == 2 ) {
-            commands_handle( cmd, TVTIME_COLOUR_UP, "" );
+            commands_handle( cmd, TVTIME_SATURATION_UP, "" );
         } else if( cmd->picturemode == 3 ) {
             commands_handle( cmd, TVTIME_HUE_UP, "" );
         }
@@ -3195,7 +3194,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         } else if( cmd->picturemode == 1 ) {
             commands_handle( cmd, TVTIME_CONTRAST_DOWN, "" );
         } else if( cmd->picturemode == 2 ) {
-            commands_handle( cmd, TVTIME_COLOUR_DOWN, "" );
+            commands_handle( cmd, TVTIME_SATURATION_DOWN, "" );
         } else if( cmd->picturemode == 3 ) {
             commands_handle( cmd, TVTIME_HUE_DOWN, "" );
         }
@@ -3205,7 +3204,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->vidin && config_get_save_restore_picture( cmd->cfg ) ) {
             cmd->brightness = videoinput_get_brightness( cmd->vidin );
             cmd->contrast = videoinput_get_contrast( cmd->vidin );
-            cmd->colour = videoinput_get_colour( cmd->vidin );
+            cmd->saturation = videoinput_get_saturation( cmd->vidin );
             cmd->hue = videoinput_get_hue( cmd->vidin );
             if( cmd->osd ) {
                 tvtime_osd_show_message( cmd->osd,
@@ -3217,7 +3216,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->stationmgr && cmd->vidin && config_get_save_restore_picture( cmd->cfg ) ) {
             station_set_current_brightness( cmd->stationmgr, videoinput_get_brightness( cmd->vidin ) );
             station_set_current_contrast( cmd->stationmgr, videoinput_get_contrast( cmd->vidin ) );
-            station_set_current_colour( cmd->stationmgr, videoinput_get_colour( cmd->vidin ) );
+            station_set_current_saturation( cmd->stationmgr, videoinput_get_saturation( cmd->vidin ) );
             station_set_current_hue( cmd->stationmgr, videoinput_get_hue( cmd->vidin ) );
             if( cmd->osd ) {
                 char message[ 128 ];
@@ -3622,9 +3621,9 @@ int commands_get_global_contrast( commands_t *cmd )
     return cmd->contrast;
 }
 
-int commands_get_global_colour( commands_t *cmd )
+int commands_get_global_saturation( commands_t *cmd )
 {
-    return cmd->colour;
+    return cmd->saturation;
 }
 
 int commands_get_global_hue( commands_t *cmd )

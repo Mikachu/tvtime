@@ -2499,8 +2499,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     config_save( ct, "DefaultBrightness", number );
     snprintf( number, 4, "%d", commands_get_global_contrast( commands ) );
     config_save( ct, "DefaultContrast", number );
-    snprintf( number, 4, "%d", commands_get_global_colour( commands ) );
-    config_save( ct, "DefaultColour", number );
+    snprintf( number, 4, "%d", commands_get_global_saturation( commands ) );
+    config_save( ct, "DefaultSaturation", number );
     snprintf( number, 4, "%d", commands_get_global_hue( commands ) );
     config_save( ct, "DefaultHue", number );
 

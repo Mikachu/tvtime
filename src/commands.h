@@ -89,7 +89,7 @@ const char *commands_get_new_norm( commands_t *cmd );
 int commands_get_new_input_width( commands_t *cmd );
 int commands_get_global_brightness( commands_t *cmd );
 int commands_get_global_contrast( commands_t *cmd );
-int commands_get_global_colour( commands_t *cmd );
+int commands_get_global_saturation( commands_t *cmd );
 int commands_get_global_hue( commands_t *cmd );
 int commands_set_freq_table( commands_t *cmd );
 const char *commands_get_new_freq_table( commands_t *cmd );

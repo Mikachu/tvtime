@@ -45,7 +45,7 @@ struct station_info_s
     const band_entry_t *channel;
     int brightness;
     int contrast;
-    int colour;
+    int saturation;
     int hue;
     int finetune;
 
@@ -121,7 +121,7 @@ static station_info_t *station_info_new( int pos, const char *name,
         memset( i->xmltvid, 0, sizeof( i->xmltvid ) );
         i->brightness = -1;
         i->contrast = -1;
-        i->colour = -1;
+        i->saturation = -1;
         i->hue = -1;
         i->finetune = 0;
 
@@ -282,10 +282,14 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *audio = xmlGetProp( station, BAD_CAST "audio" );
             xmlChar *brightness = xmlGetProp( station, BAD_CAST "brightness" );
             xmlChar *contrast = xmlGetProp( station, BAD_CAST "contrast" );
-            xmlChar *colour = xmlGetProp( station, BAD_CAST "colour" );
+            xmlChar *saturation = xmlGetProp( station, BAD_CAST "colour" );
             xmlChar *hue = xmlGetProp( station, BAD_CAST "hue" );
             xmlChar *finetune = xmlGetProp( station, BAD_CAST "finetune" );
             xmlChar *xmltvid = xmlGetProp( station, BAD_CAST "xmltvid" );
+
+            if( !saturation ) {
+                saturation = xmlGetProp( station, BAD_CAST "saturation" );
+            }
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -322,7 +326,7 @@ int station_readconfig( station_mgr_t *mgr )
                 }
                 if( brightness ) station_set_current_brightness( mgr, atoi( (char *) brightness ) );
                 if( contrast ) station_set_current_contrast( mgr, atoi( (char *) contrast ) );
-                if( colour ) station_set_current_colour( mgr, atoi( (char *) colour ) );
+                if( saturation ) station_set_current_saturation( mgr, atoi( (char *) saturation ) );
                 if( hue ) station_set_current_hue( mgr, atoi( (char *) hue ) );
                 if( finetune ) station_set_current_finetune( mgr, atoi( (char *) finetune ) );
                 if( xmltvid ) station_set_current_xmltv_id( mgr, (char *) xmltvid );
@@ -332,7 +336,7 @@ int station_readconfig( station_mgr_t *mgr )
             if( finetune ) xmlFree( finetune );
             if( brightness ) xmlFree( brightness );
             if( contrast ) xmlFree( contrast );
-            if( colour ) xmlFree( colour );
+            if( saturation ) xmlFree( saturation );
             if( hue ) xmlFree( hue );
             if( norm ) xmlFree( norm );
             if( audio ) xmlFree( audio );
@@ -828,10 +832,10 @@ void station_set_current_contrast( station_mgr_t *mgr, int val )
     }
 }
 
-void station_set_current_colour( station_mgr_t *mgr, int val )
+void station_set_current_saturation( station_mgr_t *mgr, int val )
 {
     if( mgr->current ) {
-        mgr->current->colour = val;
+        mgr->current->saturation = val;
     }
 }
 
@@ -860,10 +864,10 @@ int station_get_current_contrast( station_mgr_t *mgr )
     }
 }
 
-int station_get_current_colour( station_mgr_t *mgr )
+int station_get_current_saturation( station_mgr_t *mgr )
 {
     if( mgr->current ) {
-        return mgr->current->colour;
+        return mgr->current->saturation;
     } else {
         return -1;
     }
@@ -1111,9 +1115,9 @@ int station_writeconfig( station_mgr_t *mgr )
             snprintf( buf, sizeof( buf ), "%d", rp->contrast );
             xmlSetProp( node, BAD_CAST "contrast", BAD_CAST buf );
         }
-        if( rp->colour >= 0 ) {
-            snprintf( buf, sizeof( buf ), "%d", rp->colour );
-            xmlSetProp( node, BAD_CAST "colour", BAD_CAST buf );
+        if( rp->saturation >= 0 ) {
+            snprintf( buf, sizeof( buf ), "%d", rp->saturation );
+            xmlSetProp( node, BAD_CAST "saturation", BAD_CAST buf );
         }
         if( rp->hue >= 0 ) {
             snprintf( buf, sizeof( buf ), "%d", rp->hue );
