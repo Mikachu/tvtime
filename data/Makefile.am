@@ -22,7 +22,7 @@ dist_tvtimedata_DATA = FreeMonoBold.ttf tvtimeSansBold.ttf \
 	filmstrip_0003.png filmstrip_0004.png infoicon_0000.png
 
 EXTRA_DIST = COPYING.DScaler COPYING.tvtimeSansBold COPYING.FreeMonoBold \
-	tvtimeSansBold.sfd FreeMonoBold.sfd DScaler401src.zip
+	DScaler401src.zip tvtimeSansBold.sfd FreeMonoBold.sfd
 
 %.ttf: %.pe %.sfd
 	pfaedit -script $^
