@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,6 +87,20 @@ void blit_colour_packed422( unsigned char *output, int width, int height, int st
 
     for( i = 0; i < height; i++ ) {
         blit_colour_packed422_scanline( output + (i * stride), width, luma, cb, cr );
+    }
+}
+
+void cheap_packed444_to_packed422_scanline( unsigned char *output,
+                                            unsigned char *input, int width )
+{
+    width /= 2;
+    while( width-- ) {
+        output[ 0 ] = input[ 0 ];
+        output[ 1 ] = input[ 1 ];
+        output[ 2 ] = input[ 3 ];
+        output[ 3 ] = input[ 2 ];
+        output += 4;
+        input += 6;
     }
 }
 
@@ -673,6 +688,351 @@ void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char 
 
             dest[ i*2 ] = src[ i ];
             dest[ i*2 + 1 ] = ( sum + 128 ) >> 8;
+        }
+    }
+}
+
+/**
+ * These are from lavtools in mjpegtools:
+ *
+ * colorspace.c:  Routines to perform colorspace conversions.
+ *
+ *  Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#define FP_BITS 18
+
+/* precomputed tables */
+
+static int Y_R[256];
+static int Y_G[256];
+static int Y_B[256];
+static int Cb_R[256];
+static int Cb_G[256];
+static int Cb_B[256];
+static int Cr_R[256];
+static int Cr_G[256];
+static int Cr_B[256];
+static int conv_RY_inited = 0;
+
+static int RGB_Y[256];
+static int R_Cr[256];
+static int G_Cb[256];
+static int G_Cr[256];
+static int B_Cb[256];
+static int conv_YR_inited = 0;
+
+static int myround(double n)
+{
+  if (n >= 0) 
+    return (int)(n + 0.5);
+  else
+    return (int)(n - 0.5);
+}
+
+static void init_RGB_to_YCbCr_tables(void)
+{
+  int i;
+
+  /*
+   * Q_Z[i] =   (coefficient * i
+   *             * (Q-excursion) / (Z-excursion) * fixed-point-factor)
+   *
+   * to one of each, add the following:
+   *             + (fixed-point-factor / 2)         --- for rounding later
+   *             + (Q-offset * fixed-point-factor)  --- to add the offset
+   *             
+   */
+  for (i = 0; i < 256; i++) {
+    Y_R[i] = myround(0.299 * (double)i 
+		     * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_G[i] = myround(0.587 * (double)i 
+		     * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_B[i] = myround((0.114 * (double)i 
+		      * 219.0 / 255.0 * (double)(1<<FP_BITS))
+		     + (double)(1<<(FP_BITS-1))
+		     + (16.0 * (double)(1<<FP_BITS)));
+
+    Cb_R[i] = myround(-0.168736 * (double)i 
+		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_G[i] = myround(-0.331264 * (double)i 
+		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_B[i] = myround((0.500 * (double)i 
+		       * 224.0 / 255.0 * (double)(1<<FP_BITS))
+		      + (double)(1<<(FP_BITS-1))
+		      + (128.0 * (double)(1<<FP_BITS)));
+
+    Cr_R[i] = myround(0.500 * (double)i 
+		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_G[i] = myround(-0.418688 * (double)i 
+		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_B[i] = myround((-0.081312 * (double)i 
+		       * 224.0 / 255.0 * (double)(1<<FP_BITS))
+		      + (double)(1<<(FP_BITS-1))
+		      + (128.0 * (double)(1<<FP_BITS)));
+  }
+  conv_RY_inited = 1;
+}
+
+static void init_YCbCr_to_RGB_tables(void)
+{
+  int i;
+
+  /*
+   * Q_Z[i] =   (coefficient * i
+   *             * (Q-excursion) / (Z-excursion) * fixed-point-factor)
+   *
+   * to one of each, add the following:
+   *             + (fixed-point-factor / 2)         --- for rounding later
+   *             + (Q-offset * fixed-point-factor)  --- to add the offset
+   *             
+   */
+
+  /* clip Y values under 16 */
+  for (i = 0; i < 16; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(16) 
+		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
+		    + (double)(1<<(FP_BITS-1)));
+  }
+  for (i = 16; i < 236; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(i - 16) 
+		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
+		    + (double)(1<<(FP_BITS-1)));
+  }
+  /* clip Y values above 235 */
+  for (i = 236; i < 256; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(235) 
+		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
+		    + (double)(1<<(FP_BITS-1)));
+  }
+    
+  /* clip Cb/Cr values below 16 */	 
+  for (i = 0; i < 16; i++) {
+    R_Cr[i] = myround(1.402 * (double)(-112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(-112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(-112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(-112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  for (i = 16; i < 241; i++) {
+    R_Cr[i] = myround(1.402 * (double)(i - 128)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(i - 128)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(i - 128)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  /* clip Cb/Cr values above 240 */	 
+  for (i = 241; i < 256; i++) {
+    R_Cr[i] = myround(1.402 * (double)(112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(112)
+		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  conv_YR_inited = 1;
+}
+
+
+void rgb24_to_packed444_601_scanline( unsigned char *output,
+                                      unsigned char *input,
+                                      int width )
+{
+    if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
+
+    while( width-- ) {
+        int r = input[ 0 ];
+        int g = input[ 1 ];
+        int b = input[ 2 ];
+
+        output[ 0 ] = (Y_R[ r ] + Y_G[ g ] + Y_B[ b ]) >> FP_BITS;
+        output[ 1 ] = (Cb_R[ r ] + Cb_G[ g ] + Cb_B[ b ]) >> FP_BITS;
+        output[ 2 ] = (Cr_R[ r ] + Cr_G[ g ] + Cr_B[ b ]) >> FP_BITS;
+        output += 3;
+        input += 3;
+    }
+}
+
+void packed444_to_rgb24_601_scanline( unsigned char *output,
+                                      unsigned char *input,
+                                      int width )
+{
+    if( !conv_YR_inited ) init_YCbCr_to_RGB_tables();
+
+    while( width-- ) {
+        int luma = input[ 0 ];
+        int cb = input[ 1 ];
+        int cr = input[ 2 ];
+
+        output[ 0 ] = (RGB_Y[ luma ] + R_Cr[ cr ]) >> FP_BITS;
+        output[ 1 ] = (RGB_Y[ luma ] + G_Cb[ cb ] + G_Cr[cr]) >> FP_BITS;
+        output[ 2 ] = (RGB_Y[ luma ] + B_Cb[ cb ]) >> FP_BITS;
+
+        output += 3;
+        input += 3;
+    }
+}
+
+/*
+ * Color Bars:
+ *
+ *     top 2/3:  75% white, followed by 75% binary combinations
+ *                of R', G', and B' with decreasing luma
+ *
+ * middle 1/12:  reverse order of above, but with 75% white and
+ *                alternating black
+ *
+ *  bottom 1/4:  -I, 100% white, +Q, black, PLUGE, black,
+ *                where PLUGE is (black - 4 IRE), black, (black + 4 IRE)
+ *
+ */
+
+/*  75% white   */
+/*  75% yellow  */
+/*  75% cyan    */
+/*  75% green   */
+/*  75% magenta */
+/*  75% red     */
+/*  75% blue    */
+static unsigned char rainbowRGB[] = {
+  191, 191, 191,
+  191, 191,   0,
+    0, 191, 191,
+    0, 191,   0,
+  191,   0, 191,
+  191,   0,   0,
+    0,   0, 191 };
+static unsigned char rainbowYCbCr[ 21 ];
+
+
+/*  75% blue    */
+/*      black   */
+/*  75% magenta */
+/*      black   */
+/*  75% cyan    */
+/*      black   */
+/*  75% white   */
+static unsigned char wobnairRGB[] = {
+    0,   0, 191,
+    0,   0,   0,
+  191,   0, 191,
+    0,   0,   0,
+    0, 191, 191,
+    0,   0,   0,
+  191, 191, 191 };
+static unsigned char wobnairYCbCr[ 21 ];
+
+
+
+void create_colourbars_packed444( unsigned char *output,
+                                  int width, int height, int stride )
+{
+    int i, x, y, w;
+    int bnb_start;
+    int pluge_start;
+    int stripe_width;
+    int pl_width;
+
+    rgb24_to_packed444_601_scanline( rainbowYCbCr, rainbowRGB, 7 );
+    rgb24_to_packed444_601_scanline( wobnairYCbCr, wobnairRGB, 7 );
+
+    bnb_start = height * 2 / 3;
+    pluge_start = height * 3 / 4;
+    stripe_width = (width + 6) / 7;
+
+    /* Top: Rainbow */
+    for( y = 0; y < bnb_start; y++ ) {
+        for( i = 0, x = 0; i < 7; i++ ) {
+            for( w = 0; (w < stripe_width) && (x < width); w++, x++ ) {
+                output[ (y*stride) + (x*3) + 0 ] = rainbowYCbCr[ (i*3) + 0 ];
+                output[ (y*stride) + (x*3) + 1 ] = rainbowYCbCr[ (i*3) + 1 ];
+                output[ (y*stride) + (x*3) + 2 ] = rainbowYCbCr[ (i*3) + 2 ];
+            }
+        }
+    }
+
+
+    /* Middle:  Wobnair */
+    for(; y < pluge_start; y++ ) {
+        for (i = 0, x = 0; i < 7; i++) {
+            for (w = 0; (w < stripe_width) && (x < width); w++, x++) {
+                output[ (y*stride) + (x*3) + 0 ] = wobnairYCbCr[ (i*3) + 0 ];
+                output[ (y*stride) + (x*3) + 1 ] = wobnairYCbCr[ (i*3) + 1 ];
+                output[ (y*stride) + (x*3) + 2 ] = wobnairYCbCr[ (i*3) + 2 ];
+            }
+        }
+    }
+
+    for(; y < height; y++ ) {
+        /* Bottom:  PLUGE */
+        pl_width = 5 * stripe_width / 4;
+        /* -I -- well, we use -Cb here */
+        for (x = 0; x < pl_width; x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 0;
+            output[ (y*stride) + (x*3) + 1 ] = 16;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        /* white */
+        for (; x < (2 * pl_width); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 235;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        /* +Q -- well, we use +Cr here */
+        for (; x < (3 * pl_width); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 0;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 240;
+        }
+        /* black */
+        for (; x < (5 * stripe_width); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 16;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        /* black - 8 (3.75IRE) | black | black + 8  */
+        for (; x < (5 * stripe_width) + (stripe_width / 3); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 8;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        for (; x < (5 * stripe_width) + (2 * (stripe_width / 3)); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 16;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        for (; x < (6 * stripe_width); x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 24;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
+        }
+        /* black */
+        for (; x < width; x++) {
+            output[ (y*stride) + (x*3) + 0 ] = 16;
+            output[ (y*stride) + (x*3) + 1 ] = 128;
+            output[ (y*stride) + (x*3) + 2 ] = 128;
         }
     }
 }

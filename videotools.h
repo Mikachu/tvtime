@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +107,27 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output,
                                                  unsigned char *input,
                                                  unsigned char *foreground,
                                                  int width );
+/* Alpha provided is from 0-256 not 0-255. */
+void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
+                                                       unsigned char *input,
+                                                       unsigned char *fg,
+                                                       int width, int alpha );
+void cheap_packed444_to_packed422_scanline( unsigned char *output,
+                                            unsigned char *input, int width );
+
+/**
+ * This filter actually does not meet the spec so I'm not
+ * sure what to call it.  I got it from Poynton's site.
+ */
+void chroma422_to_chroma444_rec601_scanline( unsigned char *dest,
+                                             unsigned char *src,
+                                             int srcwidth );
+void packed444_to_rgb24_601_scanline( unsigned char *output,
+                                      unsigned char *input,
+                                      int width );
+void rgb24_to_packed444_601_scanline( unsigned char *output,
+                                      unsigned char *input,
+                                      int width );
 
 void composite_alphamask_packed4444( unsigned char *output, int owidth,
                                      int oheight, int ostride,
@@ -118,14 +140,6 @@ void composite_packed4444_to_packed422( unsigned char *output, int owidth,
                                         unsigned char *foreground, int fwidth,
                                         int fheight, int fstride,
                                         int xpos, int ypos );
-
-/**
- * Alpha provided is from 0-256 not 0-255.
- */
-void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
-                                                       unsigned char *input,
-                                                       unsigned char *fg,
-                                                       int width, int alpha );
 void composite_packed4444_alpha_to_packed422( unsigned char *output,
                                               int owidth, int oheight,
                                               int ostride,
@@ -133,14 +147,8 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output,
                                               int fwidth, int fheight,
                                               int fstride,
                                               int xpos, int ypos, int alpha );
-
-/**
- * This filter actually does not meet the spec so I'm not
- * sure what to call it.  I got it from Poynton's site.
- */
-void chroma422_to_chroma444_rec601_scanline( unsigned char *dest,
-                                             unsigned char *src, int srcwidth );
-
+void create_colourbars_packed444( unsigned char *output,
+                                  int width, int height, int stride );
 void blit_colour_packed4444( unsigned char *output, int width, int height,
                              int stride, int alpha, int luma, int cb, int cr );
 void blit_colour_packed422( unsigned char *output, int width, int height,

@@ -111,6 +111,22 @@ static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe
     osd_string_delete( test_string );
 }
 
+void build_colourbars( unsigned char *output, int width, int height )
+{
+    unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
+    int i;
+    if( !cb444 ) { memset( output, 255, width * height * 2 ); return; }
+
+    create_colourbars_packed444( cb444, width, height, width*3 );
+    for( i = 0; i < height; i++ ) {
+        unsigned char *curout = output + (i * width * 2);
+        unsigned char *curin = cb444 + (i * width * 3);
+        cheap_packed444_to_packed422_scanline( curout, curin, width );
+    }
+
+    free( cb444 );
+}
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -145,7 +161,8 @@ int main( int argc, char **argv )
     char next_chan_buffer[5];
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
-    int showtest = 1;
+    unsigned char *colourbars;
+    int showtest = 0;
 
 
     /* Default device. */
@@ -210,11 +227,13 @@ int main( int argc, char **argv )
 
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
-    if( !testframe_odd || !testframe_even ) {
+    colourbars = (unsigned char *) malloc( width * height * 2 );
+    if( !testframe_odd || !testframe_even || !colourbars ) {
         fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
         return 1;
     }
     build_test_frames( testframe_odd, testframe_even, width, height );
+    build_colourbars( colourbars, width, height );
 
     /* Setup OSD stuff. */
     channel_number = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
@@ -342,8 +361,19 @@ int main( int argc, char **argv )
             if( commands & TVTIME_DEBUG ) {
                 printdebug = 1;
             }
+            if( commands & TVTIME_SHOW_BARS ) {
+                if( !showtest ) {
+                    showtest = 2;
+                } else {
+                    showtest = 0;
+                }
+            }
             if( commands & TVTIME_SHOW_TEST ) {
-                showtest = !showtest;
+                if( !showtest ) {
+                    showtest = 1;
+                } else {
+                    showtest = 0;
+                }
             }
             if( commands & TVTIME_LUMA_UP || commands & TVTIME_LUMA_DOWN ) {
                 if( !apply_luma_correction ) {
@@ -518,8 +548,10 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the top field. */
-        if( showtest ) {
+        if( showtest == 1 ) {
             memcpy( sdl_get_output(), testframe_even, width*height*2 );
+        } else if( showtest == 2 ) {
+            memcpy( sdl_get_output(), colourbars, width*height*2 );
         } else {
             if( apply_luma_correction ) {
                 video_correction_packed422_field_to_frame_top( vc, sdl_get_output(), width*2, curframe,
@@ -569,8 +601,10 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the bottom field. */
-        if( showtest ) {
+        if( showtest == 1 ) {
             memcpy( sdl_get_output(), testframe_odd, width*height*2 );
+        } else if( showtest == 2 ) {
+            memcpy( sdl_get_output(), colourbars, width*height*2 );
         } else {
             if( apply_luma_correction ) {
                 video_correction_packed422_field_to_frame_bot( vc, sdl_get_output(), width*2,
