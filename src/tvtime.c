@@ -451,8 +451,6 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 
 static void tvtime_build_copied_field( unsigned char *output,
                                        unsigned char *curframe,
-                                       unsigned char *lastframe,
-                                       unsigned char *secondlastframe,
                                        video_correction_t *vc,
                                        tvtime_osd_t *osd,
                                        console_t *con,
@@ -470,8 +468,6 @@ static void tvtime_build_copied_field( unsigned char *output,
     if( bottom_field ) {
         /* Advance frame pointers to the next input line. */
         curframe += instride;
-        lastframe += instride;
-        secondlastframe += instride;
     }
 
     /* Copy a scanline. */
@@ -491,8 +487,6 @@ static void tvtime_build_copied_field( unsigned char *output,
         /* Copy a scanline. */
         blit_packed422_scanline( output, curframe, width );
         curframe += instride * 2;
-        lastframe += instride * 2;
-        secondlastframe += instride * 2;
 
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
@@ -1031,8 +1025,7 @@ int main( int argc, char **argv )
             } else {
                 if( curmethod->doscalerbob ) {
                     tvtime_build_copied_field( output->get_output_buffer(),
-                                       curframe, lastframe, secondlastframe,
-                                       vc, osd, con, vs, 0,
+                                       curframe, vc, osd, con, vs, 0,
                                        vc && config_get_apply_luma_correction( ct ),
                                        width, height, width * 2, output->get_output_stride() );
                 } else {
@@ -1109,8 +1102,7 @@ int main( int argc, char **argv )
                 } else {
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( output->get_output_buffer(),
-                                          curframe, lastframe,
-                                          secondlastframe, vc, osd, con, vs, 1,
+                                          curframe, vc, osd, con, vs, 1,
                                           vc && config_get_apply_luma_correction( ct ),
                                           width, height, width * 2, output->get_output_stride() );
                     } else {
