@@ -26,55 +26,6 @@
 extern "C" {
 #endif
 
-/**
- * Functions to handle SDL output.
- *
- * We have to make sure all our calls to SDL occur in the same thread,
- * since otherwise SDL is not happy.  All of the other functions here
- * are for the render thread.
- */
-
-/**
- * Initialize the SDL output device.  Provided is the width and height
- * that incoming frames will be provided at.  This width and height, of
- * course, having nothing to do with the output width and height, which
- * will be decided internally.
- *
- * Function gets the width to scale to.
- * If aspect is 1 we run in 16:9 mode.
- */
-int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect );
-
-/**
- * Returns a pointer to the next frame to be drawn.
- */
-unsigned char *sdl_get_output( void );
-
-/**
- * Display the given frame immediately.
- */
-void sdl_show_frame( void );
-
-/**
- * Toggle fullscreen mode.
- */
-int sdl_toggle_fullscreen( void );
-
-/**
- * Toggle display aspect ratio.
- */
-int sdl_toggle_aspect( void );
-
-/**
- * Perform the polling of events.  Sends signals to the input object.
- */
-void sdl_poll_events( input_t *in );
-
-/**
- * Shutdown SDL.
- */
-void sdl_quit( void );
-
 output_api_t *get_sdl_output( void );
 
 #ifdef __cplusplus
