@@ -89,17 +89,5 @@
 #define TVTIME_ICON_CHANGENTSCMODE     "\xee\x80\xbf" /* Change NTSC Mode    */
 #define TVTIME_ICON_APPLYMATTE         "\xee\x81\x80" /* Apply Matte         */
 #define TVTIME_ICON_SETFSPOS           "\xee\x80\xb5" /* Fullscreen Position */
-
-/*
- * Both "Reset all channels as active" and "Sharpness" are currently
- * represented as the same glyph -- a stylisized exclamation point.
- * 
- * I do not envy the role of silvarian for having to come up with an icon
- * to represent either of these concepts.
- *
- * TVTIME_ICON_EXCLAMATION is only indended for local consumption in this
- * file, and may be removed at any time.
- */
-#define TVTIME_ICON_EXCLAMATION        "\xee\x80\xa7"
-#define TVTIME_ICON_SHARPNESS          TVTIME_ICON_EXCLAMATION
-#define TVTIME_ICON_ALLCHANNELSACTIVE  TVTIME_ICON_EXCLAMATION
+#define TVTIME_ICON_SHARPNESS          "\xee\x81\x81" /* Output Sharpness    */
+#define TVTIME_ICON_ALLCHANNELSACTIVE  "\xee\x80\xa7" /* Set All Active      */
