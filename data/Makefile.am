@@ -36,6 +36,9 @@ dist_tvtimedata_DATA = FreeMonoBold.ttf tvtimeSansBold.ttf \
 EXTRA_DIST = COPYING.DScaler COPYING.tvtimeSansBold COPYING.FreeMonoBold \
 	tvtimeSansBold.sfd FreeMonoBold.sfd DScaler401src.zip
 
+%.ttf: %.pe %.sfd
+	pfaedit -script $^
+
 .PHONY: uninstall-hook
 uninstall-hook:
 	-rmdir -p '$(DESTDIR)$(tvtimedatadir)'

@@ -1,0 +1,6 @@
+#! /usr/bin/pfaedit
+
+file = $1
+Open( file )
+Generate( $fontname + ".ttf" )
+Close()
