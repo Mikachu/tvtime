@@ -194,7 +194,9 @@ static void print_usage( char **argv )
 
 config_t *config_new( int argc, char **argv )
 {
-    char c, *configFile = NULL, base[255];
+    char base[255];
+    char *configFile = 0;
+    char c;
 
     config_t *ct = (config_t *) malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -303,6 +305,13 @@ config_t *config_new( int argc, char **argv )
     ct->buttonmap[ 3 ] = TVTIME_TV_VIDEO;
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
+
+    if( !parser_new( &(ct->pf), "/etc/tvtimerc" ) ) {
+        fprintf( stderr, "config: Could not read configuration from %s\n", "/etc/tvtimerc" );
+    } else {
+        config_init( ct );
+        parser_delete( &(ct->pf) );
+    }
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 235 );
