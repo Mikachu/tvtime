@@ -72,6 +72,7 @@ static int isFreePos( station_mgr_t *mgr, int pos )
 
 static int getNextPos( station_mgr_t *mgr )
 {
+    if ( !mgr->first ) return 0;
     return mgr->first->prev->pos + 1;
 }
 
