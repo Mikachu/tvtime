@@ -90,7 +90,6 @@ char *expand_user_path( const char *path )
 {
     wordexp_t result;
     char *ret = 0;
-    int i;
 
     /* Expand the string.  */
     switch( wordexp( path, &result, 0 ) ) {
