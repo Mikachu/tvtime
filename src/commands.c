@@ -114,6 +114,7 @@ static command_names_t command_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
+    { "SET_AUDIO_MODE", TVTIME_SET_AUDIO_MODE },
     { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
     { "SET_NORM", TVTIME_SET_NORM },
@@ -238,13 +239,6 @@ int tvtime_command_takes_arguments( int command )
     return (command == TVTIME_DISPLAY_MESSAGE || command == TVTIME_SCREENSHOT ||
             command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
             command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE);
-}
-
-void menu_set_value( menu_t *menu, int newval )
-{
-    char string[ 128 ];
-    sprintf( string, "%c%c%c  %3d", 0xee, 0x80, 0x80, newval );
-    menu_set_text( menu, 1, string );
 }
 
 struct commands_s {
@@ -458,6 +452,80 @@ static void reset_norm_menu( menu_t *menu, const char *norm )
     menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "input" );
 }
 
+static void osd_build_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
+{
+    char string[ 128 ];
+
+    if( curmode == VIDEOINPUT_MONO ) {
+        sprintf( string, "%c%c%c  Mono", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Mono", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SET_AUDIO_MODE, "mono" );
+    menu_set_right_command( menu, 1, TVTIME_SET_AUDIO_MODE, "mono" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
+
+    if( curmode == VIDEOINPUT_STEREO ) {
+        sprintf( string, "%c%c%c  Stereo", 0xee, 0x80, 0xa5 );
+    } else {
+        sprintf( string, "%c%c%c  Stereo", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_AUDIO_MODE, "stereo" );
+    menu_set_right_command( menu, 2, TVTIME_SET_AUDIO_MODE, "stereo" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+
+    if( ntsc ) {
+        if( curmode == VIDEOINPUT_LANG1 || curmode == VIDEOINPUT_LANG2 ) {
+            sprintf( string, "%c%c%c  SAP", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  SAP", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "sap" );
+        menu_set_right_command( menu, 3, TVTIME_SET_AUDIO_MODE, "sap" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+    } else {
+        if( curmode == VIDEOINPUT_LANG1 ) {
+            sprintf( string, "%c%c%c  Primary Language", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Primary Language", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "lang1" );
+        menu_set_right_command( menu, 3, TVTIME_SET_AUDIO_MODE, "lang1" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+        if( curmode == VIDEOINPUT_LANG2 ) {
+            sprintf( string, "%c%c%c  Secondary Language", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Secondary Language", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SET_AUDIO_MODE, "lang2" );
+        menu_set_right_command( menu, 4, TVTIME_SET_AUDIO_MODE, "lang2" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+        menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+    }
+}
+
+
+static void menu_set_value( menu_t *menu, int newval )
+{
+    char string[ 128 ];
+    sprintf( string, "%c%c%c  %d", 0xee, 0x80, 0x80, newval );
+    menu_set_text( menu, 1, string );
+}
+
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime )
@@ -612,27 +680,57 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     */
     sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
-    menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_right_command( menu, 2, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0x9a );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_CC, "" );
-    menu_set_right_command( menu, 2, TVTIME_TOGGLE_CC, "" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0x9a );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_CC, "" );
+    menu_set_right_command( menu, 3, TVTIME_TOGGLE_CC, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "input-pal" );
+    menu_set_text( menu, 0, "Setup - Input configuration" );
+    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 3, string );
@@ -647,25 +745,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "input-pal" );
-    menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 2, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu = menu_new( "audiomode" );
+    menu_set_text( menu, 0, "Setup - Input configuration - Preferred audio mode" );
     commands_add_menu( cmd, menu );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
+    if( cmd->vidin ) {
+        osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                                   videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                   videoinput_get_audio_mode( cmd->vidin ) );
+    } else {
+        osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ), 0, 0 );
+    }
 
     menu = menu_new( "norm" );
     menu_set_text( menu, 0, "Setup - Input configuration - Television standard" );
@@ -957,7 +1046,6 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
     tvtime_osd_show_list( osd, 1 );
 }
 
-
 /**
  * Hardcoded menus.
  */
@@ -1172,12 +1260,6 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     int key;
 
     if( tvtime_cmd == TVTIME_NOCOMMAND ) return;
-
-    /*
-    if( cmd->menuactive && !tvtime_is_menu_command( tvtime_cmd ) && cmd->curusermenu ) {
-        menu_off( cmd );
-    }
-    */
 
     if( cmd->menuactive && tvtime_is_menu_command( tvtime_cmd ) ) {
         int x, y, line;
@@ -1424,7 +1506,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     } else {
                         sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
                     }
-                    menu_set_text( stationmenu, 4, string );
+                    menu_set_text( stationmenu, 2, string );
                     commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
@@ -1485,6 +1567,32 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_CREDITS:
         break;
 
+    case TVTIME_SET_AUDIO_MODE:
+        if( cmd->vidin ) {
+            if( !strcasecmp( arg, "mono" ) ) {
+                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_MONO );
+            } else if( !strcasecmp( arg, "stereo" ) ) {
+                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_STEREO );
+            } else if( !strcasecmp( arg, "sap" ) || !strcasecmp( arg, "lang1" ) ) {
+                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_LANG1 );
+            } else {
+                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_LANG2 );
+            }
+            if( cmd->osd ) {
+                if( !cmd->menuactive ) {
+                    osd_list_audio_modes( cmd->osd, videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                          videoinput_get_audio_mode( cmd->vidin ) );
+                }
+                tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
+                tvtime_osd_show_info( cmd->osd );
+                osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                                           videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                           videoinput_get_audio_mode( cmd->vidin ) );
+                commands_refresh_menu( cmd );
+            }
+        }
+        break;
+
     case TVTIME_TOGGLE_AUDIO_MODE:
         if( cmd->vidin ) {
             videoinput_set_audio_mode( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) << 1 );
@@ -1493,6 +1601,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                       videoinput_get_audio_mode( cmd->vidin ) );
                 tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
                 tvtime_osd_show_info( cmd->osd );
+                osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                                           videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                           videoinput_get_audio_mode( cmd->vidin ) );
+                commands_refresh_menu( cmd );
             }
         }
         break;
