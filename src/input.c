@@ -134,7 +134,7 @@ static int frequencies_find_named_channel( const char *str )
     }
 
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        char *curstr = tvtuner[ i ].name;
+        const char *curstr = tvtuner[ i ].name;
         while( *curstr == ' ' ) curstr++;
 
         if( !strcasecmp( curstr, instr ) ) {
@@ -166,6 +166,7 @@ static void reinit_tuner( input_t *in )
         }
 
         if( in->osd ) {
+            tvtime_osd_set_freq_table( in->osd, freq_table_names[ cur_freq_table ].long_name );
             tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
             tvtime_osd_show_info( in->osd );
         }
@@ -219,7 +220,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     } else if( !strcasecmp( "italy", chanlist_name ) ) {
         cur_freq_table = PAL_ITALY;
     } else if( !strcasecmp( "newzealand", chanlist_name ) ) {
-        cur_freq_table = PAL_NZ_CABLE;
+        cur_freq_table = PAL_NEWZEALAND;
     } else if( !strcasecmp( "australia", chanlist_name ) ) {
         cur_freq_table = PAL_AUSTRALIA;
     } else if( !strcasecmp( "ireland", chanlist_name ) ) {
@@ -405,7 +406,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
             if( videoinput_has_tuner( in->vidin ) ) {
                 cur_freq_table = ( cur_freq_table + 1 ) % NUM_FREQ_TABLES;
                 reinit_tuner( in );
-                tvtime_osd_set_freq_table( in->osd, freq_table_info[ cur_freq_table ].name );
             }
             break;
 
