@@ -162,33 +162,17 @@
         start tvtime, and on the second press it will send a <b>QUIT</b>
         message.</p>
 
-        <h3>6. Setting up the menu keys on remotes without menu buttons</h3>
+        <h3>6. Menu navigation on remotes without menu buttons</h3>
 
         <img style="float: right" src="remote-nomenu-small.jpg" alt="A remote control without menu buttons">
 
         <p>Many remote controls, like the one featured on the right,
         do not have separate menu navigation buttons but instead double-up
-        the channel up/down and volume up/down buttons for menu navigation.</p>
-
-        <p>In a future version of tvtime, we will include special commands to
-        better handle this case.  Until then, a simple hack is to use the
-        more expressive keyboard key mapping interface, where the menu commands
-        are automatically distinguished from the keyboard commands.  For
-        example:</p>
-
-<pre>
-    begin
-      prog = irexec
-      button = CH+
-      config = tvtime-command KEY_EVENT up
-      repeat = 1
-    end
-</pre>
-
-        <p>This sends the key event for the up arrow key whenever the CH+ button
-        is pressed on the remote.  When the menu is active, this key maps to
-        moving the cursor up in the menu, while when the menu is not visible,
-        this changes the channel.</p>
+        the channel up/down and volume up/down buttons for menu navigation.
+        tvtime 0.9.11 includes the commands UP, DOWN, LEFT and RIGHT for
+        this dual-purpose.  When not in the menu, the UP and DOWN commands
+        control channel navigation, while the LEFT and RIGHT commands
+        control volume.</p>
 
         <h3>7. Problems when tvtime runs at realtime priority</h3>
         <p>You may experience some missed events if you run tvtime as
@@ -218,7 +202,8 @@
 
         <h3>9. ChangeLog</h3>
         <ul>
-        <li>Nov 4, 2003: Added a section about realtime priority problems.
+        <li>Nov 4, 2003: Added a section about realtime priority problems,
+              and updated the section on menu navigation keys.
         <li>Oct 9, 2003: Added a section with an example lircrc file.
         </ul>
 
