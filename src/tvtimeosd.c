@@ -24,7 +24,7 @@
 #include "tvtimeosd.h"
 #include "credits.h"
 
-#define OSD_FADE_DELAY  160
+#define OSD_FADE_DELAY  60
 
 typedef struct string_object_s
 {
