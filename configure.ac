@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.52)
-AC_INIT(tvtime, 0.9.1, http://www.sourceforge.net/projects/tvtime)
+AC_INIT(tvtime, 0.9.2, http://www.sourceforge.net/projects/tvtime)
 AC_CONFIG_SRCDIR([src/tvtime.c])
-AM_INIT_AUTOMAKE(tvtime,0.9.1)
+AM_INIT_AUTOMAKE(tvtime,0.9.2)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
@@ -27,6 +27,35 @@ AC_FUNC_MMAP
 AC_CHECK_FUNCS([atexit gettimeofday memset strerror])
 
 AM_PATH_SDL(1.2.2, , AC_MSG_ERROR([Requires SDL 1.2 or later]))
+
+
+
+dnl ---------------------------------------------
+dnl zlib
+dnl ---------------------------------------------
+dnl Test for libz
+AC_CHECK_LIB(z, gzsetparams,
+        [ AC_CHECK_HEADER(zlib.h,
+          have_zlib=yes
+          ZLIB_LIBS="-lz",)], AC_MSG_ERROR(zlib needed))
+
+AM_CONDITIONAL(HAVE_ZLIB, [test x"$have_zlib" = "xyes"])
+AC_SUBST(ZLIB_LIBS)
+
+
+dnl ---------------------------------------------
+dnl libpng
+dnl ---------------------------------------------
+dnl Test for libpng
+AC_CHECK_LIB(png, png_read_png,
+        [ AC_CHECK_HEADER(png.h,
+          have_libpng=yes
+          PNG_LIBS="-lpng",)], AC_MSG_ERROR(libpng needed))
+
+AM_CONDITIONAL(HAVE_LIBPNG, [test x"$have_libpng" = "xyes"])
+AC_SUBST(PNG_LIBS)
+
+
 
 AC_ARG_ENABLE([warnings],
     [  --disable-warnings      do not treat warnings as errors])
