@@ -557,9 +557,9 @@ void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
     snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ), "%s", norm );
 }
 
-void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
+void tvtime_osd_set_input( tvtime_osd_t *osd, const char *text )
 {
-    snprintf( osd->input_text, sizeof( osd->input_text ), "%s", norm );
+    snprintf( osd->input_text, sizeof( osd->input_text ), "%s", text );
 }
 
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )

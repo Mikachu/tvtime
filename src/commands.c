@@ -3272,7 +3272,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             snprintf( cmd->next_chan_buffer, sizeof( cmd->next_chan_buffer ),
                       "%d", station_get_current_id( cmd->stationmgr ) );
             if( cmd->osd ) {
-                tvtime_osd_set_channel_number( cmd->osd, cmd->next_chan_buffer );
+                if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+                    tvtime_osd_set_channel_number( cmd->osd,
+                                                   cmd->next_chan_buffer );
+                }
                 commands_handle( cmd, TVTIME_DISPLAY_INFO, "" );
             }
         }
