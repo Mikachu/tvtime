@@ -44,35 +44,41 @@ struct key_name_s {
 };
 
 static key_name_t key_names[] = {
-    { "up", I_UP },
-    { "down", I_DOWN },
-    { "left", I_LEFT },
-    { "right", I_RIGHT },
-    { "insert", I_INSERT },
-    { "home", I_HOME },
-    { "end", I_END },
+    { "Up", I_UP },
+    { "Down", I_DOWN },
+    { "Left", I_LEFT },
+    { "Right", I_RIGHT },
+    { "Insert", I_INSERT },
+    { "Home", I_HOME },
+    { "End", I_END },
     { "pgup", I_PGUP },
     { "pgdn", I_PGDN },
-    { "f1", I_F1 },
-    { "f2", I_F2 },
-    { "f3", I_F3 },
-    { "f4", I_F4 },
-    { "f5", I_F5 },
-    { "f6", I_F6 },
-    { "f7", I_F7 },
-    { "f8", I_F8 },
-    { "f9", I_F9 },
-    { "f10", I_F10 },
-    { "f11", I_F11 },
-    { "f12", I_F12 },
-    { "f13", I_F13 },
-    { "f14", I_F14 },
-    { "f15", I_F15 },
-    { "backspace", I_BACKSPACE },
-    { "escape", I_ESCAPE },
-    { "enter", I_ENTER },
-    { "print", I_PRINT },
-    { "menu", I_MENU },
+    { "pg up", I_PGUP },
+    { "pg dn", I_PGDN },
+    { "PageUp", I_PGUP },
+    { "PageDown", I_PGDN },
+    { "Page Up", I_PGUP },
+    { "Page Down", I_PGDN },
+    { "F1", I_F1 },
+    { "F2", I_F2 },
+    { "F3", I_F3 },
+    { "F4", I_F4 },
+    { "F5", I_F5 },
+    { "F6", I_F6 },
+    { "F7", I_F7 },
+    { "F8", I_F8 },
+    { "F9", I_F9 },
+    { "F10", I_F10 },
+    { "F11", I_F11 },
+    { "F12", I_F12 },
+    { "F13", I_F13 },
+    { "F14", I_F14 },
+    { "F15", I_F15 },
+    { "Backspace", I_BACKSPACE },
+    { "Escape", I_ESCAPE },
+    { "Enter", I_ENTER },
+    { "Print", I_PRINT },
+    { "Menu", I_MENU },
     { 0, 0 }
 };
 
@@ -141,6 +147,8 @@ static unsigned int parse_colour( const char *str )
 
     if( ret == 1 ) {
         return a;
+    } else if( ret == 2 ) {
+        return 0xff000000 | ( (a & 0xff) << 8 ) | (r & 0xff);
     } else if( ret == 3 ) {
         return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
     } else if( ret == 4 ) {
