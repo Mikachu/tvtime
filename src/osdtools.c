@@ -908,6 +908,15 @@ int osd_list_visible( osd_list_t *osdl )
     return (osdl->numlines > 0 && osd_string_visible( osdl->lines[ 0 ] ));
 }
 
+void osd_list_rerender( osd_list_t *osdl )
+{
+    int i;
+
+    for( i = 0; i < osdl->numlines; i++ ) {
+        osd_string_rerender( osdl->lines[ i ] );
+    }
+}
+
 void osd_list_set_hold( osd_list_t *osdl, int hold )
 {
     osdl->hold = hold;

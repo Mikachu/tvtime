@@ -478,6 +478,8 @@ void tvtime_osd_set_pixel_aspect( tvtime_osd_t *osd, double pixel_aspect )
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
         osd_string_rerender( osd->strings[ i ].string );
     }
+
+    osd_list_rerender( osd->list );
 }
 
 void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
