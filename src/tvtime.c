@@ -1026,10 +1026,10 @@ int main( int argc, char **argv )
                          "available, exiting.\n" );
         return 1;
     }
-    curmethodid = config_get_preferred_deinterlace_method( ct );
+    curmethodid = config_get_deinterlace_method( ct );
     if( curmethodid >= get_num_deinterlace_methods() ||
         curmethodid < 0) {
-        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, using first method found.\n" );
+        fprintf( stderr, "tvtime: Invalid deinterlace method, using first method found.\n" );
         curmethodid = 0;
     }
     curmethod = get_deinterlace_method( curmethodid );

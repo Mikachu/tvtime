@@ -119,7 +119,7 @@ struct config_s
     int *keymap;
     char *timeformat;
     int *buttonmap;
-    char ssdir[ 256 ];
+    char *ssdir;
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
@@ -130,7 +130,7 @@ struct config_s
 
     char *rvr_filename;
 
-    int preferred_deinterlace_method;
+    int deinterlace_method;
     int check_freq_present;
 
     int use_vbi;
@@ -232,12 +232,12 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "V4LDevice" ) ) {
-            free( ct->v4ldev );
+            if( ct->v4ldev ) free( ct->v4ldev );
             ct->v4ldev = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "VBIDevice" ) ) {
-            free( ct->vbidev );
+            if( ct->vbidev ) free( ct->vbidev );
             ct->vbidev = strdup( curval );
         }
 
@@ -262,25 +262,28 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Norm" ) ) {
-            free( ct->norm );
+            if( ct->norm ) free( ct->norm );
             ct->norm = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Frequencies" ) ) {
-            free( ct->freq );
+            if( ct->freq ) free( ct->freq );
             ct->freq = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "TimeFormat" ) ) {
-            free( ct->timeformat );
+            if( ct->timeformat ) free( ct->timeformat );
             ct->timeformat = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ScreenShotDir" ) ) {
+            if( ct->ssdir ) free( ct->ssdir );
             if( curval[ 0 ] == '~' && getenv( "HOME" ) ) {
-                snprintf( ct->ssdir, sizeof( ct->ssdir ), "%s%s", getenv( "HOME" ), curval + 1 );
+                if( asprintf( &(ct->ssdir), "%s/%s", getenv( "HOME" ), curval + 1 ) < 0 ) {
+                    ct->ssdir = 0;
+                }
             } else {
-                strncpy( ct->ssdir, curval, 255 );
+                ct->ssdir = strdup( curval );
             }
         }
 
@@ -315,11 +318,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "StartupDeinterlaceMethod" ) ) {
-            ct->preferred_deinterlace_method = atoi( curval );
+            ct->deinterlace_method = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "CheckForSignal" ) ) {
-            ct->preferred_deinterlace_method = atoi( curval );
+            ct->check_freq_present = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
@@ -520,7 +523,6 @@ static void print_usage( char **argv )
 
 config_t *config_new( void )
 {
-    DIR *temp_dir = 0;
     char temp_dirname[ 1024 ];
     char base[ 256 ];
     struct passwd *pwuid = 0;
@@ -546,8 +548,22 @@ config_t *config_new( void )
     ct->freq = strdup( "us-cable" );
     ct->nummodes = 0;
     ct->modelist = 0;
+    ct->fullscreen = 0;
+    ct->menu_bg_rgb = 4278190080U;     /* opaque black (billy: says who?) */
+    ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
+    ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
+    ct->deinterlace_method = 0;
+    ct->check_freq_present = 1;
+    ct->use_vbi = 0;
+    ct->start_channel = 1;
+    ct->prev_channel = 1;
+    ct->overscan = 0.0;
+    ct->rvr_filename = 0;
+    ct->framerate = FRAMERATE_FULL;
+    ct->ssdir = strdup( getenv( "HOME" ) );
+    ct->timeformat = strdup( "%X" );
 
-    ct->uid = getuid( );
+    ct->uid = getuid();
     pwuid = getpwuid( ct->uid );
     if( !pwuid ) {
         fprintf( stderr, "config: You don't exist, go away!\n" );
@@ -563,30 +579,12 @@ config_t *config_new( void )
     if( asprintf( &(ct->command_pipe), 
                   "%s/TV-%s/tvtimefifo", FIFODIR, pwuid->pw_name ) < 0 ) {
         fprintf( stderr, "config: Out of memory.\n" );
+        free( ct->command_pipe_dir );
         free( ct );
         return 0;
     }
 
-    if( strlen( nl_langinfo( T_FMT ) ) ) {
-        ct->timeformat = strdup( nl_langinfo( T_FMT ) );
-    } else {
-        ct->timeformat = strdup( "%r" );
-    }
-    strncpy( ct->ssdir, getenv( "HOME" ), 255 );
-    ct->fullscreen = 0;
-    ct->menu_bg_rgb = 4278190080U; /* opaque black */
-    ct->channel_text_rgb = 4294967040U; /* opaque yellow */
-    ct->other_text_rgb = 4294303411U; /* opaque wheat */
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
-    ct->preferred_deinterlace_method = 0;
-    ct->check_freq_present = 1;
-    ct->use_vbi = 0;
-    ct->start_channel = 1;
-    ct->prev_channel = 1;
-    ct->overscan = 0.0;
-    ct->rvr_filename = 0;
-    ct->framerate = FRAMERATE_FULL;
-
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not allocate memory for keymap.\n" );
         free( ct );
@@ -669,9 +667,8 @@ config_t *config_new( void )
             fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
             free( ct );
             return 0;
-        }
-        else {
-            temp_dir = opendir( temp_dirname );
+        } else {
+            DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
                 fprintf( stderr, "config: %s is not a directory.\n", 
                          temp_dirname );
@@ -787,6 +784,7 @@ void config_delete( config_t *ct )
     if( ct->configsave ) configsave_close( ct->configsave );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
+    if( ct->ssdir ) free( ct->ssdir );
     free( ct->timeformat );
     free( ct->norm );
     free( ct->freq );
@@ -868,9 +866,9 @@ int config_get_apply_luma_correction( config_t *ct )
     return ct->apply_luma_correction;
 }
 
-int config_get_preferred_deinterlace_method( config_t *ct )
+int config_get_deinterlace_method( config_t *ct )
 {
-    return ct->preferred_deinterlace_method;
+    return ct->deinterlace_method;
 }
 
 double config_get_luma_correction( config_t *ct )
