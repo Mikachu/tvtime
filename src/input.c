@@ -218,12 +218,16 @@ void input_callback( input_t *in, InputEvent command, int arg )
                  if( verbose ) fprintf( stderr, "tvtime: Changing to "
                                         "channel %s\n", 
                                         chanlist[ chanindex ].name );
-                 tvtime_osd_show_channel_number( in->osd,
-                                                 chanlist[ chanindex ].name );
+                 if( in->osd ) {
+                     tvtime_osd_show_channel_number( in->osd,
+                                                     chanlist[ chanindex ].name );
+                 }
                  strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
                            localtime(&tm) );
-                 tvtime_osd_show_channel_info( in->osd, timestamp );
-                 tvtime_osd_show_channel_logo( in->osd );
+                 if( in->osd ) {
+                     tvtime_osd_show_channel_info( in->osd, timestamp );
+                     tvtime_osd_show_channel_logo( in->osd );
+                 }
              }
              break;
 
@@ -236,7 +240,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
              if( verbose ) {
                  fprintf( stderr, "input: volume %d\n", (volume & 0xFF) );
              }
-             tvtime_osd_show_volume_bar( in->osd, volume & 0xff );
+             if( in->osd ) {
+                 tvtime_osd_show_volume_bar( in->osd, volume & 0xff );
+             }
              break;
 
          case TVTIME_MIXER_MUTE:
@@ -248,7 +254,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
              videoinput_set_hue_relative( 
                  in->vidin, 
                  (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
-             tvtime_osd_show_data_bar( in->osd, "Hue    ", videoinput_get_hue( in->vidin ) );
+             if( in->osd ) {
+                 tvtime_osd_show_data_bar( in->osd, "Hue    ", videoinput_get_hue( in->vidin ) );
+             }
              break;
 
          case TVTIME_BRIGHT_UP: 
@@ -256,7 +264,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
              videoinput_set_brightness_relative( 
                  in->vidin, 
                  (tvtime_cmd == TVTIME_BRIGHT_UP) ? 1 : -1 );
-             tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
+             if( in->osd ) {
+                 tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
+             }
              break;
 
          case TVTIME_CONT_UP:
@@ -264,7 +274,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
              videoinput_set_contrast_relative( 
                  in->vidin, 
                  (tvtime_cmd == TVTIME_CONT_UP) ? 1 : -1 );
-             tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
+             if( in->osd ) {
+                 tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
+             }
 
              break;
 
@@ -273,7 +285,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
              videoinput_set_colour_relative( 
                  in->vidin, 
                  (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
-             tvtime_osd_show_data_bar( in->osd, "Colour ", videoinput_get_colour( in->vidin ) );
+             if( in->osd ) {
+                 tvtime_osd_show_data_bar( in->osd, "Colour ", videoinput_get_colour( in->vidin ) );
+             }
              break;
 
          case TVTIME_ENTER:
@@ -300,16 +314,20 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                       chanlist[ chanindex ].name );
                          }
 
-                         tvtime_osd_show_channel_number( 
-                             in->osd, 
-                             chanlist[ chanindex ].name );
+                         if( in->osd ) {
+                             tvtime_osd_show_channel_number( 
+                                 in->osd, 
+                                 chanlist[ chanindex ].name );
+                         }
 
                          strftime( timestamp, 50, 
                                    config_get_timeformat( in->cfg ), 
                                    localtime(&tm) );
 
-                         tvtime_osd_show_channel_info( in->osd, timestamp );
-                         tvtime_osd_show_channel_logo( in->osd );
+                         if( in->osd ) {
+                             tvtime_osd_show_channel_info( in->osd, timestamp );
+                             tvtime_osd_show_channel_logo( in->osd );
+                         }
                          in->frame_counter = 0;
                      } else {
                          /* no valid channel */
@@ -394,7 +412,9 @@ void input_next_frame( input_t *in )
         strcpy( input_text, in->next_chan_buffer );
         if( !(in->frame_counter % 10) )
             strcat( input_text, "_" );
-        tvtime_osd_show_channel_number( in->osd, input_text );
+        if( in->osd ) {
+            tvtime_osd_show_channel_number( in->osd, input_text );
+        }
     }
 
     if( in->videohold ) in->videohold--;

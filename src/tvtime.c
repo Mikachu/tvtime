@@ -68,7 +68,15 @@ static void build_test_frames( unsigned char *oddframe,
 {
     osd_string_t *test_string;
 
+    memset( oddframe, 0, width * height * 2 );
+    memset( evenframe, 0, width * height * 2 );
+
     test_string = osd_string_new( "FreeSansBold.ttf", 80, width, height, 4.0 / 3.0 );
+    if( !test_string ) {
+        fprintf( stderr, "tvtime: Can't create string for test frame, test frames unavailable.\n" );
+        return;
+    }
+
     blit_colour_packed422( oddframe, width, height, width*2, 16, 128, 128 );
     blit_colour_packed422( evenframe, width, height, width*2, 80, 128, 128 );
 
@@ -205,7 +213,7 @@ static void tvtime_build_frame( unsigned char *output,
 
         /* Clear a scanline. */
         blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
     }
@@ -216,7 +224,7 @@ static void tvtime_build_frame( unsigned char *output,
     } else {
         blit_packed422_scanline( output, curframe, width );
     }
-    tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     output += outstride;
     scanline++;
 
@@ -234,7 +242,7 @@ static void tvtime_build_frame( unsigned char *output,
         }
 
         deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
-        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
 
@@ -248,7 +256,7 @@ static void tvtime_build_frame( unsigned char *output,
         } else {
             blit_packed422_scanline( output, curframe, width );
         }
-        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
     }
@@ -256,12 +264,12 @@ static void tvtime_build_frame( unsigned char *output,
     if( !bottom_field ) {
         /* Clear a scanline. */
         blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
     }
 
-    menu_composite_packed422( menu, out, width, frame_height, outstride );
+    if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
 
 int main( int argc, char **argv )
@@ -396,6 +404,9 @@ int main( int argc, char **argv )
 
     /* Setup OSD stuff. */
     osd = tvtime_osd_new( width, height, 4.0 / 3.0 );
+    if( !osd ) {
+        fprintf( stderr, "Can't initialize OSD object.\n" );
+    }
 
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( vidin ) ) {
@@ -439,9 +450,11 @@ int main( int argc, char **argv )
             }
             strftime( timestamp, 50, config_get_timeformat( ct ), 
                       localtime(&tm) );
-            tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
-            tvtime_osd_show_channel_info( osd, timestamp );
-            tvtime_osd_show_channel_logo( osd );
+            if( osd ) {
+                tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
+                tvtime_osd_show_channel_info( osd, timestamp );
+                tvtime_osd_show_channel_logo( osd );
+            }
         }
     }
 
@@ -481,10 +494,9 @@ int main( int argc, char **argv )
                      config_get_aspect( ct ) ? 16.0 / 9.0 : 4.0 / 3.0 );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
-        return 1;
     }
 
-    input_set_menu( in, menu );
+    if( menu ) input_set_menu( in, menu );
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
@@ -575,9 +587,13 @@ int main( int argc, char **argv )
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             deinterlace_scanline = curmethod->function;
-            tvtime_osd_show_message( osd, curmethod->name );
+            if( osd ) {
+                tvtime_osd_show_message( osd, curmethod->name );
+            }
         }
-        tvtime_osd_volume_muted( osd, mixer_ismute() );
+        if( osd ) {
+            tvtime_osd_volume_muted( osd, mixer_ismute() );
+        }
         input_next_frame( in );
 
         /* CHECKPOINT1 : Blit the second field */
@@ -734,7 +750,9 @@ int main( int argc, char **argv )
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
 
-        tvtime_osd_advance_frame( osd );
+        if( osd ) {
+            tvtime_osd_advance_frame( osd );
+        }
     }
 
     sdl_quit();

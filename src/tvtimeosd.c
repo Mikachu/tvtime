@@ -16,6 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "osd.h"
@@ -57,42 +58,57 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
         return 0;
     }
 
+    osd->channel_number = 0;
+    osd->channel_info = 0;
+    osd->volume_bar = 0;
+    osd->data_bar = 0;
+    osd->muted = 0;
+    osd->channel_logo = 0;
+
     osd->channel_number = osd_string_new( "FreeSansBold.ttf", 80, width,
                                           height, frameaspect );
+    osd->channel_info = osd_string_new( "FreeSansBold.ttf", 30, width,
+                                        height, frameaspect );
+    osd->volume_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
+                                      height, frameaspect );
+    osd->data_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
+                                    height, frameaspect );
+    osd->muted = osd_string_new( "FreeSansBold.ttf", 15, width,
+                                 height, frameaspect );
+    osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
+                                         frameaspect, 256 );
+
+    if( !osd->channel_number || !osd->channel_info || !osd->volume_bar ||
+        !osd->data_bar || !osd->muted || !osd->channel_logo ) {
+        fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
+        tvtime_osd_delete( osd );
+        return 0;
+    }
+
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
     osd_string_show_border( osd->channel_number, 1 );
     osd->channel_number_xpos = 40;
     osd->channel_number_ypos = 30;
 
-    osd->channel_info = osd_string_new( "FreeSansBold.ttf", 30, width,
-                                        height, frameaspect );
     osd_string_set_colour( osd->channel_info, 220, 12, 155 );
     osd_string_show_border( osd->channel_info, 1 );
     osd->channel_info_xpos = width / 2;
     osd->channel_info_ypos = 40;
 
-    osd->volume_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                      height, frameaspect );
     osd_string_set_colour( osd->volume_bar, 200, 128, 128 );
     osd->volume_bar_xpos = 20;
     osd->volume_bar_ypos = height - 40;
 
-    osd->data_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                    height, frameaspect );
     osd_string_set_colour( osd->data_bar, 200, 128, 128 );
     osd->data_bar_xpos = 20;
     osd->data_bar_ypos = height - 40;
 
-    osd->muted = osd_string_new( "FreeSansBold.ttf", 15, width,
-                                 height, frameaspect );
     osd_string_set_colour( osd->muted, 200, 128, 128 );
     osd_string_show_text( osd->muted, "Mute", 100 );
     osd->ismuted = 0;
     osd->muted_xpos = 20;
     osd->muted_ypos = height - 40;
 
-    osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
-                                         frameaspect, 256 );
     osd->channel_logo_xpos = width / 2;
     osd->channel_logo_ypos = 86;
 
@@ -101,6 +117,12 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
 
 void tvtime_osd_delete( tvtime_osd_t *osd )
 {
+    if( osd->channel_number ) osd_string_delete( osd->channel_number );
+    if( osd->channel_info ) osd_string_delete( osd->channel_info );
+    if( osd->volume_bar ) osd_string_delete( osd->volume_bar );
+    if( osd->data_bar ) osd_string_delete( osd->data_bar );
+    if( osd->muted ) osd_string_delete( osd->muted );
+    if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
     free( osd );
 }
 
