@@ -141,8 +141,7 @@ case "$1" in
 
 	# Create the configuration file if it doesn't exist
 	if [ ! -f $CONFIGFILE ]; then
-	    gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz \
-		> $CONFIGFILE
+	    cp /usr/share/doc/tvtime/examples/default.tvtime.xml $CONFIGFILE
 	fi
 
 	# Configure tvtime.
