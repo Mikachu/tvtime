@@ -52,6 +52,7 @@ int station_get_current_id( station_mgr_t *mgr );
 const char *station_get_current_channel_name( station_mgr_t *mgr );
 const char *station_get_current_band( station_mgr_t *mgr );
 int station_get_current_frequency( station_mgr_t *mgr );
+int station_get_current_active( station_mgr_t *mgr );
 
 /**
  * Add or update the channel list.

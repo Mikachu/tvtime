@@ -339,12 +339,20 @@ int station_scan_band( station_mgr_t *mgr, const char *band )
 
 int station_toggle_curr( station_mgr_t *mgr ) 
 {
-    if ( mgr->current ) {
-        mgr->current->active= !mgr->current->active;
+    if( mgr->current ) {
+        mgr->current->active = !mgr->current->active;
 	return 1;
     }
     return 0;
    
+}
+
+int station_get_current_active( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->active;
+    }
+    return 0;
 }
 
 int station_scan( station_mgr_t *mgr ) 

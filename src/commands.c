@@ -243,6 +243,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_SKIP_CHANNEL:
         station_toggle_curr( in->stationmgr );
+        if( station_get_current_active( in->stationmgr ) ) {
+            tvtime_osd_show_message( in->osd, "Channel active in list." );
+        } else {
+            tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+        }
 	break;
             
     case TVTIME_ASPECT:
