@@ -23,6 +23,7 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedy.h"
 
 /**
  * Deinterlace the latest field, attempting to weave wherever it won't cause
@@ -209,6 +210,15 @@ static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *outpu
     emms();
 }
 
+static void copy_scanline( unsigned char *output, unsigned char *m2,
+                           unsigned char *t1, unsigned char *m1,
+                           unsigned char *b1, unsigned char *t0,
+                           unsigned char *b0, int width )
+{
+    blit_packed422_scanline( output, m2, width );
+}
+
+
 static deinterlace_setting_t settings[] =
 {
     {
@@ -236,7 +246,8 @@ static deinterlace_method_t twoframe =
     MM_ACCEL_X86_MMXEXT,
     2,
     settings,
-    deinterlace_twoframe_packed422_scanline_mmxext
+    deinterlace_twoframe_packed422_scanline_mmxext,
+    copy_scanline
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -25,6 +25,7 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedy.h"
 
 static int EdgeDetect = 625;
 static int JaggieThreshold = 73;
@@ -120,6 +121,14 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
     emms();
 }
 
+static void copy_scanline( unsigned char *output, unsigned char *m2,
+                           unsigned char *t1, unsigned char *m1,
+                           unsigned char *b1, unsigned char *t0,
+                           unsigned char *b0, int width )
+{
+    blit_packed422_scanline( output, m2, width );
+}
+
 static deinterlace_setting_t settings[] =
 {
     {
@@ -147,7 +156,8 @@ static deinterlace_method_t bobmethod =
     MM_ACCEL_X86_MMXEXT,
     2,
     settings,
-    deinterlace_videobob_packed422_scanline_mmxext
+    deinterlace_videobob_packed422_scanline_mmxext,
+    copy_scanline
 };
 
 #ifdef BUILD_TVTIME_PLUGINS

@@ -42,9 +42,14 @@ typedef void (*setting_onchange_t)(deinterlace_setting_t *);
 typedef void (*deinterlace_plugin_init_t)( void );
 
 /**
- * The scanline function that every deinterlacer plugin must implement
- * to do its work.
- *
+ * There are two scanline functions that every deinterlacer plugin
+ * must implement to do its work: one for a 'copy' and one for
+ * an 'interpolate' for the currently active field.  This so so that
+ * while plugins may be delaying fields, the external API assumes that
+ * the plugin is completely realtime.
+ */
+
+/**
  * Each deinterlacing routine can require data from up to four fields.
  * The current field is being output is Field 4:
  *
@@ -59,14 +64,32 @@ typedef void (*deinterlace_plugin_init_t)( void );
  *
  * Pointers are always to scanlines in the standard packed 4:2:2 format.
  */
-typedef void (*deinterlace_scanline_t)( unsigned char *output,
-                                        unsigned char *t1,
-                                        unsigned char *m1,
-                                        unsigned char *b1,
-                                        unsigned char *t0,
-                                        unsigned char *m0,
-                                        unsigned char *b0,
-                                        int width );
+typedef void (*deinterlace_interp_scanline_t)( unsigned char *output,
+                                               unsigned char *t1,
+                                               unsigned char *m1,
+                                               unsigned char *b1,
+                                               unsigned char *t0,
+                                               unsigned char *m0,
+                                               unsigned char *b0,
+                                               int width );
+/**
+ * For the copy scanline, the API is basically the same, except that
+ * we're given a scanline to 'copy'.
+ *
+ * | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |   T0    |         |   T1    |         |
+ * |         |    M1   |         |   M2    |
+ * |   B0    |         |   B1    |         |
+ */
+typedef void (*deinterlace_copy_scanline_t)( unsigned char *output,
+                                             unsigned char *m2,
+                                             unsigned char *t1,
+                                             unsigned char *m1,
+                                             unsigned char *b1,
+                                             unsigned char *t0,
+                                             unsigned char *b0,
+                                             int width );
+
 
 /**
  * Plugin settings can be any of the following.
@@ -108,7 +131,8 @@ struct deinterlace_method_s
     int accelrequired;
     int numsettings;
     deinterlace_setting_t *settings;
-    deinterlace_scanline_t function;
+    deinterlace_interp_scanline_t interpolate_scanline;
+    deinterlace_copy_scanline_t copy_scanline;
 };
 
 /**

@@ -54,7 +54,6 @@ static int tolerance = 2000;
  */
 static deinterlace_method_t *curmethod;
 static int curmethodid;
-static deinterlace_scanline_t deinterlace_scanline;
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -137,14 +136,17 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  *
  * We want to build frames so that they look like this:
  *  Top field:      Bot field:
- *     Copy            Blank
+ *     Copy            Double
  *     Interp          Copy
  *     Copy            Interp
  *     Interp          Copy
  *     Copy            --
  *     --              --
- *     --              Interp
- *     Blank           Copy
+ *     --              --
+ *     Copy            Interp
+ *     Interp          Copy
+ *     Copy            Interp
+ *     Double          Copy
  *
  *  So, say a frame is n high.
  *  For the bottom field, the first scanline is blank (special case).
@@ -165,6 +167,7 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  * |         |   T0    |         |   T1    |
  * |   M0    |         |    M1   |         |
  * |         |   B0    |         |   B1    |
+ * |  NX0    |         |   NX1   |         |
  *
  * So, since we currently get frames not individual fields from V4L, there
  * are two possibilities for where these come from:
@@ -219,42 +222,52 @@ static void tvtime_build_frame( unsigned char *output,
     }
 
     /* Copy a scanline. */
+    blit_packed422_scanline( output, curframe, width );
+
     if( correct_input ) {
-        video_correction_correct_packed422_scanline( vc, output, curframe, width );
-    } else {
-        blit_packed422_scanline( output, curframe, width );
+        video_correction_correct_packed422_scanline( vc, output, output, width );
     }
+
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     output += outstride;
     scanline++;
 
-    for( i = (frame_height - 2) / 2; i; --i ) {
+    for( i = ((frame_height - 2) / 2); i; --i ) {
         unsigned char *top1 = curframe;
         unsigned char *mid1 = curframe + instride;
         unsigned char *bot1 = curframe + (instride*2);
+        unsigned char *nxt1 = curframe + (instride*3);
+
         unsigned char *top0 = lastframe;
         unsigned char *mid0 = lastframe + instride;
         unsigned char *bot0 = lastframe + (instride*2);
+        unsigned char *nxt0 = lastframe + (instride*3);
+
+        if( i == 1 ) {
+            nxt1 = mid1;
+            nxt0 = mid0;
+        }
 
         if( !bottom_field ) {
             mid1 = mid0;
+            nxt1 = nxt0;
             mid0 = secondlastframe + instride;
+            nxt0 = secondlastframe + (instride*3);
         }
 
-        deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
+        curmethod->interpolate_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
 
+        /* Copy a scanline. */
+        curmethod->copy_scanline( output, bot1, mid1, bot0, nxt1, mid0, nxt0, width );
         curframe += instride * 2;
         lastframe += instride * 2;
         secondlastframe += instride * 2;
 
-        /* Copy a scanline. */
         if( correct_input ) {
-            video_correction_correct_packed422_scanline( vc, output, curframe, width );
-        } else {
-            blit_packed422_scanline( output, curframe, width );
+            video_correction_correct_packed422_scanline( vc, output, output, width );
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
@@ -264,6 +277,10 @@ static void tvtime_build_frame( unsigned char *output,
     if( !bottom_field ) {
         /* Double the bottom scanline. */
         blit_packed422_scanline( output, curframe, width );
+
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, output, output, width );
+        }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
@@ -271,58 +288,6 @@ static void tvtime_build_frame( unsigned char *output,
 
     if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
-
-/**
- * This code is an experiment I was running where we output at 2*field rate and
- * use linear interpolation.  The idea is to always show a new frame every refresh rate
- * of the output device, and have the output emulate a TV.  Unfortunately this has
- * not been a very successful experiment...  If my CRT is at 100hz for example, I don't
- * get the horrid bounciness of linear interpolation, however I get a lower frequency
- * bounce.  I've just pushed the temporal alias lower...
- */
-static void tvtime_build_between_frame( unsigned char *output,
-                                        unsigned char *topframe,
-                                        unsigned char *botframe,
-                                        int width,
-                                        int frame_height,
-                                        int instride,
-                                        int outstride,
-                                        video_correction_t *vc,
-                                        tvtime_osd_t *osd,
-                                        menu_t *menu )
-{
-    unsigned char tempscanline[ 768*2 ];
-    int scanline = 0;
-    int i;
-
-    // First scanline, copy both top and bot
-    botframe += instride;
-    interpolate_packed422_scanline( output, topframe, botframe, width );
-    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    output += outstride;
-    scanline++;
-
-    for( i = 0; i < (frame_height - 2) / 2; i++ ) {
-        /* Interp top, copy bottom. */
-        interpolate_packed422_scanline( tempscanline, topframe, topframe + (instride*2), width );
-        interpolate_packed422_scanline( output, tempscanline, botframe, width );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        topframe += (instride*2);
-        output += outstride;
-        scanline++;
-
-        /* Interp bottom, copy top. */
-        interpolate_packed422_scanline( tempscanline, botframe, botframe + (instride*2), width );
-        interpolate_packed422_scanline( output, tempscanline, topframe, width );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        botframe += (instride*2);
-        output += outstride;
-        scanline++;
-    }
-
-    /* Should handle the last scanline here... */
-}
-
 
 int main( int argc, char **argv )
 {
@@ -353,11 +318,14 @@ int main( int argc, char **argv )
     menu_t *menu;
 
     setup_speedy_calls();
-    twoframe_plugin_init();
+
+    greedy_plugin_init();
     videobob_plugin_init();
+    greedy2frame_plugin_init();
+    twoframe_plugin_init();
     linear_plugin_init();
     weave_plugin_init();
-    greedy2frame_plugin_init();
+    double_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -445,7 +413,6 @@ int main( int argc, char **argv )
     }
     curmethodid = 0;
     curmethod = get_deinterlace_method( curmethodid );
-    deinterlace_scanline = curmethod->function;
 
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
@@ -637,7 +604,6 @@ int main( int argc, char **argv )
         if( input_toggle_deinterlacing_mode( in ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
-            deinterlace_scanline = curmethod->function;
             if( osd ) {
                 tvtime_osd_show_message( osd, curmethod->name );
             }

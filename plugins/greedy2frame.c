@@ -23,16 +23,17 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedy.h"
 
 static int GreedyTwoFrameThreshold = 4;
 static int GreedyTwoFrameThreshold2 = 8;
 
 static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char *output,
+                                                                  unsigned char *m2,
                                                                   unsigned char *t1,
                                                                   unsigned char *m1,
                                                                   unsigned char *b1,
                                                                   unsigned char *t0,
-                                                                  unsigned char *m0,
                                                                   unsigned char *b0,
                                                                   int width )
 {
@@ -50,9 +51,9 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
     width /= 4;
     while( width-- ) {
         movq_m2r( *t1, mm1 );
-        movq_m2r( *m1, mm0 );
+        movq_m2r( *m2, mm0 );
         movq_m2r( *b1, mm3 );
-        movq_m2r( *m0, mm2 );
+        movq_m2r( *m1, mm2 );
 
         // Average T1 and B1 so we can do interpolated bobbing if we bob onto T1.
         movq_r2r( mm3, mm7 );                 // mm7 = B1
@@ -124,15 +125,24 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
         // Advance to the next set of pixels.
         output += 8;
         t0 += 8;
-        m0 += 8;
         b0 += 8;
         t1 += 8;
         m1 += 8;
         b1 += 8;
+        m2 += 8;
     }
     sfence();
     emms();
 }
+
+static void copy_scanline( unsigned char *output, unsigned char *t1,
+                           unsigned char *m1, unsigned char *b1,
+                           unsigned char *t0, unsigned char *m0,
+                           unsigned char *b0, int width )
+{
+    blit_packed422_scanline( output, m1, width );
+}
+
 
 static deinterlace_setting_t settings[] =
 {
@@ -161,6 +171,7 @@ static deinterlace_method_t greedymethod =
     MM_ACCEL_X86_MMXEXT,
     2,
     settings,
+    copy_scanline,
     deinterlace_greedytwoframe_packed422_scanline_mmxext
 };
 
