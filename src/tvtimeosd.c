@@ -25,6 +25,7 @@
 #include "commands.h"
 #include "pulldown.h"
 
+#define MENU_FADE_DELAY  100
 #define OSD_FADE_DELAY  60
 
 typedef struct string_object_s
@@ -579,7 +580,7 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
 {
     if( showlist ) {
-        osd_list_set_timeout( osd->list, OSD_FADE_DELAY );
+        osd_list_set_timeout( osd->list, MENU_FADE_DELAY );
     } else {
         osd_list_set_timeout( osd->list, 0 );
     }
