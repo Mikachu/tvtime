@@ -55,7 +55,7 @@ build-stamp:  config.status
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) FREEFONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont/\""'
+	$(MAKE) FREEFONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont\""'
 	#/usr/bin/docbook-to-man debian/tvtime.sgml > tvtime.1
 
 	touch build-stamp

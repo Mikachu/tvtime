@@ -8,7 +8,8 @@
 //  published by the Free Software Foundation.  A copy of this license is
 //  included with this software distribution in the file COPYING.  If you
 //  do not have a copy, you may obtain a copy by writing to the Free
-//  Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+//  Software Foundation, Inc., 59 Temple Place, Suite 330 - Boston, MA
+//  02111-1307  USA
 //
 //  This software is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +26,103 @@
 // CVS Log
 //
 // $Log$
+// Revision 1.3  2003/04/30 05:35:37  sfllaw
+// 	* tvtime/debian/rules: Try to make FONTDIR work.
+// 	* tvtime/src/Makefile.am: Ibid.
+// 	* tvtime/src/utils.c: Ibid.
+//
+// 	* tvtime/src/DS_Filter.h: Fixed copyright notices.
+// 	* tvtime/src/Makefile.am: Ibid.
+// 	* tvtime/src/bands.h: Ibid.
+// 	* tvtime/src/commands.c: Ibid.
+// 	* tvtime/src/commands.h: Ibid.
+// 	* tvtime/src/configsave.c: Ibid.
+// 	* tvtime/src/configsave.h: Ibid.
+// 	* tvtime/src/console.c: Ibid.
+// 	* tvtime/src/console.h: Ibid.
+// 	* tvtime/src/credits.c: Ibid.
+// 	* tvtime/src/credits.h: Ibid.
+// 	* tvtime/src/deinterlace.c: Ibid.
+// 	* tvtime/src/deinterlace.h: Ibid.
+// 	* tvtime/src/dfboutput.c: Ibid.
+// 	* tvtime/src/dfboutput.h: Ibid.
+// 	* tvtime/src/diffcomp.c: Ibid.
+// 	* tvtime/src/diffcomp.h: Ibid.
+// 	* tvtime/src/dscalerplugin.c: Ibid.
+// 	* tvtime/src/dscalerplugin.h: Ibid.
+// 	* tvtime/src/expandpng.c: Ibid.
+// 	* tvtime/src/fifo.c: Ibid.
+// 	* tvtime/src/fifo.h: Ibid.
+// 	* tvtime/src/input.c: Ibid.
+// 	* tvtime/src/input.h: Ibid.
+// 	* tvtime/src/leetft.c: Ibid.
+// 	* tvtime/src/leetft.h: Ibid.
+// 	* tvtime/src/menu.c: Ibid.
+// 	* tvtime/src/menu.h: Ibid.
+// 	* tvtime/src/mixer.c: Ibid.
+// 	* tvtime/src/mixer.h: Ibid.
+// 	* tvtime/src/osdtools.c: Ibid.
+// 	* tvtime/src/osdtools.h: Ibid.
+// 	* tvtime/src/outputapi.h: Ibid.
+// 	* tvtime/src/outputfilter.c: Ibid.
+// 	* tvtime/src/outputfilter.h: Ibid.
+// 	* tvtime/src/performance.c: Ibid.
+// 	* tvtime/src/performance.h: Ibid.
+// 	* tvtime/src/pnginput.c: Ibid.
+// 	* tvtime/src/pnginput.h: Ibid.
+// 	* tvtime/src/pngoutput.c: Ibid.
+// 	* tvtime/src/pngoutput.h: Ibid.
+// 	* tvtime/src/pulldown.c: Ibid.
+// 	* tvtime/src/pulldown.h: Ibid.
+// 	* tvtime/src/ree.c: Ibid.
+// 	* tvtime/src/ree.h: Ibid.
+// 	* tvtime/src/reepktq.c: Ibid.
+// 	* tvtime/src/reepktq.h: Ibid.
+// 	* tvtime/src/rtctimer.c: Ibid.
+// 	* tvtime/src/rtctimer.h: Ibid.
+// 	* tvtime/src/rvrmain.c: Ibid.
+// 	* tvtime/src/rvrreader.c: Ibid.
+// 	* tvtime/src/rvrreader.h: Ibid.
+// 	* tvtime/src/scope.c: Ibid.
+// 	* tvtime/src/scope.h: Ibid.
+// 	* tvtime/src/sdloutput.c: Ibid.
+// 	* tvtime/src/sdloutput.h: Ibid.
+// 	* tvtime/src/speedtools.h: Ibid.
+// 	* tvtime/src/speedy.c: Ibid.
+// 	* tvtime/src/speedy.h: Ibid.
+// 	* tvtime/src/station.c: Ibid.
+// 	* tvtime/src/station.h: Ibid.
+// 	* tvtime/src/taglines.h: Ibid.
+// 	* tvtime/src/timingtest.c: Ibid.
+// 	* tvtime/src/tvtime-command.c: Ibid.
+// 	* tvtime/src/tvtime.c: Ibid.
+// 	* tvtime/src/tvtimeconf.c: Ibid.
+// 	* tvtime/src/tvtimeconf.h: Ibid.
+// 	* tvtime/src/tvtimeosd.c: Ibid.
+// 	* tvtime/src/tvtimeosd.h: Ibid.
+// 	* tvtime/src/utils.c: Ibid.
+// 	* tvtime/src/utils.h: Ibid.
+// 	* tvtime/src/vbidata.c: Ibid.
+// 	* tvtime/src/vbidata.h: Ibid.
+// 	* tvtime/src/vbiscreen.c: Ibid.
+// 	* tvtime/src/vbiscreen.h: Ibid.
+// 	* tvtime/src/vgasync.c: Ibid.
+// 	* tvtime/src/vgasync.h: Ibid.
+// 	* tvtime/src/videocorrection.c: Ibid.
+// 	* tvtime/src/videocorrection.h: Ibid.
+// 	* tvtime/src/videofilter.c: Ibid.
+// 	* tvtime/src/videofilter.h: Ibid.
+// 	* tvtime/src/videoinput.c: Ibid.
+// 	* tvtime/src/videoinput.h: Ibid.
+// 	* tvtime/src/videotools.c: Ibid.
+// 	* tvtime/src/videotools.h: Ibid.
+// 	* tvtime/src/vsync.c: Ibid.
+// 	* tvtime/src/vsync.h: Ibid.
+// 	* tvtime/src/x11tools.c: Ibid.
+// 	* tvtime/src/x11tools.h: Ibid.
+// 	* tvtime/src/xvoutput.c: Ibid.
+// 	* tvtime/src/xvoutput.h: Ibid.
+//
 // Revision 1.2  2003/01/07 15:25:45  vektor
 // Added some missing debian files, and removed ^M's from the DScaler
 // header files.
