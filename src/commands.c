@@ -198,6 +198,7 @@ static void update_xmltv_channel( commands_t *cmd )
         }
     } else if( cmd->osd ) {
         tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
+        tvtime_osd_set_info_available( cmd->osd, 0 );
     }
 }
 
@@ -309,7 +310,10 @@ static void update_xmltv_display( commands_t *cmd )
 
 static void update_xmltv_listings( commands_t *cmd )
 {
-    if( cmd->xmltv && cmd->osd && xmltv_needs_refresh( cmd->xmltv ) ) {
+    if( cmd->xmltv && cmd->osd && cmd->vidin &&
+        videoinput_has_tuner( cmd->vidin ) &&
+        xmltv_needs_refresh( cmd->xmltv ) ) {
+
         xmltv_refresh( cmd->xmltv );
         update_xmltv_display( cmd );
     }
@@ -514,7 +518,9 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_start( cmd->osd, "" );
         tvtime_osd_set_show_length( cmd->osd, "" );
         tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
+        tvtime_osd_set_info_available( cmd->osd, 0 );
         tvtime_osd_show_info( cmd->osd );
+        tvtime_osd_clear( cmd->osd );
     }
 
     if( config_get_save_restore_picture( cmd->cfg ) && cmd->vidin && !videoinput_has_tuner( cmd->vidin ) ) {
