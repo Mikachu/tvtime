@@ -110,7 +110,7 @@ void filter_deinterlace_methods( int accel, int fields_available )
         if( cur->method->fields_required > fields_available ) {
             /* This method is no good, drop it from the list. */
             fprintf( stderr, "deinterlace: %s disabled: requires "
-                     "%d field buffers, only %d available.\n",
+                     "%d field buffers, only have %d.\n",
                      cur->method->short_name, cur->method->fields_required,
                      fields_available );
             drop = 1;

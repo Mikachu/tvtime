@@ -518,14 +518,14 @@ static int conf_xml_parse( config_t *ct, char *configFile )
 
     doc = xmlParseFile( configFile );
     if( !doc ) {
-        lfprintf( stderr, _("config: Error parsing configuration file %s.\n"),
+        lfprintf( stderr, _("Error parsing configuration file %s.\n"),
                   configFile );
         return 0;
     }
 
     top = xmlDocGetRootElement( doc );
     if( !top ) {
-        lfprintf( stderr, _("config: No XML root element found in %s.\n"),
+        lfprintf( stderr, _("No XML root element found in %s.\n"),
                   configFile );
         xmlFreeDoc( doc );
         return 0;
@@ -533,7 +533,7 @@ static int conf_xml_parse( config_t *ct, char *configFile )
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
         lfprintf( stderr,
-                  _("config: %s is not a tvtime configuration file.\n"),
+                  _("%s is not a tvtime configuration file.\n"),
                   configFile );
         xmlFreeDoc( doc );
         return 0;
@@ -567,18 +567,14 @@ static xmlDocPtr configsave_open( const char *config_filename )
     doc = xmlParseFile( config_filename );
     if( !doc ) {
         if( file_is_openable_for_read( config_filename ) ) {
-            lfputs( _("config: Config file exists, but cannot be parsed.\n"),
-                    stderr );
-            lfputs( _("config: Settings will NOT be saved.\n"), stderr );
+            lfputs( _("Config file cannot be parsed by tvtime. "
+                      "Settings will not be saved.\n"), stderr );
             return 0;
         } else {
             /* Config file doesn't exist, create a new one. */
-            lfputs( _("config: No config file found, creating a new one.\n"),
-                    stderr );
             doc = xmlNewDoc( BAD_CAST "1.0" );
             if( !doc ) {
-                lfputs( _("config: Could not create new config file.\n"),
-                        stderr );
+                lfputs( _("Could not create new config file.\n"), stderr );
                 return 0;
             }
             create_file = 1;
@@ -602,8 +598,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
         /* Create the root node */
         top = xmlNewDocNode( doc, 0, BAD_CAST "tvtime", 0 );
         if( !top ) {
-            lfputs( _("config: Error creating configuration file.\n"),
-                    stderr );
+            lfputs( _("Error creating configuration file.\n"), stderr );
             xmlFreeDoc( doc );
             return 0;
         } else {
@@ -614,8 +609,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        lfprintf( stderr,
-                  _("config: %s is not a tvtime configuration file.\n"),
+        lfprintf( stderr, _("%s is not a tvtime configuration file.\n"),
                   config_filename );
         xmlFreeDoc( doc );
         return 0;
@@ -625,7 +619,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
     xmlSaveFormatFile( config_filename, doc, 1 );
     if( create_file ) {
         if( chown( config_filename, getuid(), getgid() ) < 0 ) {
-            lfprintf( stderr, _("config: Cannot change owner of %s: %s.\n"),
+            lfprintf( stderr, _("Cannot change owner of %s: %s.\n"),
                       config_filename, strerror( errno ) );
         }
     }
@@ -928,12 +922,12 @@ config_t *config_new( void )
 
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
-            lfprintf( stderr, _("config: Cannot create %s: %s.\n"),
+            lfprintf( stderr, _("Cannot create %s: %s.\n"),
                       temp_dirname, strerror( errno ) );
         } else {
             DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
-                lfprintf( stderr, _("config: %s is not a directory.\n"), 
+                lfprintf( stderr, _("%s is not a directory.\n"), 
                           temp_dirname );
             } else {
                 closedir( temp_dir );
@@ -943,7 +937,7 @@ config_t *config_new( void )
     } else {
         /* We created the directory, now force it to be owned by the user. */
         if( chown( temp_dirname, getuid(), getgid() ) < 0 ) {
-            lfprintf( stderr, _("config: Cannot change owner of %s: %s.\n"),
+            lfprintf( stderr, _("Cannot change owner of %s: %s.\n"),
                       temp_dirname, strerror( errno ) );
         }
     }
