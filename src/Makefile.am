@@ -75,8 +75,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	hashtable.h hashtable.c cpuinfo.h cpuinfo.c videodev.h videodev2.h \
 	menu.c menu.h outputfilter.h outputfilter.c dfbmatroxtv.c xmltv.h \
 	xmltv.c gettext.h tvtimeglyphs.h mpeg2input.h mpeg2input.c \
-	lircclient.h lircclient.c vtdata.h vtdata.c vtscreen.h vtscreen.c
-
+	lircclient.h lircclient.c
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
@@ -91,7 +90,7 @@ tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(FONT_CFLAGS) $(MPEG2_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) $(MPEG2_LIBS) -lm -lzvbi
+	$(DYNAMIC_LD_LIBS) $(MPEG2_LIBS) -lm
 if ARCH_X86
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread

@@ -797,6 +797,7 @@ static int lvfprintf( FILE *stream, const char *format, va_list ap )
     }
 
     /* else, ret remains as the return value from vsnprintf () */
+    free( str );
     return ret;
 #else /* no ENABLE_NLS */
     return vfprintf( stream, format, ap );
