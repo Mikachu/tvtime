@@ -164,7 +164,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
     for( i=0; i < con->rows; i++ ) {
         int tmp;
 
-        con->coords[ i ].x = con->x + video_width / 100 ;
+        con->coords[ i ].x = (con->x + video_width / 100) & ~1 ;
 
         if( i == 0 ) 
             tmp = con->y + ((double)height - (double)rowheight * (double)con->rows) / (double)2;

@@ -15,34 +15,47 @@ static char outbuf[2048];
 static int pll = 0;
 
 /* this is NOT exactly right */
-static char *ccode = " !\"#$%&'()a+,-./0123456789:;<=>?@"
-                     "abcdefghijklmnopqrstuvwxyz"
-                     "[e]iouabcdefghijklmnopqrstuvwxyzc/Nn.";
+static char *ccode = " !\"#$%&'()\0341+,-./0123456789:;<=>?@"
+                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+//                     "abcdefghijklmnopqrstuvwxyz"
+                     "[\0351]\0355\0363\0372abcdefghijklmnopqr"
+                     "stuvwxyz\0347\0367\0245\0244\0240";
+static char *wccode = "\0256\0260\0275\0277T\0242\0243#\0340 "
+                      "\0350\0354\0362\0371";
+
+static char *extcode1 = "\0301\0311\0323\0332\0334\0374"
+                       "`\0241*'-\0251S*\"\"\0300\0302"
+                       "\0307\0310\0312\0313\0353\0316\0317\0357"
+                       "\0324\0331\0371\0333\0253\0273";
+
+static char *extcode2 = "\0303\0343\0315\0314\0354\0322\0362\0325"
+                        "{}\\^_|~\0304\0344\0326\0366\0337\0245\0244|"
+                        "\0305\0345\0330\0370++++";
 
 int parityok(int n)
 {				/* check parity for 2 bytes packed in n */
     int j, k;
     for (k = 0, j = 0; j < 7; j++)
-	if (n & (1 << j))
-	    k++;
+        if (n & (1 << j))
+            k++;
     if ((k & 1) && (n & 0x80))
-	return 0;
+        return 0;
     for (k = 0, j = 8; j < 15; j++)
-	if (n & (1 << j))
-	    k++;
+        if (n & (1 << j))
+            k++;
     if ((k & 1) && (n & 0x8000))
-	return 0;
+        return 0;
     return 1;
 }
 
 int decodebit(unsigned char *data, int threshold)
 {
     return ((data[0] + data[1] + data[2] + data[3] + data[4] + data[5] +
-	data[6] + data[7] + data[8] + data[9] + data[10] + data[11] +
-	data[12] + data[13] + data[14] + data[15] + data[16] + data[17] +
-	data[18] + data[19] + data[20] + data[21] + data[22] + data[23] +
-	data[24] + data[25] + data[26] + data[27] + data[28] + data[29] +
-	data[30] + data[31])>>5 > threshold);
+             data[6] + data[7] + data[8] + data[9] + data[10] + data[11] +
+             data[12] + data[13] + data[14] + data[15] + data[16] + data[17] +
+             data[18] + data[19] + data[20] + data[21] + data[22] + data[23] +
+             data[24] + data[25] + data[26] + data[27] + data[28] + data[29] +
+             data[30] + data[31])>>5 > threshold);
 }
 
 
@@ -52,13 +65,13 @@ int ccdecode(unsigned char *vbiline)
     int sample, packedbits = 0;
 
     for (i=0; i<250; i++) {
-	sample = vbiline[i];
-	if (sample - maxval > 10)
-	    (maxval = sample, max = i);
-	if (sample < minval)
-	    minval = sample;
-	if (maxval - sample > 40)
-	    break;
+        sample = vbiline[i];
+        if (sample - maxval > 10)
+            (maxval = sample, max = i);
+        if (sample < minval)
+            minval = sample;
+        if (maxval - sample > 40)
+            break;
     }
     sample = ((maxval + minval) >> 1);
     pll = max;
@@ -70,7 +83,7 @@ int ccdecode(unsigned char *vbiline)
     i = max + 538;
 #endif
     if (!decodebit(&vbiline[i], sample))
-	return 0;
+        return 0;
 #ifndef PAL_DECODE
     tmp = i + 57;		/* tmp = data bit zero */
 #else
@@ -78,16 +91,16 @@ int ccdecode(unsigned char *vbiline)
 #endif
     for (i = 0; i < 16; i++) {
 #ifndef PAL_DECODE
-	clk = tmp + i * 57;
+        clk = tmp + i * 57;
 #else
-	clk = tmp + i * 71;
+        clk = tmp + i * 71;
 #endif
-	if (decodebit(&vbiline[clk], sample)) {
-	    packedbits |= 1 << i;
-	}
+        if (decodebit(&vbiline[clk], sample)) {
+            packedbits |= 1 << i;
+        }
     }
     if (parityok(packedbits))
-	return packedbits;
+        return packedbits;
     return 0;
 }				/* ccdecode */
 
@@ -226,13 +239,12 @@ static void parse_xds_packet( const char *packet, int length )
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
         fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
-                        int month = packet[6];// & 15;
-                        int day = packet[5];// & 31;
-                        int hour = packet[4];// & 31;
-                        int min = packet[3];// & 63;
-
-        fprintf( stderr, "PIN: %d %d %d %d (%d %d, %d:%d)\n",
-                 min, hour, day, month, day & 31, month & 15, hour & 31, min & 63 );
+                        int month = packet[5];// & 15;
+                        int day = packet[4];// & 31;
+                        int hour = packet[3];// & 31;
+                        int min = packet[2];// & 63;
+        fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
+                 day & 31, months[month & 15], hour & 31, min & 63 );
                  // packet[ 3 ], packet[ 4 ], packet[ 5 ], packet[ 6 ] );
                  //packet[ 5 ] & 31, packet[ 6 ], packet[ 4 ] & 31, packet[ 3 ] & 63 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
@@ -242,6 +254,21 @@ static void parse_xds_packet( const char *packet, int length )
             if( cur >= 0 && cur < 96 ) {
                 fprintf( stderr, "%s%s", i ? ", " : "", eia608_program_type[ cur ] );
             }
+        }
+        fprintf( stderr, "\n" );
+    } else if( packet[ 0 ] < 0x03 && packet[ 1 ] >= 0x10 && packet[ 1 ] <= 0x17 ) {
+        fprintf( stderr, "Program Description: Line %d", packet[1] & 0xf );
+        fprintf( stderr, "%s\n", packet[ 2 ] );
+        
+    } else if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x02 ) {
+        fprintf( stderr, "Program Length: Length: %02d:%02d", packet[ 3 ] & 63, 
+                 packet[ 2 ] & 63 ); 
+        if( length > 4 ) {
+            fprintf( stderr, " Elapsed: %02d:%02d", packet[ 5 ] & 63, 
+                     packet[ 4 ] & 63 );
+        }
+        if( length > 6 ) {
+            fprintf( stderr, ".%02d", packet[ 6 ] & 63 );
         }
         fprintf( stderr, "\n" );
     } else {
@@ -304,17 +331,23 @@ int ProcessLine( unsigned char *s, int bottom )
     int w1, b1, b2;
     static int lastchar = 0, mode = 0;
     static int nocc = 0;
-    int m, n;
+    int m=0, n=0;
 
     m = strlen(outbuf);
     w1 = ccdecode(s);
     if (!w1)
-	nocc++;
+        nocc++;
 
     b1 = w1 & 0x7f;
     b2 = (w1 >> 8) & 0x7f;
 
     if( !b1 && !b2 ) return 0;
+
+    if( b1 >= 0x10 && b1 <= 0x1F && b2 >= 0x20 && b2 <= 0x7F ) {
+        fprintf( stderr, "control code: 0x%02x 0x%02x\n", b1, b2 );
+        return 0;
+    }
+
     if( bottom && xds_decode( b1, b2 ) ) return 0;
 
 /*
@@ -337,40 +370,68 @@ int ProcessLine( unsigned char *s, int bottom )
             b2 >> 1 & 1,
             b2 >> 0 & 1, b1, b2);
 */
+    if( (b1 & 96) )
+    fprintf( stderr, "b1 = 0x%02x  b2 = 0x%02x\n", b1, b2 );
+    if( b1 == 0x11 || b1 == 0x19 || 
+        b1 == 0x12 || b1 == 0x13 || 
+        b1 == 0x1A || b1 == 0x1B ) {
+        switch( b1 ) {
+        case 0x1A:
+        case 0x12:
+            /* use extcode1 */
+            break;
+        case 0x13:
+        case 0x1B:
+            /* use extcode2 */
+            break;
+        case 0x11:
+        case 0x19:
+            /* use wcode */
+            break;
+        default:
+            break;
+        }
+    } else if( (b1 & 96) ) {
+        /* use ccode */
+        
+    }
 
+#if 0
     if ((b1 & 96)) {
-	if (b1 > 31) {
-	    strncat(outbuf, &ccode[b1 - 32], 1);
-	    if (lastchar == '.' || lastchar == '['
-		|| lastchar == '>' || lastchar == ']'
-		|| lastchar == '!' || lastchar == '?')
-		outbuf[strlen(outbuf) - 1] =
-		    toupper(ccode[b1 - 32]);
-	    if (b1 > 32)
-		lastchar = ccode[b1 - 32];
-	}
-	if (b2 > 31) {
-	    strncat(outbuf, &ccode[b2 - 32], 1);
-	    if (lastchar == '.' || lastchar == '['
-		|| lastchar == '>' || lastchar == ']'
-		|| lastchar == '!' || lastchar == '?')
-		outbuf[strlen(outbuf) - 1] =
-		    toupper(ccode[b2 - 32]);
-	    if (b2 > 32)
-		lastchar = ccode[b2 - 32];
-	}
+        if (b1 > 31) {
+            strncat(outbuf, &ccode[b1 - 32], 1);
+            if (lastchar == '.' || lastchar == '['
+                || lastchar == '>' || lastchar == ']'
+                || lastchar == '!' || lastchar == '?')
+                outbuf[strlen(outbuf) - 1] =
+                    toupper(ccode[b1 - 32]);
+            if (b1 > 32)
+                lastchar = ccode[b1 - 32];
+        }
+        if (b2 > 31) {
+            strncat(outbuf, &ccode[b2 - 32], 1);
+            if (lastchar == '.' || lastchar == '['
+                || lastchar == '>' || lastchar == ']'
+                || lastchar == '!' || lastchar == '?')
+                outbuf[strlen(outbuf) - 1] =
+                    toupper(ccode[b2 - 32]);
+            if (b2 > 32)
+                lastchar = ccode[b2 - 32];
+        }
     }
     if (!(b1 & 96) && b1 && *outbuf)
-	if (outbuf[strlen(outbuf) - 1] != ' ')
-	    strncat(outbuf, ccode, 1);
+        if (outbuf[strlen(outbuf) - 1] != ' ')
+            strncat(outbuf, ccode, 1);
     n = strlen(outbuf);
     if (!(b1 & 96) && b1 && *outbuf) {
-	if (++mode > 4) {
-	    fprintf(stderr, "%s\n", outbuf);
-	    *outbuf = 0;
-	    mode = 0;
-	}
+        if (++mode > 4) {
+            fprintf(stderr, "%s\n", outbuf);
+            *outbuf = 0;
+            mode = 0;
+        }
     }
+#endif
+
     return n - m;
 }				/* ProcessLine */
 
@@ -412,6 +473,7 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
         fprintf( stderr, "error, can't read vbi data.\n" );
         return;
     }
+
     ProcessLine( &vbi->buf[ DO_LINE*2048 ], 0 );
     ProcessLine( &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
 
