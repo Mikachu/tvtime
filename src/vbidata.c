@@ -511,8 +511,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         return 0;
     }
 
-    if( vbi->enabled && 
-        b1 >= 0x10 && b1 <= 0x1F && b2 >= 0x20 && b2 <= 0x7F ) {
+    if( vbi->vs && vbi->enabled && b1 >= 0x10 && b1 <= 0x1F && b2 >= 0x20 && b2 <= 0x7F ) {
         int code;
         if( (b2 & 64) ) {
             /* Preamble Code */
@@ -812,6 +811,8 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         return 1;
     }
 
+    if( !vbi->vs ) return 0;
+
     if( !vbi->enabled ) return 0;
 
     vbi->lastcode = 0;
@@ -955,7 +956,7 @@ void vbidata_reset( vbidata_t *vbi )
     vbi->lastcount = 0;
     vbi->xds_packet[ 0 ] = 0;
     vbi->xds_cursor = 0;
-    vbiscreen_reset( vbi->vs );
+    if( vbi->vs ) vbiscreen_reset( vbi->vs );
 }
 
 void vbidata_capture_mode( vbidata_t *vbi, int mode )
