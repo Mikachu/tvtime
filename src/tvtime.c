@@ -1444,6 +1444,9 @@ int main( int argc, char **argv )
         commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
     }
 
+    /* Set the mier device. */
+    mixer_set_device( config_get_mixer_device( ct ) );
+
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
 

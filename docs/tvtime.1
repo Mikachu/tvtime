@@ -47,6 +47,9 @@ tvtime \- a high quality television application
 .IR frequencies \|]
 .RB [\| \-c
 .IR channel \|]
+.RB [\| \-x
+.IR "mixer device" \|:[
+.IR channel ]\|]
 
 .SH DESCRIPTION
 
@@ -98,6 +101,8 @@ nokeep tab (@);
 l l.
 \(bu@Xv
 \(bu@DirectFB
+\(bu@mga
+\(bu@xmga
 .TE
 
 .TP
@@ -244,6 +249,42 @@ l l.
 \(bu@france
 \(bu@russia
 .TE
+
+.TP
+.B \-x
+The mixer device and channel for the volume controls. (defaults to
+.IR /dev/mixer:line ).
+Valid channels are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@vol
+\(bu@bass
+\(bu@treble
+\(bu@synth
+\(bu@pcm
+\(bu@speaker
+\(bu@line
+\(bu@mic
+\(bu@cd
+\(bu@mix
+\(bu@pcm2
+\(bu@rec
+\(bu@igain
+\(bu@ogain
+\(bu@line1
+\(bu@line2
+\(bu@line3
+\(bu@dig1
+\(bu@dig2
+\(bu@dig3
+\(bu@phin
+\(bu@phout
+\(bu@video
+\(bu@radio
+\(bu@monitor
+.TE
+
 
 .SH FILES
 

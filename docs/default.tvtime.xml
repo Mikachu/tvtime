@@ -101,6 +101,14 @@
   -->
   <option name="VBIDevice" value="/dev/vbi0"/>
 
+  <!--
+    This sets the mixer device and channel to use.  The format is device
+    name:channel name.  Valid channels are:
+      vol, bass, treble, synth, pcm, speaker, line, mic, cd, mix, pcm2,
+      rec, igain, ogain, line1, line2, line3, dig1, dig2, dig3, phin,
+      phout, video, radio, monitor
+   -->
+  <option name="MixerDevice" value="/dev/mixer:line"/>
 
   <!--
     This option enables 16:9 aspect ratio mode by default on startup.

@@ -26,12 +26,15 @@
 #include <sys/ioctl.h>
 #include <sys/soundcard.h>
 #include <sys/mman.h>
+#include <string.h>
+#include "utils.h"
 #include "mixer.h"
 
 static char *mixer_device = "/dev/mixer";
-static int mixer_usemaster = 0;
 static int levelpercentage = 0;
 static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
+static int mixer_channel = SOUND_MIXER_LINE;
+static int mixer_dev_mask = 1 << SOUND_MIXER_LINE;
 static int muted = 0;
 
 int mixer_get_volume( void )
@@ -43,16 +46,14 @@ int mixer_get_volume( void )
     if( fd != -1 ) {
 
         ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
-        if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster == 0 ) ) {
-            cmd = SOUND_MIXER_READ_LINE;
-        } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
-            cmd = SOUND_MIXER_READ_VOLUME;
+        if( devs & mixer_dev_mask ) {
+            cmd = MIXER_READ( mixer_channel );
         } else {
             close( fd );
             return curvol;
         }
 
-        ioctl( fd,cmd,&v );
+        ioctl( fd, cmd, &v );
         curvol = ( v & 0xFF00 ) >> 8;
         close( fd );
     }
@@ -71,10 +72,8 @@ int mixer_set_volume( int percentdiff )
     fd = open( mixer_device, O_RDONLY );
     if( fd != -1 ) {
         ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
-        if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster==0 ) ) {
-            cmd = SOUND_MIXER_WRITE_LINE;
-        } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
-            cmd = SOUND_MIXER_WRITE_VOLUME;
+        if( devs & mixer_dev_mask ) {
+            cmd = MIXER_WRITE( mixer_channel );
         } else {
             close( fd );
             return 0;
@@ -101,10 +100,8 @@ void mixer_mute( int mute )
 
             /* Save volume */
             ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
-            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster == 0 ) ) {
-                cmd = SOUND_MIXER_READ_LINE;
-            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
-                cmd = SOUND_MIXER_READ_VOLUME;
+            if( devs & mixer_dev_mask ) {
+                cmd = MIXER_READ( mixer_channel );
             } else {
                 close( fd );
                 return;
@@ -115,10 +112,8 @@ void mixer_mute( int mute )
 
             /* Now set volume to 0 */
             ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
-            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster==0 ) ) {
-                cmd = SOUND_MIXER_WRITE_LINE;
-            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
-                cmd = SOUND_MIXER_WRITE_VOLUME;
+            if( devs & mixer_dev_mask ) {
+                cmd = MIXER_WRITE( mixer_channel );
             } else {
                 close( fd );
                 return;
@@ -134,10 +129,8 @@ void mixer_mute( int mute )
     } else {
         if( fd != -1 ) {
             ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
-            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster==0 ) ) {
-                cmd = SOUND_MIXER_WRITE_LINE;
-            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
-                cmd = SOUND_MIXER_WRITE_VOLUME;
+            if( devs & mixer_dev_mask ) {
+                cmd = MIXER_WRITE( mixer_channel );
             } else {
                 close( fd );
                 return;
@@ -169,5 +162,41 @@ void mixer_toggle_mute( void )
 int mixer_ismute( void )
 {
     return muted;
+}
+
+static char *oss_core_devnames[] = SOUND_DEVICE_NAMES;
+
+void mixer_set_device( const char *devname )
+{
+    const char *channame;
+    int found = 0;
+    int i;
+
+    mixer_device = strdup( devname );
+    if( !mixer_device ) return;
+
+    i = strcspn( mixer_device, ":" );
+    if( i == strlen( mixer_device ) ) {
+        channame = "line";
+    } else {
+        mixer_device[ i ] = 0;
+        channame = mixer_device + i + 1;
+    }
+    if( !file_is_openable_for_read( mixer_device ) ) {
+        fprintf( stderr, "mixer: Can't open device %s, volume controls unavailable.\n", mixer_device );
+    }
+
+    mixer_channel = SOUND_MIXER_LINE;
+    for( i = 0; i < SOUND_MIXER_NRDEVICES; i++ ) {
+        if( !strcasecmp( channame, oss_core_devnames[ i ] ) ) {
+            mixer_channel = i;
+            found = 1;
+            break;
+        }
+    }
+    if( !found ) {
+        fprintf( stderr, "mixer: No such mixer channel '%s', using channel 'line'.\n", channame );
+    }
+    mixer_dev_mask = 1 << mixer_channel;
 }
 

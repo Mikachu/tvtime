@@ -77,6 +77,8 @@ struct config_s
 
     char *rvr_filename;
 
+    char *mixerdev;
+
     char *deinterlace_method;
     int check_freq_present;
 
@@ -115,6 +117,7 @@ static void copy_config( config_t *dest, config_t *src )
     dest->command_pipe_dir = 0;
     dest->command_pipe = 0;
     dest->rvr_filename = 0;
+    dest->mixerdev = 0;
     dest->config_filename = 0;
     dest->modelist = 0;
     dest->nummodes = 0;
@@ -312,6 +315,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
             ct->overscan = ( atof( curval ) / 2.0 ) / 100.0;
         }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "MixerDevice" ) ) {
+            if( ct->mixerdev ) free( ct->mixerdev );
+            ct->mixerdev = strdup( curval );
+        }
     }
 
     if( name ) xmlFree( name );
@@ -497,7 +505,7 @@ static void print_usage( char **argv )
     fprintf( stderr, "usage: %s [-ahkmMsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
                      "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n"
-                     "\t\t[-D <output_driver>]\n" , argv[ 0 ] );
+                     "\t\t[-D <output_driver>] [-x <mixer device>[:<channel>]]\n" , argv[ 0 ] );
 
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-h\tShow this help message.\n" );
@@ -526,6 +534,13 @@ static void print_usage( char **argv )
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
     fprintf( stderr, "\t-D\tThe output driver to use: Xv, DirectFB, mga, xmga (defaults to Xv).\n");
+
+    fprintf( stderr, "\t-x\tThe mixer device and channel.  (defaults to /dev/mixer:line)\n"
+                     "\t  \tValid channels are:\n"
+                     "\t  \t\tvol, bass, treble, synth, pcm, speaker, line, mic,\n"
+                     "\t  \t\tcd, mix, pcm2, rec, igain, ogain, line1, line2,\n"
+                     "\t  \t\tline3, dig1, dig2, dig3, phin, phout, video,\n"
+                     "\t  \t\tradio, monitor\n" );
 
     fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"
@@ -583,6 +598,7 @@ config_t *config_new( void )
     ct->framerate = FRAMERATE_FULL;
     ct->ssdir = strdup( getenv( "HOME" ) );
     ct->timeformat = strdup( "%X" );
+    ct->mixerdev = strdup( "/dev/mixer:line" );
 
     /* We set these to 0 so we can delete safely if necessary. */
     ct->rvr_filename = 0;
@@ -718,7 +734,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'k': ct->slave_mode = 1; break;
@@ -731,6 +747,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                   configFile = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
                   ct->rvr_filename = strdup( optarg ); break;
+        case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
+                  ct->mixerdev = strdup( optarg ); break;
         case 'H': ct->outputheight = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
@@ -803,6 +821,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
         config_save( ct, "Norm", ct->norm );
         config_save( ct, "Frequencies", ct->freq );
+
+        config_save( ct, "MixerDevice", ct->mixerdev );
     }
 
     return 1;
@@ -820,6 +840,7 @@ void config_free_data( config_t *ct )
     if( ct->command_pipe_dir ) free( ct->command_pipe_dir );
     if( ct->command_pipe ) free( ct->command_pipe );
     if( ct->rvr_filename ) free( ct->rvr_filename );
+    if( ct->mixerdev ) free( ct->mixerdev );
     if( ct->vbidev ) free( ct->vbidev );
     if( ct->config_filename ) free( ct->config_filename );
     if( ct->deinterlace_method ) free( ct->deinterlace_method );
@@ -1082,5 +1103,10 @@ int config_get_framerate_mode( config_t *ct )
 int config_get_slave_mode( config_t *ct )
 {
     return ct->slave_mode;
+}
+
+const char *config_get_mixer_device( config_t *ct )
+{
+    return ct->mixerdev;
 }
 

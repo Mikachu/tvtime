@@ -181,6 +181,19 @@ authors use. :)
 This sets which device to use for VBI decoding.
 
 .TP
+<option name="MixerDevice" value="/dev/mixer:line"/>
+This sets the mixer device and channel to use.  The format is device
+name:channel name.  Valid channels are:
+
+.nh
+.IR vol ", " bass ", " treble ", " synth ", " pcm ", " speaker ", "
+.IR line ", "  mic ", "  cd ", "  mix ", "  pcm2 ", " rec ", " 
+.IR igain ", "  ogain ", "  line1 ", "  line2 ", "  line3 ", "
+.IR dig1 ", "  dig2 ", "  dig3 ", "  phin ", " phout ", " video ", "
+.IR radio ", "  monitor
+.hy
+
+.TP
 <option name="Widescreen" value="0"/>
 This option enables 16:9 aspect ratio mode by default on startup.
 

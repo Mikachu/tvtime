@@ -31,6 +31,7 @@ void mixer_mute( int mute );
 int mixer_conditional_mute( void );
 void mixer_toggle_mute( void );
 int mixer_ismute( void );
+void mixer_set_device( const char *devname );
 
 #ifdef __cplusplus
 };
