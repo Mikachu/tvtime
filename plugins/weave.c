@@ -34,7 +34,7 @@ void deinterlace_plugin_init( void )
 void weave_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "linear: Registering weave deinterlacing algorithm.\n" );
+    fprintf( stderr, "weave: Registering weave deinterlacing algorithm.\n" );
     register_deinterlace_method( &weavemethod );
 }
 
