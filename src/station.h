@@ -92,14 +92,47 @@ void station_prev( station_mgr_t *mgr );
 void station_toggle_us_cable_mode( station_mgr_t *mgr );
 
 /**
- * Information about the current channel.
+ * Returns the id of this channel.
  */
 int station_get_current_id( station_mgr_t *mgr );
+
+/**
+ * Returns the position of the current channel in the list.  This is
+ * only used to know when we have wrapped around during channel
+ * scanning.
+ */
 int station_get_current_pos( station_mgr_t *mgr );
+
+/**
+ * Returns the name of this channel.
+ */
 const char *station_get_current_channel_name( station_mgr_t *mgr );
+
+/**
+ * Returns the frequency band for this channel.
+ */
 const char *station_get_current_band( station_mgr_t *mgr );
+
+/**
+ * Returns the numeric frequency for this channel that can be passed to
+ * the tuner.
+ */
 int station_get_current_frequency( station_mgr_t *mgr );
+
+/**
+ * Returns true if the current channel is active in the browse list.
+ */
 int station_get_current_active( station_mgr_t *mgr );
+
+/**
+ * Returns the network name of this channel sent by the network.
+ */
+const char *station_get_current_network_name( station_mgr_t *mgr );
+
+/**
+ * Returns the network call letters for this channel.
+ */
+const char *station_get_current_network_call_letters( station_mgr_t *mgr );
 
 /**
  * The last channel we were at, before the current one.
@@ -135,6 +168,16 @@ void station_activate_all_channels( station_mgr_t *mgr );
  * Remap the current channel to the new position.
  */
 int station_remap( station_mgr_t *mgr, int pos );
+
+/**
+ * Sets the network name of this channel.
+ */
+void station_set_current_network_name( station_mgr_t *mgr, const char *network_name );
+
+/**
+ * Sets the network call letters of this channel.
+ */
+void station_set_current_network_call_letters( station_mgr_t *mgr, const char *call_letters );
 
 /**
  * Writes out the current station config.

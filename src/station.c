@@ -35,6 +35,8 @@ struct station_info_s
     int pos;
     int active;
     char name[ 32 ];
+    char network_name[ 33 ];
+    char network_call_letters[ 7 ];
     const band_t *band;
     const band_entry_t *channel;
 
@@ -52,7 +54,7 @@ struct station_mgr_s
     int last_channel;
     int new_install;
     char band_and_frequency[ 1024 ];
-    char stationrc[255];
+    char stationrc[ 255 ];
     char *norm;
     char *table;
 };
@@ -73,23 +75,25 @@ static const band_t *get_band( const char *band )
 static int isFreePos( station_mgr_t *mgr, int pos )
 {
     station_info_t *rp = mgr->first;
-    if( !rp ) return 1;
 
-    do {
-        if( pos == rp->pos ) return 0;
-        rp = rp->next;
-    } while ( rp != mgr->first );
+    if( rp ) {
+        do {
+            if( pos == rp->pos ) return 0;
+            rp = rp->next;
+        } while ( rp != mgr->first );
+    }
 
     return 1;
 }
 
 static int getNextPos( station_mgr_t *mgr )
 {
-    if ( !mgr->first ) return 1;
+    if( !mgr->first ) return 1;
     return mgr->first->prev->pos + 1;
 }
 
-static station_info_t *newInfo( int pos, const char *name, const band_t *band, const band_entry_t *channel )
+static station_info_t *station_info_new( int pos, const char *name, const band_t *band,
+                                         const band_entry_t *channel )
 {
     station_info_t *i;
 
@@ -99,10 +103,13 @@ static station_info_t *newInfo( int pos, const char *name, const band_t *band, c
         i->active = 1;
         i->channel = channel;
         i->band = band;
+        memset( i->network_name, 0, sizeof( i->network_name ) );
+        memset( i->network_call_letters, 0, sizeof( i->network_call_letters ) );
+
         if( name ) {
-            snprintf( i->name, 32, "%s", name );
+            snprintf( i->name, sizeof( i->name ), "%s", name );
         } else {
-            sprintf( i->name, "%d", pos );
+            snprintf( i->name, sizeof( i->name ), "%d", pos );
         }
 
         i->next = 0;
@@ -235,6 +242,8 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *pos_s = xmlGetProp( station, BAD_CAST "position" );
             xmlChar *band = xmlGetProp( station, BAD_CAST "band" );
             xmlChar *channel = xmlGetProp( station, BAD_CAST "channel" );
+            xmlChar *network = xmlGetProp( station, BAD_CAST "network" );
+            xmlChar *call = xmlGetProp( station, BAD_CAST "call" );
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -251,8 +260,12 @@ int station_readconfig( station_mgr_t *mgr )
                 }
                 station_add( mgr, pos, (char *) band, (char *) channel, (char *) name );
                 station_set_current_active( mgr, active );
+                if( network ) station_set_current_network_name( mgr, (char *) network );
+                if( call ) station_set_current_network_call_letters( mgr, (char *) call );
             }
 
+            if( network ) xmlFree( network );
+            if( call ) xmlFree( call );
             if( name ) xmlFree( name );
             if( active_s ) xmlFree( active_s );
             if( pos_s ) xmlFree( pos_s );
@@ -530,14 +543,14 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
             }
             newentry->name = entryname;
             newentry->freq = freq;
-            info = newInfo( pos, name, &custom_band, newentry );
+            info = station_info_new( pos, name, &custom_band, newentry );
             if( info ) insert( mgr, info );
             return pos;
         }
     } else if( band ) {
         for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
             if( !strcasecmp( entry->name, channel ) ) {
-                info = newInfo( pos, name, band, entry );
+                info = station_info_new( pos, name, band, entry );
                 if( info ) insert( mgr, info );
                 return pos;
             }
@@ -563,7 +576,7 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
             pos = getNextPos( mgr );
         }
 
-        info = newInfo( pos, 0, band, &(band->channels[ i ]) );
+        info = station_info_new( pos, 0, band, &(band->channels[ i ]) );
         if( info ) insert( mgr, info );
     }
 
@@ -577,7 +590,40 @@ int station_set_current_active( station_mgr_t *mgr, int active )
         return 1;
     }
     return 0;
-   
+}
+
+const char *station_get_current_network_name( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->network_name;
+    } else {
+        return "";
+    }
+}
+
+void station_set_current_network_name( station_mgr_t *mgr, const char *network_name )
+{
+    if( mgr->current ) {
+        snprintf( mgr->current->network_name,
+                  sizeof( mgr->current->network_name ), "%s", network_name );
+    }
+}
+
+const char *station_get_current_network_call_letters( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->network_call_letters;
+    } else {
+        return "";
+    }
+}
+
+void station_set_current_network_call_letters( station_mgr_t *mgr, const char *call_letters )
+{
+    if( mgr->current ) {
+        snprintf( mgr->current->network_call_letters,
+                  sizeof( mgr->current->network_call_letters ), "%s", call_letters );
+    }
 }
 
 void station_activate_all_channels( station_mgr_t *mgr )
@@ -774,6 +820,13 @@ int station_writeconfig( station_mgr_t *mgr )
         xmlSetProp( node, BAD_CAST "position", BAD_CAST buf );
         xmlSetProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
         xmlSetProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
+
+        if( *(rp->network_name) ) {
+            xmlSetProp( node, BAD_CAST "network", BAD_CAST rp->network_name );
+        }
+        if( *(rp->network_call_letters) ) {
+            xmlSetProp( node, BAD_CAST "call", BAD_CAST rp->network_call_letters );
+        }
 
         rp = rp->next;
     } while( rp != mgr->first );
