@@ -54,6 +54,7 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
+#if 0
 
 static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
 {
@@ -112,6 +113,8 @@ static void pngscreenshot( unsigned char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
+#endif
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -130,9 +133,11 @@ int main( int argc, char **argv )
     tvtime_osd_t *osd;
     int videohold = CHANNEL_HOLD;
     int i;
+/*
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
     unsigned char *colourbars;
+*/
     config_t *ct;
     input_t *in;
 
@@ -323,8 +328,7 @@ int main( int argc, char **argv )
         struct timeval curfieldtime;
         struct timeval blitstart;
         struct timeval blitend;
-        int printdebug = 0, showtest = 0;
-        int commands;
+        int printdebug = 0;
 
         sdl_poll_events( in );
         if ( !input_next_frame( in ) ) break;
@@ -463,6 +467,8 @@ int main( int argc, char **argv )
         if( videohold ) videohold--;
         if( input_get_videohold( in ) ) input_dec_videohold( in );
     }
+
+    sdl_quit();
 
     if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );
     videoinput_delete( vidin );

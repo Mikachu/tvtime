@@ -115,15 +115,8 @@ void sdl_poll_events( input_t *in )
     if( SDL_PollEvent( &event ) ) {
 
         if( event.type == SDL_QUIT ) {
-            if( fs ) {
-                SDL_WM_ToggleFullScreen( screen );
-                fs = 0;
-            }
-            SDL_UnlockYUVOverlay( frame );
-            SDL_FreeYUVOverlay( frame );
-            SDL_Quit();
-
             curcommand = I_QUIT;
+            input_callback( in, curcommand, arg );
         }
 
         if( event.type == SDL_KEYDOWN ) {
@@ -213,8 +206,20 @@ void sdl_poll_events( input_t *in )
                 }
                 break;
             }
-        }
 
         input_callback( in, curcommand, arg );
+        }
     }
+}
+
+void sdl_quit()
+{
+    if( fs ) {
+        SDL_WM_ToggleFullScreen( screen );
+        fs = 0;
+    }
+    SDL_UnlockYUVOverlay( frame );
+    SDL_FreeYUVOverlay( frame );
+    SDL_Quit();
+
 }

@@ -1,0 +1,87 @@
+#
+# This is a nice comment
+#
+
+verbose = 0
+CaptureSource = 1
+OutputWidth = 800
+InputWidth = 720
+WideScreen = 0
+DebugMode = 0
+ApplyLumaCorrection = 1
+LumaCorrection = 1.0
+Output420 = 0
+V4LDevice = /dev/video0
+CaptureSource = 0
+Norm = ntsc
+Frequencies = us-cable
+TunerNumber = 0
+
+########################################
+#
+#  Keybindings
+#  -----------
+#
+#  Handy Reference Chart
+#  ---------------------
+#
+#  CTRL=C          META=M        SHIFT=S
+#  F1=F1           ...           F15=F15
+#  ESC=\0033       UP=\0421      DOWN=\0422    LEFT=\0424    RIGHT=\0423
+#  INSERT=\0425    HOME=\0425    END=\0427     PGUP=\0430    PGDN=\0431
+#  PRINTSC=\0474
+#  
+#  Example
+#  -------
+#
+#  To set the debug key to control+d:
+#  key_debug = C+d
+#
+#  To set the quit key to control+meta+shift+q:
+#  key_quit = C+M+S+q
+#
+#  To set the volume up key to Right Arrow (RIGHT):
+#  key_mixer_up = \0423
+#
+#  Defaults
+#  --------
+#
+#  key_quit         = \0033
+#  key_channel_up   = \0421
+#  key_channel_down = \0422
+#  key_luma_up      = j
+#  key_luma_down    = h
+#  key_mixer_mute   = m
+#  key_mixer_up     = +
+#  key_mixer_down   = -
+#  key_hue_down     = F1
+#  key_hue_up       = F2
+#  key_bright_down  = F3
+#  key_bright_up    = F4
+#  key_cont_down    = F5
+#  key_cont_up      = F6
+#  key_colour_down  = F7
+#  key_colour_up    = F8
+#  key_show_bars    = F11
+#  key_show_test    = F12
+#  key_debug        = d
+
+key_quit         = \0033
+key_channel_up   = \0421
+key_channel_down = \0422
+key_luma_up      = j
+key_luma_down    = h
+key_mixer_mute   = m
+key_mixer_up     = +
+key_mixer_down   = -
+key_hue_down     = F1
+key_hue_up       = F2
+key_bright_down  = F3
+key_bright_up    = F4
+key_cont_down    = F5
+key_cont_up      = F6
+key_colour_down  = F7
+key_colour_up    = F8
+key_show_bars    = F11
+key_show_test    = F12
+key_debug        = d

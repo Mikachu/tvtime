@@ -57,4 +57,9 @@ void sdl_show_frame( void );
  */
 void sdl_poll_events( input_t *in );
 
+/**
+ * Shutdown SDL
+ */
+void sdl_quit();
+
 #endif /* SDLOUTPUT_H_INCLUDED */

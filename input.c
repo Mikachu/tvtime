@@ -80,8 +80,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
     verbose = config_get_verbose( in->cfg );
 
-    fprintf( stderr, "input: command = %d  arg = %d\n", command, arg );
-
     switch( command ) {
     case I_QUIT:
         in->quit = 1;
@@ -89,9 +87,12 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
     case I_KEYDOWN:
          tvtime_cmd = config_key_to_command( in->cfg, arg );
-         fprintf( stderr, "input: command becomes %d\n", tvtime_cmd );
 
          switch( tvtime_cmd ) {
+
+         case TVTIME_QUIT:
+             in->quit = 1;
+             break;
 
          case TVTIME_CHANNEL_CHAR:
              /* decode the input char from commands and capitalize */
