@@ -1310,12 +1310,12 @@ int main( int argc, char **argv )
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "FullScreen", "1" );
+                    configsave( config_get_configsave( ct ), "StartupFullScreen", "1" );
                 }
                 if( osd ) tvtime_osd_show_message( osd, "Fullscreen mode active." );
             } else {
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "FullScreen", "0" );
+                    configsave( config_get_configsave( ct ), "StartupFullScreen", "0" );
                 }
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
@@ -1324,12 +1324,12 @@ int main( int argc, char **argv )
             if( output->toggle_aspect() ) {
                 if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "WideScreen", "1" );
+                    configsave( config_get_configsave( ct ), "StartupWideScreen", "1" );
                 }
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "WideScreen", "0" );
+                    configsave( config_get_configsave( ct ), "StartupWideScreen", "0" );
                 }
             }
         }
@@ -1355,7 +1355,7 @@ int main( int argc, char **argv )
             if( config_get_configsave( ct ) ) {
                 snprintf( number, 3, "%d", curmethodid );
                 number[3] = '\0';
-                configsave( config_get_configsave( ct ), "PreferredDeinterlaceMethod", number );
+                configsave( config_get_configsave( ct ), "StartupDeinterlaceMethod", number );
             }
         }
         if( commands_update_luma_power( commands ) ) {
@@ -1678,13 +1678,13 @@ int main( int argc, char **argv )
 
     if( config_get_configsave( ct ) ) {
         snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
-        configsave( config_get_configsave( ct ), "PrevChannel", number );
+        configsave( config_get_configsave( ct ), "StartupPrevChannel", number );
 
         snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
-        configsave( config_get_configsave( ct ), "StartChannel", number );
+        configsave( config_get_configsave( ct ), "StartupChannel", number );
 
         snprintf( number, 3, "%d", framerate_mode );
-        configsave( config_get_configsave( ct ), "FramerateMode", number );
+        configsave( config_get_configsave( ct ), "StartupFramerateMode", number );
 
         if( vidin ) {
             snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );

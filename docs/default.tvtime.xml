@@ -89,10 +89,10 @@
 
 
   <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
-  <option name="Widescreen" value="0"/>
+  <option name="StartupWidescreen" value="0"/>
 
   <!-- Default to a 768x576 window. -->
-  <option name="OutputHeight" value="576"/>
+  <option name="StartupOutputHeight" value="576"/>
 
   <!--
     This sets the percent of the sides to leave to the overscan, that is,
@@ -108,7 +108,7 @@
     set at runtime so that when you quit tvtime in fullscreen, starting it
     again will start back in fullscreen mode.
   -->
-  <option name="StartFullscreen" value="0"/>
+  <option name="StartupFullscreen" value="0"/>
 
   <!--
     This sets the framerate of the output from tvtime.
@@ -124,7 +124,7 @@
     video game consoles.  Use weave and select either TFF or BFF, whichever
     does not exhibit interlace effects.
   -->
-  <option name="FramerateMode" value="0"/>
+  <option name="StartupFramerateMode" value="0"/>
 
 
   <!--
@@ -158,9 +158,9 @@
   <option name="ChannelTextFG" value="0xFFFFFF00"/>
   <option name="OtherTextFG" value="0xFFF5DEB3"/>
 
-  <option name="PrevChannel" value="9"/>
-  <option name="StartChannel" value="10"/>
-  <option name="PreferredDeinterlaceMethod" value="0"/>
+  <option name="StartupPrevChannel" value="9"/>
+  <option name="StartupChannel" value="10"/>
+  <option name="StartupDeinterlaceMethod" value="0"/>
   <option name="DebugMode" value="0"/>
 
 

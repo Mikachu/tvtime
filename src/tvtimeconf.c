@@ -200,7 +200,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     if( name && value ) {
         char *curval = (char *) value;
 
-        if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupOutputHeight" ) ) {
             ct->outputheight = atoi( curval );
         }
 
@@ -212,7 +212,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->verbose = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupWidescreen" ) ) {
             ct->aspect = atoi( curval );
         }
 
@@ -250,11 +250,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->priority = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartFullscreen" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupFullscreen" ) ) {
             ct->fullscreen = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "FramerateMode" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupFramerateMode" ) ) {
             ct->framerate = atoi( curval );
         }
 
@@ -293,11 +293,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->other_text_rgb = parse_colour( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "PrevChannel" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupPrevChannel" ) ) {
             ct->prev_channel = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartChannel" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupChannel" ) ) {
             ct->start_channel = atoi( curval );
         }
 
@@ -311,7 +311,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             }
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "PreferredDeinterlaceMethod" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartupDeinterlaceMethod" ) ) {
             ct->preferred_deinterlace_method = atoi( curval );
         }
 
