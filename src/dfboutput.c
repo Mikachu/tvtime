@@ -68,7 +68,7 @@ static void resize_window( void )
 {
      window->Resize( window, current_rect->w, current_rect->h );
      wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
-     wsurface->Flip( wsurface, NULL, 0 );
+     wsurface->Flip( wsurface, 0, 0 );
 }
 
 static void move_window( void )
@@ -137,7 +137,7 @@ static int dfb_init( int outputheight, int aspect, int verbose )
 
      calc_size( current_rect, -1, outputheight, aspect );
 
-     DirectFBInit( NULL, NULL );
+     DirectFBInit( 0, 0 );
      DirectFBCreate( &dfb );
 
      /* Get the video layer */
@@ -194,7 +194,7 @@ static int dfb_init( int outputheight, int aspect, int verbose )
 
      window->GetSurface( window, &wsurface );
      wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
-     wsurface->Flip( wsurface, NULL, 0 );
+     wsurface->Flip( wsurface, 0, 0 );
      window->SetOpacity( window, 0xff );
 
      /* Select events */
@@ -236,9 +236,9 @@ static int dfb_set_input_size( int inputwidth, int inputheight )
 
      video->GetSurface( video, &surface );
      surface->Clear( surface, 0, 0, 0, 0xff );
-     surface->Flip( surface, NULL, 0 );
+     surface->Flip( surface, 0, 0 );
      surface->Clear( surface, 0, 0, 0, 0xff );
-     surface->Flip( surface, NULL, 0 );
+     surface->Flip( surface, 0, 0 );
      surface->Clear( surface, 0, 0, 0, 0xff );
 
      video->SetOpacity( video, 0xff );
@@ -329,9 +329,9 @@ static void dfb_wait_for_sync( int field )
 static int dfb_show_frame( int x, int y, int width, int height )
 {
 #ifdef DIRECTFB_HAS_TRIPLE
-     surface->Flip( surface, NULL, DSFLIP_ONSYNC );
+     surface->Flip( surface, 0, DSFLIP_ONSYNC );
 #else
-     surface->Flip( surface, NULL, 0 );
+     surface->Flip( surface, 0, 0 );
 #endif
      return 1;
 }
@@ -502,7 +502,7 @@ static void dfb_poll_events( input_t *in )
                current_rect->w = event.w;
                current_rect->h = event.h;
                wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
-               wsurface->Flip( wsurface, NULL, 0 );
+               wsurface->Flip( wsurface, 0, 0 );
                resize_video();
                break;
           default:
@@ -580,7 +580,7 @@ output_api_t *get_dfb_output( void )
 
 output_api_t *get_dfb_output( void )
 {
-     return NULL;
+     return 0;
 }
 
 #endif
