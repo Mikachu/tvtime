@@ -251,6 +251,7 @@ struct videoinput_s
     int audiomode;
     int change_muted;
     int user_muted;
+    int hw_muted;
 
     int hastuner;
     int numtuners;
@@ -496,6 +497,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->signal_acquire_wait = 0;
     vidin->change_muted = 1;
     vidin->user_muted = 0;
+    vidin->hw_muted = 1;
     vidin->hasaudio = 1;
     vidin->audiomode = 0;
     vidin->curinput = 0;
@@ -1096,30 +1098,7 @@ void videoinput_set_colour_relative( videoinput_t *vidin, int offset )
 
 static void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
-    struct video_audio audio;
-    int is_muted = 1;
-
-    if( vidin->isv4l2 ) {
-        struct v4l2_control control;
-
-        control.id = V4L2_CID_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOC_G_CTRL, &control ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't get mute info.  Post a bug report with your\n"
-                             "videoinput: driver info to " PACKAGE_BUGREPORT "\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-        } else {
-            is_muted = control.value;
-        }
-    } else {
-        if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
-            fprintf( stderr, "videoinput: Audio state query failed (got '%s').\n",
-                     strerror( errno ) );
-        } else {
-            is_muted = ((audio.flags & VIDEO_AUDIO_MUTE) == VIDEO_AUDIO_MUTE);
-        }
-    }
-
-    if( vidin->hasaudio && mute != is_muted ) {
+    if( vidin->hasaudio && mute != vidin->hw_muted ) {
         if( vidin->isv4l2 ) {
             struct v4l2_control control;
 
@@ -1136,32 +1115,28 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                 videoinput_set_control_v4l2( vidin, V4L2_CID_AUDIO_VOLUME, 1.0 );
             }
         } else {
-            if( mute ) {
-                audio.flags |= VIDEO_AUDIO_MUTE;
+            struct video_audio audio;
+
+            if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &audio ) < 0 ) {
+                fprintf( stderr, "videoinput: Audio state query failed (got '%s').\n",
+                         strerror( errno ) );
             } else {
-                audio.flags &= ~VIDEO_AUDIO_MUTE;
-            }
-            audio.volume = 65535;
+                if( mute ) {
+                    audio.flags |= VIDEO_AUDIO_MUTE;
+                } else {
+                    audio.flags &= ~VIDEO_AUDIO_MUTE;
+                }
+                audio.volume = 65535;
 
-            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
-                fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
-                         "might cause this.  Post a bug report with your driver info to "
-                         PACKAGE_BUGREPORT "\n" );
-                fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+                if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &audio ) < 0 ) {
+                    fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
+                             "might cause this.  Post a bug report with your driver info to "
+                             PACKAGE_BUGREPORT "\n" );
+                    fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+                }
             }
         }
-    }
-
-    if( vidin->isv4l2 ) {
-        struct v4l2_control control;
-        control.id = V4L2_CID_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOC_G_CTRL, &control ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't get mute info.  Post a bug report with your\n"
-                             "videoinput: driver info to " PACKAGE_BUGREPORT "\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-        } else {
-            is_muted = control.value;
-        }
+        vidin->hw_muted = mute;
     }
 }
 
@@ -1214,6 +1189,7 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 
                 if( was_muted & !(audio.flags & VIDEO_AUDIO_MUTE) ) {
                     /* Stupid card dropped the mute state, have to go back to being muted. */
+                    vidin->hw_muted = 0;
                     videoinput_do_mute( vidin, 1 );
                 }
             }
