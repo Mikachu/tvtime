@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-10-31 01:22+0100\n"
-"PO-Revision-Date: 2003-10-31 02:44+0100\n"
+"PO-Revision-Date: 2003-10-31 16:56+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -360,10 +360,13 @@ msgstr "Aktuell"
 msgid "No program information available"
 msgstr "Ingen programinformation tillgänglig"
 
+# Det här är nästa TV-program. Jag vet inte om den här översättningen är
+# optimal. Kanske kan problemet undvikas genom att skriva om så att den
+# istället specifierar start- och sluttid för nästa TV-program?
 #: src/commands.c:265
 #, c-format
 msgid "Next: %s"
-msgstr "Nästa: %s"
+msgstr "Härnäst: %s"
 
 #: src/commands.c:306
 msgid "Renumber current channel"
