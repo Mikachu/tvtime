@@ -78,7 +78,8 @@ static void tvtime_setup_fbuf( vo_instance_t *_instance,
     mpeg2input_t * instance = (mpeg2input_t *) _instance;
 
     buf[0] = (uint8_t *) instance->frame[instance->index].data;
-    buf[1] = buf[2] = 0;
+    buf[1] = buf[0] + instance->width*instance->height;
+    buf[2] = buf[1] + ((instance->width/2)*(instance->height/2));
     *id = instance->frame + instance->index++;
 }
 
@@ -89,7 +90,6 @@ static void tvtime_draw_frame( vo_instance_t * _instance,
     mpeg2input_t *instance = (mpeg2input_t *) _instance;
 
     /* draw frame->data */
-    fprintf( stderr, "draw\n" );
     instance->curframe = frame->data;
     instance->proceed = 0;
 }
@@ -100,15 +100,14 @@ static int tvtime_alloc_frames( mpeg2input_t * instance )
     char * alloc;
     int i;
 
-    fprintf( stderr, "tvtime alloc\n" );
-
     size = 0;
     alloc = 0;
     for( i = 0; i < 3; i++ ) {
         if( i == 0 ) {
             size = (instance->width * instance->height * 3);
             alloc = malloc( 3 * size );
-            fprintf( stderr, "width %d, height %d\n", instance->width, instance->height );
+            fprintf( stderr, "width %d, height %d\n",
+                     instance->width, instance->height );
             instance->frames422 = malloc( instance->width *
                                           instance->height * 2 * 3 );
             if( !alloc || !instance->frames422 ) return 1;
@@ -131,7 +130,7 @@ static void tvtime_close( vo_instance_t * _instance )
 
 static int common_setup( mpeg2input_t * instance, int width, int height )
 {
-    fprintf( stderr, "common_setup\n");
+    fprintf( stderr, "mpeg2input: common_setup\n");
 
     instance->vo.set_fbuf = 0;
     instance->vo.discard = 0;
@@ -175,15 +174,11 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 
     info = mpeg2_info (mpeg2dec);
     while (1) {
-        fprintf( stderr, "parse again\n" );
 	state = mpeg2_parse (mpeg2dec);
-        fprintf( stderr, "switch state %d\n", state );
 	switch (state) {
 	case -1:
-        fprintf( stderr, "state -1\n" );
 	    return;
 	case STATE_SEQUENCE:
-        fprintf( stderr, "in sequence\n" );
 	    /* might set nb fbuf, convert format, stride */
 	    /* might set fbufs */
 	    if (output->setup (output, info->sequence->width,
@@ -213,7 +208,6 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 	    }
 	    break;
 	case STATE_PICTURE:
-        fprintf( stderr, "in picture\n" );
 	    /* might skip */
 	    /* might set fbuf */
 	    if (output->set_fbuf) {
@@ -228,12 +222,10 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 				    info->current_fbuf->id);
 	    break;
 	case STATE_PICTURE_2ND:
-        fprintf( stderr, "in picture 2\n" );
 	    /* should not do anything */
 	    break;
 	case STATE_SLICE:
 	case STATE_END:
-        fprintf( stderr, "in slice or end\n" );
 	    /* draw current picture */
 	    /* might free frame buffer */
 	    if (info->display_fbuf) {
@@ -324,7 +316,7 @@ static int demux(uint8_t * buf, uint8_t * end, int flags, mpeg2input_t *instance
 	}
 	break;
     case DEMUX_DATA:
-	if ((state_bytes > end - buf)) {
+	if (state_bytes > end - buf) {
 	    decode_mpeg2 (buf, end);
 	    state_bytes -= end - buf;
 	    return 0;
@@ -333,7 +325,7 @@ static int demux(uint8_t * buf, uint8_t * end, int flags, mpeg2input_t *instance
 	buf += state_bytes;
 	break;
     case DEMUX_SKIP:
-	if ((state_bytes > end - buf)) {
+	if (state_bytes > end - buf) {
 	    state_bytes -= end - buf;
 	    return 0;
 	}
@@ -429,7 +421,7 @@ static int demux(uint8_t * buf, uint8_t * end, int flags, mpeg2input_t *instance
 		}
 		DONEBYTES (len);
 		bytes = 6 + (header[4] << 8) + header[5] - len;
-		if ((bytes > end - buf)) {
+		if (bytes > end - buf) {
 		    decode_mpeg2 (buf, end);
 		    state = DEMUX_DATA;
 		    state_bytes = bytes - (end - buf);
@@ -463,13 +455,10 @@ static void ps_loop( mpeg2input_t * instance )
 {
     uint8_t * end;
 
-    fprintf( stderr, "mpeg2input: ps_loop, proceed %d\n", instance->proceed );
-
     if( instance->proceed ) {
         do {
             int tmp;
 
-            fprintf( stderr, "in ps_loop 2\n" );
             end = buffer + fread( buffer, 1, BUFFER_SIZE, in_file );
             tmp = demux( buffer, end, 0, instance );
             if( tmp == 1 ) {
@@ -492,12 +481,9 @@ mpeg2input_t *mpeg2input_new( const char *filename, int track, int accel )
 
     fprintf( stderr, "using track %x\n", demux_track );
 
-/*
     if( accel ) {
-        mpeg2_accel( 0 );
+        mpeg2_accel( accel );
     }
-*/
-        mpeg2_accel( 0 );
 
     in_file = fopen( filename, "rb" );
     if( !in_file ) {
@@ -555,11 +541,9 @@ static void planar420_to_packed422_frame( uint8_t *output,
 
 int mpeg2input_next_frame( mpeg2input_t *mpegin )
 {
-    fprintf( stderr, "next frame called\n" );
     ps_loop( mpegin );
     mpegin->proceed = 1;
     mpegin->curout = (mpegin->curout + 1) % 3;
-    fprintf( stderr, "time to convert ?\n" );
     planar420_to_packed422_frame( mpegin->frames422 + (mpegin->curout * mpegin->width * mpegin->height * 2),
                                   mpegin->curframe, mpegin->width, mpegin->height );
     return 1;
