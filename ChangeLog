@@ -1,5 +1,7 @@
 
 0.9.8.1 -
+  * gygy: Fix for multiple lirc commands mapped to one key
+  * silvaran: Fixed xscreensaver shutdown code
   * vektor: Show network name and network call letters in XDS
       information (fixes 729588)
   * vektor: Fixed documentation for channel_renumber (fixes 729675)

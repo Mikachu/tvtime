@@ -51,6 +51,10 @@ Authors and contributors
   Krister Lagerstrom <krister@kmlager.com>
     - Support for reading commands on stdin
 
+  Scott Van Wart <silvaran@users.sourceforge.net>
+  Adrian Minta <gygy@rdslink.ro>
+    - Bugfixes
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
