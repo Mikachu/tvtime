@@ -1,7 +1,7 @@
 
 # you know it, baby
-CC = gcc -Wall -O3 -funroll-loops -fomit-frame-pointer
-CXX = g++ -Wall -O3 -funroll-loops -fomit-frame-pointer
+CC = gcc -Wall -O3 -funroll-loops -fomit-frame-pointer -rdynamic
+CXX = g++ -Wall -O3 -funroll-loops -fomit-frame-pointer -rdynamic
 #CC = gcc -g -Wall -pedantic
 
 # libsdl because i'm too cheap to do it myself
