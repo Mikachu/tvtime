@@ -21,4 +21,5 @@ dist_tvtimedata_DATA = menubg.png testlogo.png FreeSansBold.ttf credits.png \
 	DI_Greedy2Frame.dll DI_TwoFrame.dll DI_VideoWeave.dll \
 	DI_VideoBob.dll DI_TomsMoComp.dll
 
-EXTRA_DIST = freefont-sfd.tar.gz
+EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip
+
