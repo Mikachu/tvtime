@@ -726,10 +726,10 @@ int station_writeconfig( station_mgr_t *mgr )
                          BAD_CAST "-//tvtime//DTD stationlist 1.0//EN",
                          BAD_CAST "http://tvtime.sourceforge.net/DTD/stationlist1.dtd" );
         doc->intSubset = dtd;
-        if( doc->children == NULL ) {
-            xmlAddChild( (xmlNodePtr)doc, (xmlNodePtr)dtd );
+        if( !doc->children ) {
+            xmlAddChild( (xmlNodePtr) doc, (xmlNodePtr) dtd );
         } else {
-            xmlAddPrevSibling( doc->children, (xmlNodePtr)dtd );
+            xmlAddPrevSibling( doc->children, (xmlNodePtr) dtd );
         }
 
         /* Create the root node */

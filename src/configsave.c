@@ -105,10 +105,10 @@ configsave_t *configsave_open( const char *filename )
                          BAD_CAST "-//tvtime//DTD tvtime 1.0//EN",
                          BAD_CAST "http://tvtime.sourceforge.net/DTD/tvtime1.dtd" );
         cs->doc->intSubset = dtd;
-        if( cs->doc->children == NULL ) {
-            xmlAddChild( (xmlNodePtr)cs->doc, (xmlNodePtr)dtd );
+        if( !cs->doc->children ) {
+            xmlAddChild( (xmlNodePtr) cs->doc, (xmlNodePtr) dtd );
         } else {
-            xmlAddPrevSibling( cs->doc->children, (xmlNodePtr)dtd );
+            xmlAddPrevSibling( cs->doc->children, (xmlNodePtr) dtd );
         }
 
         /* Create the root node */
