@@ -4,6 +4,7 @@ Makefile
 Makefile.in
 *.o
 tvtime
+expandpng
 timingtest
 *.swp
 .xvpics
