@@ -883,6 +883,7 @@ int main( int argc, char **argv )
     char *error_string = 0;
     int read_stdin = 1;
     double pixel_aspect;
+    char number[ 4 ];
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1990,25 +1991,21 @@ int main( int argc, char **argv )
         station_writeconfig( stationmgr );
     }
 
-    {
-        char number[ 4 ];
+    snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );
+    config_save( ct, "PrevChannel", number );
 
-        snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );
-        config_save( ct, "PrevChannel", number );
+    snprintf( number, 4, "%d", station_get_current_id( stationmgr ) );
+    config_save( ct, "Channel", number );
 
-        snprintf( number, 4, "%d", station_get_current_id( stationmgr ) );
-        config_save( ct, "Channel", number );
+    snprintf( number, 4, "%d", framerate_mode );
+    config_save( ct, "FramerateMode", number );
 
-        snprintf( number, 4, "%d", framerate_mode );
-        config_save( ct, "FramerateMode", number );
+    snprintf( number, 4, "%2.1f", commands_get_overscan( commands ) * 2.0 * 100.0 );
+    config_save( ct, "OverScan", number );
 
-        snprintf( number, 4, "%2.1f", commands_get_overscan( commands ) * 2.0 * 100.0 );
-        config_save( ct, "OverScan", number );
-
-        if( vidin ) {
-            snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
-            config_save( ct, "V4LInput", number );
-        }
+    if( vidin ) {
+        snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
+        config_save( ct, "V4LInput", number );
     }
 
     output->shutdown();
