@@ -93,9 +93,9 @@ like -l 1.3 or -l 0.8 or similar.  This applies a gamma correction curve
 to the luminance channel, and will distort your colour, but maybe in a
 way that you find improves your mood. :)
 
-4.  Key Bindings
+4.  Key bindings
 
-  Luma Correction
+  Luma correction
   ---------------
   k              : decrease correction value by 0.1
   l              : increase correction value by 0.1
@@ -118,6 +118,16 @@ way that you find improves your mood. :)
   ----
   f              : toggle fullscreen mode
   q or escape    : quit
+
+5.  CPU usage
+
+  tvtime takes alot of CPU, especially to get the full-framerate output.
+nVidia's binary drivers, and I think the GATOS ATI drivers, have a very
+efficient XVideo implementation that should help alot to get high
+framerate on machines with capable video cards.  However, tvtime will
+also need alot of CPU to generate the fully deinterlaced video stream.
+I run happily on a P3-733 with a G400, and Doug runs even more happily
+on a P3-900 with a Geforce 2 and nVidia's binary drivers.
 
 
 Authors and contributors
