@@ -1615,6 +1615,8 @@ int main( int argc, char **argv )
                 secondlastframe = rvrreader_get_secondlastframe( rvrreader );
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
+            } else {
+                usleep( 10000 );
             }
             acquired = 1;
             filtered_cur = 0;
