@@ -34,13 +34,10 @@ typedef enum InputEvent_e {
 
 } InputEvent;
 
-#include "tvtimeosd.h"
-#include "videoinput.h"
 #include "tvtimeconf.h"
-#include "videocorrection.h"
 #include "menu.h"
 #include "console.h"
-#include "vbidata.h"
+#include "commands.h"
 
 /* Modifiers */
 #define I_SHIFT                 (1<<16)
@@ -81,24 +78,10 @@ typedef enum InputEvent_e {
 #define I_PRINT                 316
 #define I_MENU                  319
 
-input_t *input_new( config_t *cfg, videoinput_t *vidin, 
-                    tvtime_osd_t *osd, video_correction_t *vc );
+input_t *input_new( config_t *cfg, commands_t *com, console_t *con, 
+                    menu_t *menu );
 void input_delete( input_t *in );
 void input_callback( input_t *in, InputEvent command, int arg );
-
-int input_quit( input_t *in );
-int input_take_screenshot( input_t *in );
-int input_print_debug( input_t *in );
-int input_show_bars( input_t *in );
-int input_toggle_fullscreen( input_t *in );
-int input_toggle_aspect( input_t *in );
-int input_toggle_deinterlacing_mode( input_t *in );
-int input_toggle_menu( input_t *in );
-void input_set_console( input_t *in, console_t *con );
-void input_set_vbidata( input_t *in, vbidata_t *con );
-
-void input_set_menu( input_t *in, menu_t *m );
-
 void input_next_frame( input_t *in );
 
 #ifdef __cplusplus

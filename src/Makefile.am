@@ -1,5 +1,7 @@
 
 tvtimedatadir = $(datadir)/tvtime
+tvtimesysconfdir = $(sysconfdir)/tvtime
+pkgsysconfdir = $(sysconfdir)/tvtime
 
 TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
 TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
@@ -16,7 +18,8 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins -ltvtimeplugins
 # DIRECTFB_LIBS = 
 # endif
 
-OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic -DDATADIR="\"$(tvtimedatadir)\""
+OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic \
+	-DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS)
@@ -35,7 +38,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	outputapi.h performance.h performance.c vbidata.h vbidata.c \
 	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
 	wm_state.h wm_state.c console.h console.c speedtools.h \
-	vbiscreen.h vbiscreen.c
+	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c
 
 bin_PROGRAMS = tvtime
 

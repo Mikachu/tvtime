@@ -30,7 +30,8 @@ extern "C" {
 
 typedef struct menu_s menu_t;
 
-menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, 
+#include "commands.h"
+menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin, 
                   tvtime_osd_t *osd, int width, 
                   int height, double aspect );
 void menu_delete( menu_t *m );

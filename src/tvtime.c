@@ -48,6 +48,8 @@
 #include "console.h"
 #include "vbidata.h"
 #include "vbiscreen.h"
+#include "fifo.h"
+#include "commands.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -428,6 +430,8 @@ int main( int argc, char **argv )
     int has_signal = 0;
     vbidata_t *vbidata;
     vbiscreen_t *vs;
+    fifo_t *fifo;
+    commands_t *commands;
 
     setup_speedy_calls();
 
@@ -594,18 +598,19 @@ int main( int argc, char **argv )
                                          config_get_luma_correction( ct ) );
     }
 
-    in = input_new( ct, vidin, osd, vc );
-    if( !in ) {
-        fprintf( stderr, "tvtime: Can't create input handler.\n" );
+    commands = commands_new( ct, vidin, osd, vc );
+    if( !commands ) {
+        fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;
     }
 
-    menu = menu_new( in, ct, vidin, osd, width, height, 
+    menu = menu_new( commands, ct, vidin, osd, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
     }
-    if( menu ) input_set_menu( in, menu );
+
+    commands_set_menu( commands, menu );
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
@@ -661,8 +666,15 @@ int main( int argc, char **argv )
 
     if( con ) {
         console_setup_pipe( con, config_get_command_pipe( ct ) );
-        input_set_console( in, con );
+        commands_set_console( commands, con );
     }
+
+    in = input_new( ct, commands, con, menu );
+    if( !in ) {
+        fprintf( stderr, "tvtime: Can't create input handler.\n" );
+        return 1;
+    }
+
 
     vs = vbiscreen_new( width, height, 
                         config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
@@ -680,6 +692,13 @@ int main( int argc, char **argv )
         vbidata_capture_mode( vbidata, CAPTURE_OFF );
     }
 
+    fifo = fifo_new( ct, NULL );
+    if( !fifo ) {
+        fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
+                         "fifo object failed.\n" );
+    }
+
+
     /* Setup the output. */
     output = get_xv_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
@@ -689,7 +708,7 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    input_set_vbidata( in, vbidata );
+    commands_set_vbidata( commands, vbidata );
 
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
@@ -722,21 +741,27 @@ int main( int argc, char **argv )
 
         output->poll_events( in );
 
-        if( input_quit( in ) ) break;
-        printdebug = input_print_debug( in );
-        showbars = input_show_bars( in );
-        screenshot = input_take_screenshot( in );
-        if( input_toggle_fullscreen( in ) ) {
+        if( fifo ) {
+            int cmd;
+            cmd = fifo_next_command( fifo );
+            commands_handle( commands, cmd, 0 );
+        }
+
+        if( commands_quit( commands ) ) break;
+        printdebug = commands_print_debug( commands );
+        showbars = commands_show_bars( commands );
+        screenshot = commands_take_screenshot( commands );
+        if( commands_toggle_fullscreen( commands ) ) {
             output->toggle_fullscreen( 0, 0 );
         }
-        if( input_toggle_aspect( in ) ) {
+        if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
                 tvtime_osd_show_message( osd, "16:9 display mode" );
             } else {
                 tvtime_osd_show_message( osd, "4:3 display mode" );
             }
         }
-        if( input_toggle_deinterlacing_mode( in ) ) {
+        if( commands_toggle_deinterlacing_mode( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
@@ -744,6 +769,7 @@ int main( int argc, char **argv )
                 tvtime_osd_show_info( osd );
             }
         }
+        commands_next_frame( commands );
         input_next_frame( in );
 
         /* Aquire the next frame. */
@@ -934,6 +960,8 @@ int main( int argc, char **argv )
     videoinput_delete( vidin );
     config_delete( ct );
     input_delete( in );
+    commands_delete( commands );
+    fifo_delete( fifo );
     if( vbidata ) {
         vbidata_delete( vbidata );
     }

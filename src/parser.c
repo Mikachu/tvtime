@@ -38,7 +38,6 @@ void parser_delete( parser_file_t *pf )
         free( pf->nv_pairs[i].value );
     }
     free( pf->nv_pairs );
-    fclose( pf->fh );
 }
 
 int parser_openfile( parser_file_t *pf, const char *filename )
@@ -52,8 +51,6 @@ int parser_openfile( parser_file_t *pf, const char *filename )
 
     pf->fh = fopen( filename, "r" );
     if( !(pf->fh) ) {
-        fprintf( stderr, "parser: Can't open %s: %s\n",
-                 filename, strerror( errno ) );
         return 0;
     }
 
@@ -113,17 +110,11 @@ int parser_readfile( parser_file_t *pf )
     return 1;
 }
 
-int parser_new( parser_file_t *pf, const char *filename )
+int parser_merge_file( parser_file_t* pf, const char *filename )
 {
     char *ptr, *name, *value, *start, *tmp;
     int pairs=0, saweq=0;
     
-    pf->fh = NULL;
-    pf->file_length = 0;
-    pf->file_contents = NULL;
-    pf->nv_pairs = NULL;
-    pf->num_pairs = 0;
-
     if( !parser_openfile( pf, filename) ) {
         return 0;
     }
@@ -139,11 +130,6 @@ int parser_new( parser_file_t *pf, const char *filename )
         fprintf( stderr, "parser: Insufficient memory to strdup filename.\n" );
         return 0;
     }
-
-    /* default to 25 nv pairs -- will realloc later if necessary */
-    pf->nv_pairs = (struct nv_pair*)malloc(sizeof(struct nv_pair)*25);
-    memset( pf->nv_pairs, 0, sizeof(struct nv_pair)*25 );
-    pf->num_pairs = 25;
 
     ptr = pf->file_contents;
     while( *ptr ) {
@@ -241,8 +227,28 @@ int parser_new( parser_file_t *pf, const char *filename )
     }
 
     free( pf->file_contents );
+    fclose( pf->fh );
+    pf->fh = NULL;
+    pf->file_length = 0;
     pf->file_contents = NULL;
+
     return 1;
+}
+
+int parser_new( parser_file_t *pf, const char *filename )
+{
+    if( !pf ) return;
+
+    pf->fh = NULL;
+    pf->file_length = 0;
+    pf->file_contents = NULL;
+
+    /* default to 25 nv pairs -- will realloc later if necessary */
+    pf->nv_pairs = (struct nv_pair*)malloc(sizeof(struct nv_pair)*25);
+    memset( pf->nv_pairs, 0, sizeof(struct nv_pair)*25 );
+    pf->num_pairs = 25;
+
+    return parser_merge_file( pf, filename );
 }
 
 int parser_dump( parser_file_t *pf )

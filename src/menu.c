@@ -61,14 +61,14 @@ struct menu_s {
     int frame_height;
     double frame_aspect;
 
-    input_t *in;
+    commands_t *in;
     config_t *cfg;
     videoinput_t *vidin;
     tvtime_osd_t *osd;
 };
 
 
-menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, 
+menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin, 
                   tvtime_osd_t *osd, int width, 
                   int height, double aspect )
 {
@@ -584,7 +584,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
                 MenuScreen tmp = m->menu_previous_screen;
                 m->menu_previous_screen = MENU_MAIN;
                 if( m->menu_screen == MENU_MAIN ) {
-                    input_toggle_menu( m->in );
+                    commands_toggle_menu( m->in );
                     m->menu_screen = MENU_MAIN;
                     /* now remove OSD */
                     m->visible = 0;
@@ -650,7 +650,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
             switch( tvtime_cmd ) {
 
             case TVTIME_MENUMODE:
-                input_toggle_menu( m->in );
+                commands_toggle_menu( m->in );
                 m->menu_screen = MENU_MAIN;
                 /* now remove OSD */
                 m->visible = 0;

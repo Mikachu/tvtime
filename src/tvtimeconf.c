@@ -117,7 +117,7 @@ struct config_s
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
-    char *command_pipe;
+    char command_pipe[ 256 ];
 
 	int preferred_deinterlace_method;
 };
@@ -192,7 +192,8 @@ config_t *config_new( int argc, char **argv )
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
-    ct->command_pipe = strdup( "tvtime.fifo" );
+    strncpy( ct->command_pipe, getenv( "HOME" ), 235 );
+    strncat( ct->command_pipe, "/.tvtime/tvtimefifo", 255 );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
     ct->fullscreen = 0;
@@ -271,13 +272,24 @@ config_t *config_new( int argc, char **argv )
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
 
     if( !configFile ) {
-        strncpy( base, getenv( "HOME" ), 245 );
-        strcat( base, "/.tvtimerc" );
+        strncpy( base, getenv( "HOME" ), 235 );
+        strcat( base, "/.tvtime/tvtimerc" );
         configFile = base;
     }
 
     if( parser_new( &(ct->pf), configFile ) ) {
         config_init( ct );
+    } else {
+        fprintf( stderr, "\n** Notice: tvtime user config file "
+                         "has changed to ~/.tvtime/tvtimerc **\n" );
+
+        strncpy( base, CONFDIR, 245 );
+        strcat( base, "/tvtimerc" );
+        configFile = base;
+        parser_delete( &(ct->pf) );
+        if( parser_new( &(ct->pf), configFile ) ) {
+            config_init( ct );
+        }
     }
 
     while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:I" )) != -1 ) {
@@ -397,8 +409,7 @@ void config_init( config_t *ct )
     }
 
     if( (tmp = parser_get( &(ct->pf), "CommandPipe", 1 )) ) {
-        free( ct->command_pipe );
-        ct->command_pipe = strdup( tmp );
+        strncpy( ct->command_pipe, tmp, 255 );
     }
 
     if( (tmp = parser_get( &(ct->pf), "TimeFormat", 1 )) ) {
@@ -603,6 +614,8 @@ int config_key_to_command( config_t *ct, int key )
 int string_to_command( const char *str )
 {
     int i=0;
+
+    if( !str ) return TVTIME_NOCOMMAND;
 
     while( i < NUM_CMDS ) {
         if( !strcasecmp( cmd_table[i].name, str ) ) {

@@ -132,4 +132,6 @@ void config_set_preferred_deinterlace_method( config_t *ct, int preferred_deinte
 
 void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr );
 
+int string_to_command( const char *str );
+
 #endif /* TVTIMECONF_H_INCLUDED */

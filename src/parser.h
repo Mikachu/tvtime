@@ -40,7 +40,7 @@ int parser_new( parser_file_t *pf, const char *filename );
 const char *parser_get( parser_file_t *pf, const char *name, int k );
 void parser_delete( parser_file_t *pf );
 int parser_dump( parser_file_t *pf );
-
+int parser_merge_file( parser_file_t* pf, const char *filename );
 #ifdef __cplusplus
 };
 #endif
