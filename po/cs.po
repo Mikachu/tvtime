@@ -692,9 +692,8 @@ msgstr "Kontrast"
 
 #: src/commands.c:1510 src/commands.c:1560 src/commands.c:1675
 #: src/commands.c:3155 src/commands.c:3174
-#, fuzzy
 msgid "Saturation"
-msgstr "Barevný kontrast"
+msgstr "Saturace"
 
 #: src/commands.c:1514 src/commands.c:1564 src/commands.c:1708
 #: src/commands.c:3113 src/commands.c:3177
@@ -1201,7 +1200,7 @@ msgstr "Čtení konfigurace z %s\n"
 
 #: src/tvtimeconf.c:966
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
-msgstr ""
+msgstr "Nelze spustit dvě instance tvtime se stejnou konfigurací.\n"
 
 #: src/tvtimeconf.c:977
 msgid "Saving command line options.\n"
