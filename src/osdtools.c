@@ -304,8 +304,8 @@ int osd_databars_get_frames_left( osd_databars_t *osdd )
 
 void osd_databars_prerender( osd_databars_t *osdd, int num_filled )
 {
-
-    memset( osdd->data, 0, osdd->width * 4 );
+    blit_colour_packed4444_scanline( osdd->data, osdd->width,
+                                     0, 16, 128, 128 );
     composite_bars_packed4444_scanline( osdd->data, osdd->data, osdd->width,
                                         osdd->alpha, osdd->luma, osdd->cb,
                                         osdd->cr, num_filled );
