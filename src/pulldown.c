@@ -211,8 +211,12 @@ int determine_pulldown_offset_history( int top_repeat, int bot_repeat, int tff, 
     return ret;
 }
 
+static int reference = 0;
+
 int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int tff, int predicted )
 {
+    int avgbot = 0;
+    int avgtop = 0;
     int i, j;
     int ret;
     int mintopval = -1;
@@ -223,9 +227,21 @@ int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int t
     int minbotpos = -1;
     int min2botval = -1;
     int min2botpos = -1;
+    int predicted_pos = 0;
 
     tophistory[ histpos ] = top_repeat;
     bothistory[ histpos ] = bot_repeat;
+
+    for( j = 0; j < HISTORY_SIZE; j++ ) {
+        avgtop += tophistory[ j ];
+        avgbot += bothistory[ j ];
+    }
+    avgtop /= 5;
+    avgbot /= 5;
+
+    for( i = 0; i < 5; i++ ) { if( (1<<i) == predicted ) { predicted_pos = i; break; } }
+
+    fprintf( stderr, "top: %8d bot: %8d\ttop-avg: %8d bot-avg: %8d (%d)\n", top_repeat, bot_repeat, top_repeat - avgtop, bot_repeat - avgbot, (5 + predicted_pos - reference) % 5 );
 
     for( j = 0; j < HISTORY_SIZE; j++ ) {
         int cur = tophistory[ j ];
@@ -260,11 +276,13 @@ int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int t
     for( i = 0; i < 5; i++ ) {
         int valid = 1;
         for( j = 0; j < 5; j++ ) {
-            if( tff_top_pattern[ j ] && !tophistory_diff[ (i + j) % 5 ] ) {
+            // if( tff_top_pattern[ j ] && !tophistory_diff[ (i + j) % 5 ] && tophistory[ (i + j) % 5 ] != mintopval ) {
+            if( tff_top_pattern[ j ] && (tophistory[ (i + j) % 5 ] > avgtop || !tophistory_diff[ (i + j) % 5 ]) ) {
                 valid = 0;
                 break;
             }
-            if( tff_bot_pattern[ j ] && !bothistory_diff[ (i + j) % 5 ] ) {
+            // if( tff_bot_pattern[ j ] && !bothistory_diff[ (i + j) % 5 ] && bothistory[ (i + j) % 5 ] != minbotval ) {
+            if( tff_bot_pattern[ j ] && (bothistory[ (i + j) % 5 ] > avgbot || !bothistory_diff[ (i + j) % 5 ]) ) {
                 valid = 0;
                 break;
             }
@@ -282,6 +300,121 @@ int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int t
     */
 
     histpos = (histpos + 1) % HISTORY_SIZE;
+    reference = (reference + 1) % 5;
+
+    if( !ret ) {
+        /* No pulldown sequence is valid, return an error. */
+        return 0;
+    } else if( !(predicted & ret) ) {
+        /**
+         * We have a valid sequence, but it doesn't match our prediction.
+         * Return the first 'valid' sequence in the list.
+         */
+        for( i = 0; i < 5; i++ ) { if( ret & (1<<i) ) return (1<<i); }
+    }
+
+    /**
+     * The predicted phase is still valid.
+     */
+    return predicted;
+}
+
+int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat, int tff, int predicted )
+{
+    int avgbot = 0;
+    int avgtop = 0;
+    int i, j;
+    int ret;
+    int mintopval = -1;
+    int mintoppos = -1;
+    int min2topval = -1;
+    int min2toppos = -1;
+    int minbotval = -1;
+    int minbotpos = -1;
+    int min2botval = -1;
+    int min2botpos = -1;
+    int predicted_pos = 0;
+
+    tophistory[ histpos ] = top_repeat;
+    bothistory[ histpos ] = bot_repeat;
+
+    for( j = 0; j < 3; j++ ) {
+        avgtop += tophistory[ (histpos + 5 - j) % 5 ];
+        avgbot += bothistory[ (histpos + 5 - j) % 5 ];
+    }
+    avgtop /= 3;
+    avgbot /= 3;
+
+    for( i = 0; i < 5; i++ ) { if( (1<<i) == predicted ) { predicted_pos = i; break; } }
+
+    /*
+    fprintf( stderr, "top: %8d bot: %8d\ttop-avg: %8d bot-avg: %8d (%d)\n",
+             top_repeat, bot_repeat, top_repeat - avgtop, bot_repeat - avgbot,
+             (5 + predicted_pos - reference) % 5 );
+    */
+
+    for( j = 0; j < 3; j++ ) {
+        int cur = tophistory[ (histpos + 5 - j) % 5 ];
+        if( cur < mintopval || mintopval < 0 ) {
+            min2topval = mintopval;
+            min2toppos = mintoppos;
+            mintopval = cur;
+            mintoppos = j;
+        } else if( cur < min2topval || min2topval < 0 ) {
+            min2topval = cur;
+            min2toppos = j;
+        }
+    }
+
+    for( j = 0; j < 3; j++ ) {
+        int cur = bothistory[ (histpos + 5 - j) % 5 ];
+        if( cur < minbotval || minbotval < 0 ) {
+            min2botval = minbotval;
+            min2botpos = minbotpos;
+            minbotval = cur;
+            minbotpos = j;
+        } else if( cur < min2botval || min2botval < 0 ) {
+            min2botval = cur;
+            min2botpos = j;
+        }
+    }
+
+    tophistory_diff[ histpos ] = ((mintoppos == histpos) || (min2toppos == histpos));
+    bothistory_diff[ histpos ] = ((minbotpos == histpos) || (min2botpos == histpos));
+
+    ret = 0;
+    for( i = 0; i < 5; i++ ) {
+        int valid = 1;
+        for( j = 0; j < 3; j++ ) {
+            // if( tff_top_pattern[ j ] && !tophistory_diff[ (i + j) % 5 ] && tophistory[ (i + j) % 5 ] != mintopval ) {
+            // if( tff_top_pattern[ j ] && (tophistory[ (i + j) % 5 ] > avgtop || !tophistory_diff[ (i + j) % 5 ]) ) {
+            if( tff_top_pattern[ (i + 5 - j) % 5 ] && tophistory[ (histpos + 5 - j) % 5 ] > avgtop ) {
+            // if( tff_top_pattern[ (i + 5 - j) % 5 ] && !tophistory_diff[ (histpos + 5 - j) % 5 ] && tophistory[ (histpos + 5 - j) % 5 ] != mintopval ) {
+                valid = 0;
+                break;
+            }
+            // if( tff_bot_pattern[ j ] && !bothistory_diff[ (i + j) % 5 ] && bothistory[ (i + j) % 5 ] != minbotval ) {
+            // if( tff_bot_pattern[ j ] && (bothistory[ (i + j) % 5 ] > avgbot || !bothistory_diff[ (i + j) % 5 ]) ) {
+            if( tff_bot_pattern[ (i + 5 - j) % 5 ] && bothistory[ (histpos + 5 - j) % 5 ] > avgbot ) {
+            // if( tff_bot_pattern[ (i + 5 - j) % 5 ] && !bothistory_diff[ (histpos + 5 - j) % 5 ] && bothistory[ (histpos + 5 - j) % 5 ] != minbotval ) {
+                valid = 0;
+                break;
+            }
+        }
+        if( valid ) ret |= (1<<i);
+    }
+
+    /*
+    fprintf( stderr, "ret: %d %d %d %d %d\n",
+             PULLDOWN_OFFSET_1 & ret,
+             PULLDOWN_OFFSET_2 & ret,
+             PULLDOWN_OFFSET_3 & ret,
+             PULLDOWN_OFFSET_4 & ret,
+             PULLDOWN_OFFSET_5 & ret );
+    */
+
+    histpos = (histpos + 1) % HISTORY_SIZE;
+    reference = (reference + 1) % 5;
 
     if( !ret ) {
         /* No pulldown sequence is valid, return an error. */

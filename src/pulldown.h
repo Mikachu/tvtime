@@ -21,5 +21,6 @@
 int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff, int last_offset );
 int determine_pulldown_offset_history( int top_repeat, int bot_repeat, int tff, int *realbest );
 int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int tff, int predicted );
+int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat, int tff, int predicted );
 
 #endif /* PULLDOWN_H_INCLUDED */
