@@ -133,7 +133,6 @@ void videoinput_free_all_frames( videoinput_t *vidin )
 {
     int i;
 
-    fprintf( stderr, "buffers: %d\n", vidin->numframes );
     for( i = 0; i < vidin->numframes; i++ ) {
         free_frame( vidin, i );
     }

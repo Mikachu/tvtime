@@ -82,7 +82,7 @@ void (*blit_colour_packed422_scanline)( unsigned char *output,
 void (*blit_colour_packed4444_scanline)( unsigned char *output,
                                          int width, int alpha, int luma,
                                          int cb, int cr );
-void *(*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
+void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
 void (*deinterlace_twoframe_packed422_scanline)( unsigned char *output,
                                                  unsigned char *t1,
                                                  unsigned char *m1,
@@ -92,6 +92,8 @@ void (*deinterlace_twoframe_packed422_scanline)( unsigned char *output,
                                                  unsigned char *b0,
                                                  int width );
 
+const char *speedy_get_deinterlacing_mode( void );
+const char *speedy_next_deinterlacing_mode( void );
 void setup_speedy_calls( void );
 
 #endif /* SPEEDY_H_INCLUDED */

@@ -347,6 +347,10 @@ int main( int argc, char **argv )
         if( input_toggle_aspect( in ) ) {
             sdl_toggle_aspect();
         }
+        if( input_toggle_deinterlacing_mode( in ) ) {
+            const char *mode = speedy_next_deinterlacing_mode();
+            tvtime_osd_show_message( osd, mode );
+        }
 
         input_next_frame( in );
 
@@ -502,7 +506,6 @@ int main( int argc, char **argv )
 
 
         /* We're done with the input now. */
-        //blit_packed422_scanline( lastframe, curframe, width * height );
         videoinput_free_frame( vidin, curframeid );
 
 

@@ -144,6 +144,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_FULLSCREEN ]     = 'f';
     ct->keymap[ TVTIME_ASPECT ]         = 'a';
     ct->keymap[ TVTIME_SCREENSHOT ]     = 's';
+    ct->keymap[ TVTIME_DEINTERLACINGMODE ] = 't';
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 245 );
@@ -496,6 +497,11 @@ void config_init_keymap( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "key_screenshot")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_SCREENSHOT ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_deinterlacing_mode")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_DEINTERLACINGMODE ] = key;
     }
    
 }

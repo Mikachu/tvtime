@@ -88,6 +88,7 @@ int input_show_bars( input_t *in );
 int input_show_test( input_t *in );
 int input_toggle_fullscreen( input_t *in );
 int input_toggle_aspect( input_t *in );
+int input_toggle_deinterlacing_mode( input_t *in );
 
 void input_next_frame( input_t *in );
 

@@ -589,29 +589,65 @@ void deinterlace_twoframe_packed422_scanline_c( unsigned char *output,
     interpolate_packed422_scanline( output, t1, b1, width );
 }
 
+static uint32_t speedy_accel;
+
+typedef struct deinterlace_mode_s
+{
+    const char *name;
+    void (*function)( unsigned char *output, unsigned char *t1,
+                      unsigned char *m1, unsigned char *b1,
+                      unsigned char *t0, unsigned char *m0,
+                      unsigned char *b0, int width );
+    int accel;
+} deinterlace_mode_t;
+
+deinterlace_mode_t modes[] = {
+    { "TwoFrame", deinterlace_twoframe_packed422_scanline_mmxext, MM_ACCEL_X86_MMXEXT },
+    { "Greedy", deinterlace_greedytwoframe_packed422_scanline_mmxext, MM_ACCEL_X86_MMXEXT },
+    { "Linear", deinterlace_twoframe_packed422_scanline_c, 0 } };
+int curmode = -1;
+
+const char *speedy_get_deinterlacing_mode( void )
+{
+    return modes[ curmode ].name;
+}
+
+const char *speedy_next_deinterlacing_mode( void )
+{
+    for(;;) {
+        curmode = ( curmode + 1 ) % ( sizeof( modes ) / sizeof( deinterlace_mode_t ) );
+        if( !modes[ curmode ].accel || (speedy_accel & modes[ curmode ].accel) ) {
+            deinterlace_twoframe_packed422_scanline = modes[ curmode ].function;
+            return modes[ curmode ].name;
+        }
+    }
+    return 0;
+}
+
+
 void setup_speedy_calls( void )
 {
-    uint32_t accel = mm_accel();
+    speedy_accel = mm_accel();
 
     interpolate_packed422_scanline = interpolate_packed422_scanline_c;
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
     blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_c;
     blit_packed422_scanline = blit_packed422_scanline_c;
-    deinterlace_twoframe_packed422_scanline = deinterlace_twoframe_packed422_scanline_c;
 
-    if( accel & MM_ACCEL_X86_MMXEXT ) {
-        fprintf( stderr, "tvtime: Using MMXEXT optimized functions.\n" );
+    speedy_next_deinterlacing_mode();
+
+    if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
+        fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
         blit_packed422_scanline = blit_packed422_scanline_mmxext_xine;
-        deinterlace_twoframe_packed422_scanline = deinterlace_twoframe_packed422_scanline_mmxext;
-    } else if( accel & MM_ACCEL_X86_MMX ) {
-        fprintf( stderr, "tvtime: Using MMX optimized functions.\n" );
+    } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
+        fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
     } else {
-        fprintf( stderr, "tvtime: No optimizations detected, "
+        fprintf( stderr, "speedycode: No optimizations detected, "
                          "using C fallbacks.\n" );
     }
 }

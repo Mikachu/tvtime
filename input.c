@@ -48,6 +48,7 @@ struct input_s {
     int showtest;
     int togglefullscreen;
     int toggleaspect;
+    int toggledeinterlacingmode;
 };
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
@@ -74,6 +75,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
+    in->toggledeinterlacingmode = 0;
 
     return in;
 }
@@ -128,6 +130,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_ASPECT:
              in->toggleaspect = 1;
+             break;
+
+         case TVTIME_DEINTERLACINGMODE:
+             in->toggledeinterlacingmode = 1;
              break;
 
          case TVTIME_CHANNEL_CHAR:
@@ -322,6 +328,11 @@ int input_toggle_aspect( input_t *in )
     return in->toggleaspect;
 }
 
+int input_toggle_deinterlacing_mode( input_t *in )
+{
+    return in->toggledeinterlacingmode;
+}
+
 void input_next_frame( input_t *in )
 {
     /* Decrement the frame counter if user is typing digits */
@@ -346,5 +357,6 @@ void input_next_frame( input_t *in )
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
+    in->toggledeinterlacingmode = 0;
 }
 
