@@ -30,28 +30,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if defined(__FreeBSD__)
-#include <machine/param.h>
-#endif
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <sys/time.h>
-
 #include <X11/X.h>
-#include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/cursorfont.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
-#ifdef HAVE_XTESTEXTENSION
-#include <X11/extensions/XTest.h>
-#endif
-
 #include "display.h"
 #include "speedy.h"
 #include "xcommon.h"

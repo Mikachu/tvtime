@@ -48,6 +48,7 @@ area_t xcommon_get_video_area( void );
 area_t xcommon_get_window_area( void );
 void xcommon_clear_screen( void );
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height );
+int xcommon_toggle_root( int fullscreen_width, int fullscreen_height );
 int xcommon_toggle_aspect( void );
 void xcommon_poll_events( input_t *in );
 void xcommon_set_window_caption( const char *caption );
