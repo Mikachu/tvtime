@@ -135,6 +135,8 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
     return 1;
 }
 
+
+
 static void station_dump( station_mgr_t *mgr )
 {
     station_info_t *rp = mgr->first;
@@ -218,18 +220,20 @@ int station_set( station_mgr_t *mgr, int pos )
 void station_next( station_mgr_t *mgr )
 {
     if( mgr->current ) {
+        station_info_t *i= mgr->current;
         do {
             mgr->current = mgr->current->next;
-	} while ( !mgr->current->active ); 
+	} while ( !mgr->current->active && mgr->current != i ); 
     }
 }
 
 void station_prev( station_mgr_t *mgr )
 {
     if( mgr->current ) {
+        station_info_t *i= mgr->current;
         do {
-        mgr->current = mgr->current->prev;
-        } while ( !mgr->current->active );
+            mgr->current = mgr->current->prev;
+        } while ( !mgr->current->active && mgr->current != i );
     }
 }
 
@@ -329,7 +333,7 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
 }
 
 int station_scan_band( station_mgr_t *mgr, const char *band )
-{ // 
+{
     return 0;
 }
 
@@ -348,7 +352,75 @@ int station_scan( station_mgr_t *mgr )
     return 0;
 }
 
-int station_writeConfig( config_t *ct )
+int station_remove( station_mgr_t *mgr )
+{ // untested
+    station_info_t *i= mgr->current;
+    if( !mgr->current ) return 0;
+    i->next->prev= i->prev;
+    i->prev->next= i->next;
+    
+    if( i == mgr->first ) {
+        mgr->first= i->next;
+    }
+    
+    if( i == mgr->current ) {
+        mgr->current= i->next;
+    }
+
+    if( i == i->next ) {
+        mgr->current= NULL;
+        mgr->first= NULL;
+    }
+    free( i );
+    return 1;
+}
+
+int station_remap( station_mgr_t *mgr, int pos ) 
+{ // untested, hope it works
+    if( !mgr->current ) return 0;
+    if( pos == mgr->current->pos ) return 1;
+    
+    if( isFreePos( mgr, pos ) ) {
+        station_info_t *i= mgr->current;
+        i->next->prev= i->prev;
+        i->prev->next= i->next;
+        i->pos= pos;
+        return insert( mgr, i );
+    
+    } else {
+        station_info_t *i= mgr->current;
+        station_info_t *rp= mgr->first;
+        station_info_t *t0, *t1;
+
+        do {
+            if ( pos == rp->pos ) break;
+            rp= rp->next;
+        } while ( rp != mgr->first );
+
+        rp->next->prev= i;
+        rp->prev->next= i;
+
+        i->next->prev= rp;
+        i->prev->next= rp;
+
+        t0= rp->next;
+        t1= rp->prev;
+
+        rp->next= i->next;
+        rp->prev= i->prev;
+
+        i->next= t0;
+        i->prev= t1;
+
+        rp->pos= i->pos;
+        i->pos= pos;
+	
+        if ( rp == mgr->first ) mgr->first= i;
+        return 1;
+    }
+}
+
+int station_writeConfig( config_t *ct, station_mgr_t *mgr )
 {
     return 0;
 }
