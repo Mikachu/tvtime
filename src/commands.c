@@ -157,9 +157,6 @@ struct commands_s {
     int apply_invert;
     int apply_mirror;
     int apply_chroma_kill;
-    int apply_luma;
-    int update_luma;
-    double luma_power;
 
     double overscan;
 
@@ -965,25 +962,14 @@ static void reset_overscan_menu( menu_t *menu, double overscan )
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
-static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
-                                int apply_invert, int apply_mirror,
-                                int apply_chroma_kill, int isntsc,
-                                int apply_pulldown )
+static void reset_filters_menu( menu_t *menu, int apply_invert,
+                                int apply_mirror, int apply_chroma_kill,
+                                int isntsc, int apply_pulldown )
 {
     char string[ 128 ];
     int cur = 1;
 
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
-
-    if( isbttv ) {
-        snprintf( string, sizeof( string ), apply_luma ?
-                  TVTIME_ICON_GENERALTOGGLEON "  %s" :
-                  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
-                  _("BT8x8 luma correction") );
-        menu_set_text( menu, cur, string );
-        menu_set_enter_command( menu, cur, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
-        cur++;
-    }
 
     if( isntsc ) {
         snprintf( string, sizeof( string ), apply_pulldown ?
@@ -1108,9 +1094,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->apply_invert = config_get_invert( cfg );
     cmd->apply_mirror = config_get_mirror( cfg );
     cmd->apply_chroma_kill = 0;
-    cmd->apply_luma = config_get_apply_luma_correction( cfg );
-    cmd->update_luma = 0;
-    cmd->luma_power = config_get_luma_correction( cfg );
 
     cmd->boost = config_get_audio_boost( cfg );
 
@@ -1130,10 +1113,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->curmenusize = 0;
     cmd->curusermenu = 0;
     memset( cmd->menus, 0, sizeof( cmd->menus ) );
-
-    if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
-        cmd->apply_luma = 0;
-    }
 
     if( vidin && videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC &&
                  videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC_JP ) {
@@ -1155,10 +1134,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         } else {
             set_redirect( "stations", "stations-ntsccable-nosignal" );
         }
-    }
-
-    if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
-        cmd->luma_power = 1.0;
     }
 
     menu = menu_new( "root-tuner" );
@@ -1504,9 +1479,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                        cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                        cmd->apply_luma, cmd->apply_invert,
-                        cmd->apply_mirror, cmd->apply_chroma_kill,
+                        cmd->apply_invert, cmd->apply_mirror,
+                        cmd->apply_chroma_kill,
                         cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                         cmd->pulldown_alg );
 
@@ -2787,9 +2761,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->apply_invert = !cmd->apply_invert;
         if( cmd->osd ) {
             reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                                cmd->apply_luma, cmd->apply_invert,
-                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->apply_invert, cmd->apply_mirror,
+                                cmd->apply_chroma_kill,
                                 cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                                 cmd->pulldown_alg );
             commands_refresh_menu( cmd );
@@ -2811,9 +2784,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->apply_mirror = !cmd->apply_mirror;
         if( cmd->osd ) {
             reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                                cmd->apply_luma, cmd->apply_invert,
-                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->apply_invert, cmd->apply_mirror,
+                                cmd->apply_chroma_kill,
                                 cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                                 cmd->pulldown_alg );
             commands_refresh_menu( cmd );
@@ -2835,9 +2807,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->apply_chroma_kill = !cmd->apply_chroma_kill;
         if( cmd->osd ) {
             reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                                cmd->apply_luma, cmd->apply_invert,
-                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->apply_invert, cmd->apply_mirror,
+                                cmd->apply_chroma_kill,
                                 cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                                 cmd->pulldown_alg );
             commands_refresh_menu( cmd );
@@ -2847,30 +2818,6 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             } else {
                 tvtime_osd_show_message( cmd->osd, _("Chroma kill disabled.") );
             }
-        }
-        break;
-
-    case TVTIME_TOGGLE_LUMA_CORRECTION:
-        cmd->apply_luma = !cmd->apply_luma;
-        if( cmd->osd ) {
-            reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                                cmd->apply_luma, cmd->apply_invert,
-                                cmd->apply_mirror, cmd->apply_chroma_kill,
-                                cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
-                                cmd->pulldown_alg );
-            commands_refresh_menu( cmd );
-
-            if( cmd->apply_luma ) {
-                tvtime_osd_show_message( cmd->osd, _("Luma correction enabled.") );
-            } else {
-                tvtime_osd_show_message( cmd->osd, _("Luma correction disabled.") );
-            }
-        }
-        if( cmd->apply_luma ) {
-            config_save( cmd->cfg, "ApplyLumaCorrection", "1" );
-        } else {
-            config_save( cmd->cfg, "ApplyLumaCorrection", "0" );
         }
         break;
 
@@ -2886,27 +2833,6 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             tvtime_osd_show_message( cmd->osd, message );
             reset_overscan_menu( commands_get_menu( cmd, "overscan" ), cmd->overscan );
             commands_refresh_menu( cmd );
-        }
-        break;
-
-    case TVTIME_LUMA_UP:
-    case TVTIME_LUMA_DOWN:
-        if( cmd->apply_luma ) {
-            char message[ 200 ];
-            cmd->luma_power = cmd->luma_power + ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 );
-
-            cmd->update_luma = 1;
-
-            if( cmd->luma_power > 10.0 ) cmd->luma_power = 10.0;
-            if( cmd->luma_power <  0.0 ) cmd->luma_power = 0.0;
-
-            snprintf( message, sizeof( message ), "%.1f", cmd->luma_power );
-            config_save( cmd->cfg, "LumaCorrection", message );
-            if( cmd->osd ) {
-                snprintf( message, sizeof( message ),
-                          _("Luma correction value: %.1f"), cmd->luma_power );
-                tvtime_osd_show_message( cmd->osd, message );
-            }
         }
         break;
 
@@ -3454,7 +3380,6 @@ void commands_next_frame( commands_t *cmd )
     cmd->togglepulldowndetection = 0;
     cmd->togglematte = 0;
     cmd->togglequiet = 0;
-    cmd->update_luma = 0;
     cmd->resizewindow = 0;
     cmd->setdeinterlacer = 0;
     cmd->setfreqtable = 0;
@@ -3555,21 +3480,6 @@ int commands_apply_mirror( commands_t *cmd )
 int commands_apply_chroma_kill( commands_t *cmd )
 {
     return cmd->apply_chroma_kill;
-}
-
-int commands_apply_luma_correction( commands_t *cmd )
-{
-    return cmd->apply_luma;
-}
-
-int commands_update_luma_power( commands_t *cmd )
-{
-    return cmd->update_luma;
-}
-
-double commands_get_luma_power( commands_t *cmd )
-{
-    return cmd->luma_power;
 }
 
 double commands_get_overscan( commands_t *cmd )
@@ -3684,9 +3594,8 @@ void commands_set_pulldown_alg( commands_t *cmd, int pulldown_alg )
 {
     cmd->pulldown_alg = pulldown_alg;
     reset_filters_menu( commands_get_menu( cmd, "filters" ),
-                        cmd->vidin && videoinput_is_bttv( cmd->vidin ),
-                        cmd->apply_luma, cmd->apply_invert,
-                        cmd->apply_mirror, cmd->apply_chroma_kill,
+                        cmd->apply_invert, cmd->apply_mirror,
+                        cmd->apply_chroma_kill,
                         cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                         cmd->pulldown_alg );
     commands_refresh_menu( cmd );

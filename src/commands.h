@@ -45,7 +45,6 @@ void commands_refresh_menu( commands_t *cmd );
 int commands_menu_active( commands_t *cmd );
 void commands_set_station_mgr( commands_t *cmd, station_mgr_t *mgr );
 
-double commands_get_luma_power( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
 int commands_get_framerate( commands_t *cmd );
@@ -77,9 +76,7 @@ const char *commands_screenshot_filename( commands_t *cmd );
 int commands_show_deinterlacer_info( commands_t *cmd );
 int commands_scan_channels( commands_t *cmd );
 int commands_resize_window( commands_t *cmd );
-int commands_update_luma_power( commands_t *cmd );
 int commands_restart_tvtime( commands_t *cmd );
-int commands_apply_luma_correction( commands_t *cmd );
 int commands_apply_colour_invert( commands_t *cmd );
 int commands_apply_mirror( commands_t *cmd );
 int commands_apply_chroma_kill( commands_t *cmd );

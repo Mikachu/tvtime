@@ -1465,10 +1465,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                          "deintdescription" ), curmethodid );
 
     /* Setup the video correction tables. */
-    videofilter_set_bt8x8_correction( tvtime->inputfilter,
-                                   commands_apply_luma_correction( commands ) );
-    videofilter_set_luma_power( tvtime->inputfilter,
-                                commands_get_luma_power( commands ) );
     videofilter_set_colour_invert( tvtime->inputfilter,
                                    commands_apply_colour_invert( commands ) );
     videofilter_set_mirror( tvtime->inputfilter,
@@ -1957,10 +1953,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             config_save( ct, "Frequencies",
                          commands_get_new_freq_table( commands ) );
         }
-        if( commands_update_luma_power( commands ) ) {
-            videofilter_set_luma_power( tvtime->inputfilter,
-                                        commands_get_luma_power( commands ) );
-        }
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
         }
@@ -1989,11 +1981,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         commands_next_frame( commands );
 
         /* Notice this because it's cheap. */
-        videofilter_set_bt8x8_correction
-            ( tvtime->inputfilter,
-              commands_apply_luma_correction( commands ) );
-        videofilter_set_colour_invert
-            ( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
+        videofilter_set_colour_invert( tvtime->inputfilter,
+                                commands_apply_colour_invert( commands ) );
         videofilter_set_mirror( tvtime->inputfilter,
                                 commands_apply_mirror( commands ) );
         videofilter_set_chroma_kill( tvtime->inputfilter,

@@ -152,8 +152,6 @@ const char *config_get_geometry( config_t *ct );
 int config_get_inputwidth( config_t *ct );
 int config_get_aspect( config_t *ct );
 int config_get_inputnum( config_t *ct );
-int config_get_apply_luma_correction( config_t *ct );
-double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );

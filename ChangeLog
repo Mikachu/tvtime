@@ -1,5 +1,7 @@
 
 0.9.14 -
+  * vektor: Removed the "bt8x8 luma correction" feature.  It's confusing,
+      slow, and not really usful in practice.
   * vektor: Fixed colour problems for DVB driver users.
   * vektor: Change the default process priority to -10 instead of -19,
       since using -19 seems just a little excessive.

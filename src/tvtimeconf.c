@@ -61,8 +61,6 @@ struct config_s
     int priority;
     int ntsc_mode;
     int send_fields;
-    int apply_luma_correction;
-    double luma_correction;
     int fspos;
     int picsaverestore;
     int brightness;
@@ -283,17 +281,6 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "DebugMode" ) ) {
             ct->debug = atoi( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "ApplyLumaCorrection" ) ) {
-            ct->apply_luma_correction = atoi( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "LumaCorrection" ) ) {
-            ct->luma_correction = atof( curval );
-            if( !isnormal( ct->luma_correction ) ) {
-                ct->luma_correction = 1.0;
-            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "V4LDevice" ) ) {
@@ -708,8 +695,6 @@ config_t *config_new( void )
     ct->priority = -10;
     ct->ntsc_mode = 0;
     ct->send_fields = 0;
-    ct->apply_luma_correction = 0;
-    ct->luma_correction = 1.0;
     ct->fspos = 0;
     ct->picsaverestore = 1;
     ct->brightness = -1;
@@ -1461,19 +1446,9 @@ int config_get_inputnum( config_t *ct )
     return ct->inputnum;
 }
 
-int config_get_apply_luma_correction( config_t *ct )
-{
-    return ct->apply_luma_correction;
-}
-
 const char *config_get_deinterlace_method( config_t *ct )
 {
     return ct->deinterlace_method;
-}
-
-double config_get_luma_correction( config_t *ct )
-{
-    return ct->luma_correction;
 }
 
 const char *config_get_v4l_device( config_t *ct )

@@ -238,22 +238,6 @@
   <option name="MirrorInput" value="0"/>
 
   <!--
-    This indicates whether the luma correction option should be enabled by
-    default when starting the application.  Luma correction can be turned
-    on or off within the application using the "c" key.
-  -->
-  <option name="ApplyLumaCorrection" value="0"/>
-
-  <!--
-    This indicates the power for correction.  A value of 1.0 does
-    nothing except apply Bt8x8 correction, if you have a Bt8x8-based
-    capture card.  Values less than one make the output darker, and
-    values greater than one make the output brighter.  The valid range
-    is 0.1 to 10.0 in increments of 0.1.
-  -->
-  <option name="LumaCorrection" value="1.0"/>
-
-  <!--
     When this option is turned on, screenshots will not announce
     themselves on the OSD.  This is useful if you intend to take a
     lot of screenshots, and don't want the text to interrupt your TV
