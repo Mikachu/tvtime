@@ -653,10 +653,10 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
 
             if( bottom_field ) {
                 data.t1 = curframe + instride;
-                data.b1 = curframe + (instride*3);
+                data.b1 = (i>1) ? (curframe + (instride*3)) : (curframe + instride);
             } else {
                 data.t1 = lastframe + instride;
-                data.b1 = lastframe + (instride*3);
+                data.b1 = (i>1) ? (lastframe + (instride*3)) : (lastframe + instride);
             }
 
             data.tt2 = lastframe;
