@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include "osd.h"
@@ -53,6 +54,8 @@ struct tvtime_osd_s
     char channel_number_text[ 20 ];
     char tv_norm_text[ 20 ];
     char input_text[ 128 ];
+    char deinterlace_text[ 128 ];
+    char timeformat[ 128 ];
 };
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
@@ -74,6 +77,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
     memset( osd->input_text, 0, sizeof( osd->input_text ) );
+    memset( osd->deinterlace_text, 0, sizeof( osd->deinterlace_text ) );
+    memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
 
     fontfile = DATADIR "/FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
@@ -153,12 +158,26 @@ void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
     snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
 }
 
-void tvtime_osd_show_info( tvtime_osd_t *osd, const char *date )
+void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )
 {
+    snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ) - 1, method );
+}
+
+void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
+{
+    snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, format );
+}
+
+void tvtime_osd_show_info( tvtime_osd_t *osd )
+{
+    char timestamp[ 50 ];
+    time_t tm = time( 0 );
     char text[ 200 ];
+
+    strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
     osd_string_show_text( osd->channel_number, osd->channel_number_text, 80 );
-    osd_string_show_text( osd->channel_info, date, 80 );
-    sprintf( text, "[%s] %s", osd->tv_norm_text, osd->input_text );
+    osd_string_show_text( osd->channel_info, timestamp, 80 );
+    sprintf( text, "[%s] %s - %s", osd->tv_norm_text, osd->input_text, osd->deinterlace_text );
     osd_string_show_text( osd->data_bar, text, 80 );
     osd_string_set_timeout( osd->volume_bar, 0 );
 }

@@ -264,7 +264,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            int instride,
                                            int outstride )
 {
-    unsigned char tempscanline[ 768*2 ];
+    /* unsigned char tempscanline[ 768*2 ]; */
     int scanline = 0;
     int i;
 
@@ -449,9 +449,12 @@ int main( int argc, char **argv )
     osd = tvtime_osd_new( width, height, 4.0 / 3.0 );
     if( !osd ) {
         fprintf( stderr, "Can't initialize OSD object.\n" );
+    } else {
+        tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
+        tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
+        tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
+        tvtime_osd_set_deinterlace_method( osd, curmethod->name );
     }
-    tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
-    tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
 
     /**
      * Set to the current channel, or the first channel in our
@@ -484,17 +487,11 @@ int main( int argc, char **argv )
 
         if( osd ) {
             tvtime_osd_set_channel_number( osd, chanlist[ chanindex ].name );
+            tvtime_osd_show_info( osd );
         }
     } else if( osd ) {
         tvtime_osd_set_channel_number( osd, "" );
-    }
-
-    if( osd ) {
-        char timestamp[ 50 ];
-        time_t tm = time( 0 );
-        strftime( timestamp, 50, config_get_timeformat( ct ), 
-                  localtime( &tm ) );
-        tvtime_osd_show_info( osd, timestamp );
+        tvtime_osd_show_info( osd );
     }
 
     /* Setup the video correction tables. */
@@ -625,7 +622,8 @@ int main( int argc, char **argv )
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
-                tvtime_osd_show_message( osd, curmethod->name );
+                tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+                tvtime_osd_show_info( osd );
             }
         }
         if( osd ) {
@@ -712,7 +710,6 @@ int main( int argc, char **argv )
         }
 
 
-
         if( output->is_interlaced() ) {
             /* Wait until we can draw the odd field. */
             output->wait_for_sync( 1 );
@@ -723,21 +720,6 @@ int main( int argc, char **argv )
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
-
-            /* We're done with the input now. */
-            if( fieldsavailable == 3 ) {
-                videoinput_free_frame( vidin, lastframeid );
-                lastframeid = curframeid;
-                lastframe = curframe;
-            } else if( fieldsavailable == 5 ) {
-                videoinput_free_frame( vidin, secondlastframeid );
-                secondlastframeid = lastframeid;
-                lastframeid = curframeid;
-                secondlastframe = lastframe;
-                lastframe = curframe;
-            } else {
-                videoinput_free_frame( vidin, curframeid );
-            }
         } else {
             /* Build the output from the bottom field. */
             output->lock_output_buffer();
@@ -763,24 +745,25 @@ int main( int argc, char **argv )
             }
             output->unlock_output_buffer();
             performance_checkpoint_constructed_bot_field( perf );
+        }
+
+        /* We're done with the input now. */
+        if( fieldsavailable == 3 ) {
+            videoinput_free_frame( vidin, lastframeid );
+            lastframeid = curframeid;
+            lastframe = curframe;
+        } else if( fieldsavailable == 5 ) {
+            videoinput_free_frame( vidin, secondlastframeid );
+            secondlastframeid = lastframeid;
+            lastframeid = curframeid;
+            secondlastframe = lastframe;
+            lastframe = curframe;
+        } else {
+            videoinput_free_frame( vidin, curframeid );
+        }
 
 
-            /* We're done with the input now. */
-            if( fieldsavailable == 3 ) {
-                videoinput_free_frame( vidin, lastframeid );
-                lastframeid = curframeid;
-                lastframe = curframe;
-            } else if( fieldsavailable == 5 ) {
-                videoinput_free_frame( vidin, secondlastframeid );
-                secondlastframeid = lastframeid;
-                lastframeid = curframeid;
-                secondlastframe = lastframe;
-                lastframe = curframe;
-            } else {
-                videoinput_free_frame( vidin, curframeid );
-            }
-
-
+        if( !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer ) {
                 while( performance_get_usecs_since_last_field( perf )
@@ -791,8 +774,6 @@ int main( int argc, char **argv )
                 }
             }
             performance_checkpoint_delayed_blit_bot_field( perf );
-
-
 
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );

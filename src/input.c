@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
@@ -251,14 +250,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                         "channel %s\n", 
                                         chanlist[ chanindex ].name );
                  if( in->osd ) {
-                     char timestamp[50];
-                     time_t tm = time(NULL);
-
-                     strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
-                               localtime(&tm) );
-
                      tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
-                     tvtime_osd_show_info( in->osd, timestamp );
+                     tvtime_osd_show_info( in->osd );
                  }
              }
              break;
@@ -306,16 +299,11 @@ void input_callback( input_t *in, InputEvent command, int arg )
                  }
                  if( in->osd ) {
                      tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+                     tvtime_osd_show_info( in->osd );
                  }
              } else if( in->osd ) {
                  tvtime_osd_set_channel_number( in->osd, "" );
-             }
-             if( in->osd ) {
-                 char timestamp[50];
-                 time_t tm = time(NULL);
-                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
-                           localtime(&tm) );
-                 tvtime_osd_show_info( in->osd, timestamp );
+                 tvtime_osd_show_info( in->osd );
              }
              break;
 
@@ -384,13 +372,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                          }
 
                          if( in->osd ) {
-                             char timestamp[50];
-                             time_t tm = time(NULL);
-                             strftime( timestamp, 50, 
-                                       config_get_timeformat( in->cfg ), 
-                                       localtime(&tm) );
                              tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
-                             tvtime_osd_show_info( in->osd, timestamp );
+                             tvtime_osd_show_info( in->osd );
                          }
                          in->frame_counter = 0;
                      } else {
@@ -473,7 +456,7 @@ void input_next_frame( input_t *in )
             strcat( input_text, "_" );
         if( in->osd ) {
             tvtime_osd_set_channel_number( in->osd, input_text );
-            tvtime_osd_show_info( in->osd, "" );
+            tvtime_osd_show_info( in->osd );
         }
     }
 

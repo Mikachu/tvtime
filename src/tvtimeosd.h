@@ -50,10 +50,13 @@ typedef struct tvtime_osd_s tvtime_osd_t;
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 
-void tvtime_osd_show_info( tvtime_osd_t *osd, const char *date );
+void tvtime_osd_show_info( tvtime_osd_t *osd );
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm );
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text );
+void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method );
+
+void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage );
