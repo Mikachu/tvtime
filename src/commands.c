@@ -242,8 +242,8 @@ static void reinit_tuner( commands_t *in )
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
             tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
-            tvtime_osd_set_network_call( in->osd, "" );
-            tvtime_osd_set_network_name( in->osd, "" );
+            tvtime_osd_set_network_call( in->osd, station_get_current_network_call_letters( in->stationmgr ) );
+            tvtime_osd_set_network_name( in->osd, station_get_current_network_name( in->stationmgr ) );
             tvtime_osd_set_show_name( in->osd, "" );
             tvtime_osd_set_show_rating( in->osd, "" );
             tvtime_osd_set_show_start( in->osd, "" );
@@ -975,6 +975,36 @@ void commands_next_frame( commands_t *in )
     if( in->change_channel ) {
         reinit_tuner( in );
         in->change_channel = 0;
+    }
+
+    if( in->vbi ) {
+        if( *(vbidata_get_network_name( in->vbi )) ) {
+            /* If the network name has changed, save it to the config file. */
+            if( strcmp( station_get_current_network_name( in->stationmgr ),
+                        vbidata_get_network_name( in->vbi ) ) ) {
+                station_set_current_network_name( in->stationmgr,
+                                                  vbidata_get_network_name( in->vbi ) );
+                station_writeconfig( in->stationmgr );
+            }
+
+            if( in->osd ) {
+                tvtime_osd_set_network_name( in->osd, station_get_current_network_name( in->stationmgr ) );
+            }
+        }
+
+        if( *(vbidata_get_network_call_letters( in->vbi )) ) {
+            /* If the call letters have changed, save them to the config file. */
+            if( strcmp( station_get_current_network_call_letters( in->stationmgr ),
+                        vbidata_get_network_call_letters( in->vbi ) ) ) {
+                station_set_current_network_call_letters( in->stationmgr,
+                                                          vbidata_get_network_call_letters( in->vbi ) );
+                station_writeconfig( in->stationmgr );
+            }
+
+            if( in->osd ) {
+                tvtime_osd_set_network_call( in->osd, station_get_current_network_call_letters( in->stationmgr ) );
+            }
+        }
     }
 
     in->printdebug = 0;

@@ -252,9 +252,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             fprintf( stderr, "Network name: '%s'\n", packet + 2 );
         }
         snprintf( vbi->network_name, sizeof( vbi->network_name ), "%s", packet + 2 );
-        if( vbi->osd ) {
-            tvtime_osd_set_network_name( vbi->osd, vbi->network_name );
-        }
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
         int movie_rating = packet[ 2 ] & 7;
         int scheme = (packet[ 2 ] & 56) >> 3;
@@ -314,9 +311,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         }
 
         snprintf( vbi->call_letters, sizeof( vbi->call_letters ), "%s", packet + 2 );
-        if( vbi->osd ) {
-            tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
-        }
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
         int month = packet[5];
         int day = packet[4];
