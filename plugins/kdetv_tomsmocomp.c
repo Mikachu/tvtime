@@ -124,13 +124,9 @@ static deinterlace_method_t tomsmocompmethod =
       "" }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void dscaler_tomsmocomp_plugin_init( void )
-#endif
+deinterlace_method_t *dscaler_tomsmocomp_get_method( void )
 {
-    register_deinterlace_method( &tomsmocompmethod );
     tomsmocomp_init();
+    return &tomsmocompmethod;
 }
 

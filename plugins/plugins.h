@@ -26,15 +26,17 @@
  * executable.
  */
 
-void linear_plugin_init( void );
-void scalerbob_plugin_init( void );
-void linearblend_plugin_init( void );
-void vfir_plugin_init( void );
-void dscaler_tomsmocomp_plugin_init( void );
-void dscaler_greedyh_plugin_init( void );
-void greedy_plugin_init( void );
-void weave_plugin_init( void );
-void weavetff_plugin_init( void );
-void weavebff_plugin_init( void );
+#include <deinterlace.h>
+
+deinterlace_method_t *linear_get_method( void );
+deinterlace_method_t *scalerbob_get_method( void );
+deinterlace_method_t *linearblend_get_method( void );
+deinterlace_method_t *vfir_get_method( void );
+deinterlace_method_t *dscaler_tomsmocomp_get_method( void );
+deinterlace_method_t *dscaler_greedyh_get_method( void );
+deinterlace_method_t *greedy_get_method( void );
+deinterlace_method_t *weave_get_method( void );
+deinterlace_method_t *weavetff_get_method( void );
+deinterlace_method_t *weavebff_get_method( void );
 
 #endif /* TVTIME_PLUGINS_H_INCLUDED */

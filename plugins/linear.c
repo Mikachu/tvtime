@@ -66,12 +66,8 @@ static deinterlace_method_t linearmethod =
       "" }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void linear_plugin_init( void )
-#endif
+deinterlace_method_t *linear_get_method( void )
 {
-    register_deinterlace_method( &linearmethod );
+    return &linearmethod;
 }
 

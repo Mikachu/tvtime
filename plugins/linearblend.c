@@ -196,12 +196,8 @@ static deinterlace_method_t linearblendmethod =
       "" }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void linearblend_plugin_init( void )
-#endif
+deinterlace_method_t *linearblend_get_method( void )
 {
-    register_deinterlace_method( &linearblendmethod );
+    return &linearblendmethod;
 }
 

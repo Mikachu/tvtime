@@ -1236,21 +1236,21 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
 
     if( !output->is_interlaced() ) {
-        linear_plugin_init();
-        scalerbob_plugin_init();
+        register_deinterlace_method( linear_get_method() );
+        register_deinterlace_method( scalerbob_get_method() );
 
-        linearblend_plugin_init();
-        vfir_plugin_init();
+        register_deinterlace_method( linearblend_get_method() );
+        register_deinterlace_method( vfir_get_method() );
 
 #ifdef ARCH_X86
-        dscaler_tomsmocomp_plugin_init();
-        dscaler_greedyh_plugin_init();
+        register_deinterlace_method( dscaler_tomsmocomp_get_method() );
+        register_deinterlace_method( dscaler_greedyh_get_method() );
 #endif
-        greedy_plugin_init();
+        register_deinterlace_method( greedy_get_method() );
 
-        weave_plugin_init();
-        weavetff_plugin_init();
-        weavebff_plugin_init();
+        register_deinterlace_method( weave_get_method() );
+        register_deinterlace_method( weavetff_get_method() );
+        register_deinterlace_method( weavebff_get_method() );
     }
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {

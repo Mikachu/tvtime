@@ -171,12 +171,8 @@ static deinterlace_method_t vfirmethod =
       "" }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void vfir_plugin_init( void )
-#endif
+deinterlace_method_t *vfir_get_method( void )
 {
-    register_deinterlace_method( &vfirmethod );
+    return &vfirmethod;
 }
 

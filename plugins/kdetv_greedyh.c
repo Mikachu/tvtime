@@ -125,13 +125,9 @@ static deinterlace_method_t greedymethod =
       "deinterlacer from DScaler." }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void dscaler_greedyh_plugin_init( void )
-#endif
+deinterlace_method_t *dscaler_greedyh_get_method( void )
 {
-    register_deinterlace_method( &greedymethod );
     greedyh_init();
+    return &greedymethod;
 }
 

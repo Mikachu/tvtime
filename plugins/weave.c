@@ -68,12 +68,8 @@ static deinterlace_method_t weavemethod =
       "" }
 };
 
-#ifdef BUILD_TVTIME_PLUGINS
-void deinterlace_plugin_init( void )
-#else
-void weave_plugin_init( void )
-#endif
+deinterlace_method_t *weave_get_method( void )
 {
-    register_deinterlace_method( &weavemethod );
+    return &weavemethod;
 }
 
