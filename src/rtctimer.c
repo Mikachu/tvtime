@@ -62,7 +62,7 @@ rtctimer_t *rtctimer_new( int verbose )
 
     if( fcntl( rtctimer->rtc_fd, F_SETOWN, getpid() ) < 0 ) {
         if( rtctimer->verbose ) {
-            fprintf( stderr, "rtctimer: cannot set ownership of "
+            fprintf( stderr, "rtctimer: Cannot set ownership of "
                              "/dev/rtc: %s\n", strerror( errno ) );
         }
         close( rtctimer->rtc_fd );
