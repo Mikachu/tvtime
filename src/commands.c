@@ -37,6 +37,9 @@
 #define NUM_FAVORITES 9
 #define MAX_USER_MENUS 64
 
+/* Minutes to increment sleeptimer */
+#define SLEEPTIMER_STEP 10
+
 enum menu_type
 {
     MENU_REDIRECT,
@@ -85,6 +88,8 @@ struct commands_s {
     int digit_counter;
     int quit;
     int inputnum;
+    int sleeptimer;
+    time_t sleeptimer_start;
 
     xmltv_t *xmltv;
 
@@ -866,6 +871,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->displayinfo = 0;
     cmd->checkfreq = config_get_check_freq_present( cfg );
+
+    cmd->sleeptimer = 0;
+    cmd->sleeptimer_start = 0;
 
     cmd->quit = 0;
     cmd->showbars = 0;
@@ -1794,6 +1802,7 @@ int commands_in_menu( commands_t *cmd )
 
 void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 {
+    time_t now;
     int volume;
     int key;
 
@@ -1859,6 +1868,34 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         tvtime_cmd = config_key_to_command( cmd->cfg, key );
         if( tvtime_cmd != TVTIME_KEY_EVENT ) {
             commands_handle( cmd, tvtime_cmd, arg );
+        }
+        break;
+
+    case TVTIME_SLEEP:
+        time( &now );
+        /**
+         * increment sleeptimer by SLEEPTIMER_STEP if user hits
+         * button within 5 seconds else turn it off
+         */
+        if( cmd->sleeptimer_start && (now > (cmd->sleeptimer_start + 5)) ) {
+            cmd->sleeptimer = 0;
+            cmd->sleeptimer_start = 0;
+        } else {
+            cmd->sleeptimer++;
+            cmd->sleeptimer_start = now;
+        }
+
+        if( cmd->osd ) {
+            char message[ 25 ];
+
+            if( cmd->sleeptimer ) {
+                sprintf( message, "Sleep in %d Min.",
+                         (int) (cmd->sleeptimer * SLEEPTIMER_STEP) );
+            } else {
+                sprintf( message, "Sleeptimer: off" );
+            }
+
+            tvtime_osd_show_message( cmd->osd, message );
         }
         break;
 
@@ -3074,5 +3111,19 @@ const char *commands_get_new_freq_table( commands_t *cmd )
 int commands_check_freq_present( commands_t *cmd )
 {
     return cmd->checkfreq;
+}
+
+int commands_sleeptimer( commands_t *cmd )
+{
+    return cmd->sleeptimer;
+}
+
+int commands_sleeptimer_do_shutdown( commands_t *cmd )
+{
+    time_t now;
+
+    time( &now );
+
+    return (now >= ((cmd->sleeptimer * SLEEPTIMER_STEP * 60) + cmd->sleeptimer_start));
 }
 

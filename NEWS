@@ -7,6 +7,8 @@ For news and updates on tvtime, please visit our website at:
 News for 0.9.9.1
 
   *  Added program listings using XMLTV.  Use with --xmltv=filename.
+  *  Added commands for chroma kill, sleep timer, and enabling or
+     disabling signal detection.
   *  Added a DirectFB output layer by Ville Syrjala.
 
 News for 0.9.9

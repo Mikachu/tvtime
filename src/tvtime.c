@@ -1753,6 +1753,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             restarttvtime = 1;
             break;
         }
+        /* Check if it's time to sleep and dream well */
+        if( commands_sleeptimer( commands ) && commands_sleeptimer_do_shutdown( commands ) ) break;
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );

@@ -1,5 +1,6 @@
 
 0.9.9.1
+  * vektor: Added a sleep command and sleep timer.
   * vektor: Security update for tvtime dropping root privs.
   * vektor: Only show the alwaysontop menu entry and fullscreen menu
       entry if it is supported by the window manager and output layer.
