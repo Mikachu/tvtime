@@ -16,7 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -143,7 +143,7 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_Vector *glyphp
 
             if( use_kerning && previous && glyphindex[ i ] ) {
                 FT_Vector  delta;
-                FT_Get_Kerning( face, previous, glyphindex[ i ], FT_KERNING_DEFAULT, &delta );
+                FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_default, &delta );
                 pen_x += delta.x >> 6;
             }
 
