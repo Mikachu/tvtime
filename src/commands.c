@@ -228,7 +228,8 @@ static void reinit_tuner( commands_t *in )
         //}
 
         if( config_get_verbose( in->cfg ) ) {
-            fprintf( stderr, "tvtime: Changing to channel %s.\n", station_get_current_channel_name( in->stationmgr ) );
+            fprintf( stderr, "tvtime: Changing to channel %s.\n",
+                     station_get_current_channel_name( in->stationmgr ) );
         }
 
         if( in->osd ) {
