@@ -1,4 +1,7 @@
 
-Fri Oct 25 09:17:02 ADT 2002 - vektor
-  Autoconfed.
+Thu Oct 31 14:27:05 AST 2002
+  * (vektor) Removed the force-DScaler-defaults on startup for V4L settings.
+
+Fri Oct 25 09:17:02 ADT 2002
+  * (vektor) Autoconfed
 

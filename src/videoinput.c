@@ -391,43 +391,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
 
 
-    /* This code should all be cleaned up.... */
-    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCGPICT" );
-        return 0;
-    }
-
-    if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Current brightness %d, hue %d, "
-                         "colour %d, contrast %d.\n",
-                 grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-                 grab_pict.contrast );
-    }
-
-    if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
-        grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
-        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
-        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
-        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 65535.0);
-    } else {
-        grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
-        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
-        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
-        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
-    }
-    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCSPICT" );
-        return 0;
-    }
-
-    if( vidin->verbose ) {
-       fprintf( stderr, "videoinput: Set to brightness %d, hue %d, "
-                        "colour %d, contrast %d.\n",
-                grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-                grab_pict.contrast );
-    }
-
-
     /* Try to set up mmap-based capture. */
     if( ioctl( vidin->grab_fd, VIDIOCGMBUF, &(vidin->gb_buffers) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get capture buffer properties.  No mmap support?\n"
@@ -474,6 +437,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->have_mmap = 0;
 
     /* Set the format using the SPICT ioctl. */
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
+                 "process the output: %s.\n", strerror( errno ) );
+        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
+                 "indicating your capture card, driver, and the error message above.\n" );
+        close( vidin->grab_fd );
+        free( vidin );
+        return 0;
+    }
     grab_pict.depth = 16;
     grab_pict.palette = VIDEO_PALETTE_YUV422;
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
@@ -521,19 +493,18 @@ void videoinput_set_hue( videoinput_t *vidin, int newhue )
 
 void videoinput_set_hue_relative( videoinput_t *vidin, int offset )
 {
-    struct video_picture grab_pict;
     int newhue;
 
-    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &vidin->grab_pict ) < 0 ) {
         return;
     }
 
-    newhue = (int) ((((double) grab_pict.hue / 65535.0) * 100.0) + 0.5);
+    newhue = (int) ((((double) vidin->grab_pict.hue / 65535.0) * 100.0) + 0.5);
     newhue += offset;
     if( newhue > 100 ) newhue = 100;
     if( newhue <   0 ) newhue = 0;
-    grab_pict.hue = (int) (((((double) newhue) / 100.0) * 65535.0) + 0.5);
-    ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
+    vidin->grab_pict.hue = (int) (((((double) newhue) / 100.0) * 65535.0) + 0.5);
+    ioctl( vidin->grab_fd, VIDIOCSPICT, &vidin->grab_pict );
 }
 
 int videoinput_get_brightness( videoinput_t *vidin )
@@ -755,6 +726,46 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
 int videoinput_is_bttv( videoinput_t *vidin )
 {
     return vidin->isbttv;
+}
+
+void videoinput_reset_default_settings( videoinput_t *vidin )
+{
+/*
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        perror( "ioctl VIDIOCGPICT" );
+        return 0;
+    }
+
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: Current brightness %d, hue %d, "
+                         "colour %d, contrast %d.\n",
+                 grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+                 grab_pict.contrast );
+    }
+
+    if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
+        grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
+        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
+        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 65535.0);
+    } else {
+        grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
+        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
+        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
+    }
+    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
+        perror( "ioctl VIDIOCSPICT" );
+        return 0;
+    }
+
+    if( vidin->verbose ) {
+       fprintf( stderr, "videoinput: Set to brightness %d, hue %d, "
+                        "colour %d, contrast %d.\n",
+                grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+                grab_pict.contrast );
+    }
+*/
 }
 
 void videoinput_delete( videoinput_t *vidin )

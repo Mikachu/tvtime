@@ -112,6 +112,8 @@ void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
 int videoinput_get_colour( videoinput_t *vidin );
 void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
 
+void videoinput_reset_default_settings( videoinput_t *vidin );
+
 /**
  * Sets the frequency to tune in to. (ie. the station to watch)
  * Since frequencies.c specifies all freqs in KHz, we take that as input.
