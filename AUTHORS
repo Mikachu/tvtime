@@ -24,6 +24,11 @@ Authors and contributors
   Alexander S. Belov <asbel@sice.ru>
     - config file work, check for signal present config parameter
 
+  Bart Dorsey <echo@thebucket.org>
+  Nicolas Boos <nicolaxx@free.fr>
+  Simon Law <sfllaw@engmail.uwaterloo.ca>
+    - Work on the debian packages
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
