@@ -153,10 +153,10 @@
         <tt>ksnapshot</tt>, <tt>gimp</tt> or <tt>xwd</tt> only see the
         colourkeyed window, and not output of tvtime.</p>
 
-        <p>We believe it is a design flaw or driver limitation on the X or
-        video card hardware that neither can provide the image to screenshot
-        applications.  For this reason, the only known method of taking
-        screenshots of tvtime along with the desktop is to use the
+        <p>We believe it is a design flaw or driver limitation of the X 
+        server or video card hardware that neither can provide the image
+        to screenshot applications.  For this reason, the only known method
+        of taking screenshots of tvtime along with the desktop is to use the
         <b>screenshot</b> feature inside tvtime, and cut-and-paste the
         output into a full desktop screen capture.</p>
 
@@ -191,15 +191,12 @@
         information. We cannot know how to supply it with interlaced content
         to ensure that fields are shown in the right order.</p>
 
-        <p>There are two possible solutions.  I have been told that with the
-        NVIDIA TV output drivers, when using XVIDEO, if you supply them with
-        <b>top-field-first</b> frames, they will display the fields correctly.
-        To experiment, try tvtime using the <b>Progressive: Top Field First</b>
-        deinterlacer.  This may give good results.  The second option would be
-        using a card with a TV output driver that gives field information.
-        An example is the Matrox G400/G450/G550 driver in <b>DirectFB</b>.
-        We have an output mode in tvtime specifically for this driver, but
-        it is experimental and currently not being further developed.</p>
+        <p>That said, I have been told that when using the NVIDIA TV output
+        drivers, supplying them with <b>top-field-first</b> frames will cause
+        it to display the fields correctly.  To experiment, try tvtime
+        using the <b>Progressive: Top Field First</b> deinterlacer.
+        Please <a href="mailto:vektor@dumbterm.net">let me know</a> if this
+        gives good results.</p>
 
         <h3><a name="bsd">7. Does tvtime support FreeBSD or NetBSD?</a></h3>
 
@@ -213,10 +210,9 @@
         <a href="http://mplayerhq.hu">mplayer</a> for one example of some code
         that uses this driver.</p>
 
-        <p>The only other Linux-specific features that we use would be the
+        <p>The only other Linux-specific feature that we use would be the
         /dev/rtc code to do high performance timing (I assume there is a BSD
-        equivalent of this), and potentially the wine loader for the DScaler
-        DLLs may need updating.</p>
+        equivalent of this).</p>
 
         <p>If you make any progress on any of these, please let us know.
         Thanks.</p>
