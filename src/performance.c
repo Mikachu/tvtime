@@ -23,7 +23,7 @@
 #include "performance.h"
 
 #define DROP_HISTORY_SIZE        10
-#define NUM_TO_AVERAGE          100 
+#define NUM_TO_AVERAGE           30
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -214,5 +214,34 @@ double performance_get_percentage_dropped( performance_t *perf )
     }
 
     return 1.0 - ( ( (double) DROP_HISTORY_SIZE ) / ( (double) cur ) );
+}
+
+double get_estimated_video_card_speed( performance_t *perf, int framesize )
+{
+    double nummeasured = NUM_TO_AVERAGE;
+    double avgblittime;
+
+    if( nummeasured > perf->total_blits ) {
+        nummeasured = perf->total_blits;
+    }
+    avgblittime = perf->total_blitting_ms / nummeasured;
+    return (( ((double) framesize) / avgblittime ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ));
+}
+
+double get_estimated_rendering_time( performance_t *perf )
+{
+    double constructed_top = ((double) timediff( &perf->constructed_top, &perf->show_bot )) / 1000.0;
+    double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
+    return (constructed_top + constructed_bot);
+}
+
+double get_time_top_to_bot( performance_t *perf )
+{
+    return (double) perf->time_top_to_bot / 1000.0;
+}
+
+double get_time_bot_to_top( performance_t *perf )
+{
+    return (double) perf->time_bot_to_top / 1000.0;
 }
 

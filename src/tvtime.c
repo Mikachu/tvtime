@@ -772,7 +772,6 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     char text[ 200 ];
 
     tvtime_osd_list_set_lines( osd, 4 );
-
     tvtime_osd_list_set_text( osd, 0, "Frame drop setting" );
 
     sprintf( text, "Full rate: %.2ffps", maxrate );
@@ -785,6 +784,29 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     tvtime_osd_list_set_text( osd, 3, text );
 
     tvtime_osd_list_set_hilight( osd, mode + 1 );
+    tvtime_osd_show_list( osd, 1 );
+}
+
+void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf, int framesize )
+{
+    char text[ 200 ];
+
+    tvtime_osd_list_set_lines( osd, 4 );
+    tvtime_osd_list_set_text( osd, 0, "Performance estimates" );
+
+    sprintf( text, "Video upload speed: %.2fMB/sec",
+             get_estimated_video_card_speed( perf, framesize ) );
+    tvtime_osd_list_set_text( osd, 1, text );
+
+    sprintf( text, "Rendering time: %5.2fms",
+             get_estimated_rendering_time( perf ) );
+    tvtime_osd_list_set_text( osd, 2, text );
+
+    sprintf( text, "Field time (%5.2f/%5.2f)",
+             get_time_top_to_bot( perf ), get_time_bot_to_top( perf ) );
+    tvtime_osd_list_set_text( osd, 3, text );
+
+    tvtime_osd_list_set_hilight( osd, -1 );
     tvtime_osd_show_list( osd, 1 );
 }
 
@@ -1655,14 +1677,15 @@ int main( int argc, char **argv )
 
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
+            int framesize = width * height * 2;
             fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", 
                      (curmethod) ? curmethod->name : "interlaced passthrough", 
                      width, height );
-            if( curmethod ) {
-                performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
-            } else {
-                performance_print_last_frame_stats( perf, width * height * 2 );
+            if( curmethod && curmethod->doscalerbob ) {
+                framesize = width * height;
             }
+            performance_print_last_frame_stats( perf, framesize );
+            osd_list_statistics( osd, perf, framesize );
         }
         if( config_get_debug( ct ) ) {
             if( curmethod )  {
