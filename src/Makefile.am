@@ -74,7 +74,7 @@ wine/libwine.la:
 
 # Hook into the installation and uninstallation to create the required
 # FIFO directories.
-.PHONY: install-data-local
+.PHONY: install-exec-hook uninstall-hook
 install-exec-hook:
 	$(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir)
 
