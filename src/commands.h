@@ -99,6 +99,7 @@ const char *commands_get_new_freq_table( commands_t *cmd );
 int commands_sleeptimer( commands_t *cmd );
 int commands_sleeptimer_do_shutdown( commands_t *cmd );
 const char *commands_get_matte_mode( commands_t *cmd );
+const char *commands_get_fs_pos( commands_t *cmd );
 
 #ifdef __cplusplus
 };

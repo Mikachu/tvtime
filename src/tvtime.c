@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <termio.h>
+#include <ctype.h>
 #if defined (__SVR4) && defined (__sun)
 # include <sys/int_types.h>
 #else
@@ -1859,6 +1860,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                output->is_overscan_supported() );
             build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
             commands_refresh_menu( commands );
+        }
+        if( commands_get_fs_pos( commands ) ) {
+            const char *fspos = commands_get_fs_pos( commands );
+            int newpos;
+            if( tolower( fspos[ 0 ] ) == 't' ) {
+                newpos = 1;
+            } else if( tolower( fspos[ 0 ] ) == 'b' ) {
+                newpos = 2;
+            } else {
+                newpos = 0;
+            }
+            output->set_fullscreen_position( newpos );
+            config_save( ct, "FullscreenPosition", commands_get_fs_pos( commands ) );
         }
         if( commands_toggle_matte( commands ) || commands_get_matte_mode( commands ) ) {
             double matte = 4.0 / 3.0;

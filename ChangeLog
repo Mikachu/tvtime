@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Added a command to set the fullscreen position.
+  * vektor: Fixed gettext to initialize properly.
 
 0.9.10 - Fri Sep 12 18:18:23 ADT 2003
   * vektor: Got rid of the UseVBI config file parameter in favour of

@@ -143,6 +143,7 @@ struct commands_s {
     int usexds;
     int pulldown_alg;
     char newmatte[ 16 ];
+    char newpos[ 16 ];
 
     int delay;
 
@@ -1011,6 +1012,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->usexds = config_get_usexds( cfg );
     cmd->pulldown_alg = 0;
     memset( cmd->newmatte, 0, sizeof( cmd->newmatte ) );
+    memset( cmd->newpos, 0, sizeof( cmd->newpos ) );
 
     /* Number of frames to wait for next channel digit. */
     cmd->delay = 1000000 / fieldtime;
@@ -2101,6 +2103,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
+    case TVTIME_SET_FULLSCREEN_POSITION:
+        if( arg ) {
+            snprintf( cmd->newpos, sizeof( cmd->newpos ), "%s", arg );
+        }
+        break;
+
     case TVTIME_SET_MATTE:
         if( arg ) {
             snprintf( cmd->newmatte, sizeof( cmd->newmatte ), "%s", arg );
@@ -3000,6 +3008,7 @@ void commands_next_frame( commands_t *cmd )
     cmd->setdeinterlacer = 0;
     cmd->setfreqtable = 0;
     memset( cmd->newmatte, 0, sizeof( cmd->newmatte ) );
+    memset( cmd->newpos, 0, sizeof( cmd->newpos ) );
 }
 
 int commands_quit( commands_t *cmd )
@@ -3241,6 +3250,15 @@ const char *commands_get_matte_mode( commands_t *cmd )
 {
     if( *cmd->newmatte ) {
         return cmd->newmatte;
+    } else {
+        return 0;
+    }
+}
+
+const char *commands_get_fs_pos( commands_t *cmd )
+{
+    if( *cmd->newpos ) {
+        return cmd->newpos;
     } else {
         return 0;
     }
