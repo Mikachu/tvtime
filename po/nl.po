@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime cvs\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-05 20:00+0200\n"
-"PO-Revision-Date: 2003-10-05 03:49+0200\n"
+"POT-Creation-Date: 2003-10-07 00:22+0200\n"
+"PO-Revision-Date: 2003-10-05 23:25+0200\n"
 "Last-Translator: Vincent van Adrighem <adrighem@gnome.org>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -149,9 +149,8 @@ msgid "Matte setting (Anamorphic input)"
 msgstr "'Matte' instellingen (Anamorphische invoer)"
 
 #: src/tvtime.c:1109
-#, fuzzy
 msgid "Matte setting (4:3 input)"
-msgstr "'Matte' instellingen (Anamorphische invoer)"
+msgstr "'Matte' instellingen (4:3 invoer)"
 
 #: src/tvtime.c:1186
 msgid "tvtime: Can't set configuration options, exiting.\n"
@@ -393,12 +392,12 @@ msgstr "tvtime: Herstarten.\n"
 msgid "tvtime: Thank you for using tvtime.\n"
 msgstr "tvtime: Bedankt voor het gebruiken van tvtime.\n"
 
-#: src/tvtime.c:2711
+#: src/tvtime.c:2711 src/tvtime.c:2712
 #, c-format
 msgid "tvtime: Running %s.\n"
 msgstr "tvtime: Uitvoeren van %s.\n"
 
-#: src/tvtime.c:2714
+#: src/tvtime.c:2715
 msgid ""
 "\n"
 "*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
@@ -412,7 +411,7 @@ msgstr ""
 "*** foutrapporten in over officiële versies!!\n"
 "\n"
 
-#: src/tvtime.c:2723
+#: src/tvtime.c:2724
 msgid ""
 "tvtime: Can't get realtime priority for better performance, need root "
 "access.\n"
@@ -420,7 +419,7 @@ msgstr ""
 "tvtime: Kan geen realtime prioriteit krijgen. Dat kan alleen met root-"
 "toegang.\n"
 
-#: src/tvtime.c:2730
+#: src/tvtime.c:2731
 #, c-format
 msgid ""
 "\n"
@@ -437,8 +436,8 @@ msgstr ""
 "*** Kijk op de hulppagina op %s voor meer informatie\n"
 "\n"
 
-#: src/tvtime.c:2748
-#, fuzzy, c-format
+#: src/tvtime.c:2749
+#, c-format
 msgid ""
 "\n"
 "*** Failed to get 1024hz resolution from /dev/rtc.  This will cause\n"
@@ -450,10 +449,9 @@ msgid ""
 msgstr ""
 "\n"
 "*** Kan geen resolutie van 1024 Hz krijgen van /dev/rtc.\n"
-"*** Beeldweergave zal niet vloeiend zijn. Start tvtime als root, of ,met\n"
-"*** linuxkernel 2.4.19+, kunt u:\n"
+"*** Beeldweergave zal niet vloeiend zijn. Start tvtime als root, of\n"
+"*** verander de maximale resolutie met:\n"
 "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-"*** starten.\n"
 "*** Kijk op de hulppagina op %s voor meer informatie\n"
 "\n"
 
@@ -952,7 +950,7 @@ msgid "Resumed."
 msgstr "Actief."
 
 #: src/tvtimeconf.c:626
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
 "\n"
@@ -1212,7 +1210,7 @@ msgstr ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (standaard: NTSC).\n"
 
-#: src/utils.c:666
+#: src/utils.c:668
 #, c-format
 msgid ""
 "\n"
@@ -1225,6 +1223,14 @@ msgid ""
 "*** aware terminal. See %s for more information.\n"
 "\n"
 msgstr ""
+"\n"
+"*** Omdat uw tekenset niet op UTF-8 staat, maar op %s, zullen de\n"
+"*** berichten waarschijnlijk deels onleesbaar zijn in uw terminal.\n"
+"*** Dit is een bekend probleem en zal waarschijnlijk verholpen worden\n"
+"*** met de eerstvolgende versie van tvtime. U kunt om dit probleem\n"
+"*** heen werken door gebruik te maken van een UTF-8 compatibele\n"
+"*** terminal. Kijk op %s voor meer informatie.\n"
+"\n"
 
 #~ msgid "Windowed mode active."
 #~ msgstr "TV in een venster."
