@@ -333,15 +333,15 @@
 
     Commands known to tvtime:
 
-      AUTO_ADJUST_PICT           MIXER_DOWN               
-      AUTO_ADJUST_WINDOW         MIXER_TOGGLE_MUTE        
-      BRIGHTNESS_DOWN            MIXER_UP                 
-      BRIGHTNESS_UP              OVERSCAN_DOWN            
-      CHANNEL_1                  OVERSCAN_UP              
-      CHANNEL_2                  PICTURE                  
-      CHANNEL_3                  PICTURE_UP               
-      CHANNEL_4                  PICTURE_DOWN             
-      CHANNEL_5                  RESTART                  
+      AUTO_ADJUST_PICT           MIXER_TOGGLE_MUTE        
+      AUTO_ADJUST_WINDOW         MIXER_UP                 
+      BRIGHTNESS_DOWN            OVERSCAN_DOWN            
+      BRIGHTNESS_UP              OVERSCAN_UP              
+      CHANNEL_1                  PICTURE                  
+      CHANNEL_2                  PICTURE_UP               
+      CHANNEL_3                  PICTURE_DOWN             
+      CHANNEL_4                  RESTART                  
+      CHANNEL_5                  RUN_COMMAND              
       CHANNEL_6                  SAVE_PICTURE_GLOBAL      
       CHANNEL_7                  SAVE_PICTURE_CHANNEL     
       CHANNEL_8                  SCREENSHOT               
@@ -377,8 +377,9 @@
       MENU_ENTER                 TOGGLE_PAL_SECAM         
       MENU_EXIT                  TOGGLE_PAUSE             
       MENU_LEFT                  TOGGLE_PULLDOWN_DETECTION
-      MENU_RIGHT                 QUIT                     
-      MENU_UP                                             
+      MENU_RIGHT                 TOGGLE_SIGNAL_DETECTION  
+      MENU_UP                    QUIT                     
+      MIXER_DOWN                                          
 
     Special keys known by tvtime:
 

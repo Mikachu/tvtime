@@ -235,6 +235,12 @@ Asks tvtime to restart itself.  This is used in the menu when we have changed
 a value that we can't yet change at runtime.
 
 .TP
+.B RUN_COMMAND
+Instructs tvtime to spawn a command.  This can be used to start a program using
+a key in tvtime or lirc, such as to spawn mythepg or alevt.  Using
+tvtime-command run_command "xterm" will have tvtime call system( "xterm &" ).
+
+.TP
 .B SAVE_PICTURE_GLOBAL
 Saves the current picture settings as the global defaults.
 

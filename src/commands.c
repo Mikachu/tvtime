@@ -113,6 +113,7 @@ static command_names_t command_table[] = {
     { "PICTURE_DOWN", TVTIME_PICTURE_DOWN },
 
     { "RESTART", TVTIME_RESTART },
+    { "RUN_COMMAND", TVTIME_RUN_COMMAND },
 
     { "SAVE_PICTURE_GLOBAL", TVTIME_SAVE_PICTURE_GLOBAL },
     { "SAVE_PICTURE_CHANNEL", TVTIME_SAVE_PICTURE_CHANNEL },
@@ -252,7 +253,8 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
             command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE ||
             command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_SHARPNESS ||
-            command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE);
+            command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE ||
+            command == TVTIME_RUN_COMMAND);
 }
 
 struct commands_s {
@@ -2256,6 +2258,19 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 tvtime_osd_hold( cmd->osd, 0 );
                 tvtime_osd_clear( cmd->osd );
             }
+        }
+        break;
+
+    case TVTIME_RUN_COMMAND:
+        if( arg ) {
+            char commandline[ 256 ];
+            sprintf( commandline, "%s &", arg );
+            if( cmd->osd ) {
+                char message[ 256 ];
+                sprintf( message, "Running: %s", arg );
+                tvtime_osd_show_message( cmd->osd, message );
+            }
+            system( commandline );
         }
         break;
 
