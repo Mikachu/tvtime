@@ -80,6 +80,38 @@ if test "$FREETYPE_CONFIG" = "no" ; then
 fi
 
 dnl ---------------------------------------------
+dnl libxml2
+dnl ---------------------------------------------
+dnl Test for libxml2
+
+AC_PATH_PROG(LIBXML2_CONFIG,xml2-config,no)
+if test "$LIBXML2_CONFIG" = "no" ; then
+	XML2_FLAG=""
+	XML2_LIBS=""
+else
+	LIBXML_VERSION=`$LIBXML2_CONFIG --version`
+	export MAJOR=0 ; export MINOR=0 ; export MICRO=0
+	MAJOR=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $1}'`
+	MINOR=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $2}'`
+	MICRO=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $3}'`
+dnl	if test $MAJOR -lt 2 ; then
+dnl		AC_MSG_ERROR([Found libxml2 with major version number = $MAJOR < 2])
+dnl	fi
+dnl	if test $MINOR -lt 4 ; then
+dnl		AC_MSG_ERROR([Found libxml2 with minor version number = $MINOR < 4])
+dnl	fi
+dnl	if test $MICRO -lt 4 ; then
+dnl		AC_MSG_ERROR([Found libxml2 with micro version number = $MICRO < 26])
+dnl	fi
+	XML2_LIBS="`$LIBXML2_CONFIG --libs`"
+	XML2_INCL="`$LIBXML2_CONFIG --cflags`"
+	AC_DEFINE(HAVE_LIBXML2,,[LIBXML2 support])	
+fi
+AC_SUBST(XML2_LIBS)
+AC_SUBST(XML2_INCL)
+
+
+dnl ---------------------------------------------
 dnl directfb - currently disabled
 dnl ---------------------------------------------
 dnl Test for directfb

@@ -22,11 +22,11 @@ OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic \
 	-DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS)
+	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS)
+	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
 AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(DYNAMIC_LD_LIBS) -lm
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	parser.c tvtimeconf.c pngoutput.c tvtimeosd.c input.c cpu_accel.c \
@@ -39,7 +39,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
 	wm_state.h wm_state.c console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
-	station.h station.c bands.h configsave.h configsave.c x11tools.c
+	station.h station.c bands.h configsave.h configsave.c x11tools.c \
+	tvtimeconf_xml.c
 
 bin_PROGRAMS = tvtime tvscanner
 
