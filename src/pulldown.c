@@ -544,3 +544,18 @@ int pulldown_source( int action, int bottom_field )
     }
 }
 
+int pulldown_drop( int action, int bottom_field )
+{
+    int ret = 1;
+
+    if( action == PULLDOWN_SEQ_AA && bottom_field )
+        ret = 0;
+    if( action == PULLDOWN_SEQ_BC && !bottom_field )
+        ret = 0;
+    if( action == PULLDOWN_SEQ_CC && !bottom_field )
+        ret = 0;
+    if( action == PULLDOWN_SEQ_DD && bottom_field )
+        ret = 0; 
+
+    return ret;
+}

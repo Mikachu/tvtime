@@ -33,14 +33,13 @@ static methodlist_item_t *methodlist = 0;
 
 void register_deinterlace_method( deinterlace_method_t *method )
 {
-    methodlist_item_t **dest;
+    methodlist_item_t **dest = &methodlist;
+    methodlist_item_t *cur = methodlist;
 
-    if( !methodlist ) {
-        dest = &methodlist;
-    } else {
-        methodlist_item_t *cur = methodlist;
-        while( cur->next ) cur = cur->next;
+    while( cur ) {
+        if( cur->method == method ) return;
         dest = &(cur->next);
+        cur = cur->next;
     }
 
     *dest = malloc( sizeof( methodlist_item_t ) );

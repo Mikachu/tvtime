@@ -52,6 +52,8 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak, pulldown_met
 void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
                                   uint8_t *old, uint8_t *new, int w, int h, int os, int ns );
 
+int pulldown_drop( int action, int bottom_field );
+
 #ifdef __cplusplus
 };
 #endif
