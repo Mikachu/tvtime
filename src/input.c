@@ -56,10 +56,7 @@ struct input_s {
     int lirc_fd;
     struct lirc_config *lirc_conf;
 #endif
-
-    
 };
-
 
 input_t *input_new( config_t *cfg, commands_t *com, console_t *con, 
                     menu_t *menu )
@@ -212,8 +209,8 @@ void input_next_frame( input_t *in )
     }
 }
 
-
 void input_delete( input_t *in )
 {
     if( in ) free( in );
 }
+
