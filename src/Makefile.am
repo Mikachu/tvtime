@@ -1,6 +1,6 @@
 
 tvtimedatadir = $(datadir)/tvtime
-tvtimedata_DATA = menubg.png testlogo.png FreeSansBold.ttf
+dist_tvtimedata_DATA = menubg.png testlogo.png FreeSansBold.ttf
 
 TTF_CFLAGS = `freetype-config --cflags`
 TTF_LIBS = `freetype-config --libs`
