@@ -803,11 +803,41 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
             }
         }
 
-        if( mustchange && ( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) ) {
-            fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
-                     "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
-                     "            indicating your card, driver and this error message: %s.\n",
-                     strerror( errno ) );
+        if( mustchange ) {
+            if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
+                fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
+                         "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
+                         "            indicating your card, driver and this error message: %s.\n",
+                         strerror( errno ) );
+            }
+
+            /**
+             * After setting the tuner, we need to re-set the norm on our channel.
+             * Doing this fixes PAL-M, at least with the bttv driver in 2.4.20.
+             * I am not happy with this, as I haven't seen it documented anywhere.
+             * Please correct me if I'm wrong.
+             */
+            if( vidin->norm == VIDEOINPUT_NTSC ) {
+                vidin->grab_chan.norm = VIDEO_MODE_NTSC;
+            } else if( vidin->norm == VIDEOINPUT_PAL ) {
+                vidin->grab_chan.norm = VIDEO_MODE_PAL;
+            } else if( vidin->norm == VIDEOINPUT_SECAM ) {
+                vidin->grab_chan.norm = VIDEO_MODE_SECAM;
+            } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
+                vidin->grab_chan.norm = 3;
+            } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
+                vidin->grab_chan.norm = 4;
+            } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
+                vidin->grab_chan.norm = 5;
+            } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
+                vidin->grab_chan.norm = 6;
+            }
+
+            if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
+                fprintf( stderr, "videoinput: Card refuses to re-set the channel.\n"
+                         "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                         "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
+            }
         }
     }
 
