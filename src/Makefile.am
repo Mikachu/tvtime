@@ -58,7 +58,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	utils.c diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c \
 	pulldown.h pulldown.c hashtable.h hashtable.c cpuinfo.h cpuinfo.c \
 	videodev.h videodev2.h menu.c menu.h outputfilter.h outputfilter.c \
-	dfbmatroxtv.c xmltv.h xmltv.c gettext.h
+	dfbmatroxtv.c xmltv.h xmltv.c gettext.h tvtimeglyphs.h
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
