@@ -51,17 +51,20 @@ in 16:9 aspect ratio mode.
 
 .TP
 .B \-D, \-\-driver=NAME
-This option selects which output driver will be used.  tvtime currently
-supports two output drivers, one is the standard XVIDEO output,
-the other is an experimental DirectFB output driver specific to the
-Matrox G400/G450/G550 TV output on the 2nd head.  Finally, we offer an
-SDL output layer for helping porting work to other output layers.
-Valid options here are:
+This option selects which output driver will be used.  tvtime
+currently supports five output drivers: the standard XVIDEO
+output, a DirectFB output layer, an experimental DirectFB output
+driver specific to the Matrox G400/G450/G550 TV output on the
+second head, the mga and xmga options interface with mplayer's
+mga_vid driver for the G400/G200-series cards, and finally the
+SDL output driver is included to help with porting to other
+driver layers.  Valid options here are:
 .TS
 nokeep tab (@);
 l l.
 \(bu@Xv
 \(bu@DirectFB
+\(bu@matroxtv
 \(bu@mga
 \(bu@xmga
 \(bu@SDL
