@@ -81,7 +81,7 @@ static void reinit_tuner( commands_t *in )
             /* set to a known frequency */
             //frequencies_choose_first_frequency();
             
-	videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
+        videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
         if( in->vbi ) {
             vbidata_reset( in->vbi );
             vbidata_capture_mode( in->vbi, in->capturemode );
@@ -180,7 +180,7 @@ static void commands_station_change( commands_t *in )
             fprintf( stderr, "tvtime: Changing to channel %s\n", station_get_current_channel_name( in->stationmgr ) );
         }
         if( in->osd ) {
-	    //tvtime_osd_set_station_name( in->osd, i->name );
+            //tvtime_osd_set_station_name( in->osd, i->name );
             tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
@@ -244,7 +244,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_SKIP_CHANNEL:
         // to be removed
         // Billy: um, why??  This should toggle the active bit.
-	break;
+        break;
             
     case TVTIME_ASPECT:
         in->toggleaspect = 1;
@@ -284,10 +284,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) {
             if( config_get_apply_luma_correction( in->cfg ) ) {
                 tvtime_osd_show_message( in->osd, "Luma correction enabled." );
-		configsave("ApplyLumaCorrection", "1", 1);
+                configsave( "ApplyLumaCorrection", "1", 1 );
             } else {
                 tvtime_osd_show_message( in->osd, "Luma correction disabled." );
-		configsave("ApplyLumaCorrection", "0", 1);
+                configsave( "ApplyLumaCorrection", "0", 1 );
             }
         }
         break;
@@ -316,8 +316,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             video_correction_set_luma_power( in->vc,
                                              config_get_luma_correction( in->cfg ) );
 
-	    sprintf( message, "%.1f", config_get_luma_correction( in->cfg ) );
-	    configsave("LumaCorrection", message, 1);
+            sprintf( message, "%.1f", config_get_luma_correction( in->cfg ) );
+            configsave( "LumaCorrection", message, 1 );
             if( in->osd ) {
                 sprintf( message, "Luma correction value: %.1f", 
                          config_get_luma_correction( in->cfg ) );
@@ -328,15 +328,16 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_FREQLIST_DOWN:
     case TVTIME_FREQLIST_UP:
-	break;
+        break;
 
     case TVTIME_AUTO_ADJUST_PICT:
         videoinput_reset_default_settings( in->vidin );
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
-        //to be removed
-	break;
+        // to be removed
+        // Billy: Again, uh, why should this be removed??
+        break;
 
     case TVTIME_FINETUNE_DOWN:
     case TVTIME_FINETUNE_UP:
@@ -361,18 +362,19 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_UP: 
-	station_next( in->stationmgr );
-	commands_station_change( in );
-	break;
+        station_next( in->stationmgr );
+        commands_station_change( in );
+        break;
     case TVTIME_CHANNEL_DOWN:
-	station_prev( in->stationmgr );
-	commands_station_change( in );
+        station_prev( in->stationmgr );
+        commands_station_change( in );
         break;
 
     case TVTIME_CHANNEL_PREV:
-	// to be handled otherwise
-	break;
-		
+        // To be handled otherwise
+        // Billy: Why??
+        break;
+
     case TVTIME_MIXER_UP: 
     case TVTIME_MIXER_DOWN:
 
@@ -443,7 +445,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
         commands_station_change( in );
         in->frame_counter = 0;
-	break;
+        break;
     }
 }
 

@@ -454,32 +454,20 @@ static void init_RGB_to_YCbCr_tables(void)
    *             
    */
   for (i = 0; i < 256; i++) {
-    Y_R[i] = myround(0.299 * (double)i 
-		     * 219.0 / 255.0 * (double)(1<<FP_BITS));
-    Y_G[i] = myround(0.587 * (double)i 
-		     * 219.0 / 255.0 * (double)(1<<FP_BITS));
-    Y_B[i] = myround((0.114 * (double)i 
-		      * 219.0 / 255.0 * (double)(1<<FP_BITS))
-		     + (double)(1<<(FP_BITS-1))
-		     + (16.0 * (double)(1<<FP_BITS)));
+    Y_R[i] = myround(0.299 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_G[i] = myround(0.587 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_B[i] = myround((0.114 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS))
+                     + (double)(1<<(FP_BITS-1)) + (16.0 * (double)(1<<FP_BITS)));
 
-    Cb_R[i] = myround(-0.168736 * (double)i 
-		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
-    Cb_G[i] = myround(-0.331264 * (double)i 
-		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
-    Cb_B[i] = myround((0.500 * (double)i 
-		       * 224.0 / 255.0 * (double)(1<<FP_BITS))
-		      + (double)(1<<(FP_BITS-1))
-		      + (128.0 * (double)(1<<FP_BITS)));
+    Cb_R[i] = myround(-0.168736 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_G[i] = myround(-0.331264 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_B[i] = myround((0.500 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)) + (128.0 * (double)(1<<FP_BITS)));
 
-    Cr_R[i] = myround(0.500 * (double)i 
-		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
-    Cr_G[i] = myround(-0.418688 * (double)i 
-		      * 224.0 / 255.0 * (double)(1<<FP_BITS));
-    Cr_B[i] = myround((-0.081312 * (double)i 
-		       * 224.0 / 255.0 * (double)(1<<FP_BITS))
-		      + (double)(1<<(FP_BITS-1))
-		      + (128.0 * (double)(1<<FP_BITS)));
+    Cr_R[i] = myround(0.500 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_G[i] = myround(-0.418688 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_B[i] = myround((-0.081312 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS))
+                      + (double)(1<<(FP_BITS-1)) + (128.0 * (double)(1<<FP_BITS)));
   }
   conv_RY_inited = 1;
 }
@@ -500,53 +488,38 @@ static void init_YCbCr_to_RGB_tables(void)
 
   /* clip Y values under 16 */
   for (i = 0; i < 16; i++) {
-    RGB_Y[i] = myround((1.0 * (double)(16) 
-		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
-		    + (double)(1<<(FP_BITS-1)));
+    RGB_Y[i] = myround((1.0 * (double)(16) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
   }
   for (i = 16; i < 236; i++) {
-    RGB_Y[i] = myround((1.0 * (double)(i - 16) 
-		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
-		    + (double)(1<<(FP_BITS-1)));
+    RGB_Y[i] = myround((1.0 * (double)(i - 16) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
   }
   /* clip Y values above 235 */
   for (i = 236; i < 256; i++) {
-    RGB_Y[i] = myround((1.0 * (double)(235) 
-		     * 255.0 / 219.0 * (double)(1<<FP_BITS))
-		    + (double)(1<<(FP_BITS-1)));
+    RGB_Y[i] = myround((1.0 * (double)(235) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
   }
     
-  /* clip Cb/Cr values below 16 */	 
+  /* clip Cb/Cr values below 16 */
   for (i = 0; i < 16; i++) {
-    R_Cr[i] = myround(1.402 * (double)(-112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cr[i] = myround(-0.714136 * (double)(-112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cb[i] = myround(-0.344136 * (double)(-112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    B_Cb[i] = myround(1.772 * (double)(-112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    R_Cr[i] = myround(1.402 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
   }
   for (i = 16; i < 241; i++) {
-    R_Cr[i] = myround(1.402 * (double)(i - 128)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cr[i] = myround(-0.714136 * (double)(i - 128)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cb[i] = myround(-0.344136 * (double)(i - 128)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    B_Cb[i] = myround(1.772 * (double)(i - 128)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    R_Cr[i] = myround(1.402 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
   }
-  /* clip Cb/Cr values above 240 */	 
+  /* clip Cb/Cr values above 240 */
   for (i = 241; i < 256; i++) {
-    R_Cr[i] = myround(1.402 * (double)(112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cr[i] = myround(-0.714136 * (double)(112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    G_Cb[i] = myround(-0.344136 * (double)(i - 128)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
-    B_Cb[i] = myround(1.772 * (double)(112)
-		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    R_Cr[i] = myround(1.402 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
   }
   conv_YR_inited = 1;
 }
