@@ -9,7 +9,7 @@ Package: tvtime
 Architecture: i386
 Depends: ${shlibs:Depends}, ${misc:Depends}, ttf-freefont, ucf
 Recommends: xmltv-util
-Suggests: lirc-x
+Suggests: lirc-x, libdscaler
 Description: A high quality television application
  tvtime is a high quality television application for use with video 
  capture cards.  tvtime processes the input from a capture card and 
