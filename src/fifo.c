@@ -18,6 +18,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,6 +32,7 @@ struct fifo_s {
     int fd;
     char buf[ 256 ];
     int bufpos;
+    char *filename;
 };
 
 /* use NULL for givenname to use the default named pipe */
@@ -43,6 +45,8 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
         return NULL;
     }
 
+    fifo->filename = NULL;
+
     if( givenname ) filename = givenname;
 
     fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
@@ -50,7 +54,7 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
         /* attempt to create it */
         if( mkfifo( filename, S_IREAD | S_IWRITE ) == -1 ) {
             /* failed */
-            fprintf( strerror, "fifo: Couldn't create %s as a fifo: %s\n",
+            fprintf( stderr, "fifo: Couldn't create %s as a fifo: %s\n",
                      filename, strerror( errno ) );
             free( fifo );
             return NULL;
@@ -64,6 +68,7 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
 
     memset( fifo->buf, 0, sizeof( fifo->buf ) );
     fifo->bufpos = 0;
+    fifo->filename = filename;
 
     /* our fifo is open for reading */
     return fifo;
@@ -103,4 +108,10 @@ void fifo_delete( fifo_t *fifo )
     if( !fifo ) return;
     close( fifo->fd );
     free( fifo );
+}
+
+char *fifo_get_filename( fifo_t *fifo )
+{
+    if( !fifo ) return NULL;
+    return fifo->filename;
 }

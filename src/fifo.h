@@ -27,5 +27,6 @@ fifo_t *fifo_new( config_t *ct, char *givenname );
 char *fifo_next_line( fifo_t *fifo );
 int fifo_next_command( fifo_t *fifo );
 void fifo_delete( fifo_t *fifo );
+char *fifo_get_filename( fifo_t *fifo );
 
 #endif

@@ -576,6 +576,7 @@ void console_pipe_printf( console_t *con, char * format, ... )
     va_start( ap, format );
     ret = vfprintf( con->out, format, ap );
     va_end( ap );
+    fflush( con->out );
     return;
 }
 
@@ -605,29 +606,20 @@ int console_scanf( console_t *con, char *format, ... )
 
 void console_setup_pipe( console_t *con, char *pipename )
 {
-    int fd[2];
+    int fd;
 
     if( !con ) return;
 
-    if( pipe( fd ) ) {
+    if( ( fd = open( pipename, O_WRONLY | O_NONBLOCK ) ) == -1 ) {
         perror("console: Error opening pipe");
         return;
     }
 
-    if( fcntl( fd[0], F_SETFL, O_NONBLOCK ) == -1 ) {
-        perror("console: Error setting O_NONBLOCK" );
-    }
-    if( fcntl( fd[1], F_SETFL, O_NONBLOCK ) == -1 ) {
-        perror("console: Error setting O_NONBLOCK" );
-    }
-    con->in = fdopen(fd[0], "r");
-    con->out = fdopen(fd[1], "a");
-    if( con->in == NULL || con->out == NULL ) {
+    con->out = fdopen(fd, "a");
+    if( con->out == NULL ) {
         perror("console: Error fdopen'ing pipe");
-        con->in = stdin;
         con->out = stdout;
-        close( fd[0] );
-        close( fd[1] );
+        close( fd );
     }
 }
 
