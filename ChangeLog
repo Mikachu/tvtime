@@ -1,5 +1,7 @@
 
 0.9.8
+  * (vektor) tvtime now doesn't render output when the window is obscured or
+    hidden.
   * (vektor) Added console app 'tvtime-command' to send commands to a running
     tvtime instance using the fifo.
   * (vektor) configure.ac now fails if X isn't found.

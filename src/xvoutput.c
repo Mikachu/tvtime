@@ -71,18 +71,18 @@ static Atom wmDeleteAtom;
 static int motion_timeout = 0;
 
 static int xvoutput_verbose = 0;
+static int xvoutput_exposed = 0;
 
 static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
 
-
 typedef struct {
-  int x;
-  int y;
-  unsigned int width;
-  unsigned int height;
+    int x;
+    int y;
+    unsigned int width;
+    unsigned int height;
 } area_t;
 
-area_t video_area;
+static area_t video_area;
 
 int HandleXError( Display *display, XErrorEvent *xevent )
 {
@@ -247,8 +247,10 @@ static int open_display( void )
     xswa.backing_store = NotUseful;
     xswa.save_under = False;
     xswa.background_pixel = BlackPixel( display, screen );
+    xswa.event_mask = ButtonPressMask | StructureNotifyMask | KeyPressMask | PointerMotionMask |
+                      VisibilityChangeMask | PropertyChangeMask;
 
-    mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWOverrideRedirect);
+    mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWOverrideRedirect | CWEventMask);
 
     window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
                             output_width, output_height, 0,
@@ -262,10 +264,6 @@ static int open_display( void )
     hint.flags = PPosition | PSize;
 
     XSetStandardProperties( display, window, hello, hello, None, 0, 0, &hint );
-
-    XSelectInput( display, window, ButtonPressMask | StructureNotifyMask |
-                                   KeyPressMask | PointerMotionMask |
-                                   ExposureMask | PropertyChangeMask );
 
     XMapWindow( display, window );
 
@@ -288,6 +286,13 @@ static int open_display( void )
 
     DpyInfoUpdateResolution( display, screen, 0, 0 );
     DpyInfoUpdateGeometry( display, screen );
+
+    {
+        int t1, t2;
+        if( DpyInfoGetGeometry( display, screen, &t1, &t2 ) ) {
+            fprintf( stderr, "xvoutput: Geometry %dx%d, aspect ratio %.2f\n", t1, t2, (double) t1 / (double) t2 );
+        }
+    }
 
     XInternAtoms( display, atomNames, 2, False, &wmProtocolsAtom );
 
@@ -501,8 +506,8 @@ void xv_poll_events( input_t *in )
     int reconfwidth = 0;
     int reconfheight = 0;
 
-    while (XPending(display)) {
-        XNextEvent(display, &event);
+    while( XPending( display ) ) {
+        XNextEvent( display, &event );
 
         switch( event.type ) {
         case ClientMessage:
@@ -526,7 +531,34 @@ void xv_poll_events( input_t *in )
         case EnterNotify:
             XSetInputFocus( display, window, RevertToPointerRoot, CurrentTime );
             break;
-        case Expose:
+        case MapNotify:
+            xvoutput_exposed = 1;
+            if( xvoutput_verbose ) {
+                fprintf( stderr, "xvoutput: Received a map, marking window as visible (%lu).\n",
+                         event.xany.serial );
+            }
+            break;
+        case UnmapNotify:
+            xvoutput_exposed = 0;
+            if( xvoutput_verbose ) {
+                fprintf( stderr, "xvoutput: Received an unmap, marking window as hidden (%lu).\n",
+                         event.xany.serial );
+            }
+            break;
+        case VisibilityNotify:
+            if( event.xvisibility.state == VisibilityFullyObscured && xvoutput_exposed ) {
+                xvoutput_exposed = 0;
+                if( xvoutput_verbose ) {
+                    fprintf( stderr, "xvoutput: Window fully obscured, marking window as hidden (%lu).\n",
+                             event.xany.serial );
+                }
+            } else if( !xvoutput_exposed ) {
+                xvoutput_exposed = 1;
+                if( xvoutput_verbose ) {
+                    fprintf( stderr, "xvoutput: Window made visible, marking window as visible (%lu).\n",
+                             event.xany.serial );
+                }
+            }
             break;
         case ConfigureNotify:
             reconfwidth = event.xconfigure.width;
@@ -666,6 +698,21 @@ unsigned char *xv_get_output( void )
     return image_data;
 }
 
+int xv_is_exposed( void )
+{
+    return xvoutput_exposed;
+}
+
+int xv_get_visible_width( void )
+{
+    return video_area.width;
+}
+
+int xv_get_visible_height( void )
+{
+    return video_area.height;
+}
+
 static output_api_t xvoutput =
 {
     xv_init,
@@ -674,6 +721,10 @@ static output_api_t xvoutput =
     xv_get_output,
     xv_get_stride,
     xv_unlock_output,
+
+    xv_is_exposed,
+    xv_get_visible_width,
+    xv_get_visible_height,
 
     xv_is_interlaced,
     xv_wait_for_sync,

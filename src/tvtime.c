@@ -1035,87 +1035,92 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
-        if( output->is_interlaced() ) {
-            /* Wait until we can draw the even field. */
-            output->wait_for_sync( 0 );
+        if( output->is_exposed() ) {
+            if( output->is_interlaced() ) {
+                /* Wait until we can draw the even field. */
+                output->wait_for_sync( 0 );
 
-            output->lock_output_buffer();
-            tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, con, vs, 0,
-                       vc && config_get_apply_luma_correction( ct ),
-                       width, height, width * 2, output->get_output_stride() );
-            output->unlock_output_buffer();
-            performance_checkpoint_constructed_top_field( perf );
-            performance_checkpoint_delayed_blit_top_field( perf );
-            performance_checkpoint_blit_top_field_start( perf );
-            performance_checkpoint_blit_top_field_end( perf );
+                output->lock_output_buffer();
+                tvtime_build_interlaced_frame( output->get_output_buffer(),
+                           curframe, vc, osd, con, vs, 0,
+                           vc && config_get_apply_luma_correction( ct ),
+                           width, height, width * 2, output->get_output_stride() );
+                output->unlock_output_buffer();
+                performance_checkpoint_constructed_top_field( perf );
+                performance_checkpoint_delayed_blit_top_field( perf );
+                performance_checkpoint_blit_top_field_start( perf );
+            } else {
+                /* Build the output from the top field. */
+                output->lock_output_buffer();
+                if( showbars ) {
+                    blit_packed422_scanline( output->get_output_buffer(),
+                                             colourbars, width*height );
+                } else {
+                    if( curmethod->doscalerbob ) {
+                        tvtime_build_copied_field( output->get_output_buffer(),
+                                           curframe, vc, osd, con, vs, 0,
+                                           vc && config_get_apply_luma_correction( ct ),
+                                           width, height, width * 2, output->get_output_stride() );
+                    } else {
+                        tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                           curframe, lastframe, secondlastframe,
+                                           vc, osd, con, vs, 0,
+                                           vc && config_get_apply_luma_correction( ct ),
+                                           width, height, width * 2, output->get_output_stride() );
+                    }
+                }
+
+                /* For the screenshot, use the output after we build the top field. */
+                if( screenshot ) {
+                    char filename[ 256 ];
+                    char timestamp[ 50 ];
+                    time_t tm = time( 0 );
+                    strftime( timestamp, sizeof( timestamp ),
+                              config_get_timeformat( ct ), localtime( &tm ) );
+                    sprintf( filename, "tvtime-output-%s.png", timestamp );
+                    if( curmethod->doscalerbob ) {
+                        pngscreenshot( filename, output->get_output_buffer(),
+                                       width, height/2, width * 2 );
+                    } else {
+                        pngscreenshot( filename, output->get_output_buffer(),
+                                       width, height, width * 2 );
+                    }
+                }
+                output->unlock_output_buffer();
+                performance_checkpoint_constructed_top_field( perf );
+
+
+                /* Wait until it's time to blit the first field. */
+                if( rtctimer ) {
+
+                    we_were_late = 1;
+                    while( performance_get_usecs_since_frame_aquired( perf )
+                           < ( fieldtime - safetytime
+                               - performance_get_usecs_of_last_blit( perf )
+                               - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
+                        rtctimer_next_tick( rtctimer );
+                        we_were_late = 0;
+                    }
+
+                }
+                performance_checkpoint_delayed_blit_top_field( perf );
+
+                performance_checkpoint_blit_top_field_start( perf );
+                if( use_vgasync ) vgasync_spin_until_out_of_refresh();
+                if( curmethod->doscalerbob && !showbars ) {
+                    output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+                } else {
+                    output->show_frame( output_x, output_y, output_w, output_h );
+                }
+            }
         } else {
-            /* Build the output from the top field. */
-            output->lock_output_buffer();
-            if( showbars ) {
-                blit_packed422_scanline( output->get_output_buffer(),
-                                         colourbars, width*height );
-            } else {
-                if( curmethod->doscalerbob ) {
-                    tvtime_build_copied_field( output->get_output_buffer(),
-                                       curframe, vc, osd, con, vs, 0,
-                                       vc && config_get_apply_luma_correction( ct ),
-                                       width, height, width * 2, output->get_output_stride() );
-                } else {
-                    tvtime_build_deinterlaced_frame( output->get_output_buffer(),
-                                       curframe, lastframe, secondlastframe,
-                                       vc, osd, con, vs, 0,
-                                       vc && config_get_apply_luma_correction( ct ),
-                                       width, height, width * 2, output->get_output_stride() );
-                }
-            }
-
-            /* For the screenshot, use the output after we build the top field. */
-            if( screenshot ) {
-                char filename[ 256 ];
-                char timestamp[ 50 ];
-                time_t tm = time( 0 );
-                strftime( timestamp, sizeof( timestamp ),
-                          config_get_timeformat( ct ), localtime( &tm ) );
-                sprintf( filename, "tvtime-output-%s.png", timestamp );
-                if( curmethod->doscalerbob ) {
-                    pngscreenshot( filename, output->get_output_buffer(),
-                                   width, height/2, width * 2 );
-                } else {
-                    pngscreenshot( filename, output->get_output_buffer(),
-                                   width, height, width * 2 );
-                }
-            }
-            output->unlock_output_buffer();
             performance_checkpoint_constructed_top_field( perf );
-
-
-            /* Wait until it's time to blit the first field. */
-            if( rtctimer ) {
-
-                we_were_late = 1;
-                while( performance_get_usecs_since_frame_aquired( perf )
-                       < ( fieldtime - safetytime
-                           - performance_get_usecs_of_last_blit( perf )
-                           - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
-                    rtctimer_next_tick( rtctimer );
-                    we_were_late = 0;
-                }
-
-            }
             performance_checkpoint_delayed_blit_top_field( perf );
-
             performance_checkpoint_blit_top_field_start( perf );
-            if( use_vgasync ) vgasync_spin_until_out_of_refresh();
-            if( curmethod->doscalerbob && !showbars ) {
-                output->show_frame( output_x, output_y/2, output_w, output_h/2 );
-            } else {
-                output->show_frame( output_x, output_y, output_w, output_h );
-            }
-            performance_checkpoint_blit_top_field_end( perf );
         }
+        performance_checkpoint_blit_top_field_end( perf );
 
-        if( !commands_half_framerate( commands ) ) {
+        if( output->is_exposed() && !commands_half_framerate( commands ) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the odd field. */
                 output->wait_for_sync( 1 );

@@ -31,6 +31,11 @@ typedef struct output_api_s
     int (* get_output_stride)( void );
     void (* unlock_output_buffer)( void );
 
+    /* Some useful functions for windowed outputs. */
+    int (* is_exposed)( void );
+    int (* get_visible_width)( void );
+    int (* get_visible_height)( void );
+
     /* Output API for interlaced displays. */
     int (* is_interlaced)( void );
     void (* wait_for_sync)( int field );
