@@ -794,7 +794,6 @@ int videoinput_is_bttv( videoinput_t *vidin )
 
 void videoinput_reset_default_settings( videoinput_t *vidin )
 {
-
     struct video_picture grab_pict;
 
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {

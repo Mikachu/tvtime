@@ -10,7 +10,7 @@
   * (bitstream) Added support for muting of the TV card instead of muting
     the master mixer volume: MuteTVCard option in the tvtimerc (bug 633222)
   * (rascasse) Added a man page for the tvtimerc file to the docs directory
-    (still not installed, part of bug 633042)
+    (still not installed or in the dist, part of bug 633042)
   * (rascasse) Added an RPM spec file to the docs directory
   * (vektor) Added a hack/fix for a resize loop that was occuring.  If
     you resized the window it would start wildly resizing itself for a
