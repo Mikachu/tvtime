@@ -564,7 +564,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_CHAR:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( isdigit( arg & 0xff ) && in->vidin && videoinput_has_tuner( in->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
             if( in->scan_channels ) {
