@@ -41,8 +41,8 @@ static int kwin_bug = 0;
 typedef struct {
   int x;
   int y;
-  int width;
-  int height;
+  unsigned int width;
+  unsigned int height;
 } geometry_t;
 
 static geometry_t normal_state_geometry;
