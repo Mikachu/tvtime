@@ -771,7 +771,7 @@ int videoinput_freq_present( videoinput_t *vidin )
                 fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
                          strerror( errno ) );
             }
-            return 0;
+            return 1;
         }
         if( vidin->tuner.signal ) {
             return 1;
