@@ -160,8 +160,7 @@ void input_callback( input_t *in, int command, int arg )
         break;
     }
 
-    argument[ 1 ] = '\0';
-    argument[ 0 ] = arg;
+    *argument = '\0';
     commands_handle( in->com, tvtime_cmd, curarg );
 }
 
