@@ -139,6 +139,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_MIXER_DOWN ]     = '-';
     ct->keymap[ TVTIME_ENTER ]          = I_ENTER;
     ct->keymap[ TVTIME_CHANNEL_CHAR ]   = 0; 
+    ct->keymap[ TVTIME_TV_VIDEO ]       = I_F9;
     ct->keymap[ TVTIME_HUE_DOWN ]       = I_F1;
     ct->keymap[ TVTIME_HUE_UP ]         = I_F2;
     ct->keymap[ TVTIME_BRIGHT_DOWN ]    = I_F3; 
@@ -457,6 +458,11 @@ void config_init_keymap( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "key_mixer_down")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_MIXER_DOWN ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_tv_video")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_TV_VIDEO ] = key;
     }
 
     if( (tmp = parser_get( &(ct->pf), "key_hue_down")) ) {

@@ -39,6 +39,7 @@ enum tvtime_commands
     TVTIME_ENTER,
     TVTIME_CHANNEL_CHAR,
 
+    TVTIME_TV_VIDEO,
     TVTIME_HUE_DOWN,
     TVTIME_HUE_UP,
     TVTIME_BRIGHT_DOWN,

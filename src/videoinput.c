@@ -67,6 +67,7 @@ struct videoinput_s
     int grab_size;
     int numframes;
     int have_mmap;
+    int numinputs;
 
     int width;
     int height;
@@ -154,12 +155,16 @@ int videoinput_get_numframes( videoinput_t *vidin )
     return vidin->numframes;
 }
 
+int videoinput_get_num_inputs( videoinput_t *vidin )
+{
+    return vidin->numinputs;
+}
+
 /**
  * Reasonable defaults:
  *
  * v4l_device  : /dev/video0
- * inputnum    : 1
- * max_buffers : 16
+ * inputnum    : 0   ??
  */
 videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
                               int capwidth, int palmode, int verbose )
@@ -193,6 +198,21 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     if( ioctl( vidin->grab_fd, VIDIOCGCAP, &grab_cap ) < 0 ) {
         fprintf( stderr, "videoinput: No v4l device (%s).\n", v4l_device );
         return 0;
+    }
+
+
+    vidin->numinputs = 0;
+    for(;;) {
+        vidin->grab_chan.channel = vidin->numinputs;
+        if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) ) < 0 ) {
+            break;
+        }
+        vidin->numinputs++;
+    }
+
+    if( inputnum >= vidin->numinputs ) {
+        fprintf( stderr, "videoinput: Requested input number %d not valid, "
+                 "max is %d.\n", inputnum, vidin->numinputs );
     }
 
     vidin->grab_chan.channel = inputnum;
@@ -584,6 +604,30 @@ int videoinput_freq_present( videoinput_t *vidin )
     }
 
     return 0;
+}
+
+int videoinput_get_input_num( videoinput_t *vidin )
+{
+    return vidin->grab_chan.channel;
+}
+
+const char *videoinput_get_input_name( videoinput_t *vidin )
+{
+    return vidin->grab_chan.name;
+}
+
+void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
+{
+    if( inputnum >= vidin->numinputs ) {
+        fprintf( stderr, "videoinput: Requested input number %d not valid, "
+                 "max is %d.\n", inputnum, vidin->numinputs );
+    } else {
+        vidin->grab_chan.channel = inputnum;
+        if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
+            perror( "ioctl VIDIOCSCHAN" );
+        }
+        ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) );
+    }
 }
 
 void videoinput_delete( videoinput_t *vidin )

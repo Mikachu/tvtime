@@ -14,7 +14,7 @@ OPT_CFLAGS = -Wall -I. -O3 -rdynamic -DDATADIR="$(tvtimedatadir)"
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) $(PLUGINS_CFLAGS)
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) $(PLUGINS_CFLAGS)
-LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(PNG_LIBS) $(PLUGINS_LIBS) -lm
+AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(PNG_LIBS) $(PLUGINS_LIBS) -lm
 
 COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	rtctimer.c ttfont.cpp efs.cpp osd.c parser.c tvtimeconf.c \

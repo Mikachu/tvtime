@@ -126,6 +126,26 @@ int videoinput_get_tuner_freq( videoinput_t *vidin );
  */
 int videoinput_freq_present( videoinput_t *vidin );
 
+/**
+ * Returns how many inputs are available.
+ */
+int videoinput_get_num_inputs( videoinput_t *vidin );
+
+/**
+ * Returns the current input number.
+ */
+int videoinput_get_input_num( videoinput_t *vidin );
+
+/**
+ * Returns the name of the current input.
+ */
+const char *videoinput_get_input_name( videoinput_t *vidin );
+
+/**
+ * Sets the current input.
+ */
+void videoinput_set_input_num( videoinput_t *vidin, int inputnum );
+
 #ifdef __cplusplus
 };
 #endif

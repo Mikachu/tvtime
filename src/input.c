@@ -43,6 +43,7 @@ struct input_s {
     int digit_counter;
     int videohold;
     int quit;
+    int inputnum;
 
     int screenshot;
     int printdebug;
@@ -265,6 +266,13 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_MIXER_MUTE:
              mixer_toggle_mute();
+             break;
+
+         case TVTIME_TV_VIDEO:
+             videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
+             if( in->osd ) {
+                 tvtime_osd_show_message( in->osd, videoinput_get_input_name( in->vidin ) );
+             }
              break;
 
          case TVTIME_HUE_UP:
