@@ -195,7 +195,7 @@ int getNextPos() {
 }
 
 
-void freq_callback( char *band, char *channel, unsigned int freq ) {
+void freq_callback( const char *band, const char *channel, unsigned int freq ) {
 	int pos;
 	station_info_t *i;
 
