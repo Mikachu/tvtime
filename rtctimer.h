@@ -19,6 +19,10 @@
 #ifndef RTCTIMER_H_INCLUDED
 #define RTCTIMER_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Class for accurate timing support under operating systems supporting
  * the /dev/rtc real time clock device.  Under linux, the rtc device can
@@ -81,4 +85,7 @@ int rtctimer_next_tick( rtctimer_t *rtctimer );
  */
 int set_realtime_priority( int max );
 
+#ifdef __cplusplus
+};
+#endif
 #endif // RTCTIMER_H_INCLUDED

@@ -16,9 +16,12 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 #ifndef INPUT_H_INCLUDED
 #define INPUT_H_INCLUDED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct input_s input_t;
 typedef enum InputEvent_e {
@@ -94,4 +97,7 @@ void input_set_menu( input_t *in, menu_t *m );
 
 void input_next_frame( input_t *in );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* INPUT_H_INCLUDED */

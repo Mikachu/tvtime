@@ -16,6 +16,10 @@
 #ifndef SPEEDY_H_INCLUDED
 #define SPEEDY_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Speedy is a collection of optimized functions plus their C fallbacks.
  * This includes a simple system to select which functions to use
@@ -94,4 +98,7 @@ void setup_speedy_calls( void );
  */
 int speedy_get_accel( void );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* SPEEDY_H_INCLUDED */

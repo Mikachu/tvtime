@@ -21,6 +21,10 @@
 #ifndef MIXER_H_INCLUDED
 #define MIXER_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int mixer_get_volume( void );
 int mixer_set_volume( int percentdiff );
 void mixer_mute( int mute );
@@ -28,4 +32,7 @@ int mixer_conditional_mute( void );
 void mixer_toggle_mute( void );
 int mixer_ismute( void );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* MIXER_H_INCLUDED */

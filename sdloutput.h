@@ -21,6 +21,10 @@
 
 #include "input.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Functions to handle SDL output.
  *
@@ -70,4 +74,7 @@ void sdl_poll_events( input_t *in );
  */
 void sdl_quit( void );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* SDLOUTPUT_H_INCLUDED */

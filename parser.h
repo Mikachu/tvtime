@@ -19,6 +19,10 @@
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct parser_file_s {
     FILE *fh;
     long file_length;
@@ -35,4 +39,7 @@ const char *parser_get( parser_file_t *pf, const char *name );
 void parser_delete( parser_file_t *pf );
 int parser_dump( parser_file_t *pf );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* PARSER_H_INCLUDED */

@@ -19,6 +19,10 @@
 #ifndef TVTIMEOSD_H_INCLUDED
 #define TVTIMEOSD_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * This object is the master on-screen-display controler.  It's basically
  * the high-level API to control the simple OSD items like the channel
@@ -57,4 +61,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int width, int xpos,
                                               int scanline );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* TVTIMEOSD_H_INCLUDED */

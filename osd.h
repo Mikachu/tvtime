@@ -19,15 +19,20 @@
 #ifndef OSD_H_INCLUDED
 #define OSD_H_INCLUDED
 
-typedef struct osd_string_s osd_string_t;
+/**
+ * This file defines some simple primitives needed for the on screen
+ * display.  Each primitive can composite itself onto a packed 4:2:2
+ * buffer.
+ */
 
+typedef struct osd_string_s osd_string_t;
 typedef struct osd_graphic_s osd_graphic_t;
+typedef struct osd_shape_s osd_shape_t;
 
 typedef enum OSD_Shapes_e {
     OSD_Rect        = (1<<0),
     OSD_Circle      = (1<<1)
 } OSD_Shape;
-typedef struct osd_shape_s osd_shape_t;
 
 /**
  * Creates a new string with the given truetype font at the given point size.
