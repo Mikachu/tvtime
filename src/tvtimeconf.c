@@ -698,6 +698,7 @@ static void print_config_usage( char **argv )
              "                             PAL-N or PAL-60 (defaults to NTSC).\n"
              "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
              "                             centre (default).\n"
+             "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
              "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
              "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
              "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
@@ -1075,6 +1076,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "widescreen", 0, 0, 'a' },
         { "fspos", 1, 0, 'p' },
         { "xmltv", 2, 0, 't' },
+        { "priority", 2, 0, 'R' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -1085,7 +1087,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:",
+    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:R:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -1153,6 +1155,12 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   } else {
                       free( ct->freq );
                       ct->freq = strdup( optarg );
+                  }
+                  break;
+        case 'R': if( !optarg ) {
+                      fprintf( stdout, "Priority:%d\n", config_get_priority( ct ) );
+                  } else {
+                      ct->priority = atoi( optarg );
                   }
                   break;
         default:
