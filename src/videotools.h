@@ -41,11 +41,6 @@ void composite_bars_packed4444_scanline( uint8_t *output,
                                          int percentage );
 
 
-void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width );
-void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width );
-void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
-void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
-
 /**
  * Frame functions.
  */

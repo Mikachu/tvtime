@@ -1869,6 +1869,240 @@ void a8_subpix_blit_scanline_c( uint8_t *output, uint8_t *input,
     }
 }
 
+/**
+ * These are from lavtools in mjpegtools:
+ *
+ * colorspace.c:  Routines to perform colorspace conversions.
+ *
+ *  Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#define FP_BITS 18
+
+/* precomputed tables */
+
+static int Y_R[256];
+static int Y_G[256];
+static int Y_B[256];
+static int Cb_R[256];
+static int Cb_G[256];
+static int Cb_B[256];
+static int Cr_R[256];
+static int Cr_G[256];
+static int Cr_B[256];
+static int conv_RY_inited = 0;
+
+static int RGB_Y[256];
+static int R_Cr[256];
+static int G_Cb[256];
+static int G_Cr[256];
+static int B_Cb[256];
+static int conv_YR_inited = 0;
+
+static int myround(double n)
+{
+  if (n >= 0) 
+    return (int)(n + 0.5);
+  else
+    return (int)(n - 0.5);
+}
+
+static void init_RGB_to_YCbCr_tables(void)
+{
+  int i;
+
+  /*
+   * Q_Z[i] =   (coefficient * i
+   *             * (Q-excursion) / (Z-excursion) * fixed-point-factor)
+   *
+   * to one of each, add the following:
+   *             + (fixed-point-factor / 2)         --- for rounding later
+   *             + (Q-offset * fixed-point-factor)  --- to add the offset
+   *             
+   */
+  for (i = 0; i < 256; i++) {
+    Y_R[i] = myround(0.299 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_G[i] = myround(0.587 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS));
+    Y_B[i] = myround((0.114 * (double)i * 219.0 / 255.0 * (double)(1<<FP_BITS))
+                     + (double)(1<<(FP_BITS-1)) + (16.0 * (double)(1<<FP_BITS)));
+
+    Cb_R[i] = myround(-0.168736 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_G[i] = myround(-0.331264 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cb_B[i] = myround((0.500 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)) + (128.0 * (double)(1<<FP_BITS)));
+
+    Cr_R[i] = myround(0.500 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_G[i] = myround(-0.418688 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS));
+    Cr_B[i] = myround((-0.081312 * (double)i * 224.0 / 255.0 * (double)(1<<FP_BITS))
+                      + (double)(1<<(FP_BITS-1)) + (128.0 * (double)(1<<FP_BITS)));
+  }
+  conv_RY_inited = 1;
+}
+
+static void init_YCbCr_to_RGB_tables(void)
+{
+  int i;
+
+  /*
+   * Q_Z[i] =   (coefficient * i
+   *             * (Q-excursion) / (Z-excursion) * fixed-point-factor)
+   *
+   * to one of each, add the following:
+   *             + (fixed-point-factor / 2)         --- for rounding later
+   *             + (Q-offset * fixed-point-factor)  --- to add the offset
+   *             
+   */
+
+  /* clip Y values under 16 */
+  for (i = 0; i < 16; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(16) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
+  }
+  for (i = 16; i < 236; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(i - 16) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
+  }
+  /* clip Y values above 235 */
+  for (i = 236; i < 256; i++) {
+    RGB_Y[i] = myround((1.0 * (double)(235) * 255.0 / 219.0 * (double)(1<<FP_BITS))
+                       + (double)(1<<(FP_BITS-1)));
+  }
+    
+  /* clip Cb/Cr values below 16 */
+  for (i = 0; i < 16; i++) {
+    R_Cr[i] = myround(1.402 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(-112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  for (i = 16; i < 241; i++) {
+    R_Cr[i] = myround(1.402 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  /* clip Cb/Cr values above 240 */
+  for (i = 241; i < 256; i++) {
+    R_Cr[i] = myround(1.402 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cr[i] = myround(-0.714136 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    G_Cb[i] = myround(-0.344136 * (double)(i - 128) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+    B_Cb[i] = myround(1.772 * (double)(112) * 255.0 / 224.0 * (double)(1<<FP_BITS));
+  }
+  conv_YR_inited = 1;
+}
+
+void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+{
+    if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
+
+    while( width-- ) {
+        int r = input[ 0 ];
+        int g = input[ 1 ];
+        int b = input[ 2 ];
+
+        output[ 0 ] = (Y_R[ r ] + Y_G[ g ] + Y_B[ b ]) >> FP_BITS;
+        output[ 1 ] = (Cb_R[ r ] + Cb_G[ g ] + Cb_B[ b ]) >> FP_BITS;
+        output[ 2 ] = (Cr_R[ r ] + Cr_G[ g ] + Cr_B[ b ]) >> FP_BITS;
+        output += 3;
+        input += 3;
+    }
+}
+
+void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+{
+    if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
+
+    while( width-- ) {
+        int r = input[ 0 ];
+        int g = input[ 1 ];
+        int b = input[ 2 ];
+        int a = input[ 3 ];
+        
+        output[ 0 ] = a;
+        output[ 1 ] = (Y_R[ r ] + Y_G[ g ] + Y_B[ b ]) >> FP_BITS;
+        output[ 2 ] = (Cb_R[ r ] + Cb_G[ g ] + Cb_B[ b ]) >> FP_BITS;
+        output[ 3 ] = (Cr_R[ r ] + Cr_G[ g ] + Cr_B[ b ]) >> FP_BITS;
+        output += 4;
+        input += 4;
+    }
+}
+
+void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+{
+    if( !conv_YR_inited ) init_YCbCr_to_RGB_tables();
+
+    while( width-- ) {
+        int luma = input[ 0 ];
+        int cb = input[ 1 ];
+        int cr = input[ 2 ];
+
+        output[ 0 ] = clip255( (RGB_Y[ luma ] + R_Cr[ cr ]) >> FP_BITS );
+        output[ 1 ] = clip255( (RGB_Y[ luma ] + G_Cb[ cb ] + G_Cr[cr]) >> FP_BITS );
+        output[ 2 ] = clip255( (RGB_Y[ luma ] + B_Cb[ cb ]) >> FP_BITS );
+
+        output += 3;
+        input += 3;
+    }
+}
+
+/**
+ * 601 numbers:
+ *
+ * Y' =  0.299*R' + 0.587*G' + 0.114*B' (in  0.0 to  1.0)
+ * Cb = -0.169*R' - 0.331*G' + 0.500*B' (in -0.5 to +0.5)
+ * Cr =  0.500*R' - 0.419*G' - 0.081*B' (in -0.5 to +0.5)
+ *
+ * Inverse:
+ *      Y         Cb        Cr
+ * R  1.0000   -0.0009    1.4017
+ * G  1.0000   -0.3437   -0.7142
+ * B  1.0000    1.7722    0.0010
+ *
+ * S170M numbers:
+ * Y'   =  0.299*R' + 0.587*G' + 0.114*B' (in  0.0 to 1.0)
+ * B-Y' = -0.299*R' - 0.587*G' + 0.886*B'
+ * R-Y' =  0.701*R' - 0.587*G' - 0.114*B'
+ */
+void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width )
+{
+    while( width-- ) {
+        double yp = (((double) input[ 0 ]) - 16.0) / 255.0;
+        double cb = (((double) input[ 1 ]) - 128.0) / 255.0;
+        double cr = (((double) input[ 2 ]) - 128.0) / 255.0;
+        double r, g, b;
+
+        r = yp - (0.0009*cb) + (1.4017*cr);
+        g = yp - (0.3437*cb) - (0.7142*cr);
+        b = yp + (1.7722*cb) + (0.0010*cr);
+
+        if( r > 1.0 ) r = 1.0; else if( r < 0.0 ) r = 0.0;
+        if( g > 1.0 ) g = 1.0; else if( g < 0.0 ) g = 0.0;
+        if( b > 1.0 ) b = 1.0; else if( b < 0.0 ) b = 0.0;
+
+        output[ 0 ] = (int) ((r * 255.0) + 0.5);
+        output[ 1 ] = (int) ((g * 255.0) + 0.5);
+        output[ 2 ] = (int) ((b * 255.0) + 0.5);
+
+        output += 3;
+        input += 3;
+    }
+}
+
+
 
 static uint32_t speedy_accel;
 

@@ -239,6 +239,14 @@ void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int wid
 void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int width );
 
 /**
+ * Conversions between Y'CbCr and R'G'B'.
+ */
+void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width );
+void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width );
+void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
+void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width );
+
+/**
  * Struct for pulldown detection metrics.
  */
 typedef struct pulldown_metrics_s {
