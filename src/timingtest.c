@@ -63,6 +63,7 @@ int main( int argc, char **argv )
     uint64_t after = 0;
     int stride = width * 2;
     int testid = 0;
+    double mhz;
     int i;
 
     if( argc < 2 ) {
@@ -87,7 +88,8 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    fprintf( stderr, "timingtest: CPU MHz %.3f\n", speedy_measure_cpu_mhz() );
+    mhz = speedy_measure_cpu_mhz();
+    fprintf( stderr, "timingtest: CPU MHz %.3f\n", mhz );
 
     /* Always use the same random seed. */
     srandom( seed );
@@ -170,8 +172,8 @@ int main( int argc, char **argv )
         avg_count++;
     }
 
-    fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles.\n",
-             avg_count, (avg_sum/avg_count ) );
+    fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles (%.2f ms).\n",
+             avg_count, (avg_sum/avg_count ), ((double) (avg_sum/avg_count)) / (mhz * 1000.0) );
 
     free( source422packed );
     free( dest422packed );
