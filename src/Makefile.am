@@ -32,12 +32,6 @@ OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
-if ARCH_386
-DSCALER_SRCS = DS_ApiCommon.h
-else
-DSCALER_SRCS =
-endif
-
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
 	deinterlace.c videocorrection.c videotools.c attributes.h \
@@ -58,7 +52,7 @@ bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner \
 	tvtime-startup
 EXTRA_PROGRAMS = expandpng timingtest
 
-tvtime_SOURCES = $(COMMON_SRCS) $(DSCALER_SRCS) $(OUTPUT_SRCS) tvtime.c
+tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
