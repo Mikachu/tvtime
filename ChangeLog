@@ -1,5 +1,5 @@
 
-0.9.10
+0.9.10 - Fri Sep 12 18:18:23 ADT 2003
   * vektor: Got rid of the UseVBI config file parameter in favour of
       having a UseXDS parameter, and having the VBI code open the
       device whenever either XDS or CC decoding is enabled.
