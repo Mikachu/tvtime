@@ -92,6 +92,7 @@ Setup
       Decrease
       Increase
       Back
+    Apply matte
     16:9 output
     Fullscreen
     Always On Top

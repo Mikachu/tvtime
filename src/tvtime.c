@@ -909,6 +909,13 @@ static void build_output_menu( menu_t *menu, int widescreen,
         cur++;
     }
 
+    snprintf( string, sizeof( string ), "%c%c%c  Apply matte", 0xee, 0x80, 0xb1 );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
+    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+    cur++;
+
     if( widescreen ) {
         snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb7 );
     } else {
@@ -1657,6 +1664,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                        output->is_fullscreen(), output->is_alwaysontop(),
                        output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
                        output->is_overscan_supported() );
+    build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1851,16 +1859,30 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                output->is_fullscreen(), output->is_alwaysontop(),
                                output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
                                output->is_overscan_supported() );
+            build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
             commands_refresh_menu( commands );
         }
-        if( commands_toggle_matte( commands ) ) {
+        if( commands_toggle_matte( commands ) || commands_get_matte_mode( commands ) ) {
             double matte = 4.0 / 3.0;
             int sqwidth = sixteennine ? ((height * 16) / 9) : ((height * 4) / 3);
             int sqheight = sixteennine ? ((width * 9) / 16) : ((width * 3) / 4);
 
             matte_x = 0;
             matte_w = width;
-            matte_mode = (matte_mode + 1) % 4;
+            if( commands_toggle_matte( commands ) ) {
+                matte_mode = (matte_mode + 1) % 4;
+            } else {
+                if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
+                    matte_mode = sixteennine ? 0 : 1;
+                } else if( !strcmp( commands_get_matte_mode( commands ), "1.85:1" ) ) {
+                    matte_mode = sixteennine ? 1 : 2;
+                } else if( !strcmp( commands_get_matte_mode( commands ), "2.35:1" ) ) {
+                    matte_mode = sixteennine ? 2 : 3;
+                } else {
+                    matte_mode = sixteennine ? 3 : 0;
+                }
+            }
+
             if( sixteennine ) {
                 if( matte_mode == 0 ) {
                     matte = 16.0 / 9.0;
@@ -1890,7 +1912,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 matte_y = (height - matte_h) / 2;
                 output->set_matte( sqwidth, matte_h );
             }
-            if( osd ) osd_list_matte( osd, matte_mode, sixteennine );
+            if( osd && !commands_menu_active( commands ) ) {
+                osd_list_matte( osd, matte_mode, sixteennine );
+            }
+            build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
+            commands_refresh_menu( commands );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
             if( height == 480 ) {

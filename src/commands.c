@@ -142,6 +142,7 @@ struct commands_s {
     int checkfreq;
     int usexds;
     int pulldown_alg;
+    char newmatte[ 16 ];
 
     int delay;
 
@@ -995,6 +996,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->checkfreq = config_get_check_freq_present( cfg );
     cmd->usexds = config_get_usexds( cfg );
     cmd->pulldown_alg = 0;
+    memset( cmd->newmatte, 0, sizeof( cmd->newmatte ) );
 
     /* Number of frames to wait for next channel digit. */
     cmd->delay = 1000000 / fieldtime;
@@ -1208,7 +1210,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle XDS decoding", 0xee, 0x80, 0xb6 );
+    sprintf( string, "%c%c%c  Toggle XDS decoding", 0xee, 0x80, 0x9a );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
     menu_set_right_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
@@ -1306,6 +1308,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "output" );
     menu_set_text( menu, 0, "Setup - Output configuration" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "matte" );
+    menu_set_text( menu, 0, "Setup - Output configuration - Apply matte" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "overscan" );
@@ -2078,6 +2084,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             commands_refresh_menu( cmd );
             sprintf( message, _("Sharpness will be %d on restart."), cmd->newsharpness );
             tvtime_osd_show_message( cmd->osd, message );
+        }
+        break;
+
+    case TVTIME_SET_MATTE:
+        if( arg ) {
+            snprintf( cmd->newmatte, sizeof( cmd->newmatte ), "%s", arg );
         }
         break;
 
@@ -2976,6 +2988,7 @@ void commands_next_frame( commands_t *cmd )
     cmd->resizewindow = 0;
     cmd->setdeinterlacer = 0;
     cmd->setfreqtable = 0;
+    memset( cmd->newmatte, 0, sizeof( cmd->newmatte ) );
 }
 
 int commands_quit( commands_t *cmd )
@@ -3211,5 +3224,14 @@ void commands_set_pulldown_alg( commands_t *cmd, int pulldown_alg )
                         cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
                         cmd->pulldown_alg );
     commands_refresh_menu( cmd );
+}
+
+const char *commands_get_matte_mode( commands_t *cmd )
+{
+    if( *cmd->newmatte ) {
+        return cmd->newmatte;
+    } else {
+        return 0;
+    }
 }
 
