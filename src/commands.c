@@ -795,9 +795,10 @@ void commands_next_frame( commands_t *in )
 
     if( in->audio_counter == 0 ) {
         videoinput_set_audio_mode( in->vidin, 2 );
-        tvtime_osd_set_audio_mode( in->osd,
-                                   videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
-        tvtime_osd_show_info( in->osd );
+        if( in->osd ) {
+            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+            tvtime_osd_show_info( in->osd );
+        }
         in->audio_counter = -1;
     }
 
