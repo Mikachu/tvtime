@@ -171,6 +171,7 @@ static void reinit_tuner( input_t *in )
             tvtime_osd_show_info( in->osd );
         }
     } else if( in->osd ) {
+        tvtime_osd_set_freq_table( in->osd, "" );
         tvtime_osd_set_channel_number( in->osd, "" );
         tvtime_osd_show_info( in->osd );
     }

@@ -226,7 +226,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->channel_number, osd->channel_number_text, 80 );
     osd_string_show_text( osd->channel_info, timestamp, 80 );
 
-    sprintf( text, "%s: %s", osd->tv_norm_text, osd->freqtable_text );
+    sprintf( text, "%s%s%s", osd->tv_norm_text,
+             strlen( osd->freqtable_text ) ? ": " : "", osd->freqtable_text );
     osd_string_show_text( osd->tuner_info, text, 80 );
 
     sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
