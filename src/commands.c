@@ -423,7 +423,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "root-tuner" );
     menu_set_text( menu, 0, "Setup" );
-    sprintf( string, "%c%c%c  Station management", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Station management", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
@@ -432,7 +432,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "input" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "input" );
     menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 3, "Picture settings" );
+    sprintf( string, "%c%c%c  Picture settings", 0xee, 0x80, 0x9e );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
@@ -454,7 +455,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
     menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 2, "Picture settings" );
+    sprintf( string, "%c%c%c  Picture settings", 0xee, 0x80, 0x9e );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
