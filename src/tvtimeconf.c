@@ -567,7 +567,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
     doc = xmlParseFile( config_filename );
     if( !doc ) {
         if( file_is_openable_for_read( config_filename ) ) {
-            lfputs( _("Config file cannot be parsed by tvtime. "
+            lfputs( _("Config file cannot be parsed. "
                       "Settings will not be saved.\n"), stderr );
             return 0;
         } else {
@@ -664,10 +664,10 @@ static void print_usage( char **argv )
               "                                 custom (first run tvtime-scanner)\n\n"), stderr );
     lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
-    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576).\n"), stderr );
+    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
     lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-              "                             (defaults to 720).\n"), stderr );
+              "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -k, --slave                Disables input handling in tvtime (slave mode).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
     lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
@@ -717,10 +717,10 @@ static void print_config_usage( char **argv )
               "                                 custom (first run tvtime-scanner)\n\n"), stderr );
     lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
-    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576).\n"), stderr );
+    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
     lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-              "                             (defaults to 720).\n"), stderr );
+              "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
     lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
     lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"

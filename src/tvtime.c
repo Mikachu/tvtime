@@ -860,7 +860,7 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
     char string[ 128 ];
     char text[ 128 ];
 
-    snprintf( text, sizeof( text ), _("Full rate: %.2ffps"), maxrate );
+    snprintf( text, sizeof( text ), _("Full rate: %.2f fps"), maxrate );
     snprintf( string, sizeof( string ), mode == 0 ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text );
     menu_set_text( menu, 1, string );
@@ -868,14 +868,14 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
     menu_set_enter_command( menu, 1, TVTIME_SET_FRAMERATE, "full" );
 
     snprintf( text, sizeof( text ),
-              _("Half rate, deinterlace top fields: %.2ffps"), maxrate / 2 );
+              _("Half rate, deinterlace top fields: %.2f fps"), maxrate / 2 );
     snprintf( string, sizeof( string ), mode == 1 ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_FRAMERATE, "top" );
 
     snprintf( text, sizeof( text ),
-              _("Half rate, deinterlace bottom fields: %.2ffps"), maxrate / 2 );
+              _("Half rate, deinterlace bottom fields: %.2f fps"), maxrate / 2 );
     snprintf( string, sizeof( string ), mode == 2 ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text );
     menu_set_text( menu, 3, string );
@@ -986,15 +986,15 @@ static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     tvtime_osd_list_set_lines( osd, 4 );
     tvtime_osd_list_set_text( osd, 0, _("Frame drop setting") );
 
-    snprintf( text, sizeof( text ), _("Full rate: %.2ffps"), maxrate );
+    snprintf( text, sizeof( text ), _("Full rate: %.2f fps"), maxrate );
     tvtime_osd_list_set_text( osd, 1, text );
 
     snprintf( text, sizeof( text ),
-              _("Half rate, deinterlace top fields: %.2ffps"), maxrate / 2 );
+              _("Half rate, deinterlace top fields: %.2f fps"), maxrate / 2 );
     tvtime_osd_list_set_text( osd, 2, text );
 
     snprintf( text, sizeof( text ),
-              _("Half rate, deinterlace bottom fields: %.2ffps"),
+              _("Half rate, deinterlace bottom fields: %.2f fps"),
               maxrate / 2 );
     tvtime_osd_list_set_text( osd, 3, text );
 
@@ -1016,19 +1016,19 @@ static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     snprintf( text, sizeof( text ), "%s: %s", _("Deinterlacer"), deinterlacer );
     tvtime_osd_list_set_text( osd, 1, text );
 
-    snprintf( text, sizeof( text ), _("Input: %s at %dx%d"),
+    snprintf( text, sizeof( text ), _("Input: %s at %dx%d pixels"),
               videoinput_get_norm_name( norm ), width, height );
     tvtime_osd_list_set_text( osd, 2, text );
 
-    snprintf( text, sizeof( text ), _("Attempted framerate: %.2ffps"),
+    snprintf( text, sizeof( text ), _("Attempted framerate: %.2f fps"),
              frameratemode ? 1000000.0 / ((double) (fieldtime*2)) : 1000000.0 / ((double) fieldtime) );
     tvtime_osd_list_set_text( osd, 3, text );
 
-    snprintf( text, sizeof( text ), _("Average blit time: %.2fms (%.0fMB/sec)"),
+    snprintf( text, sizeof( text ), _("Average blit time: %.2f ms (%.0f MB/sec)"),
              blit_time, (((double) framesize) * 0.00095367431640625000) / blit_time );
     tvtime_osd_list_set_text( osd, 4, text );
 
-    snprintf( text, sizeof( text ), _("Average render time: %5.2fms"),
+    snprintf( text, sizeof( text ), _("Average render time: %5.2f ms"),
               performance_get_estimated_rendering_time( perf ) );
     tvtime_osd_list_set_text( osd, 5, text );
 
@@ -1038,7 +1038,7 @@ static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
 
     if( !frameratemode ) {
         snprintf( text, sizeof( text ), 
-                  _("Blit spacing: %4.1f/%4.1fms (want %4.1fms)"),
+                  _("Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"),
                   performance_get_time_top_to_bot( perf ),
                   performance_get_time_bot_to_top( perf ),
                   ((double) fieldtime) * 0.001 );
@@ -1343,7 +1343,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     } else if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
-            if( asprintf( &error_string, _("Can't open RVR file %s."),
+            if( asprintf( &error_string, _("Cannot open RVR file %s."),
                           config_get_rvr_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
@@ -1988,10 +1988,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
                         tvtime_osd_show_message( osd,
-                              _("2-3 Pulldown detection disabled.") );
+                              _("2-3 pulldown inversion disabled.") );
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
                         tvtime_osd_show_message( osd,
-                              _("2-3 Pulldown detection enabled.") );
+                              _("2-3 pulldown inversion enabled.") );
                     }
                     commands_refresh_menu( commands );
                 }

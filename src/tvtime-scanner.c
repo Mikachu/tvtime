@@ -133,7 +133,7 @@ int main( int argc, char **argv )
     for( f = 44*16; f <= 958*16; f += 4 ) {
         char stationmhz[ 128 ];
 
-        fprintf( stderr, _("Checking %6.2fMHz:"), ((double) f) / 16.0 );
+        fprintf( stderr, _("Checking %6.2f MHz:"), ((double) f) / 16.0 );
         videoinput_set_tuner_freq( vidin, (f * 1000) / 16 );
         usleep( 200000 ); /* 0.2 sec */
         tuned = videoinput_freq_present( vidin );

@@ -2104,7 +2104,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             curname = menu_get_name( cmd->curusermenu );
             commands_refresh_menu( cmd );
             snprintf( message, sizeof( message ),
-                      _("Horizontal Resolution will be %d on restart."),
+                      _("Horizontal resolution will be %d pixels on restart."),
                       cmd->newinputwidth );
             tvtime_osd_show_message( cmd->osd, message );
         }
