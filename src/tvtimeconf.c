@@ -1676,11 +1676,6 @@ int config_get_usexds( config_t *ct )
     return ct->use_xds;
 }
 
-char *config_get_vbidev( config_t *ct )
-{
-    return ct->vbidev;
-}
-
 int config_get_check_freq_present( config_t *ct )
 {
     return ct->check_freq_present;

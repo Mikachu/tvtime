@@ -187,7 +187,6 @@ const char *config_get_xmltv_file( config_t *ct );
 double config_get_overscan( config_t *ct );
 int config_get_check_freq_present( config_t *ct );
 int config_get_usexds( config_t *ct );
-char *config_get_vbidev( config_t *ct );
 int config_get_invert( config_t *ct );
 int config_get_cc( config_t *ct );
 int config_get_mirror( config_t *ct );

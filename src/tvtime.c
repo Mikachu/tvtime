@@ -1626,7 +1626,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                      "closed captions unavailable.\n"), stderr );
         }
 
-        vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
+        vbidata = vbidata_new( config_get_vbi_device( ct ), vs, verbose );
         if( !vbidata ) {
             fputs( _("tvtime: Could not create vbidata.\n"), stderr );
         } else {
