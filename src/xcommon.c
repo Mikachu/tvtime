@@ -108,6 +108,9 @@ static area_t video_area;
 static area_t window_area;
 static area_t scale_area;
 
+static Time lastpresstime = 0;
+static Time lastreleasetime = 0;
+
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
@@ -1498,11 +1501,17 @@ void xcommon_poll_events( input_t *in )
             input_callback( in, I_KEYDOWN, arg );
             break;
         case ButtonPress:
-            input_callback( in, I_BUTTONPRESS, event.xbutton.button );
+            if( event.xbutton.time != lastpresstime ) {
+                input_callback( in, I_BUTTONPRESS, event.xbutton.button );
+                lastpresstime = event.xbutton.time;
+            }
             getfocus = 1;
             break;
         case ButtonRelease:
-            input_callback( in, I_BUTTONRELEASE, event.xbutton.button );
+            if( event.xbutton.time != lastreleasetime ) {
+                input_callback( in, I_BUTTONRELEASE, event.xbutton.button );
+                lastreleasetime = event.xbutton.time;
+            }
             getfocus = 1;
             break;
         default: break;
