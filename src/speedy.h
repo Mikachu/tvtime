@@ -192,6 +192,8 @@ extern void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int 
 extern void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
 extern void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
 extern void (*speedy_memcpy)( void *output, void *input, size_t size );
+extern void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
+                                        unsigned char *new, int os, int ns );
 
 /**
  * Sets up the function pointers to point at the fastest function available.
@@ -204,9 +206,9 @@ void setup_speedy_calls( int verbose );
 int speedy_get_accel( void );
 
 /**
- * Returns the current speedy time.
+ * Returns the time in clock ticks.
  */
-unsigned int speedy_get_usecs( void );
+unsigned int speedy_get_cycles( void );
 
 /**
  * Resets the speedy timer.

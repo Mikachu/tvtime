@@ -78,19 +78,19 @@ void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width )
 void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
+void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
+                                 unsigned char *new, int os, int ns );
 
 
-static unsigned int speedy_time = 0;
-static struct timeval cur_start_time;
-static struct timeval cur_end_time;
+static uint64_t speedy_time = 0;
+static uint64_t cur_start_time, cur_end_time;
 
 #define SPEEDY_START() \
-    gettimeofday( &cur_start_time, 0 )
+    rdtscll( cur_start_time );
 
 #define SPEEDY_END() \
-    gettimeofday( &cur_end_time, 0 ); \
-    speedy_time += (   ( ( cur_end_time.tv_sec * 1000 * 1000 ) + cur_end_time.tv_usec ) \
-                     - ( ( cur_start_time.tv_sec * 1000 * 1000 ) + cur_start_time.tv_usec ) )
+    rdtscll( cur_end_time ); \
+    speedy_time += cur_end_time - cur_start_time;
 
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
@@ -292,10 +292,12 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
                                   unsigned char *new, int os, int ns )
 {
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
-    short out[ 48 ]; /* Output buffer for the partial metrics from the mmx code. */
+    short out[ 24 ]; /* Output buffer for the partial metrics from the mmx code. */
     unsigned char *outdata = (unsigned char *) out;
     unsigned char *oldp, *newp;
     int i;
+
+    SPEEDY_START();
 
     pxor_r2r( mm4, mm4 );  // 4 even difference sums.
     pxor_r2r( mm5, mm5 );  // 4 odd difference sums.
@@ -429,6 +431,8 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
     }
 
     emms();
+
+    SPEEDY_END();
 }
 
 void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
@@ -436,6 +440,8 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
 {
     int x, y, e=0, o=0, s=0, p=0, t=0;
     unsigned char *oldp, *newp;
+
+    SPEEDY_START();
     m->s = m->p = m->t = 0;
     for (x = 8; x; x--) {
         oldp = old; old += 2;
@@ -457,6 +463,7 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
     m->e = e;
     m->o = o;
     m->d = e+o;
+    SPEEDY_END();
 }
 
 
@@ -1541,6 +1548,7 @@ void setup_speedy_calls( int verbose )
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
     halfmirror_packed422_inplace_scanline = halfmirror_packed422_inplace_scanline_c;
     speedy_memcpy = temp_memcpy;
+    diff_packed422_block8x8 = diff_packed422_block8x8_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         if( verbose ) {
@@ -1557,12 +1565,14 @@ void setup_speedy_calls( int verbose )
         blend_packed422_scanline = blend_packed422_scanline_mmxext;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
+        diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         }
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
+        diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
     } else {
         if( verbose ) {
             fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );
@@ -1575,9 +1585,9 @@ int speedy_get_accel( void )
     return speedy_accel;
 }
 
-unsigned int speedy_get_usecs( void )
+unsigned int speedy_get_cycles( void )
 {
-    return speedy_time;
+    return (unsigned int) speedy_time;
 }
 
 void speedy_reset_timer( void )
