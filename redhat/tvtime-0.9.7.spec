@@ -68,13 +68,13 @@ rm -rf %{buildroot}
 %{_mandir}/man5/%{name}rc.5*
 
 %changelog
-* Mon Feb 24 2003 Paul Jara <rascasse at sourceforge.net>
+* Mon Feb 24 2003 Paul Jara <rascasse at users.sourceforge.net>
 - Added default.tvtimerc to docs directory
 - Sync'd with latest CVS version
 - tvscanner replaced with timingtest
-* Mon Feb 24 2003 Paul Jara <rascasse at sourceforge.net>
+* Mon Feb 24 2003 Paul Jara <rascasse at users.sourceforge.net>
 - Added man pages for tvtime and tvtimerc
 - Macro-ized some common shell commands
 - Added icon and menu entry for RedHat 8.0+
-* Sun Feb 23 2003 Paul Jara <rascasse at sourceforge.net>
+* Sun Feb 23 2003 Paul Jara <rascasse at users.sourceforge.net>
 - Initial build.
