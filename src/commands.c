@@ -279,8 +279,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) {
             if( config_get_apply_luma_correction( in->cfg ) ) {
                 tvtime_osd_show_message( in->osd, "Luma correction enabled." );
+		configsave("ApplyLumaCorrection", "1", 1);
             } else {
                 tvtime_osd_show_message( in->osd, "Luma correction disabled." );
+		configsave("ApplyLumaCorrection", "0", 1);
             }
         }
         break;
