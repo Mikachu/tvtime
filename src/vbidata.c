@@ -39,11 +39,15 @@
 
 struct vbidata_s
 {
+    char *filename;
     int fd;
+    int open;
     vbiscreen_t *vs;
     uint8_t buf[ 65536 ];
     int wanttop;
     int wanttext;
+
+    int usexds;
 
     unsigned int colour;
     int row, ital;
@@ -813,6 +817,8 @@ int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
         return 1;
     }
 
+    if( !vbi->usexds ) return 1;
+
     if( bottom && xds_decode( vbi, b1, b2 ) ) {
         return 1;
     }
@@ -889,14 +895,14 @@ vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose )
         return 0;
     }
 
-    vbi->fd = open( filename, O_RDONLY );
-    if( vbi->fd < 0 ) {
-        fprintf( stderr, "vbidata: Can't open %s: %s\n",
-                 filename, strerror( errno ) );
+    vbi->filename = strdup( filename );
+    if( !vbi->filename ) {
         free( vbi );
         return 0;
     }
 
+    vbi->open = 0;
+    vbi->usexds = 0;
     vbi->vs = vs;
     vbi->verbose = verbose;
 
@@ -905,9 +911,26 @@ vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose )
     return vbi;
 }
 
-void vbidata_delete( vbidata_t *vbi )
+static void vbidata_open_device( vbidata_t *vbi )
+{
+    vbi->fd = open( vbi->filename, O_RDONLY );
+    if( vbi->fd < 0 ) {
+        fprintf( stderr, "vbidata: Can't open %s: %s\n",
+                 vbi->filename, strerror( errno ) );
+    } else {
+        vbi->open = 1;
+    }
+}
+
+static void vbidata_close_device( vbidata_t *vbi )
 {
     close( vbi->fd );
+    vbi->open = 0;
+}
+
+void vbidata_delete( vbidata_t *vbi )
+{
+    if( vbi->open ) vbidata_close_device( vbi );
     free( vbi );
 }
 
@@ -1024,40 +1047,65 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
     if( !vbi->enabled && vbi->vs ) {
         vbiscreen_reset( vbi->vs );
     }
+
+    if( vbi->enabled && !vbi->open ) {
+        vbidata_open_device( vbi );
+    }
+
+    if( !vbi->enabled && !vbi->usexds ) {
+        vbidata_reset( vbi );
+        vbidata_close_device( vbi );
+    }
+}
+
+void vbidata_capture_xds( vbidata_t *vbi, int xds )
+{
+    vbi->usexds = xds;
+
+    if( vbi->usexds && !vbi->open ) {
+        vbidata_open_device( vbi );
+    }
+
+    if( !vbi->usexds && !vbi->enabled ) {
+        vbidata_reset( vbi );
+        vbidata_close_device( vbi );
+    }
 }
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )
 {
-    if( read( vbi->fd, vbi->buf, 65536 ) < 65536 ) {
-        if( vbi->verbose ) {
-            fprintf( stderr, "vbidata: Can't read vbi data: %s\n",
-                     strerror( errno ) );
-        }
-    } else {
-        int scanline = 11; /* Process line 21. */
-        int k;
-
-        /* Apply diz' new filter. */
-        for( k = 1; k < 7; k++ ) {
-            int j = scanline * 2048;
-            int i;
-
-            for( i = 1600; i > 0; i-- ) {
-                vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+    if( vbi->open ) {
+        if( read( vbi->fd, vbi->buf, 65536 ) < 65536 ) {
+            if( vbi->verbose ) {
+                fprintf( stderr, "vbidata: Can't read vbi data: %s\n",
+                         strerror( errno ) );
             }
-        }
-        ProcessLine( vbi, &vbi->buf[ scanline * 2048 ], 0 );
+        } else {
+            int scanline = 11; /* Process line 21. */
+            int k;
 
-        /* Apply diz' new filter. */
-        for( k = 1; k < 7; k++ ) {
-            int j = ( 16 + scanline )*2048;
-            int i;
+            /* Apply diz' new filter. */
+            for( k = 1; k < 7; k++ ) {
+                int j = scanline * 2048;
+                int i;
 
-            for( i = 1600; i > 0; i-- ) {
-                vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+                for( i = 1600; i > 0; i-- ) {
+                    vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+                }
             }
+            ProcessLine( vbi, &vbi->buf[ scanline * 2048 ], 0 );
+
+            /* Apply diz' new filter. */
+            for( k = 1; k < 7; k++ ) {
+                int j = ( 16 + scanline )*2048;
+                int i;
+
+                for( i = 1600; i > 0; i-- ) {
+                    vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+                }
+            }
+            ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
         }
-        ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
     }
 }
 

@@ -57,6 +57,8 @@ void vbidata_reset( vbidata_t *vbi );
 void vbidata_capture_mode( vbidata_t *vbi, int mode );
 void vbidata_process_frame( vbidata_t *vbi, int printdebug );
 
+void vbidata_capture_xds( vbidata_t *vbi, int xds );
+
 const char *vbidata_get_program_name( vbidata_t *vbi );
 const char *vbidata_get_program_type( vbidata_t *vbi );
 const char *vbidata_get_program_rating( vbidata_t *vbi );
