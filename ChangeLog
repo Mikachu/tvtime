@@ -1,5 +1,7 @@
 
 0.9.8
+  * vektor: Channel now switches after timeout if you're typing in
+      a new position number (fixes 721289)
   * vektor: Added support for custom frequencies in the staitonlist.xml
       file and added a command to save current finetuning as a new
       station (fixes 711434)
