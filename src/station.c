@@ -249,7 +249,7 @@ void station_next( station_mgr_t *mgr )
         station_info_t *i= mgr->current;
         do {
             mgr->current = mgr->current->next;
-	} while ( !mgr->current->active && mgr->current != i ); 
+        } while ( !mgr->current->active && mgr->current != i ); 
     }
 }
 
@@ -362,7 +362,7 @@ int station_set_current_active( station_mgr_t *mgr, int active )
 {
     if( mgr->current ) {
         mgr->current->active = active;
-	return 1;
+        return 1;
     }
     return 0;
    
@@ -438,7 +438,7 @@ int station_remap( station_mgr_t *mgr, int pos )
 
         rp->pos= i->pos;
         i->pos= pos;
-	
+
         if ( rp == mgr->first ) mgr->first= i;
         return 1;
     }
@@ -459,7 +459,8 @@ int station_writeconfig( station_mgr_t *mgr)
         fprintf( stderr, "station: Couldn't open %s for writing\n", name );
         return 0;
     }
-    
+
+    fprintf( stderr, "station: Writing station file '~/.tvtime/stations'.\n" );    
     rp= mgr->first;
     if( mgr->first ) {
         do {
@@ -469,7 +470,6 @@ int station_writeconfig( station_mgr_t *mgr)
     }
 
     fclose( f );
-
     return 1;
 }
 
