@@ -32,6 +32,7 @@
 #include <pwd.h>
 #include <errno.h>
 #include <libxml/parser.h>
+#include <math.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -286,6 +287,9 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "LumaCorrection" ) ) {
             ct->luma_correction = atof( curval );
+            if( !isnormal( ct->luma_correction ) ) {
+                ct->luma_correction = 1.0;
+            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "V4LDevice" ) ) {
@@ -379,6 +383,9 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
             ct->overscan = ( atof( curval ) / 2.0 ) / 100.0;
+            if( !isnormal( ct->overscan ) ) {
+                ct->overscan = 0.0;
+            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "MixerDevice" ) ) {
