@@ -284,6 +284,16 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
                                   uint8_t *new, int os, int ns );
 
 /**
+ * From the MPEG2 reference implementation.
+ */
+
+/* horizontal 1:2 interpolation filter */
+void mpeg2_422_to_444_plane_c( uint8_t *dst, uint8_t *src, int width, int height );
+
+/* vertical 1:2 interpolation filter */
+void mpeg2_420_to_422_plane_c( uint8_t *dst, uint8_t *src, int width, int height, int progressive );
+
+/**
  * Here are the function pointers which will be initialized to point at the
  * fastest available version of the above after a call to setup_speedy_calls().
  */
