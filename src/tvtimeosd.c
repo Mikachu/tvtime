@@ -173,7 +173,7 @@ void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
 
 const int top_size = 7;
 const int left_size = 7;
-const int bottom_size = 8;
+const int bottom_size = 13;
 
 tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frameaspect )
 {
@@ -296,13 +296,13 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_VOLUME_BAR ].string, 1 );
     osd->strings[ OSD_VOLUME_BAR ].xpos = (( width * left_size ) / 100) & ~1;
-    osd->strings[ OSD_VOLUME_BAR ].ypos = ( height * 90 ) / 100;
+    osd->strings[ OSD_VOLUME_BAR ].ypos = ( height * (100 - bottom_size) ) / 100;
 
     osd_string_set_colour_rgb( osd->strings[ OSD_DATA_BAR ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_DATA_BAR ].string, 1 );
     osd->strings[ OSD_DATA_BAR ].xpos = osd->strings[ OSD_VOLUME_BAR ].xpos;
-    osd->strings[ OSD_DATA_BAR ].ypos = ( height * 90 ) / 100;
+    osd->strings[ OSD_DATA_BAR ].ypos = ( height * (100 - bottom_size) ) / 100;
 
     osd_string_set_colour_rgb( osd->strings[ OSD_MUTED ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
