@@ -71,6 +71,20 @@
 #include "mm_accel.h"
 
 /**
+ * This is how many frames to wait until deciding if the pulldown phase
+ * has changed or if we've really found a pulldown sequence.  This is
+ * currently set to about 1 second, that is, we won't go into film mode
+ * until we've seen a pulldown sequence successfully for 1 second.
+ */
+#define PULLDOWN_ERROR_WAIT     60
+
+/**
+ * This is how many predictions have to be incorrect before we fall back to
+ * video mode.  Right now, if we mess up, we jump to video mode immediately.
+ */
+#define PULLDOWN_ERROR_THRESHOLD 2
+
+/**
  * Michael Niedermayer's magic FIRs
  *
  * [-1 14 3]
@@ -113,6 +127,52 @@ const double fadespeed = 65.0;
  * Number of frames to wait before detecting a signal.
  */
 const int scan_delay = 10;
+
+typedef struct tvtime_deinterlacer_s
+{
+    int start;
+    int end;
+    int cur;
+} tvtime_deinterlacer_t;
+
+typedef struct tvtime_s
+{
+    deinterlace_method_t *curmethod;
+    videofilter_t *filter;
+    int filtered_curframe;
+    int last_topdiff;
+    int last_botdiff;
+
+    /* 2-3 pulldown detection. */
+    int pdoffset;
+    int pderror;
+    int pdlastbusted;
+    int filmmode;
+} tvtime_t;
+
+tvtime_t *tvtime_new( videofilter_t *filter )
+{
+    tvtime_t *tvtime = malloc( sizeof( tvtime_t ) );
+    if( !tvtime ) return 0;
+
+    tvtime->curmethod = 0;
+    tvtime->filter = filter;
+    tvtime->filtered_curframe = 0;
+    tvtime->last_topdiff = 0;
+    tvtime->last_botdiff = 0;
+
+    tvtime->pdoffset = PULLDOWN_SEQ_AA;
+    tvtime->pderror = PULLDOWN_ERROR_WAIT;
+    tvtime->pdlastbusted = 0;
+    tvtime->filmmode = 0;
+
+    return tvtime;
+}
+
+void tvtime_set_deinterlacer( tvtime_t *tvtime, deinterlace_method_t *method )
+{
+    tvtime->curmethod = method;
+}
 
 static void build_colourbars( uint8_t *output, int width, int height )
 {
@@ -188,21 +248,6 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
     pngoutput_delete( pngout );
     free( tempscanline );
 }
-
-/**
- * This is how many frames to wait until deciding if the pulldown phase
- * has changed or if we've really found a pulldown sequence.  This is
- * currently set to about 1 second, that is, we won't go into film mode
- * until we've seen a pulldown sequence successfully for 1 second.
- */
-#define PULLDOWN_ERROR_WAIT     60
-
-/**
- * This is how many predictions have to be incorrect before we fall back to
- * video mode.  Right now, if we mess up, we jump to video mode immediately.
- */
-#define PULLDOWN_ERROR_THRESHOLD 2
-
 
 /**
  * Explination of the loop:
@@ -291,13 +336,8 @@ static void pulldown_merge_fields( uint8_t *output,
     }
 }
 
-static videofilter_t *filter = 0;
-static int filtered_cur = 0;
-
-static int last_topdiff = 0;
-static int last_botdiff = 0;
-
-static void calculate_pulldown_score_vektor( uint8_t *curframe,
+static void calculate_pulldown_score_vektor( tvtime_t *tvtime,
+                                             uint8_t *curframe,
                                              uint8_t *lastframe,
                                              int instride,
                                              int frame_height,
@@ -305,32 +345,28 @@ static void calculate_pulldown_score_vektor( uint8_t *curframe,
 {
     int i;
 
-    last_topdiff = 0;
-    last_botdiff = 0;
+    tvtime->last_topdiff = 0;
+    tvtime->last_botdiff = 0;
 
     for( i = 0; i < frame_height; i++ ) {
-        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, i ) ) {
-            videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
+        if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, i ) ) {
+            videofilter_packed422_scanline( tvtime->filter, curframe + (i*instride), width, 0, i );
         }
 
         if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-            last_topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
-                                                            lastframe + (i*instride), width );
-            last_botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
-                                                            lastframe + (i*instride) + instride,
-                                                            width );
+            tvtime->last_topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
+                                                                    lastframe + (i*instride), width );
+            tvtime->last_botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
+                                                                    lastframe + (i*instride) + instride,
+                                                                    width );
         }
     }
 
-    filtered_cur = 1;
+    tvtime->filtered_curframe = 1;
 }
 
-static int pdoffset = PULLDOWN_SEQ_AA;
-static int pderror = PULLDOWN_ERROR_WAIT;
-static int pdlastbusted = 0;
-static int filmmode = 0;
-
-static void tvtime_build_deinterlaced_frame( uint8_t *output,
+static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
+                                             uint8_t *output,
                                              uint8_t *curframe,
                                              uint8_t *lastframe,
                                              uint8_t *secondlastframe,
@@ -351,7 +387,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
 
     if( pulldown_alg != PULLDOWN_VEKTOR ) {
         /* If we leave vektor pulldown mode, lose our state. */
-        filmmode = 0;
+        tvtime->filmmode = 0;
     }
 
     if( pulldown_alg == PULLDOWN_VEKTOR ) {
@@ -359,7 +395,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         if( !bottom_field ) {
             int predicted;
 
-            predicted = pdoffset << 1;
+            predicted = tvtime->pdoffset << 1;
             if( predicted > PULLDOWN_SEQ_DD ) predicted = PULLDOWN_SEQ_AA;
 
             /**
@@ -368,43 +404,44 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
              */
 
-            pdoffset = determine_pulldown_offset_short_history_new( last_topdiff, last_botdiff, 1, predicted );
+            tvtime->pdoffset = determine_pulldown_offset_short_history_new( tvtime->last_topdiff,
+                                                                            tvtime->last_botdiff, 1, predicted );
             //pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
 
-            calculate_pulldown_score_vektor( curframe, lastframe, instride, frame_height, width );
+            calculate_pulldown_score_vektor( tvtime, curframe, lastframe, instride, frame_height, width );
 
             /* 3:2 pulldown state machine. */
-            if( !pdoffset ) {
+            if( !tvtime->pdoffset ) {
                 /* No pulldown offset applies, drop out of pulldown immediately. */
-                pdlastbusted = 0;
-                pderror = PULLDOWN_ERROR_WAIT;
-            } else if( pdoffset != predicted ) {
-                if( pdlastbusted ) {
-                    pdlastbusted--;
-                    pdoffset = predicted;
+                tvtime->pdlastbusted = 0;
+                tvtime->pderror = PULLDOWN_ERROR_WAIT;
+            } else if( tvtime->pdoffset != predicted ) {
+                if( tvtime->pdlastbusted ) {
+                    tvtime->pdlastbusted--;
+                    tvtime->pdoffset = predicted;
                 } else {
-                    pderror = PULLDOWN_ERROR_WAIT;
+                    tvtime->pderror = PULLDOWN_ERROR_WAIT;
                 }
             } else {
-                if( pderror ) {
-                    pderror--;
+                if( tvtime->pderror ) {
+                    tvtime->pderror--;
                 }
 
-                if( !pderror ) {
-                    pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
+                if( !tvtime->pderror ) {
+                    tvtime->pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
                 }
             }
 
 
-            if( !pderror ) {
-                // We're in pulldown, reverse it.
-                if( !filmmode ) {
+            if( !tvtime->pderror ) {
+                /* We're in pulldown, reverse it. */
+                if( !tvtime->filmmode ) {
                     fprintf( stderr, "Film mode enabled.\n" );
-                    if( osd ) tvtime_osd_set_film_mode( osd, pdoffset );
-                    filmmode = 1;
+                    if( osd ) tvtime_osd_set_film_mode( osd, tvtime->pdoffset );
+                    tvtime->filmmode = 1;
                 }
 
-                if( pulldown_source( pdoffset, 0 ) ) {
+                if( pulldown_source( tvtime->pdoffset, 0 ) ) {
                     pulldown_merge_fields( output, lastframe, lastframe + instride,
                                            osd, con, vs, width, frame_height, instride*2, outstride );
                 } else {
@@ -414,14 +451,14 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
 
                 return;
             } else {
-                if( filmmode ) {
+                if( tvtime->filmmode ) {
                     fprintf( stderr, "Film mode disabled.\n" );
                     if( osd ) tvtime_osd_set_film_mode( osd, -1 );
-                    filmmode = 0;
+                    tvtime->filmmode = 0;
                 }
             }
-        } else if( !pderror ) {
-            if( pulldown_source( pdoffset, 1 ) ) {
+        } else if( !tvtime->pderror ) {
+            if( pulldown_source( tvtime->pdoffset, 1 ) ) {
                 pulldown_merge_fields( output, curframe, lastframe + instride,
                                        osd, con, vs, width, frame_height, instride*2, outstride );
             } else {
@@ -436,10 +473,10 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( filter && !filtered_cur ) {
+        if( tvtime->filter && !tvtime->filtered_curframe ) {
             for( i = 0; i < frame_height; i++ ) {
-                if( videofilter_active_on_scanline( filter, i ) ) {
-                    videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
+                if( videofilter_active_on_scanline( tvtime->filter, i ) ) {
+                    videofilter_packed422_scanline( tvtime->filter, curframe + (i*instride), width, 0, i );
                 }
             }
         }
@@ -477,8 +514,8 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         }
 
         /* Copy a scanline. */
-        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline ) ) {
-            videofilter_packed422_scanline( filter, curframe, width, 0, scanline );
+        if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline ) ) {
+            videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline );
         }
         blit_packed422_scanline( output, curframe, width );
         if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
@@ -498,9 +535,9 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             data.t0 = curframe;
             data.b0 = curframe + (instride*2);
 
-            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
-                videofilter_packed422_scanline( filter, curframe + instride, width, 0, scanline );
-                videofilter_packed422_scanline( filter, curframe + (instride*2), width, 0, scanline + 1 );
+            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ) {
+                videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, scanline );
+                videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, scanline + 1 );
             }
 
             if( bottom_field ) {
@@ -586,7 +623,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         }
     }
 
-    filtered_cur = 1;
+    tvtime->filtered_curframe = 1;
 }
 
 static void tvtime_build_interlaced_frame( uint8_t *output,
@@ -650,7 +687,8 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
     }
 }
 
-static void tvtime_build_copied_field( uint8_t *output,
+static void tvtime_build_copied_field( tvtime_t *tvtime,
+                                       uint8_t *output,
                                        uint8_t *curframe,
                                        tvtime_osd_t *osd,
                                        console_t *con,
@@ -670,8 +708,8 @@ static void tvtime_build_copied_field( uint8_t *output,
     }
 
     /* Copy a scanline. */
-    if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + bottom_field ) ) {
-        videofilter_packed422_scanline( filter, curframe, width, 0, scanline + bottom_field );
+    if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + bottom_field ) ) {
+        videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline + bottom_field );
     }
     // blit_packed422_scanline( output, curframe, width );
     quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
@@ -687,14 +725,14 @@ static void tvtime_build_copied_field( uint8_t *output,
     for( i = ((frame_height - 2) / 2); i; --i ) {
         /* Copy/interpolate a scanline. */
         if( bottom_field ) {
-            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
-                videofilter_packed422_scanline( filter, curframe, width, 0, scanline + 1 );
+            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ) {
+                videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline + 1 );
             }
             // interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
             quarter_blit_vertical_packed422_scanline( output, curframe - (instride*2), curframe, width );
         } else {
-            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline ) ) {
-                videofilter_packed422_scanline( filter, curframe, width, 0, scanline );
+            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline ) ) {
+                videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline );
             }
             // blit_packed422_scanline( output, curframe, width );
             if( i > 1 ) {
@@ -766,6 +804,7 @@ int main( int argc, char **argv )
     int read_stdin = 1;
     double pixel_aspect;
     char number[ 4 ];
+    tvtime_t *tvtime;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -838,7 +877,6 @@ int main( int argc, char **argv )
     }
 
     verbose = config_get_verbose( ct );
-
     if( verbose ) {
         cpuinfo_print_info();
     }
@@ -894,6 +932,12 @@ int main( int argc, char **argv )
 
     /* Setup the speedy calls. */
     setup_speedy_calls( mm_accel(), verbose );
+
+    /* Setup the tvtime object. */
+    tvtime = tvtime_new( videofilter_new() );
+    if( !tvtime->filter ) {
+        fprintf( stderr, "tvtime: Can't initialize filters.\n" );
+    }
 
     if( !output->is_interlaced() ) {
         linear_plugin_init();
@@ -1054,6 +1098,7 @@ int main( int argc, char **argv )
             if( !curmethodid ) break;
         }
     }
+    tvtime_set_deinterlacer( tvtime, curmethod );
 
     /* Build colourbars. */
     colourbars = malloc( width * height * 2 );
@@ -1107,19 +1152,15 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    /* Setup the video correction tables. */
-    filter = videofilter_new();
-    if( !filter ) {
-        fprintf( stderr, "tvtime: Can't initialize filters.\n" );
-        return 1;
-    } else {
-        videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
-        videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
+    if( tvtime->filter ) {
+        /* Setup the video correction tables. */
+        videofilter_set_bt8x8_correction( tvtime->filter, commands_apply_luma_correction( commands ) );
+        videofilter_set_luma_power( tvtime->filter, commands_get_luma_power( commands ) );
     }
 
     if( vidin && videoinput_is_uyvy( vidin ) ) {
-        if( filter ) {
-            videofilter_enable_uyvy_conversion( filter );
+        if( tvtime->filter ) {
+            videofilter_enable_uyvy_conversion( tvtime->filter );
         } else {
             fprintf( stderr, "tvtime: Card requires conversion from UYVY, but "
                      "we failed to initialize our converter!\n" );
@@ -1338,6 +1379,7 @@ int main( int argc, char **argv )
                     while( strcasecmp( config_get_deinterlace_method( cur ), curmethod->short_name ) ) {
                         curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
                         curmethod = get_deinterlace_method( curmethodid );
+                        tvtime_set_deinterlacer( tvtime, curmethod );
                         if( curmethodid == firstmethod ) break;
                     }
                     if( osd ) {
@@ -1415,6 +1457,7 @@ int main( int argc, char **argv )
                 curmethodid = (curmethodid & ~1) + (((curmethodid & 1) + 1) % 2);
             }
             curmethod = get_deinterlace_method( curmethodid );
+            tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
@@ -1422,7 +1465,7 @@ int main( int argc, char **argv )
             config_save( ct, "DeinterlaceMethod", curmethod->short_name );
         }
         if( commands_update_luma_power( commands ) ) {
-            videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
+            videofilter_set_luma_power( tvtime->filter, commands_get_luma_power( commands ) );
         }
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
@@ -1431,7 +1474,7 @@ int main( int argc, char **argv )
         input_next_frame( in );
 
         /* Notice this because it's cheap. */
-        videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
+        videofilter_set_bt8x8_correction( tvtime->filter, commands_apply_luma_correction( commands ) );
 
 
         /**
@@ -1477,7 +1520,7 @@ int main( int argc, char **argv )
                 }
             }
             acquired = 1;
-            filtered_cur = 0;
+            tvtime->filtered_curframe = 0;
         } else {
             /**
              * Wait for the next field time.
@@ -1614,11 +1657,11 @@ int main( int argc, char **argv )
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field( output->get_output_buffer(),
+                        tvtime_build_copied_field( tvtime, output->get_output_buffer(),
                                            curframe, osd, con, vs, 0,
                                            width, height, width * 2, output->get_output_stride() );
                     } else {
-                        tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                        tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
                                            curframe, lastframe, secondlastframe,
                                            osd, con, vs, 0,
                                            width, height, width * 2, output->get_output_stride() );
@@ -1743,11 +1786,11 @@ int main( int argc, char **argv )
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field( output->get_output_buffer(),
+                        tvtime_build_copied_field( tvtime, output->get_output_buffer(),
                                           curframe, osd, con, vs, 1,
                                           width, height, width * 2, output->get_output_stride() );
                     } else {
-                        tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                        tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
                                           curframe, lastframe,
                                           secondlastframe, osd, con, vs, 1,
                                           width, height, width * 2, output->get_output_stride() );
