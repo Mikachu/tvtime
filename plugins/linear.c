@@ -15,6 +15,7 @@ static void deinterlace_scanline_linear( unsigned char *output, unsigned char *t
 
 static deinterlace_method_t linearmethod =
 {
+    DEINTERLACE_PLUGIN_API_VERSION,
     "Linear interpolation",
     "Linear",
     1,

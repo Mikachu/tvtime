@@ -229,6 +229,7 @@ static deinterlace_setting_t settings[] =
 
 static deinterlace_method_t twoframe =
 {
+    DEINTERLACE_PLUGIN_API_VERSION,
     "TwoFrame (DScaler)",
     "2-Frame",
     4,

@@ -1,16 +1,64 @@
-
+/**
+ * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
 
 #ifndef DEINTERLACE_H_INCLUDED
 #define DEINTERLACE_H_INCLUDED
 
+#define DEINTERLACE_PLUGIN_API_VERSION 0x00000001
+
 /**
- * Our deinterlacer plugin API is modeled after DScaler's.
+ * Our deinterlacer plugin API is modeled after DScaler's.  This module
+ * represents the API that all deinterlacer plugins must export, and
+ * also provides a registration mechanism for the application to be able
+ * to iterate through available plugins and select an appropriate one.
  */
+
 typedef struct deinterlace_setting_s deinterlace_setting_t;
 typedef struct deinterlace_method_s deinterlace_method_t;
 
+/**
+ * Callback for setting change notification.
+ */
 typedef void (*setting_onchange_t)(deinterlace_setting_t *);
 
+/**
+ * Interface for plugin initialization.
+ */
+typedef void (*deinterlace_plugin_init_t)( void );
+
+/**
+ * The scanline function that every deinterlacer plugin must implement
+ * to do its work.
+ *
+ * Each deinterlacing routine can require data from up to four fields.
+ * The current field is being output is Field 4:
+ *
+ * | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |         |   T0    |         |   T1    |
+ * |   M0    |         |    M1   |         |
+ * |         |   B0    |         |   B1    |
+ *
+ * While all pointers are passed in, each plugin is only guarenteed for
+ * the ones it indicates it requires (in the fields_required parameter)
+ * to be available.
+ *
+ * Pointers are always to scanlines in the standard packed 4:2:2 format.
+ */
 typedef void (*deinterlace_scanline_t)( unsigned char *output,
                                         unsigned char *t1,
                                         unsigned char *m1,
@@ -20,17 +68,22 @@ typedef void (*deinterlace_scanline_t)( unsigned char *output,
                                         unsigned char *b0,
                                         int width );
 
-typedef void (*deinterlace_plugin_init_t)( void );
-
+/**
+ * Plugin settings can be any of the following.
+ */
 typedef enum
 {
-    SETTING_NOT_PRESENT,
     SETTING_ONOFF,
     SETTING_YESNO,
     SETTING_ITEMFROMLIST,
     SETTING_SLIDER
 } setting_type_t;
 
+/**
+ * Each setting provides a pointer to the value, the min, max, default
+ * and step increment, and if it's not 0, a function to be called
+ * when the parameter is updated.
+ */
 struct deinterlace_setting_s
 {
     const char *name;
@@ -43,8 +96,12 @@ struct deinterlace_setting_s
     setting_onchange_t onchange;
 };
 
+/**
+ * This structure defines the deinterlacer plugin.
+ */
 struct deinterlace_method_s
 {
+    int version;
     const char *name;
     const char *short_name;
     int fields_required;
