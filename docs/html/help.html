@@ -82,104 +82,115 @@
             <li><a href="#macrovision">FAQ: Purple lines in video?  How do I avoid macrovision?</a><br>
             <li><a href="#noise">FAQ: Interference problems with soundcards</a><br>
             <li><a href="#tvout">FAQ: Optimal settings for tvtime on TV output</a><br>
+            <li><a href="#bsd">FAQ: Does tvtime support FreeBSD or NetBSD?</a>
             </ol>
         </td></tr></table>
 
-<hr>
-<h3><a name="resources">1. Support resources</a></h3>
+        <hr>
+        <h3><a name="resources">1. Support resources</a></h3>
 
-<p>Interested in <b>tvtime</b>?  Having trouble?  Have suggestions?  Why not hang
-out with us on <b>IRC</b> at
-<a href="http://www.freenode.net">irc.freenode.net</a>, channel
-<b>#livid</b>.  Hope to see you there!</p>
+        <p>Interested in <b>tvtime</b>?  Having trouble?  Have
+        suggestions?  Why not hang out with us on <b>IRC</b> at
+        <a href="http://www.freenode.net">irc.freenode.net</a>, channel
+        <b>#livid</b>.  Hope to see you there!</p>
 
-<p>There is also a
-<a href="http://sourceforge.net/mail/?group_id=64301">tvtime mailing list</a>
-which you can subscribe to, or read on the web.</p>
+        <p>There is also a
+        <a href="http://sourceforge.net/mail/?group_id=64301">tvtime mailing list</a>
+        which you can subscribe to, or read on the web.</p>
 
-<hr>
-<h3><a name="summary">2. Summary of new features by release</a></h3>
+        <hr>
+        <h3><a name="summary">2. Summary of new features by release</a></h3>
 
-<table border="0" width="100%">
-<tr><th class="version"><b>tvtime 0.9.8.5</b>
-<td>
-<ol>
-<li>Some root safety improvements.
-<li>Added support for long-format command line arguments.
-<li>Added config file options to set startup window position.
-<li>Compile fixes for non-C99 compilers and older DirectFB versions.
-</ol>
-<tr><th class="version"><b>tvtime 0.9.8.4</b>
-<td>
-<ol>
-<li>Support for norm switching between "compatible" norms for areas
-which receive both SECAM and PAL format stations.
-<li>Added support for the mga_vid driver for the Matrox G200/G400 series
-cards from mplayer.
-<li>Semi-experimental of the X code for better fullscreen support under
-many window managers.  Testing appreciated.
-<li>Support for changing the mixer device and channel (see 'man tvtime'
-and the config file documentation).
-<li>Slightly less partial experimental UTF-8 support. Now works with any
-simple left-to-right scripts which are in FreeSansBold.ttf .
-</ol>
-<tr><th class="version"><b>tvtime 0.9.8.2</b>
-<td>
-<ol>
-<li>Fixed all of the known crashes and many minor bugs from the 0.9.8
-release.
-<li>Updated the look-and-feel of the user interface.
-<li>Partial EXPERIMENTAL UTF-8 support. Only works with UTF-8
-characters that are also in ISO-8859-1 (Latin-1).
-</ol>
-<tr><th class="version"><b>tvtime 0.9.8</b>
-<td>
-<ol>
-<li>New XML config file format for both the tvtime configuration, and
-the station list.
-<li>tvtime now has two distinct half-framerate modes: top-field-first
-frames, and bottom-field-first frames.  This helps with manually
-deinterlacing 2-2 pulldown or progressive content.
-<li>Added support for preset 'modes', which can set the deinterlacer,
-window size, fullscreen setting and framerate mode.
-<li>Added support for custom frequencies in the stationlist.xml file,
-and a runtime command to add a new station from the current fine-tuning
-settings.
-<li>Added some DScaler DLLs and a wine layer to load these deinterlacer
-plugins directly without porting to Linux.  This gives us the following
-new deinterlacers:
-<ol>
-<li>DScaler: Greedy - High Motion
-<li>DScaler: Greedy - 2-frame
-<li>DScaler: TwoFrame
-<li>DScaler: TomsMoComp
-<li>DScaler: Video Bob
-<li>DScaler: Video Weave
-</ol>
-We had our own ports of videobob, twoframe, and greedy2frame, but they
-were found to be buggy.  Our ports are currently disabled.
-<li>Added the ffmpeg vertical deinterlacer filter.
-<li>Support for multiple audio channels (stereo, mono, lang1, lang2).
-<li>Included a bunch of fixes for PAL-M support.
-<li>Added a slave mode for freevo integration.
-<li>Various speedups, quality improvements, and bugfixes.
-</ol>
-<tr><th class="version"><b>tvtime 0.9.7</b>
-<td>
-<ol>
-<li>Moved config files into a new config file directory ~/.tvtime
-<li>Reworked the frequency tables, merging europe-cable, europe-west,
-europe-east all into 'europe'.  Added the 'russia' frequency table.
-<li>Added a channel scanner.  <b>F10</b> walks through the channel list and
-disables inactive channels.
-<li>Added the 'XVideo Bob' deinterlacer filter.
-<li>Added lirc support.
-<li>Added the overscan feature.
-<li>Added hardware support webpage.
-<li>Added a half-framerate mode ('=' to activate it).
-<li>Fixed alot of bug reports.
-</ol>
-</table><p>
+        <table border="0" width="100%">
+        <tr><th class="version"><b>tvtime 0.9.8.5</b>
+            <td>
+            <ol>
+                <li>Some root safety improvements.
+                <li>Added support for long-format command line arguments.
+                <li>Added config file options to set startup window position.
+                <li>Compile fixes for non-C99 compilers and older DirectFB versions.
+            </ol>
+        <tr><th class="version"><b>tvtime 0.9.8.4</b>
+            <td>
+            <ol>
+                <li>Support for norm switching between "compatible"
+                    norms for areas which receive both SECAM and
+                    PAL format stations.
+                <li>Added support for the mga_vid driver for the
+                    Matrox G200/G400 series cards from mplayer.
+                <li>Semi-experimental of the X code for better
+                    fullscreen support under many window managers.
+                    Testing appreciated.
+                <li>Support for changing the mixer device and channel
+                    (see 'man tvtime' and the config file documentation).
+                <li>Slightly less partial experimental UTF-8 support.
+                    Now works with any simple left-to-right scripts
+                    which are in FreeSansBold.ttf .
+           </ol>
+        <tr><th class="version"><b>tvtime 0.9.8.2</b>
+            <td>
+            <ol>
+                <li>Fixed all of the known crashes and many minor
+                    bugs from the 0.9.8 release.
+                <li>Updated the look-and-feel of the user interface.
+                <li>Partial EXPERIMENTAL UTF-8 support. Only works with
+                    UTF-8 characters that are also in ISO-8859-1 (Latin-1).
+            </ol>
+        <tr><th class="version"><b>tvtime 0.9.8</b>
+            <td>
+            <ol>
+                <li>New XML config file format for both the tvtime
+                    configuration, and the station list.
+                <li>tvtime now has two distinct half-framerate modes:
+                    top-field-first frames, and bottom-field-first
+                    frames.  This helps with manually deinterlacing
+                    2-2 pulldown or progressive content.
+                <li>Added support for preset 'modes', which can set the
+                    deinterlacer, window size, fullscreen setting and
+                    framerate mode.
+                <li>Added support for custom frequencies in the
+                    stationlist.xml file, and a runtime command to add
+                    a new station from the current fine-tuning settings.
+                <li>Added some DScaler DLLs and a wine layer to load
+                    these deinterlacer plugins directly without porting
+                    to Linux.  This gives us the following new
+                    deinterlacers:
+                    <ol>
+                        <li>DScaler: Greedy - High Motion
+                        <li>DScaler: Greedy - 2-frame
+                        <li>DScaler: TwoFrame
+                        <li>DScaler: TomsMoComp
+                        <li>DScaler: Video Bob
+                        <li>DScaler: Video Weave
+                    </ol>
+                    We had our own ports of videobob, twoframe, and
+                    greedy2frame, but they were found to be buggy.  Our
+                    ports are currently disabled.
+                <li>Added the ffmpeg vertical deinterlacer filter.
+                <li>Support for multiple audio channels (stereo, mono,
+                    lang1, lang2).
+                <li>Included a bunch of fixes for PAL-M support.
+                <li>Added a slave mode for freevo integration.
+                <li>Various speedups, quality improvements, and bugfixes.
+            </ol>
+        <tr><th class="version"><b>tvtime 0.9.7</b>
+            <td>
+            <ol>
+                <li>Moved config files into a new config file directory
+                    ~/.tvtime
+                <li>Reworked the frequency tables, merging europe-cable,
+                    europe-west, europe-east all into 'europe'.  Added
+                    the'russia' frequency table.
+                <li>Added a channel scanner.  <b>F10</b> walks through
+                    the channel list and disables inactive channels.
+                <li>Added the 'XVideo Bob' deinterlacer filter.
+                <li>Added lirc support.
+                <li>Added the overscan feature.
+                <li>Added hardware support webpage.
+                <li>Added a half-framerate mode ('=' to activate it).
+                <li>Fixed alot of bug reports.
+            </ol>
+        </table>
 
 <hr>
 <h3><a name="bugs">3. Summary of known bugs by release</a></h3>
@@ -503,6 +514,29 @@ results.  The second option would be using a card with a TV output
 driver that gives field information.  An example is the Matrox
 G400/G450/G550 driver in <b>DirectFB</b>.  We are working on native
 support for TV output in this setting.</p>
+
+<hr>
+<h3><a name="bsd">12. FAQ: Does tvtime support FreeBSD or NetBSD?</a></h3>
+
+<p>Every now and then someone asks about BSD'ish systems and tvtime.
+Currently, tvtime will not work on BSD-based systems, but the code to
+get it to work should not be too difficult.</p>
+
+<p>There is a driver for bt848 and bt878-based cards under BSD called
+<b>bsdbt848</b>.  The API for this driver is different from Linux's
+video4linux that tvtime was written for, so the first job would be to do
+the input code in tvtime to handle this driver.  See
+<a href="http://mplayerhq.hu">mplayer</a> for one example of some code
+that uses this driver.</p>
+
+<p>The only other Linux-specific features that we use would be the
+/dev/rtc code to do high performance timing (I assume there is a BSD
+equivalent of this), and potentially the wine loader for the DScaler
+DLLs may need updating.</p>
+
+<p>If you make any progress on any of these, please let me know.
+Thanks.</p>
+
 
         </td></tr>
     </table>
