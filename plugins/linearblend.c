@@ -156,7 +156,7 @@ static deinterlace_method_t linearblendmethod =
     DEINTERLACE_PLUGIN_API_VERSION,
     "Linear Blend (idea from mplayer)",
     "LinearBlend",
-    1,
+    2,
     MM_ACCEL_X86_MMXEXT,
     0,
     0,
