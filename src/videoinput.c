@@ -440,8 +440,16 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                  "with your card, driver and this error message: %s.\n", strerror( errno ) );
         fprintf( stderr, "videoinput: Will try to fall back to (untested) read()-based capture..\n" );
     } else {
-        /* If we got more frames than we asked for, well, let's ignore it for now. */
-        vidin->numframes = vidin->gb_buffers.frames;
+        /* If we got more frames than we asked for, limit to 4 for now. */
+        if( vidin->gb_buffers.frames > 4 ) {
+            if( vidin->verbose ) {
+                fprintf( stderr, "videoinput: Capture card provides %d buffers, but we only need 4.\n",
+                         vidin->gb_buffers.frames );
+            }
+            vidin->numframes = 4;
+        } else {
+            vidin->numframes = vidin->gb_buffers.frames;
+        }
 
         vidin->grab_buf = (struct video_mmap *) malloc( sizeof( struct video_mmap ) * vidin->numframes );
         if( !vidin->grab_buf ) {
