@@ -60,14 +60,16 @@ static int HandleXError( Display *display, XErrorEvent *xevent )
 
     if( xevent->error_code == BadAlloc ) {
         fprintf( stderr, "\n"
-            "    Your video card is out of memory.  If you are using an\n"
-            "    on-board video card such as the Intel i8xx-based cards,\n"
-            "    you can configure how much video memory it gets in your\n"
-            "    XF86Config file.  See 'man i810' or the appropriate\n"
-            "    documentation for your driver.  This can also occur if\n"
-            "    you have an old video card, and are using too large\n"
-            "    a framebuffer.  Please lower your resolution before using\n"
-            "    tvtime.\n\n" );
+"    Cannot allocate enough off-screen video memory.  This may be fixed by:\n"
+"\n"
+"      1. Closing or restarting large X applications.\n"
+"      2. Lowering the sharpness setting of tvtime (--inputwidth parameter).\n"
+"      3. Lowering your colour depth or highest configured resolution.\n"
+"      4. Increasing the amount of video memory in your X config file\n"
+"         (for example, if you are using the i810 XFree86 driver.)\n"
+"\n"
+"    See http://tvtime.net/ for more information.\n\n" );
+
     } else {
         XGetErrorText( display, xevent->error_code, str, 1024 );
         fprintf( stderr, "xvoutput: Received X error: %s\n", str );
