@@ -82,7 +82,8 @@ static Cmd_Names cmd_table[] = {
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL },
-    { "TOGGLE_CC", TVTIME_TOGGLE_CC }
+    { "TOGGLE_CC", TVTIME_TOGGLE_CC },
+    { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE }
 };
 
 
@@ -270,6 +271,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
     ct->keymap[ 'w' ] = TVTIME_TOGGLE_CC;
+    ct->keymap[ '=' ] = TVTIME_TOGGLE_HALF_FRAMERATE;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

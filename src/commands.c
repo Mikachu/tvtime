@@ -60,6 +60,7 @@ struct commands_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
+    int halfrate;
     
     int menu_on;
     menu_t *menu;
@@ -327,6 +328,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->halfrate = 0;
     in->menu_on = 0;
     in->console_on = 0;
     in->scrollconsole = 0;
@@ -438,6 +440,14 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             console_scroll_n( in->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
         break;
             
+    case TVTIME_TOGGLE_HALF_FRAMERATE:
+        in->halfrate = !in->halfrate;
+        if( in->halfrate ) {
+            tvtime_osd_show_message( in->osd, "Half-framerate mode." );
+        } else {
+            tvtime_osd_show_message( in->osd, "Full-framerate mode." );
+        }
+        break;
 
     case TVTIME_TOGGLE_CONSOLE:
         in->console_on = !in->console_on;
@@ -709,6 +719,11 @@ int commands_take_screenshot( commands_t *in )
 int commands_toggle_fullscreen( commands_t *in )
 {
     return in->togglefullscreen;
+}
+
+int commands_half_framerate( commands_t *in )
+{
+    return in->halfrate;
 }
 
 int commands_toggle_aspect( commands_t *in )

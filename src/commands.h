@@ -48,6 +48,7 @@ int commands_toggle_fullscreen( commands_t *in );
 int commands_toggle_aspect( commands_t *in );
 int commands_toggle_deinterlacing_mode( commands_t *in );
 int commands_toggle_menu( commands_t *in );
+int commands_half_framerate( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
 

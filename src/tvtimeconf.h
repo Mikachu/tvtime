@@ -83,6 +83,8 @@ enum tvtime_commands
     TVTIME_SCROLL_CONSOLE_DOWN,
     TVTIME_TOGGLE_CC,
 
+    TVTIME_TOGGLE_HALF_FRAMERATE,
+
     TVTIME_LAST
 };
 

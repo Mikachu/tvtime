@@ -1,6 +1,10 @@
 
 0.9.7
-  * (xlnx-x) Added a previous channel button
+  * (vektor) Officially re-enabled the EWMH code from the ogle
+    fullscreen handler wm_state.c.
+  * (vektor) Reverted to previous frequencies.h format.
+  * (vektor) Added a half-framerate mode, default key is '='.
+  * (xlnx-x) Added a previous channel button.
   * (vektor) We now exit properly on window manager destroy messages.
   * (vektor) Added a configure check for Xinerama (bug 636424)
   * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576.

@@ -183,6 +183,7 @@ OtherTextFG = 0xFFF5DEB3
 # key_skip_channel           = r
 # \0040 = space
 # key_auto_adjust_pict       = \0040
+# key_toggle_half_framerate  = =
 
 
 key_quit                   = \0033
@@ -225,6 +226,7 @@ key_toggle_console         = `
 key_toggle_cc              = w
 key_skip_channel           = r
 key_auto_adjust_pict       = \0040
+key_toggle_half_framerate  = =
 
 
 # Up to 9 mouse button bindings are supported

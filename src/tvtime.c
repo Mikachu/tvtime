@@ -835,6 +835,10 @@ int main( int argc, char **argv )
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
+            performance_checkpoint_constructed_top_field( perf );
+            performance_checkpoint_delayed_blit_top_field( perf );
+            performance_checkpoint_blit_top_field_start( perf );
+            performance_checkpoint_blit_top_field_end( perf );
         } else {
             /* Build the output from the top field. */
             output->lock_output_buffer();
@@ -884,32 +888,34 @@ int main( int argc, char **argv )
             performance_checkpoint_blit_top_field_end( perf );
         }
 
-        if( output->is_interlaced() ) {
-            /* Wait until we can draw the odd field. */
-            output->wait_for_sync( 1 );
+        if( !commands_half_framerate( commands ) ) {
+            if( output->is_interlaced() ) {
+                /* Wait until we can draw the odd field. */
+                output->wait_for_sync( 1 );
 
-            output->lock_output_buffer();
-            tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, con, vs, 1,
-                       vc && config_get_apply_luma_correction( ct ),
-                       width, height, width * 2, output->get_output_stride() );
-            output->unlock_output_buffer();
-        } else {
-            /* Build the output from the bottom field. */
-            output->lock_output_buffer();
-            if( showbars ) {
-                blit_packed422_scanline( output->get_output_buffer(),
-                                         colourbars, width*height );
+                output->lock_output_buffer();
+                tvtime_build_interlaced_frame( output->get_output_buffer(),
+                           curframe, vc, osd, menu, con, vs, 1,
+                           vc && config_get_apply_luma_correction( ct ),
+                           width, height, width * 2, output->get_output_stride() );
+                output->unlock_output_buffer();
             } else {
-                tvtime_build_deinterlaced_frame( output->get_output_buffer(),
-                                  curframe, lastframe,
-                                  secondlastframe, vc, osd, menu, con, vs, 1,
-                                  vc && config_get_apply_luma_correction( ct ),
-                                  width, height, width * 2, output->get_output_stride() );
+                /* Build the output from the bottom field. */
+                output->lock_output_buffer();
+                if( showbars ) {
+                    blit_packed422_scanline( output->get_output_buffer(),
+                                             colourbars, width*height );
+                } else {
+                    tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                      curframe, lastframe,
+                                      secondlastframe, vc, osd, menu, con, vs, 1,
+                                      vc && config_get_apply_luma_correction( ct ),
+                                      width, height, width * 2, output->get_output_stride() );
+                }
+                output->unlock_output_buffer();
             }
-            output->unlock_output_buffer();
-            performance_checkpoint_constructed_bot_field( perf );
         }
+        performance_checkpoint_constructed_bot_field( perf );
 
         /* We're done with the input now. */
         if( aquired ) {
@@ -928,11 +934,10 @@ int main( int argc, char **argv )
             }
 
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
-
         }
 
 
-        if( !output->is_interlaced() ) {
+        if( !commands_half_framerate( commands ) && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 
@@ -949,6 +954,10 @@ int main( int argc, char **argv )
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
             output->show_frame();
+            performance_checkpoint_blit_bot_field_end( perf );
+        } else {
+            performance_checkpoint_delayed_blit_bot_field( perf );
+            performance_checkpoint_blit_bot_field_start( perf );
             performance_checkpoint_blit_bot_field_end( perf );
         }
 
