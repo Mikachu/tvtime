@@ -30,7 +30,7 @@
 # define _(string) gettext (string)
 # include "gettext.h"
 #else
-# define _(string) string
+# define _(string) (string)
 #endif
 #include "station.h"
 #include "mixer.h"
@@ -819,7 +819,7 @@ static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
         cur++;
     }
 
-    snprintf( string, sizeof( string ), apply_pulldown ?
+    snprintf( string, sizeof( string ), apply_invert ?
               TVTIME_ICON_GENERALTOGGLEON "  %s" :
               TVTIME_ICON_GENERALTOGGLEOFF "  %s",
               _("Colour invert") );
@@ -827,10 +827,6 @@ static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_COLOUR_INVERT, "" );
     cur++;
 
-    snprintf( string, sizeof( string ), apply_pulldown ?
-              TVTIME_ICON_GENERALTOGGLEON "  %s" :
-              TVTIME_ICON_GENERALTOGGLEOFF "  %s",
-              _("Colour invert") );
     snprintf( string, sizeof( string ), apply_mirror ?
               TVTIME_ICON_GENERALTOGGLEON "  %s" :
               TVTIME_ICON_GENERALTOGGLEOFF "  %s",
@@ -957,7 +953,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
         cmd->apply_luma = 0;
-        fprintf( stderr, "commands: Input isn't from a bt8x8, disabling luma correction.\n" );
+        lfputs( _("commands: Input isn't from a bt8x8, disabling luma correction.\n"), stderr );
     }
 
     if( vidin && videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC &&
@@ -983,7 +979,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
-        fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
+        lfputs( _("commands: Luma correction value out of range. Using 1.0.\n"), stderr );
         cmd->luma_power = 1.0;
     }
 
@@ -1616,11 +1612,12 @@ static void add_to_favorites( commands_t *cmd, int pos )
 static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
 {
     tvtime_osd_list_set_lines( osd, ntsc ? 4 : 5 );
-    tvtime_osd_list_set_text( osd, 0, "Preferred audio channel" );
-    tvtime_osd_list_set_text( osd, 1, "Mono" );
-    tvtime_osd_list_set_text( osd, 2, "Stereo" );
-    tvtime_osd_list_set_text( osd, 3, ntsc ? "SAP" : "Primary Language" );
-    if( !ntsc ) tvtime_osd_list_set_text( osd, 4, "Secondary Language" );
+    tvtime_osd_list_set_text( osd, 0, _("Preferred audio mode") );
+    tvtime_osd_list_set_text( osd, 1, _("Mono") );
+    tvtime_osd_list_set_text( osd, 2, _("Stereo") );
+    tvtime_osd_list_set_text( osd, 3, ntsc ?
+			      _("SAP") : _("Primary Language") );
+    if( !ntsc ) tvtime_osd_list_set_text( osd, 4, _("Secondary Language") );
     if( curmode == VIDEOINPUT_MONO ) {
         tvtime_osd_list_set_hilight( osd, 1 );
     } else if( curmode == VIDEOINPUT_STEREO ) {
@@ -1669,7 +1666,7 @@ static void menu_enter( commands_t *cmd )
 
 static void menu_back( commands_t *cmd )
 {
-    if( cmd->curmenu == MENU_FAVORITES ) { /* FIXME oh no! a special case? */
+    if( cmd->curmenu == MENU_FAVORITES ) {
         commands_handle( cmd, TVTIME_SHOW_MENU, "stations" );
     } else if( cmd->curmenu == MENU_USER ) {
         int command = menu_get_back_command( cmd->curusermenu );
@@ -1689,7 +1686,7 @@ static void display_current_menu( commands_t *cmd )
     if( cmd->curmenu == MENU_FAVORITES ) {
         char string[ 128 ];
         tvtime_osd_list_set_lines( cmd->osd, cmd->numfavorites + 3 );
-        tvtime_osd_list_set_text( cmd->osd, 0, "Favorites" );
+        tvtime_osd_list_set_text( cmd->osd, 0, _("Favorites") );
         for( i = 0; i < cmd->numfavorites; i++ ) {
             char text[ 32 ];
             snprintf( text, sizeof (text), "%d", cmd->favorites[ i ] );
