@@ -467,11 +467,10 @@ int main( int argc, char **argv )
      * Set to the current channel, or the first channel in our
      * frequency list.
      */
-    if( !frequencies_set_chanlist( (char*)config_get_v4l_freq( ct ) ) ) {
-        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", 
+    if( !frequencies_set_chanlist( config_get_v4l_freq( ct ) ) ) {
+        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s, using us-cable.\n", 
                  config_get_v4l_freq( ct ) );
-        /* XXX: Print valid frequency regions here. */
-        return 1;
+        frequencies_set_chanlist( "us-cable" );
     }
 
     /* Setup the tuner if available. */

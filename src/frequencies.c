@@ -1305,7 +1305,7 @@ struct CHANLIST   *chanlist  = ntsc_cable;
 int                chancount = CHAN_COUNT(ntsc_cable);
 int                chanindex = 1;
 
-int frequencies_set_chanlist( char *str )
+int frequencies_set_chanlist( const char *str )
 {
     int i;
 
@@ -1343,7 +1343,7 @@ int frequencies_find_current_index( videoinput_t *vidin )
     return i;
 }
 
-int frequencies_find_named_channel( char *str )
+int frequencies_find_named_channel( const char *str )
 {
     int i, diff;
     char paddedstr[6];

@@ -118,8 +118,8 @@ extern struct STRTAB chanlist_names[];
 extern int                chantab;
 extern struct CHANLIST   *chanlist;
 extern int                chancount;
-int                       frequencies_set_chanlist( char *str );
+int                       frequencies_set_chanlist( const char *str );
 int                       frequencies_find_current_index( videoinput_t *vidin );
-int                       frequencies_find_named_channel( char *str );
+int                       frequencies_find_named_channel( const char *str );
 extern int                chanindex;
 #endif
