@@ -24,6 +24,7 @@
 #include "tvtimeosd.h"
 #include "credits.h"
 #include "commands.h"
+#include "pulldown.h"
 
 #define OSD_FADE_DELAY  60
 
@@ -85,6 +86,7 @@ struct tvtime_osd_s
 
     double framerate;
     int framerate_mode;
+    int film_mode;
 
     credits_t *credits;
     int show_credits;
@@ -181,6 +183,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     strcpy( osd->hold_message, "" );
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
+    osd->film_mode = -1;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -413,6 +416,11 @@ void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )
     snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ) - 1, "%s", method );
 }
 
+void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode )
+{
+    osd->film_mode = mode;
+}
+
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
 {
     snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, "%s", format );
@@ -455,14 +463,24 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     if( *(osd->hold_message) ) {
         sprintf( text, "%s", osd->hold_message );
     } else {
-        const char *mode = "";
+        const char *rate_mode = "";
+        const char *film_mode = "";
         if( osd->framerate_mode == FRAMERATE_HALF_TFF ) {
-            mode = " TFF";
+            rate_mode = " TFF";
         } else if( osd->framerate_mode == FRAMERATE_HALF_BFF ) {
-            mode = " BFF";
+            rate_mode = " BFF";
         }
-        sprintf( text, "%s - %s [%.2ffps%s]", osd->input_text,
-                 osd->deinterlace_text, osd->framerate, mode );
+        switch( osd->film_mode ) {
+            case 0: film_mode = ", DFilm"; break;
+            case PULLDOWN_OFFSET_1: film_mode = ", Film1"; break;
+            case PULLDOWN_OFFSET_2: film_mode = ", Film2"; break;
+            case PULLDOWN_OFFSET_3: film_mode = ", Film3"; break;
+            case PULLDOWN_OFFSET_4: film_mode = ", Film4"; break;
+            case PULLDOWN_OFFSET_5: film_mode = ", Film5"; break;
+            default: film_mode = ""; break;
+        }
+        sprintf( text, "%s - %s [%.2ffps%s%s]", osd->input_text,
+                 osd->deinterlace_text, osd->framerate, rate_mode, film_mode );
     }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );

@@ -59,6 +59,7 @@ void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_channel_name( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_hold_message( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method );
+void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode );
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal );
 void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode );
