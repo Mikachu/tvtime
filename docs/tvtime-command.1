@@ -305,6 +305,14 @@ This command sets where widescreen output will be aligned when in fullscreen
 mode, either top for the top of the screen, center, or bottom.
 
 .TP
+.B SET_MATTE
+This command sets the matte to apply to the output.  This changes the
+size of the output window, and is useful for watching a 2.35:1 movie in
+a long, thin window, or for watching it at the top of the screen using
+the fullscreen position option.  Valid options here are 16:9, 1.85:1,
+2.35:1 or 4:3.
+
+.TP
 .B SET_NORM
 This command takes a parameter and sets the current television standard.
 It will be used in tvtime after a restart.
@@ -325,6 +333,13 @@ This command is used to bring up the tvtime setup menu.
 .TP
 .B SHOW_STATS
 Shows a debug screen showing statistics about the running instance of tvtime.
+
+.TP
+.B SLEEP
+This command sets the sleep timer to tell tvtime to shut itself off after
+a certain amount of time.  Sending this command will first activate the feature,
+and sending it again will increase the timer up until a maximum value at which
+point it is shut off.
 
 .TP
 .B TOGGLE_ALWAYSONTOP
