@@ -193,7 +193,6 @@ int main( int argc, char **argv )
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) ) {
         fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
     }
-
     if( !set_realtime_priority( 0 ) ) {
         fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
@@ -211,6 +210,7 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
         }
     }
+    fprintf( stderr, "tvtime: Done stealing resources.\n" );
 
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
