@@ -80,7 +80,6 @@ Here are the core set of key bindings you want to learn for using tvtime:
     +/-             Volume control
     f               Fullscreen
     s               Take a screenshot
-    ?               Display info
     d               Display debug statistics
 
   Here are some advanced keys.  These features are all configurable via
@@ -115,9 +114,9 @@ and a list of active channels for browsing.  All of these features are
 available within the OSD menu system itself.  Here we present some of
 the details for users that wish to configure their stations directly.
 
-  For European users of cable providers that do not use standard
-frequencies, try out our new channel scanner, 'tvtime-scanner'.  This
-outputs to the 'Custom' frequency table, selectable in the OSD menu.
+  European users of cable providers that do not use standard frequencies
+can use our channel scanner: tvtime-scanner.  This outputs to the
+'Custom' frequency table, selectable in the OSD menu.
 
 4.1 stationlist.xml
     ---------------

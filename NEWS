@@ -17,6 +17,7 @@ News for 0.9.9
   *  Native support for UYVY input from the rivatv driver.
   *  Removed lirc support in favour of using tvtime-command.
   *  Fixed remaining screensaver, Xinerama and fullscreen issues.
+  *  Many other new features and bugfixes.
 
 News for 0.9.8.5
 

@@ -17,6 +17,11 @@ reasonable, we are curious to know your thoughts and opinions.
           (~/.tvtime/tvtime.xml).  Feedback on how easy tvtime is to
           configure with the new menu would be appreciated.
 
+     ***  Lirc support has changed
+
+          We no longer support lirc through its client library.  All
+          lirc configuration files must be changed to use tvtime-command
+
      ***  We now have a menu system
 
           Hit tab or the right mouse button to try it out!  If the
@@ -64,66 +69,21 @@ reasonable, we are curious to know your thoughts and opinions.
          hue_down                   f7
          hue_up                     f8
 
+3. How to upgrade your .lircrc
 
-  That's it!  For reference, here is the complete set of key
-bindings in tvtime 0.9.8.5 and 0.9.9.
+  Users can upgrade their lircrc by changing entries like this:
 
-                                    0.9.8.5        0.9.9
-         -------------------------+--------------+-------------
-         quit                     | escape, q    | escape, q
-         show_menu                |              | f1, tab, b3
-         channel_inc              | up, k, b4    | up, b4
-         channel_dec              | down, j, b5  | down, b5
-         channel_prev             | backspace      backspace
-         finetune_up              | right, l       right
-         finetune_down            | left, h        left
-         luma_correction          | c
-         luma_up                  | x
-         luma_down                  z
-         toggle_mute                m, b2          m, b2
-         mixer_up                   +              +
-         mixer_down                 -              -
-         enter                      enter          enter
-         brightness_down            f1
-         brightness_up              f2
-         contrast_down              f3
-         contrast_up                f4
-         colour_down                f5
-         colour_up                  f6
-         hue_down                   f7
-         hue_up                     f8
-         picture                                   f6
-         picture_up                                f7
-         picture_down                              f8
-         channel_save_tuning        f9
-         channel_scan               f10
-         channel_activate_all       f11
-         channel_skip               f12
-         channel_renumber           r              r
-         toggle_bars                b              b
-         show_stats                 d              d
-         toggle_fullscreen          f              f
-         toggle_input               i, b3          i
-         toggle_aspect              a              a
-         screenshot                 s              s
-         toggle_deinterlacer        t              t
-         toggle_pulldown_detection  p              p
-         auto_adjust_pict           ' '            ' '
-         toggle_console             `              `
-         scroll_console_up          pgup           pgup
-         scroll_console_down        pgdn           pgdn
-         toggle_cc                  w              c
-         toggle_framerate           =              =
-         toggle_pause               end            end
-         toggle_audio_mode          e              e
-         overscan_up                >              >
-         overscan_down              <              <
-         display_info               b1             b1
-         toggle_mode                *              *
-         auto_adjust_window         /              /
-         mixer_toggle_mute          ,              ,
-         toggle_compatible_norm     n
-         toggle_ntsc_cable_mode     o
-         toggle_matte                              ins
+    begin
+      prog = tvtime
+      button = the_one_you_want_on_your_remote
+      config = quit
+    end
 
+  To use irexec and tvtime-command like this:
+
+    begin
+      prog = irexec
+      button = the_one_you_want_on_your_remote
+      config = tvtime-command quit
+    end
 
