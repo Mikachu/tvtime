@@ -1214,6 +1214,10 @@ int main( int argc, char **argv )
     if( config_get_fullscreen( ct ) ) {
         commands_handle( commands, TVTIME_TOGGLE_FULLSCREEN, 0 );
     }
+    /* If we start half-framerate, toggle that now. */
+    if( config_get_half_framerate( ct ) ) {
+        commands_handle( commands, TVTIME_TOGGLE_HALF_FRAMERATE, 0 );
+    }
 
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
@@ -1595,6 +1599,8 @@ int main( int argc, char **argv )
 
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
     configsave( "StartChannel", number, 1 );
+    snprintf( number, 3, "%d", half_framerate );
+    configsave( "HalfFramerate", number, 1 );
     if( vidin ) {
         snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
         configsave( "CaptureSource", number, 1 );

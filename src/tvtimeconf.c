@@ -71,6 +71,7 @@ struct config_s
     char *vbidev;
 
     int start_channel;
+    int halfrate;
 
     double hoverscan;
     double voverscan;
@@ -332,6 +333,10 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->fullscreen = atoi( tmp );
     }
 
+    if( (tmp = parser_get( pf, "HalfFramerate", 1 )) ) {
+        ct->halfrate = atoi( tmp );
+    }
+
     if( (tmp = parser_get( pf, "Norm", 1 )) ) {
         free( ct->norm );
         ct->norm = strdup( tmp );
@@ -505,6 +510,7 @@ config_t *config_new( int argc, char **argv )
     ct->hoverscan = 0.0;
     ct->voverscan = 0.0;
     ct->rvr_filename = 0;
+    ct->halfrate = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -859,5 +865,10 @@ const char *config_get_screenshot_dir( config_t *ct )
 const char *config_get_rvr_filename( config_t *ct )
 {
     return ct->rvr_filename;
+}
+
+int config_get_half_framerate( config_t *ct )
+{
+    return ct->halfrate;
 }
 
