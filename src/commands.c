@@ -488,7 +488,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 4, "Scan channels for signal" );
+    sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
