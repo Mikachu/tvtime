@@ -433,7 +433,7 @@ static void switch_to_normal_state(Display *dpy, Window win)
     sizehints->x = 0; // obsolete but should be set in case
     sizehints->y = 0; // an old wm is used
     
-#if 1 //bloody wm's that can't cope with unmap/map
+#if 0 //bloody wm's that can't cope with unmap/map
     // We have to be unmapped to change motif decoration hints 
     XUnmapWindow(dpy, win);
     
