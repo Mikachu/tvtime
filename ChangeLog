@@ -1,5 +1,8 @@
 
 0.9.11 -
+  * vektor: Documents some commands which we forgot about in the man
+      page for tvtime-command: DISPLAY_MESSAGE, KEY_EVENT,
+      SHOW_DEINTERLACER_INFO and SHOW_MENU,
   * vektor: Save state of the mirror filter across sessions.
   * vektor: Save state of closed captions across sessions.
   * vektor: Save state of the colour invert filter across sessions.

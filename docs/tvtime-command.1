@@ -129,6 +129,12 @@ channel information, current deinterlacer and framerate, the time, and
 input settings.
 
 .TP
+.B DISPLAY_MESSAGE
+This will display a message along the bottom of the OSD.  Useful for
+cron jobs or other scripts to send notifications to a user running
+tvtime.
+
+.TP
 .B ENTER
 Sends a virtual enter command.  Use this when changing the channel:
 .br
@@ -154,6 +160,12 @@ Decreases the hue setting of the input.
 .TP
 .B HUE_UP
 Increases the hue setting of the input.
+
+.TP
+.B KEY_EVENT
+Sends a fake keystroke event to tvtime.  This is useful for
+doing complex operations via a remote control, as you can
+indirect events to tvtime's internal key binding system.
 
 .TP
 .B LUMA_DOWN
@@ -302,10 +314,16 @@ This command takes a parameter and sets the current sharpness in pixels.
 It will be used in tvtime after a restart.
 
 .TP
+.B SHOW_DEINTERLACER_INFO
+Shows a help screen on the OSD describing the current deinterlacer setting.
+
+.TP
+.B SHOW_MENU
+This command is used to bring up the tvtime setup menu.
+
+.TP
 .B SHOW_STATS
-Asks
-.B tvtime
-to output debugging statistics to standard error.
+Shows a debug screen showing statistics about the running instance of tvtime.
 
 .TP
 .B TOGGLE_ALWAYSONTOP
