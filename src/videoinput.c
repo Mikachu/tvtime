@@ -562,12 +562,27 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             return 0;
         }
 
-        fprintf( stderr, "v4l2 results: w %d, h %d, field %d, colorspace %d\n",
-                 imgformat.fmt.pix.width,
-                 imgformat.fmt.pix.height,
-                 imgformat.fmt.pix.field,
-                 imgformat.fmt.pix.colorspace );
+        if( vidin->verbose ) {
+            fprintf( stderr, "videoinput: Field %d, colorspace %d.\n",
+                 imgformat.fmt.pix.field, imgformat.fmt.pix.colorspace );
+        }
 
+        if( vidin->height != imgformat.fmt.pix.height ) {
+            fprintf( stderr, "videoinput: Card refuses to give full-height "
+                     "frames, gives %d instead.\n"
+                     "videoinput: Giving up, sorry!\n",
+                     imgformat.fmt.pix.height );
+            close( vidin->grab_fd );
+            free( vidin );
+            return 0;
+        }
+
+        if( capwidth != imgformat.fmt.pix.width ) {
+            fprintf( stderr, "videoinput: Requested input width %d unavailable: "
+                     "driver offers %d.  Using %d.\n",
+                     capwidth, imgformat.fmt.pix.width,
+                     imgformat.fmt.pix.width );
+        }
         vidin->width = imgformat.fmt.pix.width;
 
     } else {
@@ -655,11 +670,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         /**
          * Ask Video Device for Buffers 
          */
-        req.count = 5;
+        req.count = 4;
         req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
         if( ioctl( vidin->grab_fd, VIDIOC_REQBUFS, &req ) < 0 ) {
-            fprintf( stderr, "reqbufs failed: %s\n", strerror( errno ) );
+            fprintf( stderr, "videoinput: Card failed to allocate capture buffers: %s\n",
+                     strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -667,12 +683,17 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         vidin->numframes = req.count;
 
         if( vidin->numframes < 1 ) {
-            fprintf( stderr, "no capture buffers available.\n" );
+            fprintf( stderr, "videoinput: No capture buffers available from card.\n" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
-        } else {
-            fprintf( stderr, "got %d frames\n", vidin->numframes );
+        } else if( vidin->numframes > 4 ) {
+            /* If we got more frames than we asked for, limit to 4 for now. */
+            if( vidin->verbose ) {
+                fprintf( stderr, "videoinput: Capture card provides %d buffers, but we only need 4.\n",
+                         vidin->numframes );
+            }
+            vidin->numframes = 4;
         }
 
         /**
@@ -684,7 +705,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             vidbuf->index = i;
             vidbuf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             if( ioctl( vidin->grab_fd, VIDIOC_QUERYBUF, vidbuf ) < 0 ) {
-                fprintf( stderr, "can't query buffer %d: %s.\n", i, strerror( errno ) );
+                fprintf( stderr, "videoinput: Can't get information about buffer %d: %s.\n",
+                         i, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -693,7 +715,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             vidin->capbuffers[ i ].data = mmap( 0, vidbuf->length, PROT_READ | PROT_WRITE,
                                                 MAP_SHARED, vidin->grab_fd, vidbuf->m.offset );
             if( ((int) vidin->capbuffers[ i ].data) == -1 ) {
-                fprintf( stderr, "can't mmap buffer %d: %s.\n", i, strerror( errno ) );
+                fprintf( stderr, "videoinput: Can't map buffer %d: %s.\n",
+                         i, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -706,7 +729,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
          * Tell video stream to begin capture.
          */
         if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
-            fprintf( stderr, "can't begin streaming: %s.\n", strerror( errno ) );
+            fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
+                     strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -1339,47 +1363,16 @@ int videoinput_is_bttv( videoinput_t *vidin )
 
 void videoinput_reset_default_settings( videoinput_t *vidin )
 {
-    if( !vidin->isv4l2 ) {
-        struct video_picture grab_pict;
-
-        if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver won't tell us picture settings: %s\n",
-                     strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
-            return;
-        }
-
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Current brightness %d, hue %d, "
-                             "colour %d, contrast %d.\n",
-                     grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-                     grab_pict.contrast );
-        }
-
-        if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
-            grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
-            grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
-            grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
-            grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 65535.0);
-        } else {
-            grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
-            grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
-            grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
-            grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
-        }
-        if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-            fprintf( stderr, "videoinput: Driver won't let us set picture settings: %s\n",
-                     strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
-            return;
-        }
-
-        if( vidin->verbose ) {
-           fprintf( stderr, "videoinput: Set to brightness %d, hue %d, "
-                            "colour %d, contrast %d.\n",
-                    grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-                    grab_pict.contrast );
-        }
+    if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
+        videoinput_set_hue( vidin, (int) ((((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 100.0) + 0.5) );
+        videoinput_set_brightness( vidin, (int) ((((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 100.0) + 0.5) );
+        videoinput_set_contrast( vidin, (int) (((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 100.0) + 0.5) );
+        videoinput_set_colour( vidin, (int) (((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 100.0) + 0.5) );
+    } else {
+        videoinput_set_hue( vidin, (int) ((((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 100.0) + 0.5) );
+        videoinput_set_brightness( vidin, (int) ((((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 100.0) + 0.5) );
+        videoinput_set_contrast( vidin, (int) (((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 100.0) + 0.5) );
+        videoinput_set_colour( vidin, (int) (((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 100.0) + 0.5) );
     }
 }
 
