@@ -1,5 +1,7 @@
 
 0.9.9.1
+  * vektor: Added the chroma kill filter to the input filters menu,
+      and a command TOGGLE_CHROMA_KILL.
   * vektor: Added a --display command line option.
   * vektor: Added XMLTV listings support.  Use --xmltv to specify the
       name.

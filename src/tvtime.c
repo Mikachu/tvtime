@@ -942,15 +942,15 @@ static void build_pulldown_menu( menu_t *menu, int pulldownactive )
     } else {
         snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb8 );
     }
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-    menu_set_right_command( menu, 4, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    menu_set_enter_command( menu, 5, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
+    menu_set_right_command( menu, 5, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
 }
 
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
@@ -1508,6 +1508,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
         videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
         videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
+        videofilter_set_chroma_kill( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
     }
 
     if( vidin && videoinput_is_uyvy( vidin ) ) {
@@ -1953,6 +1954,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
         videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
         videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
+        videofilter_set_chroma_kill( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
 
         if( osd ) {
             tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );

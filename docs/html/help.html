@@ -90,6 +90,7 @@
             <li><a href="#tvout">FAQ: Optimal settings for tvtime on TV
                 output</a>
             <li><a href="#bsd">FAQ: Does tvtime support FreeBSD or NetBSD?</a>
+            <li><a href="#ssname">FAQ: How do I force the screenshots to be a specific filename?</a>
             </ol>
         </td></tr></table>
 
@@ -449,6 +450,20 @@ DLLs may need updating.</p>
 
 <p>If you make any progress on any of these, please let me know.
 Thanks.</p>
+
+<hr>
+<h3><a name="ssname">FAQ: How do I force the screenshots to be a specific filename?</a></h3>
+
+<p>tvtime's screenshots can be given a filename when requested
+using <b>tvtime-command</b>.  Simply do:</p>
+
+<pre>
+  tvtime-command SCREENSHOT "current.png"
+</pre>
+
+<p>And the screenshot will output as <b>current.png</b>.  This is
+useful for scripts which upload the latest image from the TV to a webpage,
+for example.</p>
 
 
         </td></tr>

@@ -129,6 +129,7 @@ struct commands_s {
 
     int apply_invert;
     int apply_mirror;
+    int apply_chroma_kill;
 
     int apply_luma;
     int update_luma;
@@ -900,6 +901,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
+    cmd->apply_chroma_kill = 0;
 
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
     cmd->update_luma = 0;
@@ -1272,11 +1274,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
     menu_set_right_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_CHROMA_KILL, "" );
+    menu_set_right_command( menu, 4, TVTIME_TOGGLE_CHROMA_KILL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "picture-notuner" );
@@ -2297,6 +2304,28 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
+    case TVTIME_TOGGLE_CHROMA_KILL:
+        cmd->apply_chroma_kill = !cmd->apply_chroma_kill;
+        if( cmd->osd ) {
+            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
+            char string[ 128 ];
+
+            if( cmd->apply_chroma_kill ) {
+                sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb7 );
+            } else {
+                sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
+            }
+            menu_set_text( filtermenu, 4, string );
+            commands_refresh_menu( cmd );
+
+            if( cmd->apply_chroma_kill ) {
+                tvtime_osd_show_message( cmd->osd, "Chroma kill enabled." );
+            } else {
+                tvtime_osd_show_message( cmd->osd, "Chroma kill disabled." );
+            }
+        }
+        break;
+
     case TVTIME_TOGGLE_LUMA_CORRECTION:
         cmd->apply_luma = !cmd->apply_luma;
         if( cmd->osd ) {
@@ -2931,6 +2960,11 @@ int commands_apply_colour_invert( commands_t *cmd )
 int commands_apply_mirror( commands_t *cmd )
 {
     return cmd->apply_mirror;
+}
+
+int commands_apply_chroma_kill( commands_t *cmd )
+{
+    return cmd->apply_chroma_kill;
 }
 
 int commands_apply_luma_correction( commands_t *cmd )

@@ -30,6 +30,7 @@ struct videofilter_s
     int uyvy_conversion;
     int colour_invert;
     int mirror;
+    int chromakill;
 
     uint8_t tempscanline[ 2048 ];
 };
@@ -44,6 +45,7 @@ videofilter_t *videofilter_new( void )
     vf->uyvy_conversion = 0;
     vf->colour_invert = 0;
     vf->mirror = 0;
+    vf->chromakill = 0;
 
     return vf;
 }
@@ -69,6 +71,11 @@ void videofilter_set_mirror( videofilter_t *vf, int mirror )
     vf->mirror = mirror;
 }
 
+void videofilter_set_chroma_kill( videofilter_t *vf, int chromakill )
+{
+    vf->chromakill = chromakill;
+}
+
 void videofilter_set_full_extent_correction( videofilter_t *vf, int correct )
 {
 }
@@ -85,7 +92,8 @@ void videofilter_enable_uyvy_conversion( videofilter_t *vf )
 
 int videofilter_active_on_scanline( videofilter_t *vf, int scanline )
 {
-    if( vf->uyvy_conversion || vf->colour_invert || vf->mirror || (vf->vc && vf->bt8x8_correction) ) {
+    if( vf->uyvy_conversion || vf->colour_invert || vf->mirror ||
+        vf->chromakill || (vf->vc && vf->bt8x8_correction) ) {
         return 1;
     } else {
         return 0;
@@ -101,11 +109,10 @@ void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
 
     if( vf->vc && vf->bt8x8_correction ) {
         video_correction_correct_packed422_scanline( vf->vc, data, data, width );
-        // filter_luma_121_packed422_inplace_scanline( data, width );
-        // filter_luma_14641_packed422_inplace_scanline( data, width );
-        // halfmirror_packed422_inplace_scanline( data, width );
-        // kill_chroma_packed422_inplace_scanline( data, width );
-        // testing_packed422_inplace_scanline( data, width, scanline );
+        /* filter_luma_121_packed422_inplace_scanline( data, width ); */
+        /* filter_luma_14641_packed422_inplace_scanline( data, width ); */
+        /* halfmirror_packed422_inplace_scanline( data, width ); */
+        /* testing_packed422_inplace_scanline( data, width, scanline ); */
     }
 
     if( vf->colour_invert ) {
@@ -114,6 +121,10 @@ void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
 
     if( vf->mirror ) {
         mirror_packed422_inplace_scanline( data, width );
+    }
+
+    if( vf->chromakill ) {
+        kill_chroma_packed422_inplace_scanline( data, width );
     }
 }
 

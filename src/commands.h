@@ -84,6 +84,7 @@ int commands_restart_tvtime( commands_t *cmd );
 int commands_apply_luma_correction( commands_t *cmd );
 int commands_apply_colour_invert( commands_t *cmd );
 int commands_apply_mirror( commands_t *cmd );
+int commands_apply_chroma_kill( commands_t *cmd );
 int commands_set_deinterlacer( commands_t *cmd );
 const char *commands_get_new_deinterlacer( commands_t *cmd );
 const char *commands_get_new_norm( commands_t *cmd );

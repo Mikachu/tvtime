@@ -366,25 +366,25 @@
       COLOR_UP                   TOGGLE_AUDIO_MODE        
       COLOUR_DOWN                TOGGLE_BARS              
       COLOUR_UP                  TOGGLE_CC                
-      CONTRAST_DOWN              TOGGLE_COLOR_INVERT      
-      CONTRAST_UP                TOGGLE_COLOUR_INVERT     
-      DISPLAY_INFO               TOGGLE_CONSOLE           
-      DISPLAY_MESSAGE            TOGGLE_DEINTERLACER      
-      ENTER                      TOGGLE_FULLSCREEN        
-      FINETUNE_DOWN              TOGGLE_FRAMERATE         
-      FINETUNE_UP                TOGGLE_INPUT             
-      HUE_DOWN                   TOGGLE_LUMA_CORRECTION   
-      HUE_UP                     TOGGLE_MATTE             
-      KEY_EVENT                  TOGGLE_MIRROR            
-      LUMA_DOWN                  TOGGLE_MODE              
-      LUMA_UP                    TOGGLE_MUTE              
-      MENU_DOWN                  TOGGLE_NTSC_CABLE_MODE   
-      MENU_ENTER                 TOGGLE_PAL_SECAM         
-      MENU_EXIT                  TOGGLE_PAUSE             
-      MENU_LEFT                  TOGGLE_PULLDOWN_DETECTION
-      MENU_RIGHT                 TOGGLE_SIGNAL_DETECTION  
-      MENU_UP                    QUIT                     
-      MIXER_DOWN                                          
+      CONTRAST_DOWN              TOGGLE_CHROMA_KILL       
+      CONTRAST_UP                TOGGLE_COLOR_INVERT      
+      DISPLAY_INFO               TOGGLE_COLOUR_INVERT     
+      DISPLAY_MESSAGE            TOGGLE_CONSOLE           
+      ENTER                      TOGGLE_DEINTERLACER      
+      FINETUNE_DOWN              TOGGLE_FULLSCREEN        
+      FINETUNE_UP                TOGGLE_FRAMERATE         
+      HUE_DOWN                   TOGGLE_INPUT             
+      HUE_UP                     TOGGLE_LUMA_CORRECTION   
+      KEY_EVENT                  TOGGLE_MATTE             
+      LUMA_DOWN                  TOGGLE_MIRROR            
+      LUMA_UP                    TOGGLE_MODE              
+      MENU_DOWN                  TOGGLE_MUTE              
+      MENU_ENTER                 TOGGLE_NTSC_CABLE_MODE   
+      MENU_EXIT                  TOGGLE_PAL_SECAM         
+      MENU_LEFT                  TOGGLE_PAUSE             
+      MENU_RIGHT                 TOGGLE_PULLDOWN_DETECTION
+      MENU_UP                    TOGGLE_SIGNAL_DETECTION  
+      MIXER_DOWN                 QUIT                     
 
     Special keys known by tvtime:
 
