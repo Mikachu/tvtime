@@ -24,9 +24,10 @@ docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/screenshot-small.jpg html/setws.png html/sun-greedy.png \
 	html/sun-linear.png html/toshiba-16x9-screenshot.jpg \
 	html/tvtime-logo-banner.png html/tvtime.css \
-	html/usage.html html/why.html html/wsshot-small.jpg
-EXTRA_DIST = default.tvtime.xml $(man_MANS) $(docs_html) \
-	tvtime.16x16.png tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
+	html/usage.html html/why.html html/wsshot-small.jpg \
+	html/default.tvtime.xml
+EXTRA_DIST = $(man_MANS) $(docs_html) tvtime.16x16.png \
+	tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
 
 # We use $(datadir)/applications from the freedesktop spec
 # http://www.freedesktop.org/standards/desktop-entry-spec/
@@ -57,7 +58,7 @@ install-exec-hook:
 	-if [ -f noconfdir ]; then                                           \
 	   rm -f noconfdir;                                                  \
 	 else                                                                \
-	   $(INSTALL) -m 'u=rw,go=r' 'default.tvtime.xml'                    \
+	   $(INSTALL) -m 'u=rw,go=r' 'html/default.tvtime.xml'               \
 	     '$(DESTDIR)$(pkgsysconfdir)/tvtime.xml' || touch noconfdir;     \
 	 fi
 	@if [ -f noconfdir ]; then rm -f noconfdir; (                        \
