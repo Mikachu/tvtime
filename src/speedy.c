@@ -901,25 +901,6 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width )
-{
-    SPEEDY_START();
-
-    while( width-- ) {
-        unsigned int cur_a = input[ 0 ];
-
-        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
-                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
-                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
-                                   | cur_a;
-
-        output += 4;
-        input += 4;
-    }
-
-    SPEEDY_END();
-}
-
 void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width )
 {
     SPEEDY_START();
@@ -939,6 +920,45 @@ void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *in
     SPEEDY_END();
 }
 
+void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width )
+{
+    const uint64_t round  = 0x0080008000800080;
+    const uint64_t alpha  = 0x00000000000000ff;
+    const uint64_t noalp  = 0xffffffffffff0000;
+
+    SPEEDY_START();
+
+    pxor_r2r( mm7, mm7 );
+    while( width-- ) {
+        movd_m2r( *input, mm0 );
+        punpcklbw_r2r( mm7, mm0 );
+
+        movq_r2r( mm0, mm2 );
+        pshufw_r2r( mm2, mm2, 0 );
+        movq_r2r( mm2, mm4 );
+        pand_m2r( alpha, mm4 );
+
+        pmullw_r2r( mm2, mm0 );
+        paddw_m2r( round, mm0 );
+
+        movq_r2r( mm0, mm3 );
+        psrlw_i2r( 8, mm3 );
+        paddw_r2r( mm3, mm0 );
+        psrlw_i2r( 8, mm0 );
+
+        pand_m2r( noalp, mm0 );
+        paddw_r2r( mm4, mm0 );
+
+        packuswb_r2r( mm0, mm0 );
+        movd_r2m( mm0, *output );
+
+        output += 4;
+        input += 4;
+    }
+    emms();
+
+    SPEEDY_END();
+}
 
 static uint32_t speedy_accel;
 
@@ -965,6 +985,7 @@ void setup_speedy_calls( void )
         composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_mmxext;
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
+        premultiply_packed4444_scanline = premultiply_packed4444_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
