@@ -60,7 +60,7 @@ int freq_byName( const char **band, const char **channel, int us_cable )
 }
 
 
-int freq_for_band( char *band, int us_cable, freq_callback_t f )
+int freq_for_band( const char *band, int us_cable, freq_callback_t f )
 {
     const band_t *b;
     const band_entry_t *rp;

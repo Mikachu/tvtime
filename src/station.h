@@ -41,8 +41,7 @@ int station_set(int pos);
 void station_next( void );
 void station_prev( void );
 int station_hasChanged( void );
-
-station_info_t *station_getInfo();
+station_info_t *station_getInfo( void );
 
 int station_add( int pos, char *band, char *channel, char* name );
 

@@ -30,7 +30,7 @@ extern "C" {
 int freq_byName( const char **band, const char **channel, int us_cable );
 
 typedef int (*freq_callback_t)( const char *band, const char *channel, unsigned int freq );
-int freq_for_band( char *band, int us_cable, freq_callback_t f );
+int freq_for_band( const char *band, int us_cable, freq_callback_t f );
 
 // tab-seperated
 //char *freq_getBands();
