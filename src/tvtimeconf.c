@@ -48,7 +48,7 @@
 #include "utils.h"
 
 #define MAX_KEYSYMS 350
-#define MAX_BUTTONS 10
+#define MAX_BUTTONS 15
 
 struct config_s
 {

@@ -1,4 +1,8 @@
 
+0.9.14 -
+  * vektor: Increase the max number of mouse buttons to 15 (Mikachu has
+      a mouse with 11 buttons).
+
 0.9.13 - Sat Sep 25 13:51:13 EDT 2004
   * inguin: German translation of man pages.
   * inguin: Added code to set the XMLTV language using the command
