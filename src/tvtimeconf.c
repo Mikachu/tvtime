@@ -582,7 +582,7 @@ static void print_usage( char **argv )
               "                                 custom (first run tvtime-scanner)\n\n"), stderr );
     lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
-    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
+    lfputs( _("  -g, --geometry=GEOMETRY    Sets the output window size.\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
     lfputs( _("  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
               "                             (defaults to 720 pixels).\n"), stderr );
@@ -635,7 +635,7 @@ static void print_config_usage( char **argv )
               "                                 custom (first run tvtime-scanner)\n\n"), stderr );
     lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
     lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
-    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"), stderr );
+    lfputs( _("  -g, --geometry=GEOMETRY    Sets the output window size.\n"), stderr );
     lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
     lfputs( _("  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
               "                             (defaults to 720 pixels).\n"), stderr );
