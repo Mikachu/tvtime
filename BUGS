@@ -28,7 +28,6 @@ General bugs
 690473 Blue frame shown on channel change
 692392 XVideo problems with two X servers and X4.2.1 mga driver
 690473 Blue frame shown on channel change when gbuffers=2
-690428 No detection of non-square-pixel displays
 672810 g400 marvel
 
 
@@ -45,18 +44,9 @@ General bugs
    deinterlacing algorithms, we currently only have MMXEXT versions.
    Shouldn't take long just haven't bothered yet.
 
-632781 Data bars mess up at other frame sizes 
- * If you're not using 720 pixels/scanline input sampling, tvtime
-   doesn't do the volume/data OSD bars correctly.  We have no idea why
-   this is yet.
-
 633235 No on-frame indication of dropped frames
  * You can use the -s switch to see when you drop frames, but it would
    be nice to be told somehow using the OSD or something...
-
-636423 No support for 16:9 geometry output
- * We should detect when your monitor's aspect ratio is not 4:3 and
-   correct for that, and also check for non-square pixel sizes.
 
 
 Known incompatibility problems
