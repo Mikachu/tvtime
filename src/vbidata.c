@@ -128,47 +128,126 @@ int parityok( int n )
     return 1;
 }
 
+#define VBI_LINELEN     2048
+/* clock-in period = 2x bit period at the initial VBI frequency, actually 
+ * 28.64*2/1.006976 = ~56.88
+ * for PAL:
+ * 35.47*2/1.006976 = ~70.45 */
+#ifndef PAL_DECODE
+#define VBI_CLKIN       57
+#else
+#define VBI_CLKIN       71
+#endif
+
+/* use an average to handle noisy cases; assume proper input.
+ * the avg is taken over slightly less than one sampled cycle at the
+ * initial frequency */
 int decodebit( uint8_t *data, int threshold )
 {
-    return (data[0] > threshold);
+     int sum = 0, i; 
+     for (i = 0; i < (VBI_CLKIN - 1)/2; i++) {
+          sum += data[i];
+     }
+     return (sum > threshold*(VBI_CLKIN - 1)/2);
 }
 
+/* Return index relative to start of ary of the next local maximum.
+ * This is upper-bounded by range, which is assumed valid.
+ */
+int find_next_max(uint8_t *ary, int range)
+{
+        int i, m, maxval, maxi;
+        maxi = 0;
+        maxval = ary[maxi]*ary[maxi];
+        for (i = 1; i < range; i++) {
+                /* prefer closest high peak */
+                m = ary[i]*ary[i] - i*i;
+                if (m > maxval) {
+                        maxval = m;
+                        maxi = i;
+                }
+        }
+        return maxi;
+}
+
+int find_next_min(uint8_t *ary, int range)
+{
+        int i, m, minval, mini;
+        mini = 0;
+        minval = ary[mini]*ary[mini];
+        for (i = 1; i < range; i++) {
+                /* prefer closest low peak */
+                m = ary[i]*ary[i] + i*i;
+                if (m < minval) {
+                        minval = m;
+                        mini = i;
+                }
+        }
+        return mini;
+}
 
 int ccdecode( uint8_t *vbiline )
 {
-    int max = 48, maxval = 128, minval = 255, i = 0, clk = 0, tmp = 0;
+    int max[7], min[7], x_start, x_end;
+    int i = 0, clk = 0, tmp = 0;
     int sample, packedbits = 0;
 
-    for (i=0; i<250; i++) {
-        sample = vbiline[i];
-        if (sample - maxval > 10)
-            (maxval = sample, max = i);
-        if (sample < minval)
-            minval = sample;
-        if (maxval - sample > 40)
-            break;
+    /* set starting point of captured data by skipping 0's 
+     * avoid diz' filter effects at start 
+     */
+    for (x_start = 1; x_start < VBI_LINELEN; x_start++) {
+         if (vbiline[x_start] != 0) 
+              break;
     }
-    sample = ((maxval + minval) >> 1);
+    /* set end-point */
+    for (x_end = VBI_LINELEN - 1; x_end > x_start ; x_end--) {
+        if (vbiline[x_end] != 0) 
+             break;
+    }
 
-    /* found clock lead-in, double-check start */
-#ifndef PAL_DECODE
-    i = max + 478;
-#else
-    i = max + 538;
-#endif
+    /* Assumes the use of BTTV and philips cards in which the VBI is sampled 
+     * at 8x Fsc.  A clock cycle completes every VBI_CLKIN/2 units.
+     * ie. every clock-in pair 10, has period VBI_CLKIN.  After this and 
+     * framing, the VBI frequency drops in half.  A total of 19 
+     * clock-in/framing * bits (at full freq) + 16 data bits (at half freq) 
+     * => 19 + 16*2 = 51 clocked intervals with data.
+     *
+     * find the local minima for the 14 bit clock-in of 10s 
+     */
+
+     /* choose a window in the valid range that contains at least the 
+      * first maximum and a fall-off: (divide range by 51/2 = 25.5,
+      * and double the result for safety), 
+      *   [x_start, (x_end - x_start)/13] */
+    max[0] = x_start + find_next_max(vbiline + x_start, (x_end - x_start)/13);
+    for (i = 1; i < 7; i++) {
+         min[i-1] = max[i-1] + find_next_min(vbiline + max[i-1], VBI_CLKIN);
+         max[i] = min[i-1] + find_next_max(vbiline + min[i-1], VBI_CLKIN);
+    }
+    min[6] = max[6] + find_next_min(vbiline + max[6], VBI_CLKIN);
+
+    /* determine sample threshold by averaging; using multiple points helps 
+     * for noisy channels */
+
+    sample = 0;
+    for (i = 0; i < 7; i++) {
+         sample += (vbiline[max[i]] + vbiline[min[i]]);
+    }
+    sample /= 14; /* do this last to minimize round-off errors */
+
+    /* found clock lead-in, double-check start.
+     * this is 4-bits from the last min (min[6]).  the frame is all
+     * zeroes til this place, so we can skip over these
+     */
+    for (i = min[6]; i < x_end && vbiline[i] < sample; i++);
+
     if (!decodebit(&vbiline[i], sample))
         return 0;
-#ifndef PAL_DECODE
-    tmp = i + 57;  /* tmp = data bit zero */
-#else
-    tmp = i + 71;
-#endif
+
+    tmp = i + VBI_CLKIN;  /* tmp = data bit zero, and frequency now halves */
+
     for (i = 0; i < 16; i++) {
-#ifndef PAL_DECODE
-        clk = tmp + i * 57;
-#else
-        clk = tmp + i * 71;
-#endif
+        clk = tmp + i * VBI_CLKIN;
         if (decodebit(&vbiline[clk], sample)) {
             packedbits |= 1 << i;
         }
@@ -508,7 +587,6 @@ const int rows[] = {
 #define ROLL_4      8
 #define POP_UP      9
 #define PAINT_ON    10
-
 
 int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
 {

@@ -89,6 +89,9 @@ Authors and contributors
   Michael Lawrence <lawremi@iastate.edu>
     - Extended XMLTV info to list the upcoming show.
 
+  Kevin Ko <kevko@users.sourceforge.net>
+    - Improved CC decoding by adding better VBI clock-signal locking
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>
