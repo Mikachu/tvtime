@@ -2127,16 +2127,18 @@ void packed444_to_nonpremultiplied_packed4444_scanline( uint8_t *output,
 
 }
 
-int aspect_adjust_packed4444_scanline( uint8_t *output,
-                                       uint8_t *input, 
-                                       int width,
-                                       double aspectratio )
+void aspect_adjust_packed4444_scanline( uint8_t *output,
+                                        uint8_t *input, 
+                                        int width,
+                                        double pixel_aspect )
 {
     double i;
     int prev_i = 0;
     int w = 0;
 
-    for( i = 0.0; i < width; i += aspectratio ) {
+    pixel_aspect = 1.0 / pixel_aspect;
+
+    for( i = 0.0; i < width; i += pixel_aspect ) {
         uint8_t *curin = input + ((int) i)*4;
 
         if( !prev_i ) {
@@ -2169,8 +2171,6 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
         prev_i = (int) i;
         w++;
     }
-
-    return w;
 }
 
 /**

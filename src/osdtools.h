@@ -126,8 +126,7 @@ void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
                                              int scanline );
 
 
-osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
-                                int video_height, double aspect, int alpha );
+osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int alpha );
 void osd_graphic_delete( osd_graphic_t *osdg );
 int osd_graphic_get_width( osd_graphic_t *osdg );
 int osd_graphic_get_height( osd_graphic_t *osdg );

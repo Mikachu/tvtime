@@ -108,7 +108,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         return 0;
     }
 
-    osd->channel_logo = 0;
     strcpy( osd->hold_message, "" );
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
@@ -126,7 +125,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
 
     fontfile = "FreeSansBold.ttf";
-    logofile = "testlogo.png";
+    logofile = "tvtimelogo-small.png";
 
     osd->smallfont = osd_font_new( fontfile, 18, pixel_aspect );
     if( !osd->smallfont ) {
@@ -177,9 +176,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].rightjustified = 0;
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont );
 
-    /* Logo disabled for now.
-    osd->channel_logo = osd_graphic_new( logofile, width, height, frameaspect, 256 );
-    */
+    /* We create the logo, but it's ok if it fails to load. */
+    osd->channel_logo = osd_graphic_new( logofile, pixel_aspect, 256 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -283,12 +281,19 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].xpos = ( osd->strings[ OSD_SHOW_START ].xpos + osd_string_get_width( osd->strings[ OSD_SHOW_START ].string ) ) & ~1;
     osd->strings[ OSD_SHOW_LENGTH ].ypos = osd->strings[ OSD_SHOW_START ].ypos;
 
+    osd->channel_logo_xpos = osd->strings[ OSD_TIME_STRING ].xpos;
+    osd->channel_logo_ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
+
     osd_string_set_colour_rgb( osd->strings[ OSD_NETWORK_NAME ].string,
                                (other_rgb >> 16) & 0xff, 
                                (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_NETWORK_NAME ].string, 1 );
     osd->strings[ OSD_NETWORK_NAME ].xpos = osd->strings[ OSD_TIME_STRING ].xpos;
-    osd->strings[ OSD_NETWORK_NAME ].ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
+    if( osd->channel_logo ) {
+        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo );
+    } else {
+        osd->strings[ OSD_NETWORK_NAME ].ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
+    }
 
     osd_string_set_colour_rgb( osd->strings[ OSD_NETWORK_CALL ].string,
                                (other_rgb >> 16) & 0xff, 
@@ -296,12 +301,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_border( osd->strings[ OSD_NETWORK_CALL ].string, 1 );
     osd->strings[ OSD_NETWORK_CALL ].xpos = osd->strings[ OSD_TIME_STRING ].xpos;
     osd->strings[ OSD_NETWORK_CALL ].ypos = osd->strings[ OSD_NETWORK_NAME ].ypos + osd_string_get_height( osd->strings[ OSD_MUTED ].string );
-
-
-    if( osd->channel_logo ) {
-        osd->channel_logo_xpos = (( width * 60 ) / 100) & ~1;
-        osd->channel_logo_ypos = ( height * 14 ) / 100;
-    }
 
     return osd;
 }
@@ -630,7 +629,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( scanline >= osd->channel_logo_ypos &&
                 scanline < osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo ) ) {
 
-                int startx = osd->channel_logo_xpos - xpos;
+                int startx = osd->channel_logo_xpos - osd_graphic_get_width( osd->channel_logo ) - xpos;
                 int strx = 0;
                 if( startx < 0 ) {
                     strx = -startx;

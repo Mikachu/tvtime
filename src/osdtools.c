@@ -663,26 +663,60 @@ void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
 /* Graphic functions */
 struct osd_graphic_s
 {
-    pnginput_t *png;
-    int frames_left;
-
     uint8_t *image4444;
     int image_width;
     int image_height;
-    double image_aspect;
-    int image_adjusted_width;
-    int image_graphic_height;
+    int frames_left;
     int alpha;
 };
 
-void osd_graphic_render_image4444( osd_graphic_t *osdg );
-
-osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
-                                int video_height, double video_aspect, 
-                                int alpha )
+int load_png_to_packed4444( uint8_t *buffer, int width, int height, int stride,
+                            double pixel_aspect, pnginput_t *pngin )
 {
-    osd_graphic_t *osdg = malloc( sizeof( struct osd_graphic_s ) );
+    int has_alpha = pnginput_has_alpha( pngin );
+    int pngwidth, pngheight;
+    uint8_t *cb444;
+    uint8_t *curout;
+    int i;
+
+    pngwidth = pnginput_get_width( pngin );
+    pngheight = pnginput_get_height( pngin );
+
+    cb444 = malloc( pngwidth * 3 );
+    if( !cb444 ) return 0;
+
+    curout = malloc( pngwidth * 4 );
+    if( !curout ) {
+        free( cb444 );
+        return 0;
+    }
+
+    for( i = 0; i < height; i++ ) {
+        uint8_t *scanline = pnginput_get_scanline( pngin, i );
+        uint8_t *outputscanline = buffer + (stride * i);
+
+        if( has_alpha ) {
+            rgba32_to_packed4444_rec601_scanline( curout, scanline, pngwidth );
+            premultiply_packed4444_scanline( curout, curout, pngwidth );
+        } else {
+            rgb24_to_packed444_rec601_scanline( cb444, scanline, pngwidth );
+            packed444_to_nonpremultiplied_packed4444_scanline( curout, cb444, pngwidth, 255 );
+        }
+
+        aspect_adjust_packed4444_scanline( outputscanline, curout, pngwidth, pixel_aspect );
+    }
+
+    free( curout );
+    free( cb444 );
+
+    return 1;
+}
+
+osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int alpha )
+{
+    osd_graphic_t *osdg = malloc( sizeof( osd_graphic_t ) );
     char *fullfilename;
+    pnginput_t *pngin;
 
     if( !osdg ) {
         return 0;
@@ -695,85 +729,53 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
         free( osdg );
         return 0;
     }
-    osdg->png = pnginput_new( fullfilename );
+    pngin = pnginput_new( fullfilename );
     free( fullfilename );
 
-    if( !osdg->png ) {
+    if( !pngin ) {
         free( osdg );
         return 0;
     }
 
     osdg->frames_left = 0;
-    osdg->image4444 = malloc( video_width * video_height * 4 );
+    osdg->alpha = alpha;
+    osdg->image_width = (int) (( ((double) pnginput_get_width( pngin )) * pixel_aspect ) + 1.5);
+    osdg->image_height = pnginput_get_height( pngin );
+    osdg->image4444 = malloc( osdg->image_width * osdg->image_height * 4 );
     if( !osdg->image4444 ) {
-        pnginput_delete( osdg->png );
+        pnginput_delete( pngin );
         free( osdg );
         return 0;
     }
-    osdg->image_width = video_width;
-    osdg->image_height = video_height;
-    osdg->image_aspect = video_aspect / (double)(((double)osdg->image_width)/((double)osdg->image_height));
 
-    osdg->alpha = alpha;
-    osd_graphic_render_image4444( osdg );
+    if( !load_png_to_packed4444( osdg->image4444, osdg->image_width,
+                                 osdg->image_height, osdg->image_width*4,
+                                 pixel_aspect, pngin ) ) {
+        fprintf( stderr, "osd_graphic: Can't render image '%s'.\n", filename );
+        pnginput_delete( pngin );
+        free( osdg->image4444 );
+        free( osdg );
+        return 0;
+    }
 
+    pnginput_delete( pngin );
     return osdg;
 }
 
 void osd_graphic_delete( osd_graphic_t *osdg )
 {
-    pnginput_delete( osdg->png );
     free( osdg->image4444 );
     free( osdg );
 }
 
-void osd_graphic_render_image4444( osd_graphic_t *osdg )
-{
-    int i, width, height;
-    uint8_t *scanline;
-    uint8_t *cb444;
-    uint8_t *curout;
-    int has_alpha = pnginput_has_alpha( osdg->png );
-
-    width = pnginput_get_width( osdg->png );
-    height = pnginput_get_height( osdg->png );
-    osdg->image_graphic_height = height;
-
-    cb444 = malloc( width * 3 );
-    if( !cb444 ) return;
-
-    curout = malloc( width * 4 );
-    if( !curout ) {
-        free( cb444 );
-        return;
-    }
-
-    for( i=0; i < height; i++ ) {
-        scanline = pnginput_get_scanline( osdg->png, i );
-        if( has_alpha ) {
-            rgba32_to_packed4444_rec601_scanline( curout, scanline, width );
-            premultiply_packed4444_scanline( curout, curout, width );
-        } else {
-            rgb24_to_packed444_rec601_scanline( cb444, scanline, width );
-            packed444_to_nonpremultiplied_packed4444_scanline( curout, cb444, width, 255 );
-        }
-        osdg->image_adjusted_width = aspect_adjust_packed4444_scanline( 
-                                           osdg->image4444+(i*osdg->image_width*4),
-                                           curout, width, osdg->image_aspect );
-    }
-
-    free( curout );
-    free( cb444 );
-}
-
 int osd_graphic_get_width( osd_graphic_t *osdg )
 {
-    return osdg->image_adjusted_width;
+    return osdg->image_width;
 }
 
 int osd_graphic_get_height( osd_graphic_t *osdg )
 {
-    return osdg->image_graphic_height;
+    return osdg->image_height;
 }
 
 void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout )
@@ -805,11 +807,11 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                int scanline )
 {
     if( osdg->frames_left ) {
-        if( scanline < osdg->image_graphic_height && xpos < osdg->image_adjusted_width ) {
+        if( scanline < osdg->image_height && xpos < osdg->image_width ) {
             int alpha;
 
-            if( (xpos+width) > osdg->image_adjusted_width ) {
-                width = osdg->image_adjusted_width - xpos;
+            if( (xpos+width) > osdg->image_width ) {
+                width = osdg->image_width - xpos;
             }
 
             if( osdg->frames_left < OSD_FADEOUT_TIME ) {
@@ -819,7 +821,7 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
             }
 
             composite_packed4444_alpha_to_packed422_scanline( output, background,
-                osdg->image4444 + (osdg->image_width*4*scanline) + (xpos*4),
+                osdg->image4444 + (osdg->image_width*scanline*4) + (xpos*4),
                 width, alpha );
         }
     }

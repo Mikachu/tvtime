@@ -253,10 +253,8 @@ void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int 
 void packed444_to_nonpremultiplied_packed4444_scanline( uint8_t *output, 
                                                         uint8_t *input,
                                                         int width, int alpha );
-int aspect_adjust_packed4444_scanline( uint8_t *output,
-                                       uint8_t *input, 
-                                       int width,
-                                       double aspectratio );
+void aspect_adjust_packed4444_scanline( uint8_t *output, uint8_t *input, 
+                                        int width, double pixel_aspect );
 
 /**
  * Sub-pixel data bar renderer.  There are 128 bars.  Is this even useful?
