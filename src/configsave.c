@@ -30,9 +30,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <libxml/parser.h>
 #include "configsave.h"
 #include "utils.h"
