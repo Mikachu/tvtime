@@ -362,32 +362,22 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the top field. */
-
-        if( showtest == 1 ) {
-/*
-            memcpy( sdl_get_output(), testframe_even, width*height*2 );
-*/
-        } else if( showtest == 2 ) {
-/*
-            memcpy( sdl_get_output(), colourbars, width*height*2 );
-*/
+        if( config_get_apply_luma_correction( ct ) ) {
+            video_correction_packed422_field_to_frame_top( vc, 
+                                                           sdl_get_output(),
+                                                           width*2, 
+                                                           curframe,
+                                                           width, height/2,
+                                                           width*4 );
         } else {
-            if( config_get_apply_luma_correction( ct ) ) {
-                video_correction_packed422_field_to_frame_top( vc, 
-                                                               sdl_get_output(),
-                                                               width*2, 
-                                                               curframe,
-                                                               width, height/2,
-                                                               width*4 );
-            } else {
-                packed422_field_to_frame_top( sdl_get_output(), width*2, 
-                                              curframe,
-                                              width, height/2, width*4 );
-            }
-
-            tvtime_osd_volume_muted( osd, mixer_ismute() );
-            tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
+            packed422_field_to_frame_top( sdl_get_output(), width*2, 
+                                          curframe,
+                                          width, height/2, width*4 );
         }
+
+        tvtime_osd_volume_muted( osd, mixer_ismute() );
+        tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
+                                        height, width*2 );
 
 
         /* CHECKPOINT3 : Constructed the top field. */
@@ -418,30 +408,20 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the bottom field. */
-        if( showtest == 1 ) {
-/*
-            memcpy( sdl_get_output(), testframe_odd, width*height*2 );
-*/
-        } else if( showtest == 2 ) {
-/*
-            memcpy( sdl_get_output(), colourbars, width*height*2 );
-*/
+        if( config_get_apply_luma_correction( ct ) ) {
+            video_correction_packed422_field_to_frame_bot( vc, 
+                                                           sdl_get_output(),
+                                                           width*2,
+                                                           curframe + (width*2),
+                                                           width, height/2,
+                                                           width*4 );
         } else {
-            if( config_get_apply_luma_correction( ct ) ) {
-                video_correction_packed422_field_to_frame_bot( vc, 
-                                                               sdl_get_output(),
-                                                               width*2,
-                                                               curframe + (width*2),
-                                                               width, height/2,
-                                                               width*4 );
-            } else {
-                packed422_field_to_frame_bot( sdl_get_output(), width*2, 
-                                              curframe + (width*2),
-                                              width, height/2, width*4 );
-            }
-            tvtime_osd_volume_muted( osd, mixer_ismute() );
-            tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
+            packed422_field_to_frame_bot( sdl_get_output(), width*2, 
+                                          curframe + (width*2),
+                                          width, height/2, width*4 );
         }
+        tvtime_osd_volume_muted( osd, mixer_ismute() );
+        tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
 
 
         /* CHECKPOINT5 : Built the second field */
