@@ -152,19 +152,47 @@
     meaning higher priority (blame UNIX for that).
   -->
   <option name="ProcessPriority" value="-19"/>
+
+  <!--
+    Sets the time format to be used in the tvtime OSD.  The format is a
+    string in the same format as strftime().  See 'man strftime' for
+    details on the format used.  The default is to use the time format
+    of your locale.
+  -->
   <option name="TimeFormat" value="%X"/>
+
+  <!--
+    This is the default directory in which screenshots are placed.
+    The default is into user's home directory.
+  -->
   <option name="ScreenShotDir" value="~"/>
-  <option name="MenuBG" value="0"/>
+
+  <!--
+    These options set the ARGB colours used for the text in the OSD.
+    The default for the channel name is yellow, and the default for
+    the surrounding text is "wheat".  The colour format can be hex
+    or decimal.  If the alpha channel is not specified the default
+    is 255 (opaque).
+
+    Examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215
+  -->
   <option name="ChannelTextFG" value="0xFFFFFF00"/>
   <option name="OtherTextFG" value="0xFFF5DEB3"/>
 
-  <option name="StartupPrevChannel" value="9"/>
-  <option name="StartupChannel" value="10"/>
+  <!--
+    The following settings are saved at runtime to remember your current
+    channel, previous channel, and deinterlacer used.
+  -->
+  <option name="StartupPrevChannel" value="2"/>
+  <option name="StartupChannel" value="2"/>
   <option name="StartupDeinterlaceMethod" value="0"/>
-  <option name="DebugMode" value="0"/>
 
 
   <!--
+    Preset 'modes' for tvtime may be defined for convenience.  By
+    default, tvtime ships with two useful modes: LargeWindow and
+    SmallWindow.
+
     Supported deinterlacers:
 
     LineDoubler    Line Doubler
@@ -182,12 +210,48 @@
     Weave          Weave Last Field
   -->
 
-  <mode name="Fullscreen" deinterlacer="GreedyH" fullscreen="1" framerate_mode="0"/>
-  <mode name="Window" deinterlacer="Vertical" fullscreen="0" window_height="576" framerate_mode="0"/>
+  <mode name="LargeWindow" deinterlacer="GreedyH" fullscreen="0" window_height="576" framerate_mode="0"/>
   <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
 
 
   <!--
+    The rest of the configuration file defines how the input to
+    tvtime is mapped to tvtime commands.  Each command can be bound
+    to multiple keys and mouse buttons.  Up to nine mouse buttons
+    are supported.
+
+    Commands known to tvtime:
+
+      AUTO_ADJUST_PICT           HUE_UP                   
+      BRIGHTNESS_DOWN            LUMA_UP                  
+      BRIGHTNESS_UP              LUMA_DOWN                
+      CHANNEL_1                  MIXER_MUTE               
+      CHANNEL_2                  MIXER_UP                 
+      CHANNEL_3                  MIXER_DOWN               
+      CHANNEL_4                  OVERSCAN_DOWN            
+      CHANNEL_5                  OVERSCAN_UP              
+      CHANNEL_6                  SCREENSHOT               
+      CHANNEL_7                  SCROLL_CONSOLE_DOWN      
+      CHANNEL_8                  SCROLL_CONSOLE_UP        
+      CHANNEL_9                  SHOW_STATS               
+      CHANNEL_0                  TOGGLE_ASPECT            
+      CHANNEL_DOWN               TOGGLE_AUDIO_MODE        
+      CHANNEL_PREV               TOGGLE_BARS              
+      CHANNEL_RENUMBER           TOGGLE_CC                
+      CHANNEL_SCAN               TOGGLE_CONSOLE           
+      CHANNEL_SKIP               TOGGLE_CREDITS           
+      CHANNEL_UP                 TOGGLE_DEINTERLACER      
+      COLOUR_DOWN                TOGGLE_FULLSCREEN        
+      COLOUR_UP                  TOGGLE_FRAMERATE         
+      COLOR_DOWN                 TOGGLE_INPUT             
+      COLOR_UP                   TOGGLE_LUMA_CORRECTION   
+      CONTRAST_DOWN              TOGGLE_MODE              
+      CONTRAST_UP                TOGGLE_NTSC_CABLE_MODE   
+      DISPLAY_INFO               TOGGLE_PAUSE             
+      ENTER                      TOGGLE_PULLDOWN_DETECTION
+      FINETUNE_DOWN              QUIT                     
+      FINETUNE_UP                                         
+
     Special keys known by tvtime:
 
       Up, Down, Left, Right, Insert, Home, End, PageUp, PageDown,
