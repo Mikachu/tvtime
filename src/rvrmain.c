@@ -193,7 +193,7 @@ static void *disk_writer_thread_main( void *crap )
 
 int main( int argc, char **argv )
 {
-    config_t *cfg = config_new( argc, argv );
+    config_t *cfg = config_new();
     int headersize, i;
     int norm = 0;
 
@@ -201,6 +201,8 @@ int main( int argc, char **argv )
         fprintf( stderr, "rvr: Can't create config reader!  Exiting.\n" );
         return 1;
     }
+
+    config_parse_tvtime_command_line( cfg, argc, argv );
 
     /* Check args. */
     if( !config_get_rvr_filename( cfg ) ) {
