@@ -21,6 +21,8 @@
  *  Copyright (C) 1995  Linus Torvalds
  *
  * Found in linux 2.4.20.
+ *
+ * Also helped from code in 'cpuinfo.c' found in mplayer.
  */
 
 #include <stdio.h>

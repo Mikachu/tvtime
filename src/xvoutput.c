@@ -503,6 +503,7 @@ void xv_poll_events( input_t *in )
                 input_callback( in, I_QUIT, 0 );
             }
             break;
+
         case DestroyNotify:
             if( event.xdestroywindow.window != window ) {
                 break;
@@ -512,6 +513,9 @@ void xv_poll_events( input_t *in )
         case MotionNotify:
             XUndefineCursor( display, window );
             motion_timeout = 30;
+            break;
+        case EnterNotify:
+            XSetInputFocus( display, window, RevertToPointerRoot, CurrentTime );
             break;
         case Expose:
             break;
