@@ -477,25 +477,30 @@ static int conf_xml_parse( config_t *ct, char *configFile )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vamsb] [-H <height>] [-I <sampling>] "
-                     "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
-                     "[-f <frequencies>] [-t <tuner>] "
-                     "[-D <deinterlace method>] [-r rvrfile]\n", argv[ 0 ] );
-    fprintf( stderr, "\t-v\tShow verbose messages.\n" );
+    fprintf( stderr, "usage: %s [-ahmsv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
+                     "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
+                     "\t\t[-n <norm>] [-f <frequencies>]\n", argv[ 0 ] );
+
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
-    fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
-    fprintf( stderr, "\t-I\tV4L input scanline sampling, defaults to 720.\n" );
-    fprintf( stderr, "\t-H\tOutput window height, defaults to 576.\n" );
+    fprintf( stderr, "\t-h\tShow this help message.\n" );
+    fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
+    fprintf( stderr, "\t-s\tPrint stats on frame drops (for debugging).\n" );
+    fprintf( stderr, "\t-v\tShow verbose messages.\n" );
+
+    fprintf( stderr, "\t-F\tAdditional config file to load settings from.\n" );
+
+    fprintf( stderr, "\t-r\tRVR recorded file to play (for debugging).\n" );
+
+    fprintf( stderr, "\t-H\tOutput window height (defaults to 576).\n" );
+    fprintf( stderr, "\t-I\tvideo4linux input scanline sampling (defaults to 720).\n" );
 
     fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
+    fprintf( stderr, "\t-b\tVBI device (defaults to /dev/vbi0).\n" );
     fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
-
-    fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
-
-    fprintf( stderr, "\t-r\tRVR recorded file to play.\n" );
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
+
     fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"
                      "\t  \tValid values are:\n"
@@ -508,8 +513,6 @@ static void print_usage( char **argv )
                      "\t  \t\tnewzealand\n"
                      "\t  \t\tfrance\n"
                      "\t  \t\trussia\n" );
-    fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
-                     "\t  \t(defaults to 0)\n");
 }
 
 config_t *config_new( int argc, char **argv )
@@ -699,23 +702,22 @@ config_t *config_new( int argc, char **argv )
         conf_xml_parse(ct, configFile);
     }
 
-    while( (c = getopt( argc, argv, "hH:I:avsmd:i:n:f:t:F:D:Ib:r:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahmsvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
         switch( c ) {
-        case 'H': ct->outputheight = atoi( optarg ); break;
-        case 'I': ct->inputwidth = atoi( optarg ); break;
-        case 'v': ct->verbose = 1; break;
         case 'a': ct->aspect = 1; break;
+        case 'm': ct->fullscreen = 1; break;
         case 's': ct->debug = 1; break;
-        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
-        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'v': ct->verbose = 1; break;
+        case 'F': configFile = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
                   ct->rvr_filename = strdup( optarg ); break;
+        case 'H': ct->outputheight = atoi( optarg ); break;
+        case 'I': ct->inputwidth = atoi( optarg ); break;
+        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
         case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
-        case 'F': configFile = strdup( optarg ); break;
-        case 'm': ct->fullscreen = 1; break;
-        case 'D': ct->preferred_deinterlace_method = atoi( optarg ); break;
         default:
             print_usage( argv );
             return 0;
