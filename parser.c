@@ -28,14 +28,6 @@ struct nv_pair {
     char *value;
 };
 
-struct parser_file_s {
-    FILE *fh;
-    long file_length;
-    char *file_contents;
-    struct nv_pair *nv_pairs;
-    int num_pairs;
-};
-
 void parser_delete( parser_file_t *pf )
 {
     int i;
@@ -54,7 +46,7 @@ int parser_openfile( parser_file_t *pf, const char *filename )
 
     if( !filename ) return 0;
 
-    if( !(pf->fh) ) {
+    if( pf->fh ) {
         fclose(pf->fh);
         pf->fh = NULL;
     }
@@ -96,7 +88,7 @@ int parser_get( parser_file_t *pf, const char *name, const char *def, char **val
 int parser_readfile( parser_file_t *pf )
 {
     long length=0;
-    size_t num_read=0;
+    size_t num_read = 0;
     char *file;
 
     if( !(pf->fh) ) {
@@ -106,6 +98,7 @@ int parser_readfile( parser_file_t *pf )
 
     fseek( pf->fh, 0L, SEEK_END );
     length = ftell( pf->fh );
+    fseek( pf->fh, 0L, SEEK_SET );
     file = (char *)malloc(length+1);
     if( !file ) {
         fprintf( stderr, "parser: Insufficient memory to read file.\n" );
@@ -116,18 +109,14 @@ int parser_readfile( parser_file_t *pf )
         if( ferror( pf->fh ) > 0 ) {
             fprintf( stderr, "parser: Could not read file.\n" );
             return 0;
-        }
-        fprintf( stderr, "parser: Empty config file.\n" );
-        return 0;
-    } else if( num_read > 0 ) {
-        file[num_read] = '\0';
-        pf->file_contents = file;
-        pf->file_length = num_read;
-        return 1;
+        }   
     }
 
-    /* NOTREACHED */
-    return 0;
+    file[length+1] = '\0';
+    pf->file_contents = file;
+    pf->file_length = length+1;
+
+    return 1;
 }
 
 int parser_new( parser_file_t *pf, const char *filename )
@@ -153,6 +142,12 @@ int parser_new( parser_file_t *pf, const char *filename )
         return 0;
     }
     
+    pf->filename = strdup( filename );
+    if( !pf->filename ) {
+        fprintf( stderr, "parser: Insufficient memory to strdup filename.\n" );
+        return 0;
+    }
+
     /* default to 25 nv pairs -- will realloc later if necessary */
     pf->nv_pairs = (struct nv_pair*)malloc(sizeof(struct nv_pair)*25);
     memset( pf->nv_pairs, 0, sizeof(struct nv_pair)*25 );
@@ -164,10 +159,11 @@ int parser_new( parser_file_t *pf, const char *filename )
         ptr++;
     }
     ptr = pf->file_contents;
-    for( ; ptr <= pf->file_contents + pf->file_length ; ) {
+    for( ; ptr < pf->file_contents + pf->file_length + 1; ) {
         switch( *ptr ) {
         case ' ':
         case '\t':
+        case '\0':
             ptr++;
             break;
 
@@ -177,10 +173,12 @@ int parser_new( parser_file_t *pf, const char *filename )
             break;
 
         default:
-            if( sscanf( ptr, " %as = %n", &name, &num ) ) {
+            if( sscanf( ptr, "%as = %n", &name, &num ) ) {
                 value = strdup( ptr+num );
                 if( !value ) {
                     fprintf( stderr, "parser: Error doing strdup.\n" );
+                    free( pf->file_contents );
+                    pf->file_contents = NULL;
                     return 0;
                 }
                 
@@ -191,6 +189,8 @@ int parser_new( parser_file_t *pf, const char *filename )
                                                     (pf->num_pairs+25)*sizeof(struct nv_pair) );
                     if( !tmp ) {
                         fprintf( stderr, "parser: Error reallocing.\n" );
+                        free( pf->file_contents );
+                        pf->file_contents = NULL;
                         return 0;
                     }
                     pf->num_pairs += 25;
@@ -199,13 +199,31 @@ int parser_new( parser_file_t *pf, const char *filename )
                 pf->nv_pairs[pairs].name = name;
                 pf->nv_pairs[pairs].value = value;
                 pairs++;
-                ptr = ptr + num + strlen(value) + 1;
+                ptr = ptr + num + strlen(value);
             } else {
                 fprintf( stderr, "parser: Name without a value in input.\n" );
+                free( pf->file_contents );
+                pf->file_contents = NULL;
                 return 0;
             }
             break;
         }
+    }
+
+    free( pf->file_contents );
+    pf->file_contents = NULL;
+    return 1;
+}
+
+int parser_dump( parser_file_t *pf )
+{
+    int i;
+
+    if( !pf ) return 0;
+
+    for( i=0; i < pf->num_pairs; i++ ) {
+        if( !pf->nv_pairs[i].name ) break;
+        fprintf( stderr, "parser: %s = %s\n", pf->nv_pairs[i].name, pf->nv_pairs[i].value );
     }
     return 1;
 }

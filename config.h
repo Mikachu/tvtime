@@ -1,6 +1,8 @@
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
+ * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -16,23 +18,31 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
-struct parser_file_s {
-    FILE *fh;
-    long file_length;
-    char *file_contents;
-    struct nv_pair *nv_pairs;
-    int num_pairs;
-    char *filename;
+#include "parser.h"
+
+struct config_t {
+    parser_file_t pf;
+
+    int outputwidth;
+    int inputwidth;
+    int verbose;
+    int aspect;
+    int debug;
+    int apply_luma_correction;
+    int output420;
+    char *v4ldev;
+    int inputnum;
+    double luma_correction;
+    char *norm;
+    char *freq;
+    int tuner_number;
 };
 
-typedef struct parser_file_s parser_file_t;
-
-int parser_new( parser_file_t *pf, const char *filename );
-int parser_get( parser_file_t *pf, const char *name, const char *def, char **value );
-void parser_delete( parser_file_t *pf );
-int parser_dump( parser_file_t *pf );
+int config_new( struct config_t *ct, const char *filename );
+int config_init( struct config_t *ct );
+int config_dump( struct config_t *ct );
 
 #endif
