@@ -37,7 +37,6 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
-#include "display.h"
 #include "speedy.h"
 #include "xcommon.h"
 
@@ -52,7 +51,7 @@ static XShmSegmentInfo shminfo;
 static XvPortID xv_port;
 
 static int input_width, input_height;
-static int xvoutput_verbose = 0;
+static int xvoutput_verbose;
 static int xvoutput_error = 0;
 
 static int HandleXError( Display *display, XErrorEvent *xevent )

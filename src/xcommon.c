@@ -49,7 +49,7 @@
 #include <X11/extensions/XTest.h>
 #endif
 
-#include "display.h"
+#include "xfullscreen.h"
 #include "speedy.h"
 #include "utils.h"
 #include "xcommon.h"
@@ -83,6 +83,7 @@ static int matte_height;
 static int alwaysontop;
 static int has_focus;
 static int wm_is_metacity;
+static xfullscreen_t *xf;
 
 static Atom net_supporting_wm_check;
 static Atom net_supported;
@@ -180,18 +181,11 @@ static int xv_get_width_for_height( int window_height )
         widthratio = matte_width;
     }
 
-    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
-        if( xcommon_verbose ) {
-            fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
-                     sar_frac_n, sar_frac_d );
-        }
-    } else {
-        /* Assume square pixels. */
-        if( xcommon_verbose ) {
-            fprintf( stderr, "xcommon: Assuming square pixel display.\n" );
-        }
-        sar_frac_n = 1;
-        sar_frac_d = 1;
+    xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
+
+    if( xcommon_verbose ) {
+        fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
+                 sar_frac_n, sar_frac_d );
     }
 
     /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
@@ -689,18 +683,11 @@ static void calculate_video_area( void )
         widthratio = matte_width;
     }
 
-    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
-        if( xcommon_verbose ) {
-            fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
-                     sar_frac_n, sar_frac_d );
-        }
-    } else {
-        /* Assume 4:3 aspect ? */
-        if( xcommon_verbose ) {
-            fprintf( stderr, "xcommon: Assuming square pixel display.\n" );
-        }
-        sar_frac_n = 1;
-        sar_frac_d = 1;
+    xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
+
+    if( xcommon_verbose ) {
+        fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
+                 sar_frac_n, sar_frac_d );
     }
 
     /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
@@ -740,8 +727,6 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     XSetWindowAttributes xswa;
     const char *hello = "tvtime";
     unsigned long mask;
-    int displaywidthratio;
-    int displayheightratio;
     char *wmname;
 
     output_aspect = aspect;
@@ -749,7 +734,6 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     if( output_height < 0 ) {
         output_height = 576;
     }
-    xcommon_verbose = verbose;
 
     have_xtest = 0;
     output_on_root = 0;
@@ -757,7 +741,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     has_ewmh_state_above = 0;
     has_ewmh_state_below = 0;
     output_fullscreen = 0;
-    xcommon_verbose = 0;
+    xcommon_verbose = verbose;
     xcommon_exposed = 0;
     xcommon_colourkey = 0;
     motion_timeout = 0;
@@ -824,17 +808,15 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     screen = DefaultScreen( display );
 
-    DpyInfoInit( display, screen );
-    DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXinerama );
-    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginXinerama );
+    xf = xfullscreen_new( display, screen, verbose );
+    if( !xf ) {
+        fprintf( stderr, "xcommon: Can't initialize fullscreen information object.\n" );
+        XCloseDisplay( display );
+        return 0;
+    }
 
-    DpyInfoUpdateResolution( display, screen, 0, 0 );
-    DpyInfoUpdateGeometry( display, screen );
-
-    if( xcommon_verbose && DpyInfoGetGeometry( display, screen, &displaywidthratio, &displayheightratio ) ) {
-        fprintf( stderr, "xcommon: Geometry %dx%d, display aspect ratio %.2f\n",
-                 displaywidthratio, displayheightratio,
-                 (double) displaywidthratio / (double) displayheightratio );
+    if( xcommon_verbose ) {
+        xfullscreen_print_summary( xf );
     }
 
 #ifdef HAVE_XTESTEXTENSION
@@ -1031,16 +1013,14 @@ void xcommon_set_window_position( int x, int y )
 
 void xcommon_resize_window_fullscreen( void )
 {
-    XWindowAttributes attrs;
     int x, y, w, h;
 
     if( output_fullscreen ) {
         xcommon_toggle_fullscreen( 0, 0 );
     }
 
-    XGetWindowAttributes( display, wm_window, &attrs );
-    DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
-    DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h );
+    xfullscreen_update( xf );
+    xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
 
     /* Show our fullscreen window. */
     x11_static_gravity( display, wm_window );
@@ -1125,9 +1105,8 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     if( output_fullscreen ) {
         int x, y, w, h;
   
-        DpyInfoUpdateResolution( display, screen, window_area.x, window_area.y );
-        DpyInfoGetScreenOffset( display, screen, &x, &y );
-        DpyInfoGetResolution( display, screen, &w, &h );
+        xfullscreen_update( xf );
+        xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
 
         output_width = w;
         output_height = h;
@@ -1198,15 +1177,12 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
 int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
 {
-    XWindowAttributes attrs;
-    XGetWindowAttributes( display, wm_window, &attrs );
-
     output_fullscreen = !output_fullscreen;
     if( output_fullscreen ) {
         int x, y, w, h;
 
-        DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
-        DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h );
+        xfullscreen_update( xf );
+        xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
 
         // windowed_output_window = output_window;
         // fs_window = RootWindow( display, screen );
@@ -1224,6 +1200,9 @@ int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
         output_height = h;
         xcommon_exposed = 1;
     } else {
+        XWindowAttributes attrs;
+        XGetWindowAttributes( display, wm_window, &attrs );
+
         /* Clear the root window. */
         XSetForeground( display, gc, BlackPixel( display, screen ) );
         XClearWindow( display, output_window );
@@ -1492,6 +1471,7 @@ void xcommon_close_display( void )
     XDestroyWindow( display, wm_window );
     XDestroyWindow( display, fs_window );
     XCloseDisplay( display );
+    xfullscreen_delete( xf );
 }
 
 void xcommon_set_window_caption( const char *caption )
