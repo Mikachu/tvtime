@@ -810,7 +810,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
             vidin->capbuffers[ i ].data = mmap( 0, vidbuf->length, PROT_READ | PROT_WRITE,
                                                 MAP_SHARED, vidin->grab_fd, vidbuf->m.offset );
-            if( ((int) vidin->capbuffers[ i ].data) == -1 ) {
+            if( vidin->capbuffers[ i ].data == MAP_FAILED ) {
                 fprintf( stderr, "videoinput: Can't map buffer %d: %s.\n",
                          i, strerror( errno ) );
                 close( vidin->grab_fd );
@@ -864,7 +864,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
             vidin->map = (uint8_t *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
                                            MAP_SHARED, vidin->grab_fd, 0 );
-            if( (int) (vidin->map) != -1 ) {
+            if( vidin->map != MAP_FAILED ) {
                 vidin->have_mmap = 1;
                 videoinput_free_all_frames( vidin );
                 return vidin;
