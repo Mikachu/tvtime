@@ -30,3 +30,8 @@ Sharpness             0xEE 0x80 0xA7  U+E027
 Add Button            0xEE 0x80 0xA8  U+E028
 Delete Button         0xEE 0x80 0xA9  U+E029
 Favorites Icon        0xEE 0x80 0xAA  U+E02A
+Deinterlacer Desc.    0xEE 0x80 0xAB  U+E02B
+Attempted Framerate   0xEE 0x80 0xAC  U+E02C
+Input Filters         ????
+Rename channel        ????
+Renumber channel      ????
