@@ -51,15 +51,38 @@ const band_entry_t band_data_vhf_ireland[] = {
 };
 
 /**
- * For australian VHF information, see:
+ * For australian VHF and UHF information, see:
  * http://www.aba.gov.au/broadcasters/television.htm
+ * For australian analog terrestrial transmissions.
+ * Old allocations: AS10=209250, AS11=216250
+ * New allocations: AS10=210250, AS11=217250
  */
 const band_entry_t band_data_vhf_australia[] = {
-    { "AS1",   57250 }, { "AS2",   64250 }, { "AS3",   86250 },
-    { "AS4",   95250 }, { "AS5",  102250 }, { "AS5A", 138250 },
-    { "AS6",  175250 }, { "AS7",  182250 }, { "AS8",  189250 },
-    { "AS9",  196250 }, { "AS9A", 203250 }, { "AS10", 209250 },
-    { "AS11", 216250 }, { "AS12", 223250 }
+    { "AS0",   46250 }, { "AS1",   57250 }, { "AS2",   64250 },
+    { "AS3",   86250 }, { "AS4",   95250 }, { "AS5",  102250 },
+    { "AS5A", 138250 }, { "AS6",  175250 }, { "AS7",  182250 },
+    { "AS8",  189250 }, { "AS9",  196250 }, { "AS9A", 203250 },
+    { "AS10", 209250 }, { "AS11", 216250 }, { "AS12", 224250 }
+};
+
+/**
+ * Why does australia have to be so different? :)
+ */
+const band_entry_t band_data_uhf_australia[] = {
+    { "AU28", 527250 }, { "AU29", 534250 }, { "AU30", 541250 },
+    { "AU31", 548250 }, { "AU32", 555250 }, { "AU33", 562250 },
+    { "AU34", 569250 }, { "AU35", 576250 }, { "AU36", 583250 },
+    { "AU37", 590250 }, { "AU38", 597250 }, { "AU39", 604250 },
+    { "AU40", 611250 }, { "AU41", 618250 }, { "AU42", 625250 },
+    { "AU43", 632250 }, { "AU44", 639250 }, { "AU45", 646250 },
+    { "AU46", 653250 }, { "AU47", 660250 }, { "AU48", 667250 },
+    { "AU49", 674250 }, { "AU50", 681250 }, { "AU51", 688250 },
+    { "AU52", 695250 }, { "AU53", 702250 }, { "AU54", 709250 },
+    { "AU55", 716250 }, { "AU56", 723250 }, { "AU57", 730250 },
+    { "AU58", 737250 }, { "AU59", 744250 }, { "AU60", 751250 },
+    { "AU61", 758250 }, { "AU62", 765250 }, { "AU63", 772250 },
+    { "AU64", 779250 }, { "AU65", 786250 }, { "AU66", 793250 },
+    { "AU67", 800250 }, { "AU68", 807250 }, { "AU69", 814250 }
 };
 
 /**
@@ -309,7 +332,8 @@ const band_t bands[] = {
     { "Australia Optus", band_data_australia_optus, sizeof( band_data_australia_optus ) / sizeof( band_entry_t ) },
     { "VHF Italy", band_data_vhf_italy, sizeof( band_data_vhf_italy ) / sizeof( band_entry_t ) },
     { "VHF Ireland", band_data_vhf_ireland, sizeof( band_data_vhf_ireland ) / sizeof( band_entry_t ) },
-    { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) }
+    { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) },
+    { "UHF Australia", band_data_uhf_australia, sizeof( band_data_uhf_australia ) / sizeof( band_entry_t ) }
 };
 const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
 const band_t *us_cable_band = &(bands[ 0 ]);
@@ -319,7 +343,7 @@ const band_t *us_cable_band = &(bands[ 0 ]);
  Europe     VHF Italy, VHF E1-E12, VHF S1-S41, VHF Russia, UHF
  France     VHF France, UHF
  East       VHF Russia, UHF
- Australia  VHF Australia, UHF
+ Australia  VHF Australia, UHF-AU
  NZ         VHF E1-E12, UHF
  US Cable   US CATV
  US Air     US Bcast

@@ -62,6 +62,9 @@ Authors and contributors
     - Work on the DirectFB output driver for the Matrox G400 style
       TV output drivers.
 
+  David Atkinson <psykax@psykax.com>
+    - Updates for Australian frequencies
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler

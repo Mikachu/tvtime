@@ -1,5 +1,6 @@
 
 0.9.8.3 -
+  * psykax: Fixed UHF for Australia.
   * vektor: Added a command to mute the mixer volume (fixes 731817)
   * vektor: Added a config file option and command line parameter
       to set the mixer device and channel.  Syntax is
