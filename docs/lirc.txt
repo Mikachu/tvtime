@@ -1,0 +1,21 @@
+
+LIRC
+~~~~
+If you have lirc (Linux Infrared Remote Control) installed on your system 
+you can control tvtime with your remote control. Everything you can do 
+with the keyboard should be possible to do with your remote control.
+
+For .lircrc you need to know that the program name to use is tvtime and 
+the configuration lines that you can use are the same as for the keyboard 
+configuration but without key_ in the beginning. Valid keyboard strings 
+can be found on http://tvtime.sourceforge.net.
+
+So, to be able to turn off tvtime with your remote you have to edit your 
+~/.lircrc to include the following:
+
+begin
+  prog = tvtime
+  button = the_one_you_want_on_your_remote
+  config = quit
+end
+
