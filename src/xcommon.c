@@ -84,13 +84,17 @@ static int matte_height = 0;
 static int alwaysontop = 0;
 static int has_focus = 0;
 
-static Atom wmProtocolsAtom;
-static Atom wmDeleteAtom;
+static Atom net_supporting_wm_check;
 static Atom net_supported;
+static Atom net_wm_name;
 static Atom net_wm_state;
 static Atom net_wm_state_above;
 static Atom net_wm_state_below;
 static Atom net_wm_state_fullscreen;
+static Atom utf8_string;
+static Atom kwm_keep_on_top;
+static Atom wm_protocols;
+static Atom wm_delete_window;
 
 static int wm_is_metacity = 0;
 
@@ -106,6 +110,44 @@ static int timediff( struct timeval *large, struct timeval *small )
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
+
+/**
+ * Cache every atom we need in xcommon.  This minimizes round trips
+ * to the server.  The number of atoms and their position is hardcoded,
+ * but it's small.  Making this look pretty I think would be too
+ * annoying to be worth it.
+ */
+static void load_atoms( Display *dpy )
+{
+    static char *atom_names[] = {
+        "_NET_SUPPORTING_WM_CHECK",
+        "_NET_SUPPORTED",
+        "_NET_WM_NAME",
+        "_NET_WM_STATE",
+        "_NET_WM_STATE_ABOVE",
+        "_NET_WM_STATE_BELOW",
+        "_NET_WM_STATE_FULLSCREEN",
+        "UTF8_STRING",
+        "KWM_KEEP_ON_TOP",
+        "WM_PROTOCOLS",
+        "WM_DELETE_WINDOW"
+    };
+    Atom atoms_return[ 11 ];
+
+    XInternAtoms( display, atom_names, 11, False, atoms_return );
+    net_supporting_wm_check = atoms_return[ 0 ];
+    net_supported = atoms_return[ 1 ];
+    net_wm_name = atoms_return[ 2 ];
+    net_wm_state = atoms_return[ 3 ];
+    net_wm_state_above = atoms_return[ 4 ];
+    net_wm_state_below = atoms_return[ 5 ];
+    net_wm_state_fullscreen = atoms_return[ 6 ];
+    utf8_string = atoms_return[ 7 ];
+    kwm_keep_on_top = atoms_return[ 8 ];
+    wm_protocols = atoms_return[ 9 ];
+    wm_delete_window = atoms_return[ 10 ];
+}
+
 
 /**
  * Called after mapping a window - waits until the window is mapped.
@@ -241,68 +283,63 @@ static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
  */
 static void get_window_manager_name( Display *dpy, Window wm_window, char **wm_name_return )
 {
-    Atom atom;
+    Atom type_return;
+    int format_return;
+    unsigned long bytes_after_return;
+    unsigned long nitems_return;
+    unsigned char *prop_return = 0;
 
-    atom = XInternAtom( dpy, "_NET_WM_NAME", True );
-    if( atom != None ) {
-        Atom type_return;
-        int format_return;
-        unsigned long bytes_after_return;
-        unsigned long nitems_return;
-        unsigned char *prop_return = 0;
-
-        if( XGetWindowProperty( dpy, wm_window, atom, 0,
-                                4, False, XA_STRING,
-                                &type_return, &format_return,
-                                &nitems_return, &bytes_after_return,
-                                &prop_return ) != Success ) {
-            fprintf( stderr, "xcommon: Can't get window manager name "
-                             "property (WM not compliant).\n" );
-            *wm_name_return = strdup( "unknown" );
-            return;
-        }
+    if( XGetWindowProperty( dpy, wm_window, net_wm_name, 0,
+                            4, False, XA_STRING,
+                            &type_return, &format_return,
+                            &nitems_return, &bytes_after_return,
+                            &prop_return ) != Success ) {
+        fprintf( stderr, "xcommon: Can't get window manager name "
+                         "property (WM not compliant).\n" );
+        *wm_name_return = strdup( "unknown" );
+        return;
+    }
     
-        if( type_return == None ) {
-            fprintf( stderr, "xcommon: No window manager name "
-                             "property found (WM not compliant).\n" );
-            *wm_name_return = strdup( "unknown" );
-            return;
-        }
+    if( type_return == None ) {
+        fprintf( stderr, "xcommon: No window manager name "
+                         "property found (WM not compliant).\n" );
+        *wm_name_return = strdup( "unknown" );
+        XFree( prop_return );
+        return;
+    }
 
-        if( type_return != XA_STRING ) {
-            Atom type_utf8 = XInternAtom( dpy, "UTF8_STRING", True );
-            if( type_utf8 == None ) {
-                fprintf( stderr, "xcommon: Window manager name not "
-                                 "ASCII or UTF8, giving up.\n" );
+    if( type_return != XA_STRING ) {
+        XFree( prop_return );
+
+        if( type_return == utf8_string ) {
+            if( XGetWindowProperty( dpy, wm_window, net_wm_name, 0,
+                                    4, False, utf8_string,
+                                    &type_return, &format_return,
+                                    &nitems_return,
+                                    &bytes_after_return,
+                                    &prop_return ) != Success ) {
+                fprintf( stderr, "wm_name: Can't get window "
+                                 "manager name propety "
+                                 "(WM not compliant).\n" );
                 *wm_name_return = strdup( "unknown" );
                 return;
             }
 
-            if( type_return == type_utf8 ) {
-                if( XGetWindowProperty( dpy, wm_window, atom, 0,
-                                        4, False, type_utf8,
-                                        &type_return, &format_return,
-                                        &nitems_return,
-                                        &bytes_after_return,
-                                        &prop_return ) != Success ) {
-                    fprintf( stderr, "wm_name: Can't get window "
-                                     "manager name propety "
-                                     "(WM not compliant).\n" );
-                    *wm_name_return = strdup( "unknown" );
-                    return;
-                }
-
-                if( format_return == 8 ) {
-                    *wm_name_return = strdup( (char *) prop_return );
-                }
-            }
-            if( prop_return ) XFree( prop_return );
-        } else {
             if( format_return == 8 ) {
                 *wm_name_return = strdup( (char *) prop_return );
             }
             XFree( prop_return );
+        } else {
+            fprintf( stderr, "xcommon: Window manager name not "
+                             "ASCII or UTF8, giving up.\n" );
+            *wm_name_return = strdup( "unknown" );
+            return;
         }
+    } else {
+        if( format_return == 8 ) {
+            *wm_name_return = strdup( (char *) prop_return );
+        }
+        XFree( prop_return );
     }
 }
 
@@ -314,19 +351,13 @@ static void get_window_manager_name( Display *dpy, Window wm_window, char **wm_n
  */
 static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
 {
-    Atom atom;
     Atom type_return;
     int format_return;
     unsigned long nitems_return;
     unsigned long bytes_after_return;
     unsigned char *prop_return = 0;
 
-    atom = XInternAtom( dpy, "_NET_SUPPORTING_WM_CHECK", True );
-    if( atom == None ) {
-        return 0;
-    }
-
-    if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), atom, 0,
+    if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supporting_wm_check, 0,
                             1, False, XA_WINDOW,
                             &type_return, &format_return, &nitems_return,
                             &bytes_after_return, &prop_return ) != Success ) {
@@ -366,7 +397,7 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
          * root window, but the win_id is no longer valid.
          * This is to check for a stale window manager
          */
-        status = XGetWindowProperty( dpy, win_id, atom, 0,
+        status = XGetWindowProperty( dpy, win_id, net_supporting_wm_check, 0,
                                      1, False, XA_WINDOW,
                                      &type_return, &format_return, &nitems_return,
                                      &bytes_after_return, &prop_return );
@@ -387,7 +418,7 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
         if( type_return == XA_CARDINAL ) {
             /* Hack for old and busted metacity. */
             /* Allow this atom to be a CARDINAL. */
-            XGetWindowProperty( dpy, win_id, atom, 0,
+            XGetWindowProperty( dpy, win_id, net_supporting_wm_check, 0,
                                 1, False, XA_CARDINAL,
                                 &type_return, &format_return, &nitems_return,
                                 &bytes_after_return, &prop_return );
@@ -438,21 +469,6 @@ static int check_for_state_fullscreen( Display *dpy )
     int item_offset = 0;
     int supports_net_wm_state = 0;
     int supports_net_wm_state_fullscreen = 0;
-
-    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
-    if( net_supported == None ) {
-        return 0;
-    }
-
-    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
-    if( net_wm_state == None ) {
-        return 0;
-    }
-
-    net_wm_state_fullscreen = XInternAtom( dpy, "_NET_WM_STATE_FULLSCREEN", False );
-    if( net_wm_state_fullscreen == None ) {
-        return 0;
-    }
 
     do {
         if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
@@ -525,21 +541,6 @@ static int check_for_state_above( Display *dpy )
     int supports_net_wm_state = 0;
     int supports_net_wm_state_above = 0;
 
-    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
-    if( net_supported == None ) {
-        return 0;
-    }
-
-    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
-    if( net_wm_state == None ) {
-        return 0;
-    }
-
-    net_wm_state_above = XInternAtom( dpy, "_NET_WM_STATE_ABOVE", False );
-    if( net_wm_state_above == None ) {
-        return 0;
-    }
-
     do {
         if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
                                 item_offset, nr_items, False, XA_ATOM,
@@ -610,21 +611,6 @@ static int check_for_state_below( Display *dpy )
     int item_offset = 0;
     int supports_net_wm_state = 0;
     int supports_net_wm_state_below = 0;
-
-    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
-    if( net_supported == None ) {
-        return 0;
-    }
-
-    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
-    if( net_wm_state == None ) {
-        return 0;
-    }
-
-    net_wm_state_below = XInternAtom( dpy, "_NET_WM_STATE_BELOW", False );
-    if( net_wm_state_below == None ) {
-        return 0;
-    }
 
     do {
         if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
@@ -818,6 +804,8 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
         }
     }
 
+    load_atoms( display );
+
     screen = DefaultScreen( display );
 
     DpyInfoInit( display, screen );
@@ -882,13 +870,13 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
         XEvent ev;
         long mask;
 
-        memset(&ev, 0, sizeof(ev));
+        memset( &ev, 0, sizeof( ev ) );
         ev.xclient.type = ClientMessage;
         ev.xclient.window = DefaultRootWindow( display );
-        ev.xclient.message_type = XInternAtom( display, "KWM_KEEP_ON_TOP", False );
+        ev.xclient.message_type = kwm_keep_on_top;
         ev.xclient.format = 32;
-        ev.xclient.data.l[0] = fs_window;
-        ev.xclient.data.l[1] = CurrentTime;
+        ev.xclient.data.l[ 0 ] = fs_window;
+        ev.xclient.data.l[ 1 ] = CurrentTime;
         mask = SubstructureRedirectMask;
         XSendEvent( display, DefaultRootWindow( display ), False, mask, &ev );
     }
@@ -961,11 +949,8 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
     XDefineCursor( display, output_window, nocursor );
 
-    wmProtocolsAtom = XInternAtom( display, "WM_PROTOCOLS", False );
-    wmDeleteAtom = XInternAtom( display, "WM_DELETE_WINDOW", False );
-
     /* collaborate with the window manager for close requests */
-    XSetWMProtocols( display, wm_window, &wmDeleteAtom, 1 );
+    XSetWMProtocols( display, wm_window, &wm_delete_window, 1 );
 
     calculate_video_area();
     x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
@@ -1076,6 +1061,13 @@ void xcommon_clear_screen( void )
     XSetForeground( display, gc, xcommon_colourkey );
     XFillRectangle( display, output_window, gc, video_area.x, video_area.y,
                     video_area.width, video_area.height );
+    /* This is how to draw text.
+    XSetForeground( display, gc, WhitePixel( display, screen ) );
+    XDrawString( display, output_window, gc,
+                 video_area.x + (video_area.width/3),
+                 video_area.y + (video_area.height/3),
+                 text, strlen( text ) );
+     */
     XSync( display, False );
 }
 
@@ -1131,11 +1123,11 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             ev.type = ClientMessage;
             ev.xclient.window = wm_window;
-            ev.xclient.message_type = XInternAtom( display, "_NET_WM_STATE", False );
+            ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD not an atom just a define
-            ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
-            ev.xclient.data.l[2] = 0;
+            ev.xclient.data.l[ 0 ] = 1; // _NET_WM_STATE_ADD not an atom just a define
+            ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
+            ev.xclient.data.l[ 2 ] = 0;
 
             XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
@@ -1168,11 +1160,11 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             ev.type = ClientMessage;
             ev.xclient.window = wm_window;
-            ev.xclient.message_type = XInternAtom( display, "_NET_WM_STATE", False );
+            ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE not an atom just a define
-            ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
-            ev.xclient.data.l[2] = 0;
+            ev.xclient.data.l[ 0 ] = 0; // _NET_WM_STATE_REMOVE not an atom just a define
+            ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
+            ev.xclient.data.l[ 2 ] = 0;
 
             XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
@@ -1264,8 +1256,8 @@ void xcommon_poll_events( input_t *in )
         switch( event.type ) {
         case ClientMessage:
             /* X sucks this way.  Thanks to walken for help on this one. */
-            if( ( event.xclient.message_type == wmProtocolsAtom ) && ( event.xclient.format == 32 ) &&
-                ( event.xclient.data.l[ 0 ] == wmDeleteAtom ) ) {
+            if( ( event.xclient.message_type == wm_protocols ) && ( event.xclient.format == 32 ) &&
+                ( event.xclient.data.l[ 0 ] == wm_delete_window ) ) {
                 input_callback( in, I_QUIT, 0 );
             }
             break;
