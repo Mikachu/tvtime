@@ -623,6 +623,18 @@ static xmlDocPtr configsave_open( const char *config_filename )
     }
     return doc;
 }
+
+static void print_copyright( void )
+{
+    fprintf( stderr,
+    "\n"
+    "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
+    "others.  For details and copying conditions, please see our website\n"
+    "at http://tvtime.net/\n"
+    "\n"
+    "tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
+    "Alexander S. Belov, and Achim Schneider.\n" );
+}
  
 static void print_usage( char **argv )
 {
@@ -962,6 +974,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "fspos", 1, 0, 'p' },
         { "xmltv", 1, 0, 't' },
         { "display", 1, 0, 'X' },
+        { "version", 0, 0, 'Q' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -969,7 +982,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     char c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:",
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:Q",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
@@ -1018,6 +1031,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                       }
                       break;
             case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
+            case 'Q': print_copyright(); return 0;
             default:
                 print_usage( argv );
                 return 0;
