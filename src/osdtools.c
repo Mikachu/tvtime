@@ -833,6 +833,7 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
 struct osd_list_s
 {
     double aspect;
+    int frames_left;
     int numlines;
     int hilight;
     int width;
@@ -851,6 +852,7 @@ osd_list_t *osd_list_new( double pixel_aspect )
 
     osdl->hilight = -1;
     osdl->numlines = 0;
+    osdl->frames_left = 0;
     osdl->width = 0;
     osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
     if( !osdl->font ) {
@@ -939,6 +941,8 @@ int osd_list_get_numlines( osd_list_t *osdl )
 void osd_list_set_timeout( osd_list_t *osdl, int timeout )
 {
     int i;
+
+    osdl->frames_left = timeout;
     for( i = 0; i < osdl->numlines; i++ ) {
         osd_string_set_timeout( osdl->lines[ i ], timeout );
     }
@@ -952,6 +956,11 @@ int osd_list_visible( osd_list_t *osdl )
 void osd_list_advance_frame( osd_list_t *osdl )
 {
     int i;
+
+    if( osdl->frames_left > 0 ) {
+        osdl->frames_left--;
+    }
+
     for( i = 0; i < osdl->numlines; i++ ) {
         osd_string_advance_frame( osdl->lines[ i ] );
     }
@@ -968,17 +977,25 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
         if( scanline < (osd_string_get_height( osdl->lines[ i ] ) + 2) ) {
             int bgwidth = osdl->width - xpos;
+            int alpha150, alpha80;
+
             if( bgwidth > width ) bgwidth = width;
+
+            alpha150 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 150.0) + 0.5);
+            alpha80 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 80.0) + 0.5);
+
+            if( alpha150 > 150 ) alpha150 = 150;
+            if( alpha80 > 80 ) alpha80 = 80;
 
             if( !i ) {
                 /* tvtime blue */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, 150 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, alpha150 );
             } else if( i == osdl->hilight ) {
                 /* white */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, 80 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, alpha80 );
             } else {
                 /* gray */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, 80 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, alpha80 );
             }
 
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
