@@ -34,7 +34,7 @@ static int ft_lib_refcount = 0;
 static FT_Library ft_lib = 0;
 
 #define MAX_STRING_LENGTH 1024
-#define HASHTABLE_SIZE 303 /* is a prime number. */
+#define HASHTABLE_SIZE 307 /* is a prime number. */
 
 struct ft_font_s
 {
@@ -71,8 +71,8 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
 
     cur = malloc( sizeof( *cur ) );
     
-    if (cur == NULL) {
-        fprintf ( stderr, "leeft: Out of memory\n");
+    if( !cur ) {
+        fprintf( stderr, "leeft: Out of memory\n" );
         return 0;
     }
     error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
@@ -184,6 +184,7 @@ void ft_font_delete( ft_font_t *font )
         FT_Done_Glyph( cur->glyph );
         FT_Done_Glyph( cur->bitmap );
         hashtable_delete( font->glyphdata, index );
+        free( cur );
     }
 
     FT_Done_Face( font->face );

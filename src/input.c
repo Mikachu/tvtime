@@ -158,7 +158,7 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
         }
     } else {
         fcntl( in->lirc_fd, F_SETFL, O_NONBLOCK );
-        if ( lirc_readconfig( NULL, &in->lirc_conf, NULL ) == 0 ) {
+        if( lirc_readconfig( 0, &in->lirc_conf, 0 ) == 0 ) {
             in->lirc_used = 1;
         } else {
             if( verbose ) {
@@ -176,6 +176,11 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
 
 void input_delete( input_t *in )
 {
+#ifdef HAVE_LIRC
+    if( in->lirc_used ) {
+        lirc_freeconfig( in->lirc_conf );
+    }
+#endif
     free( in );
 }
 

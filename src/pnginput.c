@@ -25,7 +25,7 @@ struct pnginput_s
     FILE *f;
     png_structp png_ptr;
     png_infop info_ptr;
-    png_infop end_info;
+    // png_infop end_info;
     int has_alpha;
 };
 
@@ -40,7 +40,7 @@ pnginput_t *pnginput_new( const char *filename )
 
     pnginput->png_ptr = 0;
     pnginput->info_ptr = 0;
-    pnginput->end_info = 0;
+    // pnginput->end_info = 0;
 
     pnginput->f = fopen( filename, "rb" );
     if( !pnginput->f ) {
@@ -65,6 +65,7 @@ pnginput_t *pnginput_new( const char *filename )
         return 0;
     }
 
+/*
     pnginput->end_info = png_create_info_struct( pnginput->png_ptr );
     if( !pnginput->end_info ) {
         png_destroy_read_struct( &(pnginput->png_ptr), &(pnginput->info_ptr), 0 );
@@ -74,6 +75,7 @@ pnginput_t *pnginput_new( const char *filename )
         pnginput_delete( pnginput );
         return 0;
     }
+*/
 
     png_init_io( pnginput->png_ptr, pnginput->f );
 
@@ -112,6 +114,7 @@ void pnginput_delete( pnginput_t *pnginput )
 {
     if( pnginput->png_ptr && pnginput->info_ptr ) {
         png_destroy_read_struct( &(pnginput->png_ptr), &(pnginput->info_ptr), 0 );
+        png_destroy_info_struct( &(pnginput->png_ptr), &(pnginput->info_ptr) );
     }
     if( pnginput->f ) {
         fclose( pnginput->f );

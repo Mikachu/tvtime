@@ -819,6 +819,7 @@ void osd_list_delete( osd_list_t *osdl )
     for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
         if( osdl->lines[ i ] ) osd_string_delete( osdl->lines[ i ] );
     }
+    osd_font_delete( osdl->font );
     free( osdl );
 }
 
