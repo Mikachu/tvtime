@@ -863,6 +863,7 @@ int main( int argc, char **argv )
     int scanning = 0;
     int firstscan = 0;
     int use_vgasync = 0;
+    int half_framerate = -1;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -933,10 +934,10 @@ int main( int argc, char **argv )
     }
 
     /* Field display in microseconds. */
-    if( norm != VIDEOINPUT_NTSC ) {
-        fieldtime = 20000;
-    } else {
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP ) {
         fieldtime = 16683;
+    } else {
+        fieldtime = 20000;
     }
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
@@ -1258,6 +1259,17 @@ int main( int argc, char **argv )
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
         paused = commands_pause( commands );
+        if( half_framerate < 0 || half_framerate != commands_half_framerate( commands ) ) {
+            half_framerate = commands_half_framerate( commands );
+            if( osd ) {
+                if( half_framerate ) {
+                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) (fieldtime*2)) );
+                } else {
+                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) fieldtime) );
+                }
+                tvtime_osd_show_info( osd );
+            }
+        }
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 configsave( "FullScreen", "1", 1 );
@@ -1301,6 +1313,7 @@ int main( int argc, char **argv )
         }
         commands_next_frame( commands );
         input_next_frame( in );
+
 
         /* Notice this because it's cheap. */
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
@@ -1493,7 +1506,7 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_blit_top_field_end( perf );
 
-        if( output->is_exposed() && !commands_half_framerate( commands ) ) {
+        if( output->is_exposed() && !half_framerate ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the odd field. */
                 output->wait_for_sync( 1 );
@@ -1545,7 +1558,7 @@ int main( int argc, char **argv )
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
-        if( !commands_half_framerate( commands ) && !output->is_interlaced() ) {
+        if( !half_framerate && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 

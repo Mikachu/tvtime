@@ -229,13 +229,11 @@ static void reinit_tuner( commands_t *in )
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
-            tvtime_osd_show_info( in->osd );
         }
     } else if( in->osd ) {
         tvtime_osd_set_audio_mode( in->osd, "" );
         tvtime_osd_set_freq_table( in->osd, "" );
         tvtime_osd_set_channel_number( in->osd, "" );
-        tvtime_osd_show_info( in->osd );
         tvtime_osd_set_network_call( in->osd, "" );
         tvtime_osd_set_network_name( in->osd, "" );
         tvtime_osd_set_show_name( in->osd, "" );
@@ -396,13 +394,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             
     case TVTIME_TOGGLE_HALF_FRAMERATE:
         in->halfrate = !in->halfrate;
-        if( in->osd ) {
-            if( in->halfrate ) {
-                tvtime_osd_show_message( in->osd, "Half-framerate mode." );
-            } else {
-                tvtime_osd_show_message( in->osd, "Full-framerate mode." );
-            }
-        }
         break;
 
     case TVTIME_TOGGLE_CONSOLE:

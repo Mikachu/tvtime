@@ -94,7 +94,8 @@ static const char *taglines[] = {
 "tvtime: it's time you traded up",
 "tvtime: whiter than white!",
 "tvtime: the most trusted name in news",
-"tvtime: I don't think it's quite fair to condemn a whole program because of a single slip-up." };
+"tvtime: I don't think it's quite fair to condemn a whole program because of a single slip-up",
+"tvtime: it's better than bad, it's good" };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 
