@@ -58,8 +58,12 @@ static int HandleXError( Display *display, XErrorEvent *xevent )
 {
     char str[ 1024 ];
 
-    XGetErrorText( display, xevent->error_code, str, 1024 );
-    fprintf( stderr, "xvoutput: Received X error event: %s\n", str );
+    if( xevent->error_code == BadAlloc ) {
+        fprintf( stderr, "xvoutput: Out of video card memory.\n" );
+    } else {
+        XGetErrorText( display, xevent->error_code, str, 1024 );
+        fprintf( stderr, "xvoutput: Received X error event: %s\n", str );
+    }
     xvoutput_error = 1;
     return 0;
 }
@@ -177,12 +181,10 @@ static void *create_shm( int size )
         shminfo.shmaddr = (char *) shmat( shminfo.shmid, 0, 0 );
         if( shminfo.shmaddr != (char *)-1 ) {
 
-            /* On linux the IPC_RMID only kicks off once everyone detaches the shm */
-            /* doing this early avoids shm leaks when we are interrupted. */
-            /* this would break the solaris port though :-/ */
-            /* shmctl (instance->shminfo.shmid, IPC_RMID, 0); */
-
-            /* XShmAttach fails on remote displays, so we have to catch this event */
+            /**
+             * XShmAttach fails on remote displays, so we have to catch
+             * this event.
+             */
 
             XSync( display, False );
             x11_InstallXErrorHandler();
@@ -190,20 +192,23 @@ static void *create_shm( int size )
             shminfo.readOnly = True;
             if( XShmAttach( display, &shminfo ) ) {
                 error = 0;
+            } else {
+                fprintf( stderr, "xvoutput: tvtime cannot run on a remote X server.\n" );
             }
 
             XSync( display, False );
 
             /**
-             * We immediately delete the shared memory segment, protecting us for
-             * if we crash or whatever, to make sure we still clean up.
+             * We immediately delete the shared memory segment to ensure
+             * that we clean up after crashes.
              */
             shmctl( shminfo.shmid, IPC_RMID, 0 );
         }
+    } else {
+        fprintf( stderr, "xvoutput: Out of memory.\n" );
     }
 
     if( error ) {
-        fprintf( stderr, "xvoutput: Cannot create shared memory.\n" );
         return 0;
     } else {
         return shminfo.shmaddr;

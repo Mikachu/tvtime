@@ -1181,8 +1181,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     ct = config_new();
     if( !ct ) {
-        fputs( _("tvtime: Can't set configuration options, exiting.\n"),
-               stderr );
+        lfputs( _("tvtime: Out of memory.\n"), stderr );
         return 1;
     }
 
@@ -2692,20 +2691,19 @@ int main( int argc, char **argv )
      */
     setup_i18n();
 
-    fprintf( stderr, _("tvtime: Running %s.\n"), PACKAGE_STRING );
+    lfprintf( stderr, _("tvtime: Running %s.\n"), PACKAGE_STRING );
 
     /* Disable this code for a release. */
-    fputs( _("\n"
-             "*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
-             "*** We often break stuff during development.  "
-             "Please submit bug reports\n"
-             "*** based on released versions only!!\n\n"), stderr );
+    lfputs( _("\n"
+             "*** WARNING: This is a DEVELOPMENT version of tvtime.\n"
+             "*** Please do not redistribute snapshots, and please submit\n"
+             "*** bug reports for released versions only!\n\n"), stderr );
 
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
     if( !set_realtime_priority( 0 ) ) {
-        fputs( _("tvtime: Can't get realtime priority for better performance, "
-                 "need root access.\n"), stderr );
+        lfputs( _("tvtime: Cannot get realtime priority for better "
+                  "performance, need root access.\n"), stderr );
     }
 
     rtctimer = rtctimer_new( 1 );
