@@ -111,19 +111,11 @@ static void deinterlace_line( uint8_t *dst, uint8_t *lum_m4,
 #endif
 }
 
-
-/**
- * The commented-out method below that uses the bottom_field member is more
- * like the filter as specified in the MPEG2 spec, but it doesn't seem to
- * have the desired effect.
- */
-
 static void deinterlace_scanline_vfir( uint8_t *output,
                                        deinterlace_scanline_data_t *data,
                                        int width )
 {
     deinterlace_line( output, data->tt1, data->t0, data->m1, data->b0, data->bb1, width*2 );
-    // blit_packed422_scanline( output, data->m1, width );
 }
 
 static void copy_scanline( uint8_t *output,
@@ -131,13 +123,6 @@ static void copy_scanline( uint8_t *output,
                            int width )
 {
     blit_packed422_scanline( output, data->m0, width );
-    /*
-    if( data->bottom_field ) {
-        deinterlace_line( output, data->tt2, data->t1, data->m2, data->b1, data->bb2, width*2 );
-    } else {
-        deinterlace_line( output, data->tt0, data->t1, data->m0, data->b1, data->bb0, width*2 );
-    }
-    */
 }
 
 
