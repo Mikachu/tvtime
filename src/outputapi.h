@@ -55,6 +55,7 @@ typedef struct output_api_s
     /* Functions for all outputs. */
     int (* toggle_aspect)( void );
     int (* toggle_fullscreen)( int fullscreen_width, int fullscreen_height );
+    void (* resize_window_fullscreen)( void );
     void (* set_window_caption)( const char *caption );
 
     void (* set_window_position)( int x, int y );

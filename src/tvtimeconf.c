@@ -190,7 +190,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         char *curval = (char *) value;
 
         if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
-            ct->outputheight = atoi( curval );
+            if( curval[ 0 ] == 'f' || curval[ 0 ] == 'F' ) {
+                ct->outputheight = -1;
+            } else {
+                ct->outputheight = atoi( curval );
+            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "UseWindowPosition" ) ) {
@@ -783,7 +787,12 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                   ct->rvr_filename = strdup( optarg ); break;
         case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                   ct->mixerdev = strdup( optarg ); break;
-        case 'H': ct->outputheight = atoi( optarg ); break;
+        case 'H': if( optarg[ 0 ] == 'f' || optarg[ 0 ] == 'F' ) {
+                      ct->outputheight = -1;
+                  } else {
+                      ct->outputheight = atoi( optarg );
+                  }
+                  break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
         case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;

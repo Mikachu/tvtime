@@ -170,6 +170,10 @@ static int mga_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     return 1;
 }
 
+static void mga_resize_window_fullscreen( void )
+{
+}
+
 static void mga_set_window_caption( const char *caption )
 {
 }
@@ -220,6 +224,7 @@ static output_api_t mgaoutput =
 
     mga_toggle_aspect,
     mga_toggle_fullscreen,
+    mga_resize_window_fullscreen,
     mga_set_window_caption,
 
     mga_set_window_position,

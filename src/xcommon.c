@@ -161,6 +161,22 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
     }
 }
 
+static void x11_static_gravity( Display *dpy, Window win )
+{
+    XSizeHints hints;
+    hints.flags = PWinGravity;
+    hints.win_gravity = StaticGravity;
+    XSetWMNormalHints( dpy, win, &hints );
+}
+
+static void x11_northwest_gravity( Display *dpy, Window win )
+{
+    XSizeHints hints;
+    hints.flags = PWinGravity;
+    hints.win_gravity = NorthWestGravity;
+    XSetWMNormalHints( dpy, win, &hints );
+}
+
 /* Used for error handling. */
 static unsigned long req_serial;
 static int (*prev_xerrhandler)( Display *dpy, XErrorEvent *ev );
@@ -701,6 +717,9 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     output_aspect = aspect;
     output_height = init_height;
+    if( output_height < 0 ) {
+        output_height = 576;
+    }
     xcommon_verbose = verbose;
 
     display = XOpenDisplay( 0 );
@@ -906,6 +925,10 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     calculate_video_area();
     x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
 
+    if( init_height < 0 ) {
+        xcommon_resize_window_fullscreen();
+    }
+
     return 1;
 }
 
@@ -956,7 +979,27 @@ void xcommon_set_window_position( int x, int y )
         fprintf( stderr, "xcommon: Target window position %d,%d.\n", x, y );
     }
 
+    x11_northwest_gravity( display, wm_window );
     XMoveWindow( display, wm_window, x, y );
+}
+
+void xcommon_resize_window_fullscreen( void )
+{
+    XWindowAttributes attrs;
+    int x, y, w, h;
+    double refresh;
+
+    if( output_fullscreen ) {
+        xcommon_toggle_fullscreen( 0, 0 );
+    }
+
+    XGetWindowAttributes( display, wm_window, &attrs );
+    DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
+    DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
+
+    /* Show our fullscreen window. */
+    x11_static_gravity( display, wm_window );
+    XMoveResizeWindow( display, wm_window, x, y, w, h );
 }
 
 void xcommon_set_window_height( int window_height )
@@ -1001,7 +1044,6 @@ static void x11_wait_unmapped( Display *dpy, Window win )
         XMaskEvent( dpy, StructureNotifyMask, &event );
     } while ( (event.type != UnmapNotify) || (event.xunmap.event != win) );
 }
-
 
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {

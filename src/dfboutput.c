@@ -449,6 +449,11 @@ int dfb_is_fullscreen( void )
     return 1;
 }
 
+void dfb_resize_window_fullscreen( void )
+{
+    /* Tv-out is always full screen */
+}
+
 void dfb_set_window_position( int x, int y )
 {
     /* This has no meaning since we're always fullscreen */
@@ -487,6 +492,7 @@ output_api_t dfboutput =
 
     dfb_toggle_aspect,
     dfb_toggle_fullscreen,
+    dfb_resize_window_fullscreen,
     dfb_set_window_caption,
 
     dfb_set_window_position,

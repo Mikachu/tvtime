@@ -1,5 +1,10 @@
 
 0.9.8.6 -
+  * vektor: Added a special fullscreen window mode (use
+      --height=full or hit '*' a few times from the default
+      config).  This resizes the window the same as if it
+      was fullscreen, but does not use override_redirect or
+      change layer.
   * vektor: Added China broadcast frequencies (thanks to
       Merlin Ma).
   * vektor: Renamed, rearranged, and cleaned up the available

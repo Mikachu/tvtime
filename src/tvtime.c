@@ -1336,9 +1336,13 @@ int main( int argc, char **argv )
                 if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
                     output->toggle_fullscreen( 0, 0 );
                 } else {
-                    output->set_window_height( config_get_outputheight( cur ) );
-                    if( config_get_useposition( cur ) ) {
-                        output->set_window_position( config_get_output_x( cur ), config_get_output_y( cur ) );
+                    if( config_get_outputheight( cur ) < 0 ) {
+                        output->resize_window_fullscreen();
+                    } else {
+                        output->set_window_height( config_get_outputheight( cur ) );
+                        if( config_get_useposition( cur ) ) {
+                            output->set_window_position( config_get_output_x( cur ), config_get_output_y( cur ) );
+                        }
                     }
                 }
                 if( framerate_mode != config_get_framerate_mode( cur ) ) {
