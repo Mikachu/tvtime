@@ -1,11 +1,13 @@
 
 0.9.8
+  * (vektor) No longer write past the end of the number string (fixes
+    bug 715997)
   * (vektor) Screenshots save to $HOME, print a message to OSD on
     screenshot.
   * (vektor) Wrote a videofilter object, and sped up luma correction by
     about 2x.
   * (mrallen/vektor) Added an insanely useful pause command for debugging,
-    defaults to I_END.
+    defaults to I_END (fixes bug 715068)
   * (vektor) Fixed a small memleak in the screenshot code.
   * (vektor) Added a new filter for the CC data written by diz.  It's
     definitely better than the crappy averaging mess that was there before,
