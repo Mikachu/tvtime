@@ -560,14 +560,17 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         }
     }
 
-    if( !vidin->isv4l2 ) {
-        /* Check if this is a bttv-based card.  Code taken from xawtv. */
+    /* Check if this is a bttv-based card.  Code taken from xawtv. */
 #define BTTV_VERSION            _IOR('v' , BASE_VIDIOCPRIVATE+6, int)
-        /* dirty hack time / v4l design flaw -- works with bttv only
-         * this adds support for a few less common PAL versions */
-        if( !(ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0) ) {
-            vidin->isbttv = 1;
-        } else if( norm > VIDEOINPUT_SECAM ) {
+    /* dirty hack time / v4l design flaw -- works with bttv only
+     * this adds support for a few less common PAL versions */
+    if( !(ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0) ) {
+        vidin->isbttv = 1;
+    }
+#undef BTTV_VERSION
+
+    if( !vidin->isv4l2 ) {
+        if( !vidin->isbttv && norm > VIDEOINPUT_SECAM ) {
             fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
                              "videoinput: The norm %s is only supported in V4L1 for bttv-supported cards.\n",
                      v4l_device, videoinput_get_norm_name( norm ) );
@@ -575,7 +578,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             free( vidin );
             return 0;
         }
-#undef BTTV_VERSION
 
         if( norm > VIDEOINPUT_NTSC_JP ) {
             fprintf( stderr, "videoinput: Detected only a V4L1 driver.  The PAL-60 norm\n"
