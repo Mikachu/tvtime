@@ -214,7 +214,7 @@ const char *get_tvtime_fifo( config_t *ct )
 
         /* Try to get a hostname. */
         hostenv = (char *) malloc( hostenv_size );
-        while( gethostname( hostenv, hostenv_size ) < 0) {
+        while( gethostname( hostenv, hostenv_size ) < 0 ) {
             hostenv_size *= 2;
             hostenv_realloc = realloc( hostenv, hostenv_size );
             if( hostenv_realloc == NULL ) {
