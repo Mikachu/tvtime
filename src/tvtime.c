@@ -59,6 +59,17 @@ static int curmethodid;
 static int fadepos = 0;
 static double fadespeed = 65.0;
 
+#define SIGNAL_RECOVER_DELAY 2
+#define SIGNAL_AQUIRE_DELAY  2
+
+#define TUNER_STATE_HAS_SIGNAL      0
+#define TUNER_STATE_SIGNAL_DETECTED 1
+#define TUNER_STATE_SIGNAL_LOST     2
+#define TUNER_STATE_NO_SIGNAL       3
+static int cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+static int signal_recover_wait = 0;
+static int signal_aquire_wait = 0;
+
 static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
@@ -381,7 +392,6 @@ int main( int argc, char **argv )
     menu_t *menu;
     output_api_t *output;
     performance_t *perf;
-    int washold = 0;
 
     setup_speedy_calls();
 
@@ -618,17 +628,15 @@ int main( int argc, char **argv )
 
     /* Initialize our timestamps. */
     for(;;) {
-        char caption[ 255 ];
         unsigned char *curframe;
         int curframeid;
         int printdebug = 0;
-        int showbars, videohold, screenshot;
+        int showbars, screenshot;
         int aquired = 0;
 
         output->poll_events( in );
 
         if( input_quit( in ) ) break;
-        videohold = input_videohold( in );
         printdebug = input_print_debug( in );
         showbars = input_show_bars( in );
         screenshot = input_take_screenshot( in );
@@ -662,31 +670,59 @@ int main( int argc, char **argv )
 
 
         /* Aquire the next frame. */
-        if( !videohold && videoinput_freq_present( vidin ) ) {
-            curframe = videoinput_next_frame( vidin, &curframeid );
-            if( washold ) {
-                secondlastframe = lastframe = curframe = saveframe;
-                washold--;
+        if( videoinput_freq_present( vidin ) ) {
+            switch( cur_tuner_state ) {
+            case TUNER_STATE_NO_SIGNAL:
+            case TUNER_STATE_SIGNAL_LOST:
+                cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
+                signal_aquire_wait = SIGNAL_AQUIRE_DELAY;
+                signal_recover_wait = 0;
+            case TUNER_STATE_SIGNAL_DETECTED:
+                if( signal_aquire_wait ) {
+                    signal_aquire_wait--;
+                } else {
+                    cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+                }
+            default: break;
             }
-            aquired = 1;
         } else {
-            if( !videohold ) {
+            switch( cur_tuner_state ) {
+            case TUNER_STATE_HAS_SIGNAL:
+                save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
+                fadepos = 0;
+            case TUNER_STATE_SIGNAL_DETECTED:
+                cur_tuner_state = TUNER_STATE_SIGNAL_LOST;
+                signal_recover_wait = SIGNAL_RECOVER_DELAY;
+            case TUNER_STATE_SIGNAL_LOST:
+                if( signal_recover_wait ) {
+                    signal_recover_wait--;
+                    break;
+                } else {
+                    cur_tuner_state = TUNER_STATE_NO_SIGNAL;
+                    /* OSD should say something here */
+                }
+            default:
                 if( fadepos < 256 ) {
                     crossfade_frame( fadeframe, saveframe, colourbars, width,
                                      height, width*2, width*2, width*2, fadepos );
                     fadepos += fadespeed;
-                    secondlastframe = lastframe = curframe = fadeframe;
-                } else if( fadepos > 256 && fadepos != 256 ) {
-                    secondlastframe = lastframe = curframe = colourbars;
-                    fadepos = 256;
                 }
-            } else {
-                save_last_frame( saveframe, curframe, width, height, width*2, width*2 );
-                secondlastframe = lastframe = curframe = saveframe;
-                washold = CHANNEL_ACTIVE_DELAY;
-                fadepos = 0;
             }
-            usleep( 20 );
+        }
+
+        if( cur_tuner_state == TUNER_STATE_HAS_SIGNAL || TUNER_STATE_SIGNAL_DETECTED ) {
+            curframe = videoinput_next_frame( vidin, &curframeid );
+            aquired = 1;
+        }
+
+        if( cur_tuner_state != TUNER_STATE_HAS_SIGNAL ) {
+            if( fadepos == 0 ) {
+                secondlastframe = lastframe = curframe = saveframe;
+            } else if( fadepos >= 256 ) {
+                secondlastframe = lastframe = curframe = colourbars;
+            } else {
+                secondlastframe = lastframe = curframe = fadeframe;
+            }
         }
         performance_checkpoint_aquired_input_frame( perf );
 

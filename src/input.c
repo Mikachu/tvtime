@@ -29,9 +29,6 @@
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
 
-/* Number of frames to pause during channel change. */
-#define CHANNEL_HOLD 1
-
 
 struct input_s {
     config_t *cfg;
@@ -41,7 +38,6 @@ struct input_s {
     char next_chan_buffer[ 5 ];
     int frame_counter;
     int digit_counter;
-    int videohold;
     int quit;
     int inputnum;
     int muted;
@@ -171,7 +167,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->digit_counter = 0;
     in->menu = 0;
 
-    in->videohold = 0;
     in->quit = 0;
     in->showbars = 0;
     in->printdebug = 0;
@@ -245,8 +240,6 @@ static void input_channel_change_relative( input_t *in, int offset )
             usleep( 80000 );
             videoinput_mute( in->vidin, 1 );
         }
-
-        in->videohold = CHANNEL_HOLD;
 
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
@@ -502,8 +495,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             videoinput_mute( in->vidin, 1 );
                         }
 
-                        in->videohold = CHANNEL_HOLD;
-
                         if( verbose ) {
                             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                                      tvtuner[ cur_channel ].name );
@@ -554,11 +545,6 @@ int input_take_screenshot( input_t *in )
     return in->screenshot;
 }
 
-int input_videohold( input_t *in )
-{
-    return in->videohold;
-}
-
 int input_toggle_fullscreen( input_t *in )
 {
     return in->togglefullscreen;
@@ -601,8 +587,6 @@ void input_next_frame( input_t *in )
             tvtime_osd_show_info( in->osd );
         }
     }
-
-    if( in->videohold ) in->videohold--;
 
     in->printdebug = 0;
     in->screenshot = 0;
