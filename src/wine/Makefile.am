@@ -46,8 +46,8 @@ noinst_HEADERS = avifmt.h basetsd.h com.h debugtools.h driver.h elfdll.h \
 	winuser.h wrapper.h
 
 stubs.lo: stubs.s
-	$(CC) -c $(srcdir)/stubs.s -o stubs.lo
+	$(LIBTOOL) $(CC) -c -o $@ $^
 
 wrapper.lo: wrapper.S
-	$(CC) -c $(srcdir)/wrapper.S -o wrapper.lo
+	$(LIBTOOL) $(CC) -c -o $@ $^
 
