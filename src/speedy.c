@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +104,12 @@ static uint64_t cur_start_time, cur_end_time;
 #define SPEEDY_END() \
     rdtscll( cur_end_time ); \
     speedy_time += cur_end_time - cur_start_time;
+
+/**
+ * result = (1 - alpha)B + alpha*F
+ *        =  B - alpha*B + alpha*F
+ *        =  B + alpha*(F - B)
+ */
 
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
@@ -2164,6 +2171,52 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
     }
 
     return w;
+}
+
+/**
+ * Sub-pixel data bar renderer.  There are 128 bars.
+ */
+void composite_bars_packed4444_scanline( uint8_t *output,
+                                         uint8_t *background, int width,
+                                         int a, int luma, int cb, int cr,
+                                         int percentage )
+{
+    /**
+     * This is the size of both the bar and the spacing in between in subpixel
+     * units out of 256.  Yes, as it so happens, that puts it equal to 'width'.
+     */
+    int barsize = ( width * 256 ) / 256;
+    int i;
+
+    /* We only need to composite the bar on the pixels that matter. */
+    for( i = 0; i < percentage; i++ ) {
+        int barstart = i * barsize * 2;
+        int barend = barstart + barsize;
+        int pixstart = barstart / 256;
+        int pixend = barend / 256;
+        int j;
+
+        for( j = pixstart; j <= pixend; j++ ) {
+            uint8_t *curout = output + (j*4);
+            uint8_t *curin = background + (j*4);
+            int curstart = j * 256;
+            int curend = curstart + 256;
+            int alpha;
+
+            if( barstart > curstart ) curstart = barstart;
+            if( barend < curend ) curend = barend;
+            if( curend - curstart < 256 ) {
+                alpha = ( ( curend - curstart ) * a ) / 256;
+            } else {
+                alpha = a;
+            }
+
+            curout[ 0 ] = curin[ 0 ] + multiply_alpha( alpha - curin[ 0 ], alpha );
+            curout[ 1 ] = curin[ 1 ] + multiply_alpha( luma - curin[ 1 ], alpha );
+            curout[ 2 ] = curin[ 2 ] + multiply_alpha( cb - curin[ 2 ], alpha );
+            curout[ 3 ] = curin[ 3 ] + multiply_alpha( cr - curin[ 3 ], alpha );
+        }
+    }
 }
 
 

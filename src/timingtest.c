@@ -23,7 +23,6 @@
 #include <sys/time.h>
 #include <string.h>
 #include "rtctimer.h"
-#include "videotools.h"
 #include "speedy.h"
 #include "leetft.h"
 

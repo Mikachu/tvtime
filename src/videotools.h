@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,15 +31,6 @@ extern "C" {
  * these depend on the speedy.[h,c] functions, or are implementations
  * of the full-frame versions.
  */
-
-/**
- * Sub-pixel data bar renderer.  There are 128 bars.
- */
-void composite_bars_packed4444_scanline( uint8_t *output,
-                                         uint8_t *background, int width,
-                                         int a, int luma, int cb, int cr,
-                                         int percentage );
-
 
 /**
  * Frame functions.

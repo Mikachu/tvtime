@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,30 +21,6 @@
 #include <stdlib.h>
 #include "speedy.h"
 #include "videotools.h"
-
-static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
-{
-    if( x > 255 ) {
-        return 255;
-    } else if( x < 0 ) {
-        return 0;
-    } else {
-        return x;
-    }
-}
-
-/**
- * result = (1 - alpha)B + alpha*F
- *        =  B - alpha*B + alpha*F
- *        =  B + alpha*(F - B)
- */
-
-static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
-{
-    int temp;
-    temp = (r * a) + 0x80;
-    return ((temp + (temp >> 8)) >> 8);
-}
 
 void blit_colour_packed4444( uint8_t *output, int width, int height,
                              int stride, int alpha, int luma, int cb, int cr )
@@ -262,52 +238,6 @@ void composite_packed4444_alpha_to_packed422( uint8_t *output,
                                                               output + ((dest_x) * 2),
                                                               foreground + ((src_y + i) * fstride), blit_w, alpha );
             output += ostride;
-        }
-    }
-}
-
-/**
- * Sub-pixel data bar renderer.  There are 128 bars.
- */
-void composite_bars_packed4444_scanline( uint8_t *output,
-                                         uint8_t *background, int width,
-                                         int a, int luma, int cb, int cr,
-                                         int percentage )
-{
-    /**
-     * This is the size of both the bar and the spacing in between in subpixel
-     * units out of 256.  Yes, as it so happens, that puts it equal to 'width'.
-     */
-    int barsize = ( width * 256 ) / 256;
-    int i;
-
-    /* We only need to composite the bar on the pixels that matter. */
-    for( i = 0; i < percentage; i++ ) {
-        int barstart = i * barsize * 2;
-        int barend = barstart + barsize;
-        int pixstart = barstart / 256;
-        int pixend = barend / 256;
-        int j;
-
-        for( j = pixstart; j <= pixend; j++ ) {
-            uint8_t *curout = output + (j*4);
-            uint8_t *curin = background + (j*4);
-            int curstart = j * 256;
-            int curend = curstart + 256;
-            int alpha;
-
-            if( barstart > curstart ) curstart = barstart;
-            if( barend < curend ) curend = barend;
-            if( curend - curstart < 256 ) {
-                alpha = ( ( curend - curstart ) * a ) / 256;
-            } else {
-                alpha = a;
-            }
-
-            curout[ 0 ] = curin[ 0 ] + multiply_alpha( alpha - curin[ 0 ], alpha );
-            curout[ 1 ] = curin[ 1 ] + multiply_alpha( luma - curin[ 1 ], alpha );
-            curout[ 2 ] = curin[ 2 ] + multiply_alpha( cb - curin[ 2 ], alpha );
-            curout[ 3 ] = curin[ 3 ] + multiply_alpha( cr - curin[ 3 ], alpha );
         }
     }
 }

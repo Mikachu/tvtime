@@ -259,6 +259,14 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
                                        double aspectratio );
 
 /**
+ * Sub-pixel data bar renderer.  There are 128 bars.  Is this even useful?
+ */
+void composite_bars_packed4444_scanline( uint8_t *output,
+                                         uint8_t *background, int width,
+                                         int a, int luma, int cb, int cr,
+                                         int percentage );
+
+/**
  * Struct for pulldown detection metrics.
  */
 typedef struct pulldown_metrics_s {

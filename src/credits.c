@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pnginput.h"
-#include "videotools.h"
 #include "speedy.h"
 #include "credits.h"
 #include "utils.h"
