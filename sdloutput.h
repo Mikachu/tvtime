@@ -19,13 +19,7 @@
 #ifndef SDLOUTPUT_H_INCLUDED
 #define SDLOUTPUT_H_INCLUDED
 
-#include <SDL/SDL.h>
 #include "input.h"
-
-/**
- * Returns a pointer to the next frame to be drawn.
- */
-unsigned char *sdl_get_output( void );
 
 /**
  * Functions to handle SDL output.
@@ -47,19 +41,23 @@ unsigned char *sdl_get_output( void );
 int sdl_init( int width, int height, int outputwidth, int aspect );
 
 /**
+ * Returns a pointer to the next frame to be drawn.
+ */
+unsigned char *sdl_get_output( void );
+
+/**
  * Display the given frame immediately.
  */
 void sdl_show_frame( void );
 
 /**
- * Perform the polling of events.  Returns a bitfield of the commands
- * listed above.
+ * Perform the polling of events.  Sends signals to the input object.
  */
 void sdl_poll_events( input_t *in );
 
 /**
- * Shutdown SDL
+ * Shutdown SDL.
  */
-void sdl_quit();
+void sdl_quit( void );
 
 #endif /* SDLOUTPUT_H_INCLUDED */

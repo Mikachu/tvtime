@@ -120,7 +120,6 @@ void sdl_poll_events( input_t *in )
         }
 
         if( event.type == SDL_KEYDOWN ) {
-
             curcommand = I_KEYDOWN;
 
             mods = event.key.keysym.mod;
@@ -130,69 +129,23 @@ void sdl_poll_events( input_t *in )
 
             switch ( event.key.keysym.sym ) {
 
-            case SDLK_KP_PLUS:
-                arg |= '+';
-                break;
+            case SDLK_KP_PLUS:     arg |= '+'; break;
+            case SDLK_KP_MINUS:    arg |= '-'; break;
+            case SDLK_KP_DIVIDE:   arg |= '/'; break;
+            case SDLK_KP_PERIOD:   arg |= '.'; break;
+            case SDLK_KP_MULTIPLY: arg |= '*'; break;
+            case SDLK_KP_EQUALS:   arg |= '='; break;
 
-            case SDLK_KP_MINUS:
-                arg |= '-';
-                break;
-
-            case SDLK_KP_DIVIDE:
-                arg |= '/';
-                break;
-
-            case SDLK_KP_PERIOD:
-                arg |= '.';
-                break;
-
-            case SDLK_KP_MULTIPLY:
-                arg |= '*';
-                break;
-
-            case SDLK_KP_EQUALS:
-                arg |= '=';
-                break;
-
-            case SDLK_KP0:
-                arg |= '0';
-                break;
-
-            case SDLK_KP1:
-                arg |= '1';
-                break;
-
-            case SDLK_KP2:
-                arg |= '2';
-                break;
-
-            case SDLK_KP3:
-                arg |= '3';
-                break;
-
-            case SDLK_KP4:
-                arg |= '4';
-                break;
-
-            case SDLK_KP5:
-                arg |= '5';
-                break;
-
-            case SDLK_KP6:
-                arg |= '6';
-                break;
-
-            case SDLK_KP7:
-                arg |= '7';
-                break;
-
-            case SDLK_KP8:
-                arg |= '8';
-                break;
-
-            case SDLK_KP9:
-                arg |= '9';
-                break;
+            case SDLK_KP0: arg |= '0'; break;
+            case SDLK_KP1: arg |= '1'; break;
+            case SDLK_KP2: arg |= '2'; break;
+            case SDLK_KP3: arg |= '3'; break;
+            case SDLK_KP4: arg |= '4'; break;
+            case SDLK_KP5: arg |= '5'; break;
+            case SDLK_KP6: arg |= '6'; break;
+            case SDLK_KP7: arg |= '7'; break;
+            case SDLK_KP8: arg |= '8'; break;
+            case SDLK_KP9: arg |= '9'; break;
 
             case SDLK_KP_ENTER:
                 arg |= I_ENTER;
@@ -207,12 +160,12 @@ void sdl_poll_events( input_t *in )
                 break;
             }
 
-        input_callback( in, curcommand, arg );
+            input_callback( in, curcommand, arg );
         }
     }
 }
 
-void sdl_quit()
+void sdl_quit( void )
 {
     if( fs ) {
         SDL_WM_ToggleFullScreen( screen );
@@ -221,5 +174,5 @@ void sdl_quit()
     SDL_UnlockYUVOverlay( frame );
     SDL_FreeYUVOverlay( frame );
     SDL_Quit();
-
 }
+

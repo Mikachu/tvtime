@@ -228,18 +228,10 @@ int main( int argc, char **argv )
                 if( verbose ) fprintf( stderr, 
                                        "tvtime: Changing to channel %s.\n", 
                                        chanlist[ chanindex ].name );
-/*
-                osd_string_show_text( channel_number, 
-                                      chanlist[ chanindex ].name, 80 );
-*/
             } else if( rc > 0 ) {
                 if( verbose ) fprintf( stderr, 
                                        "tvtime: Changing to channel %s.\n",
                                        chanlist[ chanindex ].name );
-/*
-                osd_string_show_text( channel_number, 
-                                      chanlist[ chanindex ].name, 80 );
-*/
             }
             tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
         }
