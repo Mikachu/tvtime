@@ -81,6 +81,7 @@
 #include "mm_accel.h"
 #include "menu.h"
 #include "tvtimeglyphs.h"
+#include "lircclient.h"
 
 /**
  * This is how many frames to wait until deciding if the pulldown phase
@@ -1184,6 +1185,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int matte_h = 0;
     int matte_mode = 0;
     int restarttvtime = 0;
+    int use_lirc = 0;
     int i;
 
     ct = config_new();
@@ -1636,6 +1638,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         return 1;
     }
 
+    /* Initialize lirc where available. */
+    use_lirc = lirc_open();
+
     /* Setup VBI stuff for NTSC-like norms. */
     if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
@@ -1784,6 +1789,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             commands_set_half_size( commands, curmethod->doscalerbob );
         }
         output->poll_events( in );
+        if( use_lirc ) lirc_poll( commands );
 
         if( commands_quit( commands ) ) break;
         if( commands_restart_tvtime( commands ) ) {
@@ -2681,6 +2687,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
     if( osd ) {
         tvtime_osd_delete( osd );
+    }
+    if( use_lirc ) {
+        lirc_shutdown();
     }
 
     /* Free temporary memory. */

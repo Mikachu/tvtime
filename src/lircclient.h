@@ -23,10 +23,28 @@
 extern "C" {
 #endif
 
-#include "input.h"
+#include "commands.h"
 
+/**
+ * These functions are static, there is no object.  This is because
+ * lirc_client uses static data and will only allow one client per
+ * process.
+ */
+
+/**
+ * Initialize lirc client.
+ */
 int lirc_open( void );
-void poll_lirc( input_t *in );
+
+/**
+ * Shutdown our lirc client.
+ */
+void lirc_shutdown( void );
+
+/**
+ * Poll commands from lirc.  Call this often.
+ */
+void lirc_poll( commands_t *commands );
 
 #ifdef __cplusplus
 };

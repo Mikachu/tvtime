@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dlfcn.h>
@@ -24,11 +25,13 @@
 #include "lircclient.h"
 
 struct lirc_config;
-static int (*lirc_init)(char *prog,int verbose) = 0;
-static int (*lirc_deinit)(void) = 0;
-static int (*lirc_readconfig)(char *file,struct lirc_config **config, int (check)(char *s)) = 0;
-static int (*lirc_nextcode)(char **code) = 0;
-static int (*lirc_code2char)(struct lirc_config *config,char *code,char **string) = 0;
+static int (*lirc_init)( char *prog, int verbose ) = 0;
+static int (*lirc_deinit)( void ) = 0;
+static int (*lirc_readconfig)( char *file, struct lirc_config **config,
+                               int (check)( char *s ) ) = 0;
+static int (*lirc_nextcode)( char **code ) = 0;
+static int (*lirc_code2char)( struct lirc_config *config,
+                              char *code, char **string ) = 0;
 
 static struct lirc_config *lirc_conf;
 static int lirc_fd;
@@ -73,13 +76,17 @@ int lirc_open( void )
     return 0;
 }
 
-void poll_lirc( input_t *in )
+void lirc_shutdown( void )
+{
+    lirc_deinit();
+}
+
+void lirc_poll( commands_t *commands )
 {
     char *code;
     char *string;
     int cmd;
-    
-    
+
     if( lirc_nextcode( &code ) != 0 ) {
         /* Can not connect to lircd. */
         return;
@@ -90,18 +97,30 @@ void poll_lirc( input_t *in )
         return;
     }
 
-    lirc_code2char( lirc_conf, code, &string );
+    while( !lirc_code2char( lirc_conf, code, &string ) && string ) {
+        char cmdstr[ 4096 ];
+        char args[ 4096 ];
+        int i;
 
-    if( !string ) {
-        /* No tvtime action for this code. */
-        return;
-    }
+        strncpy( cmdstr, string, sizeof( cmdstr ) );
+        *args = 0;
 
-    cmd = tvtime_string_to_command( string );
-    if( cmd != -1 ) {
-        // input_callback( in, I_REMOTE, cmd );
-    } else {
-        fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
+        for( i = 0;; i++ ) {
+            if( !cmdstr[ i ] ) break;
+            if( isspace( cmdstr[ i ] ) ) {
+                cmdstr[ i ] = '\0';
+                strncpy( args, cmdstr +  i + 1, sizeof( args ) );
+                break;
+            }
+        }
+
+        cmd = tvtime_string_to_command( cmdstr );
+        if( cmd != TVTIME_NOCOMMAND ) {
+            commands_handle( commands, cmd, args );
+        } else {
+            fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
+        }
     }
+    free( code );
 }
 
