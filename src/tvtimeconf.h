@@ -137,7 +137,7 @@ int config_get_start_channel( config_t *ct );
 int config_get_left_scanline_bias( config_t *ct );
 int config_get_right_scanline_bias( config_t *ct );
 
-parser_file_t *config_get_parsed_file( config_t *ct );
+const char *config_get_config_filename( config_t *ct );
 
 void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction );
 void config_set_luma_correction( config_t *ct, double luma_correction );

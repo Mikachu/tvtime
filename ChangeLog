@@ -1,5 +1,8 @@
 
 0.9.7
+  * (vektor) tvtime now creates the ~/.tvtime/tvtimerc file on startup
+  * (vektor) tvtime now creates the ~/.tvtime directory on startup
+  * (vektor) Fixed screenshot code to handle the XVideo Bob filter
   * (vektor) Added back "newzealand" at least for 0.9.7 (fixes bug 690983)
   * (vektor) Removed the scanline bias feature until I determine if it's
     actually a good idea

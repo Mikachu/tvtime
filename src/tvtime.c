@@ -580,7 +580,7 @@ int main( int argc, char **argv )
         dlevel = 5;
     }
 
-    if( config_get_parsed_file( ct )->filename && !configsave_open( config_get_parsed_file( ct )->filename ) ) {
+    if( !configsave_open( config_get_config_filename( ct ) ) ) {
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
     }
 

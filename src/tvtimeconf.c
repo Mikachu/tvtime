@@ -148,6 +148,8 @@ struct config_s
 
     int left_scanline_bias;
     int right_scanline_bias;
+
+    char config_filename[ 1024 ];
 };
 
 void config_init( config_t *ct );
@@ -350,6 +352,7 @@ config_t *config_new( int argc, char **argv )
     /* Then read in local settings. */
     strncpy( base, getenv( "HOME" ), 235 );
     strcat( base, "/.tvtime/tvtimerc" );
+    sprintf( ct->config_filename, "%s", base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         if( configFile ) parser_delete( &(ct->pf) );
@@ -385,6 +388,7 @@ config_t *config_new( int argc, char **argv )
 
     /* Then read in additional settings. */
     if( configFile && configFile != base ) {
+        sprintf( ct->config_filename, "%s", configFile );
         fprintf( stderr, "config: Reading configuration from %s\n", configFile );
         parser_delete( &(ct->pf) );
         
@@ -933,9 +937,9 @@ void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *c
 }
 
 
-parser_file_t *config_get_parsed_file( config_t *ct )
+const char *config_get_config_filename( config_t *ct )
 {
-    return &(ct->pf);
+    return ct->config_filename;
 }
 
 char *config_get_command_pipe( config_t *ct )
