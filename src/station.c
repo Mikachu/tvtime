@@ -300,6 +300,10 @@ int station_scan( void )
      * stations and just mark the 'active' bit if there is signal
      * on the channel.
      */
+    /* Achim:
+     * I think it should work like add_band, but only add if there
+     * is a signal...
+     */
     return 0;
 }
 
