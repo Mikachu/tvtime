@@ -98,7 +98,7 @@ struct osd_string_s
     int border_cb;
     int border_cr;
 
-    uint8_t *image4444;
+    uint8_t image4444[ MEMORY_PER_STRING ];
     int image_size;
     int image_textwidth;
     int image_textheight;
@@ -113,12 +113,6 @@ osd_string_t *osd_string_new( osd_font_t *font )
     }
 
     osds->font = font;
-    osds->image4444 = malloc( MEMORY_PER_STRING );
-    if( !osds->image4444 ) {
-        free( osds );
-        return 0;
-    }
-
     osds->fts = ft_string_new( osd_font_get_font( osds->font ) );
     if( !osds->fts ) {
         fprintf( stderr, "osd_string: Can't create string.\n" );
@@ -140,7 +134,7 @@ osd_string_t *osd_string_new( osd_font_t *font )
     osds->border_cb = 128;
     osds->border_cr = 128;
 
-    osds->image_size = MEMORY_PER_STRING;
+    osds->image_size = sizeof( osds->image4444 );
     osds->image_textwidth = 0;
     osds->image_textheight = 0;
 
@@ -150,7 +144,6 @@ osd_string_t *osd_string_new( osd_font_t *font )
 void osd_string_delete( osd_string_t *osds )
 {
     ft_string_delete( osds->fts );
-    free( osds->image4444 );
     free( osds );
 }
 
