@@ -183,7 +183,8 @@ struct commands_s {
 static void menu_set_value( menu_t *menu, int newval, const char *icon )
 {
     char string[ 128 ];
-    snprintf( string, sizeof( string ), "%s  %s: %d", icon, _("Current"), newval );
+    snprintf( string, sizeof( string ), "%s  %s: %d",
+              icon, _("Current"), newval );
     menu_set_text( menu, 1, string );
 }
 
@@ -226,7 +227,7 @@ static void display_xmltv_description( commands_t *cmd, const char *title,
 
     if( description && *description ) {
         tvtime_osd_list_set_text( cmd->osd, cur++, "" );
-        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, description, 4 );
+        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, description, 6 );
     }
 
     if( next_title && *next_title ) {
