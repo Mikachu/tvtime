@@ -61,23 +61,23 @@ static int parity = 0;
 static void *screen_framebuffer = 0;
 static int screen_pitch = 0;
 
-void dfb_lock_output_buffer( void )
+static void dfb_lock_output_buffer( void )
 {
     current_frame->Lock( current_frame, DSLF_WRITE|DSLF_READ, 
                          &screen_framebuffer, &screen_pitch );
 }
 
-void dfb_unlock_output_buffer( void )
+static void dfb_unlock_output_buffer( void )
 {
     current_frame->Unlock( current_frame );
 }
 
-unsigned char *dfb_get_output_buffer( void )
+static unsigned char *dfb_get_output_buffer( void )
 {
     return (unsigned char *) screen_framebuffer;
 }
 
-int dfb_get_current_output_field( void )
+static int dfb_get_current_output_field( void )
 {
     int fieldid = 0;
 #if DIRECTFB_COMPILE_VERSION >= 914
@@ -86,12 +86,12 @@ int dfb_get_current_output_field( void )
     return fieldid;
 }
 
-int dfb_get_output_stride( void )
+static int dfb_get_output_stride( void )
 {
     return screen_pitch;
 }
 
-void dfb_shutdown( void )
+static void dfb_shutdown( void )
 {
     if( buffer ) {
         buffer->Release( buffer );
@@ -116,9 +116,9 @@ void dfb_shutdown( void )
     }
 }
 
-const char *fb_dev_name = "/dev/fb0";
+static const char *fb_dev_name = "/dev/fb0";
 
-int dfb_setup_temp_buffer()
+static int dfb_setup_temp_buffer()
 {
   int res;
 
@@ -139,7 +139,7 @@ int dfb_setup_temp_buffer()
   return 0;
 }
 
-int dfb_init( int outputheight, int aspect, int verbose )
+static int dfb_init( int outputheight, int aspect, int verbose )
 {
     DFBDisplayLayerConfig dlc;
     DFBDisplayLayerConfigFlags failed;
@@ -281,12 +281,12 @@ int dfb_init( int outputheight, int aspect, int verbose )
     return 1;
 }
 
-int dfb_is_interlaced( void )
+static int dfb_is_interlaced( void )
 {
     return 1;
 }
 
-void dfb_wait_for_sync( int field )
+static void dfb_wait_for_sync( int field )
 {
     while( dfb_get_current_output_field() != field ) {
     /*do { */
@@ -297,7 +297,7 @@ void dfb_wait_for_sync( int field )
     }
 }
 
-int dfb_show_frame( int x, int y, int width, int height )
+static int dfb_show_frame( int x, int y, int width, int height )
 {
 
     IDirectFBSurface *blitsrc = current_frame;
@@ -314,19 +314,19 @@ int dfb_show_frame( int x, int y, int width, int height )
     return 1;
 }
 
-int dfb_toggle_aspect( void )
+static int dfb_toggle_aspect( void )
 {
     /* Not supported yet */
     return 0;
 }
 
-int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
+static int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
     /* Doesn't make sense for tv-output */
     return 1;
 }
 
-void dfb_poll_events( input_t *in )
+static void dfb_poll_events( input_t *in )
 {
     DFBInputEvent event;
     int curcommand = 0, arg = 0;
@@ -408,28 +408,28 @@ void dfb_poll_events( input_t *in )
     return;
 }
 
-void dfb_set_window_caption( const char *caption )
+static void dfb_set_window_caption( const char *caption )
 {
     /* Doesn't make sense for tv-out */
 }
 
-int dfb_is_exposed( void ) 
+static int dfb_is_exposed( void ) 
 { 
     /* Always exposed for tv-out */
     return 1; 
 } 
  
-int dfb_get_visible_width( void ) 
+static int dfb_get_visible_width( void ) 
 { 
     return output_width; 
 } 
  
-int dfb_get_visible_height( void ) 
+static int dfb_get_visible_height( void ) 
 { 
     return output_height; 
 } 
 
-int dfb_set_input_size( int inputwidth, int inputheight )
+static int dfb_set_input_size( int inputwidth, int inputheight )
 {
     int need_input_resize = (current_frame == NULL ||
                             (input_width != inputwidth) || (input_height != inputheight));
@@ -443,37 +443,37 @@ int dfb_set_input_size( int inputwidth, int inputheight )
     return 1;
 }
 
-int dfb_is_fullscreen( void )
+static int dfb_is_fullscreen( void )
 {
     /* Tv-out is always full screen */
     return 1;
 }
 
-void dfb_resize_window_fullscreen( void )
+static void dfb_resize_window_fullscreen( void )
 {
     /* Tv-out is always full screen */
 }
 
-void dfb_set_window_position( int x, int y )
+static void dfb_set_window_position( int x, int y )
 {
     /* This has no meaning since we're always fullscreen */
 }
 
-void dfb_set_window_height( int window_height )
+static void dfb_set_window_height( int window_height )
 {
     /* Dfb Tv-out does not support height modifications */
 }
 
-int dfb_can_read_from_buffer( void )
+static int dfb_can_read_from_buffer( void )
 {
     return 0;
 }
 
-void dfb_set_fullscreen_position( int pos )
+static void dfb_set_fullscreen_position( int pos )
 {
 }
 
-output_api_t dfboutput =
+static output_api_t dfboutput =
 {
     dfb_init,
 
