@@ -40,7 +40,6 @@ struct videoinput_s
     int width;
     int height;
 
-    /* Wouldn't it be nice if ... */
     int maxbufs;
 
     unsigned char *grab_data;
@@ -53,7 +52,6 @@ struct videoinput_s
     int curframe;
 
     struct video_mbuf gb_buffers;
-
 };
 
 
@@ -88,33 +86,29 @@ unsigned char *videoinput_next_image( videoinput_t *vidin )
 {
     int rc;
 
-    for(;;) {
-        if( vidin->have_mmap ) {
-            return vidin->map + vidin->gb_buffers.offsets[ grab_wait(vidin) ];
+    if( vidin->have_mmap ) {
+        return vidin->map + vidin->gb_buffers.offsets[ grab_wait(vidin) ];
+    } else {
+        rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
+        if( vidin->grab_size != rc ) {
+            fprintf( stderr, "videoinput: grabber read error (rc=%d)\n", rc );
+            return 0;
         } else {
-            rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
-            if( vidin->grab_size != rc ) {
-                fprintf( stderr, "videoinput: grabber read error (rc=%d)\n", rc );
-                return NULL;
-            } else {
-                return vidin->grab_data;
-            }
+            return vidin->grab_data;
         }
-
-        sleep( 1 );
     }
 }
 
 void videoinput_free_last_frame( videoinput_t *vidin )
 {
-    grab_next(vidin);
+    grab_next( vidin );
 }
 
 void videoinput_free_all_frames( videoinput_t *vidin )
 {
     int i;
 
-    for( i = 0; i < vidin->numframes; i++ ) grab_next(vidin);
+    for( i = 0; i < vidin->numframes; i++ ) grab_next( vidin );
 }
 
 int videoinput_get_width( videoinput_t *vidin )

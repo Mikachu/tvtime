@@ -244,7 +244,6 @@ void planar422_field_to_packed422_frame( unsigned char *output,
     }
 
     for( i = 0; i < (height / 2) - 1; i++ ) {
-
         if( !bottom_field ) {
             /* Copy a scanline. */
             copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
