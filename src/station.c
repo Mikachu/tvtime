@@ -485,6 +485,7 @@ int station_get_current_active( station_mgr_t *mgr )
     return 0;
 }
 
+
 int station_remove( station_mgr_t *mgr )
 { // untested
     station_info_t *i= mgr->current;
@@ -508,49 +509,57 @@ int station_remove( station_mgr_t *mgr )
     return 1;
 }
 
+station_info_t *ripout( station_mgr_t *mgr, int pos ) {
+    station_info_t *rp = mgr->first;
+
+    do {
+        if( pos == rp->pos ) break;
+        rp = rp->next;
+    } while( rp != mgr->first );
+
+    rp->next->prev= rp->prev;
+    rp->prev->next= rp->next;
+    
+    if( rp == mgr->first ) {
+        mgr->first= rp->next;
+    }
+    
+    if( rp == mgr->current ) {
+        mgr->current= rp->next;
+    }
+
+    if( rp == rp->next ) {
+        mgr->current= NULL;
+        mgr->first= NULL;
+    }
+
+    return rp;
+}
+
+
 int station_remap( station_mgr_t *mgr, int pos )
 {
+    int res;
     if( !mgr->current ) return 0;
     if( pos == mgr->current->pos ) return 1;
 
     if( isFreePos( mgr, pos ) ) {
-        station_info_t *i = mgr->current;
-        i->next->prev = i->prev;
-        i->prev->next = i->next;
+        station_info_t *i = ripout( mgr, mgr->current->pos );
         i->pos = pos;
-        return insert( mgr, i );
+        res= insert( mgr, i );
 
     } else {
-        station_info_t *i = mgr->current;
-        station_info_t *rp = mgr->first;
-        station_info_t *t0, *t1;
-
-        do {
-            if( pos == rp->pos ) break;
-            rp = rp->next;
-        } while( rp != mgr->first );
-
-        rp->next->prev = i;
-        rp->prev->next = i;
-
-        i->next->prev = rp;
-        i->prev->next = rp;
-
-        t0 = rp->next;
-        t1 = rp->prev;
-
-        rp->next = i->next;
-        rp->prev = i->prev;
-
-        i->next = t0;
-        i->prev = t1;
-
-        rp->pos = i->pos;
+        station_info_t *old = ripout( mgr, pos );
+        station_info_t *i = ripout( mgr, mgr->current->pos );
+        
+        old->pos= i->pos;
         i->pos = pos;
-
-        if( rp == mgr->first ) mgr->first = i;
-        return 1;
+        res= insert( mgr, old ) && insert( mgr, i );
     }
+    if ( mgr->verbose ) {
+        station_dump( mgr );
+    }
+    return res;
 }
 
 int station_writeconfig( station_mgr_t *mgr)
