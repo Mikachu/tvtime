@@ -170,6 +170,8 @@ if test x"$no_x" != x"yes"; then
 	    X11_LIBS="$X11_LIBS -lXxf86vm"],,
 	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])],,
 	[$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])
+else
+    AC_MSG_ERROR(X needed and no X libraries or development headers found)
 fi
 AC_SUBST(X11_CFLAGS)
 AC_SUBST(X11_LIBS)

@@ -1,5 +1,7 @@
 
 0.9.8
+  * (vektor) configure.ac now fails if X isn't found.
+  * (vektor) Enabled DScaler DLL filters, added the wine directory.
   * (vektor) Completely removed the scanline bias code, I don't think it's
     the right hting to do.
   * (vektor) We now depend on libxml2 in our configure script.
