@@ -233,7 +233,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
-    ct->keymap[ 'p' ] = TVTIME_CHANNEL_PREV;
+    ct->keymap[ 8 ] = TVTIME_CHANNEL_PREV; // default to backspace
     ct->keymap[ 'k' ] = TVTIME_CHANNEL_UP;
     ct->keymap[ 'j' ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
