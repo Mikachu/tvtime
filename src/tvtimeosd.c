@@ -658,12 +658,6 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
         osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "", osd->delay );
     }
 
-    if( *(osd->freqtable_text) ) {
-        snprintf( text, sizeof( text ), "%s", osd->freqtable_text );
-        osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, osd->delay );
-    } else {
-        osd_string_set_timeout( osd->strings[ OSD_TUNER_INFO ].string, 0 );
-    }
     snprintf( text, sizeof( text ), "%s", osd->input_text );
     osd_string_show_text( osd->strings[ OSD_INPUT_NAME ].string, text, osd->delay );
 
