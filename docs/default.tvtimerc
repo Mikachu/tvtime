@@ -16,8 +16,8 @@ CaptureSource = 0
 # This sets the default capture device to use.
 V4LDevice = /dev/video0
 
-# This sets the default TV norm.  Valid options are "ntsc", "pal"
-# or "secam".
+# This sets the default TV norm.  Valid options are "ntsc", "pal",
+# "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
 Norm = ntsc
 
 # This sets the default frequency table to use for any tuners found.

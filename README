@@ -27,41 +27,42 @@ processes it, and displays it on a computer monitor or projector.
 
   Using tvtime
   
+usage: tvtime [-vasb] [-w <width>] [-I <sampling>] [-d <device>]
+              [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]
 
+	-v	Show verbose messages.
+	-a	16:9 mode.
+	-s	Print frame skip information (for debugging).
+	-I	V4L input scanline sampling, defaults to 720.
+	-w	Output window width, defaults to 800.
+	-d	video4linux device (defaults to /dev/video0).
+	-i	video4linux input number (defaults to 0).
+	-c	Apply luma correction.
+	-l	Luma correction value (defaults to 1.0, use of this implies -c).
+	-b	se bt8x8 correction when applying luma correction.
+	-n	The mode to set the tuner to: PAL, NTSC or SECAM.
+	  	(defaults to NTSC)
+	-f	The channels you are receiving with the tuner
+	  	(defaults to us-cable).
+	  	Valid values are:
+	  		us-bcast
+	  		us-cable
+	  		us-cable-hrc
+	  		japan-bcast
+	  		japan-cable
+	  		europe-west
+	  		europe-east
+	  		italy
+	  		newzealand
+	  		australia
+	  		ireland
+	  		france
+	  		china-bcast
+	  		southafrica
+	  		argentina
+	  		canada-cable
+	  		australia-optus
 
-usage: ./tvtime [-as] [-I <sampling>] [-w <width>] [-d <device>
-                [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]
-        -a        16:9 mode.
-        -s        Print frame skip information (for debugging).
-        -I        V4L input scanline sampling, defaults to 720.
-        -w        Output window width, defaults to 800.
-        -d        video4linux device (defaults to /dev/video0).
-        -i        video4linux input number (defaults to 0).
-        -c        Enable luma correction.
-        -l        Luma correction value (defaults to 1.0).  Use of this implies -c.
-        -n        The mode to set the tuner to: PAL, NTSC or SECAM.
-                  (defaults to NTSC)
-        -f        The channels you are receiving with the tuner
-                  (defaults to us-cable).
-                  Valid values are:
-                          us-bcast
-                          us-cable
-                          us-cable-hrc
-                          japan-bcast
-                          japan-cable
-                          europe-west
-                          europe-east
-                          italy
-                          newzealand
-                          australia
-                          ireland
-                          france
-                          china-bcast
-                          southafrica
-                          argentina
-                          canada-cable
-                          australia-optus
-        -t        The tuner number for this input (defaults to 0).
 
 
 Notes and FAQ
@@ -73,14 +74,6 @@ widescreen DVDs), simulating a 16:9 TV.  If you're using a hardware DVD
 player, you should tell it that you have a 16:9 TV.  The output width
 parameter is for the output window, the height is determined by the
 aspect ratio (yeah, we assume square pixels for now).
-
-2.  bttv kernel buffers
-
-  Someone noted that if you have a few number of kernel buffers for your
-bttv card, then they had problems.  I could not reproduce it.  I use
-'modprobe bttv gbuffers=8' but even using 2 buffers seemed fine for me.
-Using a large number (like 8) may suck since the audio sync may be too
-off.  Let me know if you have problems.
 
 3.  Luma correction and the bttv
 

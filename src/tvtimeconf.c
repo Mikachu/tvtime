@@ -67,8 +67,8 @@ static void print_usage( char **argv )
                      "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n"
                      "\t-b\tse bt8x8 correction when applying luma correction.\n"
 
-                     "\t-n\tThe mode to set the tuner to: PAL, NTSC or SECAM.\n"
-                     "\t  \t(defaults to NTSC)\n"
+                     "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
+                     "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n"
                      "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"
                      "\t  \tValid values are:\n"
