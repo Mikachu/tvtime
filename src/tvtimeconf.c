@@ -638,119 +638,117 @@ static void print_copyright( void )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr,
-             _("usage: %s [OPTION]...\n\n"
-             "  -a, --widescreen           16:9 mode.\n"
-             "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
-             "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
-             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-             "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-             "                             xmga, matroxtv or SDL (defaults to Xv).\n"
-             "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
-             "                             (defaults to us-cable).\n\n"
-             "                             Valid values are:\n"
-             "                                 us-cable\n"
-             "                                 us-cable100\n"
-             "                                 us-broadcast\n"
-             "                                 china-broadcast\n"
-             "                                 japan-cable\n"
-             "                                 japan-broadcast\n"
-             "                                 europe\n"
-             "                                 australia\n"
-             "                                 australia-optus\n"
-             "                                 newzealand\n"
-             "                                 france\n"
-             "                                 russia\n"
-             "                                 custom (first run tvtime-scanner)\n\n"
-             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
-             "  -h, --help                 Show this help message.\n"
-             "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
-             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-             "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-             "                             (defaults to 720).\n"
-             "  -k, --slave                Disables input handling in tvtime (slave mode).\n"
-             "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
-             "  -M, --window               Start tvtime in window mode.\n"
-             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
-             "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-             "                             PAL-N or PAL-60 (defaults to NTSC).\n"
-             "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-             "                             centre (default).\n"
-             "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
-             "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
-             "  -S, --saveoptions          Save command line options to the config file.\n"
-             "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
-             "  -v, --verbose              Print debugging messages to stderr.\n"
-             "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
-             "                             (defaults to /dev/mixer:line)\n\n"
-             "                             Valid channels are:\n"
-             "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-             "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-             "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
-             "                                 video, radio, monitor\n"), argv[ 0 ] );
+    lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
+    lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
+    lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
+    lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
+    lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
+    lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+              "                             xmga, matroxtv or SDL (defaults to Xv).\n"), stderr );
+    lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+              "                             (defaults to us-cable).\n\n"
+              "                             Valid values are:\n"
+              "                                 us-cable\n"
+              "                                 us-cable100\n"
+              "                                 us-broadcast\n"
+              "                                 china-broadcast\n"
+              "                                 japan-cable\n"
+              "                                 japan-broadcast\n"
+              "                                 europe\n"
+              "                                 australia\n"
+              "                                 australia-optus\n"
+              "                                 newzealand\n"
+              "                                 france\n"
+              "                                 russia\n"
+              "                                 custom (first run tvtime-scanner)\n\n"), stderr );
+    lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
+    lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
+    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576).\n"), stderr );
+    lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
+    lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+              "                             (defaults to 720).\n"), stderr );
+    lfputs( _("  -k, --slave                Disables input handling in tvtime (slave mode).\n"), stderr );
+    lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
+    lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
+    lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+              "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+              "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
+    lfputs( _("  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+              "                             centre (default).\n"), stderr );
+    lfputs( _("  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"), stderr );
+    lfputs( _("  -s, --showdrops            Print stats on frame drops (for debugging).\n"), stderr );
+    lfputs( _("  -S, --saveoptions          Save command line options to the config file.\n"), stderr );
+    lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
+    lfputs( _("  -v, --verbose              Print debugging messages to stderr.\n"), stderr );
+    lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+              "                             (defaults to /dev/mixer:line)\n\n"
+              "                             Valid channels are:\n"
+              "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
+              "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
+              "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+              "                                 video, radio, monitor\n"), stderr );
 }
 
 static void print_config_usage( char **argv )
 {
-    fprintf( stderr,
-             _("usage: %s [OPTION]...\n\n"
-             "  -a, --widescreen           16:9 mode.\n"
-             "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
-             "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
-             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-             "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-             "                             xmga, matroxtv or SDL (defaults to Xv).\n"
-             "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
-             "                             (defaults to us-cable).\n\n"
-             "                             Valid values are:\n"
-             "                                 us-cable\n"
-             "                                 us-cable100\n"
-             "                                 us-broadcast\n"
-             "                                 china-broadcast\n"
-             "                                 japan-cable\n"
-             "                                 japan-broadcast\n"
-             "                                 europe\n"
-             "                                 australia\n"
-             "                                 australia-optus\n"
-             "                                 newzealand\n"
-             "                                 france\n"
-             "                                 russia\n\n"
-             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
-             "  -h, --help                 Show this help message.\n"
-             "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
-             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-             "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-             "                             (defaults to 720).\n"
-             "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
-             "  -M, --window               Start tvtime in window mode.\n"
-             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
-             "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-             "                             PAL-N or PAL-60 (defaults to NTSC).\n"
-             "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-             "                             centre (default).\n"
-             "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
-             "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
-             "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
-             "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
-             "                             (defaults to /dev/mixer:line)\n\n"
-             "                             Valid channels are:\n"
-             "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-             "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-             "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
-             "                                 video, radio, monitor\n"), argv[ 0 ] );
+    lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
+    lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
+    lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
+    lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
+    lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
+    lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+              "                             xmga, matroxtv or SDL (defaults to Xv).\n"), stderr );
+    lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+              "                             (defaults to us-cable).\n\n"
+              "                             Valid values are:\n"
+              "                                 us-cable\n"
+              "                                 us-cable100\n"
+              "                                 us-broadcast\n"
+              "                                 china-broadcast\n"
+              "                                 japan-cable\n"
+              "                                 japan-broadcast\n"
+              "                                 europe\n"
+              "                                 australia\n"
+              "                                 australia-optus\n"
+              "                                 newzealand\n"
+              "                                 france\n"
+              "                                 russia\n"
+              "                                 custom (first run tvtime-scanner)\n\n"), stderr );
+    lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
+    lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
+    lfputs( _("  -H, --height=HEIGHT        Output window height (defaults to 576).\n"), stderr );
+    lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
+    lfputs( _("  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+              "                             (defaults to 720).\n"), stderr );
+    lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
+    lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
+    lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+              "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+              "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
+    lfputs( _("  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+              "                             centre (default).\n"), stderr );
+    lfputs( _("  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"), stderr );
+    lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
+    lfputs( _("  -X, --display=DISPLAY      Use the given X display to connect to.\n"), stderr );
+    lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+              "                             (defaults to /dev/mixer:line)\n\n"
+              "                             Valid channels are:\n"
+              "                                 vol, bass, treble, synth, pcm, speaker, line,\n"
+              "                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
+              "                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+              "                                 video, radio, monitor\n"), stderr );
 }
 
 static void print_scanner_usage( char **argv )
 {
-    fprintf( stderr,
-             _("usage: %s [OPTION]...\n\n"
-             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
-             "  -h, --help                 Show this help message.\n"
-             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
-             "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-             "                             PAL-N or PAL-60 (defaults to NTSC).\n"), argv[ 0 ] );
+    lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ]);
+    lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
+    lfputs( _("  -F, --configfile=FILE      Additional config file to load settings from.\n"), stderr );
+    lfputs( _("  -h, --help                 Show this help message.\n"), stderr );
+    lfputs( _("  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"), stderr );
+    lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+              "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+              "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
 }
 
 config_t *config_new( void )

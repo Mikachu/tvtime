@@ -1219,7 +1219,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "norm" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
-              _("Setup"), _("Input Configuration"), _("Television standard") );
+              _("Setup"), _("Input configuration"), _("Television standard") );
     menu_set_text( menu, 0, string );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
     snprintf( string, sizeof( string ), TVTIME_ICON_RESTART "  %s",

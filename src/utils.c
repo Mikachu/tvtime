@@ -650,12 +650,7 @@ void setup_i18n( void )
 #ifdef ENABLE_NLS
     char *mycodeset;
 
-#ifdef LC_MESSAGES
-    setlocale( LC_MESSAGES, "" );
-    setlocale( LC_CTYPE, "" );
-#else
     setlocale( LC_ALL, "" );
-#endif
     mycodeset = nl_langinfo( CODESET );
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
