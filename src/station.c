@@ -226,7 +226,10 @@ int station_readconfig( station_mgr_t *mgr )
         return 0;
     }
 
-    fprintf( stderr, "station: Reading stationlist from %s\n", mgr->stationrc );
+    if( mgr->verbose ) {
+        fprintf( stderr, "station: Reading stationlist from %s\n",
+                 mgr->stationrc );
+    }
     doc = xmlParseFile( mgr->stationrc );
     if( !doc ) {
         return 0;
@@ -240,7 +243,8 @@ int station_readconfig( station_mgr_t *mgr )
     }
 
     if( xmlStrcasecmp( cur->name, BAD_CAST "stationlist" ) ) {
-        fprintf( stderr, "station: %s: Document not a stationlist.\n", mgr->stationrc );
+        fprintf( stderr, "station: %s: Document not a stationlist.\n",
+                 mgr->stationrc );
         xmlFreeDoc( doc );
         return 0;
     }

@@ -147,7 +147,7 @@ int rtctimer_start_clock( rtctimer_t *rtctimer )
     if( !rtctimer->rtc_running ) {
         if( ioctl( rtctimer->rtc_fd, RTC_PIE_ON, 0 ) < 0 ) {
             if( rtctimer->verbose ) {
-                fprintf( stderr, "rtctimer: cannot start periodic "
+                fprintf( stderr, "rtctimer: Cannot start periodic "
                          "interrupts: %s\n", strerror( errno ) );
             }
             return 0;
@@ -164,7 +164,7 @@ int rtctimer_stop_clock( rtctimer_t *rtctimer )
     if( rtctimer->rtc_running ) {
         if( ioctl( rtctimer->rtc_fd, RTC_PIE_OFF, 0 ) < 0 ) {
             if( rtctimer->verbose ) {
-                fprintf( stderr, "rtctimer: cannot stop periodic "
+                fprintf( stderr, "rtctimer: Cannot stop periodic "
                          "interrupts: %s\n", strerror( errno ) );
             }
             return rtctimer->rtc_running;
