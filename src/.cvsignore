@@ -1,0 +1,10 @@
+.libs
+.deps
+Makefile
+Makefile.in
+*.o
+tvtime
+timingtest
+*.swp
+.xvpics
+
