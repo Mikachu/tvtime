@@ -176,7 +176,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
 
     osd->channel_logo = 0;
-    sprintf( osd->hold_message, "" );
+    strcpy( osd->hold_message, "" );
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
 
