@@ -159,7 +159,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd_string_set_colour_rgb( osd->muted, 245, 222, 179 );
     osd_string_show_text( osd->muted, "Mute", 100 );
     osd->muted_xpos = ( width * 5 ) / 100;
-    osd->muted_ypos = ( height * 90 ) / 100;
+    osd->muted_ypos = osd->volume_bar_ypos - osd_string_get_height( osd->muted );
     osd->ismuted = 0;
 
     osd->channel_logo_xpos = ( width * 60 ) / 100;
@@ -478,9 +478,30 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     }
 
+    if( osd->ismuted ) {
+        if( scanline >= osd->muted_ypos &&
+            scanline < osd->muted_ypos + osd_string_get_height( osd->muted ) ) {
+
+            int startx = osd->muted_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->muted,
+                                                         output + (startx*2),
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->muted_ypos );
+            }
+        }
+    }
+
     /**
      * For the bottom info, the data bar has priority over the
-     * muted indicator which has priority over the volume bar.
+     * volume bar.
      */
     if( osd_string_visible( osd->data_bar ) ) {
         if( scanline >= osd->data_bar_ypos &&
@@ -499,25 +520,6 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                          width - startx,
                                                          strx,
                                                          scanline - osd->data_bar_ypos );
-            }
-        }
-    } else if( osd->ismuted ) {
-        if( scanline >= osd->muted_ypos &&
-            scanline < osd->muted_ypos + osd_string_get_height( osd->muted ) ) {
-
-            int startx = osd->muted_xpos - xpos;
-            int strx = 0;
-            if( startx < 0 ) {
-                strx = -startx;
-                startx = 0;
-            }
-            if( startx < width ) {
-                osd_string_composite_packed422_scanline( osd->muted,
-                                                         output + (startx*2),
-                                                         output + (startx*2),
-                                                         width - startx,
-                                                         strx,
-                                                         scanline - osd->muted_ypos );
             }
         }
     } else if( osd_string_visible( osd->volume_bar ) ) {
