@@ -43,7 +43,7 @@ static DFBColor colorkey;
 static int input_width, input_height;
 static int output_aspect = 0;
 static int output_fullscreen = 0;
-static int deinterlacing = 1;
+static int deinterlacing = 0;
 static int alwaysontop = 0;
 static int fullscreen_pos = 0;
 
