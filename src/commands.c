@@ -1035,7 +1035,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->console = 0;
 
     cmd->vbi = 0;
-    cmd->capturemode = CAPTURE_OFF;
+    cmd->capturemode = config_get_cc( cfg ) ? CAPTURE_CC1 : CAPTURE_OFF;
 
     cmd->curfavorite = 0;
     cmd->numfavorites = 0;
@@ -2252,6 +2252,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             } else {
                 if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("Closed captions enabled.") );
                 cmd->capturemode = CAPTURE_CC1;
+            }
+            if( cmd->capturemode ) {
+                config_save( cmd->cfg, "ShowCC", "1" );
+            } else {
+                config_save( cmd->cfg, "ShowCC", "0" );
             }
         } else {
             if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("No VBI device configured for CC decoding.") );

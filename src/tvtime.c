@@ -1654,7 +1654,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     }
 
     /* Setup VBI stuff for NTSC-like norms. */
-    if( height == 480 ) {
+    if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
             fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
