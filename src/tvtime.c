@@ -1418,7 +1418,7 @@ int main( int argc, char **argv )
         /* Notice this because it's cheap. */
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
 
-        /* Aquire the next frame. */
+        /* Acquire the next frame. */
         if( rvrreader ) {
             tuner_state = TUNER_STATE_HAS_SIGNAL;
         } else if( vidin ) {

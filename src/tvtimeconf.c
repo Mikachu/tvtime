@@ -591,14 +591,14 @@ config_t *config_new( int argc, char **argv )
     ct->framerate = FRAMERATE_FULL;
 
     if( !ct->keymap ) {
-        fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
+        fprintf( stderr, "config: Could not allocate memory for keymap.\n" );
         free( ct );
         return 0;
     }
 
     ct->buttonmap = (int *) malloc( MAX_BUTTONS * sizeof( int ) );
     if( !ct->buttonmap ) {
-        fprintf( stderr, "config: Could not aquire memory for buttonmap.\n" );
+        fprintf( stderr, "config: Could not allocate memory for buttonmap.\n" );
         free( ct->keymap );
         free( ct );
         return 0;
