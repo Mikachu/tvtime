@@ -794,6 +794,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
          */
         req.count = 4;
         req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        req.memory = V4L2_MEMORY_MMAP;
 
         if( ioctl( vidin->grab_fd, VIDIOC_REQBUFS, &req ) < 0 ) {
             fprintf( stderr, "videoinput: Card failed to allocate capture buffers: %s\n",
@@ -826,6 +827,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
             vidbuf->index = i;
             vidbuf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            vidbuf->memory = V4L2_MEMORY_MMAP;
             if( ioctl( vidin->grab_fd, VIDIOC_QUERYBUF, vidbuf ) < 0 ) {
                 fprintf( stderr, "videoinput: Can't get information about buffer %d: %s.\n",
                          i, strerror( errno ) );
