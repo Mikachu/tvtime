@@ -175,8 +175,8 @@ static deinterlace_method_t greedymethod =
     "Greedy2Frame",
     4,
     MM_ACCEL_X86_MMXEXT,
-    2,
     0,
+    2,
     settings,
     copy_scanline,
     deinterlace_greedytwoframe_packed422_scanline_mmxext

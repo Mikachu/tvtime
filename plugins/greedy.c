@@ -172,8 +172,8 @@ static deinterlace_method_t greedymethod =
     "Greedy",
     3,
     MM_ACCEL_X86_MMXEXT,
-    1,
     0,
+    1,
     settings,
     copy_scanline,
     deinterlace_greedy_packed422_scanline_mmxext

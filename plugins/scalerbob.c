@@ -47,8 +47,8 @@ static deinterlace_method_t scalerbobmethod =
     "XVideo Bob",
     1,
     0,
-    0,
     1,
+    0,
     0,
     copy_scanline_1,
     copy_scanline_2

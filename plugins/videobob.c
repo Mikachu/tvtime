@@ -164,8 +164,8 @@ static deinterlace_method_t bobmethod =
     "Bob",
     2,
     MM_ACCEL_X86_MMXEXT,
-    2,
     0,
+    2,
     settings,
     deinterlace_videobob_packed422_scanline_mmxext,
     copy_scanline

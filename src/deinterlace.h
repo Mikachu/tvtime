@@ -129,8 +129,8 @@ struct deinterlace_method_s
     const char *short_name;
     int fields_required;
     int accelrequired;
-    int numsettings;
     int doscalerbob;
+    int numsettings;
     deinterlace_setting_t *settings;
     deinterlace_interp_scanline_t interpolate_scanline;
     deinterlace_copy_scanline_t copy_scanline;

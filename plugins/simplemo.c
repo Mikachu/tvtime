@@ -22,7 +22,13 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
+#include "config.h"
+#include "attributes.h"
+#include "mmx.h"
+#include "mm_accel.h"
 #include "speedy.h"
+#include "speedtools.h"
 #include "deinterlace.h"
 
 const int weight[] = {
@@ -123,6 +129,11 @@ static void deinterlace_scanline_slow( unsigned char *output,
     m1 += (drop - 2)*2;
     output += (drop - 2)*2;
 
+    PREFETCH_2048( weight );
+    PREFETCH_2048( t1 );
+    PREFETCH_2048( b1 );
+    PREFETCH_2048( m1 );
+
     for( i = drop; i < width - drop; i++ ) {
 
         /* todo: rounding */
@@ -153,6 +164,8 @@ static void deinterlace_scanline_slow( unsigned char *output,
         b1 += 2;
         m1 += 2;
     }
+    sfence();
+    emms();
 }
 
 static void copy_scanline( unsigned char *output, unsigned char *m2,
@@ -169,8 +182,8 @@ static deinterlace_method_t simplemo =
     DEINTERLACE_PLUGIN_API_VERSION,
     "Simple Motion-Adaptive",
     "SimpleMo",
-    1,
-    0,
+    2,
+    MM_ACCEL_X86_MMXEXT,
     0,
     0,
     0,
