@@ -1039,10 +1039,13 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
 
 static uint32_t speedy_accel;
 
-void setup_speedy_calls( void )
+void setup_speedy_calls( int verbose )
 {
     speedy_accel = mm_accel();
-    speedy_print_cpu_info();
+
+    if( verbose ) {
+        speedy_print_cpu_info();
+    }
 
     interpolate_packed422_scanline = interpolate_packed422_scanline_c;
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
@@ -1057,7 +1060,9 @@ void setup_speedy_calls( void )
     filter_luma_11_packed422_scanline = filter_luma_11_packed422_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
-        fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
+        if( verbose ) {
+            fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
+        }
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
@@ -1068,12 +1073,15 @@ void setup_speedy_calls( void )
         premultiply_packed4444_scanline = premultiply_packed4444_scanline_mmxext;
         blend_packed422_scanline = blend_packed422_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
-        fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
+        if( verbose ) {
+            fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
+        }
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
     } else {
-        fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, "
-                         "using C fallbacks.\n" );
+        if( verbose ) {
+            fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );
+        }
     }
 }
 

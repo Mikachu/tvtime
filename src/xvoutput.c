@@ -70,6 +70,8 @@ static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
 static int motion_timeout = 0;
 
+static int xvoutput_verbose = 0;
+
 static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
 
 
@@ -140,8 +142,10 @@ static int xv_check_extension( void )
                 if( xv_port_has_yuy2( adaptorInfo[ i ].base_id + j ) ) {
                     if( XvGrabPort( display, adaptorInfo[ i ].base_id + j, 0 ) == Success ) {
                         xv_port = adaptorInfo[ i ].base_id + j;
-                        fprintf( stderr, "xvoutput: Using XVIDEO adaptor %lu: %s.\n",
-                                 adaptorInfo[ i ].base_id + j, adaptorInfo[ i ].name );
+                        if( xvoutput_verbose ) {
+                            fprintf( stderr, "xvoutput: Using XVIDEO adaptor %lu: %s.\n",
+                                     adaptorInfo[ i ].base_id + j, adaptorInfo[ i ].name );
+                        }
                         XvFreeAdaptorInfo( adaptorInfo );
                         return 1;
                     }
@@ -178,43 +182,46 @@ static int open_display( void )
         return 0;
     }
 
-    fprintf( stderr, "xvoutput: Display %s, vendor %s, ", DisplayString( display ), ServerVendor( display ) );
+    if( xvoutput_verbose ) {
+        fprintf( stderr, "xvoutput: Display %s, vendor %s, ",
+        DisplayString( display ), ServerVendor( display ) );
 
-    if( strstr( ServerVendor( display ), "XFree86" ) ) {
-        int vendrel = VendorRelease( display );
+        if( strstr( ServerVendor( display ), "XFree86" ) ) {
+            int vendrel = VendorRelease( display );
 
-	fprintf( stderr, "XFree86 " );
-        if( vendrel < 336 ) {
-	    /*
-	     * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
-	     * those cases here.
-	     */
-	    fprintf( stderr, "%d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
-	} else if( vendrel < 3900 ) {
-	    /* 3.3.x versions, other than the exceptions handled above */
-	    fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 100) % 10);
-	    if (((vendrel / 10) % 10) || (vendrel % 10)) {
-		fprintf( stderr, ".%d", (vendrel / 10) % 10);
-		if (vendrel % 10) {
-		    fprintf( stderr, ".%d", vendrel % 10);
-		}
+	    fprintf( stderr, "XFree86 " );
+            if( vendrel < 336 ) {
+	        /*
+	         * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
+	         * those cases here.
+	         */
+	        fprintf( stderr, "%d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
+	    } else if( vendrel < 3900 ) {
+	        /* 3.3.x versions, other than the exceptions handled above */
+	        fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 100) % 10);
+	        if (((vendrel / 10) % 10) || (vendrel % 10)) {
+		    fprintf( stderr, ".%d", (vendrel / 10) % 10);
+		    if (vendrel % 10) {
+		        fprintf( stderr, ".%d", vendrel % 10);
+		    }
+	        }
+	    } else if( vendrel < 40000000 ) {
+	        /* 4.0.x versions */
+	        fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 10) % 10);
+	        if( vendrel % 10 ) {
+		    fprintf( stderr, ".%d", vendrel % 10 );
+	        }
+	    } else {
+	        /* post-4.0.x */
+	        fprintf( stderr, "%d.%d.%d", vendrel / 10000000, (vendrel / 100000) % 100, (vendrel / 1000) % 100);
+	        if( vendrel % 1000 ) {
+		    fprintf( stderr, ".%d", vendrel % 1000);
+	        }
 	    }
-	} else if( vendrel < 40000000 ) {
-	    /* 4.0.x versions */
-	    fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 10) % 10);
-	    if( vendrel % 10 ) {
-		fprintf( stderr, ".%d", vendrel % 10 );
-	    }
-	} else {
-	    /* post-4.0.x */
-	    fprintf( stderr, "%d.%d.%d", vendrel / 10000000, (vendrel / 100000) % 100, (vendrel / 1000) % 100);
-	    if( vendrel % 1000 ) {
-		fprintf( stderr, ".%d", vendrel % 1000);
-	    }
-	}
-	fprintf( stderr, "\n" );
-    } else {
-        fprintf( stderr, "vendor release %d\n", VendorRelease( display ) );
+	    fprintf( stderr, "\n" );
+        } else {
+            fprintf( stderr, "vendor release %d\n", VendorRelease( display ) );
+        }
     }
 
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
@@ -394,13 +401,14 @@ static void xv_clear_screen( void )
                     video_area.width, video_area.height );
 }
 
-int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
+int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect, int verbose )
 {
     output_aspect = aspect;
     input_width = inputwidth;
     input_height = inputheight;
     output_width = outputwidth;
     output_height = ( output_width * 3 ) / 4;
+    xvoutput_verbose = verbose;
     calculate_video_area();
 
     if( !open_display() ) return 0;

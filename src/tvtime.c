@@ -546,7 +546,17 @@ int main( int argc, char **argv )
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
-    setup_speedy_calls();
+    ct = config_new( argc, argv );
+    if( !ct ) {
+        fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
+        return 1;
+    }
+    verbose = config_get_verbose( ct );
+    if( verbose ) {
+        dlevel = 5;
+    }
+
+    setup_speedy_calls( verbose );
 
     greedy_plugin_init();
     videobob_plugin_init();
@@ -557,16 +567,6 @@ int main( int argc, char **argv )
     weave_plugin_init();
     double_plugin_init();
     scalerbob_plugin_init();
-
-    ct = config_new( argc, argv );
-    if( !ct ) {
-        fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
-        return 1;
-    }
-    verbose = config_get_verbose( ct );
-    if( verbose ) {
-        dlevel = 5;
-    }
 
     if( !configsave_open( config_get_config_filename( ct ) ) ) {
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
@@ -840,7 +840,7 @@ int main( int argc, char **argv )
     /* Setup the output. */
     output = get_xv_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
-                       config_get_aspect( ct ) ) ) {
+                       config_get_aspect( ct ), verbose ) ) {
         fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );
         videoinput_delete( vidin );

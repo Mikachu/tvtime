@@ -152,7 +152,7 @@ extern void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigne
 /**
  * Sets up the function pointers to point at the fastest function available.
  */
-void setup_speedy_calls( void );
+void setup_speedy_calls( int verbose );
 
 /**
  * Returns a bitfield of what accellerations are available.  See mm_accel.h.
