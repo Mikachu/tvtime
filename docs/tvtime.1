@@ -1,0 +1,106 @@
+.TH "tvtime" "1" "0.9.6" "Billy Biggs <vektor@dumbterm.net>" ""
+.SH "NAME"
+.LP 
+\fBtvtime\fR \- high quality television application
+.SH "SYNTAX"
+.LP 
+tvtime [\-vasb] [\-w <width>] [\-I <sampling>] [\-d <device>] [\-i <input>] [\-n <norm>] [\-f <frequencies>] [\-t <tuner>]
+       
+.SH "DESCRIPTION"
+.LP 
+tvtime is a high quality television application for use with video capture cards.  tvtime processes the input from a capture card and displays it on a computer monitor or projector.
+
+  tvtime supports:
+
+  o   Deinterlaced output at full interlaced rate of 59.94 frames per second for NTSC source, or 50 frames per second for PAL sources. This gives smoothness of motion and high visual quality.
+
+  o   Multiple deinterlacing algorithms for finding the optimal mode for the video content and available processor speed.
+
+  o   16:9 aspect ratio mode for the highest available resolution when processing input from an external DVD player or digital satellite receiver.
+
+  o   A super\-slick on\-screen\-display for the complete television experience.
+.SH "OPTIONS"
+\-v
+.br 
+	Show verbose messages.
+
+\-a
+.br 
+	16:9 mode.
+
+\-s
+.br 
+	Print frame skip information (for debugging).
+
+\-I
+.br 
+	V4L input scanline sampling, defaults to 720.
+
+\-w
+.br 
+	Output window width, defaults to 800.
+
+\-d
+.br 
+	video4linux device (defaults to /dev/video0).
+
+\-i
+.br 
+	video4linux input number (defaults to 0).
+
+\-c
+.br 
+	Apply luma correction.
+
+\-l
+.br 
+	Luma correction value (defaults to 1.0, use of this implies \-c).
+
+
+\-n
+.br 
+	The mode to set the tuner to: PAL, NTSC, SECAM, PAL\-NC, PAL\-M, PAL\-N or NTSC\-JP (defaults to NTSC).
+
+\-f
+.br 
+	The channels you are receiving with the tuner
+             (defaults to us\-cable).
+              Valid values are:
+                us\-cable
+                us\-broadcast
+                japan\-cable
+                japan\-broadcast
+                europe\-cable
+                europe\-west
+                europe\-east
+                uk\-broadcast
+                australia
+                newzealand
+                italy
+                france
+                argentina
+.SH "FILES"
+.LP 
+~/.tvtimerc
+.SH "AUTHORS"
+.LP 
+Billy Biggs <vektor@dumbterm.net>
+    \- Deinterlacing cowboy and video nerd
+    \- Original tvtime author
+
+  Doug Bell <drbell@users.sourceforge.net>
+    \- Tuner, audio mixer, OSD and menu haxor
+    \- Configuration and input management
+
+  David I. Lehn <dlehn@users.sourceforge.net>
+    \- autoconf setup, taken from his autoconf'ing of movietime
+
+  Paul Jara <rascasse@users.sourceforge.net>
+    \- man pages and the RPM spec file
+
+  Bart Dorsey <echo@thebucket.org>
+    \- tvtime man page
+
+.SH "SEE ALSO"
+.LP 
+tvtimerc(5)
