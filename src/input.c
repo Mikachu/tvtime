@@ -186,6 +186,7 @@ void input_delete( input_t *in )
 
 void input_callback( input_t *in, int command, int arg )
 {
+    char argument[ 2 ];
     int tvtime_cmd = 0;
 
     /* Once we've been told to quit, ignore all commands. */
@@ -194,7 +195,7 @@ void input_callback( input_t *in, int command, int arg )
     switch( command ) {
     case I_QUIT:
         in->quit = 1;
-        commands_handle( in->com, TVTIME_QUIT, arg );
+        commands_handle( in->com, TVTIME_QUIT, 0 );
         return;
         break;
 
@@ -206,7 +207,11 @@ void input_callback( input_t *in, int command, int arg )
         } else if( command == I_BUTTONPRESS ) {
             tvtime_cmd = config_button_to_command( in->cfg, arg );
         } else {
-            tvtime_cmd = config_key_to_command( in->cfg, arg );
+            if( commands_in_menu( in->com ) ) {
+                tvtime_cmd = config_key_to_menu_command( in->cfg, arg );
+            } else {
+                tvtime_cmd = config_key_to_command( in->cfg, arg );
+            }
         }
 
         if( command == I_KEYDOWN ) {
@@ -253,7 +258,9 @@ void input_callback( input_t *in, int command, int arg )
         break;
     }
 
-    commands_handle( in->com, tvtime_cmd, arg );
+    argument[ 1 ] = '\0';
+    argument[ 0 ] = arg;
+    commands_handle( in->com, tvtime_cmd, argument );
 }
 
 #ifdef HAVE_LIRC

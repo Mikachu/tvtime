@@ -63,6 +63,7 @@ struct config_s
     int y;
 
     int keymap[ 8 * MAX_KEYSYMS ];
+    int keymapmenu[ 8 * MAX_KEYSYMS ];
     int buttonmap[ MAX_BUTTONS ];
 
     int inputwidth;
@@ -371,7 +372,9 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
                     }
 
                     command_id = tvtime_string_to_command( (const char *) command );
-                    if( command_id != TVTIME_NOCOMMAND ) {
+                    if( tvtime_is_menu_command( command_id ) ) {
+                        ct->keymapmenu[ keycode ] = command_id;
+                    } else if( command_id != TVTIME_NOCOMMAND ) {
                         ct->keymap[ keycode ] = command_id;
                     }
 
@@ -639,6 +642,7 @@ config_t *config_new( void )
 
     ct->uid = getuid();
 
+    memset( ct->keymapmenu, 0, sizeof( ct->keymapmenu ) );
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
 
@@ -699,6 +703,7 @@ config_t *config_new( void )
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
     ct->keymap[ 'y' ] = TVTIME_SHOW_DEINTERLACER_INFO;
+    ct->keymap[ 'u' ] = TVTIME_CHANNEL_FAVORITES;
 
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
@@ -706,6 +711,18 @@ config_t *config_new( void )
     ct->buttonmap[ 3 ] = TVTIME_TOGGLE_INPUT;
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_INC;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DEC;
+
+    /* Menu keys. */
+    ct->keymapmenu[ I_UP ] = TVTIME_MENU_UP;
+    ct->keymapmenu[ I_DOWN ] = TVTIME_MENU_DOWN;
+    ct->keymapmenu[ I_LEFT ] = TVTIME_MENU_LEFT;
+    ct->keymapmenu[ I_RIGHT ] = TVTIME_MENU_RIGHT;
+    ct->keymapmenu[ 'k' ] = TVTIME_MENU_UP;
+    ct->keymapmenu[ 'j' ] = TVTIME_MENU_DOWN;
+    ct->keymapmenu[ 'h' ] = TVTIME_MENU_LEFT;
+    ct->keymapmenu[ 'l' ] = TVTIME_MENU_RIGHT;
+    ct->keymapmenu[ I_ENTER ] = TVTIME_MENU_ENTER;
+    ct->keymapmenu[ 'm' ] = TVTIME_MENU_EXIT;
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
     asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) );
@@ -961,6 +978,17 @@ int config_key_to_command( config_t *ct, int key )
 
         if( isalnum( key & 0x1ff ) ) {
             return TVTIME_CHANNEL_CHAR;
+        }
+    }
+        
+    return TVTIME_NOCOMMAND;
+}
+
+int config_key_to_menu_command( config_t *ct, int key )
+{
+    if( key ) {
+        if( ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
+            return ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
         }
     }
         

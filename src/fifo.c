@@ -103,7 +103,8 @@ int fifo_get_next_command( fifo_t *fifo )
             if( !str[ i ] ) break;
             if( isspace( str[ i ] ) ) {
                 str[ i ] = '\0';
-                memcpy(fifo->arg, str + i + 1, 255-i);
+                memcpy( fifo->arg, str + i + 1, 255 - i );
+                break;
             }
         }
 

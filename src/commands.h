@@ -41,6 +41,7 @@ enum tvtime_commands
     TVTIME_QUIT,
     TVTIME_CHANNEL_INC,
     TVTIME_CHANNEL_DEC,
+    TVTIME_CHANNEL_FAVORITES,
     TVTIME_CHANNEL_PREV,
     TVTIME_TOGGLE_LUMA_CORRECTION,
     TVTIME_LUMA_UP,
@@ -117,7 +118,19 @@ enum tvtime_commands
     TVTIME_TOGGLE_ALWAYSONTOP,
     TVTIME_TOGGLE_MATTE,
     TVTIME_TOGGLE_MODE,
-    TVTIME_TOGGLE_COMPATIBLE_NORM
+    TVTIME_TOGGLE_COMPATIBLE_NORM,
+
+    TVTIME_DISPLAY_MESSAGE,
+
+    TVTIME_SHOW_MENU,
+
+    /* Everything below here is a menu-mode command. */
+    TVTIME_MENU_UP,
+    TVTIME_MENU_DOWN,
+    TVTIME_MENU_LEFT,
+    TVTIME_MENU_RIGHT,
+    TVTIME_MENU_ENTER,
+    TVTIME_MENU_EXIT
 };
 
 enum framerate_mode
@@ -134,10 +147,12 @@ int tvtime_num_commands( void );
 const char *tvtime_get_command( int pos );
 int tvtime_get_command_id( int pos );
 
+int tvtime_is_menu_command( int command );
+
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
                           station_mgr_t *mgr, tvtime_osd_t *osd );
 void commands_delete( commands_t *in );
-void commands_handle( commands_t *in, int command, int arg );
+void commands_handle( commands_t *in, int command, const char *arg );
 
 int commands_quit( commands_t *in );
 int commands_take_screenshot( commands_t *in );
@@ -162,6 +177,7 @@ int commands_scan_channels( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
 int commands_show_deinterlacer_info( commands_t *in );
+int commands_in_menu( commands_t *in );
 
 int commands_console_on( commands_t *in );
 

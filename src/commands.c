@@ -66,6 +66,7 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_ACTIVATE_ALL", TVTIME_CHANNEL_ACTIVATE_ALL },
     { "CHANNEL_DEC", TVTIME_CHANNEL_DEC },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DEC },
+    { "CHANNEL_FAVORITES", TVTIME_CHANNEL_FAVORITES },
     { "CHANNEL_INC", TVTIME_CHANNEL_INC },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
@@ -84,6 +85,7 @@ static Cmd_Names cmd_table[] = {
     { "CONTRAST_UP", TVTIME_CONTRAST_UP },
 
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
+    { "DISPLAY_MESSAGE", TVTIME_DISPLAY_MESSAGE },
 
     { "ENTER", TVTIME_ENTER },
 
@@ -95,6 +97,13 @@ static Cmd_Names cmd_table[] = {
 
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
     { "LUMA_UP", TVTIME_LUMA_UP },
+
+    { "MENU_DOWN", TVTIME_MENU_DOWN },
+    { "MENU_ENTER", TVTIME_MENU_ENTER },
+    { "MENU_EXIT", TVTIME_MENU_EXIT },
+    { "MENU_LEFT", TVTIME_MENU_LEFT },
+    { "MENU_RIGHT", TVTIME_MENU_RIGHT },
+    { "MENU_UP", TVTIME_MENU_UP },
 
     { "MIXER_DOWN", TVTIME_MIXER_DOWN },
     { "MIXER_TOGGLE_MUTE", TVTIME_MIXER_TOGGLE_MUTE },
@@ -108,6 +117,7 @@ static Cmd_Names cmd_table[] = {
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
+    { "SHOW_MENU", TVTIME_SHOW_MENU },
     { "SHOW_STATS", TVTIME_SHOW_STATS },
 
     { "TOGGLE_ALWAYSONTOP", TVTIME_TOGGLE_ALWAYSONTOP },
@@ -176,6 +186,13 @@ const char *tvtime_command_to_string( int command )
     return "ERROR";
 }
 
+int tvtime_is_menu_command( int command )
+{
+    return (command >= TVTIME_MENU_UP);
+}
+
+#define NUM_FAVORITES 9
+
 struct commands_s {
     config_t *cfg;
     videoinput_t *vidin;
@@ -222,6 +239,12 @@ struct commands_s {
     int capturemode;
 
     station_mgr_t *stationmgr;
+
+    int showfavorites;
+    int numfavorites;
+    int curfavorite;
+    int curfavpos;
+    int favorites[ NUM_FAVORITES ];
 };
 
 static void reinit_tuner( commands_t *in )
@@ -335,6 +358,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->vbi = 0;
     in->capturemode = CAPTURE_OFF;
 
+    in->showfavorites = 0;
+    in->numfavorites = 0;
+    in->curfavorite = 0;
+    in->curfavpos = 0;
 
     /**
      * Set the current channel list.
@@ -370,13 +397,90 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
     tvtime_osd_show_list( osd, 1 );
 }
 
-void commands_handle( commands_t *in, int tvtime_cmd, int arg )
+static void osd_list_favorites( commands_t *in )
+{
+    int i;
+
+    tvtime_osd_list_set_lines( in->osd, in->numfavorites + 3 );
+    tvtime_osd_list_set_text( in->osd, 0, "Favorites" );
+    for( i = 0; i < in->numfavorites; i++ ) {
+        char text[ 32 ];
+        sprintf( text, "%d", in->favorites[ i ] );
+        tvtime_osd_list_set_text( in->osd, i + 1, text );
+    }
+    tvtime_osd_list_set_text( in->osd, in->numfavorites + 1, "Add current station" );
+    tvtime_osd_list_set_text( in->osd, in->numfavorites + 2, "Exit" );
+    tvtime_osd_list_set_hilight( in->osd, in->curfavpos + 1 );
+    tvtime_osd_show_list( in->osd, 1 );
+}
+
+static void add_to_favorites( commands_t *in, int pos )
+{
+    int i;
+
+    for( i = 0; i < NUM_FAVORITES; i++ ) {
+        if( in->favorites[ i ] == pos ) return;
+    }
+    in->favorites[ in->curfavorite ] = pos;
+    in->curfavorite = (in->curfavorite + 1) % NUM_FAVORITES;
+    if( in->numfavorites < NUM_FAVORITES ) {
+        in->numfavorites++;
+    }
+}
+
+int commands_in_menu( commands_t *in )
+{
+    return in->showfavorites;
+}
+
+void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
 {
     int volume;
+
+    if( in->showfavorites && !tvtime_is_menu_command( tvtime_cmd ) ) {
+        tvtime_osd_show_list( in->osd, 0 );
+        in->showfavorites = 0;
+    }
+
+    if( in->showfavorites ) {
+        switch( tvtime_cmd ) {
+        case TVTIME_MENU_EXIT:
+            tvtime_osd_show_list( in->osd, 0 );
+            in->showfavorites = 0;
+            break;
+        case TVTIME_MENU_UP:
+            in->curfavpos = (in->curfavpos + in->numfavorites + 2 - 1) % (in->numfavorites + 2);
+            osd_list_favorites( in );
+            break;
+        case TVTIME_MENU_DOWN:
+            in->curfavpos = (in->curfavpos + 1) % (in->numfavorites + 2);
+            osd_list_favorites( in );
+            break;
+        case TVTIME_MENU_ENTER:
+            if( in->curfavpos == in->numfavorites ) {
+                add_to_favorites( in, station_get_current_id( in->stationmgr ) );
+            } else {
+                if( in->curfavpos < in->numfavorites ) {
+                    station_set( in->stationmgr, in->favorites[ in->curfavpos ] );
+                    in->change_channel = 1;
+                }
+            }
+            tvtime_osd_show_list( in->osd, 0 );
+            in->showfavorites = 0;
+            break;
+        }
+        return;
+    }
 
     switch( tvtime_cmd ) {
     case TVTIME_QUIT:
         in->quit = 1;
+        break;
+
+    case TVTIME_CHANNEL_FAVORITES:
+        in->showfavorites = 1;
+        in->curfavpos = 0;
+        osd_list_favorites( in );
         break;
 
     case TVTIME_SHOW_DEINTERLACER_INFO:
@@ -546,6 +650,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
+    case TVTIME_DISPLAY_MESSAGE:
+        if( in->osd && arg ) tvtime_osd_show_message( in->osd, arg );
+        break;
+
     case TVTIME_DISPLAY_INFO:
         in->displayinfo = !in->displayinfo;
         if( in->osd ) {
@@ -583,7 +691,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_CHAR:
-        if( isdigit( arg & 0xff ) && in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( arg && isdigit( arg[ 0 ] ) && in->vidin && videoinput_has_tuner( in->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
             if( in->scan_channels ) {
@@ -592,7 +700,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
             /* Decode the input char from commands.  */
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-            in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
+            in->next_chan_buffer[ in->digit_counter ] = arg[ 0 ];
             in->digit_counter++;
             in->frame_counter = CHANNEL_DELAY;
 
@@ -877,43 +985,43 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_1:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 49);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "1" );
         break;
 
     case TVTIME_CHANNEL_2:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 50);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "2" );
         break;
 
     case TVTIME_CHANNEL_3:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 51);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "3" );
         break;
 
     case TVTIME_CHANNEL_4:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 52);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "4" );
         break;
 
     case TVTIME_CHANNEL_5:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 53);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "5" );
         break;
 
     case TVTIME_CHANNEL_6:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 54);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "6" );
         break;
 
     case TVTIME_CHANNEL_7:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 55);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "7" );
         break;
 
     case TVTIME_CHANNEL_8:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 56);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "8" );
         break;
 
     case TVTIME_CHANNEL_9:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 57);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "9" );
         break;
 
     case TVTIME_CHANNEL_0:
-        commands_handle(in, TVTIME_CHANNEL_CHAR, 48);
+        commands_handle( in, TVTIME_CHANNEL_CHAR, "0" );
         break;
 
     case TVTIME_TOGGLE_PAUSE:
