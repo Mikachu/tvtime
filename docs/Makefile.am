@@ -36,14 +36,14 @@ dist_desktopdata_DATA = net-tvtime.desktop
 # We use $(datadir)/icons/hicolor as our theme from the freedesktop spec
 # http://www.freedesktop.org/standards/menu-spec/
 install-data-local:
-	$(INSTALL) -d $(datadir)/icons/hicolor/16x16/apps
-	$(INSTALL) -d $(datadir)/icons/hicolor/32x32/apps
-	$(INSTALL) -d $(datadir)/icons/hicolor/48x48/apps
-	$(INSTALL) -d $(datadir)/pixmaps
-	$(INSTALL_DATA) $(srcdir)/tvtime.16x16.png $(datadir)/icons/hicolor/16x16/apps/tvtime.png
-	$(INSTALL_DATA) $(srcdir)/tvtime.32x32.png $(datadir)/icons/hicolor/32x32/apps/tvtime.png
-	$(INSTALL_DATA) $(srcdir)/tvtime.48x48.png $(datadir)/icons/hicolor/48x48/apps/tvtime.png
-	$(INSTALL_DATA) $(srcdir)/tvtime.48x48.png $(datadir)/pixmaps/tvtime.png
+	$(INSTALL) -d '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps'
+	$(INSTALL) -d '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps'
+	$(INSTALL) -d '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps'
+	$(INSTALL) -d '$(DESTDIR)$(datadir)/pixmaps'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.16x16.png' '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.png' '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
 
 .PHONY: install-exec-hook
 install-exec-hook:
@@ -67,7 +67,7 @@ install-exec-hook:
 
 uninstall-hook:
 	-rmdir -p '$(DESTDIR)$(pkgsysconfdir)'
-	-rm -f $(datadir)/icons/hicolor/16x16/apps/tvtime.png
-	-rm -f $(datadir)/icons/hicolor/32x32/apps/tvtime.png
-	-rm -f $(datadir)/icons/hicolor/48x48/apps/tvtime.png
-	-rm -f $(datadir)/pixmaps/tvtime.png
+	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
+	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
+	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
+	-rm -f '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
