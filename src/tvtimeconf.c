@@ -440,6 +440,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
 {
     xmlDocPtr doc;
     xmlNodePtr top;
+    int create_file = 0;
 
     doc = xmlParseFile( config_filename );
     if( !doc ) {
@@ -455,6 +456,7 @@ static xmlDocPtr configsave_open( const char *config_filename )
                 fprintf( stderr, "config: Could not create new config file.\n" );
                 return 0;
             }
+	    create_file = 1;
         }
     }
 
@@ -493,6 +495,12 @@ static xmlDocPtr configsave_open( const char *config_filename )
 
     xmlKeepBlanksDefault( 0 );
     xmlSaveFormatFile( config_filename, doc, 1 );
+    if (create_file) {
+        if( chown( config_filename, getuid(), getgid() ) < 0 ) {
+            fprintf( stderr, "config: Cannot chown %s.\n        %s.",
+                    config_filename, strerror( errno ) );
+        }
+    }
     return doc;
 }
  
@@ -555,8 +563,8 @@ static void print_usage( char **argv )
 
 config_t *config_new( void )
 {
-    char temp_dirname[ 1024 ];
-    char base[ 256 ];
+    char *temp_dirname;
+    char *base;
 
     config_t *ct = malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -673,7 +681,7 @@ config_t *config_new( void )
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DEC;
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
-    snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
+    asprintf( &temp_dirname, "%s/.tvtime", getenv( "HOME" ) );
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
             fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
@@ -681,30 +689,38 @@ config_t *config_new( void )
             DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
                 fprintf( stderr, "config: %s is not a directory.\n", 
-                         temp_dirname );
+                        temp_dirname );
             } else {
                 closedir( temp_dir );
             }
         }
         /* If the directory already exists, we didn't need to create it. */
+    } else {
+        /* We created the directory, now force it to be owned by the user. */
+        if( chown( temp_dirname, getuid(), getgid() ) < 0 ) {
+            fprintf( stderr, "config: Cannot chown %s.\n"
+                             "        %s",
+                     temp_dirname, strerror( errno ) );
+        }
     }
+    free( temp_dirname );
 
     /* First read in global settings. */
-    strncpy( base, CONFDIR, 245 );
-    strcat( base, "/tvtime.xml" );
+    asprintf( &base, "%s/tvtime.xml", CONFDIR );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         conf_xml_parse( ct, base );
     }
+    free( base );
 
     /* Then read in local settings. */
-    strncpy( base, getenv( "HOME" ), 235 );
-    strcat( base, "/.tvtime/tvtime.xml" );
+    asprintf( &base, "%s/.tvtime/tvtime.xml", getenv( "HOME" ) );
     ct->config_filename = strdup( base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         conf_xml_parse( ct, base );
     }
+    free( base );
 
     return ct;
 }
