@@ -29,7 +29,7 @@ PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
 PLUGINS_LIBS = -L$(top_builddir)/plugins
 
 # Set the following if you want to specify an additional font directory
-# FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/' -DTVFONTDIR='/usr/share/fonts/truetype/tvtime/'
+# FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
 if HAVE_DIRECTFB
 DIRECTFB_CFLAGS = `directfb-config --cflags`
