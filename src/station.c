@@ -395,7 +395,7 @@ int station_set( station_mgr_t *mgr, int pos )
     return 0;
 }
 
-void station_next( station_mgr_t *mgr )
+void station_up( station_mgr_t *mgr )
 {
     mgr->last_channel = station_get_current_id( mgr );
 
@@ -407,7 +407,7 @@ void station_next( station_mgr_t *mgr )
     }
 }
 
-void station_prev( station_mgr_t *mgr )
+void station_down( station_mgr_t *mgr )
 {
     mgr->last_channel = station_get_current_id( mgr );
 
@@ -419,7 +419,7 @@ void station_prev( station_mgr_t *mgr )
     }
 }
 
-void station_last( station_mgr_t *mgr )
+void station_prev( station_mgr_t *mgr )
 {
     station_set( mgr, mgr->last_channel );
 }

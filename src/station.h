@@ -23,6 +23,16 @@
 extern "C" {
 #endif
 
+/**
+ * The station manager object handles the list of stations for the
+ * tuner.  This gives us the frequencies, handles renumbering, and
+ * stores user information about the channel like its name and call
+ * letters.
+ *
+ * Station information is stored in the stationlist.xml file, and
+ * changes made at runtime are saved.
+ */
+
 /** 
  * NTSC cable modes.
  */
@@ -32,24 +42,52 @@ extern "C" {
 
 typedef struct station_mgr_s station_mgr_t;
 
-station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mode, int verbose );
+/**
+ * Creates a new station manager object.  This will look up the given
+ * 'norm' and 'table' in the stationlist.xml.  If not found, it will use
+ * the default list for the table name.  Tables with defaults are:
+ *
+ * us-cable, us-broadcast, japan-cable, japan-broadcast, russia, europe,
+ * france, australia, australia-optus, newzealand
+ */
+station_mgr_t *station_new( const char *norm, const char *table,
+                            int us_cable_mode, int verbose );
+
+/**
+ * This will free the station manager object, but will not write any
+ * unsaved changes to the stationlist file.
+ */
 void station_delete( station_mgr_t *mgr );
 
 /**
- * Is this a clean startup?
+ * Is this a clean startup, that is, was there no entry in the
+ * stationlist for this frequency table?  If so, tvtime will start its
+ * channel scanner.
  */
 int station_is_new_install( station_mgr_t *mgr );
 
 /**
- * Set the current channel.
+ * Set the current channel directly to the given position.
  */
 int station_set( station_mgr_t *mgr, int pos );
-void station_next( station_mgr_t *mgr );
-void station_prev( station_mgr_t *mgr );
-void station_last( station_mgr_t *mgr );
 
 /**
- * Set the us cable mode (global).
+ * Change up one channel in the list.
+ */
+void station_up( station_mgr_t *mgr );
+
+/**
+ * Change down one channel in the list.
+ */
+void station_down( station_mgr_t *mgr );
+
+/**
+ * Change to the last channel we were at before the current one.
+ */
+void station_prev( station_mgr_t *mgr );
+
+/**
+ * Set the us cable mode.
  */
 void station_toggle_us_cable_mode( station_mgr_t *mgr );
 

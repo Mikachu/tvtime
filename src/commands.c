@@ -698,7 +698,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_next( in->stationmgr );
+            station_up( in->stationmgr );
             in->change_channel = 1;
         }
         break;
@@ -710,7 +710,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_prev( in->stationmgr );
+            station_down( in->stationmgr );
             in->change_channel = 1;
         }
         break;
@@ -723,7 +723,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_last( in->stationmgr );
+            station_prev( in->stationmgr );
             in->change_channel = 1;
         }
         break;
