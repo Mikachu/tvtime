@@ -1414,7 +1414,7 @@ static void composite_colour4444_alpha_to_packed422_scanline_c( uint8_t *output,
 {
     int a = ((af * alpha) + 0x80) >> 8;
     if( a == 0xff ) {
-        return blit_colour_packed422_scanline( output, width, y, cb, cr );
+        blit_colour_packed422_scanline( output, width, y, cb, cr );
     } else if( a ) {
         int i;
 
@@ -1450,6 +1450,100 @@ static void composite_colour4444_alpha_to_packed422_scanline_c( uint8_t *output,
         }
     }
 }
+
+#ifdef ARCH_X86
+static void composite_colour4444_alpha_to_packed422_scanline_mmxext( uint8_t *output, uint8_t *input,
+                                                                     int af, int y, int cb, int cr,
+                                                                     int width, int alpha )
+{
+    const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
+    const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
+    const mmx_t round  = { 0x0080008000800080ULL };
+    mmx_t foreground;
+    int i;
+
+    if( !alpha ) {
+        blit_packed422_scanline( output, input, width );
+        return;
+    }
+
+    foreground.ub[ 0 ] = foreground.ub[ 4 ] = af;
+    foreground.ub[ 1 ] = foreground.ub[ 5 ] = y;
+    foreground.ub[ 2 ] = foreground.ub[ 6 ] = cb;
+    foreground.ub[ 3 ] = foreground.ub[ 7 ] = cr;
+
+    movq_m2r( alpha, mm2 );
+    pshufw_r2r( mm2, mm2, 0 );
+    pxor_r2r( mm7, mm7 );
+
+    for( i = width/2; i; i-- ) {
+        /* mm1 = [ cr ][ y ][ cb ][ y ] */
+        movd_m2r( *input, mm1 );
+        punpcklbw_r2r( mm7, mm1 );
+
+        movq_m2r( foreground, mm3 );
+        movq_r2r( mm3, mm4 );
+        punpcklbw_r2r( mm7, mm3 );
+        punpckhbw_r2r( mm7, mm4 );
+        /* mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha. */
+
+        /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ] */
+        pshufw_r2r( mm3, mm5, 0 );
+        pshufw_r2r( mm4, mm6, 0 );
+        /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201 */
+        pshufw_r2r( mm3, mm3, 201 );
+        /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16 */
+        pshufw_r2r( mm4, mm4, 16 );
+
+        pand_m2r( alpha1, mm3 );
+        pand_m2r( alpha2, mm4 );
+        pand_m2r( alpha1, mm5 );
+        pand_m2r( alpha2, mm6 );
+        por_r2r( mm4, mm3 );
+        por_r2r( mm6, mm5 );
+
+        /* now, mm5 is af and mm1 is B.  Need to multiply them. */
+        pmullw_r2r( mm1, mm5 );
+
+        /* Multiply by appalpha. */
+        pmullw_r2r( mm2, mm3 );
+        paddw_m2r( round, mm3 );
+        psrlw_i2r( 8, mm3 );
+        /* Result is now B + F. */
+        paddw_r2r( mm3, mm1 );
+
+        /* Round up appropriately. */
+        paddw_m2r( round, mm5 );
+
+        /* mm6 contains our i>>8; */
+        movq_r2r( mm5, mm6 );
+        psrlw_i2r( 8, mm6 );
+
+        /* Add mm6 back into mm5.  Now our result is in the high bytes. */
+        paddw_r2r( mm6, mm5 );
+
+        /* Shift down. */
+        psrlw_i2r( 8, mm5 );
+
+        /* Multiply by appalpha. */
+        pmullw_r2r( mm2, mm5 );
+        paddw_m2r( round, mm5 );
+        psrlw_i2r( 8, mm5 );
+
+        psubusw_r2r( mm5, mm1 );
+
+        /* mm1 = [ B + F - af*B ] */
+        packuswb_r2r( mm1, mm1 );
+        movd_r2m( mm1, *output );
+
+        output += 4;
+        input += 4;
+    }
+    sfence();
+    emms();
+}
+#endif
+
 
 static void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
                                                                 uint8_t *foreground, int width, int alpha )
@@ -2681,6 +2775,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
+        composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_mmxext;
         speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
