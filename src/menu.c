@@ -73,7 +73,7 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
                   int height, double aspect )
 {
     menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
-    int i;
+    // int i;
 
     if( !m ) {
         return 0;
@@ -108,6 +108,7 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
     m->bg_cr = (int)oconv[2];
 */
 
+/*
     for( i = 0; i < MENU_LINES; i++ ) {
         m->menu_line[ i ].line = osd_string_new( "FreeSansBold.ttf", 20, width, height, aspect );
         if( !m->menu_line[ i ].line ) {
@@ -121,6 +122,7 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
                               ( i * osd_string_get_height( m->menu_line[ i ].line ) ) +
                               ( ( height * 5 ) / 100 );
     }
+*/
 
     return m;
 }
