@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -293,13 +293,21 @@ static output_api_t sdloutput =
     sdl_get_stride,
     sdl_unlock_output,
 
+    sdl_is_exposed,
+    sdl_get_visible_width,
+    sdl_get_visible_height,
+    sdl_is_fullscreen,
+
     sdl_is_interlaced,
     sdl_wait_for_sync,
+
     sdl_show_frame,
 
     sdl_toggle_aspect,
     sdl_toggle_fullscreen,
     sdl_set_window_caption,
+
+    sdl_set_window_height,
 
     sdl_poll_events,
     sdl_quit
