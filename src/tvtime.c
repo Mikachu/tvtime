@@ -2733,8 +2733,7 @@ int main( int argc, char **argv )
          */
         lfprintf( stderr, _("\n"
     "    Failed to drop root privileges: %s.\n"
-    "    tvtime will exit now to avoid security problems resulting from\n"
-    "    an application running as root when it might not be allowed to.\n\n"),
+    "    tvtime will now exit to avoid security problems.\n\n");
             strerror( errno ) );
         return 1;
     }
