@@ -170,7 +170,7 @@ static xmlNodePtr find_list( xmlNodePtr node, const char *normname, const char *
         if( !xmlStrcasecmp( node->name, BAD_CAST "list" ) ) {
             xmlChar *norm = xmlGetProp( node, BAD_CAST "norm" );
 
-            if( norm && !xmlStrcasecmp( norm, BAD_CAST norm ) ) {
+            if( norm && !xmlStrcasecmp( norm, BAD_CAST normname ) ) {
                 xmlChar *table = xmlGetProp( node, BAD_CAST "frequencies" );
                 if( table && !xmlStrcasecmp( table, BAD_CAST tablename ) ) {
 
