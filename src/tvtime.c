@@ -60,7 +60,6 @@
 # include "config.h"
 #endif
 
-#include "vgasync.h"
 #include "rvrreader.h"
 #include "pulldown.h"
 
@@ -865,7 +864,6 @@ int main( int argc, char **argv )
     int scanwait = scan_delay;
     int scanning = 0;
     int numscanned = 0;
-    int use_vgasync = 0;
     int framerate_mode = -1;
     int preset_mode = -1;
     char kbd_cmd[ 1024 ];
@@ -912,12 +910,6 @@ int main( int argc, char **argv )
     verbose = config_get_verbose( ct );
 
     /* Steal system resources in the name of performance. */
-    if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
-        fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
-        use_vgasync = 1;
-    } else if( verbose ) {
-        fprintf( stderr, "tvtime: Disabling VGA port polling.\n" );
-    }
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
         fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
     }
@@ -1743,7 +1735,6 @@ int main( int argc, char **argv )
                 performance_checkpoint_delayed_blit_top_field( perf );
 
                 performance_checkpoint_blit_top_field_start( perf );
-                if( use_vgasync ) vgasync_spin_until_out_of_refresh();
                 if( curmethod->doscalerbob && !showbars ) {
                     output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
                 } else {
@@ -1857,7 +1848,6 @@ int main( int argc, char **argv )
 
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
-            if( use_vgasync ) vgasync_spin_until_out_of_refresh();
             if( curmethod->doscalerbob && !showbars ) {
                 output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
