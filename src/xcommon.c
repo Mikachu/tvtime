@@ -1057,7 +1057,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
 
     /* The class hint is useful for window managers like WindowMaker. */
-    classhint.res_class = "xawtv";
+    classhint.res_class = "tvtime";
     classhint.res_name = "TVWindow";
     XSetClassHint( display, wm_window, &classhint );
     classhint.res_name = "TVFullscreen";
