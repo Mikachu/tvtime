@@ -42,6 +42,9 @@ Authors and contributors
   Stewart Allen <stewart@neuron.com>
     - Cleanup of the command names, various bugfixes
 
+  Justin A <justin@bouncybouncy.net>
+    - Previous channel saved to config file
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
@@ -103,6 +106,10 @@ Code we stole (well, used under the GPL)
     Bjorn is the X master, lots of help from him, and thanks to hh for
     being so cool.
     The code is Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort.
+
+  Code and ideas on 2-3 pulldown detection by
+    D Richard Felker III <dalias@aerifal.cx>, from his work on
+    deinterlacer filters for mplayer
 
   Taglines courtesy of
     James Dewar, Adam Letts, Andrew Lewycky, Håkan Hjort, Billy Biggs,
