@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dlfcn.h>
+#include <string.h>
+#include <ctype.h>
 #include "utils.h"
 #include "lircclient.h"
 
