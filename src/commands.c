@@ -433,12 +433,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_CHANNEL_SAVE_TUNING:
         if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             char freq[ 32 ];
-            char freqname[ 32 ];
             int pos;
 
             snprintf( freq, sizeof( freq ), "%f", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-            snprintf( freqname, sizeof( freqname ), "%.2fMHz", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-            pos = station_add( in->stationmgr, 0, "Custom", freq, freqname );
+            pos = station_add( in->stationmgr, 0, "Custom", freq, 0 );
             station_writeconfig( in->stationmgr );
             station_set( in->stationmgr, pos );
             in->change_channel = 1;

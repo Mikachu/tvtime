@@ -501,8 +501,14 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
     const band_t *band = get_band( bandname );
     const band_entry_t *entry;
     station_info_t *info;
+    char tempname[ 32 ];
 
     if( !isFreePos( mgr, pos ) ) pos = getNextPos( mgr );
+
+    if( !name ) {
+        sprintf( tempname, "%d", pos );
+        name = tempname;
+    }
 
     if( !strcasecmp( bandname, "Custom" ) ) {
         int freq = (int) ((atof( channel ) * 1000.0) + 0.5);
