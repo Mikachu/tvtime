@@ -98,6 +98,10 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
         fprintf( stderr, "sdloutput: Couldn't create overlay surface.\n" );
         return 0;
     }
+    if( !frame->hw_overlay ) {
+        fprintf( stderr, "sdloutput: Can't get a hardware YUY2 overlay surface, giving up.\n" );
+        return 0;
+    }
     SDL_LockYUVOverlay( frame );
 
     SDL_WM_SetCaption( tagline, 0 );

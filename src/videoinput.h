@@ -79,7 +79,7 @@ int videoinput_get_height( videoinput_t *vidin );
 /**
  * Returns true if this input is a BT8x8-based card.
  */
-int videoinput_is_bt8x8( videoinput_t *vidin );
+int videoinput_is_bttv( videoinput_t *vidin );
 
 /**
  * Returns a pointer to the next image buffer.  Also returns the last field

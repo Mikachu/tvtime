@@ -1,5 +1,8 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
+ *
+ * Uses hacky bttv detection code from xawtv:
+ *   (c) 1997-2001 Gerd Knorr <kraxel@bytesex.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,6 +77,7 @@ struct videoinput_s
     int height;
 
     int norm;
+    int isbttv;
 
     unsigned char *grab_data;
     unsigned char *map;
@@ -254,6 +258,25 @@ void videoinput_find_and_set_tuner( videoinput_t *vidin )
     videoinput_get_and_print_tuner_info( vidin );
 }
 
+static const char *get_norm_name( int norm )
+{
+    if( norm == VIDEOINPUT_PAL ) {
+        return "pal";
+    } else if( norm == VIDEOINPUT_SECAM ) {
+        return "secam";
+    } else if( norm == VIDEOINPUT_PAL_NC ) {
+        return "pal-nc";
+    } else if( norm == VIDEOINPUT_PAL_M ) {
+        return "pal-m";
+    } else if( norm == VIDEOINPUT_PAL_N ) {
+        return "pal-n";
+    } else if( norm == VIDEOINPUT_NTSC_JP ) {
+        return "ntsc-jp";
+    }
+
+    return "ntsc";
+}
+
 
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                               int norm, int verbose )
@@ -297,6 +320,22 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     if( vidin->numinputs == 0 ) {
         fprintf( stderr, "videoinput: No input channels available on "
                  "video4linux device '%s'.\n", v4l_device );
+        close( vidin->grab_fd );
+        free( vidin );
+        return 0;
+    }
+
+    /* Check if this is a bttv-based card.  Code taken from xawtv. */
+#define BTTV_VERSION            _IOR('v' , BASE_VIDIOCPRIVATE+6, int)
+    /* dirty hack time / v4l design flaw -- works with bttv only
+     * this adds support for a few less common PAL versions */
+    vidin->isbttv = 0;
+    if( -1 != ioctl( vidin->grab_fd, BTTV_VERSION, &i ) ) {
+        vidin->isbttv = 1;
+    } else if( norm > VIDEOINPUT_SECAM ) {
+        fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
+                 "videoinput: The norm you requested, %s, is only supported for bttv-based cards.\n",
+                 v4l_device, get_norm_name( norm ) );
         close( vidin->grab_fd );
         free( vidin );
         return 0;
@@ -705,6 +744,11 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
 
     /* Once we've set the input, go look for a tuner. */
     videoinput_find_and_set_tuner( vidin );
+}
+
+int videoinput_is_bttv( videoinput_t *vidin )
+{
+    return vidin->isbttv;
 }
 
 void videoinput_delete( videoinput_t *vidin )
