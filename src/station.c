@@ -714,7 +714,7 @@ int station_writeconfig( station_mgr_t *mgr )
         }
     }
 
-    list = find_list( top, mgr->norm, mgr->table );
+    list = find_list( top->xmlChildrenNode, mgr->norm, mgr->table );
     if( !list ) {
         list = xmlNewTextChild( top, 0, BAD_CAST "list", 0 );
         xmlNewProp( list, BAD_CAST "norm", BAD_CAST mgr->norm );
@@ -722,20 +722,20 @@ int station_writeconfig( station_mgr_t *mgr )
     }
 
     do {
-        xmlNodePtr node = find_station( list, rp->name );
+        xmlNodePtr node = find_station( list->xmlChildrenNode, rp->name );
         char buf[ 255 ];
 
         sprintf( buf, "%d", rp->pos );
         if( !node ) {
             node = xmlNewTextChild( list, 0, BAD_CAST "station", 0 );
         }
-        xmlNewProp( node, BAD_CAST "name", BAD_CAST rp->name );
-        xmlNewProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );
+        xmlSetProp( node, BAD_CAST "name", BAD_CAST rp->name );
+        xmlSetProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );
 
         sprintf( buf, "%d", rp->pos );
-        xmlNewProp( node, BAD_CAST "position", BAD_CAST buf );
-        xmlNewProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
-        xmlNewProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
+        xmlSetProp( node, BAD_CAST "position", BAD_CAST buf );
+        xmlSetProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
+        xmlSetProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
 
         rp = rp->next;
     } while( rp != mgr->first );
