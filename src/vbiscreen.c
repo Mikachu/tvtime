@@ -82,7 +82,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vbiscreen_t *vs = (vbiscreen_t *)malloc(sizeof(struct vbiscreen_s));
 
     if( !vs ) {
-        return NULL;
+        return 0;
     }
 
     vs->verbose = verbose;
@@ -162,7 +162,6 @@ void blank_screen( vbiscreen_t *vs )
 void clear_screen( vbiscreen_t *vs )
 {
     int base, i;
-    if( !vs ) return;
 
     base = vs->top_of_screen * COLS;
     for( i = 0; i < ROWS * COLS; i++ ) {
@@ -175,25 +174,21 @@ void clear_screen( vbiscreen_t *vs )
 
 void clear_hidden_roll( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     memset( vs->hiddenbuf, 0, COLS );
 }
 
 void clear_hidden_pop( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     memset( vs->buffers + vs->curbuffer * COLS * ROWS , 0, COLS * ROWS );
 }
 
 void clear_hidden_paint( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     memset( vs->paintbuf , 0, COLS * ROWS );
 }
 
 void clear_displayed_pop( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     memset( vs->buffers + ( vs->curbuffer ^ 1 ) * COLS * ROWS , 0, COLS * ROWS );
 }
 
@@ -201,7 +196,6 @@ void vbiscreen_dump_screen_text( vbiscreen_t *vs )
 {
     int i, offset;
     
-    if( !vs ) return;
     offset = vs->top_of_screen * COLS;
 
     fprintf( stderr, "\n   0123456789abcdefghij012345678901" );
@@ -225,8 +219,6 @@ int update_row_x( vbiscreen_t *vs, int row )
 {
     char text[ COLS + 1 ];
     int i, j, haschars = 0, base;
-
-    if( !vs ) return 0;
 
     text[ COLS ] = 0;
     base = ( ( vs->top_of_screen + row ) % ( 2 * ROWS ) ) * COLS;
@@ -253,8 +245,6 @@ int update_row_x( vbiscreen_t *vs, int row )
 
 void update_row( vbiscreen_t *vs )
 {
-    if( !vs ) return;
-
     update_row_x( vs, vs->cury );
     /*vbiscreen_dump_screen_text( vs );*/
 }
@@ -262,8 +252,6 @@ void update_row( vbiscreen_t *vs )
 void update_all_rows( vbiscreen_t *vs )
 {
     int row = 0;
-
-    if( !vs ) return;
 
     for( row = 0; row < ROWS; row++ ) {
         update_row_x( vs, row );
@@ -293,7 +281,7 @@ void scroll_screen( vbiscreen_t *vs )
 {
     int start_row;
 
-    if( !vs || !vs->captions || !vs->style || vs->style > ROLL_4 )
+    if( !vs->captions || !vs->style || vs->style > ROLL_4 )
         return;
     
     start_row = ( vs->first_line + vs->top_of_screen ) % ( 2 * ROWS );
@@ -314,7 +302,6 @@ void scroll_screen( vbiscreen_t *vs )
 void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital, 
                             unsigned int colour, int row )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "indent: %d, ital: %d, colour: 0x%x, row: %d\n", indent, ital, colour, row );
 
     if( 0 && vs->captions && vs->style <= ROLL_4 && vs->style ) {
@@ -337,7 +324,6 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
 
 void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
 {
-    if( !vs ) return;
     if( vs->verbose )
         fprintf( stderr, "in set mode\n");
 
@@ -403,7 +389,6 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
 
 void vbiscreen_tab( vbiscreen_t *vs, int cols )
 {
-    if( !vs ) return;
     if( cols < 0 || cols > 3 ) return;
     vs->curx += cols;
     if( vs->curx > 31 ) vs->curx = 31;
@@ -411,7 +396,6 @@ void vbiscreen_tab( vbiscreen_t *vs, int cols )
 
 void vbiscreen_set_colour( vbiscreen_t *vs, unsigned int col )
 {
-    if( !vs ) return;
     vs->fgcolour = col;
 }
 
@@ -424,7 +408,6 @@ void vbiscreen_clear_current_cell( vbiscreen_t *vs )
 void vbiscreen_set_current_cell( vbiscreen_t *vs, char text )
 {
     int base;
-    if( !vs ) return;
     base = ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
     if( isprint( text ) ) 
         vs->text[ base + vs->curx + vs->indent ] = text;
@@ -435,7 +418,6 @@ void vbiscreen_set_current_cell( vbiscreen_t *vs, char text )
 void vbiscreen_delete_to_end( vbiscreen_t *vs )
 {
     int i;
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in del to end\n");
     for( i = vs->curx; i < COLS; i++ ) {
         vbiscreen_clear_current_cell( vs );
@@ -448,7 +430,6 @@ void vbiscreen_delete_to_end( vbiscreen_t *vs )
 
 void vbiscreen_backspace( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in backspace\n");
     if( !vs->curx ) return;
     vs->curx--;
@@ -458,7 +439,6 @@ void vbiscreen_backspace( vbiscreen_t *vs )
 
 void vbiscreen_erase_displayed( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in erase disp\n");
 
     if( vs->captions && vs->style && vs->style <= ROLL_4 ) {
@@ -471,7 +451,6 @@ void vbiscreen_erase_displayed( vbiscreen_t *vs )
 
 void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in erase non disp\n");
 
     if( vs->captions && vs->style == POP_UP ) {
@@ -484,7 +463,6 @@ void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 
 void vbiscreen_carriage_return( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in CR\n");
     if( vs->style != POP_UP) {
         /* not sure if this is right for text mode */
@@ -504,7 +482,6 @@ void vbiscreen_carriage_return( vbiscreen_t *vs )
 void copy_buf_to_screen( vbiscreen_t *vs, char *buf )
 {
     int base, i, j;
-    if( !vs ) return;
 
     base = vs->top_of_screen * COLS;
     for( j = 0, i = 0; i < ROWS * COLS; i++, j++ ) {
@@ -517,7 +494,6 @@ void copy_buf_to_screen( vbiscreen_t *vs, char *buf )
 
 void vbiscreen_end_of_caption( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in end of caption\n");
 
     if( vs->style == PAINT_ON ) {
@@ -536,7 +512,6 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs )
 
 void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
 {
-    if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in print (%d, %d)[%c %c]\n", vs->curx, vs->cury, c1, c2);
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
@@ -586,7 +561,6 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
 
 void vbiscreen_reset( vbiscreen_t *vs )
 {
-    if( !vs ) return;
     clear_screen( vs );
     clear_hidden_pop( vs );
     clear_displayed_pop( vs );
@@ -602,7 +576,6 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 {
     int x=0, y=0, row=0, index=0;
 
-    if( !vs ) return;
     if( !output ) return;
     if( scanline >= vs->y && scanline < vs->y + vs->height ) {
 
