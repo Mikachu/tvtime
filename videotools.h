@@ -73,7 +73,7 @@ void packed422_field_to_frame_bot( unsigned char *output, int outstride,
                                    int fieldheight, int fieldstride );
 
 /**
- * Useful scanline functions.
+ * Scanline functions.
  */
 void blit_colour_packed4444_scanline( unsigned char *output, int width,
                                       int alpha, int luma, int cb, int cr );
@@ -129,6 +129,9 @@ void rgb24_to_packed444_601_scanline( unsigned char *output,
                                       unsigned char *input,
                                       int width );
 
+/**
+ * Frame functions.
+ */
 void composite_alphamask_packed4444( unsigned char *output, int owidth,
                                      int oheight, int ostride,
                                      unsigned char *mask, int mwidth,

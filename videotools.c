@@ -128,12 +128,8 @@ void interpolate_packed422_scanline( unsigned char *output, unsigned char *top,
 {
     int i;
 
-    //for( i = width; i; --i ) {
-    //    *output++ = ((*top++) + (*bot++)) >> 1;
-    //}
-    for( i = 0; i < width*2; i++ ) {
-        //output[ i*2 ] = (top[ i*2 ] + bot[ i*2 ]) >> 1;
-        output[ i ] = (top[ i ] + bot[ i ]) >> 1;
+    for( i = width*2; i; --i ) {
+        *output++ = ((*top++) + (*bot++)) >> 1;
     }
 }
 
