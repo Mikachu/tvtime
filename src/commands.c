@@ -399,8 +399,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_PREV:
-        // To be handled otherwise
-        // Billy: Why??
+        if( videoinput_has_tuner( in->vidin ) ) {
+            station_last( in->stationmgr );
+            commands_station_change( in );
+        }
         break;
 
     case TVTIME_MIXER_UP: 

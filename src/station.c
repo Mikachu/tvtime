@@ -42,6 +42,7 @@ struct station_mgr_s
     int verbose;
     int debug;
     int us_cable_mode;
+    int last_channel;
 };
 
 static const band_t *get_band( const char *band )
@@ -182,6 +183,7 @@ station_mgr_t *station_init( config_t *ct )
     mgr->first = 0;
     mgr->current = 0;
     mgr->us_cable_mode = 0;
+    mgr->last_channel = 0;
 
     frequencies = config_get_v4l_freq( ct );
 
@@ -230,8 +232,10 @@ station_mgr_t *station_init( config_t *ct )
 int station_set( station_mgr_t *mgr, int pos )
 {
     station_info_t *rp = mgr->first;
-    if( !mgr->first ) return 0;
 
+    mgr->last_channel = station_get_current_id( mgr );
+
+    if( !rp ) return 0;
     do {
         if( rp->pos == pos ) {
             mgr->current = rp;
@@ -245,6 +249,8 @@ int station_set( station_mgr_t *mgr, int pos )
 
 void station_next( station_mgr_t *mgr )
 {
+    mgr->last_channel = station_get_current_id( mgr );
+
     if( mgr->current ) {
         station_info_t *i= mgr->current;
         do {
@@ -255,12 +261,19 @@ void station_next( station_mgr_t *mgr )
 
 void station_prev( station_mgr_t *mgr )
 {
+    mgr->last_channel = station_get_current_id( mgr );
+
     if( mgr->current ) {
         station_info_t *i= mgr->current;
         do {
             mgr->current = mgr->current->prev;
         } while ( !mgr->current->active && mgr->current != i );
     }
+}
+
+void station_last( station_mgr_t *mgr )
+{
+    station_set( mgr, mgr->last_channel );
 }
 
 int station_get_current_id( station_mgr_t *mgr )

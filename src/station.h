@@ -39,6 +39,7 @@ station_mgr_t *station_init( config_t *ct );
 int station_set( station_mgr_t *mgr, int pos );
 void station_next( station_mgr_t *mgr );
 void station_prev( station_mgr_t *mgr );
+void station_last( station_mgr_t *mgr );
 
 /**
  * Set the us cable mode (global).
