@@ -277,6 +277,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_CC:
+	/* Doug: I dont want this to be enabled yet so ...*/
+	break;
+	
         vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
         if( in->capturemode )
             in->capturemode = CAPTURE_OFF;
