@@ -304,6 +304,12 @@ int station_scan( void )
      * I think it should work like add_band, but only add if there
      * is a signal...
      */
+    /* Billy:
+     * I disagree.  I want to start with a list of all the US cable
+     * frequencies, then use scan to disable all of the ones from
+     * the active list that don't have signal, but still let me switch
+     * to them manually.
+     */
     return 0;
 }
 
