@@ -152,7 +152,7 @@ static char *table_lookup_model( int vendor, int family, int model )
     return NULL; /* Not found */
 }
 
-int get_cpu_vendor( const char *idstr )
+static int get_cpu_vendor( const char *idstr )
 {
     if( !strcmp( idstr, "GenuineIntel" ) ) return X86_VENDOR_INTEL;
     if( !strcmp( idstr, "AuthenticAMD" ) ) return X86_VENDOR_AMD;
