@@ -1296,8 +1296,16 @@ int config_key_to_command( config_t *ct, int key )
 int config_key_to_menu_command( config_t *ct, int key )
 {
     if( key ) {
+        int cmd;
+
         if( ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
             return ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
+        }
+
+        /* Fall back to standard commands. */
+        cmd = config_key_to_command( ct, key );
+        if( cmd != TVTIME_NOCOMMAND ) {
+            return cmd;
         }
 
         if( isalnum( key & 0x1ff ) ) {
@@ -1333,10 +1341,13 @@ int config_button_to_menu_command( config_t *ct, int button )
     if( button < 0 || button >= MAX_BUTTONS ) {
         return 0;
     } else {
-        return ct->buttonmapmenu[ button ];
+        if( ct->buttonmapmenu[ button ] ) {
+            return ct->buttonmapmenu[ button ];
+        } else {
+            return ct->buttonmap[ button ];
+        }
     }
 }
-
 
 int config_get_num_modes( config_t *ct )
 {
