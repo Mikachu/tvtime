@@ -513,7 +513,7 @@ int main( int argc, char **argv )
         }
     }
 
-    vc = video_correction_new( config_get_bt8x8_correction( ct ), 0 );
+    vc = video_correction_new( videoinput_is_bttv( vidin ), 0 );
     if( !vc ) {
         fprintf( stderr, "tvtime: Can't initialize luma "
                          "and chroma correction tables.\n" );
