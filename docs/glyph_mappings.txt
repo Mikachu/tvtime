@@ -35,19 +35,12 @@ Attempted Framerate   0xEE 0x80 0xAC  U+E02C
 Television Standard   0xEE 0x80 0xAD  U+E02D
 Input Filters         0xEE 0x80 0xAE  U+E02E
 Renumber channel      0xEE 0x80 0xAF  U+E02F
-
-Setup -> Station management -> Finetune current channel
 Finetune channel      0xEE 0x80 0xB0  U+E030
-
-Setup -> Output configuration -> Overscan setting
 Overscan setting      0xEE 0x80 0xB1  U+E031
-
-Setup -> Output configuration -> Fullscreen
-Setup -> Output configuration -> 16:9 output
-Setup -> Input configuration -> Toggle closed captions
-Setup -> Output configuration -> Always on top
-On                    0xEE 0x80 0xB7  U+E037
-Off                   0xEE 0x80 0xB8  U+E038
+General Toggle On     0xEE 0x80 0xB7  U+E037
+General Toggle Off    0xEE 0x80 0xB8  U+E038
+Output Configuration  0xEE 0x80 0xB9  U+E039
+Frequency Table Sel.  0xEE 0x80 0xBA  U+E03A
 
 TBD
 Setup
