@@ -119,6 +119,7 @@ unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char
 unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned char *old, int width );
 
 void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width );
+void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width );
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
 
 /**
@@ -156,6 +157,7 @@ extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned 
 extern void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                          unsigned char *src2, int width, int pos );
 extern void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int width );
+extern void (*filter_luma_14641_packed422_inplace_scanline)( unsigned char *data, int width );
 extern unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
 extern unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
                                                        unsigned char *bot, int width );

@@ -70,6 +70,7 @@ void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *i
 void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                   unsigned char *src2, int width, int pos );
 void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int width );
+void (*filter_luma_14641_packed422_inplace_scanline)( unsigned char *data, int width );
 unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
 unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
                                                 unsigned char *bot, int width );
@@ -260,12 +261,12 @@ void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
 
 void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
-    int r1 = *data;
+    int r1 = 0;
     int r2 = 0;
-    data += 2;
 
     SPEEDY_START();
-    width--;
+    data += 2;
+    width -= 1;
     while( width-- ) {
         int s1, s2;
         s1 = *data + r1; r1 = *data;
@@ -276,6 +277,27 @@ void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int widt
     SPEEDY_END();
 }
 
+void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width )
+{
+    int r1 = 0;
+    int r2 = 0;
+    int r3 = 0;
+    int r4 = 0;
+
+    SPEEDY_START();
+    width -= 4;
+    data += 4;
+    while( width-- ) {
+        int s1, s2, s3, s4;
+        s1 = *data + r1; r1 = *data;
+        s2 = s1    + r2; r2 = s1;
+        s3 = s2    + r3; r3 = s2;
+        s4 = s3    + r4; r4 = s3;
+        *(data - 4) = s4 >> 4;
+        data += 2;
+    }
+    SPEEDY_END();
+}
 
 void interpolate_packed422_scanline_c( unsigned char *output,
                                        unsigned char *top,
@@ -1170,6 +1192,7 @@ void setup_speedy_calls( int verbose )
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
     filter_luma_121_packed422_inplace_scanline = filter_luma_121_packed422_inplace_scanline_c;
+    filter_luma_14641_packed422_inplace_scanline = filter_luma_14641_packed422_inplace_scanline_c;
     comb_factor_packed422_scanline = 0;
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;

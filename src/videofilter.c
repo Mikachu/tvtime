@@ -60,6 +60,7 @@ void videofilter_packed422_scanline( videofilter_t *vf, unsigned char *data,
     if( vf->vc && vf->bt8x8_correction ) {
         video_correction_correct_packed422_scanline( vf->vc, data, data, width );
         // filter_luma_121_packed422_inplace_scanline( data, width );
+        // filter_luma_14641_packed422_inplace_scanline( data, width );
         // kill_chroma_packed422_inplace_scanline( data, width );
     }
 }
