@@ -202,8 +202,9 @@ static void parse_xds_packet( const char *packet, int length )
 {
     int i;
 
-    /* Stick a null at the end. */
-    packet[ length - 1 ] = '\0';
+    /* Stick a null at the end, and cut off the last two characters. */
+    packet[ length - 2 ] = '\0';
+    length -= 2;
 
     if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x03 ) {
         fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
@@ -221,7 +222,8 @@ static void parse_xds_packet( const char *packet, int length )
                         int hour = packet[4];// & 31;
                         int min = packet[3];// & 63;
 
-        fprintf( stderr, "PIN: %d %d %d %d\n", min, hour, day, month );
+        fprintf( stderr, "PIN: %d %d %d %d (%d %d, %d:%d)\n",
+                 min, hour, day, month, day & 31, month & 15, hour & 31, min & 63 );
                  // packet[ 3 ], packet[ 4 ], packet[ 5 ], packet[ 6 ] );
                  //packet[ 5 ] & 31, packet[ 6 ], packet[ 4 ] & 31, packet[ 3 ] & 63 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
@@ -259,7 +261,7 @@ static void parse_xds_packet( const char *packet, int length )
         case 0xd: fprintf( stderr, "UNDEF start\n" ); break;
         case 0xe: fprintf( stderr, "UNDEF continue\n" ); break;
         }
-        for( i = 0; packet[ i ] != 0xf; i++ ) {
+        for( i = 0; i < length; i++ ) {
             fprintf( stderr, "0x%02x ", packet[ i ] );
         }
         fprintf( stderr, "\n" );
