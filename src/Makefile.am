@@ -15,12 +15,6 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330 - Boston, MA 02111-1307, USA
 
-if ARCH_386
-SUBDIRS = wine
-else
-SUBDIRS =
-endif
-
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 tmpdir = /tmp
 localedir = $(datadir)/locale
@@ -39,8 +33,7 @@ OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
 if ARCH_386
-DSCALER_SRCS = DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h dscalerplugin.h \
-	dscalerplugin.c
+DSCALER_SRCS = DS_ApiCommon.h
 else
 DSCALER_SRCS =
 endif
@@ -74,12 +67,7 @@ tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
-if ARCH_386
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
-	-lpthread
-else
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la -lpthread
-endif
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-command.c
@@ -107,7 +95,6 @@ timingtest_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 timingtest_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
-timingtest_LDADD = -lpthread
 
 CLEANFILES = expandpng timingtest
 

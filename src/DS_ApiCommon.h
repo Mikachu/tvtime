@@ -13,133 +13,23 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Library General Public License for more details
 ///////////////////////////////////////////////////////////////////////////////
-// Change Log
-//
-// Date          Developer             Changes
-//
-// 27 Mar 2001   John Adcock           Separated code to support plug-ins
-//
-/////////////////////////////////////////////////////////////////////////////
-// CVS Log
-//
-// $Log$
-// Revision 1.2  2003/01/07 15:25:44  vektor
-// Added some missing debian files, and removed ^M's from the DScaler
-// header files.
-//
-// Revision 1.1  2003/01/07 15:18:46  vektor
-// Added the required DScaler header files.
-//
-// Revision 1.15  2001/11/29 17:30:51  adcockj
-// Reorgainised bt848 initilization
-// More Javadoc-ing
-//
-// Revision 1.14  2001/11/22 13:32:03  adcockj
-// Finished changes caused by changes to TDeinterlaceInfo - Compiles
-//
-// Revision 1.13  2001/11/21 15:21:39  adcockj
-// Renamed DEINTERLACE_INFO to TDeinterlaceInfo in line with standards
-// Changed TDeinterlaceInfo structure to have history of pictures.
-//
-// Revision 1.12  2001/11/10 10:36:27  pgubanov
-// Need to specify _cdecl on memcpy() - plugins assume cdecl while DShow filter assumes _stdcall
-//
-// Revision 1.11  2001/07/16 18:07:50  adcockj
-// Added Optimisation parameter to ini file saving
-//
-// Revision 1.10  2001/07/13 16:15:43  adcockj
-// Changed lots of variables to match Coding standards
-//
-/////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// This file contains #define directives that control compilation of CPU-specific
-// code, mostly deinterlacing functions.  Turning these directives on requires
-// that you have Microsoft's "Processor Pack" patch installed on your build system.
-// The Processor Pack is available from Microsoft for free:
-//
-// http://msdn.microsoft.com/vstudio/downloads/ppack/
-//
-// Note that compiling the code to use a processor-specific feature is safe even
-// if your PC doesn't have the feature in question; DScaler detects processor types
-// at startup and sets flags in the global "CpuFeatureFlags" (see cpu.h for
-// the list of flags) which the code uses to determine whether or not to use
-// each feature.
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * This file is an adaptation of the DS_ApiCommon.h file from DScaler.  I have
+ * removed many of the features which are not required by the tvtime port at
+ * the current time, and just store here the structures needed by the
+ * deinterlacers.  We may try to converge back with DScaler or KDETV's
+ * adaptation in the future.  -Billy Biggs
+ */
 
 #ifndef __DS_APICOMON_H__
 #define __DS_APICOMON_H__ 1
 
-#define BOOL int
-
-
-// Symbolic constants for CpuFeatureFlags TRB 12/00
-#define FEATURE_CPUID           0x00000001
-#define FEATURE_STD_FEATURES    0x00000002
-#define FEATURE_EXT_FEATURES    0x00000004
-#define FEATURE_TSC             0x00000010
-#define FEATURE_MMX             0x00000020
-#define FEATURE_CMOV            0x00000040
-#define FEATURE_3DNOW           0x00000080
-#define FEATURE_3DNOWEXT        0x00000100
-#define FEATURE_MMXEXT          0x00000200
-#define FEATURE_SSEFP           0x00000400
-#define FEATURE_K6_MTRR         0x00000800
-#define FEATURE_P6_MTRR         0x00001000
-#define FEATURE_SSE             0x00002000
-#define FEATURE_SSE2            0x00004000
-
-///////////////////////////////////////////////////////////////////////////////
-// Definitions for the settings and new UI code
-///////////////////////////////////////////////////////////////////////////////
-
-/** type of setting
-*/
-typedef enum
-{
-    /// used when settings are depricated
-    NOT_PRESENT = 0,
-    // simple boolean setting
-    ONOFF,
-    // simple boolean setting
-    YESNO,
-    // select an item froma list
-    ITEMFROMLIST,
-    // select value using slider
-    SLIDER,
-} SETTING_TYPE;
-
-/** Function called when setting Value changes
-    return Value indicates whether.rest of screen needs to be
-    refreshed
-*/
-typedef BOOL (__cdecl SETTING_ONCHANGE)(long NewValue);
-
-/** A Dscaler setting that may be manipulated
-*/
-typedef struct
-{
-    char* szDisplayName;
-    SETTING_TYPE Type;
-    long LastSavedValue;
-    long* pValue;
-    long Default;
-    long MinValue;
-    long MaxValue;
-    long StepValue;
-    long OSDDivider;
-    const char** pszList;
-    char* szIniSection;
-    char* szIniEntry;
-    SETTING_ONCHANGE* pfnOnChange;
-} SETTING;
-
 /** Deinterlace functions return true if the overlay is ready to be displayed.
 */
-typedef void (_cdecl MEMCPY_FUNC)(void* pOutput, void* pInput, size_t nSize);
+typedef void (MEMCPY_FUNC)(void* pOutput, const void* pInput, size_t nSize);
 
 #define MAX_PICTURE_HISTORY 10
-
 
 #define PICTURE_PROGRESSIVE 0
 #define PICTURE_INTERLACED_ODD 1
@@ -155,14 +45,9 @@ typedef void (_cdecl MEMCPY_FUNC)(void* pOutput, void* pInput, size_t nSize);
 typedef struct
 {
     // pointer to the start of data for this picture
-    BYTE* pData;
+    unsigned char* pData;
     // see PICTURE_ flags
-    DWORD Flags;
-    // is this the first picture in a new series
-    // use this flag to indicate changes to any of the 
-    // paramters that are assumed to be fixed like
-    // timings or pixel width
-    BOOL IsFirstInSeries;
+    unsigned int Flags;
 } TPicture;
 
 
@@ -173,11 +58,6 @@ typedef struct
 */
 typedef struct
 {
-    /** set to version of this structure
-        used to avoid crashing with incompatable versions
-    */
-    DWORD Version;
-
     /** The most recent pictures 
         PictureHistory[0] is always the most recent.
         Pointers are NULL if the picture in question isn't valid, e.g. because
@@ -186,24 +66,16 @@ typedef struct
     TPicture* PictureHistory[MAX_PICTURE_HISTORY];
 
     /// Current overlay buffer pointer.
-    BYTE *Overlay;
-
-    /// The part of the overlay that we actually show
-    RECTL SourceRect;
-
-    /** which frame are we on now
-        \todo  remove this
-    */
-    int CurrentFrame;
+    unsigned char *Overlay;
 
     /// Overlay pitch (number of bytes between scanlines).
-    DWORD OverlayPitch;
+    unsigned int OverlayPitch;
 
     /** Number of bytes of actual data in each scanline.  May be less than
         OverlayPitch since the overlay's scanlines might have alignment
         requirements.  Generally equal to FrameWidth * 2.
     */
-    DWORD LineLength;
+    unsigned int LineLength;
 
     /// Number of pixels in each scanline.
     int FrameWidth;
@@ -216,27 +88,13 @@ typedef struct
     */
     int FieldHeight;
 
-    /// Results from the NTSC Field compare
-    long FieldDiff;
-    /// Results of the PAL Mode deinterlace detect
-    long CombFactor;
     /// Function pointer to optimized memcpy function
     MEMCPY_FUNC* pMemcpy;
-    /// What Type of CPU are we running
-    long CpuFeatureFlags;
-    /// Are we behind with processing
-    BOOL bRunningLate;
-    /// Are we behind with processing
-    BOOL bMissedFrame;
-    /// Do we want to flip accuratly
-    BOOL bDoAccurateFlips;
-    /// How big the source will end up
-    RECTL DestRect;
 
     /** distance between lines in image
         need not match the pixel width
     */
-    DWORD InputPitch;
+    unsigned int InputPitch;
 } TDeinterlaceInfo;
 
 #endif
