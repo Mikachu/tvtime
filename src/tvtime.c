@@ -259,9 +259,6 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
  * frame, and in case 2, we only need the previous frame, since the
  * current frame contains both Field 3 and Field 4.
  */
-static videofilter_t *filter = 0;
-static int filtered_cur = 0;
-
 static void pulldown_merge_fields( uint8_t *output,
                                    uint8_t *topfield,
                                    uint8_t *botfield,
@@ -290,10 +287,8 @@ static void pulldown_merge_fields( uint8_t *output,
     }
 }
 
-static int pdoffset = PULLDOWN_SEQ_AA;
-static int pderror = PULLDOWN_ERROR_WAIT;
-static int pdlastbusted = 0;
-static int filmmode = 0;
+static videofilter_t *filter = 0;
+static int filtered_cur = 0;
 
 static int last_topdiff = 0;
 static int last_botdiff = 0;
@@ -325,6 +320,11 @@ static void calculate_pulldown_score_vektor( uint8_t *curframe,
 
     filtered_cur = 1;
 }
+
+static int pdoffset = PULLDOWN_SEQ_AA;
+static int pderror = PULLDOWN_ERROR_WAIT;
+static int pdlastbusted = 0;
+static int filmmode = 0;
 
 static void tvtime_build_deinterlaced_frame( uint8_t *output,
                                              uint8_t *curframe,
