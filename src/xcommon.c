@@ -96,8 +96,10 @@ static Atom net_wm_state_above;
 static Atom net_wm_state_below;
 static Atom net_wm_state_fullscreen;
 static Atom net_wm_user_time;
+static Atom net_wm_icon;
 static Atom net_active_window;
 static Atom utf8_string;
+static Atom cardinal;
 static Atom kwm_keep_on_top;
 static Atom wm_protocols;
 static Atom wm_delete_window;
@@ -139,17 +141,19 @@ static void load_atoms( Display *dpy )
         "_NET_WM_STATE_BELOW",
         "_NET_WM_STATE_FULLSCREEN",
         "_NET_WM_USER_TIME",
+        "_NET_WM_ICON",
         "_NET_ACTIVE_WINDOW",
         "UTF8_STRING",
+        "CARDINAL",
         "KWM_KEEP_ON_TOP",
         "WM_PROTOCOLS",
         "WM_DELETE_WINDOW",
         "_XAWTV_STATION",
         "_XAWTV_REMOTE"
     };
-    Atom atoms_return[ 15 ];
+    Atom atoms_return[ 17 ];
 
-    XInternAtoms( display, atom_names, 15, False, atoms_return );
+    XInternAtoms( display, atom_names, 17, False, atoms_return );
     net_supporting_wm_check = atoms_return[ 0 ];
     net_supported = atoms_return[ 1 ];
     net_wm_name = atoms_return[ 2 ];
@@ -158,15 +162,79 @@ static void load_atoms( Display *dpy )
     net_wm_state_below = atoms_return[ 5 ];
     net_wm_state_fullscreen = atoms_return[ 6 ];
     net_wm_user_time = atoms_return[ 7 ];
-    net_active_window = atoms_return[ 8 ];
-    utf8_string = atoms_return[ 9 ];
-    kwm_keep_on_top = atoms_return[ 10 ];
-    wm_protocols = atoms_return[ 11 ];
-    wm_delete_window = atoms_return[ 12 ];
-    xawtv_station = atoms_return[ 13 ];
-    xawtv_remote = atoms_return[ 14 ];
+    net_wm_icon = atoms_return[ 8 ];
+    net_active_window = atoms_return[ 9 ];
+    utf8_string = atoms_return[ 10 ];
+    cardinal = atoms_return[ 11 ];
+    kwm_keep_on_top = atoms_return[ 12 ];
+    wm_protocols = atoms_return[ 13 ];
+    wm_delete_window = atoms_return[ 14 ];
+    xawtv_station = atoms_return[ 15 ];
+    xawtv_remote = atoms_return[ 16 ];
 }
 
+static uint32_t icon_colours[256];
+static int colours_loaded = 0;
+
+static const char *tvtime_icon =
+"                                "
+"                                "
+"                                "
+"                                "
+"    %@@@@@@@++..........%       "
+"    ..####=##=##=####..#*&      "
+"    ++@%@@@@@+++++..+...%&&     "
+"    ..%%%@@@+++....#+.+.%$&$    "
+"    +.@%@@++++...###....%&$&    "
+"    ++@@@@+++..#.#...++.%$&&    "
+"    +.@@+++....#.##...+.%&$&    "
+"    ++@@+++...#.##..+.++%$$&    "
+"    ++++++...###.#..+++.%&$&    "
+"    ++++...#.#.#....++++*$$$    "
+"    ++@....###.#...++++.*$$&    "
+"    +++..#.#.#...+++@+++*$$$    "
+"    @@+.##.#.#...+++@+++%$&$    "
+"    +++.#.##...+++@@@+++*$$$    "
+"    @@.##.#....++@@@%+@+*$$$    "
+"    @@+#.#...++++@@@%+++*&$$    "
+"    @@++....+++@@@%%@+@+-$$&    "
+"    ++++....+++@@%%-%+++*$$     "
+"    @++.+......#...+++++%$$     "
+"      +.++++......#..+@+*$&     "
+"          ...+++++...+++%$      "
+"               ...++@+++*       "
+"                                "
+"                                "
+"                                "
+"                                "
+"                                "
+"                                " ;
+
+static void load_icon( uint32_t *data )
+{
+    int i;
+
+    if( !colours_loaded ) {
+        colours_loaded = 1;
+        icon_colours[ ' ' ] = 0x00000000;
+        icon_colours[ '.' ] = 0xffcccccc;
+        icon_colours[ '+' ] = 0xffb2b2b2;
+        icon_colours[ '@' ] = 0xff999999;
+        icon_colours[ '#' ] = 0xffe5e5e5;
+        icon_colours[ '$' ] = 0xff4c4c4c;
+        icon_colours[ '%' ] = 0xff7f7f7f;
+        icon_colours[ '&' ] = 0xff333333;
+        icon_colours[ '*' ] = 0xff666666;
+        icon_colours[ '=' ] = 0xffffffff;
+        icon_colours[ '-' ] = 0xff007f7f;
+    }
+
+    *data++ = 32;
+    *data++ = 32;
+    for( i = 0; i < 32 * 32; i++ ) {
+        *data++ = icon_colours[ (int) tvtime_icon[ i ] ];
+    }
+}
 
 /**
  * Called after mapping a window - waits until the window is mapped.
@@ -914,7 +982,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
                                CopyFromParent, InputOutput, CopyFromParent,
                                mask, &xswa );
 
-    /* Tell KDE to keep the fullscreen window on top */
+    /* Tell KDE to keep the fullscreen window on top. */
     {
         XEvent ev;
         long mask;
@@ -928,6 +996,21 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
         ev.xclient.data.l[ 1 ] = CurrentTime;
         mask = SubstructureRedirectMask;
         XSendEvent( display, DefaultRootWindow( display ), False, mask, &ev );
+    }
+
+    /* Set the icon on the window. */
+    {
+        uint32_t *data = malloc( 1026 * 4 );
+        if( data ) {
+            load_icon( data );
+            XChangeProperty( display, wm_window, net_wm_icon, cardinal, 32,
+                             PropModeReplace,
+                             (const unsigned char*) data, 1026 * 4 );
+            XChangeProperty( display, fs_window, net_wm_icon, cardinal, 32,
+                             PropModeReplace, (const unsigned char*) data,
+                             1026 * 4 );
+            free( data );
+        }
     }
 
     if( check_for_EWMH_wm( display, &wmname ) ) {

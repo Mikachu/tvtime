@@ -107,6 +107,9 @@ Authors and contributors
     - Added support for reading the localized program descriptions
       from the XMLTV file.
 
+  Andrei Badea <andrei.badea@movzx.net>
+    - Added support for _NET_WM_ICON.
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>
