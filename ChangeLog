@@ -1,5 +1,9 @@
 
 0.9.13 -
+  * vektor: Removed support for configurable "modes", which were used
+      for having things like a special fullscreen mode with a different
+      deinterlacer.  The feature was too complicated to be usable and
+      cluttered the code, and not appropriate for our 1.0 release.
   * vektor: Show the title of the current show from the XMLTV information
       in the window title bar if available.
   * pv2b: Show the channel number in the window title bar if available.
