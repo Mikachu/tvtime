@@ -132,6 +132,7 @@ int main( int argc, char **argv )
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
     unsigned char *colourbars;
+    unsigned char *lastframe;
     config_t *ct;
     input_t *in;
 
@@ -317,6 +318,8 @@ int main( int argc, char **argv )
     /* Begin capturing frames. */
     videoinput_free_all_frames( vidin );
 
+    lastframe = videoinput_next_image( vidin );
+
     /* Initialize our timestamps. */
     for( i = 0; i < 7; i++ ) gettimeofday( &(checkpoint[ i ]), 0 );
     gettimeofday( &lastframetime, 0 );
@@ -401,9 +404,12 @@ int main( int argc, char **argv )
                                                                width, height/2,
                                                                width*4 );
             } else {
+                packed422_field_to_frame_top_twoframe( sdl_get_output(), width*2, curframe, lastframe, width, height, width*2 );
+/*
                 packed422_field_to_frame_top( sdl_get_output(), width*2, 
                                               curframe,
                                               width, height/2, width*4 );
+*/
             }
 
             tvtime_osd_volume_muted( osd, mixer_ismute() );
@@ -457,9 +463,12 @@ int main( int argc, char **argv )
                                                                width, height/2,
                                                                width*4 );
             } else {
+                packed422_field_to_frame_bot_twoframe( sdl_get_output(), width*2, curframe, lastframe, width, height, width*2 );
+/*
                 packed422_field_to_frame_bot( sdl_get_output(), width*2, 
                                               curframe + (width*2),
                                               width, height/2, width*4 );
+*/
             }
             tvtime_osd_volume_muted( osd, mixer_ismute() );
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
@@ -473,6 +482,7 @@ int main( int argc, char **argv )
 
         /* We're done with the input now. */
         videoinput_free_last_frame( vidin );
+        lastframe = curframe;
 
 
         /* CHECKPOINT6 : Released a frame to V4L. */

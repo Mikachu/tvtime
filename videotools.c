@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include "speedy.h"
 #include "videotools.h"
+#include "twoframe.h"
 
 struct video_correction_s
 {
@@ -34,8 +35,10 @@ struct video_correction_s
     unsigned char *temp_scanline_data;
 };
 
-void create_packed422_from_planar422_scanline( unsigned char *output, unsigned char *luma,
-                                               unsigned char *cb, unsigned char *cr, int width )
+void create_packed422_from_planar422_scanline( unsigned char *output,
+                                               unsigned char *luma,
+                                               unsigned char *cb,
+                                               unsigned char *cr, int width )
 {
     unsigned int *o = (unsigned int *) output;
 
@@ -45,19 +48,6 @@ void create_packed422_from_planar422_scanline( unsigned char *output, unsigned c
         luma += 2;
         cb++;
         cr++;
-    }
-}
-
-void blit_colour_packed4444_scanline( unsigned char *output, int width,
-                                      int alpha, int luma, int cb, int cr )
-{
-    int j;
-
-    for( j = 0; j < width; j++ ) {
-        *output++ = alpha;
-        *output++ = luma;
-        *output++ = cb;
-        *output++ = cr;
     }
 }
 
@@ -72,22 +62,13 @@ void blit_colour_packed4444( unsigned char *output, int width, int height,
     }
 }
 
-void blit_colour_packed422_scanline( unsigned char *output, int width, int y, int cb, int cr )
-{
-    int colour = cr << 24 | y << 16 | cb << 8 | y;
-    unsigned int *o = (unsigned int *) output;
-
-    for( width /= 2; width; --width ) {
-        *o++ = colour;
-    }
-}
-
 void blit_colour_packed422( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr )
 {
     int i;
 
     for( i = 0; i < height; i++ ) {
-        blit_colour_packed422_scanline( output + (i * stride), width, luma, cb, cr );
+        blit_colour_packed422_scanline( output + (i * stride), width,
+                                        luma, cb, cr );
     }
 }
 
@@ -371,6 +352,83 @@ void packed422_field_to_frame_top_filter( unsigned char *output, int outstride,
     blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
 }
 
+void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride,
+                                            unsigned char *curframe,
+                                            unsigned char *lastframe,
+                                            int width, int height, int linestride )
+{
+    int i;
+
+    curframe += linestride;
+    lastframe += linestride;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    memcpy( output, curframe, width*2 );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline_mmxext( output, top1, mid1,
+                                                        bot1, top0, mid0,
+                                                        bot0, width );
+        output += outstride;
+
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        memcpy( output, curframe, width*2 );
+        output += outstride;
+    }
+}
+
+void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride,
+                                            unsigned char *curframe,
+                                            unsigned char *lastframe,
+                                            int width, int height, int linestride )
+{
+    int i;
+
+    /* Copy a scanline. */
+    memcpy( output, curframe, width*2 );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline_mmxext( output, top1, mid1,
+                                                        bot1, top0, mid0,
+                                                        bot0, width );
+        output += outstride;
+
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        memcpy( output, curframe, width*2 );
+        output += outstride;
+    }
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+}
+
 
 static double intensity_to_voltage( video_correction_t *vc, double val )
 {   
@@ -525,9 +583,12 @@ void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned ch
     }
 }
 
-void composite_alphamask_packed4444( unsigned char *output, int owidth, int oheight, int ostride,
-                                     unsigned char *mask, int mwidth, int mheight, int mstride,
-                                     int luma, int cb, int cr, int xpos, int ypos )
+void composite_alphamask_packed4444( unsigned char *output, int owidth,
+                                     int oheight, int ostride,
+                                     unsigned char *mask, int mwidth,
+                                     int mheight, int mstride,
+                                     int luma, int cb, int cr,
+                                     int xpos, int ypos )
 {
     int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
 
@@ -569,8 +630,10 @@ void composite_alphamask_packed4444( unsigned char *output, int owidth, int ohei
     }
 }
 
-void composite_packed4444_to_packed422_scanline( unsigned char *output, unsigned char *input,
-                                                 unsigned char *foreground, int width )
+void composite_packed4444_to_packed422_scanline( unsigned char *output,
+                                                 unsigned char *input,
+                                                 unsigned char *foreground,
+                                                 int width )
 {
     int i;
 
@@ -659,7 +722,8 @@ void composite_packed4444_to_packed422( unsigned char *output, int owidth, int o
     }
 }
 
-void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, unsigned char *input,
+void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
+                                                       unsigned char *input,
                                                        unsigned char *foreground, int width, int alpha )
 {
     int i;
@@ -706,8 +770,12 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, un
     }
 }
 
-void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
-                                              unsigned char *foreground, int fwidth, int fheight, int fstride,
+void composite_packed4444_alpha_to_packed422( unsigned char *output,
+                                              int owidth, int oheight,
+                                              int ostride,
+                                              unsigned char *foreground,
+                                              int fwidth, int fheight,
+                                              int fstride,
                                               int xpos, int ypos, int alpha )
 {
     int dest_x, dest_y, src_x, src_y, blit_w, blit_h;

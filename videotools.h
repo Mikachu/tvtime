@@ -78,14 +78,18 @@ void packed422_field_to_frame_bot_filter( unsigned char *output, int outstride,
 void packed422_field_to_frame_top_filter( unsigned char *output, int outstride,
                                           unsigned char *field, int fieldwidth,
                                           int fieldheight, int fieldstride );
+void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride,
+                                            unsigned char *curframe,
+                                            unsigned char *lastframe,
+                                            int width, int height, int linestride );
+void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride,
+                                            unsigned char *curframe,
+                                            unsigned char *lastframe,
+                                            int width, int height, int linestride );
 
 /**
  * Scanline functions.
  */
-void blit_colour_packed4444_scanline( unsigned char *output, int width,
-                                      int alpha, int luma, int cb, int cr );
-void blit_colour_packed422_scanline( unsigned char *output, int width,
-                                     int luma, int cb, int cr );
 void create_packed422_from_planar422_scanline( unsigned char *output,
                                                unsigned char *luma,
                                                unsigned char *cb,
