@@ -859,6 +859,7 @@ int main( int argc, char **argv )
                        config_get_aspect( ct ) ) ) {
         fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );
+        videoinput_delete( vidin );
         return 1;
     }
 
