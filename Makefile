@@ -7,13 +7,14 @@ SDLFLAGS = `sdl-config --cflags`
 SDLLIBS = `sdl-config --libs`
 
 TTFFLAGS =
-TTFLIBS = -lttf
+TTFLIBS = -lfreetype
 
 CFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS)
+CXXFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS) -I/usr/include/freetype2
 LDFLAGS = $(SDLLIBS) $(TTFLIBS)
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
-	videotools.o ttfont.o osd.o
+	videotools.o ttfont.o efs.o osd.o
 
 all: tvtime
 

@@ -48,6 +48,16 @@ enum tvtime_commands
     TVTIME_DIGIT         = (1<<18),
     TVTIME_KP_ENTER      = (1<<19),
     TVTIME_CHANNEL_CHAR  = (1<<20),
+
+    TVTIME_HUE_DOWN      = (1<<21),
+    TVTIME_HUE_UP        = (1<<22),
+    TVTIME_BRIGHT_DOWN   = (1<<23),
+    TVTIME_BRIGHT_UP     = (1<<24),
+    TVTIME_CONT_DOWN     = (1<<25),
+    TVTIME_CONT_UP       = (1<<26),
+    TVTIME_COLOUR_DOWN   = (1<<27),
+    TVTIME_COLOUR_UP     = (1<<28),
+
     TVTIME_DEBUG         = (1<<31)
 };
 

@@ -30,6 +30,36 @@
 #include "frequencies.h"
 #include "mixer.h"
 
+
+/**
+ * Default values below for bttv from dScaler.  See http://deinterlace.sf.net/
+ */
+
+/* 10/19/2000 Mark Rejhon
+ * Better NTSC defaults
+ */
+
+/* range -128,127 */
+#define DEFAULT_HUE_NTSC 0
+
+/* range -128,127 */
+#define DEFAULT_BRIGHTNESS_NTSC 20
+
+/* range 0,511 */
+#define DEFAULT_CONTRAST_NTSC 207
+
+/* range 0,511 */
+#define DEFAULT_SAT_U_NTSC 254
+#define DEFAULT_SAT_V_NTSC 219
+
+/* PAL defaults these work for OTA PAL signals */
+#define DEFAULT_HUE_PAL 0
+#define DEFAULT_BRIGHTNESS_PAL 0
+#define DEFAULT_CONTRAST_PAL 219
+#define DEFAULT_SAT_U_PAL 254
+#define DEFAULT_SAT_V_PAL 219
+
+
 struct videoinput_s
 {
     int grab_fd;
@@ -326,6 +356,115 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     return vidin;
 }
+
+int videoinput_get_hue( videoinput_t *vidin )
+{
+    struct video_picture grab_pict;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return 0;
+    }
+    return (int) ((((double) grab_pict.hue / 65535.0) * 100.0) + 0.5);
+}
+
+void videoinput_set_hue_relative( videoinput_t *vidin, int offset )
+{
+    struct video_picture grab_pict;
+    int newhue;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return;
+    }
+
+    newhue = (int) ((((double) grab_pict.hue / 65535.0) * 100.0) + 0.5);
+    newhue += offset;
+    if( newhue > 100 ) newhue = 100;
+    if( newhue <   0 ) newhue = 0;
+    grab_pict.hue = (int) (((((double) newhue) / 100.0) * 65535.0) + 0.5);
+    ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
+}
+
+int videoinput_get_brightness( videoinput_t *vidin )
+{
+    struct video_picture grab_pict;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return 0;
+    }
+    return (int) ((((double) grab_pict.brightness / 65535.0) * 100.0) + 0.5);
+}
+
+void videoinput_set_brightness_relative( videoinput_t *vidin, int offset )
+{
+    struct video_picture grab_pict;
+    int newbright;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return;
+    }
+
+    newbright = (int) ((((double) grab_pict.brightness / 65535.0) * 100.0) + 0.5);
+    newbright += offset;
+    if( newbright > 100 ) newbright = 100;
+    if( newbright < 0 ) newbright = 0;
+    grab_pict.brightness = (int) (((((double) newbright) / 100.0) * 65535.0) + 0.5);
+    ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
+}
+
+int videoinput_get_contrast( videoinput_t *vidin )
+{
+    struct video_picture grab_pict;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return 0;
+    }
+    return (int) ((((double) grab_pict.contrast / 65535.0) * 100.0) + 0.5);
+}
+
+void videoinput_set_contrast_relative( videoinput_t *vidin, int offset )
+{
+    struct video_picture grab_pict;
+    int newcont;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return;
+    }
+
+    newcont = (int) ((((double) grab_pict.contrast / 65535.0) * 100.0) + 0.5);
+    newcont += offset;
+    if( newcont > 100 ) newcont = 100;
+    if( newcont < 0 ) newcont = 0;
+    grab_pict.contrast = (int) (((((double) newcont) / 100.0) * 65535.0) + 0.5);
+    ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
+}
+
+int videoinput_get_colour( videoinput_t *vidin )
+{
+    struct video_picture grab_pict;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return 0;
+    }
+    return (int) ((((double) grab_pict.colour / 65535.0) * 100.0) + 0.5);
+}
+
+void videoinput_set_colour_relative( videoinput_t *vidin, int offset )
+{
+    struct video_picture grab_pict;
+    int newcolour;
+
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        return;
+    }
+
+    newcolour = (int) ((((double) grab_pict.colour / 65535.0) * 100.0) + 0.5);
+    newcolour += offset;
+    if( newcolour > 100 ) newcolour = 100;
+    if( newcolour < 0 ) newcolour = 0;
+    grab_pict.colour = (int) (((((double) newcolour) / 100.0) * 65535.0) + 0.5);
+    ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict );
+}
+
 
 int videoinput_has_tuner( videoinput_t *vidin )
 {

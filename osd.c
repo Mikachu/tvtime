@@ -16,78 +16,58 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "ttfont.h"
 #include "videotools.h"
+#include "efs.h"
 #include "osd.h"
-
-typedef struct osd_font_s osd_font_t;
-
-struct osd_font_s
-{
-    Efont *font;
-};
-
-osd_font_t *osd_font_new( const char *filename, int fontsize, int video_width, int video_height )
-{
-    osd_font_t *osdf = (osd_font_t *) malloc( sizeof( osd_font_t ) );
-    if( !osdf ) {
-        return 0;
-    }
-
-    osdf->font = Efont_load( filename, fontsize, video_width, video_height );
-    if( !osdf->font ) {
-        free( osdf );
-        return 0;
-    }
-
-    return osdf;
-}
-
-void osd_font_delete( osd_font_t *osdf )
-{
-    Efont_free( osdf->font );
-    free( osdf );
-}
-
-Efont *osd_font_get_font( osd_font_t *osdf )
-{
-    return osdf->font;
-}
 
 struct osd_string_s
 {
-    osd_font_t *font;
+    efont_t *font;
     efont_string_t *efs;
     int frames_left;
+
     int text_luma;
     int text_cb;
     int text_cr;
-};
 
-struct osd_shape_s
-{
-    int type;
-    int frames_left;
-    int shape_luma;
-    int shape_cb;
-    int shape_cr;
-    int shape_height;
-    int shape_width;
-    unsigned char *shape_mask;
+    int show_border;
+    int border_luma;
+    int border_cb;
+    int border_cr;
+
+    unsigned char *image4444;
+    int image_width;
+    int image_height;
+    int image_textwidth;
+    int image_textheight;
 };
 
 osd_string_t *osd_string_new( const char *fontfile, int fontsize,
-                              int video_width, int video_height )
+                              int video_width, int video_height, double video_aspect )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
-    osds->font = osd_font_new( fontfile, fontsize, video_width, video_height );
+    osds->font = efont_new( fontfile, fontsize, video_width, video_height, video_aspect );
     osds->efs = 0;
     osds->frames_left = 0;
+
     osds->text_luma = 16;
     osds->text_cb = 128;
     osds->text_cr = 128;
+
+    osds->show_border = 0;
+    osds->border_luma = 16;
+    osds->border_cb = 128;
+    osds->border_cr = 128;
+
+    osds->image4444 = (unsigned char *) malloc( video_width * video_height * 4 );
+    osds->image_width = video_width;
+    osds->image_height = video_height;
+    osds->image_textwidth = 0;
+    osds->image_textheight = 0;
+
     return osds;
 }
 
@@ -106,12 +86,58 @@ void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr )
     osds->text_cr = cr;
 }
 
+void osd_string_show_border( osd_string_t *osds, int show_border )
+{
+    osds->show_border = show_border;
+}
+
+void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr )
+{
+    osds->border_luma = luma;
+    osds->border_cb = cb;
+    osds->border_cr = cr;
+}
+
+void osd_string_render_image4444( osd_string_t *osds )
+{
+    osds->image_textwidth = efs_get_width( osds->efs ) + 4;
+    osds->image_textheight = efs_get_height( osds->efs ) + 4;
+
+    blit_colour_4444( osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width * 4,
+                      0, 16, 128, 128 );
+
+    if( osds->show_border ) {
+        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb, osds->border_cr, 0, 0 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb, osds->border_cr, 4, 0 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb, osds->border_cr, 0, 4 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb, osds->border_cr, 4, 4 );
+    }
+
+    composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+                                    efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
+                                    efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                    osds->text_luma, osds->text_cb, osds->text_cr, 2, 2 );
+}
+
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
     if( osds->efs ) {
         efs_delete( osds->efs );
     }
-    osds->efs = efs_new( osd_font_get_font( osds->font ), text );
+    osds->efs = efs_new( osds->font, text );
+    osd_string_render_image4444( osds );
     osds->frames_left = timeout;
 }
 
@@ -131,55 +157,35 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,
                                      int xpos, int ypos, int rightjustified )
 {
-    int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
-
     if( !osds->efs ) return;
+    if( !osds->frames_left ) return;
 
-    src_x = 0;
-    src_y = 0;
-    if( rightjustified ) {
-        dest_x = xpos - efs_get_width( osds->efs );
+    if( rightjustified ) xpos -= osds->image_textwidth;
+    if( osds->frames_left < 50 ) {
+        int alpha = (int) ( ( ( ( (double) osds->frames_left ) / 50.0 ) * 256.0 ) + 0.5 );
+        composite_packed4444_alpha_to_packed422( output, width, height, stride,
+                                                 osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width*4,
+                                                 xpos, ypos, alpha );
     } else {
-        dest_x = xpos;
-    }
-    dest_y = ypos;
-    blit_w = efs_get_width( osds->efs );
-    blit_h = efs_get_height( osds->efs );
-
-    if( dest_x < 0 ) {
-        src_x = -dest_x;
-        blit_w += dest_x;
-        dest_x = 0;
-    }
-    if( dest_y < 0 ) {
-        src_y = -dest_y;
-        blit_h += dest_y;
-        dest_y = 0;
-    }
-    if( dest_x + blit_w > width ) {
-        blit_w = width - dest_x;
-    }
-    if( dest_y + blit_h > height ) {
-        blit_h = height - dest_y;
-    }
-
-    if( blit_w > 0 && blit_h > 0 ) {
-        int i;
-
-        output += dest_y * stride;
-        for( i = 0; i < blit_h; i++ ) {
-            composite_textmask_packed422_scanline( output + ((dest_x) * 2),
-                                                   output + ((dest_x) * 2),
-                                                   efs_get_scanline( osds->efs, src_y + i ),
-                                                   blit_w, osds->text_luma, osds->text_cb,
-                                                   osds->text_cr, ((double) osds->frames_left) / 50.0 );
-            output += stride;
-        }
+        composite_packed4444_to_packed422( output, width, height, stride,
+                                           osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width*4,
+                                           xpos, ypos );
     }
 }
 
 
 /* Shape functions */
+struct osd_shape_s
+{
+    int type;
+    int frames_left;
+    int shape_luma;
+    int shape_cb;
+    int shape_cr;
+    int shape_height;
+    int shape_width;
+    unsigned char *shape_mask;
+};
 
 osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_height )
 {

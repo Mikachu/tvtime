@@ -244,6 +244,32 @@ int sdl_poll_events( void )
                 curcommand |= TVTIME_KP_ENTER;
                 break;
 
+            /* Picture controls */
+            case SDLK_F1:
+                curcommand |= TVTIME_HUE_DOWN;
+                break;
+            case SDLK_F2:
+                curcommand |= TVTIME_HUE_UP;
+                break;
+            case SDLK_F3:
+                curcommand |= TVTIME_BRIGHT_DOWN;
+                break;
+            case SDLK_F4:
+                curcommand |= TVTIME_BRIGHT_UP;
+                break;
+            case SDLK_F5:
+                curcommand |= TVTIME_CONT_DOWN;
+                break;
+            case SDLK_F6:
+                curcommand |= TVTIME_CONT_UP;
+                break;
+            case SDLK_F7:
+                curcommand |= TVTIME_COLOUR_DOWN;
+                break;
+            case SDLK_F8:
+                curcommand |= TVTIME_COLOUR_UP;
+                break;
+
             default:
                 break;
             }

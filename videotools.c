@@ -142,6 +142,38 @@ static inline void copy_scanline_packed_422( unsigned char *output, unsigned cha
     }
 }
 
+void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int luma, int cb, int cr )
+{
+    int j;
+
+    for( j = 0; j < width; j++ ) {
+        *output++ = alpha;
+        *output++ = luma;
+        *output++ = cb;
+        *output++ = cr;
+    }
+}
+
+void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr )
+{
+    int i;
+
+    for( i = 0; i < height; i++ ) {
+        blit_colour_scanline_4444( output + (i * stride), width, alpha, luma, cb, cr );
+    }
+}
+
+void blit_colour_scanline_yuy2( unsigned char *output, int width, int y, int cb, int cr )
+{
+    int i;
+
+    for( i = 0; i < width; i++ ) {
+        output[ 0 ] = y;
+        if( ( i & 1 ) == 0 ) { output[ 1 ] = cb; output[ 3 ] = cr; }
+        output += 2;
+    }
+}
+
 static inline void interpolate_scanline_packed_422( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,
@@ -389,6 +421,293 @@ void composite_textmask_packed422_scanline( unsigned char *output, unsigned char
         textmask++;
         output += 2;
         input += 2;
+    }
+}
+
+void composite_alphamask_packed422_scanline( unsigned char *output, unsigned char *input,
+                                             unsigned char *mask, int width,
+                                             int textluma, int textcb, int textcr, double textalpha )
+{
+    int i;
+
+    if( textalpha > 1.0 ) textalpha = 1.0;
+    if( textalpha < 0.0 ) textalpha = 0.0;
+
+    for( i = 0; i < width; i++ ) {
+        if( mask[ 0 ] ) {
+            int a = (int) ( ( (double) mask[ 0 ] * textalpha ) + 0.5 );
+            int tmp1, tmp2;
+
+            tmp1 = (textluma - input[ 0 ]) * a;
+            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *output = tmp2 & 0xff;
+
+            if( ( i & 1 ) == 0 ) {
+                tmp1 = (textcb - input[ 1 ]) * a;
+                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                output[ 1 ] = tmp2 & 0xff;
+
+                tmp1 = (textcr - input[ 3 ]) * a;
+                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                output[ 3 ] = tmp2 & 0xff;
+            }
+        }
+        mask++;
+        output += 2;
+        input += 2;
+    }
+}
+
+void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned char *input,
+                                              unsigned char *mask, int width,
+                                              int textluma, int textcb, int textcr )
+{
+    int i;
+
+    for( i = 0; i < width; i++ ) {
+        if( mask[ 0 ] ) {
+            int a = mask[ 0 ];
+            int tmp1, tmp2;
+
+            tmp1 = (a - input[ 0 ]) * a;
+            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            output[ 0 ] = tmp2 & 0xff;
+
+            tmp1 = (textluma - input[ 1 ]) * a;
+            tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            output[ 1 ] = tmp2 & 0xff;
+
+            tmp1 = (textcb - input[ 2 ]) * a;
+            tmp2 = input[ 2 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            output[ 2 ] = tmp2 & 0xff;
+
+            tmp1 = (textcr - input[ 3 ]) * a;
+            tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            output[ 3 ] = tmp2 & 0xff;
+        }
+        mask++;
+        output += 4;
+        input += 4;
+    }
+}
+
+void composite_alphamask_packed4444( unsigned char *output, int owidth, int oheight, int ostride,
+                                     unsigned char *mask, int mwidth, int mheight, int mstride,
+                                     int luma, int cb, int cr, int xpos, int ypos )
+{
+    int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
+
+    src_x = 0;
+    src_y = 0;
+    dest_x = xpos;
+    dest_y = ypos;
+    blit_w = mwidth;
+    blit_h = mheight;
+
+    if( dest_x < 0 ) {
+        src_x = -dest_x;
+        blit_w += dest_x;
+        dest_x = 0;
+    }
+    if( dest_y < 0 ) {
+        src_y = -dest_y;
+        blit_h += dest_y;
+        dest_y = 0;
+    }
+    if( dest_x + blit_w > owidth ) {
+        blit_w = owidth - dest_x;
+    }
+    if( dest_y + blit_h > oheight ) {
+        blit_h = oheight - dest_y;
+    }
+
+    if( blit_w > 0 && blit_h > 0 ) {
+        int i;
+
+        output += dest_y * ostride;
+        for( i = 0; i < blit_h; i++ ) {
+            composite_alphamask_packed4444_scanline( output + ((dest_x) * 4),
+                                                     output + ((dest_x) * 4),
+                                                     mask + ((src_y + i)*mstride),
+                                                     blit_w, luma, cb, cr );
+            output += ostride;
+        }
+    }
+}
+
+void composite_packed4444_to_packed422_scanline( unsigned char *output, unsigned char *input,
+                                                 unsigned char *foreground, int width )
+{
+    int i;
+
+    for( i = 0; i < width; i++ ) {
+        if( foreground[ 0 ] ) {
+            int a = foreground[ 0 ];
+            int tmp1, tmp2;
+
+            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
+            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *output = tmp2 & 0xff;
+
+            if( ( i & 1 ) == 0 ) {
+                if( i == 0 || i == (width-1) ) {
+                    tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
+                    tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 1 ] = tmp2 & 0xff;
+
+                    tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
+                    tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 3 ] = tmp2 & 0xff;
+                } else {
+                    //int cb = (( foreground[ 2 + 4 ] << 1 ) + foreground[ 2 - 0 ] + foreground[ 2 + 8 ])>>2;
+                    //int cr = (( foreground[ 3 + 4 ] << 1 ) + foreground[ 3 - 0 ] + foreground[ 3 + 8 ])>>2;
+                    int cb = foreground[ 2 + 4 - (720*4)];
+                    int cr = foreground[ 3 + 4 - (720*4)];
+
+                    tmp1 = (cb - input[ 1 ]) * a;
+                    tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 1 ] = tmp2 & 0xff;
+
+                    tmp1 = (cr - input[ 3 ]) * a;
+                    tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 3 ] = tmp2 & 0xff;
+                }
+            }
+        }
+        foreground += 4;
+        output += 2;
+        input += 2;
+    }
+}
+
+void composite_packed4444_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
+                                        unsigned char *foreground, int fwidth, int fheight, int fstride,
+                                        int xpos, int ypos )
+{
+    int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
+
+    src_x = 0;
+    src_y = 0;
+    dest_x = xpos;
+    dest_y = ypos;
+    blit_w = fwidth;
+    blit_h = fheight;
+
+    if( dest_x < 0 ) {
+        src_x = -dest_x;
+        blit_w += dest_x;
+        dest_x = 0;
+    }
+    if( dest_y < 0 ) {
+        src_y = -dest_y;
+        blit_h += dest_y;
+        dest_y = 0;
+    }
+    if( dest_x + blit_w > owidth ) {
+        blit_w = owidth - dest_x;
+    }
+    if( dest_y + blit_h > oheight ) {
+        blit_h = oheight - dest_y;
+    }
+
+    if( blit_w > 0 && blit_h > 0 ) {
+        int i;
+
+        output += dest_y * ostride;
+        for( i = 0; i < blit_h; i++ ) {
+            composite_packed4444_to_packed422_scanline( output + ((dest_x) * 2),
+                                                        output + ((dest_x) * 2),
+                                                        foreground + ((src_y + i) * fstride), blit_w );
+            output += ostride;
+        }
+    }
+}
+
+void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, unsigned char *input,
+                                                       unsigned char *foreground, int width, int alpha )
+{
+    int i;
+
+    for( i = 0; i < width; i++ ) {
+        if( foreground[ 0 ] ) {
+            int a = ((foreground[ 0 ]*alpha)+0x80)>>8;
+            int tmp1, tmp2;
+
+            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
+            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *output = tmp2 & 0xff;
+
+            if( ( i & 1 ) == 0 ) {
+                if( i == 0 || i == (width-1) ) {
+                    tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
+                    tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 1 ] = tmp2 & 0xff;
+
+                    tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
+                    tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 3 ] = tmp2 & 0xff;
+                } else {
+                    //int cb = (( foreground[ 2 + 4 ] << 1 ) + foreground[ 2 - 0 ] + foreground[ 2 + 8 ])>>2;
+                    //int cr = (( foreground[ 3 + 4 ] << 1 ) + foreground[ 3 - 0 ] + foreground[ 3 + 8 ])>>2;
+                    int cb = foreground[ 2 + 4 - (720*4) ];
+                    int cr = foreground[ 3 + 4 - (720*4) ];
+
+                    tmp1 = (cb - input[ 1 ]) * a;
+                    tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 1 ] = tmp2 & 0xff;
+
+                    tmp1 = (cr - input[ 3 ]) * a;
+                    tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    output[ 3 ] = tmp2 & 0xff;
+                }
+            }
+        }
+        foreground += 4;
+        output += 2;
+        input += 2;
+    }
+}
+
+void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
+                                              unsigned char *foreground, int fwidth, int fheight, int fstride,
+                                              int xpos, int ypos, int alpha )
+{
+    int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
+
+    src_x = 0;
+    src_y = 0;
+    dest_x = xpos;
+    dest_y = ypos;
+    blit_w = fwidth;
+    blit_h = fheight;
+
+    if( dest_x < 0 ) {
+        src_x = -dest_x;
+        blit_w += dest_x;
+        dest_x = 0;
+    }
+    if( dest_y < 0 ) {
+        src_y = -dest_y;
+        blit_h += dest_y;
+        dest_y = 0;
+    }
+    if( dest_x + blit_w > owidth ) {
+        blit_w = owidth - dest_x;
+    }
+    if( dest_y + blit_h > oheight ) {
+        blit_h = oheight - dest_y;
+    }
+
+    if( blit_w > 0 && blit_h > 0 ) {
+        int i;
+
+        output += dest_y * ostride;
+        for( i = 0; i < blit_h; i++ ) {
+            composite_packed4444_alpha_to_packed422_scanline( output + ((dest_x) * 2),
+                                                              output + ((dest_x) * 2),
+                                                              foreground + ((src_y + i) * fstride), blit_w, alpha );
+            output += ostride;
+        }
     }
 }
 

@@ -29,7 +29,7 @@
 #include "mixer.h"
 
 static char *mixer_device = "/dev/mixer";
-static int mixer_usemaster = 1;
+static int mixer_usemaster = 0;
 static int levelpercentage = 0;
 static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
 static int muted = 0;

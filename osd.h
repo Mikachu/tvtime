@@ -32,16 +32,23 @@ typedef struct osd_shape_s osd_shape_t;
  * I don't understand point size vs pixel size, so, uh, whatever.  Maybe it's
  * just pixel height I have no clue.
  *
- * You have to pass in the video width and height to get the aspect ratio right.
- * I'll also need to pass in an option for 16:9 vs 4:3, but I'll do that later.
+ * Right now we require the video width, height, and the aspect ratio.
+ * Eventually I'll just take one parameter: pixel aspect, which would
+ * make more sense.
  */
 osd_string_t *osd_string_new( const char *fontfile, int fontsize,
-                              int video_width, int video_height );
+                              int video_width, int video_height,
+                              double video_aspect );
 void osd_string_delete( osd_string_t *osds );
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
+void osd_string_show_border( osd_string_t *osds, int show_border );
+void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
+void osd_string_composite_packed444( osd_string_t *osds, unsigned char *output,
+                                     int width, int height, int stride,
+                                     int xpos, int ypos );
 void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,
                                      int xpos, int ypos, int rightjustified );

@@ -19,34 +19,6 @@
 #ifndef VIDEOINPUT_H_INCLUDED
 #define VIDEOINPUT_H_INCLUDED
 
-/**
- * Default values below for bttv from dScaler.  See http://deinterlace.sf.net/
- */
-
-/* 10/19/2000 Mark Rejhon
- * Better NTSC defaults
- */
-
-/* range -128,127 */
-#define DEFAULT_HUE_NTSC 0
-
-/* range -128,127 */
-#define DEFAULT_BRIGHTNESS_NTSC 20
-
-/* range 0,511 */
-#define DEFAULT_CONTRAST_NTSC 207
-
-/* range 0,511 */
-#define DEFAULT_SAT_U_NTSC 254
-#define DEFAULT_SAT_V_NTSC 219
-
-/* PAL defaults these work for OTA PAL signals */
-#define DEFAULT_HUE_PAL 0
-#define DEFAULT_BRIGHTNESS_PAL 0
-#define DEFAULT_CONTRAST_PAL 219
-#define DEFAULT_SAT_U_PAL 254
-#define DEFAULT_SAT_V_PAL 219
-
 #include <linux/videodev.h>  /* Include this for the VIDEO_MODE defines */
 
 typedef struct videoinput_s videoinput_t;
@@ -93,6 +65,18 @@ int videoinput_get_num_frames( videoinput_t *vidin );
  * Returns true if this input has a tuner.
  */
 int videoinput_has_tuner( videoinput_t *vidin );
+
+/**
+ * Controls...
+ */
+int videoinput_get_hue( videoinput_t *vidin );
+void videoinput_set_hue_relative( videoinput_t *vidin, int offset );
+int videoinput_get_brightness( videoinput_t *vidin );
+void videoinput_set_brightness_relative( videoinput_t *vidin, int offset );
+int videoinput_get_contrast( videoinput_t *vidin );
+void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
+int videoinput_get_colour( videoinput_t *vidin );
+void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
 
 /**
  * Sets the tuner to tuner_number for the current channel. Also sets the tuners

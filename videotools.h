@@ -58,6 +58,10 @@ void planar422_field_to_packed422_frame( unsigned char *output,
                                          int lstride, int cstride,
                                          int width, int height );
 
+void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
+void blit_colour_scanline_yuy2( unsigned char *output, int width, int luma, int cb, int cr );
+void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr );
+
 /**
  * Builds a plane from a field interpolating to frame size by linear
  * interpolation.
@@ -72,9 +76,34 @@ void chroma_plane_field_to_frame( unsigned char *output, unsigned char *input,
  * transparent to full alpha.  This will probably change when I can do
  * a better renderer from ttfs.
  */
-void composite_textmask_packed422_scanline( unsigned char *output, unsigned char *bottom422,
+void composite_textmask_packed422_scanline( unsigned char *output, unsigned char *input,
                                             unsigned char *textmask, int width,
                                             int textluma, int textcb, int textcr, double textalpha );
+
+void composite_alphamask_packed422_scanline( unsigned char *output, unsigned char *input,
+                                             unsigned char *textmask, int width,
+                                             int textluma, int textcb, int textcr, double textalpha );
+void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned char *input,
+                                              unsigned char *mask, int width,
+                                              int textluma, int textcb, int textcr );
+void composite_packed4444_to_packed422_scanline( unsigned char *output, unsigned char *input,
+                                                 unsigned char *foreground, int width );
+
+void composite_alphamask_packed4444( unsigned char *output, int owidth, int oheight, int ostride,
+                                     unsigned char *mask, int mwidth, int mheight, int mstride,
+                                     int luma, int cb, int cr, int xpos, int ypos );
+void composite_packed4444_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
+                                        unsigned char *foreground, int fwidth, int fheight, int fstride,
+                                        int xpos, int ypos );
+
+/**
+ * Alpha provided is from 0-256 not 0-255.
+ */
+void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, unsigned char *input,
+                                                       unsigned char *foreground, int width, int alpha );
+void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
+                                              unsigned char *foreground, int fwidth, int fheight, int fstride,
+                                              int xpos, int ypos, int alpha );
 
 /**
  * This filter actually does not meet the spec so I'm not
