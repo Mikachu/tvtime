@@ -33,6 +33,8 @@ int config_button_to_command( config_t *ct, int button );
 int config_command_to_key( config_t *ct, int command );
 
 int config_get_verbose( config_t *ct );
+int config_get_send_fields( config_t *ct );
+const char *config_get_output_driver( config_t *ct );
 int config_get_debug( config_t *ct );
 int config_get_outputheight( config_t *ct );
 int config_get_inputwidth( config_t *ct );

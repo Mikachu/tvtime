@@ -29,6 +29,8 @@ tvtime \- a high quality television application
 .IR "config file" \|]
 .RB [\| \-r
 .IR rvrfile \|]
+.RB [\| \-D
+.IR "output driver" \|]
 .RB [\| \-H
 .IR height \|]
 .RB [\| \-I
@@ -83,6 +85,20 @@ experience.
 This option starts
 .B tvtime
 in 16:9 aspect ratio mode.
+
+.TP
+.B \-D
+This option selects which output driver will be used.  tvtime currently
+supports two output drivers, one is the standard XVIDEO output,
+the other is an experimental DirectFB output driver specific to the
+Matrox G400/G450/G550 TV output on the 2nd head.  Valid options here
+are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@Xv
+\(bu@DirectFB
+.TE
 
 .TP
 .B \-h

@@ -52,7 +52,8 @@ struct config_s
     int fullscreen;
     int priority;
     int ntsc_mode;
-
+    int send_fields;
+    char *output_driver;
     int apply_luma_correction;
     double luma_correction;
 
@@ -175,6 +176,15 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "Verbose" ) ) {
             ct->verbose = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
+            ct->send_fields = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "OutputDriver" ) ) {
+            if( ct->output_driver ) free( ct->output_driver );
+            ct->output_driver = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
@@ -404,7 +414,8 @@ static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-ahkmMsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
-                     "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n", argv[ 0 ] );
+                     "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n"
+                     "\t\t[-D <output_driver>]\n" , argv[ 0 ] );
 
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-h\tShow this help message.\n" );
@@ -432,6 +443,7 @@ static void print_usage( char **argv )
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
+    fprintf( stderr, "\t-D\tThe output driver to use: Xv, DirectFB (defaults to Xv).\n");
 
     fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"
@@ -462,6 +474,8 @@ config_t *config_new( void )
     ct->outputheight = 576;
     ct->inputwidth = 720;
     ct->verbose = 0;
+    ct->send_fields = 0;
+    ct->output_driver = strdup( "xv" );
     ct->aspect = 0;
     ct->debug = 0;
     ct->ntsc_mode = 0;
@@ -589,7 +603,7 @@ config_t *config_new( void )
                 fprintf( stderr, "config: %s is not a directory.\n", 
                          temp_dirname );
             } else {
-	        closedir( temp_dir );
+                closedir( temp_dir );
             }
         }
         /* If the directory already exists, we didn't need to create it. */
@@ -621,7 +635,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'k': ct->slave_mode = 1; break;
@@ -642,6 +656,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         case 'c': ct->prev_channel = ct->start_channel;
                   ct->start_channel = atoi( optarg ); break;
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+        case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
+                  ct->output_driver = strdup( optarg ); break;
         case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
         default:
             print_usage( argv );
@@ -685,6 +701,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         configsave( ct->configsave, "Verbose", tempstring );
 
+        configsave( ct->configsave, "OutputDriver", ct->output_driver );
+
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
         configsave( ct->configsave, "OutputHeight", tempstring );
 
@@ -714,6 +732,7 @@ void config_free_data( config_t *ct )
     if( ct->freq ) free( ct->freq );
     if( ct->ssdir ) free( ct->ssdir );
     if( ct->timeformat ) free( ct->timeformat );
+    if( ct->output_driver ) free( ct->output_driver );
     if( ct->command_pipe_dir ) free( ct->command_pipe_dir );
     if( ct->command_pipe ) free( ct->command_pipe );
     if( ct->rvr_filename ) free( ct->rvr_filename );
@@ -771,6 +790,16 @@ int config_button_to_command( config_t *ct, int button )
 int config_get_verbose( config_t *ct )
 {
     return ct->verbose;
+}
+
+int config_get_send_fields( config_t *ct )
+{
+    return ct->send_fields;
+}
+
+const char *config_get_output_driver( config_t *ct )
+{
+    return ct->output_driver;
 }
 
 int config_get_debug( config_t *ct )
