@@ -1039,7 +1039,11 @@ static void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top
 
 static void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
 {
+#ifdef WORDS_BIGENDIAN
+    uint32_t colour = cr | y << 8 | cb << 16 | y << 24;
+#else
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
+#endif
     uint32_t *o = (uint32_t *) output;
 
     for( width /= 2; width; --width ) {
@@ -1805,7 +1809,7 @@ static void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
                                                           int textcr )
 {
 #ifdef WORDS_BIGENDIAN
-    uint32_t opaque = textcr | (textcb << 8) | (textluma << 16) | 0xff<<24;
+    uint32_t opaque = textcr | (textcb << 8) | (textluma << 16) | (0xff << 24);
 #else
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
 #endif
@@ -1820,7 +1824,7 @@ static void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
 #ifdef WORDS_BIGENDIAN
             *((uint32_t *) output) = multiply_alpha( a, textcr )
                                        | (multiply_alpha( a, textcb ) << 8)
-                                       | (multiply_alpha( a, textluma ) << 16) | a << 24;
+                                       | (multiply_alpha( a, textluma ) << 16) | (a << 24);
 #else
             *((uint32_t *) output) = (multiply_alpha( a, textcr ) << 24)
                                        | (multiply_alpha( a, textcb ) << 16)
@@ -1950,7 +1954,11 @@ static void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
                                                                 int textluma, int textcb,
                                                                 int textcr, int alpha )
 {
+#ifdef WORDS_BIGENDIAN
+    uint32_t opaque = textcr | (textcb << 8) | (textluma << 16) | (0xff << 24);
+#else
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+#endif
     int i;
 
     for( i = 0; i < width; i++ ) {
@@ -1962,14 +1970,27 @@ static void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
            if( a == 0xff ) {
                *((uint32_t *) output) = opaque;
            } else if( input[ 0 ] == 0x00 ) {
+#ifdef WORDS_BIGENDIAN
+               *((uint32_t *) output) = multiply_alpha( a, textcr )
+                                          | (multiply_alpha( a, textcb ) << 8)
+                                          | (multiply_alpha( a, textluma ) << 16) | (a << 24);
+#else
                *((uint32_t *) output) = (multiply_alpha( a, textcr ) << 24)
                                           | (multiply_alpha( a, textcb ) << 16)
                                           | (multiply_alpha( a, textluma ) << 8) | a;
+#endif
            } else if( a ) {
+#ifdef WORDS_BIGENDIAN
+               *((uint32_t *) output) = (input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] ))
+                                         | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 8)
+                                         | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 16)
+                                         | ((a + multiply_alpha( 0xff - a, input[ 0 ] )) << 24);
+#else
                *((uint32_t *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
                                          | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
                                          | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
                                          | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+#endif
            }
         }
         mask++;
@@ -1983,10 +2004,17 @@ static void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, 
     while( width-- ) {
         unsigned int cur_a = input[ 0 ];
 
+#ifdef WORDS_BIGENDIAN
+        *((uint32_t *) output) = multiply_alpha( cur_a, input[ 3 ] )
+                               | (multiply_alpha( cur_a, input[ 2 ] ) << 8)
+                               | (multiply_alpha( cur_a, input[ 1 ] ) << 16)
+                               | (cur_a << 24);
+#else
         *((uint32_t *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
                                | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
                                | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
                                | cur_a;
+#endif
 
         output += 4;
         input += 4;
