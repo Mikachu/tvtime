@@ -49,6 +49,8 @@ struct input_s {
     int console_on;
     console_t *console;
 
+    int slave_mode;
+
     int quit;
 
     int lirc_used;
@@ -58,8 +60,7 @@ struct input_s {
 #endif
 };
 
-input_t *input_new( config_t *cfg, commands_t *com, console_t *con, 
-                    menu_t *menu )
+input_t *input_new( config_t *cfg, commands_t *com, console_t *con, menu_t *menu )
 {
     input_t *in = (input_t *) malloc( sizeof( input_t ) );
 
@@ -76,6 +77,7 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
     in->menu = menu;
     in->console = con;
     in->quit = 0;
+    in->slave_mode = config_get_slave_mode( cfg );
 
     in->lirc_used = 0;
 
@@ -131,32 +133,35 @@ void input_callback( input_t *in, InputEvent command, int arg )
             tvtime_cmd = config_key_to_command( in->cfg, arg );
         }
 
-        if( command == I_KEYDOWN && commands_console_on( in->com ) && 
-            in->console ) {
+        if( command == I_KEYDOWN ) {
+            if( commands_console_on( in->com ) && in->console ) {
+                char blah[2];
+                blah[1] = '\0';
 
-            char blah[2];
-            blah[1] = '\0';
+                if( tvtime_cmd == TVTIME_TOGGLE_CONSOLE ||
+                    tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
+                    tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN )
+                    break;
 
-            if( tvtime_cmd == TVTIME_TOGGLE_CONSOLE ||
-                tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
-                tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN )
-                break;
+                blah[0] = arg & 0xFF;
+                switch( blah[0] ) {
+                case I_ENTER:
+                    blah[0] = '\n';
+                    break;
 
-            blah[0] = arg & 0xFF;
-            switch( blah[0] ) {
-            case I_ENTER:
-                blah[0] = '\n';
-                break;
-                
-            default:
-                if( (arg & I_SHIFT) && isalpha(blah[0]) ) {
-                    blah[0] ^= 0x20;
+                default:
+                    if( (arg & I_SHIFT) && isalpha(blah[0]) ) {
+                        blah[0] ^= 0x20;
+                    }
+                    break;
                 }
-                break;
+                console_pipe_printf( in->console, blah );
+                console_printf( in->console, blah );
+                return;
+            } else if( in->slave_mode ) {
+                fprintf( stderr, "Keypress: %c\n", arg & 0xff );
+                return;
             }
-            console_pipe_printf( in->console, blah );
-            console_printf( in->console, blah );
-            return;
         }
         break;
 
