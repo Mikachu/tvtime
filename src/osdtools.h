@@ -146,6 +146,7 @@ void osd_list_set_timeout( osd_list_t *osdl, int timeout );
 void osd_list_set_hold( osd_list_t *osdl, int hold );
 int osd_list_get_width( osd_list_t *osdl );
 int osd_list_visible( osd_list_t *osdl );
+int osd_list_get_line_pos( osd_list_t *osdl, int y );
 void osd_list_advance_frame( osd_list_t *osdl );
 void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                                             uint8_t *output,

@@ -698,6 +698,15 @@ void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
     }
 }
 
+int tvtime_osd_list_get_line_pos( tvtime_osd_t *osd, int y )
+{
+    int ypos = y - osd->listpos_y;
+
+    if( ypos < 0 ) return 1;
+
+    return osd_list_get_line_pos( osd->list, ypos );
+}
+
 int tvtime_osd_list_get_hilight( tvtime_osd_t *osd )
 {
     return osd_list_get_hilight( osd->list );

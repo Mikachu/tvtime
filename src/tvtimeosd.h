@@ -87,6 +87,7 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message );
 void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist );
 int tvtime_osd_list_get_hilight( tvtime_osd_t *osd );
 int tvtime_osd_list_get_numlines( tvtime_osd_t *osd );
+int tvtime_osd_list_get_line_pos( tvtime_osd_t *osd, int y );
 void tvtime_osd_list_set_hilight( tvtime_osd_t *osd, int pos );
 void tvtime_osd_list_set_text( tvtime_osd_t *osd, int line, const char *text );
 void tvtime_osd_list_set_lines( tvtime_osd_t *osd, int numlines );

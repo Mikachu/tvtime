@@ -121,7 +121,6 @@ enum tvtime_commands
     TVTIME_TOGGLE_COMPATIBLE_NORM,
 
     TVTIME_DISPLAY_MESSAGE,
-    TVTIME_MOUSE_MOVE,
 
     TVTIME_SHOW_MENU,
 
@@ -131,7 +130,10 @@ enum tvtime_commands
     TVTIME_MENU_LEFT,
     TVTIME_MENU_RIGHT,
     TVTIME_MENU_ENTER,
-    TVTIME_MENU_EXIT
+    TVTIME_MENU_EXIT,
+
+    /* This is a 'menu-mode' command, but kinda not. */
+    TVTIME_MOUSE_MOVE
 };
 
 enum framerate_mode

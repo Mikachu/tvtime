@@ -665,6 +665,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
     }
 
     if( in->menuactive ) {
+        int x, y, line;
         switch( tvtime_cmd ) {
         case TVTIME_MENU_EXIT:
             menu_off( in );
@@ -687,6 +688,15 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
                 display_current_menu( in );
             } else {
                 menu_off( in );
+            }
+            break;
+        case TVTIME_MOUSE_MOVE:
+            sscanf( arg, "%d %d", &x, &y );
+            line = tvtime_osd_list_get_line_pos( in->osd, y );
+            if( line > 0 ) {
+                in->curmenupos = (line - 1);
+                if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
+                display_current_menu( in );
             }
             break;
         }

@@ -888,6 +888,21 @@ void osd_list_set_timeout( osd_list_t *osdl, int timeout )
     }
 }
 
+int osd_list_get_line_pos( osd_list_t *osdl, int y )
+{
+    int i;
+
+    for( i = 0; i < osdl->numlines && y >= 0; i++ ) {
+        if( y < osdl->height ) {
+            if( !i ) return 1;
+            return i;
+        }
+        y -= osdl->height;
+    }
+
+    return osdl->numlines - 1;
+}
+
 int osd_list_visible( osd_list_t *osdl )
 {
     return (osdl->numlines > 0 && osd_string_visible( osdl->lines[ 0 ] ));
