@@ -84,6 +84,8 @@ enum tvtime_commands
     TVTIME_SET_FRAMERATE,
     TVTIME_SET_AUDIO_MODE,
     TVTIME_SET_SHARPNESS,
+    TVTIME_SET_MATTE,
+    TVTIME_SET_FREQUENCY_TABLE,
 
     TVTIME_MENUMODE,
     TVTIME_DISPLAY_INFO,
@@ -180,6 +182,7 @@ void commands_add_menu( commands_t *cmd, menu_t *menu );
 menu_t *commands_get_menu( commands_t *cmd, const char *menuname );
 void commands_refresh_menu( commands_t *cmd );
 int commands_menu_active( commands_t *cmd );
+void commands_set_station_mgr( commands_t *cmd, station_mgr_t *mgr );
 
 double commands_get_luma_power( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
@@ -226,6 +229,8 @@ int commands_get_global_brightness( commands_t *cmd );
 int commands_get_global_contrast( commands_t *cmd );
 int commands_get_global_colour( commands_t *cmd );
 int commands_get_global_hue( commands_t *cmd );
+int commands_set_freq_table( commands_t *cmd );
+const char *commands_get_new_freq_table( commands_t *cmd );
 
 #ifdef __cplusplus
 };

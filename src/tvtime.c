@@ -1013,6 +1013,93 @@ static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     tvtime_osd_show_list( osd, 1 );
 }
 
+static void build_matte_menu( menu_t *menu, int mode, int sixteennine )
+{
+    char string[ 128 ];
+
+    if( sixteennine ) {
+        if( mode == 0 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  16:9 + Overscan", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  16:9 + Overscan", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 1, string );
+        menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "16:9" );
+        menu_set_right_command( menu, 1, TVTIME_SET_MATTE, "16:9" );
+        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+        if( mode == 1 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 2, string );
+        menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "1.85:1" );
+        menu_set_right_command( menu, 2, TVTIME_SET_MATTE, "1.85:1" );
+        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
+        if( mode == 2 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "2.35:1" );
+        menu_set_right_command( menu, 3, TVTIME_SET_MATTE, "2.35:1" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
+        if( mode == 3 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  4:3 centre", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  4:3 centre", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
+        menu_set_right_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    } else {
+        if( mode == 0 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  4:3 + Overscan", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  4:3 + Overscan", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 1, string );
+        menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "4:3" );
+        menu_set_right_command( menu, 1, TVTIME_SET_MATTE, "4:3" );
+        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
+        if( mode == 1 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  16:9", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  16:9", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 2, string );
+        menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "16:9" );
+        menu_set_right_command( menu, 2, TVTIME_SET_MATTE, "16:9" );
+        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
+        if( mode == 2 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "1.85:1" );
+        menu_set_right_command( menu, 3, TVTIME_SET_MATTE, "1.85:1" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
+        if( mode == 3 ) {
+            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa5 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "2.35:1" );
+        menu_set_right_command( menu, 4, TVTIME_SET_MATTE, "2.35:1" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    }
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+}
+
 static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
 {
     tvtime_osd_list_set_lines( osd, 5 );
@@ -1883,6 +1970,14 @@ int main( int argc, char **argv )
             }
             tvtime_set_deinterlacer( tvtime, curmethod );
             config_save( ct, "DeinterlaceMethod", curmethod->short_name );
+        }
+        if( commands_set_freq_table( commands ) ) {
+            station_writeconfig( stationmgr );
+            station_delete( stationmgr );
+            stationmgr = station_new( videoinput_get_norm_name( norm ), commands_get_new_freq_table( commands ),
+                                      config_get_ntsc_cable_mode( ct ), verbose );
+            commands_set_station_mgr( commands, stationmgr );
+            config_save( ct, "Frequencies", commands_get_new_freq_table( commands ) );
         }
         if( commands_update_luma_power( commands ) ) {
             videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );

@@ -124,6 +124,7 @@ static command_names_t command_table[] = {
     { "SET_AUDIO_MODE", TVTIME_SET_AUDIO_MODE },
     { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
+    { "SET_FREQUENCY_TABLE", TVTIME_SET_FREQUENCY_TABLE },
     { "SET_NORM", TVTIME_SET_NORM },
     { "SET_SHARPNESS", TVTIME_SET_SHARPNESS },
 
@@ -248,7 +249,9 @@ int tvtime_command_takes_arguments( int command )
 {
     return (command == TVTIME_DISPLAY_MESSAGE || command == TVTIME_SCREENSHOT ||
             command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
-            command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE);
+            command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE ||
+            command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_SHARPNESS ||
+            command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE);
 }
 
 struct commands_s {
@@ -289,6 +292,8 @@ struct commands_s {
     const char *newnorm;
     int newsharpness;
     char deinterlacer[ 128 ];
+    int setfreqtable;
+    char newfreqtable[ 128 ];
 
     int delay;
 
@@ -453,6 +458,148 @@ static void reinit_tuner( commands_t *cmd )
     menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
     menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
     menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+}
+
+static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename )
+{
+    char string[ 128 ];
+
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_NC ) {
+        if( !strcasecmp( tablename, "us-cable" ) ) {
+            sprintf( string, "%c%c%c  US Cable", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  US Cable", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 1, string );
+        menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
+        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
+        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "us-broadcast" ) ) {
+            sprintf( string, "%c%c%c  US Broadcast", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  US Broadcast", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 2, string );
+        menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
+        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
+        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "us-cable100" ) ) {
+            sprintf( string, "%c%c%c  US Cable with channels 100+", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  US Cable with channels 100+", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "us-cable100" );
+        menu_set_right_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "us-cable100" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+    } else if( norm == VIDEOINPUT_NTSC_JP ) {
+        if( !strcasecmp( tablename, "japan-cable" ) ) {
+            sprintf( string, "%c%c%c  Japan Cable", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Japan Cable", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 1, string );
+        menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
+        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
+        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "japan-broadcast" ) ) {
+            sprintf( string, "%c%c%c  Japan Broadcast", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Japan Broadcast", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 2, string );
+        menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "japan-broadcast" );
+        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "japan-broadcast" );
+        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+        menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+    } else {
+        if( !strcasecmp( tablename, "europe" ) ) {
+            sprintf( string, "%c%c%c  Europe", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Europe", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 1, string );
+        menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "europe" );
+        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "europe" );
+        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "russia" ) ) {
+            sprintf( string, "%c%c%c  Russia", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Russia", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 2, string );
+        menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "russia" );
+        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "russia" );
+        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "france" ) ) {
+            sprintf( string, "%c%c%c  France", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  France", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 3, string );
+        menu_set_enter_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "france" );
+        menu_set_right_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "france" );
+        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "australia" ) ) {
+            sprintf( string, "%c%c%c  Australia", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Australia", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 4, string );
+        menu_set_enter_command( menu, 4, TVTIME_SET_FREQUENCY_TABLE, "australia" );
+        menu_set_right_command( menu, 4, TVTIME_SET_FREQUENCY_TABLE, "australia" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "australia-optus" ) ) {
+            sprintf( string, "%c%c%c  Australia (Optus)", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Australia (Optus)", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SET_FREQUENCY_TABLE, "australia-optus" );
+        menu_set_right_command( menu, 5, TVTIME_SET_FREQUENCY_TABLE, "australia-optus" );
+        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "newzealand" ) ) {
+            sprintf( string, "%c%c%c  New Zealand", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  New Zealand", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 6, string );
+        menu_set_enter_command( menu, 6, TVTIME_SET_FREQUENCY_TABLE, "newzealand" );
+        menu_set_right_command( menu, 6, TVTIME_SET_FREQUENCY_TABLE, "newzealand" );
+        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "china-broadcast" ) ) {
+            sprintf( string, "%c%c%c  China Broadcast", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  China Broadcast", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 7, string );
+        menu_set_enter_command( menu, 7, TVTIME_SET_FREQUENCY_TABLE, "china-broadcast" );
+        menu_set_right_command( menu, 7, TVTIME_SET_FREQUENCY_TABLE, "china-broadcast" );
+        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "stations" );
+        if( !strcasecmp( tablename, "custom" ) ) {
+            sprintf( string, "%c%c%c  Custom (first run tvtime-scanner)", 0xee, 0x80, 0xa5 );
+        } else {
+            sprintf( string, "%c%c%c  Custom (first run tvtime-scanner)", 0xee, 0x80, 0xa4 );
+        }
+        menu_set_text( menu, 8, string );
+        menu_set_enter_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "custom" );
+        menu_set_right_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "custom" );
+        menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "stations" );
+        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        menu_set_text( menu, 9, string );
+        menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+        menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+        menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+    }
 }
 
 static void reset_sharpness_menu( menu_t *menu, int sharpness )
@@ -748,6 +895,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->restarttvtime = 0;
     cmd->setdeinterlacer = 0;
     cmd->newsharpness = 0;
+    cmd->setfreqtable = 0;
     cmd->brightness = config_get_global_brightness( cfg );
     cmd->contrast = config_get_global_contrast( cfg );
     cmd->colour = config_get_global_colour( cfg );
@@ -902,11 +1050,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 8, string );
+    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-general" );
@@ -943,11 +1096,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-palsecam" );
@@ -989,12 +1147,25 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 8, string );
+    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
+
+    menu = menu_new( "frequencies" );
+    menu_set_text( menu, 0, "Setup - Station management - Frequency table" );
+    commands_add_menu( cmd, menu );
+    if( vidin ) {
+        reset_frequency_menu( commands_get_menu( cmd, "frequencies" ),
+                              videoinput_get_norm( vidin ), config_get_v4l_freq( cfg ) );
+    }
 
     menu = menu_new( "finetune" );
     menu_set_text( menu, 0, "Setup - Station management - Finetune" );
@@ -1032,7 +1203,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0x9f );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
@@ -1067,7 +1238,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0x9f );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
@@ -1668,6 +1839,12 @@ void commands_add_menu( commands_t *cmd, menu_t *menu )
     }
 }
 
+void commands_set_station_mgr( commands_t *cmd, station_mgr_t *mgr )
+{
+    cmd->stationmgr = mgr;
+    reinit_tuner( cmd );
+}
+
 void commands_clear_menu_positions( commands_t *cmd )
 {
     int i;
@@ -1821,6 +1998,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_SET_DEINTERLACER:
         cmd->setdeinterlacer = 1;
         snprintf( cmd->deinterlacer, sizeof( cmd->deinterlacer ), "%s", arg );
+        break;
+
+    case TVTIME_SET_FREQUENCY_TABLE:
+        cmd->setfreqtable = 1;
+        snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", arg );
+        if( cmd->vidin ) {
+            reset_frequency_menu( commands_get_menu( cmd, "frequencies" ),
+                                  videoinput_get_norm( cmd->vidin ), cmd->newfreqtable );
+            commands_refresh_menu( cmd );
+        }
         break;
 
     case TVTIME_SET_FRAMERATE:
@@ -2679,6 +2866,7 @@ void commands_next_frame( commands_t *cmd )
     cmd->update_luma = 0;
     cmd->resizewindow = 0;
     cmd->setdeinterlacer = 0;
+    cmd->setfreqtable = 0;
 }
 
 int commands_quit( commands_t *cmd )
@@ -2866,4 +3054,13 @@ int commands_get_global_hue( commands_t *cmd )
     return cmd->hue;
 }
 
+int commands_set_freq_table( commands_t *cmd )
+{
+    return cmd->setfreqtable;
+}
+
+const char *commands_get_new_freq_table( commands_t *cmd )
+{
+    return cmd->newfreqtable;
+}
 
