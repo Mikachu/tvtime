@@ -79,8 +79,7 @@
 enum {
     PULLDOWN_NONE = 0,
     PULLDOWN_VEKTOR = 1,
-    PULLDOWN_DALIAS = 2,
-    PULLDOWN_MAX = 3,
+    PULLDOWN_MAX = 2,
 };
 static unsigned int pulldown_alg = 0;
 
@@ -299,11 +298,6 @@ static int filmmode = 0;
 static int last_topdiff = 0;
 static int last_botdiff = 0;
 
-static int pulldown_merge = 0;
-static int pulldown_copy = 0;
-static int did_copy_top = 0;
-static int last_fieldcount = 0;
-
 static void calculate_pulldown_score_vektor( uint8_t *curframe,
                                              uint8_t *lastframe,
                                              int instride,
@@ -428,80 +422,6 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             return;
         }
     }
-
-    if( pulldown_alg == PULLDOWN_DALIAS ) {
-#if 0
-        // rewrite this
-        if( osd ) tvtime_osd_set_film_mode( osd, 0 );
-
-        last_fieldcount++;
-
-        if( !bottom_field ) {
-            static pulldown_metrics_t old_peak;
-            static pulldown_metrics_t old_rel;
-            static pulldown_metrics_t old_mean;
-            static int drop_next = 0;
-            pulldown_metrics_t new_peak, new_rel, new_mean;
-            int drop_cur = 0;
-
-            diff_factor_packed422_frame( &new_peak, &new_rel, &new_mean, lastframe, curframe,
-                                         width, frame_height, width*2, width*2 );
-            /*
-            fprintf( stderr, "stats: pd=%d re=%d ro=%d rt=%d rs=%d rp=%d rd=%d\n",
-                    new_peak.d, new_rel.e, new_rel.o, new_rel.t, new_rel.s, new_rel.p, new_rel.d );
-            */
-
-            if( drop_next ) {
-                do_pulldown_action( output, lastframe, lastframe + instride, curframe,
-                                    osd, con, vs, !bottom_field, width,
-                                    frame_height, instride*2, outstride, PULLDOWN_ACTION_PREV_NEXT );
-                drop_next = 0;
-                drop_cur = 1;
-                pulldown_copy = 2;
-            } else {
-                switch( determine_pulldown_offset_dalias( &old_peak, &old_rel, &old_mean,
-                                                          &new_peak, &new_rel, &new_mean ) ) {
-                    case PULLDOWN_ACTION_PREV_NEXT: drop_next = 1; pulldown_merge = 1; break;
-                    default: break;
-                }
-            }
-            old_peak = new_peak;
-            old_rel = new_rel;
-            old_mean = new_mean;
-            if( !drop_next && !drop_cur && pulldown_copy ) {
-                // Copy.
-                tvtime_do_pulldown_action( output, lastframe, curframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_NEXT_PREV );
-                pulldown_copy--;
-                did_copy_top = 1;
-                // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
-            }
-        } else if( pulldown_merge ) {
-            // Merge.
-            tvtime_do_pulldown_action( output, curframe, lastframe,
-                                       osd, con, vs, bottom_field, width,
-                                       frame_height, instride, outstride,
-                                       PULLDOWN_ACTION_MRGE3 );
-            pulldown_merge = 0;
-            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
-        } else if( !pulldown_copy ) {
-            // Copy.
-            if( did_copy_top ) {
-                did_copy_top = 0;
-            } else {
-                tvtime_do_pulldown_action( output, lastframe, curframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_COPY4 );
-                // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
-            }
-        }
-        return;
-#endif
-    }
-
 
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
@@ -1459,8 +1379,6 @@ int main( int argc, char **argv )
                     tvtime_osd_show_message( osd, "Pulldown detection disabled." );
                 } else if( pulldown_alg == PULLDOWN_VEKTOR ) {
                     tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
-                } else if( pulldown_alg == PULLDOWN_DALIAS ) {
-                    tvtime_osd_show_message( osd, "Using dalias's pulldown detection." );
                 }
             }
         }
