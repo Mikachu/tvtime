@@ -48,6 +48,16 @@ begin
     config = DISPLAY_INFO
     repeat = 1
 end
+begin                                                                                                          
+    prog = tvtime                                                                                              
+    button = FULLSCREEN                                                                                        
+    config = TOGGLE_FULLSCREEN                                                                                 
+end                                                                                                            
+begin                                                                                                          
+    prog = tvtime                                                                                              
+    button = CC                                                                                                
+    config = TOGGLE_CC                                                                                         
+end                                                                                                            
 
 begin
     prog = tvtime
