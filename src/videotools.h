@@ -86,6 +86,8 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
                                                        unsigned char *background,
                                                        unsigned char *foreground,
                                                        int width, int alpha );
+void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
+                                   unsigned char *src2, int width, int pos );
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );
 void cheap_packed422_to_packed444_scanline( unsigned char *output,

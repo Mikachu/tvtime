@@ -47,11 +47,17 @@
 #include "taglines.h"
 #include "xvoutput.h"
 
+/* Number of frames to pause after channel change. */
+#define CHANNEL_ACTIVE_DELAY 2
+
 /**
  * Current deinterlacing method.
  */
 static deinterlace_method_t *curmethod;
 static int curmethodid;
+
+static int fadepos = 0;
+static double fadespeed = 65.0;
 
 static void build_colourbars( unsigned char *output, int width, int height )
 {
@@ -67,6 +73,38 @@ static void build_colourbars( unsigned char *output, int width, int height )
     }
 
     free( cb444 );
+}
+
+static void save_last_frame( unsigned char *saveframe, unsigned char *curframe,
+                             int width, int height, int savestride, int curstride )
+{
+    height /= 2;
+    height--;
+    while( height-- ) {
+        blit_packed422_scanline( saveframe, curframe, width );
+        saveframe += savestride;
+        interpolate_packed422_scanline( saveframe, curframe, curframe + (curstride*2), width );
+        saveframe += savestride;
+        curframe += (curstride*2);
+    }
+    blit_packed422_scanline( saveframe, curframe, width );
+    saveframe += savestride;
+    blit_packed422_scanline( saveframe, curframe, width );
+    saveframe += savestride;
+}
+
+static void crossfade_frame( unsigned char *output,
+                             unsigned char *src1,
+                             unsigned char *src2,
+                             int width, int height, int outstride,
+                             int src1stride, int src2stride, int pos )
+{
+    while( height-- ) {
+        crossfade_packed422_scanline( output, src1, src2, width, pos );
+        output += outstride;
+        src1 += src1stride;
+        src2 += src2stride;
+    }
 }
 
 static void pngscreenshot( const char *filename, unsigned char *frame422,
@@ -333,6 +371,8 @@ int main( int argc, char **argv )
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
+    unsigned char *saveframe = 0;
+    unsigned char *fadeframe = 0;
     const char *tagline;
     int lastframeid;
     int secondlastframeid;
@@ -341,6 +381,7 @@ int main( int argc, char **argv )
     menu_t *menu;
     output_api_t *output;
     performance_t *perf;
+    int washold = 0;
 
     setup_speedy_calls();
 
@@ -448,11 +489,14 @@ int main( int argc, char **argv )
 
     /* Build colourbars. */
     colourbars = (unsigned char *) malloc( width * height * 2 );
-    if( !colourbars ) {
-        fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
+    saveframe = (unsigned char *) malloc( width * height * 2 );
+    fadeframe = (unsigned char *) malloc( width * height * 2 );
+    if( !colourbars || !saveframe || !fadeframe ) {
+        fprintf( stderr, "tvtime: Can't allocate extra frame storage memory.\n" );
         return 1;
     }
     build_colourbars( colourbars, width, height );
+    blit_packed422_scanline( saveframe, colourbars, width*height );
 
 
     /* Setup OSD stuff. */
@@ -620,11 +664,28 @@ int main( int argc, char **argv )
         /* Aquire the next frame. */
         if( !videohold && videoinput_freq_present( vidin ) ) {
             curframe = videoinput_next_frame( vidin, &curframeid );
+            if( washold ) {
+                secondlastframe = lastframe = curframe = saveframe;
+                washold--;
+            }
             aquired = 1;
         } else {
-            curframe = colourbars;
-            lastframe = colourbars;
-            secondlastframe = colourbars;
+            if( !videohold ) {
+                if( fadepos < 256 ) {
+                    crossfade_frame( fadeframe, saveframe, colourbars, width,
+                                     height, width*2, width*2, width*2, fadepos );
+                    fadepos += fadespeed;
+                    secondlastframe = lastframe = curframe = fadeframe;
+                } else if( fadepos > 256 && fadepos != 256 ) {
+                    secondlastframe = lastframe = curframe = colourbars;
+                    fadepos = 256;
+                }
+            } else {
+                save_last_frame( saveframe, curframe, width, height, width*2, width*2 );
+                secondlastframe = lastframe = curframe = saveframe;
+                washold = CHANNEL_ACTIVE_DELAY;
+                fadepos = 0;
+            }
             usleep( 20 );
         }
         performance_checkpoint_aquired_input_frame( perf );
@@ -705,7 +766,7 @@ int main( int argc, char **argv )
             performance_checkpoint_delayed_blit_top_field( perf );
 
             performance_checkpoint_blit_top_field_start( perf );
-            if( !videohold ) output->show_frame();
+            output->show_frame();
             performance_checkpoint_blit_top_field_end( perf );
         }
 
@@ -779,7 +840,7 @@ int main( int argc, char **argv )
 
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
-            if( !videohold ) output->show_frame();
+            output->show_frame();
             performance_checkpoint_blit_bot_field_end( perf );
         }
 

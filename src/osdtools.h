@@ -54,6 +54,7 @@ int osd_string_get_width( osd_string_t *osds );
 int osd_string_get_height( osd_string_t *osds );
 void osd_string_set_timeout( osd_string_t *osds, int timeout );
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
+void osd_string_set_colour_rgb( osd_string_t *osds, int r, int g, int b );
 void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma,
                                    int cb, int cr );

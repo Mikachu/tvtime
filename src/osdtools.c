@@ -115,6 +115,19 @@ void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr )
     osds->text_cr = cr;
 }
 
+void osd_string_set_colour_rgb( osd_string_t *osds, int r, int g, int b )
+{
+    unsigned char rgb[ 3 ];
+    unsigned char ycbcr[ 3 ];
+
+    rgb[ 0 ] = r; rgb[ 1 ] = g; rgb[ 2 ] = b;
+    rgb24_to_packed444_rec601_scanline( ycbcr, rgb, 1 );
+
+    osds->text_luma = ycbcr[ 0 ];
+    osds->text_cb = ycbcr[ 1 ];
+    osds->text_cr = ycbcr[ 2 ];
+}
+
 void osd_string_show_border( osd_string_t *osds, int show_border )
 {
     osds->show_border = show_border;

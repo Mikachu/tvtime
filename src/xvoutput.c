@@ -387,11 +387,13 @@ int xv_toggle_aspect( void )
 
 void xv_show_frame( void )
 {
+    XLockDisplay( display );
     XvShmPutImage( display, xv_port, window, gc, image,
                    0, 0, input_width, input_height,
                    video_area.x, video_area.y,
                    video_area.width, video_area.height, False );
     XFlush( display );
+    XUnlockDisplay( display );
 }
 
 void xv_poll_events( input_t *in )
@@ -531,6 +533,8 @@ void xv_unlock_output( void )
 
 void xv_set_window_caption( const char *caption )
 {
+    XStoreName( display, window, caption );
+    XSetIconName( display, window, caption );
 }
 
 unsigned char *xv_get_output( void )

@@ -133,6 +133,21 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
     }
 }
 
+void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
+                                   unsigned char *src2, int width, int pos )
+{
+    if( pos == 0 ) {
+        blit_packed422_scanline( output, src1, width );
+    } else if( pos == 256 ) {
+        blit_packed422_scanline( output, src2, width );
+    } else {
+        width *= 2;
+        while( width-- ) {
+            *output++ = ( (*src1++ * ( 256 - pos )) + (*src2++ * pos) + 0x80 ) >> 8;
+        }
+    }
+}
+
 void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width )
 {
     while( width-- ) {

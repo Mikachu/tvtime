@@ -76,20 +76,31 @@ if test "$DIRECTFB_CONFIG" != "no" ; then
 fi
 
 dnl ---------------------------------------------
-dnl XF86VidModeExtension
+dnl check for X11, Xv and XF86VidModeExtension
 dnl ---------------------------------------------
-dnl Test for vidmode
-dnl AC_ARG_WITH(xf86vm-path,[  --with-xf86vm-path=path    Where libXxf86vm is installed],
-dnl            xv_path="$withval", xv_path="/usr/X11R6/lib")
-AC_CHECK_LIB(Xxf86vm, XF86VidModeGetModeLine,
-        [ have_vidmode=yes
-          VIDMODE_LIBS="-L/usr/X11R6/lib -lX11 -lXext -lXxf86vm"],,-L/usr/X11R6/lib -lX11 -lXext -lXxf86vm)
-if test x"$have_vidmode" = x"yes" ; then
-  AC_DEFINE([HAVE_VIDMODE],,[Define this to include XF86VidModeExtension support])
-fi
-AM_CONDITIONAL(HAVE_VIDMODE, [test x"$have_vidmode" = x"yes"])
-AC_SUBST(VIDMODE_LIBS)
+AC_PATH_XTRA
+if test x"$no_x" != x"yes"; then
+    dnl check for Xshm
+    AC_CHECK_LIB([Xext],[XShmCreateImage],
+	[AC_DEFINE([HAVE_X11],,[X11 support])
+	X11_CFLAGS="$X_CFLAGS"
+	X11_LIBS="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext"
 
+	dnl check for Xv
+	AC_CHECK_LIB([Xv],[XvShmCreateImage],
+	    [AC_DEFINE([HAVE_XV],,[Xv support])
+	    X11_LIBS="$X11_LIBS -lXv"],,
+	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
+
+	dnl check for Xvmode
+	AC_CHECK_LIB([Xxf86vm],[XF86VidModeGetModeLine],
+	    [AC_DEFINE([HAVE_XF86VIDMODE],,[XF86VidModeExtension support])
+	    X11_LIBS="$X11_LIBS -lXxf86vm"],,
+	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])],,
+	[$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS])
+fi
+AC_SUBST(X11_CFLAGS)
+AC_SUBST(X11_LIBS)
 
 AC_ARG_ENABLE([warnings],
     [  --disable-warnings      do not treat warnings as errors])

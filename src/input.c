@@ -30,7 +30,7 @@
 #define CHANNEL_DELAY 100
 
 /* Number of frames to pause during channel change. */
-#define CHANNEL_HOLD 0
+#define CHANNEL_HOLD 1
 
 
 struct input_s {

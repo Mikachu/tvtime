@@ -1,11 +1,35 @@
 
+0.9.6
+  * (bitstream) Added support for muting of the TV card instead of muting
+    the master mixer volume: MuteTVCard option in the tvtimerc (bug 633222)
+  * (rascasse) Added a man page for the tvtimerc file to the docs directory
+    (still not installed, part of bug 633042)
+  * (rascasse) Added an RPM spec file to the docs directory
+  * (vektor) Added a hack/fix for a resize loop that was occuring.  If
+    you resized the window it would start wildly resizing itself for a
+    while.  Seems to not happen anymore here.
+  * (vektor) Added support for fine tuning of channels (bug 630598)
+  * (vektor) Improved the warning messages for tuners that are silly, this
+    makes the warnings less offensive for saa7134 users (bug 633039)
+  * (bitstream) OSD clock updates while on screen (bug 628186)
+  * (diz) Postscript code for credits listing
+  * (vektor) Added credits listing, updated the credits
+  * (bitstream) Support for multiple key bindings (bug 633043)
+  * (vektor) Tuner code does not search for a channel with an active
+    frequency anymore, solving some hangs on systems where channels are
+    sparse (bug 629275)
+  * (bitstream) Whitespace ignored at end of config file options (bug 633048)
+  * (vektor) Spelling updates in the defaults.tvtimerc file (bug 634068)
+  * (bitstream) Mouse button support in the config file, wheel buttons default
+    to channel up/down
+
 0.9.5 - Sat Nov  2 19:55:45 AST 2002
   * (vektor) Cleanup of the /dev/rtc handling, can still use /dev/rtc even if
-    we can't get high resolution timing from it.
+    we can't get high resolution timing from it
   * (vektor) Smoothness improvement, frames are now scheduled at
-    more correct times.  Added a performance tracker object.
-  * (vektor) Removed the force-DScaler-defaults on startup for V4L settings.
-  * (vektor) Improved OSD display to show more information more consistently.
+    more correct times.  Added a performance tracker object
+  * (vektor) Removed the force-DScaler-defaults on startup for V4L settings
+  * (vektor) Improved OSD display to show more information more consistently
   * (vektor) Added a poor configure check for freetype2, this should
-    be improved in the future.
+    be improved in the future
 

@@ -332,17 +332,17 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
 
 void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned char *src, int width )
 {
-    mmx2_memcpy( dest, src, width*2 );
+    if( dest != src ) mmx2_memcpy( dest, src, width*2 );
 }
 
 void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width )
 {
-    __memcpy( dest, src, width*2 );
+    if( dest != src ) __memcpy( dest, src, width*2 );
 }
 
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width )
 {
-    memcpy( dest, src, width*2 );
+    if( dest != src ) memcpy( dest, src, width*2 );
 }
 
 void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,

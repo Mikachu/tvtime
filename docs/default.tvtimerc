@@ -163,6 +163,7 @@ key_colour_down            = F7
 key_colour_up              = F8
 key_tv_video               = F9
 key_show_bars              = F11
+key_show_credits           = F12
 key_debug                  = d
 key_fullscreen             = f
 key_aspect                 = a

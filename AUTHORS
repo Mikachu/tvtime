@@ -11,6 +11,8 @@ Authors and contributors
   David I. Lehn <dlehn@users.sourceforge.net>
     - autoconf setup, taken from his autoconf'ing of movietime
 
+  Paul Jara <rascasse@users.sourceforge.net>
+    - man pages and the RPM spec file
 
 Code we stole (well, used under the GPL)
 
@@ -34,16 +36,17 @@ Code we stole (well, used under the GPL)
     Taken from lavtools under the mjpegtools project:
     http://mjpegtools.sourceforge.net/
 
-  mmx.h and friends from libmpeg2
+  mmx.h and friends, and some X-related configure macros, from libmpeg2
     http://libmpeg2.sourceforge.net/
-    I think walken is the current maintainer of this gorgeous set of
-    #defines for doing MMX programming cleanly under gcc.  I am
-    constantly in awe at how great these are to use.
+    walken rewrote mmx.h based on the originals (c) 1999-2002 R. Fisher.
+    The style is awesome and they're really great to use.
+    I also got some help with my Xv code from walken's xv module in
+    libmpeg2.
 
-  fastmemcpy stolen from xine
+  Some Xv output code help, and fastmemcpy stolen from xine
     http://xine.sourceforge.net/
-    They got it apparently from mplayer.  I took their version because
-    I happened to have it around.  I have not done my own performance
+    They apparently got the fastmemcpy from mplayer.  I took their version
+    because I happened to have it around.  I have not done my own performance
     tests yet.
 
   Mixer routines stolen from mplayer
@@ -56,4 +59,20 @@ Code we stole (well, used under the GPL)
   Lots of help with the V4L API, bttv-specific features, and tuner dealings
   from the source of video4linux information, xawtv, by Gerd Knorr:
     http://bytesex.org/xawtv/
+
+  Univeral tuner frequency tables from Nathan Laredo's tvset
+    http://linuxtv.openprojects.net/
+
+  Postscript credit renderer by Nathan Laredo <laredo@gnu.org>
+    http://postscriptcode.com/
+
+  Xv code, and other X code in general, taken from tvset and playdvd,
+  both by Nathan Laredo.
+
+  X fullscreen code and some other X/Xinerama/XF86VidMode code from ogle,
+  a video player:
+    http://www.dtek.chalmers.se/~dvd/
+    Bjorn is the X master, lots of help from him, and thanks to hh for
+    being so cool.
+    The code is Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort.
 
