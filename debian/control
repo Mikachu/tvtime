@@ -1,27 +1,29 @@
 Source: tvtime
 Section: x11
 Priority: optional
-Maintainer: Bart Dorsey <echo@thebucket.org>
-Build-Depends: debhelper (>> 3.0.0), zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev
-Standards-Version: 3.5.2
+Maintainer: Simon Law <sfllaw@debian.org>
+Build-Depends: debhelper (>> 3.0.0), libc6-dev, zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev, liblircclient-dev
+Standards-Version: 3.5.9
 
 Package: tvtime
 Architecture: any
-Depends: ${shlibs:Depends}
-Description: high quality television application
- tvtime is a high quality television application for use with 
- video capture cards. tvtime processes the input from a 
- capture card and displays it on a computer monitor or 
- projector.
+Depends: ${shlibs:Depends}, ttf-freefont
+Description: A high quality television application
+ tvtime is a high quality television application for use with video 
+ capture cards.  tvtime processes the input from a capture card and 
+ displays it on a computer monitor or projector.  Unlike other 
+ television applications, tvtime focuses on high visual quality making 
+ it ideal for videophiles.
+ .
  tvtime supports:
-  * Deinterlaced output at full interlaced rate of 59.94 
-    frames per second for NTSC source, or 50 frames per 
-    second for PAL sources. This gives smoothness of motion 
-    and high visual quality.
-  * Multiple deinterlacing algorithms for finding the optimal 
-    mode for the video content and available processor speed.
-  * 16:9 aspect ratio mode for the highest available resolution 
-    when processing input from an external DVD player or digital 
-    satellite receiver.
-  * A super-slick on-screen-display for the complete television experience. 
-
+  * Deinterlaced output at a full interlaced rate of 59.94 frames per second 
+    for NTSC source, or 50 frames per second for PAL sources.  This gives 
+    smoothness of motion and high visual quality.
+  * Multiple deinterlacing algoritms for finding the optimal mode for the 
+    video content and available processor speed.
+  * 16:9 aspect ratio mode for the highest available resolution when 
+    processing input from an external DVD player or digital satellite 
+    receiver.
+  * A super-slick on-screen-display for the complete television experience.
+  * 2-3 Pulldown detection for optimal quality viewing of film content
+    from NTSC sources.

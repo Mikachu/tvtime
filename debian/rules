@@ -1,5 +1,23 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
+#
+# debian/rules file for tvtime.
+# Copyright (C) 2003  Billy Biggs
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# 
+# Based on the sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 
 # Uncomment this to turn on verbose mode.
@@ -24,8 +42,12 @@ endif
 config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-
+	./configure --host=$(DEB_HOST_GNU_TYPE)       \
+	            --build=$(DEB_BUILD_GNU_TYPE)     \
+		    --prefix=/usr                     \
+		    --mandir=\$${prefix}/share/man    \
+		    --infodir=\$${prefix}/share/info  \
+		    --with-fifogroup=video
 
 build: build-stamp
 
@@ -33,7 +55,7 @@ build-stamp:  config.status
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE)
+	$(MAKE) FREEFONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont/\""'
 	#/usr/bin/docbook-to-man debian/tvtime.sgml > tvtime.1
 
 	touch build-stamp
@@ -50,7 +72,6 @@ clean:
 	-test -r /usr/share/misc/config.guess && \
 	  cp -f /usr/share/misc/config.guess config.guess
 
-
 	dh_clean
 
 install: build
@@ -60,7 +81,11 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tvtime.
-	$(MAKE) install prefix=$(CURDIR)/debian/tvtime/usr
+	$(MAKE) install prefix=$(CURDIR)/debian/tvtime/usr       \
+	                sysconfdir=$(CURDIR)/debian/tvtime/etc   \
+			localstatedir=$(CURDIR)/debian/tvtime/var
+	# Remove the extra TTFs.
+	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/*.ttf
 
 
 # Build architecture-independent files here.
@@ -80,10 +105,9 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installmime
 #	dh_installinit
-	dh_installcron
+#	dh_installcron
 	dh_installman
-	dh_installinfo
-	dh_undocumented
+#	dh_installinfo
 	dh_installchangelogs ChangeLog
 	dh_link
 	dh_strip

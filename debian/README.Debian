@@ -1,0 +1,20 @@
+tvtime
+======
+
+This is the official Debian package for tvtime.
+
+   tvtime's source package is rather large, since it incorporates the 
+Free UCS Outline Fonts [1], and also the DScaler [2] filters.  The 
+Debian package does not install the Free UCS Outline Fonts, but rather 
+depends on the ttf-freefont package.  As such, the debian/rules script 
+uses the FREEFONT_CFLAGS variable in src/Makefile.am to convince
+tvtime to look in the right place.
+
+  The DScaler filters must be installed.  However, they cannot be 
+built from source on this platform.  You will find the required 
+copyright information in /usr/share/doc/tvtime/copyright.gz.
+
+[1]  http://savannah.nongnu.org/projects/freefont/
+[2]  http://deinterlace.sourceforge.net/
+
+ -- Simon Law <sfllaw@debian.org>  Wed, 30 Apr 2003 00:31:00 -0400
