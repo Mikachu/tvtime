@@ -399,6 +399,42 @@ static void reset_stations_menu( menu_t *menu, int ntsc, int pal, int secam,
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "root" );
 }
 
+static void reset_xmltv_languages_menu( menu_t *menu, xmltv_t *xmltv )
+{
+    int num = xmltv_get_num_languages( xmltv );
+    const char *cur = xmltv_get_language( xmltv );
+    char string[ 128 ];
+    int i;
+
+    menu_reset_num_lines( menu );
+    menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
+    menu_set_text( menu, 1, _("Default language") );
+    menu_set_enter_command( menu, 1, TVTIME_SET_XMLTV_LANGUAGE, "none" );
+
+    for( i = 1; i <= num; i++ ) {
+        const char *code = xmltv_get_language_code( xmltv, i );
+        const char *name = xmltv_get_language_name( xmltv, i );
+        const char *radio;
+
+        if( cur && code && !strncasecmp( cur, code, 2 ) ) {
+            radio = TVTIME_ICON_RADIOON;
+        } else {
+            radio = TVTIME_ICON_RADIOOFF;
+        }
+
+        snprintf( string, sizeof( string ), "%s  %s (%s)",
+                  radio, name? name : _("Unknown language"), code );
+        menu_set_text( menu, i + 1, string );
+        menu_set_enter_command( menu, i + 1,
+                                TVTIME_SET_XMLTV_LANGUAGE, code );
+    }
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
+              _("Back") );
+    menu_set_text( menu, num + 2, string );
+    menu_set_enter_command( menu, num + 2, TVTIME_MENU_EXIT, 0 );
+}
+
 static void reinit_tuner( commands_t *cmd )
 {
     /* Setup the tuner if available. */
@@ -1695,6 +1731,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                         TVTIME_ICON_HUE);
     }
 
+    menu = menu_new( "xmltv-language" );
+    snprintf( string, sizeof( string ), "%s",
+              _("Preferred XMLTV language") );
+    menu_set_text( menu, 0, string );
+    commands_add_menu( cmd, menu );
+    reset_xmltv_languages_menu( menu, cmd->xmltv );
+
     reinit_tuner( cmd );
 
     return cmd;
@@ -1977,7 +2020,7 @@ static void osd_list_xmltv_languages( tvtime_osd_t *osd, commands_t *cmd )
         const char *code = xmltv_get_language_code( cmd->xmltv, i );
         const char *name = xmltv_get_language_name( cmd->xmltv, i );
         snprintf( string, sizeof( string ), "%s (%s)",
-                  code, name? name : _("Unknown language") );
+                  name? name : _("Unknown language"), code );
         tvtime_osd_list_set_text( osd, i + 1, string );
         if( cur && code && !strncasecmp( cur, code, 2 ) ) {
             tvtime_osd_list_set_hilight( osd, i + 1 );
@@ -2361,6 +2404,45 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                       _("Television standard will be %s on restart."),
                       cmd->newnorm );
             tvtime_osd_show_message( cmd->osd, message );
+        }
+        break;
+
+    case TVTIME_SET_XMLTV_LANGUAGE:
+        if( arg ) {
+            if( isdigit( arg[ 0 ] ) ) {
+                xmltv_select_language( cmd->xmltv, atoi( arg ) );
+            } else if( !strcasecmp( arg, "none" ) ) {
+                xmltv_set_language( cmd->xmltv, 0 );
+            } else {
+                xmltv_set_language( cmd->xmltv, arg );
+            }
+            update_xmltv_listings( cmd );
+
+            if( cmd->osd ) {
+                char message[ 128 ];
+                menu_t *langmenu = commands_get_menu( cmd, "xmltv-language" );
+                int i = xmltv_get_langnum( cmd->xmltv );
+                const char *code = xmltv_get_language_code( cmd->xmltv, i );
+                const char *name = xmltv_get_language_name( cmd->xmltv, i );
+
+                reset_xmltv_languages_menu( langmenu, cmd->xmltv );
+                commands_refresh_menu( cmd );
+                if( !code ) {
+                    snprintf( message, sizeof( message ),
+                              _("Using default language for XMLTV data.") );
+                } else if( !name ) {
+                    snprintf( message, sizeof( message ),
+                              _("Using unknown language (%s) for XMLTV data."),
+                              code );
+                } else {
+                    snprintf( message, sizeof( message ),
+                              _("XMLTV language set to %s (%s)."),
+                              name, code );
+                }
+                tvtime_osd_show_message( cmd->osd, message );
+            }
+
+            config_save( cmd->cfg, "XMLTVLanguage", arg );
         }
         break;
 
@@ -3236,7 +3318,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             int i = xmltv_get_langnum( cmd->xmltv ) + 1;
             if( i > xmltv_get_num_languages( cmd->xmltv ) ) i = 0;
             xmltv_select_language( cmd->xmltv, i );
-            xmltv_refresh( cmd->xmltv );
+            update_xmltv_listings( cmd );
+            if( cmd->osd ) {
+                menu_t *langmenu = commands_get_menu( cmd, "xmltv-language" );
+                reset_xmltv_languages_menu( langmenu, cmd->xmltv );
+                if( !cmd->menuactive ) {
+                    osd_list_xmltv_languages( cmd->osd, cmd );
+                } else {
+                    commands_refresh_menu( cmd );
+                }
+            }
             if( cmd->osd && !cmd->menuactive ) {
                 osd_list_xmltv_languages( cmd->osd, cmd );
             }

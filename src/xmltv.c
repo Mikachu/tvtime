@@ -748,6 +748,7 @@ const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
 void xmltv_set_language( xmltv_t *xmltv, const char *locale )
 {
     language_t *l;
+    xmltv->refresh = 1;
     if( !locale ) {
         xmltv->locale = 0;
         return;
@@ -771,6 +772,7 @@ void xmltv_select_language( xmltv_t *xmltv, int n )
 {
     int i;
     if( n > xmltv->num_languages ) return;
+    xmltv->refresh = 1;
     if( n == 0 ) {
         xmltv->locale = 0;
         return;

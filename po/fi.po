@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-08-27 08:53-0400\n"
+"POT-Creation-Date: 2004-08-31 03:24+0200\n"
 "PO-Revision-Date: 2004-02-15 05:12+0200\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
@@ -14,19 +14,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:794 src/commands.c:1399 src/commands.c:1424
+#: src/tvtime.c:794 src/commands.c:1437 src/commands.c:1462
 msgid "Deinterlacer configuration"
 msgstr "Lomituksen poistosuodatin"
 
 #: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:959
-#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:591
-#: src/commands.c:625 src/commands.c:645 src/commands.c:707 src/commands.c:742
-#: src/commands.c:787 src/commands.c:862 src/commands.c:879 src/commands.c:906
-#: src/commands.c:966 src/commands.c:1227 src/commands.c:1279
-#: src/commands.c:1344 src/commands.c:1416 src/commands.c:1487
-#: src/commands.c:1497 src/commands.c:1545 src/commands.c:1557
-#: src/commands.c:1587 src/commands.c:1620 src/commands.c:1653
-#: src/commands.c:1685
+#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:433
+#: src/commands.c:627 src/commands.c:661 src/commands.c:681 src/commands.c:743
+#: src/commands.c:778 src/commands.c:823 src/commands.c:898 src/commands.c:915
+#: src/commands.c:942 src/commands.c:1002 src/commands.c:1263
+#: src/commands.c:1315 src/commands.c:1382 src/commands.c:1454
+#: src/commands.c:1525 src/commands.c:1535 src/commands.c:1583
+#: src/commands.c:1595 src/commands.c:1625 src/commands.c:1658
+#: src/commands.c:1691 src/commands.c:1723
 msgid "Back"
 msgstr "Paluu"
 
@@ -49,7 +49,7 @@ msgstr "Käsittele vain alemmat kentät: %.2f Hz"
 msgid "Overscan setting"
 msgstr "Ylipyyhkäisyalue"
 
-#: src/tvtime.c:903 src/commands.c:1376
+#: src/tvtime.c:903 src/commands.c:1414
 msgid "Apply matte"
 msgstr "Peitä kuvamaskilla"
 
@@ -90,7 +90,7 @@ msgstr "Yläreunassa"
 msgid "Bottom"
 msgstr "Alareunassa"
 
-#: src/tvtime.c:997 src/commands.c:1408 src/commands.c:1438
+#: src/tvtime.c:997 src/commands.c:1446 src/commands.c:1476
 msgid "Attempted framerate"
 msgstr "Kuvataajuuden valinta"
 
@@ -165,8 +165,8 @@ msgid "Matte setting (4:3 input)"
 msgstr "Kuvamaskin asetus (4:3-kuvakehys)"
 
 #: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
-#: src/tvtime.c:1422 src/tvtime.c:1470 src/tvtime.c:1495 src/tvtime.c:1509
-#: src/tvtime.c:1523 src/tvtimeconf.c:1110 src/tvtime-command.c:56
+#: src/tvtime.c:1422 src/tvtime.c:1472 src/tvtime.c:1497 src/tvtime.c:1511
+#: src/tvtime.c:1525 src/tvtimeconf.c:1118 src/tvtime-command.c:56
 #: src/tvtime-command.c:71 src/tvtime-configure.c:48 src/tvtime-scanner.c:61
 #: src/tvtime-scanner.c:97
 #, c-format
@@ -234,77 +234,77 @@ msgstr ""
 "    virheidenseurantajärjestelmään osoitteessa: %s.\n"
 "\n"
 
-#: src/tvtime.c:1439
+#: src/tvtime.c:1441
 msgid "On screen display failed to initialize, disabled.\n"
 msgstr "Kuvaruutunäytön valmistelu epäonnistui; pois käytöstä.\n"
 
-#: src/tvtime.c:1452
+#: src/tvtime.c:1454
 msgid "No video source"
 msgstr "Ei videolähdettä"
 
-#: src/tvtime.c:1499
+#: src/tvtime.c:1501
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
 msgstr "Ei voitu luoda FIFO:a, tvtimen kauko-ohjaus pois käytöstä.\n"
 
-#: src/tvtime.c:1517
+#: src/tvtime.c:1519
 msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr "Closed caption -näytön valmistelu epäonnistui; pois käytöstä.\n"
 
-#: src/tvtime.c:1745
+#: src/tvtime.c:1743
 msgid "Always-on-top enabled."
 msgstr "Aina päällimmäisenä valittu."
 
-#: src/tvtime.c:1750
+#: src/tvtime.c:1748
 msgid "Always-on-top disabled."
 msgstr "Aina päällimmäisenä pois käytöstä."
 
-#: src/tvtime.c:1770
+#: src/tvtime.c:1768
 msgid "16:9 display mode active."
 msgstr "16:9-kuvasuhde valittu."
 
-#: src/tvtime.c:1779
+#: src/tvtime.c:1777
 msgid "4:3 display mode active."
 msgstr "4:3-kuvasuhde valittu."
 
-#: src/tvtime.c:1829
+#: src/tvtime.c:1827
 msgid "Screenshot messages disabled."
 msgstr ""
 
-#: src/tvtime.c:1831
+#: src/tvtime.c:1829
 msgid "Screenshot messages enabled."
 msgstr ""
 
-#: src/tvtime.c:1906
+#: src/tvtime.c:1904
 msgid "2-3 pulldown inversion disabled."
 msgstr "Käänteinen 2:3-filmisiirto poistettu käytöstä."
 
-#: src/tvtime.c:1909
+#: src/tvtime.c:1907
 msgid "2-3 pulldown inversion enabled."
 msgstr "Käänteinen 2:3-filmisiirto käytössä."
 
-#: src/tvtime.c:1915
+#: src/tvtime.c:1913
 msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr "Käänteinen 2:3-filmisiirto ei mahdollista tällä TV-normilla."
 
-#: src/tvtime.c:2312 src/tvtime.c:2457
+#: src/tvtime.c:2310 src/tvtime.c:2455
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Kuvakaappaus: %s"
 
-#: src/tvtime.c:2606
+#: src/tvtime.c:2604
 msgid "Restarting tvtime.\n"
 msgstr "Käynnistetään tvtime uudelleen.\n"
 
-#: src/tvtime.c:2610
+#: src/tvtime.c:2608
 msgid "Thank you for using tvtime.\n"
 msgstr "Kiitos ohjelman käytöstä.\n"
 
-#: src/tvtime.c:2632
+#: src/tvtime.c:2630
 #, c-format
 msgid "Running %s.\n"
 msgstr "Käynnistetään %s.\n"
 
-#: src/tvtime.c:2650
+#: src/tvtime.c:2648
 #, c-format
 msgid ""
 "\n"
@@ -323,7 +323,7 @@ msgstr ""
 "    saa tukisivultamme osoitteessa: %s.\n"
 "\n"
 
-#: src/tvtime.c:2665
+#: src/tvtime.c:2663
 #, c-format
 msgid ""
 "\n"
@@ -346,7 +346,7 @@ msgstr ""
 "    Lisätiedoja saa tukisivultamme osoitteessa: %s.\n"
 "\n"
 
-#: src/tvtime.c:2685
+#: src/tvtime.c:2683
 #, c-format
 msgid ""
 "\n"
@@ -359,9 +359,9 @@ msgstr ""
 "    tvtime lopetetaan tietoturvariskien välttämiseksi.\n"
 "\n"
 
-#: src/commands.c:186 src/commands.c:890 src/commands.c:1211
-#: src/commands.c:1571 src/commands.c:1604 src/commands.c:1637
-#: src/commands.c:1670
+#: src/commands.c:186 src/commands.c:926 src/commands.c:1247
+#: src/commands.c:1609 src/commands.c:1642 src/commands.c:1675
+#: src/commands.c:1708
 msgid "Current"
 msgstr "Arvo"
 
@@ -431,550 +431,560 @@ msgstr "Poista signaalintunnistus käytöstä"
 msgid "Enable signal detection"
 msgstr "Ota signaalintunnistus käyttöön"
 
-#: src/commands.c:556 src/commands.c:1249 src/commands.c:1313
-#: src/commands.c:1732
+#: src/commands.c:411 src/commands.c:2018
+msgid "Default language"
+msgstr ""
+
+#: src/commands.c:426 src/commands.c:2023
+msgid "Unknown language"
+msgstr ""
+
+#: src/commands.c:592 src/commands.c:1285 src/commands.c:1351
+#: src/commands.c:1777
 msgid "Preferred audio mode"
 msgstr "Äänitilan valinta"
 
-#: src/commands.c:566
+#: src/commands.c:602
 msgid "Default to PAL-DK audio decoding"
 msgstr ""
 
-#: src/commands.c:573 src/commands.c:1254 src/commands.c:1326
+#: src/commands.c:609 src/commands.c:1290 src/commands.c:1364
 msgid "Audio volume boost"
 msgstr ""
 
-#: src/commands.c:579 src/commands.c:1259 src/commands.c:1335
+#: src/commands.c:615 src/commands.c:1295 src/commands.c:1373
 msgid "Television standard"
 msgstr "TV-standardi"
 
-#: src/commands.c:585 src/commands.c:1264 src/commands.c:1304
+#: src/commands.c:621 src/commands.c:1300 src/commands.c:1342
 msgid "Horizontal resolution"
 msgstr "Vaakaresoluutio"
 
-#: src/commands.c:605 src/commands.c:632
+#: src/commands.c:641 src/commands.c:668
 msgid "Cable"
 msgstr "Kaapeli-TV"
 
-#: src/commands.c:613 src/commands.c:640
+#: src/commands.c:649 src/commands.c:676
 msgid "Broadcast"
 msgstr "Maanpäällinen lähetys"
 
-#: src/commands.c:620
+#: src/commands.c:656
 msgid "Cable with channels 100+"
 msgstr "Yli sadan kanavan kaapeli-TV"
 
-#: src/commands.c:652
+#: src/commands.c:688
 msgid "Europe"
 msgstr "Eurooppa"
 
-#: src/commands.c:660
+#: src/commands.c:696
 msgid "Russia"
 msgstr "Venäjä"
 
-#: src/commands.c:667
+#: src/commands.c:703
 msgid "France"
 msgstr "Ranska"
 
-#: src/commands.c:674
+#: src/commands.c:710
 msgid "Australia"
 msgstr "Australia"
 
-#: src/commands.c:681
+#: src/commands.c:717
 msgid "Australia (Optus)"
 msgstr "Australia (Optus)"
 
-#: src/commands.c:688
+#: src/commands.c:724
 msgid "New Zealand"
 msgstr "Uusi Seelanti"
 
-#: src/commands.c:695
+#: src/commands.c:731
 msgid "China Broadcast"
 msgstr "Kiina (Maanpäällinen lähetys)"
 
-#: src/commands.c:702
+#: src/commands.c:738
 msgid "Custom (first run tvtime-scanner)"
 msgstr "Mukautettu (aja tvtime-scanner ensin)"
 
-#: src/commands.c:719
+#: src/commands.c:755
 #, fuzzy
 msgid "Disabled"
 msgstr "Kaapeli-TV"
 
-#: src/commands.c:725
+#: src/commands.c:761
 msgid "Quiet"
 msgstr ""
 
-#: src/commands.c:731
+#: src/commands.c:767
 msgid "Medium"
 msgstr ""
 
-#: src/commands.c:737
+#: src/commands.c:773
 msgid "Full"
 msgstr ""
 
-#: src/commands.c:752
+#: src/commands.c:788
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr "%s  Valittu: %d kuvapistettä"
 
-#: src/commands.c:759
+#: src/commands.c:795
 msgid "Low (360 pixels)"
 msgstr "Matala (360 kuvapistettä)"
 
-#: src/commands.c:765
+#: src/commands.c:801
 msgid "Moderate (576 pixels)"
 msgstr "Keskitaso (576 kuvapistettä)"
 
-#: src/commands.c:771
+#: src/commands.c:807
 msgid "Standard (720 pixels)"
 msgstr "Standardi (720 kuvapistettä)"
 
-#: src/commands.c:777
+#: src/commands.c:813
 msgid "High (768 pixels)"
 msgstr "Korkea (768 kuvapistettä)"
 
-#: src/commands.c:782 src/commands.c:1339
+#: src/commands.c:818 src/commands.c:1377
 msgid "Restart with new settings"
 msgstr "Käynnistä uusilla asetuksilla"
 
-#: src/commands.c:843 src/commands.c:1733
+#: src/commands.c:879 src/commands.c:1778
 msgid "Mono"
 msgstr "Mono"
 
-#: src/commands.c:850 src/commands.c:1734
+#: src/commands.c:886 src/commands.c:1779
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/commands.c:858 src/commands.c:1736
+#: src/commands.c:894 src/commands.c:1781
 msgid "SAP"
 msgstr "SAP"
 
-#: src/commands.c:869 src/commands.c:1736
+#: src/commands.c:905 src/commands.c:1781
 msgid "Primary Language"
 msgstr "Ensisijainen kieli"
 
-#: src/commands.c:874 src/commands.c:1737
+#: src/commands.c:910 src/commands.c:1782
 msgid "Secondary Language"
 msgstr "Toissijainen kieli"
 
-#: src/commands.c:896 src/commands.c:1217 src/commands.c:1577
-#: src/commands.c:1610 src/commands.c:1643 src/commands.c:1675
+#: src/commands.c:932 src/commands.c:1253 src/commands.c:1615
+#: src/commands.c:1648 src/commands.c:1681 src/commands.c:1713
 msgid "Increase"
 msgstr "Lisää"
 
-#: src/commands.c:901 src/commands.c:1222 src/commands.c:1582
-#: src/commands.c:1615 src/commands.c:1648 src/commands.c:1680
+#: src/commands.c:937 src/commands.c:1258 src/commands.c:1620
+#: src/commands.c:1653 src/commands.c:1686 src/commands.c:1718
 msgid "Decrease"
 msgstr "Vähennä"
 
-#: src/commands.c:925
+#: src/commands.c:961
 msgid "BT8x8 luma correction"
 msgstr "BT8x8-luminanssikorjaus"
 
-#: src/commands.c:935
+#: src/commands.c:971
 msgid "2-3 pulldown inversion"
 msgstr "Käänteinen 2:3-filmisiirto"
 
-#: src/commands.c:944
+#: src/commands.c:980
 msgid "Colour invert"
 msgstr "Käänteiset värit"
 
-#: src/commands.c:952
+#: src/commands.c:988
 msgid "Mirror"
 msgstr "Peilaus"
 
-#: src/commands.c:960
+#: src/commands.c:996
 msgid "Chroma killer"
 msgstr "Värienpoisto"
 
-#: src/commands.c:1110 src/commands.c:1145 src/commands.c:1177
-#: src/commands.c:1195 src/commands.c:1207 src/commands.c:1235
-#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
-#: src/commands.c:1326 src/commands.c:1335 src/commands.c:1370
-#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
-#: src/commands.c:1395 src/commands.c:1423 src/commands.c:1429
-#: src/commands.c:1437 src/commands.c:1443 src/commands.c:1455
-#: src/commands.c:1504 src/commands.c:1567 src/commands.c:1600
-#: src/commands.c:1633 src/commands.c:1666
+#: src/commands.c:1146 src/commands.c:1181 src/commands.c:1213
+#: src/commands.c:1231 src/commands.c:1243 src/commands.c:1271
+#: src/commands.c:1324 src/commands.c:1342 src/commands.c:1351
+#: src/commands.c:1364 src/commands.c:1373 src/commands.c:1408
+#: src/commands.c:1414 src/commands.c:1420 src/commands.c:1427
+#: src/commands.c:1433 src/commands.c:1461 src/commands.c:1467
+#: src/commands.c:1475 src/commands.c:1481 src/commands.c:1493
+#: src/commands.c:1542 src/commands.c:1605 src/commands.c:1638
+#: src/commands.c:1671 src/commands.c:1704
 msgid "Setup"
 msgstr "Asetukset"
 
-#: src/commands.c:1113 src/commands.c:1177 src/commands.c:1196
-#: src/commands.c:1208
+#: src/commands.c:1149 src/commands.c:1213 src/commands.c:1232
+#: src/commands.c:1244
 msgid "Channel management"
 msgstr "Kanavien hallinta"
 
-#: src/commands.c:1118 src/commands.c:1149 src/commands.c:1236
-#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
-#: src/commands.c:1326 src/commands.c:1335
+#: src/commands.c:1154 src/commands.c:1185 src/commands.c:1272
+#: src/commands.c:1324 src/commands.c:1342 src/commands.c:1351
+#: src/commands.c:1364 src/commands.c:1373
 msgid "Input configuration"
 msgstr "Signaalitulon asetukset"
 
-#: src/commands.c:1123 src/commands.c:1154
+#: src/commands.c:1159 src/commands.c:1190
 msgid "Picture settings"
 msgstr "Värisäädöt"
 
-#: src/commands.c:1128 src/commands.c:1159 src/commands.c:1395
-#: src/commands.c:1424 src/commands.c:1430 src/commands.c:1438
-#: src/commands.c:1444
+#: src/commands.c:1164 src/commands.c:1195 src/commands.c:1433
+#: src/commands.c:1462 src/commands.c:1468 src/commands.c:1476
+#: src/commands.c:1482
 msgid "Video processing"
 msgstr "Videonkäsittely"
 
-#: src/commands.c:1133 src/commands.c:1164 src/commands.c:1370
-#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
+#: src/commands.c:1169 src/commands.c:1200 src/commands.c:1408
+#: src/commands.c:1414 src/commands.c:1420 src/commands.c:1427
 msgid "Output configuration"
 msgstr "Näyttöasetukset"
 
-#: src/commands.c:1138 src/commands.c:1169
+#: src/commands.c:1174 src/commands.c:1205
 msgid "Exit menu"
 msgstr "Sulje valikko"
 
-#: src/commands.c:1196
+#: src/commands.c:1232
 msgid "Frequency table"
 msgstr "Kanavataulukko"
 
-#: src/commands.c:1208 src/commands.c:2893
+#: src/commands.c:1244 src/commands.c:2977
 msgid "Finetune"
 msgstr "Hienoviritys"
 
-#: src/commands.c:1240 src/commands.c:1243 src/commands.c:1292
-#: src/commands.c:1295 src/commands.c:3005
+#: src/commands.c:1276 src/commands.c:1279 src/commands.c:1328
+#: src/commands.c:1331 src/commands.c:3089
 msgid "Change video source"
 msgstr "Vaihda videolähde"
 
-#: src/commands.c:1269
+#: src/commands.c:1305
 msgid "Toggle closed captions"
 msgstr "Closed captions päälle/pois"
 
-#: src/commands.c:1274
+#: src/commands.c:1310
 msgid "Toggle XDS decoding"
 msgstr "XDS-tietojen purku päälle/pois"
 
-#: src/commands.c:1382
+#: src/commands.c:1420
 msgid "Overscan"
 msgstr "Ylipyyhkäisyalue"
 
-#: src/commands.c:1389
+#: src/commands.c:1427
 msgid "Fullscreen position"
 msgstr "Sijainti kokoruudussa"
 
-#: src/commands.c:1404
+#: src/commands.c:1442
 msgid "Current deinterlacer description"
 msgstr "Valitun suodattimen kuvaus"
 
-#: src/commands.c:1412 src/commands.c:1444
+#: src/commands.c:1450 src/commands.c:1482
 msgid "Input filters"
 msgstr "Signaalinkäsittely"
 
-#: src/commands.c:1430
+#: src/commands.c:1468
 msgid "Deinterlacer description"
 msgstr "Lomituksen poistosuodattimen kuvaus"
 
-#: src/commands.c:1455 src/commands.c:1504 src/commands.c:1567
-#: src/commands.c:1600 src/commands.c:1633 src/commands.c:1666
+#: src/commands.c:1493 src/commands.c:1542 src/commands.c:1605
+#: src/commands.c:1638 src/commands.c:1671 src/commands.c:1704
 msgid "Picture"
 msgstr "Värisäädöt"
 
-#: src/commands.c:1459 src/commands.c:1509 src/commands.c:1567
-#: src/commands.c:3035 src/commands.c:3076
+#: src/commands.c:1497 src/commands.c:1547 src/commands.c:1605
+#: src/commands.c:3119 src/commands.c:3160
 msgid "Brightness"
 msgstr "Kirkkaus"
 
-#: src/commands.c:1464 src/commands.c:1514 src/commands.c:1600
-#: src/commands.c:3049 src/commands.c:3079
+#: src/commands.c:1502 src/commands.c:1552 src/commands.c:1638
+#: src/commands.c:3133 src/commands.c:3163
 msgid "Contrast"
 msgstr "Kontrasti"
 
-#: src/commands.c:1468 src/commands.c:1518 src/commands.c:1633
-#: src/commands.c:3063 src/commands.c:3082
+#: src/commands.c:1506 src/commands.c:1556 src/commands.c:1671
+#: src/commands.c:3147 src/commands.c:3166
 msgid "Colour"
 msgstr "Värikylläisyys"
 
-#: src/commands.c:1472 src/commands.c:1522 src/commands.c:1666
-#: src/commands.c:3021 src/commands.c:3085
+#: src/commands.c:1510 src/commands.c:1560 src/commands.c:1704
+#: src/commands.c:3105 src/commands.c:3169
 msgid "Hue"
 msgstr "Värisävy"
 
-#: src/commands.c:1479
+#: src/commands.c:1517
 msgid "Save current settings as defaults"
 msgstr "Tallenna värisäädöt oletusarvoiksi"
 
-#: src/commands.c:1483 src/commands.c:1493 src/commands.c:1540
-#: src/commands.c:1552
+#: src/commands.c:1521 src/commands.c:1531 src/commands.c:1578
+#: src/commands.c:1590
 msgid "Reset to global defaults"
 msgstr "Palauta oletusarvot"
 
-#: src/commands.c:1529
+#: src/commands.c:1567
 msgid "Save current settings as global defaults"
 msgstr "Tallenna värisäädöt oletusarvoiksi"
 
-#: src/commands.c:1535
+#: src/commands.c:1573
 msgid "Save current settings as channel defaults"
 msgstr "Tallenna värisäädöt kanavalle"
 
-#: src/commands.c:1806
-msgid "Favorites"
-msgstr "Suosikit"
-
-#: src/commands.c:1813
-msgid "Add current channel"
-msgstr "Lisää valittu kanava"
-
-#: src/commands.c:1815
-msgid "Exit"
-msgstr "Lopeta"
-
-#: src/commands.c:1972
+#: src/commands.c:1736 src/commands.c:2017
 #, fuzzy
 msgid "Preferred XMLTV language"
 msgstr "Ensisijainen kieli"
 
-#: src/commands.c:1973
-msgid "Default language"
-msgstr ""
+#: src/commands.c:1851
+msgid "Favorites"
+msgstr "Suosikit"
 
-#: src/commands.c:1978
-msgid "Unknown language"
-msgstr ""
+#: src/commands.c:1858
+msgid "Add current channel"
+msgstr "Lisää valittu kanava"
 
-#: src/commands.c:2107
+#: src/commands.c:1860
+msgid "Exit"
+msgstr "Lopeta"
+
+#: src/commands.c:2152
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Uniajastin: %d minuuttia."
 
-#: src/commands.c:2110
-#, c-format
+#: src/commands.c:2155
 msgid "Sleep off."
 msgstr "Uniajastin sammutettu."
 
-#: src/commands.c:2149
-#, fuzzy, c-format
+#: src/commands.c:2194
+#, fuzzy
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Kanavan värijärjestelmäksi valittu %s."
 
-#: src/commands.c:2152
-#, fuzzy, c-format
+#: src/commands.c:2197
+#, fuzzy
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Kanavan värijärjestelmäksi valittu %s."
 
-#: src/commands.c:2181
-#, c-format
+#: src/commands.c:2226
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr ""
 
-#: src/commands.c:2184
-#, c-format
+#: src/commands.c:2229
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr ""
 
-#: src/commands.c:2212
+#: src/commands.c:2257
 msgid "Channel marked as active in the browse list."
 msgstr "Kanava merkitty aktiiviseksi."
 
-#: src/commands.c:2215
+#: src/commands.c:2260
 msgid "Channel disabled from the browse list."
 msgstr "Kanava poistettu käytöstä."
 
-#: src/commands.c:2245
-#, c-format
+#: src/commands.c:2290
 msgid "Capture card volume will not be set by tvtime."
 msgstr ""
 
-#: src/commands.c:2248
+#: src/commands.c:2293
 #, c-format
 msgid "Setting capture card volume to %d%%."
 msgstr ""
 
-#: src/commands.c:2281
+#: src/commands.c:2326
 msgid "Processing every input field."
 msgstr "Käsitellään kaikki kuvakentät."
 
-#: src/commands.c:2284
+#: src/commands.c:2329
 msgid "Processing every top field."
 msgstr "Käsitellään ylemmät kuvakentät."
 
-#: src/commands.c:2287
+#: src/commands.c:2332
 msgid "Processing every bottom field."
 msgstr "Käsitellään alemmat kuvakentät."
 
-#: src/commands.c:2302
+#: src/commands.c:2347
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "Vaakaresoluutio on %d uudelleenkäynnistyksen jälkeen."
 
-#: src/commands.c:2359
+#: src/commands.c:2404
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "TV-standardi on %s uudelleenkäynnistyksen jälkeen."
 
-#: src/commands.c:2390
+#: src/commands.c:2432
+msgid "Using default language for XMLTV data."
+msgstr ""
+
+#: src/commands.c:2435
+#, c-format
+msgid "Using unknown language (%s) for XMLTV data."
+msgstr ""
+
+#: src/commands.c:2439
+#, c-format
+msgid "XMLTV language set to %s (%s)."
+msgstr ""
+
+#: src/commands.c:2474
 msgid "All channels re-activated."
 msgstr "Kaikki kanavat merkitty aktiivisiksi."
 
-#: src/commands.c:2411
+#: src/commands.c:2495
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Anna kanavan %d uusi numero."
 
-#: src/commands.c:2423
+#: src/commands.c:2507
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Kanavahaku vaatii signaalintunnistuksen toimiakseen."
 
-#: src/commands.c:2451
+#: src/commands.c:2535
 msgid "Scanning for channels being broadcast."
 msgstr "Kanavien haku käynnissä."
 
-#: src/commands.c:2469
+#: src/commands.c:2553
 msgid "Closed captions disabled."
 msgstr "Closed captions poistettu käytöstä."
 
-#: src/commands.c:2475
+#: src/commands.c:2559
 msgid "Closed captions enabled."
 msgstr "Closed captions käytössä."
 
-#: src/commands.c:2487
+#: src/commands.c:2571
 msgid "No VBI device configured for CC decoding."
 msgstr "Ei VBI-laitetta määriteltynä CC-purkua varten."
 
-#: src/commands.c:2503
+#: src/commands.c:2587
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Kanavan värijärjestelmäksi valittu %s."
 
-#: src/commands.c:2546
+#: src/commands.c:2630
 #, c-format
 msgid "Running: %s"
 msgstr "Käynnissä: %s"
 
-#: src/commands.c:2624
+#: src/commands.c:2708
 msgid "Signal detection enabled."
 msgstr "Signaalintunnistus käytössä."
 
-#: src/commands.c:2627
+#: src/commands.c:2711
 msgid "Signal detection disabled."
 msgstr "Signaalintunnistus poistettu käytöstä."
 
-#: src/commands.c:2640
+#: src/commands.c:2724
 msgid "XDS decoding enabled."
 msgstr "XDS-tietojen purku käytössä."
 
-#: src/commands.c:2643
+#: src/commands.c:2727
 msgid "XDS decoding disabled."
 msgstr "XDS-tietojen purku poistettu käytöstä."
 
-#: src/commands.c:2689
+#: src/commands.c:2773
 msgid "Colour invert enabled."
 msgstr "Käänteiset värit käytössä."
 
-#: src/commands.c:2691
+#: src/commands.c:2775
 msgid "Colour invert disabled."
 msgstr "Käänteiset värit poistettu käytöstä."
 
-#: src/commands.c:2713
+#: src/commands.c:2797
 msgid "Mirror enabled."
 msgstr "Peilaus käytössä."
 
-#: src/commands.c:2715
+#: src/commands.c:2799
 msgid "Mirror disabled."
 msgstr "Peilaus poistettu käytöstä."
 
-#: src/commands.c:2737
+#: src/commands.c:2821
 msgid "Chroma kill enabled."
 msgstr "Värienpoisto käytössä."
 
-#: src/commands.c:2739
+#: src/commands.c:2823
 msgid "Chroma kill disabled."
 msgstr "Värienpoisto poistettu käytöstä."
 
-#: src/commands.c:2756
+#: src/commands.c:2840
 msgid "Luma correction enabled."
 msgstr "Luminanssikorjaus käytössä."
 
-#: src/commands.c:2758
+#: src/commands.c:2842
 msgid "Luma correction disabled."
 msgstr "Luminanssikorjaus poistettu käytöstä."
 
-#: src/commands.c:2775
+#: src/commands.c:2859
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Ylipyyhkäisy: %.1f%%"
 
-#: src/commands.c:2798
+#: src/commands.c:2882
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr "Luminanssikorjauksen kerroin: %.1f"
 
-#: src/commands.c:2828
+#: src/commands.c:2912
 msgid "Picture settings reset to defaults."
 msgstr "Värisäätöjen oletusarvot palautettu."
 
-#: src/commands.c:2856
+#: src/commands.c:2940
 msgid "Using nominal NTSC cable frequencies."
 msgstr "Käytetään virallisia NTSC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:2862
+#: src/commands.c:2946
 msgid "Using IRC cable frequencies."
 msgstr "Käytetään IRC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:2868
+#: src/commands.c:2952
 msgid "Using HRC cable frequencies."
 msgstr "Käytetään HRC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:2952 src/commands.c:2972
+#: src/commands.c:3036 src/commands.c:3056
 msgid "Volume"
 msgstr "Äänenvoimakkuus"
 
-#: src/commands.c:3122
+#: src/commands.c:3206
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "Värisäädöt tallennettu oletusarvoiksi.\n"
 
-#: src/commands.c:3135
+#: src/commands.c:3219
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Värisäädöt tallennettu kanavalle %d.\n"
 
-#: src/commands.c:3219
+#: src/commands.c:3303
 msgid "Paused."
 msgstr "Pysäytetty."
 
-#: src/commands.c:3219
+#: src/commands.c:3303
 msgid "Resumed."
 msgstr "Jatketaan."
 
-#: src/tvtimeconf.c:455
+#: src/tvtimeconf.c:462
 #, c-format
 msgid "Error parsing configuration file %s.\n"
 msgstr "Virhe jäsennettäessä asetustiedostoa %s.\n"
 
-#: src/tvtimeconf.c:462
+#: src/tvtimeconf.c:469
 #, c-format
 msgid "No XML root element found in %s.\n"
 msgstr "Ei XML-juurielementtiä löydetty tiedostosta %s.\n"
 
-#: src/tvtimeconf.c:470 src/tvtimeconf.c:544
+#: src/tvtimeconf.c:477 src/tvtimeconf.c:551
 #, c-format
 msgid "%s is not a tvtime configuration file.\n"
 msgstr "%s ei ole tvtimen asetustiedosto.\n"
 
-#: src/tvtimeconf.c:502
+#: src/tvtimeconf.c:509
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr "Asetustiedostoa ei voitu jäsentää. Asetuksia ei tallenneta.\n"
 
-#: src/tvtimeconf.c:509
+#: src/tvtimeconf.c:516
 msgid "Could not create new config file.\n"
 msgstr "Ei voitu luoda uutta asetustiedostoa.\n"
 
-#: src/tvtimeconf.c:533
+#: src/tvtimeconf.c:540
 msgid "Error creating configuration file.\n"
 msgstr "Virhe asetustiedostoa luotaessa.\n"
 
-#: src/tvtimeconf.c:554 src/utils.c:134
+#: src/tvtimeconf.c:561 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr "Ei voitu vaihtaa tiedoston %s omistajaa: %s.\n"
 
-#: src/tvtimeconf.c:563
+#: src/tvtimeconf.c:570
 msgid ""
 "\n"
 "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
@@ -992,7 +1002,7 @@ msgstr ""
 "tvtime on Copyright © 2001, 2002, 2003 Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov ja Achim Schneider.\n"
 
-#: src/tvtimeconf.c:574 src/tvtimeconf.c:623 src/tvtimeconf.c:669
+#: src/tvtimeconf.c:581 src/tvtimeconf.c:631 src/tvtimeconf.c:677
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -1001,27 +1011,27 @@ msgstr ""
 "Käyttö: %s [VALITSIN]...\n"
 "\n"
 
-#: src/tvtimeconf.c:575 src/tvtimeconf.c:624
+#: src/tvtimeconf.c:582 src/tvtimeconf.c:632
 msgid "  -a, --widescreen           16:9 mode.\n"
 msgstr "  -a, --widescreen           16:9-kuvasuhde.\n"
 
-#: src/tvtimeconf.c:576 src/tvtimeconf.c:625
+#: src/tvtimeconf.c:583 src/tvtimeconf.c:633
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr "  -b, --vbidevice=LAITE      VBI-laite (oletuksena /dev/vbi0).\n"
 
-#: src/tvtimeconf.c:577 src/tvtimeconf.c:626
+#: src/tvtimeconf.c:584 src/tvtimeconf.c:634
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr ""
 "  -c, --channel=KANAVA       Vaihda määrätylle kanavalle käynnistyksessä.\n"
 
-#: src/tvtimeconf.c:578 src/tvtimeconf.c:627 src/tvtimeconf.c:670
+#: src/tvtimeconf.c:585 src/tvtimeconf.c:635 src/tvtimeconf.c:678
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
 "  -d, --device=LAITE         video4linux-laite (oletuksena /dev/video0)\n"
 
-#: src/tvtimeconf.c:579 src/tvtimeconf.c:628
+#: src/tvtimeconf.c:586 src/tvtimeconf.c:636
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1060,28 +1070,28 @@ msgstr ""
 "                                 russia\n"
 "                                 custom (aja tvtime-scanner ensin)\n"
 
-#: src/tvtimeconf.c:595 src/tvtimeconf.c:644 src/tvtimeconf.c:671
+#: src/tvtimeconf.c:602 src/tvtimeconf.c:652 src/tvtimeconf.c:679
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
 "  -F, --configfile=TIEDOSTO  Ylimääräinen asetustiedosto, josta lukea "
 "asetukset.\n"
 
-#: src/tvtimeconf.c:596 src/tvtimeconf.c:645 src/tvtimeconf.c:672
+#: src/tvtimeconf.c:603 src/tvtimeconf.c:653 src/tvtimeconf.c:680
 msgid "  -h, --help                 Show this help message.\n"
 msgstr "  -h, --help                 Näytä tämä ohje.\n"
 
-#: src/tvtimeconf.c:597 src/tvtimeconf.c:646
+#: src/tvtimeconf.c:604 src/tvtimeconf.c:654
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:598 src/tvtimeconf.c:647 src/tvtimeconf.c:673
+#: src/tvtimeconf.c:605 src/tvtimeconf.c:655 src/tvtimeconf.c:681
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
 "  -i, --input=NUMERO         video4linux-videotulon numero (oletuksena 0).\n"
 
-#: src/tvtimeconf.c:599 src/tvtimeconf.c:648
+#: src/tvtimeconf.c:606 src/tvtimeconf.c:656
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
@@ -1089,7 +1099,7 @@ msgstr ""
 "  -I, --inputwidth=TARKKUUS  Videotulon vaakaresoluutio\n"
 "                             (oletuksena 720 kuvapistettä).\n"
 
-#: src/tvtimeconf.c:601
+#: src/tvtimeconf.c:608
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
@@ -1097,15 +1107,15 @@ msgstr ""
 "  -k, --slave                Estää komentojen käsittelyn tvtimessa (slave-"
 "tila).\n"
 
-#: src/tvtimeconf.c:602 src/tvtimeconf.c:650
+#: src/tvtimeconf.c:609 src/tvtimeconf.c:658
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
 msgstr "  -m, --fullsreen            Käynnistä tvtime kokoruututilassa.\n"
 
-#: src/tvtimeconf.c:603 src/tvtimeconf.c:651
+#: src/tvtimeconf.c:610 src/tvtimeconf.c:659
 msgid "  -M, --window               Start tvtime in window mode.\n"
 msgstr "  -M, --window               Käynnistä tvtime ikkunatilassa.\n"
 
-#: src/tvtimeconf.c:604 src/tvtimeconf.c:652 src/tvtimeconf.c:674
+#: src/tvtimeconf.c:611 src/tvtimeconf.c:660 src/tvtimeconf.c:682
 msgid ""
 "  -n, --norm=NORM            The norm to use for the input.  tvtime "
 "supports:\n"
@@ -1117,33 +1127,39 @@ msgstr ""
 "                             PAL-N ja PAL-60 (oletuksena NTSC).\n"
 "\n"
 
-#: src/tvtimeconf.c:607
+#: src/tvtimeconf.c:614
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
 "  -s, --showdrops            Tulosta tilastot hukatuista ruuduista\n"
 "                             (vianetsintää varten).\n"
 
-#: src/tvtimeconf.c:608 src/tvtimeconf.c:656
+#: src/tvtimeconf.c:615
+msgid ""
+"  -S, --saveoptions          Save command line options to the config file.\n"
+msgstr ""
+"  -S, --saveoptions          Tallenna komentorivivalinnat asetustiedostoon.\n"
+
+#: src/tvtimeconf.c:616 src/tvtimeconf.c:664
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 msgstr ""
 "  -t, --xmltv=TIEDOSTO       Lue XMLTV-ohjelmatiedot annetusta tiedostosta.\n"
 
-#: src/tvtimeconf.c:609 src/tvtimeconf.c:657
+#: src/tvtimeconf.c:617 src/tvtimeconf.c:665
 msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:610
+#: src/tvtimeconf.c:618
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
 msgstr "  -v, --verbose              Tulosta vianetsintätiedot stderr:iin.\n"
 
-#: src/tvtimeconf.c:611
+#: src/tvtimeconf.c:619
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
 msgstr "  -X, --display=DISPLAY      Yhdistä annettuun X-palvelimeen.\n"
 
-#: src/tvtimeconf.c:612 src/tvtimeconf.c:658
+#: src/tvtimeconf.c:620 src/tvtimeconf.c:666
 msgid ""
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
 "                             (defaults to /dev/mixer:line)\n"
@@ -1169,22 +1185,22 @@ msgstr ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 
-#: src/tvtimeconf.c:655
+#: src/tvtimeconf.c:663
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr "  -R, --prioritet=PRI        Aseta tvtime-prosessin prioriteetti.\n"
 
-#: src/tvtimeconf.c:845 src/tvtimeconf.c:854 src/tvtimeconf.c:914
-#: src/tvtimeconf.c:1026 src/tvtimeconf.c:1191
+#: src/tvtimeconf.c:853 src/tvtimeconf.c:862 src/tvtimeconf.c:922
+#: src/tvtimeconf.c:1034 src/tvtimeconf.c:1199
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr "Luetaan asetukset tiedostosta %s\n"
 
-#: src/tvtimeconf.c:944
+#: src/tvtimeconf.c:952
 msgid "Saving command line options.\n"
 msgstr "Tallennetaan komentorivivalinnat.\n"
 
-#: src/tvtimeconf.c:1117
+#: src/tvtimeconf.c:1125
 #, fuzzy
 msgid "Cannot update configuration while tvtime running.\n"
 msgstr "%s ei ole tvtimen asetustiedosto.\n"
@@ -1207,14 +1223,14 @@ msgstr "Ei voitu luoda hakemistoa %s: %s\n"
 msgid "Cannot open %s: %s\n"
 msgstr "Ei voitu avata hakemistoa %s: %s\n"
 
-#: src/utils.c:653
+#: src/utils.c:655
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 "Merkistömuunnoksen (UTF-8 - %s) valmistelu epäonnistui:\n"
 "Virhe kutsussa iconv_open (%s).\n"
 
-#: src/utils.c:664
+#: src/utils.c:666
 #, c-format
 msgid ""
 "\n"
@@ -1232,7 +1248,6 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
-#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1241,7 +1256,6 @@ msgstr ""
 "Käytettävissä olevat komennot:\n"
 
 #: src/tvtime-command.c:80
-#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime ei ole käynnissä.\n"
 
@@ -1304,13 +1318,6 @@ msgid ""
 msgstr ""
 "Kanava löydetty taajuudelta %6.2f MHz (%.2f - %.2f MHz),\n"
 "lisätään kanavalistaan.\n"
-
-#~ msgid ""
-#~ "  -S, --saveoptions          Save command line options to the config "
-#~ "file.\n"
-#~ msgstr ""
-#~ "  -S, --saveoptions          Tallenna komentorivivalinnat "
-#~ "asetustiedostoon.\n"
 
 #~ msgid ""
 #~ "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
