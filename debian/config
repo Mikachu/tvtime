@@ -91,7 +91,6 @@ add_to_options("Norm");
 add_to_options("Frequencies");
 # Low priority Debconf questions.
 add_to_options("V4LDevice");
-add_to_options("V4LInput");
 add_to_options("NTSCCableMode");
 add_to_options("UseVBI");
 add_to_options("VBIDevice");
@@ -302,47 +301,40 @@ sub set_boolean ($$) {
 
 # Setup the state machine for Q&A
 my $debconf_state=1;
-while (!$postinst and ($debconf_state != 0) and ($debconf_state != 14)) {
+while (!$postinst and ($debconf_state != 0) and ($debconf_state != 11)) {
   if ($debconf_state == 1) {
     # Select the Norm
-    set_select_other('Norm', 'high',
-                     ('ntsc','ntsc-jp','pal','pal-m','pal-n',
-                      'pal-nc','secam'));
+    set_select('Norm', 'high',
+               ('ntsc','ntsc-jp','pal','pal-m','pal-n',
+                'pal-nc','secam'));
   }
   elsif ($debconf_state == 2) {
-    set_other('Norm', 'high');
-  }
-  elsif ($debconf_state == 3) {
     # Select the frequency table.
     set_select_other('Frequencies', 'high',
                      ('australia','australia-optus','europe','france',
                       'japan-cable','japan-broadcast','newzealand','russia',
                       'us-cable','us-broadcast'));
   }
-  elsif ($debconf_state == 4) {
+  elsif ($debconf_state == 3) {
     # Specify the frequency table, if necessary.
     set_other('Frequencies', 'high');
   }
-  elsif ($debconf_state == 5) {
+  elsif ($debconf_state == 4) {
     # Specify the television capture device.
     set_string('V4LDevice', 'low');
   }
-  elsif ($debconf_state == 6) {
-    # Specify the default capture input
-    set_string('V4LInput', 'low');
-  }
-  elsif ($debconf_state == 7) {
+  elsif ($debconf_state == 5) {
     # Specify the NTSC cable mode.
     if (lc(get('tvtime/norm')) eq 'ntsc') {
       set_select('NTSCCableMode', 'low', 'Standard',
                  ('standard','irc','hrc'));
     }
   }
-  elsif ($debconf_state == 8) {
+  elsif ($debconf_state == 6) {
     # Specify whether to use VBI.
     set_boolean('UseVBI', 'low');
   }
-  elsif ($debconf_state == 9) {
+  elsif ($debconf_state == 7) {
     # Choose the VBI device, if necessary.
     if (    defined $options{'VBIDevice'}{'value'}
         and get('tvtime/vbidevice') ne $options{'VBIDevice'}{'value'}) {
@@ -352,18 +344,14 @@ while (!$postinst and ($debconf_state != 0) and ($debconf_state != 14)) {
       input('low', 'tvtime/vbidevice');
     }
   }
-  if ($debconf_state == 10) {
+  elsif ($debconf_state == 8) {
     # Select the deinterlace method
-    set_select_other('DeinterlaceMethod', 'medium',
-                     ('greedy','greedy2frame','greedyh','linear','linearblend',
-                      'linedoubler','overlaybob','tomsmocomp','twoframe',
-                      'vertical','videobob','videoweave','weave'));
+    set_select('DeinterlaceMethod', 'medium',
+               ('greedy','greedy2frame','greedyh','linear','linearblend',
+                'linedoubler','overlaybob','tomsmocomp','twoframe',
+                'vertical','videobob','videoweave','weave'));
   }
-  elsif ($debconf_state == 11) {
-    # Specify the deinterlace method, if necessary.
-    set_other('DeinterlaceMethod', 'medium');
-  }
-  elsif ($debconf_state == 12) {
+  elsif ($debconf_state == 9) {
     # Specify whether to setuid root /usr/bin/tvtime.
     if (defined $tvtime_setuid) {
       my $setuid;
@@ -378,9 +366,9 @@ while (!$postinst and ($debconf_state != 0) and ($debconf_state != 14)) {
         set('tvtime/setuid', $setuid);
       }
     }
-    input('low', 'tvtime/setuid');
+    input('medium', 'tvtime/setuid');
   }
-  elsif ($debconf_state == 13) {
+  elsif ($debconf_state == 10) {
     # Specify the process priority if tvtime is setuid.
     if (    defined $options{'ProcessPriority'}{'value'}
         and 
