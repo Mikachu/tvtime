@@ -400,6 +400,68 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 }
 
 
+static void tvtime_build_copied_field( unsigned char *output,
+                                       unsigned char *curframe,
+                                       unsigned char *lastframe,
+                                       unsigned char *secondlastframe,
+                                       video_correction_t *vc,
+                                       tvtime_osd_t *osd,
+                                       menu_t *menu,
+                                       console_t *con,
+                                       vbiscreen_t *vs,
+                                       int bottom_field,
+                                       int correct_input,
+                                       int width,
+                                       int frame_height,
+                                       int instride,
+                                       int outstride )
+{
+    int scanline = 0;
+    int i;
+
+    if( bottom_field ) {
+        /* Advance frame pointers to the next input line. */
+        curframe += instride;
+        lastframe += instride;
+        secondlastframe += instride;
+    }
+
+    /* Copy a scanline. */
+    blit_packed422_scanline( output, curframe, width );
+
+    if( correct_input ) {
+        video_correction_correct_packed422_scanline( vc, output, output, width );
+    }
+    if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+    if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+    if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+    output += outstride;
+    scanline += 2;
+
+    for( i = ((frame_height - 2) / 2); i; --i ) {
+        /* Copy a scanline. */
+        blit_packed422_scanline( output, curframe, width );
+        curframe += instride * 2;
+        lastframe += instride * 2;
+        secondlastframe += instride * 2;
+
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, output, output, width );
+        }
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+        output += outstride;
+        scanline += 2;
+    }
+}
+
+
+
 int main( int argc, char **argv )
 {
     video_correction_t *vc = 0;
@@ -444,6 +506,7 @@ int main( int argc, char **argv )
     weave_plugin_init();
     double_plugin_init();
     linearblend_plugin_init();
+    scalerbob_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -848,11 +911,19 @@ int main( int argc, char **argv )
                 blit_packed422_scanline( output->get_output_buffer(),
                                          colourbars, width*height );
             } else {
-                tvtime_build_deinterlaced_frame( output->get_output_buffer(),
-                                   curframe, lastframe, secondlastframe,
-                                   vc, osd, menu, con, vs, 0,
-                                   vc && config_get_apply_luma_correction( ct ),
-                                   width, height, width * 2, output->get_output_stride() );
+                if( curmethod->doscalerbob ) {
+                    tvtime_build_copied_field( output->get_output_buffer(),
+                                       curframe, lastframe, secondlastframe,
+                                       vc, osd, menu, con, vs, 0,
+                                       vc && config_get_apply_luma_correction( ct ),
+                                       width, height, width * 2, output->get_output_stride() );
+                } else {
+                    tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                       curframe, lastframe, secondlastframe,
+                                       vc, osd, menu, con, vs, 0,
+                                       vc && config_get_apply_luma_correction( ct ),
+                                       width, height, width * 2, output->get_output_stride() );
+                }
             }
 
             /* For the screenshot, use the output after we build the top field. */
@@ -886,7 +957,11 @@ int main( int argc, char **argv )
             performance_checkpoint_delayed_blit_top_field( perf );
 
             performance_checkpoint_blit_top_field_start( perf );
-            output->show_frame();
+            if( curmethod->doscalerbob && !showbars ) {
+                output->show_frame( 0, 0, width, height/2 );
+            } else {
+                output->show_frame( 0, 0, width, height );
+            }
             performance_checkpoint_blit_top_field_end( perf );
         }
 
@@ -908,11 +983,19 @@ int main( int argc, char **argv )
                     blit_packed422_scanline( output->get_output_buffer(),
                                              colourbars, width*height );
                 } else {
-                    tvtime_build_deinterlaced_frame( output->get_output_buffer(),
-                                      curframe, lastframe,
-                                      secondlastframe, vc, osd, menu, con, vs, 1,
-                                      vc && config_get_apply_luma_correction( ct ),
-                                      width, height, width * 2, output->get_output_stride() );
+                    if( curmethod->doscalerbob ) {
+                        tvtime_build_copied_field( output->get_output_buffer(),
+                                          curframe, lastframe,
+                                          secondlastframe, vc, osd, menu, con, vs, 1,
+                                          vc && config_get_apply_luma_correction( ct ),
+                                          width, height, width * 2, output->get_output_stride() );
+                    } else {
+                        tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                          curframe, lastframe,
+                                          secondlastframe, vc, osd, menu, con, vs, 1,
+                                          vc && config_get_apply_luma_correction( ct ),
+                                          width, height, width * 2, output->get_output_stride() );
+                    }
                 }
                 output->unlock_output_buffer();
             }
@@ -955,7 +1038,11 @@ int main( int argc, char **argv )
 
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
-            output->show_frame();
+            if( curmethod->doscalerbob && !showbars ) {
+                output->show_frame( 0, 0, width, height/2 );
+            } else {
+                output->show_frame( 0, 0, width, height );
+            }
             performance_checkpoint_blit_bot_field_end( perf );
         } else {
             performance_checkpoint_delayed_blit_bot_field( perf );

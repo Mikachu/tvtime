@@ -410,11 +410,12 @@ int xv_toggle_aspect( void )
     return output_aspect;
 }
 
-void xv_show_frame( void )
+void xv_show_frame( int x, int y, int width, int height )
 {
     XLockDisplay( display );
     XvShmPutImage( display, xv_port, window, gc, image,
-                   0, 0, input_width, input_height,
+                   /*0, 0, input_width, input_height,*/
+                   x, y, width, height,
                    video_area.x, video_area.y,
                    video_area.width, video_area.height, False );
     XFlush( display );

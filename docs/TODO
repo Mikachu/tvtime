@@ -1,5 +1,11 @@
 
-** This file is somewhat out-of-date and quite incomplete **
+Todo for 1.0:
+
+ - xvoutput module needs to error check and be intelligent.
+
+
+
+** The rest of this file is out-of-date and quite incomplete **
 
 Stuff to do
 -----------

@@ -248,6 +248,7 @@ static deinterlace_method_t twoframe =
     4,
     MM_ACCEL_X86_MMXEXT,
     2,
+    0,
     settings,
     deinterlace_twoframe_packed422_scanline_mmxext,
     copy_scanline

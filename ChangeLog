@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) Added the 'XVideo Bob' equivalent to DScaler's 'scalerbob'
+    plugin (feature request 642661).
   * (vektor) Added the SECAM-DK frequencies ("russia").
   * (vektor) Officially re-enabled the EWMH code from the ogle
     fullscreen handler wm_state.c.

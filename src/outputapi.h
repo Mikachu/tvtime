@@ -36,7 +36,7 @@ typedef struct output_api_s
     void (* wait_for_sync)( int field );
 
     /* Output API for progressive displays. */
-    void (* show_frame)( void );
+    void (* show_frame)( int x, int y, int width, int height );
 
     /* Functions for all outputs. */
     int (* toggle_aspect)( void );

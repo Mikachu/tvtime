@@ -49,6 +49,7 @@ static deinterlace_method_t doublemethod =
     0,
     0,
     0,
+    0,
     deinterlace_scanline_double,
     copy_scanline
 };

@@ -160,6 +160,7 @@ static deinterlace_method_t linearblendmethod =
     MM_ACCEL_X86_MMXEXT,
     0,
     0,
+    0,
     deinterlace_scanline_linear_blend,
     deinterlace_scanline_linear_blend2
 };
