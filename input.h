@@ -1,8 +1,6 @@
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
- * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -26,15 +24,48 @@ typedef struct input_s input_t;
 
 typedef enum InputEvent_e {
 
-    I_NOOP                  = 0,
-    I_KEYDOWN               = (1<<0)
+    I_NOOP                      = 0,
+    I_KEYDOWN                   = (1<<0)
 
 } InputEvent;
 
+/* Modifiers */
+#define I_SHIFT                 (1<<16)
+#define I_META                  (1<<17)
+#define I_CTRL                  (1<<18)
+
+/* Arrows + Home/End pad */
+#define I_UP                    273
+#define I_DOWN                  274
+#define I_RIGHT                 275
+#define I_LEFT                  276
+#define I_INSERT                277
+#define I_HOME                  278
+#define I_END                   279
+#define I_PGUP                  280
+#define I_PGDN                  281
+
+/* Function keys */
+#define I_F1                    282
+#define I_F2                    283
+#define I_F3			        284
+#define I_F4			        285
+#define I_F5                    286
+#define I_F6                    287
+#define I_F7                    288
+#define I_F8                    289
+#define I_F9                    290
+#define I_F10                   291
+#define I_F11                   292
+#define I_F12                   293
+#define I_F13                   294
+#define I_F14                   295
+#define I_F15                   296
 
 
 input_t *input_new( config_t *cfg, osd_t *osd, videoinput_t *vidin );
 void    input_delete( input_t *in );
 void    input_callback( input_t *in, InputEvent command, int arg );
+void    input_next_frame( input_*in );
 
 #endif
