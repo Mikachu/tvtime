@@ -1,0 +1,107 @@
+
+
+  Deinterlacing modes in tvtime
+  =============================
+
+  1. Modes built for video content.
+     - News shows and information channels.
+     - Most live-action television dramas.
+     - Sports broadcasts.
+     - Most video gaming consoles.
+
+     Television
+
+         What does it do?
+         - tvtime expands each field to full resolution,
+           without ever bluring in time or copying in time.
+           this effectively simulates a television.
+         When do I use it?
+         - You want TV-quality with low CPU, and you have
+           configured your monitor to run at 59.94hz or 50hz.
+
+         Modes available:
+         - Full Resolution: High quality for fullscreen use.
+         - Half Resolution: Poor quality for watching
+             TV in a small window.
+
+     Blur
+
+         What does it do?
+         - tvtime avoids flicker by blurring together
+           consecutive frames of input.
+         When do I use it?
+         - You want to run your monitor at an arbitrary
+           refresh rate, and have tvtime not use much CPU.
+
+         Modes available:
+         - Vertical: Blur vertically more than temporally,
+             better for high motion content like sports.
+         - Temporal: Evenly blur in time, low CPU mode for
+             less flicker, but visible trails on fast motion.
+
+     Motion adaptive
+
+         What does it do?
+         - tvtime tries to detect motion in the input
+           frames, reconstructing detail where possible.
+         When do I use it?
+         - You want to run your monitor at an arbitrary
+           refresh rate, and don't mind using a lot of CPU.
+
+         Modes available:
+         - Static detection: Pure interpolation where motion
+           is detected, copy where no motion.  Moderate CPU
+           requirements with high quality output.
+         - Motion search: Follow motion vectors for more
+           accurate interpolation.  High quality with high
+           CPU requirements.
+
+  2. Modes built for film content.
+     - Films broadcast on TV or from a DVD player.
+     - Cartoons and most anime.
+     - Some higher budget television dramas
+     - Older video gaming consoles.
+
+     2-3 Pulldown Detection
+
+         What does it do?
+         - tvtime detects a 2-3 pulldown sequence in the
+           video stream and uses this information to
+           intelligently reconstruct frames.
+         When do I use it?
+         - Watching an NTSC broadcast of a cartoon,
+           film, or television program shot on film.
+
+         Modes available:
+         - 2-3 pulldown detection can be enabled at any
+           time.  This will use more CPU to analyze
+           the input and detect pulldown, entering "film
+           mode" when detection is successful.
+
+     Progressive (top or bottom field first)
+
+         What does it do?
+         - tvtime constructs frames from pairs of fields.
+         When do I use it?
+         - Using a video game from a console system which
+           sends a progressive signal.
+         - Watching a film broadcast or DVD in a PAL area.
+
+         Modes available:
+         - Top Field First and Bottom Field first.  You
+           must experiment with your content and see how
+           it is being sent, and select the appropriate
+           mode in tvtime to match it.
+
+     2-2 Pulldown Detection
+
+         What does it do?
+         - While not currently available in tvtime, this
+           option would allow us to detect progressive
+           content, and whether it is top or bottom field
+           first, rather than manually setting this option.
+         When do I use it?
+         - Using a video game from a console system which
+           sends a progressive signal.
+         - Watching a film broadcast or DVD in a PAL area.
+
