@@ -104,11 +104,11 @@ dnl	if test $MICRO -lt 4 ; then
 dnl		AC_MSG_ERROR([Found libxml2 with micro version number = $MICRO < 26])
 dnl	fi
 	XML2_LIBS="`$LIBXML2_CONFIG --libs`"
-	XML2_INCL="`$LIBXML2_CONFIG --cflags`"
+	XML2_FLAG="`$LIBXML2_CONFIG --cflags`"
 	AC_DEFINE(HAVE_LIBXML2,,[LIBXML2 support])	
 fi
 AC_SUBST(XML2_LIBS)
-AC_SUBST(XML2_INCL)
+AC_SUBST(XML2_FLAG)
 
 
 dnl ---------------------------------------------
