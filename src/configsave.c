@@ -117,6 +117,7 @@ int configsave(const char *INIT_name, const char *INIT_val, const int INIT_num)
 	    str = malloc(sizeof(char)*offset);
 	    snprintf(str, offset,  "\n# Adding parameter %s\n%s = %s\n", INIT_name, INIT_name, INIT_val);
 	    write(FD, str, offset-1);
+	    free(str);
 	    return 1;
 	}
 
