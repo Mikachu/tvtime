@@ -2621,7 +2621,6 @@ int main( int argc, char **argv )
     */
 
     /* Steal system resources in the name of performance. */
-    setpriority( PRIO_PROCESS, 0, -10 );
     if( set_realtime_priority( 0 ) ) {
         realtime = 1;
     }
