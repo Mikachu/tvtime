@@ -678,8 +678,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_ENTER:
-        station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
-        commands_station_change( in );
+        if( in->next_chan_buffer[ 0 ] ) {
+            station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
+            commands_station_change( in );
+        }
         in->frame_counter = 0;
         break;
 
