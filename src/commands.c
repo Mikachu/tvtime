@@ -387,22 +387,22 @@ static void reinit_tuner( commands_t *cmd )
 
             if( brightness >= 0 ) {
                 videoinput_set_brightness( cmd->vidin, brightness );
-            } else if( cmd->brightness >= 0 ) {
+            } else {
                 videoinput_set_brightness( cmd->vidin, cmd->brightness );
             }
             if( contrast >= 0 ) {
                 videoinput_set_contrast( cmd->vidin, contrast );
-            } else if( cmd->contrast >= 0 ) {
+            } else {
                 videoinput_set_contrast( cmd->vidin, cmd->contrast );
             }
             if( colour >= 0 ) {
                 videoinput_set_colour( cmd->vidin, colour );
-            } else if( cmd->colour >= 0 ) {
+            } else {
                 videoinput_set_colour( cmd->vidin, cmd->colour );
             }
             if( hue >= 0 ) {
                 videoinput_set_hue( cmd->vidin, hue );
-            } else if( cmd->hue >= 0 ) {
+            } else {
                 videoinput_set_hue( cmd->vidin, cmd->hue );
             }
         }
