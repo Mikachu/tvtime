@@ -260,6 +260,7 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
     ProcessLine( &vbi->buf[ DO_LINE*2048 ], 0 );
     ProcessLine( &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
 
+/*
     if( printdebug ) {
         for( i = 0; i < 32; i++ ) {
             for( j = 0; j < 2048; j++ ) {
@@ -267,5 +268,6 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
             }
         }
     }
+*/
 }
 
