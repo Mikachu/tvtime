@@ -34,8 +34,13 @@ dist_desktopdata_DATA = net-tvtime.desktop
 
 # We use $(datadir)/icons/hicolor as our theme from the freedesktop spec
 # http://www.freedesktop.org/standards/menu-spec/
-icondatadir = $(datadir)/icons/hicolor/48x48/apps
-dist_icondata_DATA = tvtime.png
+install-data-local:
+	$(INSTALL) -d $(datadir)/icons/hicolor/16x16/apps
+	$(INSTALL) -d $(datadir)/icons/hicolor/32x32/apps
+	$(INSTALL) -d $(datadir)/icons/hicolor/48x48/apps
+	$(INSTALL_DATA) tvtime.16x16.png $(datadir)/icons/hicolor/16x16/apps/tvtime.png
+	$(INSTALL_DATA) tvtime.32x32.png $(datadir)/icons/hicolor/32x32/apps/tvtime.png
+	$(INSTALL_DATA) tvtime.48x48.png $(datadir)/icons/hicolor/48x48/apps/tvtime.png
 
 .PHONY: install-exec-hook
 install-exec-hook:
