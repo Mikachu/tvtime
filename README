@@ -129,7 +129,7 @@ their default key bindings.
       station list.  You can use this to manually scan your channels and
       enable those with signal or disable duplicate stations.
 
-  CHANNEL_RENUMBER (b)
+  CHANNEL_RENUMBER (r)
     - Renumbers the current channel.  This will swap the current channel
       with the number you type in.  Use this to configure your station
       list to suit preference or locality.
