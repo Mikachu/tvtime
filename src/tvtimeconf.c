@@ -858,7 +858,7 @@ config_t *config_new( void )
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
     ct->keymap[ I_F1 ] = TVTIME_SHOW_MENU;
     ct->keymap[ 'h' ] = TVTIME_SHOW_MENU;
-    ct->keymap[ '	' ] = TVTIME_SHOW_MENU;
+    ct->keymap[ '\t' ] = TVTIME_SHOW_MENU;
     ct->keymap[ I_F5 ] = TVTIME_PICTURE;
     ct->keymap[ I_F6 ] = TVTIME_PICTURE_DOWN;
     ct->keymap[ I_F7 ] = TVTIME_PICTURE_UP;
@@ -909,7 +909,7 @@ config_t *config_new( void )
     ct->keymapmenu[ I_RIGHT ] = TVTIME_MENU_ENTER;
     ct->keymapmenu[ I_ENTER ] = TVTIME_MENU_ENTER;
     ct->keymapmenu[ I_F1 ] = TVTIME_MENU_EXIT;
-    ct->keymapmenu[ '	' ] = TVTIME_MENU_EXIT;
+    ct->keymapmenu[ '\t' ] = TVTIME_MENU_EXIT;
     ct->keymapmenu[ 'q' ] = TVTIME_MENU_EXIT;
     ct->keymapmenu[ I_ESCAPE ] = TVTIME_MENU_EXIT;
     ct->buttonmapmenu[ 1 ] = TVTIME_MENU_ENTER;
@@ -1168,7 +1168,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'd': if( !optarg ) {
-                      fprintf( stdout, "V4LDevice:%s\n", config_get_v4l_device( ct ) );
+                      fprintf( stdout, "V4LDevice:%s\n",
+                               config_get_v4l_device( ct ) );
                   } else {
                       free( ct->v4ldev );
                       ct->v4ldev = strdup( optarg );
@@ -1176,7 +1177,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   break;
         case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': if( !optarg ) {
-                      fprintf( stdout, "V4LInput:%d\n", config_get_inputnum( ct ) );
+                      fprintf( stdout, "V4LInput:%d\n",
+                               config_get_inputnum( ct ) );
                   } else {
                       ct->inputnum = atoi( optarg );
                   }
@@ -1184,7 +1186,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         case 'c': ct->prev_channel = ct->start_channel;
                   ct->start_channel = atoi( optarg ); break;
         case 't': if( !optarg ) {
-                      fprintf( stdout, "XMLTVFile:%s\n", config_get_xmltv_file( ct ) );
+                      fprintf( stdout, "XMLTVFile:%s\n",
+                               config_get_xmltv_file( ct ) );
                   } else {
                       if( ct->xmltvfile ) free( ct->xmltvfile );
                       ct->xmltvfile = expand_user_path( optarg );
@@ -1208,14 +1211,16 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   }
                   break;
         case 'f': if( !optarg ) {
-                      fprintf( stdout, "Frequencies:%s\n", config_get_v4l_freq( ct ) );
+                      fprintf( stdout, "Frequencies:%s\n",
+                               config_get_v4l_freq( ct ) );
                   } else {
                       free( ct->freq );
                       ct->freq = strdup( optarg );
                   }
                   break;
         case 'R': if( !optarg ) {
-                      fprintf( stdout, "Priority:%d\n", config_get_priority( ct ) );
+                      fprintf( stdout, "Priority:%d\n",
+                               config_get_priority( ct ) );
                   } else {
                       ct->priority = atoi( optarg );
                   }
@@ -1282,7 +1287,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
     return 1;
 }
 
-int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **argv )
+int config_parse_tvtime_scanner_command_line( config_t *ct, int argc,
+                                              char **argv )
 {
     static struct option long_options[] = {
         { "help", 0, 0, 'h' },
