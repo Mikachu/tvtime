@@ -1,5 +1,6 @@
 
 0.9.7
+  * (vektor) We now exit properly on window manager destroy messages.
   * (vektor) Added a configure check for Xinerama (bug 636424)
   * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576.
   * (vektor) You can now change the default process priority in the .tvtimerc

@@ -48,6 +48,11 @@ static int output_fullscreen = 0;
 static int screen;
 static int found_colorkey = 0;
 static int colorkey = 0;
+static Atom wmProtocolsAtom;
+static Atom wmDeleteAtom;
+
+static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
+
 
 typedef struct {
   int x;
@@ -203,6 +208,12 @@ static int open_display( void )
 
     DpyInfoUpdateResolution( display, screen, 0, 0 );
     DpyInfoUpdateGeometry( display, screen );
+
+    XInternAtoms( display, atomNames, 2, False, &wmProtocolsAtom );
+
+    /* collaborate with the window manager for close requests */
+    XSetWMProtocols( display, window, &wmDeleteAtom, 1 );
+
 
     return 1;
 }
@@ -408,7 +419,21 @@ void xv_poll_events( input_t *in )
 
     while (XPending(display)) {
         XNextEvent(display, &event);
+
+        /* X sucks this way.  Thanks to walken for help on this one. */
+        if( ( event.xclient.message_type == wmProtocolsAtom ) && ( event.xclient.format == 32 ) &&
+            ( event.xclient.data.l[ 0 ] == wmDeleteAtom ) ) {
+            input_callback( in, I_QUIT, 0 );
+            continue;
+        }
+
         switch( event.type ) {
+        case DestroyNotify:
+            if( event.xdestroywindow.window != window ) {
+                break;
+            }
+            input_callback( in, I_QUIT, 0 );
+            break;
         case Expose:
             break;
         case ConfigureNotify:
