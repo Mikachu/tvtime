@@ -516,22 +516,23 @@ static int conf_xml_parse( config_t *ct, char *configFile )
 
     doc = xmlParseFile( configFile );
     if( !doc ) {
-        fprintf( stderr, "config: Error parsing configuration file %s.\n",
-                 configFile );
+        lfprintf( stderr, _("config: Error parsing configuration file %s.\n"),
+                  configFile );
         return 0;
     }
 
     top = xmlDocGetRootElement( doc );
     if( !top ) {
-        fprintf( stderr, "config: No XML root element found in %s.\n",
-                 configFile );
+        lfprintf( stderr, _("config: No XML root element found in %s.\n"),
+                  configFile );
         xmlFreeDoc( doc );
         return 0;
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        fprintf( stderr, "config: %s is not a tvtime configuration file.  "
-                         "Root node is not 'tvtime'.\n", configFile );
+        lfprintf( stderr,
+                  _("config: %s is not a tvtime configuration file.\n"),
+                  configFile );
         xmlFreeDoc( doc );
         return 0;
     }
@@ -564,15 +565,18 @@ static xmlDocPtr configsave_open( const char *config_filename )
     doc = xmlParseFile( config_filename );
     if( !doc ) {
         if( file_is_openable_for_read( config_filename ) ) {
-            fprintf( stderr, "config: Config file exists, but cannot be parsed.\n" );
-            fprintf( stderr, "config: Settings will NOT be saved.\n" );
+            lfputs( _("config: Config file exists, but cannot be parsed.\n"),
+                    stderr );
+            lfputs( _("config: Settings will NOT be saved.\n"), stderr );
             return 0;
         } else {
             /* Config file doesn't exist, create a new one. */
-            fprintf( stderr, "config: No config file found, creating a new one.\n" );
+            lfputs( _("config: No config file found, creating a new one.\n"),
+                    stderr );
             doc = xmlNewDoc( BAD_CAST "1.0" );
             if( !doc ) {
-                fprintf( stderr, "config: Could not create new config file.\n" );
+                lfputs( _("config: Could not create new config file.\n"),
+                        stderr );
                 return 0;
             }
             create_file = 1;
@@ -596,7 +600,8 @@ static xmlDocPtr configsave_open( const char *config_filename )
         /* Create the root node */
         top = xmlNewDocNode( doc, 0, BAD_CAST "tvtime", 0 );
         if( !top ) {
-            fprintf( stderr, "config: Could not create toplevel element 'tvtime'.\n" );
+            lfputs( _("config: Error creating configuration file.\n"),
+                    stderr );
             xmlFreeDoc( doc );
             return 0;
         } else {
@@ -607,8 +612,9 @@ static xmlDocPtr configsave_open( const char *config_filename )
     }
 
     if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
-        fprintf( stderr, "config: %s is not a tvtime configuration file.  "
-                         "Root node is not 'tvtime'.\n", config_filename );
+        lfprintf( stderr,
+                  _("config: %s is not a tvtime configuration file.\n"),
+                  config_filename );
         xmlFreeDoc( doc );
         return 0;
     }
@@ -617,8 +623,8 @@ static xmlDocPtr configsave_open( const char *config_filename )
     xmlSaveFormatFile( config_filename, doc, 1 );
     if( create_file ) {
         if( chown( config_filename, getuid(), getgid() ) < 0 ) {
-            fprintf( stderr, "config: Cannot change owner of %s: %s.",
-                    config_filename, strerror( errno ) );
+            lfprintf( stderr, _("config: Cannot change owner of %s: %s.\n"),
+                      config_filename, strerror( errno ) );
         }
     }
     return doc;
@@ -626,14 +632,13 @@ static xmlDocPtr configsave_open( const char *config_filename )
 
 static void print_copyright( void )
 {
-    fprintf( stderr,
-    "\n"
-    "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
-    "others.  For details and copying conditions, please see our website\n"
-    "at http://tvtime.net/\n"
-    "\n"
-    "tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
-    "Alexander S. Belov, and Achim Schneider.\n" );
+    lfputs (_("\n"
+              "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
+              "others.  For details and copying conditions, please see our website\n"
+              "at http://tvtime.net/\n"
+              "\n"
+              "tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
+              "Alexander S. Belov, and Achim Schneider.\n"), stderr );
 }
  
 static void print_usage( char **argv )
@@ -800,7 +805,12 @@ config_t *config_new( void )
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
-    ct->ssdir = strdup( getenv( "HOME" ) );
+    temp_dirname = getenv( "HOME" );
+    if( temp_dirname ) {
+        ct->ssdir = strdup( temp_dirname );
+    } else {
+        ct->ssdir = 0;
+    }
     ct->audiomode = strdup( "stereo" );
     ct->xmltvfile = strdup( "none" );
     ct->timeformat = strdup( "%X" );
@@ -915,13 +925,13 @@ config_t *config_new( void )
 
     if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
-            fprintf( stderr, "config: Cannot create %s: %s.\n",
-                     temp_dirname, strerror( errno ) );
+            lfprintf( stderr, _("config: Cannot create %s: %s.\n"),
+                      temp_dirname, strerror( errno ) );
         } else {
             DIR *temp_dir = opendir( temp_dirname );
             if( !temp_dir ) {
-                fprintf( stderr, "config: %s is not a directory.\n", 
-                         temp_dirname );
+                lfprintf( stderr, _("config: %s is not a directory.\n"), 
+                          temp_dirname );
             } else {
                 closedir( temp_dir );
             }
@@ -930,8 +940,8 @@ config_t *config_new( void )
     } else {
         /* We created the directory, now force it to be owned by the user. */
         if( chown( temp_dirname, getuid(), getgid() ) < 0 ) {
-            fprintf( stderr, "config: Cannot change owner of %s: %s.\n",
-                     temp_dirname, strerror( errno ) );
+            lfprintf( stderr, _("config: Cannot change owner of %s: %s.\n"),
+                      temp_dirname, strerror( errno ) );
         }
     }
     free( temp_dirname );
@@ -939,7 +949,7 @@ config_t *config_new( void )
     /* First read in global settings. */
     asprintf( &base, "%s/tvtime.xml", CONFDIR );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, "config: Reading configuration from %s\n", base );
+        fprintf( stderr, _("config: Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
@@ -948,7 +958,7 @@ config_t *config_new( void )
     asprintf( &base, "%s/.tvtime/tvtime.xml", getenv( "HOME" ) );
     ct->config_filename = strdup( base );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, "config: Reading configuration from %s\n", base );
+        fprintf( stderr, _("config: Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
@@ -1005,8 +1015,10 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'F': if( ct->config_filename ) free( ct->config_filename );
                       ct->config_filename = expand_user_path( optarg );
                       if( ct->config_filename ) {
-                          fprintf( stderr, "config: Reading configuration from %s\n",
-                                  ct->config_filename );
+                          lfprintf
+                              ( stderr,
+                                _("config: Reading configuration from %s\n"),
+                                ct->config_filename );
                           conf_xml_parse( ct, ct->config_filename );
                       }
                       break;
@@ -1051,7 +1063,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
     if( ct->doc && saveoptions ) {
         char tempstring[ 32 ];
-        fprintf( stderr, "config: Saving command line options.\n" );
+        lfputs( _("config: Saving command line options.\n"), stderr );
 
         /**
          * Options that aren't specified on the command line
@@ -1140,8 +1152,9 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         case 'F': if( ct->config_filename ) free( ct->config_filename );
                   ct->config_filename = expand_user_path( optarg );
                   if( ct->config_filename ) {
-                      fprintf( stderr, "config: Reading configuration from %s\n",
-                              ct->config_filename );
+                      lfprintf( stderr,
+                                _("config: Reading configuration from %s\n"),
+                                ct->config_filename );
                       conf_xml_parse( ct, ct->config_filename );
                   }
                   break;
@@ -1289,8 +1302,9 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **arg
         case 'F': if( ct->config_filename ) free( ct->config_filename );
                   ct->config_filename = expand_user_path( optarg );
                   if( ct->config_filename ) {
-                      fprintf( stderr, "config: Reading configuration from %s\n",
-                              ct->config_filename );
+                      lfprintf( stderr,
+                                _("config: Reading configuration from %s\n"),
+                                ct->config_filename );
                       conf_xml_parse( ct, ct->config_filename );
                   }
                   break;
