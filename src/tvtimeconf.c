@@ -192,16 +192,25 @@ config_t *config_new( int argc, char **argv )
 
     memset( ct->keymap, 0, 8*MAX_KEYSYMS * sizeof( int ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
+
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
     ct->keymap[ 'q' ] = TVTIME_QUIT;
     ct->keymap[ I_UP ] = TVTIME_CHANNEL_UP;
     ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DOWN;
+    ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
+    ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
+    ct->keymap[ 'k' ] = TVTIME_CHANNEL_UP;
+    ct->keymap[ 'j' ] = TVTIME_CHANNEL_DOWN;
+    ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
+    ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
+    ct->keymap[ '[' ] = TVTIME_FREQLIST_DOWN;
+    ct->keymap[ ']' ] = TVTIME_FREQLIST_UP;
     ct->keymap[ 'c' ] = TVTIME_LUMA_CORRECTION_TOGGLE;
-    ct->keymap[ 'j' ] = TVTIME_LUMA_UP;
-    ct->keymap[ 'h' ] = TVTIME_LUMA_DOWN;
+    ct->keymap[ 'z' ] = TVTIME_LUMA_DOWN;
+    ct->keymap[ 'x' ] = TVTIME_LUMA_UP;
     ct->keymap[ 'm' ] = TVTIME_MIXER_MUTE;
-    ct->keymap[ '+' ] = TVTIME_MIXER_UP;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
+    ct->keymap[ '+' ] = TVTIME_MIXER_UP;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
     ct->keymap[ I_F1 ] = TVTIME_HUE_DOWN;
     ct->keymap[ I_F2 ] = TVTIME_HUE_UP;
@@ -211,18 +220,15 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F6 ] = TVTIME_CONT_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
-    ct->keymap[ I_F9 ] = TVTIME_TV_VIDEO;
-    ct->keymap[ I_F10 ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
     ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;
     ct->keymap[ 'f' ] = TVTIME_FULLSCREEN;
+    ct->keymap[ 'i' ] = TVTIME_TV_VIDEO;
     ct->keymap[ 'a' ] = TVTIME_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
-    ct->keymap[ I_HOME ] = TVTIME_MENUMODE ;
-    ct->keymap[ ',' ] = TVTIME_FINETUNE_DOWN;
-    ct->keymap[ '.' ] = TVTIME_FINETUNE_UP;
+    ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
