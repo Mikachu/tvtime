@@ -97,7 +97,7 @@ static void deinterlace_frame_di_greedyh( unsigned char *output,
 static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "GreedyH (Dscaler DLL)",
+    "DScaler: Greedy - High Motion",
     "GreedyH",
     4,
     MM_ACCEL_X86_MMXEXT,

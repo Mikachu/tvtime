@@ -97,7 +97,7 @@ static void deinterlace_frame_di_videoweave( unsigned char *output,
 static deinterlace_method_t videoweavemethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "VideoWeave (Dscaler DLL)",
+    "DScaler: Video Weave",
     "VideoWeave",
     4,
     MM_ACCEL_X86_MMXEXT,

@@ -97,7 +97,7 @@ static void deinterlace_frame_di_tomsmocomp( unsigned char *output,
 static deinterlace_method_t tomsmocompmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "TomsMoComp (Dscaler DLL)",
+    "DScaler: TomsMoComp",
     "TomsMoComp",
     4,
     MM_ACCEL_X86_MMXEXT,

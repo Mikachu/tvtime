@@ -97,7 +97,7 @@ static void deinterlace_frame_di_oldgame( unsigned char *output,
 static deinterlace_method_t oldgamemethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "OldGame (Dscaler DLL)",
+    "DScaler: OldGame",
     "OldGame",
     4,
     MM_ACCEL_X86_MMXEXT,

@@ -97,7 +97,7 @@ static void deinterlace_frame_di_videobob( unsigned char *output,
 static deinterlace_method_t videobobmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "VideoBob (Dscaler DLL)",
+    "DScaler: Video Bob",
     "VideoBob",
     4,
     MM_ACCEL_X86_MMXEXT,

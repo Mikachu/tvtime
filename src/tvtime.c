@@ -786,26 +786,23 @@ int main( int argc, char **argv )
 
     setup_speedy_calls( verbose );
 
-    greedy_plugin_init();
-    // videobob_plugin_init();
-    // greedy2frame_plugin_init();
-    // twoframe_plugin_init();
-    linearblend_plugin_init();
-    linear_plugin_init();
-    weave_plugin_init();
-    double_plugin_init();
-    scalerbob_plugin_init();
+    dscaler_greedyh_plugin_init();
+    dscaler_greedy_plugin_init();
 
+    linearblend_plugin_init();
 
     dscaler_greedy2frame_plugin_init();
     dscaler_twoframe_plugin_init();
-    dscaler_greedyh_plugin_init();
-    dscaler_greedy_plugin_init();
+
     dscaler_videobob_plugin_init();
     dscaler_videoweave_plugin_init();
-    // how does this work anyway: dscaler_oldgame_plugin_init();
     dscaler_tomsmocomp_plugin_init();
 
+    linear_plugin_init();
+    weave_plugin_init();
+    double_plugin_init();
+
+    scalerbob_plugin_init();
 
     if( !configsave_open( config_get_config_filename( ct ) ) ) {
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );

@@ -97,7 +97,7 @@ static void deinterlace_frame_di_greedy2frame( unsigned char *output,
 static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Greedy - 2-frame (DScaler DLL)",
+    "DScaler: Greedy - 2-frame",
     "Greedy2Frame",
     4,
     MM_ACCEL_X86_MMXEXT,
