@@ -166,7 +166,14 @@ static void reinit_tuner( input_t *in )
         }
 
         if( in->osd ) {
-            tvtime_osd_set_freq_table( in->osd, freq_table_names[ cur_freq_table ].long_name );
+            if( cur_freq_table == NTSC_CABLE && ntsc_cable_mode != NTSC_CABLE_MODE_NOMINAL ) {
+                char tablename[ 200 ];
+                sprintf( tablename, "%s [%s]", freq_table_names[ cur_freq_table ].long_name,
+                     ntsc_cable_mode == NTSC_CABLE_MODE_IRC ? "IRC" : "HRC" );
+                tvtime_osd_set_freq_table( in->osd, tablename );
+            } else {
+                tvtime_osd_set_freq_table( in->osd, freq_table_names[ cur_freq_table ].long_name );
+            }
             tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
             tvtime_osd_show_info( in->osd );
         }

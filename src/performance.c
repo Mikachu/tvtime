@@ -40,6 +40,8 @@ struct performance_s
 
     int drop_history[ DROP_HISTORY_SIZE ];
     int drop_pos;
+
+    int drop_reset;
 };
 
 performance_t *performance_new( int fieldtimeus )
@@ -52,6 +54,7 @@ performance_t *performance_new( int fieldtimeus )
     perf->last_blit_time = 0;
     perf->time_bot_to_top = 0;
     perf->time_top_to_bot = 0;
+    perf->drop_reset = 0;
     gettimeofday( &perf->lastfieldtime, 0 );
     gettimeofday( &perf->lastframetime, 0 );
     gettimeofday( &perf->aquired_input, 0 );
@@ -156,15 +159,17 @@ int performance_get_usecs_of_last_blit( performance_t *perf )
 
 void performance_print_last_frame_stats( performance_t *perf )
 {
+    double aquire = ((double) timediff( &perf->aquired_input, &perf->blit_bot_end )) / 1000.0;
+    double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
+    double wait_top = ((double) timediff( &perf->delay_blit_top, &perf->constructed_top )) / 1000.0;
+    double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
+    double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
+    double wait_bot = ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0;
+    double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
+
     fprintf( stderr, "tvtime: aquire % 2.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
                      "tvtime:                 build bot % 2.2fms, wait bot % 2.2fms, blit bot % 2.2fms\n",
-             ((double) timediff( &perf->aquired_input, &perf->blit_bot_end )) / 1000.0,
-             ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0,
-             ((double) timediff( &perf->delay_blit_top, &perf->constructed_top )) / 1000.0,
-             ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0,
-             ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0,
-             ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0,
-             ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0 );
+             aquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
     fprintf( stderr, "tvtime: top-to-bot: % 2.2f, bot-to-top: % 2.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
              (double) perf->time_bot_to_top / 1000.0 );
@@ -172,9 +177,38 @@ void performance_print_last_frame_stats( performance_t *perf )
 
 void performance_print_frame_drops( performance_t *perf )
 {
+    /* Ignore the first frame drop after a reset. */
+    if( !perf->drop_reset ) {
+        perf->drop_reset = 1;
+        return;
+    }
+
     if( timediff( &perf->aquired_input, &perf->lastframetime ) > (perf->fieldtime * 3) ) {
-        fprintf( stderr, "tvtime: Frame drop detected (% 2.2fms between consecutive frames.\n",
+        double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
+        double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
+        double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
+        double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
+
+        fprintf( stderr, "tvtime: Frame drop detected (%2.2fms between consecutive frames.\n",
             ((double) timediff( &perf->aquired_input, &perf->lastframetime)) / 1000.0 );
+        performance_print_last_frame_stats( perf );
+
+        if( build_top >= blit_top && build_top >= build_bot && build_top >= blit_bot ) {
+            fprintf( stderr, "tvtime: Took %2.2fms to build a field.\n",
+                     build_top );
+        }
+        if( blit_top >= build_top && blit_top >= build_bot && blit_top >= blit_bot ) {
+            fprintf( stderr, "tvtime: Took %2.2fms to blit a field.\n",
+                     blit_top );
+        }
+        if( build_bot >= build_top && build_bot >= blit_top && build_bot >= blit_bot ) {
+            fprintf( stderr, "tvtime: Took %2.2fms to build a field.\n",
+                     build_bot );
+        }
+        if( blit_bot >= build_top && blit_bot >= blit_top && blit_bot >= build_bot ) {
+            fprintf( stderr, "tvtime: Took %2.2fms to blit a field.\n",
+                     blit_bot );
+        }
     }
 }
 
