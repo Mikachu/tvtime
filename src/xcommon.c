@@ -138,19 +138,21 @@ static int xv_get_width_for_height( int window_height )
 
 static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int aspect_height )
 {
-   /* These hints don't work with current versions of metacity.
-    * I will be doing some detection code, but in the mean time,
-    * let's not use the hints.  -Billy
-    */
-    XSizeHints hints;
+    /* These hints don't work with current versions of metacity.
+     * We'll re-enable this code for metacity when newer versions
+     * become more popular.
+     */
+    if( !wm_is_metacity ) {
+        XSizeHints hints;
 
-    hints.flags = PAspect;
-    hints.min_aspect.x = aspect_width;
-    hints.min_aspect.y = aspect_height;
-    hints.max_aspect.x = aspect_width;
-    hints.max_aspect.y = aspect_height;
+        hints.flags = PAspect;
+        hints.min_aspect.x = aspect_width;
+        hints.min_aspect.y = aspect_height;
+        hints.max_aspect.x = aspect_width;
+        hints.max_aspect.y = aspect_height;
 
-    XSetWMNormalHints( dpy, win, &hints );
+        XSetWMNormalHints( dpy, win, &hints );
+    }
 }
 
 static unsigned long req_serial;        /* used for error handling */
