@@ -133,7 +133,7 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
     return 0;
 }
 
-static int insert( station_mgr_t *mgr, station_info_t *i )
+static int insert( station_mgr_t *mgr, station_info_t *i, int allowdup )
 {
     mgr->num_stations++;
 
@@ -158,12 +158,14 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
                 return 0;
             }
 
-            if( rp->channel->freq == i->channel->freq ) {
-                if( mgr->verbose ) {
-                    fprintf( stderr, "station: Frequency %d already in use.\n",
-                             i->channel->freq );
+            if( !allowdup ) {
+                if( rp->channel->freq == i->channel->freq ) {
+                    if( mgr->verbose ) {
+                        fprintf( stderr, "station: Frequency %d already in use.\n",
+                                 i->channel->freq );
+                    }
+                    return 0;
                 }
-                return 0;
             }
             
             if( rp->pos > i->pos ) break;
@@ -610,14 +612,14 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
             newentry->name = entryname;
             newentry->freq = freq;
             info = station_info_new( pos, name, &custom_band, newentry );
-            if( info ) insert( mgr, info );
+            if( info ) insert( mgr, info, 1 );
             return pos;
         }
     } else if( band ) {
         for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
             if( !strcasecmp( entry->name, channel ) ) {
                 info = station_info_new( pos, name, band, entry );
-                if( info ) insert( mgr, info );
+                if( info ) insert( mgr, info, 1 );
                 return pos;
             }
         }
@@ -643,7 +645,7 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
         }
 
         info = station_info_new( pos, 0, band, &(band->channels[ i ]) );
-        if( info ) insert( mgr, info );
+        if( info ) insert( mgr, info, 0 );
     }
 
     return 1;
@@ -869,7 +871,7 @@ int station_remap( station_mgr_t *mgr, int pos )
     if( isFreePos( mgr, pos ) ) {
         station_info_t *i = ripout( mgr, mgr->current->pos );
         i->pos = pos;
-        res= insert( mgr, i );
+        res = insert( mgr, i, 1 );
 
     } else {
         station_info_t *old = ripout( mgr, pos );
@@ -877,7 +879,7 @@ int station_remap( station_mgr_t *mgr, int pos )
         
         old->pos= i->pos;
         i->pos = pos;
-        res= insert( mgr, old ) && insert( mgr, i );
+        res = insert( mgr, old, 1 ) && insert( mgr, i, 1 );
     }
     if ( mgr->verbose ) {
         station_dump( mgr );

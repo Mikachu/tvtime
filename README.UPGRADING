@@ -9,22 +9,14 @@ we have made some incompatible change that may cause difficulty for
 some users.  While we believe that the changes made are reasonable,
 we are curious to know your thoughts and opinions.
 
-  1. Keybindings have changed, and we have a menu.
+     ***  Some default key bindings have changed  ***
+
+               ***  We now have a menu  ***
 
      Some of the default key bindings have changed.  We recommend
      that users who have not changed their key bindings to start over
      by deleting their config files.  Feedback on how easy tvtime is
      to configure with the new menu would be greatly appreciated.
-
-  2. Some of the stationlist management policy has changed.
-
-     The stationlist will now disallow multiple channels with the same
-     frequency, even if they have different names.  We think this is a
-     good thing, but in some cases, it may mean that old stationlist.xml
-     files could lose some channels for European users.  If you have
-     spent a long time editing your stationlist.xml file, make a backup
-     and try tvtime in verbose mode first and make sure none of your
-     channels are missing.
 
 What changed with the key bindings
 ----------------------------------
