@@ -210,6 +210,30 @@ unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char
     return ret;
 }
 
+unsigned int diff_factor_packed422_scanline_test_c( unsigned char *cur, unsigned char *old, int width )
+{
+    unsigned int ret = 0;
+
+    SPEEDY_START();
+
+    width /= 16;
+
+    while( width-- ) {
+        unsigned int tmp1 = (cur[ 0 ] + cur[ 2 ] + cur[ 4 ] + cur[ 6 ])>>2;
+        unsigned int tmp2 = (old[ 0 ] + old[ 2 ] + old[ 4 ] + old[ 6 ])>>2;
+        tmp1  = (tmp1 - tmp2);
+        tmp1 *= tmp1;
+        tmp1 >>= BitShift;
+        ret += tmp1;
+        cur += (8*4);
+        old += (8*4);
+    }
+    SPEEDY_END();
+
+    return ret;
+}
+
+
 unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned char *old, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
