@@ -32,13 +32,14 @@
 
   <!--
     This sets the default TV norm.  Valid options are:
-       ntsc
-       pal
-       secam
-       pal-nc
-       pal-m
-       pal-n
-       ntsc-jp
+       NTSC
+       NTSC-JP
+       SECAM
+       PAL
+       PAL-Nc
+       PAL-M
+       PAL-N
+       PAL-60
   -->
   <option name="Norm" value="NTSC"/>
 

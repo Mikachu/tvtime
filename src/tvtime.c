@@ -921,13 +921,15 @@ int main( int argc, char **argv )
         norm = VIDEOINPUT_PAL_N;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "ntsc-jp" ) ) {
         norm = VIDEOINPUT_NTSC_JP;
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "pal-60" ) ) {
+        norm = VIDEOINPUT_PAL_60;
     } else {
         /* Only allow NTSC otherwise. */
         norm = VIDEOINPUT_NTSC;
     }
 
     /* Field display in microseconds. */
-    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_60 ) {
         fieldtime = 16683;
     } else {
         fieldtime = 20000;

@@ -1,5 +1,6 @@
 
 0.9.9 -
+  * vektor: Added support for PAL-60.
   * vektor: Added conversion from UYVY to YUYV.  We convert
       per scanline as we read it from the input.  This should
       be faster than having drivers convert.  Still, this is

@@ -155,7 +155,7 @@ int videoinput_get_norm_number( const char *name )
 {
     int i;
 
-    for( i = 0; i < VIDEOINPUT_NTSC_JP + 1; i++ ) {
+    for( i = 0; i < VIDEOINPUT_PAL_60 + 1; i++ ) {
         if( !strcasecmp( name, videoinput_get_norm_name( i ) ) ) {
             return i;
         }
