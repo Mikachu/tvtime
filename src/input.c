@@ -162,16 +162,15 @@ void frequencies_set_tuner_by_name( const char *tuner_name )
     cur_freq_table = NTSC_CABLE;
 }
 
-void frequencies_list_freqs( )
+void frequencies_list_disabled_freqs( )
 {
     int i;
 
     
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        if( tvtuner[ i ].freq[ cur_freq_table ].freq ) {
-            fprintf( stderr, "channel = %s %s ", freq_table_names[ cur_freq_table ].short_name, tvtuner[ i ].name );
-            fprintf( stderr, "%d\n", 
-                     tvtuner[ i ].freq[ cur_freq_table ].enabled);
+        if( tvtuner[ i ].freq[ cur_freq_table ].freq
+            && !tvtuner[ i ].freq[ cur_freq_table ].enabled ) {
+            fprintf( stderr, "channel = %s %s 0\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ i ].name );
         }
     }
     fprintf( stderr, "\n" );
@@ -314,7 +313,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     reinit_tuner( in );
 
     frequencies_disable_freqs( cfg );
-    frequencies_list_freqs();
 
     return in;
 }
@@ -413,6 +411,11 @@ void input_callback( input_t *in, InputEvent command, int arg )
             in->togglefullscreen = 1;
             break;
 
+        case TVTIME_SKIP_CHANNEL:
+            tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled = 0;
+            fprintf( stderr, "channel = %s %s 0\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ cur_channel ].name );
+            break;
+            
         case TVTIME_ASPECT:
             in->toggleaspect = 1;
             break;

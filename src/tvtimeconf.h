@@ -76,6 +76,7 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_NTSC_CABLE_MODE,
     TVTIME_AUTO_ADJUST_PICT,
+    TVTIME_SKIP_CHANNEL,
 
     TVTIME_LAST
 };
