@@ -13,12 +13,9 @@
 #include "DS_Deinterlace.h"
 
 
-extern long CpuFeatureFlags;
-extern FILTER_METHOD *Filters[10];
-extern int NumFilters;
-
-extern DEINTERLACE_METHOD *VideoDeintMethods[10];
-extern int NumVideoModes;
+long CpuFeatureFlags = 0xffffffff;
+static FILTER_METHOD *Filters[10];
+static int NumFilters;
 
 void LoadFilterPlugin(char* szFileName)
 {
@@ -83,23 +80,23 @@ printf("init function end\n");
 }
 
 
-void LoadDeintPlugin(char *szFileName)
+DEINTERLACE_METHOD *LoadDeintPlugin( char *filename )
 {
-    GETDEINTERLACEPLUGININFO* pfnGetDeinterlacePluginInfo;
-    DEINTERLACE_METHOD* pMethod;
+    GETDEINTERLACEPLUGININFO *pfnGetDeinterlacePluginInfo;
+    DEINTERLACE_METHOD *pMethod;
     HMODULE hPlugInMod;
 	int i;
 
-    hPlugInMod = LoadLibrary(szFileName);
+    hPlugInMod = LoadLibrary( filename );
     if(hPlugInMod == NULL)
     {
-        return;
+        return 0;
     }
 
     pfnGetDeinterlacePluginInfo = (GETDEINTERLACEPLUGININFO*)GetProcAddress(hPlugInMod, "GetDeinterlacePluginInfo");
     if(pfnGetDeinterlacePluginInfo == NULL)
     {
-        return;
+        return 0;
     }
 
     pMethod = pfnGetDeinterlacePluginInfo(CpuFeatureFlags);
@@ -108,10 +105,9 @@ void LoadDeintPlugin(char *szFileName)
         if(pMethod->SizeOfStructure == sizeof(DEINTERLACE_METHOD) &&
             pMethod->DeinterlaceStructureVersion >= DEINTERLACE_VERSION_3)
         {
-printf("Name: %s\n",pMethod->szName);
-printf("nSettings %ld\n",pMethod->nSettings);
-printf("History %ld\n",pMethod->nFieldsRequired);
-            VideoDeintMethods[NumVideoModes] = pMethod;
+fprintf( stderr, "Name: %s\n",pMethod->szName );
+fprintf( stderr, "nSettings %ld\n",pMethod->nSettings );
+printf( stderr, "History %ld\n",pMethod->nFieldsRequired );
             pMethod->hModule = hPlugInMod;
 
             // read in settings
@@ -124,9 +120,12 @@ printf("History %ld\n",pMethod->nFieldsRequired);
             {
                 pMethod->pfnPluginInit();
             }
-            NumVideoModes++;
+
+            return pMethod;
         }
     }
+
+    return 0;
 }
 
 
