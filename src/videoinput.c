@@ -612,7 +612,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
 
     /* Set to stereo by default. */
-    videoinput_set_audio_mode( vidin, VIDEO_SOUND_STEREO, 1 );
+    videoinput_set_audio_mode( vidin, VIDEO_SOUND_STEREO );
 
     /**
      * Once we're here, we've set the hardware norm.  Now confirm that
@@ -1171,7 +1171,7 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
     }
 }
 
-void videoinput_set_audio_mode( videoinput_t *vidin, int mode, int force )
+void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 {
     if( mode == VIDEOINPUT_LANG1 && vidin->norm == VIDEOINPUT_NTSC ) {
         mode = VIDEOINPUT_LANG2;
@@ -1181,7 +1181,7 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode, int force )
         mode = VIDEOINPUT_MONO;
     }
 
-    if( vidin->audiomode != mode || force ) {
+    if( vidin->audiomode != mode ) {
         if( vidin->isv4l2 ) {
             if( vidin->hastuner ) {
                 struct v4l2_tuner tuner;
@@ -1206,8 +1206,6 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode, int force )
                 }
             } else {
                 int was_muted = (audio.flags & VIDEO_AUDIO_MUTE);
-
-fprintf( stderr, "force setting audio mode to %d\n", mode );
 
                 /* Set the mode. */
                 audio.mode = mode;
@@ -1281,9 +1279,6 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
             }
         }
     }
-
-    /* Reset audio mode, the driver forgets. */
-    videoinput_set_audio_mode( vidin, videoinput_get_audio_mode( vidin ), 1 );
 }
 
 int videoinput_get_tuner_freq( videoinput_t *vidin ) 
