@@ -62,7 +62,7 @@ void sdl_toggle_fullscreen( void );
 /**
  * Toggle display aspect ratio.
  */
-void sdl_toggle_aspect( void );
+int sdl_toggle_aspect( void );
 
 /**
  * Perform the polling of events.  Sends signals to the input object.

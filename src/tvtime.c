@@ -585,7 +585,11 @@ int main( int argc, char **argv )
             sdl_toggle_fullscreen();
         }
         if( input_toggle_aspect( in ) ) {
-            sdl_toggle_aspect();
+            if( sdl_toggle_aspect() ) {
+                tvtime_osd_show_message( osd, "16:9 display mode" );
+            } else {
+                tvtime_osd_show_message( osd, "4:3 display mode" );
+            }
         }
         if( input_toggle_deinterlacing_mode( in ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();

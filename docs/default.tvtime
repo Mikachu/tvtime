@@ -3,16 +3,14 @@
 #
 
 verbose = 0
-CaptureSource = 1
+CaptureSource = 0
 OutputWidth = 800
 InputWidth = 720
 WideScreen = 0
 DebugMode = 0
-ApplyLumaCorrection = 1
+ApplyLumaCorrection = 0
 LumaCorrection = 1.0
-Output420 = 0
 V4LDevice = /dev/video0
-CaptureSource = 0
 Norm = ntsc
 Frequencies = us-cable
 TunerNumber = 0

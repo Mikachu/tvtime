@@ -122,10 +122,11 @@ static void sdl_reset_display( void )
     SDL_LockYUVOverlay( frame );
 }
 
-void sdl_toggle_aspect( void )
+int sdl_toggle_aspect( void )
 {
     sdlaspect = !sdlaspect;
     sdl_reset_display();
+    return sdlaspect;
 }
 
 
