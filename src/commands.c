@@ -233,10 +233,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             
     case TVTIME_TOGGLE_HALF_FRAMERATE:
         in->halfrate = !in->halfrate;
-        if( in->halfrate ) {
-            tvtime_osd_show_message( in->osd, "Half-framerate mode." );
-        } else {
-            tvtime_osd_show_message( in->osd, "Full-framerate mode." );
+        if( in->osd ) {
+            if( in->halfrate ) {
+                tvtime_osd_show_message( in->osd, "Half-framerate mode." );
+            } else {
+                tvtime_osd_show_message( in->osd, "Full-framerate mode." );
+            }
         }
         break;
 
@@ -247,10 +249,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_SKIP_CHANNEL:
         station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
-        if( station_get_current_active( in->stationmgr ) ) {
-            tvtime_osd_show_message( in->osd, "Channel active in list." );
-        } else {
-            tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+        if( in->osd ) {
+            if( station_get_current_active( in->stationmgr ) ) {
+                tvtime_osd_show_message( in->osd, "Channel active in list." );
+            } else {
+                tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+            }
         }
         station_writeconfig( in->stationmgr );
 	break;
@@ -288,11 +292,15 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_DISPLAY_INFO:
-        tvtime_osd_show_info( in->osd );
+        if( in->osd ) {
+            tvtime_osd_show_info( in->osd );
+        }
         break;
 
     case TVTIME_SHOW_CREDITS:
-        tvtime_osd_toggle_show_credits( in->osd );
+        if( in->osd ) {
+            tvtime_osd_toggle_show_credits( in->osd );
+        }
         break;
 
     case TVTIME_DEINTERLACINGMODE:
@@ -444,13 +452,17 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_MIXER_MUTE:
         videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
-        tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
+        if( in->osd ) {
+            tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
+        }
         break;
 
     case TVTIME_TV_VIDEO:
         in->frame_counter = 0;
         videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
-        tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
+        if( in->osd ) {
+            tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
+        }
         reinit_tuner( in );
         break;
 
