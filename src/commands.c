@@ -760,12 +760,23 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 in->renumbering = 0;
                 if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
             }
-            station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
-            in->change_channel = 1;
+            if( station_set( in->stationmgr, atoi( in->next_chan_buffer ) ) ) {
+                in->change_channel = 1;
+            } else {
+                sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
+                if( in->osd ) {
+                    tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
+                    tvtime_osd_show_info( in->osd );
+                }
+            }
             in->frame_counter = 0;
         } else {
             sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
-            in->frame_counter = 6;
+            if( in->osd ) {
+                tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
+                tvtime_osd_show_info( in->osd );
+            }
+            in->frame_counter = 0;
         }
         break;
 

@@ -440,6 +440,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, OSD_FADE_DELAY );
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
         osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, OSD_FADE_DELAY );
+    } else {
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "", OSD_FADE_DELAY );
     }
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, OSD_FADE_DELAY );
 
