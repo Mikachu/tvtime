@@ -87,9 +87,14 @@ void station_dec( station_mgr_t *mgr );
 void station_prev( station_mgr_t *mgr );
 
 /**
- * Set the us cable mode.
+ * Set the US cable mode.
  */
 void station_toggle_us_cable_mode( station_mgr_t *mgr );
+
+/**
+ * Returns the current setting of US cable mode.
+ */
+int station_get_us_cable_mode( station_mgr_t *mgr );
 
 /**
  * Returns the id of this channel.

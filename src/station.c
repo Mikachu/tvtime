@@ -328,7 +328,8 @@ int station_readconfig( station_mgr_t *mgr )
     return 1;
 }
 
-station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mode, int verbose )
+station_mgr_t *station_new( const char *norm, const char *table,
+                            int us_cable_mode, int verbose )
 {
     station_mgr_t *mgr = malloc( sizeof( station_mgr_t ) );
     const char *frequencies;
@@ -557,6 +558,11 @@ const char *station_get_current_band( station_mgr_t *mgr )
         }
         return mgr->band_and_frequency;
     }
+}
+
+int station_get_us_cable_mode( station_mgr_t *mgr )
+{
+    return mgr->us_cable_mode;
 }
 
 void station_toggle_us_cable_mode( station_mgr_t *mgr )
