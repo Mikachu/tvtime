@@ -610,12 +610,12 @@ int main( int argc, char **argv )
         return 1;
     }
     curmethodid = config_get_preferred_deinterlace_method( ct );
-	if( curmethodid >= get_num_deinterlace_methods() ||
-		curmethodid < 0) {
-		fprintf( stderr, "tvtime: Invalid preferred deinterlace method, "
-				 "exiting.\n" );
-		return 1;
-	}
+    if( curmethodid >= get_num_deinterlace_methods() ||
+        curmethodid < 0) {
+        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, "
+                         "exiting.\n" );
+        return 1;
+    }
     curmethod = get_deinterlace_method( curmethodid );
 
     /* Build colourbars. */
@@ -832,31 +832,32 @@ int main( int argc, char **argv )
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
         if( commands_toggle_fullscreen( commands ) ) {
-	    if( output->toggle_fullscreen( 0, 0 ) )
-		configsave( "FullScreen", "1", 1 );
-	    else
-		configsave( "FullScreen", "0", 1 );
-	}
-	if( commands_toggle_aspect( commands ) ) {
+            if( output->toggle_fullscreen( 0, 0 ) ) {
+                configsave( "FullScreen", "1", 1 );
+            } else {
+                configsave( "FullScreen", "0", 1 );
+            }
+        }
+        if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
                 tvtime_osd_show_message( osd, "16:9 display mode" );
-		configsave( "WideScreen", "1", 1 );
+                configsave( "WideScreen", "1", 1 );
             } else {
                 tvtime_osd_show_message( osd, "4:3 display mode" );
-		configsave( "WideScreen", "0", 1 );
+                configsave( "WideScreen", "0", 1 );
             }
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
-	    char number[4];
+            char number[4];
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
-	    snprintf(number, 3, "%d", curmethodid);
-	    number[4] = '\0';
-	    configsave( "PreferredDeinterlaceMethod", number, 1 );
+            snprintf(number, 3, "%d", curmethodid);
+            number[4] = '\0';
+            configsave( "PreferredDeinterlaceMethod", number, 1 );
         }
         commands_next_frame( commands );
         input_next_frame( in );
