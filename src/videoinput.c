@@ -247,16 +247,16 @@ struct videoinput_s
     int signal_recover_wait;
     int signal_acquire_wait;
 
-    /* V4L2 capture mode. */
+    /* V4L2 capture state. */
     capture_buffer_t capbuffers[ MAX_CAPTURE_BUFFERS ];
 
-    /* V4L1 mmap mode. */
+    /* V4L1 mmap-mode state. */
     int have_mmap;
     uint8_t *map;
     struct video_mmap *grab_buf;
     struct video_mbuf gb_buffers;
 
-    /* V4L1 read mode. */
+    /* V4L1 read-mode state. */
     int grab_size;
     uint8_t *grab_data;
 };
@@ -1194,21 +1194,8 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
                  * I am not happy with this, as I haven't seen it documented anywhere.
                  * Please correct me if I'm wrong.
                  */
-                if( vidin->norm == VIDEOINPUT_NTSC ) {
-                    grab_chan.norm = VIDEO_MODE_NTSC;
-                } else if( vidin->norm == VIDEOINPUT_PAL ) {
-                    grab_chan.norm = VIDEO_MODE_PAL;
-                } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-                    grab_chan.norm = VIDEO_MODE_SECAM;
-                } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
-                    grab_chan.norm = 3;
-                } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
-                    grab_chan.norm = 4;
-                } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
-                    grab_chan.norm = 5;
-                } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
-                    grab_chan.norm = 6;
-                }
+                grab_chan.channel = vidin->curinput;
+                grab_chan.norm = videoinput_get_v4l1_norm( vidin->norm );
 
                 if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
                     fprintf( stderr, "videoinput: Card refuses to re-set the channel.\n"
@@ -1337,10 +1324,10 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 }
             }
         }
-
-        /* Once we've set the input, go look for a tuner. */
-        videoinput_find_and_set_tuner( vidin );
     }
+
+    /* Once we've set the input, go look for a tuner. */
+    videoinput_find_and_set_tuner( vidin );
 }
 
 int videoinput_is_bttv( videoinput_t *vidin )
