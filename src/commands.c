@@ -648,6 +648,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         cmd->newnorm = "PAL-N";
     } else if( !strcasecmp( config_get_v4l_norm( cfg ), "ntsc-jp" ) ) {
         cmd->newnorm = "NTSC-JP";
+    } else if( !strcasecmp( config_get_v4l_norm( cfg ), "pal-60" ) ) {
+        cmd->newnorm = "PAL-60";
     } else {
         cmd->newnorm = "NTSC";
     }
@@ -1190,6 +1192,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             cmd->newnorm = "PAL-N";
         } else if( !strcasecmp( arg, "ntsc-jp" ) ) {
             cmd->newnorm = "NTSC-JP";
+        } else if( !strcasecmp( arg, "pal-60" ) ) {
+            cmd->newnorm = "PAL-60";
         } else {
             cmd->newnorm = "NTSC";
         }
