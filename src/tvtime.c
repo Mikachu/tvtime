@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,24 +43,14 @@
 #include "menu.h"
 #include "videocorrection.h"
 #include "plugins.h"
+#include "performance.h"
 // #include "dfboutput.h"
-
-/**
- * Warning tolerance, just for debugging.
- */
-static int tolerance = 2000;
 
 /**
  * Current deinterlacing method.
  */
 static deinterlace_method_t *curmethod;
 static int curmethodid;
-
-static int timediff( struct timeval *large, struct timeval *small )
-{
-    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
-             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
-}
 
 static void build_colourbars( unsigned char *output, int width, int height )
 {
@@ -322,21 +312,16 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 
 int main( int argc, char **argv )
 {
-    struct timeval lastfieldtime;
-    struct timeval lastframetime;
-    struct timeval checkpoint[ 7 ];
     video_correction_t *vc = 0;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
     int width, height;
     int norm = 0;
     int fieldtime;
-    int blittime = 0;
-    int skipped = 0;
+    int safetytime;
     int fieldsavailable = 0;
     int verbose;
     tvtime_osd_t *osd;
-    int i;
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
@@ -346,6 +331,7 @@ int main( int argc, char **argv )
     input_t *in;
     menu_t *menu;
     output_api_t *output;
+    performance_t *perf;
 
     setup_speedy_calls();
 
@@ -386,6 +372,12 @@ int main( int argc, char **argv )
         fieldtime = 20000;
     } else {
         fieldtime = 16683;
+    }
+    safetytime = fieldtime - ((fieldtime*3)/4);
+    perf = performance_new( fieldtime );
+    if( !perf ) {
+        fprintf( stderr, "tvtime: Can't initialize performance monitor.\n" );
+        return 1;
     }
 
     if( config_get_inputwidth( ct ) != 720 && verbose ) {
@@ -438,7 +430,8 @@ int main( int argc, char **argv )
     }
     filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
     if( !get_num_deinterlace_methods() ) {
-        fprintf( stderr, "tvtime: No deinterlacing methods available, exiting.\n" );
+        fprintf( stderr, "tvtime: No deinterlacing methods "
+                         "available, exiting.\n" );
         return 1;
     }
     curmethodid = 0;
@@ -463,7 +456,8 @@ int main( int argc, char **argv )
      * frequency list.
      */
     if( !frequencies_set_chanlist( config_get_v4l_freq( ct ) ) ) {
-        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s, using us-cable.\n", 
+        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s, "
+                         "using us-cable.\n", 
                  config_get_v4l_freq( ct ) );
         frequencies_set_chanlist( "us-cable" );
     }
@@ -474,8 +468,8 @@ int main( int argc, char **argv )
          * Set to the current channel, or the first channel in our
          * frequency list.
          */
-        char timestamp[50];
-        time_t tm = time(NULL);
+        char timestamp[ 50 ];
+        time_t tm = time( 0 );
         int rc = frequencies_find_current_index( vidin );
         if( rc == -1 ) {
             /* set to a known frequency */
@@ -491,7 +485,7 @@ int main( int argc, char **argv )
                                    chanlist[ chanindex ].name );
         }
         strftime( timestamp, 50, config_get_timeformat( ct ), 
-                  localtime(&tm) );
+                  localtime( &tm ) );
         if( osd ) {
             tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
             tvtime_osd_show_channel_info( osd, timestamp );
@@ -567,7 +561,7 @@ int main( int argc, char **argv )
         if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
             if( verbose ) {
                 fprintf( stderr, "tvtime: Can't set 1024hz "
-                                 "from /dev/rtc (need root).\n" );
+                                 "from /dev/rtc.\n" );
             }
             rtctimer_delete( rtctimer );
             rtctimer = 0;
@@ -601,16 +595,9 @@ int main( int argc, char **argv )
     }
 
     /* Initialize our timestamps. */
-    for( i = 0; i < 7; i++ ) gettimeofday( &(checkpoint[ i ]), 0 );
-    gettimeofday( &lastframetime, 0 );
-    gettimeofday( &lastfieldtime, 0 );
     for(;;) {
         unsigned char *curframe;
         int curframeid;
-        struct timeval curframetime;
-        struct timeval curfieldtime;
-        struct timeval blitstart;
-        struct timeval blitend;
         int printdebug = 0;
         int showbars, videohold, screenshot;
 
@@ -643,44 +630,29 @@ int main( int argc, char **argv )
         }
         input_next_frame( in );
 
-        /* CHECKPOINT1 : Blit the second field */
-        gettimeofday( &(checkpoint[ 0 ]), 0 );
 
         /* Aquire the next frame. */
         curframe = videoinput_next_frame( vidin, &curframeid );
+        performance_checkpoint_aquired_input_frame( perf );
 
         if( screenshot ) {
             char filename[ 256 ];
-            sprintf( filename, "tvtime-shot-input-%d-%d.png",
-                     (int) checkpoint[ 0 ].tv_sec,
-                     (int) checkpoint[ 0 ].tv_usec );
+            char timestamp[ 50 ];
+            time_t tm = time( 0 );
+            strftime( timestamp, sizeof( timestamp ),
+                      config_get_timeformat( ct ), localtime( &tm ) );
+            sprintf( filename, "tvtime-shot-input-%s.png", timestamp );
             pngscreenshot( filename, curframe, width, height, width * 2 );
         }
 
-        /* CHECKPOINT2 : Got the frame */
-        gettimeofday( &(checkpoint[ 1 ]), 0 );
 
         /* Print statistics and check for missed frames. */
-        gettimeofday( &curframetime, 0 );
         if( printdebug ) {
-            fprintf( stderr, "tvtime: aquire %d, build top %d "
-                             "blit top %d built bot %d free input %d "
-                             "wait bot %d blit bot %d\n",
-                     timediff( &(checkpoint[ 1 ]), &(checkpoint[ 0 ]) ),
-                     timediff( &(checkpoint[ 2 ]), &lastframetime ),
-                     timediff( &(checkpoint[ 3 ]), &(checkpoint[ 2 ]) ),
-                     timediff( &(checkpoint[ 4 ]), &(checkpoint[ 3 ]) ),
-                     timediff( &(checkpoint[ 5 ]), &(checkpoint[ 4 ]) ),
-                     timediff( &(checkpoint[ 6 ]), &(checkpoint[ 5 ]) ),
-                     timediff( &(checkpoint[ 0 ]), &(checkpoint[ 6 ]) ) );
+            performance_print_last_frame_stats( perf );
         }
-        if( config_get_debug( ct ) && ((timediff( &curframetime,
-                           &lastframetime ) - tolerance) > (fieldtime*2)) ) {
-            fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
-                     skipped++,
-                     timediff( &curframetime, &lastframetime ), (fieldtime*2) );
+        if( config_get_debug( ct ) ) {
+            performance_print_frame_drops( perf );
         }
-        lastframetime = curframetime;
 
 
         if( output->is_interlaced() ) {
@@ -688,62 +660,52 @@ int main( int argc, char **argv )
             output->wait_for_sync( 0 );
 
             output->lock_output_buffer();
-            tvtime_build_interlaced_frame( output->get_output_buffer(), curframe, vc, osd, menu, 0,
-                                           vc && config_get_apply_luma_correction( ct ),
-                                           width, height, width * 2, output->get_output_stride() );
+            tvtime_build_interlaced_frame( output->get_output_buffer(),
+                       curframe, vc, osd, menu, 0,
+                       vc && config_get_apply_luma_correction( ct ),
+                       width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
         } else {
             /* Build the output from the top field. */
             output->lock_output_buffer();
             if( showbars ) {
-                blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
+                blit_packed422_scanline( output->get_output_buffer(),
+                                         colourbars, width*height );
             } else {
-                tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
-                                    secondlastframe, vc, osd, menu, 0,
-                                    vc && config_get_apply_luma_correction( ct ),
-                                    width, height, width * 2, width * 2 );
+                tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                   curframe, lastframe, secondlastframe,
+                                   vc, osd, menu, 0,
+                                   vc && config_get_apply_luma_correction( ct ),
+                                   width, height, width * 2, width * 2 );
             }
             if( screenshot ) {
                 char filename[ 256 ];
-                sprintf( filename, "tvtime-shot-top-%d-%d.png",
-                         (int) checkpoint[ 0 ].tv_sec,
-                         (int) checkpoint[ 0 ].tv_usec );
-                pngscreenshot( filename, output->get_output_buffer(), width, height, width * 2 );
+                char timestamp[ 50 ];
+                time_t tm = time( 0 );
+                strftime( timestamp, sizeof( timestamp ),
+                          config_get_timeformat( ct ), localtime( &tm ) );
+                sprintf( filename, "tvtime-shot-top-%s.png", timestamp );
+                pngscreenshot( filename, output->get_output_buffer(),
+                               width, height, width * 2 );
             }
             output->unlock_output_buffer();
+            performance_checkpoint_constructed_top_field( perf );
 
 
-
-            /* CHECKPOINT3 : Constructed the top field. */
-            gettimeofday( &(checkpoint[ 2 ]), 0 );
-
-
-            /* Wait for the next field time and display. */
-            gettimeofday( &curfieldtime, 0 );
-
-            /**
-             * I'm commenting this out for now, tvtime takes
-             * too much CPU here -Billy
-            while( timediff( &curfieldtime, &lastfieldtime )
-                                    < (fieldtime-blittime) ) {
-                if( rtctimer ) {
+            /* Wait until it's time to blit the first field. */
+            if( rtctimer ) {
+                while( performance_get_usecs_since_frame_aquired( perf )
+                       < ( fieldtime - safetytime - performance_get_usecs_of_last_blit( perf ) - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
-                } else {
-                    usleep( 20 );
                 }
-                gettimeofday( &curfieldtime, 0 );
             }
-            */
-            gettimeofday( &blitstart, 0 );
+            performance_checkpoint_delayed_blit_top_field( perf );
+
+            performance_checkpoint_blit_top_field_start( perf );
             if( !videohold ) output->show_frame();
-            gettimeofday( &blitend, 0 );
-            lastfieldtime = blitend;
-            blittime = timediff( &blitend, &blitstart );
+            performance_checkpoint_blit_top_field_end( perf );
         }
 
-
-        /* CHECKPOINT4 : Blit the first field */
-        gettimeofday( &(checkpoint[ 3 ]), 0 );
 
 
         if( output->is_interlaced() ) {
@@ -751,9 +713,10 @@ int main( int argc, char **argv )
             output->wait_for_sync( 1 );
 
             output->lock_output_buffer();
-            tvtime_build_interlaced_frame( output->get_output_buffer(), curframe, vc, osd, menu, 1,
-                                           vc && config_get_apply_luma_correction( ct ),
-                                           width, height, width * 2, output->get_output_stride() );
+            tvtime_build_interlaced_frame( output->get_output_buffer(),
+                       curframe, vc, osd, menu, 1,
+                       vc && config_get_apply_luma_correction( ct ),
+                       width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
 
             /* We're done with the input now. */
@@ -774,25 +737,27 @@ int main( int argc, char **argv )
             /* Build the output from the bottom field. */
             output->lock_output_buffer();
             if( showbars ) {
-                blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
+                blit_packed422_scanline( output->get_output_buffer(),
+                                         colourbars, width*height );
             } else {
-                tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
-                                    secondlastframe, vc, osd, menu, 1,
-                                    vc && config_get_apply_luma_correction( ct ),
-                                    width, height, width * 2, width * 2 );
+                tvtime_build_deinterlaced_frame( output->get_output_buffer(),
+                                  curframe, lastframe,
+                                  secondlastframe, vc, osd, menu, 1,
+                                  vc && config_get_apply_luma_correction( ct ),
+                                  width, height, width * 2, width * 2 );
             }
             if( screenshot ) {
                 char filename[ 256 ];
-                sprintf( filename, "tvtime-shot-bot-%d-%d.png",
-                         (int) checkpoint[ 0 ].tv_sec,
-                         (int) checkpoint[ 0 ].tv_usec );
-                pngscreenshot( filename, output->get_output_buffer(), width, height, width * 2 );
+                char timestamp[ 50 ];
+                time_t tm = time( 0 );
+                strftime( timestamp, sizeof( timestamp ),
+                          config_get_timeformat( ct ), localtime( &tm ) );
+                sprintf( filename, "tvtime-shot-bot-%s.png", timestamp );
+                pngscreenshot( filename, output->get_output_buffer(),
+                               width, height, width * 2 );
             }
             output->unlock_output_buffer();
-
-
-            /* CHECKPOINT5 : Built the second field */
-            gettimeofday( &(checkpoint[ 4 ]), 0 );
+            performance_checkpoint_constructed_bot_field( perf );
 
 
             /* We're done with the input now. */
@@ -810,30 +775,22 @@ int main( int argc, char **argv )
                 videoinput_free_frame( vidin, curframeid );
             }
 
-            /* CHECKPOINT6 : Released a frame to V4L. */
-            gettimeofday( &(checkpoint[ 5 ]), 0 );
 
             /* Wait for the next field time. */
-            gettimeofday( &curfieldtime, 0 );
-            while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
-                if( rtctimer ) {
+            if( rtctimer ) {
+                while( performance_get_usecs_since_last_field( perf )
+                       < ( fieldtime - performance_get_usecs_of_last_blit( perf ) - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
-                } else {
-                    usleep( 20 );
                 }
-                gettimeofday( &curfieldtime, 0 );
             }
+            performance_checkpoint_delayed_blit_bot_field( perf );
 
-            /* CHECKPOINT7 : Done waiting to blit the bottom field. */
-            gettimeofday( &(checkpoint[ 6 ]), 0 );
 
 
             /* Display the bottom field. */
-            gettimeofday( &blitstart, 0 );
+            performance_checkpoint_blit_bot_field_start( perf );
             if( !videohold ) output->show_frame();
-            gettimeofday( &blitend, 0 );
-            lastfieldtime = blitend;
-            blittime = timediff( &blitend, &blitstart );
+            performance_checkpoint_blit_bot_field_end( perf );
         }
 
 

@@ -36,6 +36,7 @@ struct rtctimer_s
     int current_hz;
     int rtc_running;
     int verbose;
+    int usecs;
 };
 
 rtctimer_t *rtctimer_new( int verbose )
@@ -65,6 +66,7 @@ rtctimer_t *rtctimer_new( int verbose )
 
     rtctimer->rtc_running = 0;
     rtctimer->current_hz = 0;
+    rtctimer->usecs = 0;
     return rtctimer;
 }
 
@@ -122,6 +124,8 @@ int rtctimer_set_interval( rtctimer_t *rtctimer, int hz )
     }
 
     rtctimer->current_hz = hz;
+    rtctimer->usecs = (int) ( ( ( 1000.0 * 1000.0 ) / hz ) + 0.5 );
+    fprintf( stderr, "usecs is %d\n", rtctimer->usecs );
 
     if( restart ) {
         rtctimer_start_clock( rtctimer );
@@ -161,6 +165,11 @@ int rtctimer_stop_clock( rtctimer_t *rtctimer )
     }
 
     return was_running;
+}
+
+int rtctimer_get_usecs( rtctimer_t *rtctimer )
+{
+    return rtctimer->usecs;
 }
 
 int set_realtime_priority( int max )

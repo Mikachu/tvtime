@@ -81,6 +81,11 @@ int rtctimer_set_interval( rtctimer_t *rtctimer, int hz );
 int rtctimer_next_tick( rtctimer_t *rtctimer );
 
 /**
+ * Returns the number of usecs in each tick.
+ */
+int rtctimer_get_usecs( rtctimer_t *rtctimer );
+
+/**
  * Returns 1 if realtime (SCHED_FIFO) priority was gained, 0 if it is
  * unavailable (likely you're not root).
  */

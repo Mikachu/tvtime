@@ -25,7 +25,7 @@ COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	input.h menu.h mixer.h mm_accel.h mmx.h osd.h parser.h pnginput.h \
 	pngoutput.h rtctimer.h sdloutput.h speedy.h taglines.h ttfont.h \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
-	outputapi.h
+	outputapi.h performance.h performance.c
 
 bin_PROGRAMS = tvtime
 
