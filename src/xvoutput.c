@@ -130,7 +130,7 @@ static int xv_check_extension( void )
                             &dummy, &dummy, &dummy) != Success ) ||
          ( version < 2 ) || ( ( version == 2 ) && ( release < 2 ) ) ) {
 
-        fprintf( stderr, "xvoutput: XVIDEO extension not found, X server too old?\n");
+        fprintf( stderr, "xvoutput: XVIDEO extension not found: X too old? didn't load extmod?\n" );
         return 0;
     }
 
@@ -156,6 +156,14 @@ static int xv_check_extension( void )
 
     XvFreeAdaptorInfo( adaptorInfo );
     fprintf( stderr, "xvoutput: No XVIDEO port found which supports YUY2 images.\n" );
+
+    fprintf( stderr, "\n*** tvtime requires hardware YUY2 overlay support from your video card\n"
+                       "*** driver.  If you are using an older nVidia card (TNT2), then\n"
+                       "*** this capability is only available with their binary drivers.\n"
+                       "*** For some ATI cards, this feature may be found in the experimental\n"
+                       "*** GATOS drivers: http://gatos.souceforge.net/\n"
+                       "*** If unsure, please check with your distribution to see if your\n"
+                       "*** X driver supports hardware overlay surfaces.\n\n" );
     return 0;
 }
 
