@@ -29,13 +29,12 @@ AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	parser.c tvtimeconf.c pngoutput.c tvtimeosd.c input.c cpu_accel.c \
 	speedy.c pnginput.c menu.c deinterlace.c videocorrection.c \
-	videotools.c attributes.h deinterlace.h efs.h frequencies.h \
-	input.h menu.h mixer.h mm_accel.h mmx.h osdtools.h parser.h pnginput.h \
-	pngoutput.h rtctimer.h speedy.h taglines.h ttfont.h \
-	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
-	outputapi.h performance.h performance.c vbidata.h vbidata.c \
-	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
-	wm_state.h wm_state.c console.h console.c speedtools.h \
+	videotools.c attributes.h deinterlace.h efs.h input.h menu.h mixer.h \
+	mm_accel.h mmx.h osdtools.h parser.h pnginput.h pngoutput.h rtctimer.h \
+	speedy.h taglines.h ttfont.h tvtimeconf.h tvtimeosd.h videocorrection.h \
+	videoinput.h videotools.h outputapi.h performance.h performance.c \
+	vbidata.h vbidata.c credits.c credits.h xvoutput.h xvoutput.c display.h \
+	display.c wm_state.h wm_state.c console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
 	station.h station.c bands.h configsave.h configsave.c x11tools.c \
 	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c
