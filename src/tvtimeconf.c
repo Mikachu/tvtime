@@ -115,42 +115,37 @@ static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-vasb] [-w <width>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
-                     "[-f <frequencies>] [-t <tuner>]\n"
-                     "\t-v\tShow verbose messages.\n"
-                     "\t-a\t16:9 mode.\n"
-                     "\t-s\tPrint frame skip information (for debugging).\n"
-                     "\t-I\tV4L input scanline sampling, defaults to 720.\n"
-                     "\t-w\tOutput window width, defaults to 800.\n"
+                     "[-f <frequencies>] [-t <tuner>]\n", argv[ 0 ] );
+    fprintf( stderr, "\t-v\tShow verbose messages.\n" );
+    fprintf( stderr, "\t-a\t16:9 mode.\n" );
+    fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
+    fprintf( stderr, "\t-I\tV4L input scanline sampling, defaults to 720.\n" );
+    fprintf( stderr, "\t-w\tOutput window width, defaults to 800.\n" );
 
-                     "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
-                     "\t-i\tvideo4linux input number (defaults to 0).\n"
+    fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
+    fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
 
-                     "\t-c\tApply luma correction.\n"
-                     "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n"
+    fprintf( stderr, "\t-c\tApply luma correction.\n" );
+    fprintf( stderr, "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n" );
 
-                     "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
-                     "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n"
-                     "\t-f\tThe channels you are receiving with the tuner\n"
+    fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
+                     "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
+    fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"
                      "\t  \tValid values are:\n"
-                     "\t  \t\tus-bcast\n"
                      "\t  \t\tus-cable\n"
-                     "\t  \t\tus-cable-hrc\n"
-                     "\t  \t\tjapan-bcast\n"
+                     "\t  \t\tus-broadcast\n"
                      "\t  \t\tjapan-cable\n"
+                     "\t  \t\tjapan-broadcast\n"
+                     "\t  \t\teurope-cable\n"
                      "\t  \t\teurope-west\n"
                      "\t  \t\teurope-east\n"
-                     "\t  \t\titaly\n"
-                     "\t  \t\tnewzealand\n"
+                     "\t  \t\tuk-broadcast\n"
                      "\t  \t\taustralia\n"
-                     "\t  \t\tireland\n"
+                     "\t  \t\tnewzealand\n"
+                     "\t  \t\titaly\n"
                      "\t  \t\tfrance\n"
-                     "\t  \t\tchina-bcast\n"
-                     "\t  \t\tsouthafrica\n"
-                     "\t  \t\targentina\n"
-                     "\t  \t\tcanada-cable\n"
-                     "\t  \t\taustralia-optus\n\n",
-                     argv[ 0 ] );
+                     "\t  \t\targentina\n\n" );
 }
 
 
@@ -384,6 +379,7 @@ int string_to_key( const char *str )
 
     ptr = str;
     while( *ptr ) {
+        unsigned int onumber;
         int number, digits;
 
         /* skip spaces */
@@ -458,9 +454,9 @@ int string_to_key( const char *str )
 
             case '0':
                 ptr++;
-                if( *ptr && sscanf( ptr, "%o%n", &number, &digits) ) {
-                    if( digits == 3 && number < 512 ) {
-                        key |= number;
+                if( *ptr && sscanf( ptr, "%o%n", &onumber, &digits) ) {
+                    if( digits == 3 && onumber < 512 ) {
+                        key |= onumber;
                         ptr += digits;
                     } else {
                         fprintf( stderr, "config: Invalid octal keycode.\n" );

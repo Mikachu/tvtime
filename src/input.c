@@ -146,6 +146,21 @@ static int frequencies_find_named_channel( const char *str )
     return 0;
 }
 
+void frequencies_set_tuner_by_name( const char *tuner_name )
+{
+    int i;
+    for( i = 0; i < NUM_FREQ_TABLES; i++ ) {
+        if( !strcasecmp( freq_table_names[ i ].short_name, tuner_name ) ||
+            !strcasecmp( freq_table_names[ i ].long_name, tuner_name ) ) {
+            cur_freq_table = i;
+            return;
+        }
+    }
+
+    /* Default to NTSC_CABLE. */
+    cur_freq_table = NTSC_CABLE;
+}
+
 static void reinit_tuner( input_t *in )
 {
     /* Setup the tuner if available. */
@@ -188,7 +203,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
                     tvtime_osd_t *osd, video_correction_t *vc )
 {
     input_t *in = (input_t *) malloc( sizeof( input_t ) );
-    const char *chanlist_name;
 
     if( !in ) {
         fprintf( stderr, "input: Could not create new input object.\n" );
@@ -216,34 +230,10 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     /**
      * Set the current channel list.
      */
-    chanlist_name = config_get_v4l_freq( in->cfg );
-    if( !strcasecmp( "us-bcast", chanlist_name ) ) {
-        cur_freq_table = NTSC_BCAST;
-    } else if( !strcasecmp( "japan-bcast", chanlist_name ) ) {
-        cur_freq_table = NTSC_JP_BCAST;
-    } else if( !strcasecmp( "japan-cable", chanlist_name ) ) {
-        cur_freq_table = NTSC_JP_CABLE;
-    } else if( !strcasecmp( "europe", chanlist_name ) ) {
-        cur_freq_table = PAL_EUROPE;
-    } else if( !strcasecmp( "italy", chanlist_name ) ) {
-        cur_freq_table = PAL_ITALY;
-    } else if( !strcasecmp( "newzealand", chanlist_name ) ) {
-        cur_freq_table = PAL_NEWZEALAND;
-    } else if( !strcasecmp( "australia", chanlist_name ) ) {
-        cur_freq_table = PAL_AUSTRALIA;
-    } else if( !strcasecmp( "ireland", chanlist_name ) ) {
-        cur_freq_table = PAL_IRELAND;
-    } else if( !strcasecmp( "pal-cable-bg", chanlist_name ) ) {
-        cur_freq_table = PAL_CABLE_BG;
-    } else if( !strcasecmp( "argentina-cable", chanlist_name ) ) {
-        cur_freq_table = PAL_CABLE_NC;
-    } else {
-        cur_freq_table = NTSC_CABLE;
-    }
+    frequencies_set_tuner_by_name( config_get_v4l_freq( in->cfg ) );
     finetune_amount = config_get_finetune( in->cfg );
 
     reinit_tuner( in );
-
 
     return in;
 }

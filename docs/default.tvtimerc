@@ -22,22 +22,17 @@ Norm = ntsc
 
 # This sets the default frequency table to use for any tuners found.
 # Possibilities are:
-#    us-bcast
 #    us-cable
-#    us-cable-hrc
-#    canada-cable
-#    japan-bcast
+#    us-broadcast
 #    japan-cable
+#    japan-broadcast
+#    europe-cable
 #    europe-west
 #    europe-east
-#    italy
 #    newzealand
 #    australia
-#    australia-optus
-#    ireland
 #    france
-#    china-bcast
-#    southafrica
+#    italy
 #    argentina
 Frequencies = us-cable
 

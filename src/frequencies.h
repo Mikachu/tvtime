@@ -136,7 +136,7 @@ struct table_info freq_table_names[NUM_FREQ_TABLES] = {
    /* PAL_CABLE_BG    */ { "Europe cable", "europe-cable" },
    /* PAL_CABLE_NC    */ { "Argentina cable", "argentina-cable" },
    /* PAL_EAST_EUROPE */ { "Eastern europe", "europe-east" },
-   /* SECAM_FRANCE    */ { "France", "secam-france" }
+   /* SECAM_FRANCE    */ { "France", "france" }
 };
 
 struct freqlist tvtuner[] = {
