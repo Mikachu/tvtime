@@ -1332,7 +1332,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( config_get_mpeg_filename( ct ) ) {
         mpegin = mpeg2input_new( config_get_mpeg_filename( ct ), 0, mm_accel() );
         if( !mpegin ) {
-            if( asprintf( &error_string, _("Can't open MPEG file '%s'."),
+            if( asprintf( &error_string, _("Cannot open MPEG file '%s'."),
                           config_get_mpeg_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
