@@ -1213,6 +1213,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         config_save( ct, "MixerDevice", ct->mixerdev );
 
         config_save( ct, "XMLTVFile", ct->xmltvfile );
+
+        config_save( ct, "ProcessPriority", ct->priority );
     }
 
     return 1;
