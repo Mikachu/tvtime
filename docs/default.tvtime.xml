@@ -208,7 +208,7 @@
     <keyboard key="&lt;"/>
   </bind>
 
-  <bind command="renumber_channel">
+  <bind command="channel_renumber">
     <keyboard key="b"/>
   </bind>
 

@@ -58,6 +58,7 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
+    { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
     { "CHANNEL_SCAN", TVTIME_CHANNEL_SCAN },
     { "CHANNEL_SKIP", TVTIME_CHANNEL_SKIP },
     { "CHANNEL_UP", TVTIME_CHANNEL_UP },
@@ -90,8 +91,6 @@ static Cmd_Names cmd_table[] = {
 
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
-
-    { "RENUMBER_CHANNEL", TVTIME_RENUMBER_CHANNEL },
 
     { "SCREENSHOT", TVTIME_SCREENSHOT },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
@@ -427,7 +426,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         in->toggleaspect = 1;
         break;
 
-    case TVTIME_RENUMBER_CHANNEL:
+    case TVTIME_CHANNEL_RENUMBER:
         /* If we're scanning and suddenly want to renumber, stop scanning. */
         if( in->scan_channels ) {
             commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
