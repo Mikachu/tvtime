@@ -1,6 +1,6 @@
 [Desktop Entry]
 Comment=High quality video deinterlacer
-Icon=tvtime-logo.png
+Icon=tvtime-icon-hilighted.png
 Exec=tvtime
 Name=tvtime
 Terminal=0
