@@ -1,5 +1,7 @@
 
 0.9.8.3 -
+  * vektor: Mute tag on the OSD now fades out, improving usefulness
+      when using closed captions (fixes 732487)
   * vektor: OSD pixel aspect ratio is now updated on aspect change.
   * vektor: We now set the class hint, useful for window managers
       like WindowMaker (fixes 733488)

@@ -89,6 +89,7 @@ struct tvtime_osd_s
     double framerate;
     int framerate_mode;
     int film_mode;
+    int mutestate;
     int hold;
 };
 
@@ -112,6 +113,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
     osd->film_mode = -1;
+    osd->mutestate = 0;
     osd->hold = 0;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
@@ -219,7 +221,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_SIGNAL_INFO ].string, "No signal", 0 );
-    osd_string_set_hold( osd->strings[ OSD_MUTED ].string, 1 );
+    osd_string_set_hold( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
     osd->strings[ OSD_SIGNAL_INFO ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
     osd->strings[ OSD_SIGNAL_INFO ].ypos = osd->strings[ OSD_CHANNEL_NUM ].ypos
                             + osd_string_get_height( osd->strings[ OSD_CHANNEL_NUM ].string );
@@ -247,7 +249,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_MUTED ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_MUTED ].string, "Mute", 0 );
-    osd_string_set_hold( osd->strings[ OSD_MUTED ].string, 1 );
     osd->strings[ OSD_MUTED ].xpos = osd->strings[ OSD_VOLUME_BAR ].xpos;
     osd->strings[ OSD_MUTED ].ypos = osd->strings[ OSD_VOLUME_BAR ].ypos
                                      - osd_string_get_height( osd->strings[ OSD_MUTED ].string );
@@ -507,6 +508,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     for( i = OSD_NETWORK_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
         osd_string_set_timeout( osd->strings[ i ].string, delay );
     }
+    osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? delay : 0 );
 }
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
@@ -556,7 +558,8 @@ void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
 
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 {
-    osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, mutestate ? 100 : 0 );
+    osd->mutestate = mutestate;
+    osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? 100 : 0 );
 }
 
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
