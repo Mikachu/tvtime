@@ -239,6 +239,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
     struct video_picture grab_pict;
+    struct video_buffer fbuf;
     int i;
 
     if( !vidin ) {
@@ -335,6 +336,24 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         capwidth = grab_cap.minwidth;
     }
     vidin->width = capwidth;
+
+    /**
+     * I'm going to set up the framebuffer to whatever it's currently set to, and
+     * see if this fixes annoying problems with like the SAA7134 driver.  Argh!
+     */
+    if( ioctl( vidin->grab_fd, VIDIOCGFBUF, &fbuf ) < 0 ) {
+        if( vidin->verbose ) {
+            fprintf( stderr, "videoinput: Can't get framebuffer settings, which I don't need anyway: %s\n",
+                     strerror( errno ) );
+        }
+    } else {
+        if( ioctl( vidin->grab_fd, VIDIOCSFBUF, &fbuf ) < 0 ) {
+            if( vidin->verbose ) {
+                fprintf( stderr, "videoinput: Can't get framebuffer settings, which I don't need anyway: %s\n",
+                         strerror( errno ) );
+            }
+        }
+    }
 
     /* Set the format using the SPICT ioctl. */
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
