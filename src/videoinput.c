@@ -31,6 +31,9 @@
 #include <errno.h>
 #include <linux/videodev.h>
 #include <signal.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 #include "videodev2.h"
 #include "videoinput.h"
 #include "mixer.h"
@@ -264,7 +267,7 @@ static void sigalarm( int signal )
 {
     alarms++;
     fprintf( stderr, "videoinput: Frame capture timed out, hardware/driver problems?\n" );
-    fprintf( stderr, "videoinput: Please report this on our bugs page: http://tvtime.sourceforge.net/\n" );
+    fprintf( stderr, "videoinput: Please report this on our bugs page: " PACKAGE_BUGREPORT "\n" );
 }
 
 static void siginit( void )
@@ -593,8 +596,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
             fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
                      "process the output: %s.\n", strerror( errno ) );
-            fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
-                     "indicating your capture card, driver, and the error message above.\n" );
+            fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
+                     " indicating your capture card, driver, and the error message above.\n" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -605,8 +608,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
             fprintf( stderr, "videoinput: Can't get Y'CbCr 4:2:2 packed images from the card, unable to"
                      "process the output: %s.\n", strerror( errno ) );
-            fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
-                     "indicating your capture card, driver, and the error message above.\n" );
+            fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
+                     " indicating your capture card, driver, and the error message above.\n" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -634,7 +637,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                      strerror( errno ) );
             fprintf( stderr, "videoinput: Not important, but please send a bug report including what driver "
                              "you're using and output of 'tvtime -v' to our bug report page off of "
-                             "http://tvtime.sourceforge.net/\n" );
+                             PACKAGE_BUGREPORT "\n" );
         }
 
         if( vidin->verbose ) {
@@ -712,7 +715,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         /* Try to set up mmap-based capture. */
         if( ioctl( vidin->grab_fd, VIDIOCGMBUF, &(vidin->gb_buffers) ) < 0 ) {
             fprintf( stderr, "videoinput: Can't get capture buffer properties.  No mmap support?\n"
-                     "Please post a bug report about this to http://www.sourceforge.net/projects/tvtime/\n"
+                     "Please post a bug report about this to " PACKAGE_BUGREPORT "\n"
                      "with your card, driver and this error message: %s.\n", strerror( errno ) );
             fprintf( stderr, "videoinput: Will try to fall back to (untested) read()-based capture..\n" );
         } else {
@@ -973,7 +976,7 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
             if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
                 fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
                          "might cause this.  Post a bug report with your driver info to "
-                         "http://www.sourceforge.net/projects/tvtime/\n" );
+                         PACKAGE_BUGREPORT "\n" );
                 fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
         }
@@ -1012,7 +1015,7 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
             if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
                 fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
                          "might cause this.  Post a bug report with your driver info to "
-                         "http://www.sourceforge.net/projects/tvtime/\n" );
+                         PACKAGE_BUGREPORT "\n" );
                 fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
             if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
@@ -1067,7 +1070,7 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
             if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
                 fprintf( stderr, "videoinput: Tuner present, but our request to change "
                                  "to frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
-                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+                fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
             }
         }
     }
@@ -1083,7 +1086,7 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
             if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
                 fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
                          strerror( errno ) );
-                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+                fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
                 return 0;
             }
 
@@ -1179,7 +1182,7 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
 
                 if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
                     fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
-                             "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
+                             "            Please file a bug report at " PACKAGE_BUGREPORT "\n"
                              "            indicating your card, driver and this error message: %s.\n",
                              strerror( errno ) );
                 }
@@ -1208,7 +1211,7 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
 
                 if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
                     fprintf( stderr, "videoinput: Card refuses to re-set the channel.\n"
-                             "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                             "Please post a bug report to " PACKAGE_BUGREPORT "\n"
                              "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
                 } else {
                     vidin->numtuners = grab_chan.tuners;
@@ -1222,8 +1225,8 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
             if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
                 fprintf( stderr, "videoinput: Input indicates that tuners are available, but "
                          "driver refuses to give information about them.\n"
-                         "videoinput: Please file a bug report at http://www.sourceforge.net/projects/tvtime/ "
-                         "and indicate that card and driver you have.\n" );
+                         "videoinput: Please file a bug report at " PACKAGE_BUGREPORT
+                         " and indicate that card and driver you have.\n" );
                 fprintf( stderr, "videoinput: Also include this error: '%s'\n", strerror( errno ) );
                 return;
             }
@@ -1270,7 +1273,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
 
         if( ioctl( vidin->grab_fd, VIDIOC_S_INPUT, &index ) < 0 ) {
             fprintf( stderr, "videoinput: Card refuses to set its input.\n"
-                     "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                     "Please post a bug report to " PACKAGE_BUGREPORT "\n"
                      "indicating your card, driver, and this error message: %s.\n",
                      strerror( errno ) );
         } else {
@@ -1304,7 +1307,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
             grab_chan.channel = inputnum;
             if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &grab_chan ) < 0 ) {
                 fprintf( stderr, "videoinput: Card refuses to give information on its current input.\n"
-                         "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                         "Please post a bug report to " PACKAGE_BUGREPORT "\n"
                          "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
             } else {
                 grab_chan.channel = inputnum;
@@ -1312,7 +1315,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
 
                 if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
                     fprintf( stderr, "videoinput: Card refuses to set the channel.\n"
-                             "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                             "Please post a bug report to " PACKAGE_BUGREPORT "\n"
                              "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
                 }
 
@@ -1339,7 +1342,7 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
             fprintf( stderr, "videoinput: Driver won't tell us picture settings: %s\n",
                      strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+            fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
             return;
         }
 
@@ -1364,7 +1367,7 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
         if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
             fprintf( stderr, "videoinput: Driver won't let us set picture settings: %s\n",
                      strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+            fprintf( stderr, "videoinput: Please file a bug report at " PACKAGE_BUGREPORT "\n" );
             return;
         }
 

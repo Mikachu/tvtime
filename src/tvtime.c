@@ -788,7 +788,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
                          "*** that you load the 'rtc' kernel module before starting tvtime,\n"
                          "*** and make sure that your user has access to the device file.\n"
-                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
+                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
@@ -801,7 +801,7 @@ int main( int argc, char **argv )
                          "*** but tvtime cannot get 1024hz resolution!  Please run tvtime as root,\n"
                          "*** or, with linux kernel version 2.4.19 or later, run:\n"
                          "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
+                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
             }
         }
     }
@@ -1027,7 +1027,7 @@ int main( int argc, char **argv )
         }
         if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
             fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
-                               "*** See the support page at http://tvtime.sourceforge.net/ for information\n"
+                               "*** See the support page at " PACKAGE_BUGREPORT " for information\n"
                                "*** on how to increase your gbuffers setting.\n\n" );
         }
     } else {
