@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2002,2003 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2003      Per von Zweigbergk <pvz@e.kth.se>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iconv.h>
 
 /* Freetype's build stuff is weird. */
 #include <ft2build.h>
@@ -51,7 +53,8 @@ struct ft_glyph_data_s
     FT_Glyph bitmap;
 };
 
-static int ft_cache_glyph( ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox )
+static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
+                           FT_BBox *glyph_bbox )
 {
     FT_Error error;
     FT_UInt glyph_index;
@@ -73,19 +76,20 @@ static int ft_cache_glyph( ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox )
     }
     error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
     if( error ) {
-        fprintf( stderr, "leetft: Can't load glyph %d\n", wchar );
+        fprintf( stderr, "leetft: Can't load glyph %ld\n", wchar );
         return 0;
     }
     
     error = FT_Get_Glyph( font->face->glyph, &cur->glyph );
     if( error ) {
-        fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", wchar );
+        fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %ld\n",
+                 wchar );
         return 0;
     }
         
     error = FT_Glyph_Copy( cur->glyph, &cur->bitmap );
     if( error ) {
-        fprintf( stderr, "leetft: Can't copy glyph %d\n", wchar );
+        fprintf( stderr, "leetft: Can't copy glyph %ld\n", wchar );
         FT_Done_Glyph( cur->glyph );
         hashtable_delete( font->glyphdata, wchar );
         return 0;
@@ -93,7 +97,7 @@ static int ft_cache_glyph( ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox )
         
     error = FT_Glyph_To_Bitmap( &cur->bitmap, ft_render_mode_normal, 0, 1 );
     if( error ) {
-        fprintf( stderr, "leetft: Can't render glyph %d\n", wchar );
+        fprintf( stderr, "leetft: Can't render glyph %ld\n", wchar );
         FT_Done_Glyph( cur->glyph );
         FT_Done_Glyph( cur->bitmap );
         hashtable_delete( font->glyphdata, wchar );
@@ -165,7 +169,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     bbox.yMin = INT_MAX;
     bbox.yMax = -INT_MAX;
 
-    for( i = 0; i < 128; i++ ) {
+    for( i = 0; i < 256; i++ ) {
         FT_BBox glyph_bbox;
 
         if( ft_cache_glyph( font, i, &glyph_bbox ) ) {
@@ -220,8 +224,9 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points )
     return ( font->xdpi * points * 65536 ) / 72;
 }
 
-static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *glyphpos,
-                               FT_UInt *glyphindex, const char *text, int len )
+static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata,
+                               FT_UInt *glyphpos, FT_UInt *glyphindex,
+                               const wchar_t *wtext, int len )
 {
     FT_Bool use_kerning;
     FT_UInt previous;
@@ -237,7 +242,7 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
     pen_x = 0;
 
     for( i = 0; i < len; i++ ) {
-        int cur = text[ i ];
+        wchar_t cur = wtext[ i ];
         ft_glyph_data_t *curdata;
 
         curdata = hashtable_lookup( glyphdata, cur );
@@ -249,14 +254,16 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
 
             if( use_kerning && previous && glyphindex[ i ] ) {
                 FT_Vector  delta;
-                FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_unfitted, &delta );
+                FT_Get_Kerning( face, previous, glyphindex[ i ],
+                                ft_kerning_unfitted, &delta );
 
                 /* Ignore kerning on numbers for now. */
-                if( !((prevchar >= '0' && prevchar <= '9') && (text[ i ] >= '0' && text[ i ] <= '9')) ) {
+                if( !((prevchar >= '0' && prevchar <= '9') &&
+                      (wtext[ i ] >= '0' && wtext[ i ] <= '9')) ) {
                     pen_x += ( delta.x * 1024 );
                 }
             }
-            prevchar = text[ i ];
+            prevchar = wtext[ i ];
             previous = glyphindex[ i ];
 
             /* Save the current pen position. */
@@ -266,7 +273,8 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
             pen_x += curglyph->advance.x;
 
 
-            FT_Glyph_Get_CBox( curglyph, ft_glyph_bbox_subpixels, &glyph_bbox );
+            FT_Glyph_Get_CBox( curglyph, ft_glyph_bbox_subpixels,
+                               &glyph_bbox );
 
             glyph_bbox.xMin *= 1024;
             glyph_bbox.xMax *= 1024;
@@ -291,8 +299,9 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
     return bbox;
 }
 
-static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height, int dst_stride,
-                               uint8_t *src, int src_width, int src_height, int src_stride,
+static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height,
+                               int dst_stride, uint8_t *src, int src_width,
+                               int src_height, int src_stride,
                                int dst_xpos_subpix, int dst_ypos )
 {
     int blit_width = dst_width - ( dst_xpos_subpix >> 16 );
@@ -305,7 +314,8 @@ static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height, int 
         int y;
 
         for( y = 0; y < blit_height; y++ ) {
-            uint8_t *curdst = dst + ((dst_ypos + y)*dst_stride) + ( dst_xpos_subpix >> 16 );
+            uint8_t *curdst = dst + ((dst_ypos + y)*dst_stride)
+                + ( dst_xpos_subpix >> 16 );
             uint8_t *cursrc = src + (y*src_stride);
             int prev = 0;
             int pos = dst_xpos_subpix & 0xffff;
@@ -313,7 +323,8 @@ static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height, int 
             int x;
 
             for( x = 0; x < blit_width; x++ ) {
-                tmp = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
+                tmp = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) )
+                    / 65535;
                 tmp += curdst[ x ];
                 curdst[ x ] = (tmp > 255) ? 255 : tmp;
                 prev = cursrc[ x ];
@@ -325,20 +336,55 @@ static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height, int 
     }
 }
 
-void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
+void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
                      int subpix_pos, int *width, int *height, int outsize )
 {
     FT_BBox string_bbox;
-    int len;
     int push_x, i;
+    iconv_t cd;
+    const char *inbuf = ntext;
+    size_t inbytesleft;
+    wchar_t wtext[100];
+    wchar_t *outbuf = wtext;
+    size_t outbytesleft = sizeof (wtext);
+    int len;
 
-    if( !text || !(*text) ) {
+    if( !ntext || !(*ntext) ) {
         *width = *height = 0;
         return;
     }
 
-    len = strlen( text );
-    string_bbox = prerender_text( font->face, font->glyphdata, font->glyphpos, font->glyphindex, text, len );
+    cd = iconv_open ("WCHAR_T", "UTF-8");
+    
+    if (cd == (iconv_t) -1)
+        return; // How do we report errors here?
+
+    // Yes, strlen. I want to know how many bytes, not how many characters:
+    inbytesleft = strlen (ntext);
+    
+    while (inbytesleft > 0) {
+        int ret = iconv (cd,
+                         (char**)&inbuf, &inbytesleft,
+                         (char**)&outbuf, &outbytesleft);
+        if (ret == -1) {
+            perror ("iconv");
+            return; // Error reporting?
+        }
+    }
+    *outbuf = 0; // Terminate
+    len = outbuf - wtext; // Calculate length.
+
+    /*
+    // DEBUG: Print the array
+    i = 0;
+    printf ("%s ==", ntext);
+    while (wtext[i] != 0)
+        printf (" %lx", wtext[i++]);
+    printf ("(len = %d)\n", len);
+    */
+
+    string_bbox = prerender_text( font->face, font->glyphdata, font->glyphpos,
+                                  font->glyphindex, wtext, len );
 
     /**
      * Temporary hack.  I'm worried about strings where the bounding box
@@ -366,7 +412,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
 
     for( i = 0; i < len; i++ ) {
         ft_glyph_data_t *curdata;
-        int cur = text[ i ];
+        int cur = wtext[ i ];
 
         curdata = hashtable_lookup( font->glyphdata, cur );
         if( curdata ) {
@@ -375,7 +421,8 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
             blit_glyph_subpix( output, *width, *height, *width,
                                curglyph->bitmap.buffer, curglyph->bitmap.width,
                                curglyph->bitmap.rows, curglyph->bitmap.pitch,
-                               push_x + font->glyphpos[ i ] + (curglyph->left*65536),
+                               push_x + font->glyphpos[ i ]
+                               + (curglyph->left*65536),
                                font->fontsize - curglyph->top );
         }
     }
