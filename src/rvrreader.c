@@ -41,33 +41,33 @@ struct rvrreader_s
 
 off_t read_full( int fd, void *buf, size_t numbytes )
 {
-	size_t got = 0, total = 0, remain = 0;
-	if ( numbytes == 0 ) { return 0; }
-	if ( numbytes <  0 ) { return -1; }
-	while( total < numbytes ) {
-		remain = numbytes - total;
-		got = read(fd, ((uint8_t *) buf) + total, remain);
-		if ( got == 0 ) { break; }
-		if ( got <  0 ) { return got; }
-		total += got;
-	}
-	return total > 0 ? total : -1;
+    size_t got = 0, total = 0, remain = 0;
+    if ( numbytes == 0 ) { return 0; }
+    if ( numbytes <  0 ) { return -1; }
+    while( total < numbytes ) {
+        remain = numbytes - total;
+        got = read(fd, ((uint8_t *) buf) + total, remain);
+        if ( got == 0 ) { break; }
+        if ( got <  0 ) { return got; }
+        total += got;
+    }
+    return total > 0 ? total : -1;
 }
 
 off_t skip_bytes( int fd, off_t numbytes, int unused )
 {
-	static char buf[4096];
-	off_t got = 0, total = 0, remain = 0;
-	if ( numbytes == 0 ) { return 0; }
-	if ( numbytes <  0 ) { return -1; }
-	while( total < numbytes ) {
-		remain = numbytes - total;
-		got = read(fd, buf, remain > 4096 ? 4096 : remain);
-		if ( got == 0 ) { break; }
-		if ( got <  0 ) { return got; }
-		total += got;
-	}
-	return total;
+    static char buf[4096];
+    off_t got = 0, total = 0, remain = 0;
+    if ( numbytes == 0 ) { return 0; }
+    if ( numbytes <  0 ) { return -1; }
+    while( total < numbytes ) {
+        remain = numbytes - total;
+        got = read(fd, buf, remain > 4096 ? 4096 : remain);
+        if ( got == 0 ) { break; }
+        if ( got <  0 ) { return got; }
+        total += got;
+    }
+    return total;
 }
 
 rvrreader_t *rvrreader_new( const char *filename )
