@@ -27,9 +27,7 @@ int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat,
 int determine_pulldown_offset_dalias( pulldown_metrics_t *peak, pulldown_metrics_t *relative,
                                       pulldown_metrics_t *mean );
 
-void diff_factor_packed422_frame_ref( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
-                                      unsigned char *old, unsigned char *new, int w, int h, int os, int ns );
-void diff_factor_packed422_frame_mmx( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
-                                      unsigned char *old, unsigned char *new, int w, int h, int os, int ns );
+void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
+                                  unsigned char *old, unsigned char *new, int w, int h, int os, int ns );
 
 #endif /* PULLDOWN_H_INCLUDED */
