@@ -1879,8 +1879,10 @@ int main( int argc, char **argv )
         if( vidin && acquired ) {
             if( fieldsavailable == 4 ) {
                 videoinput_free_frame( vidin, secondlastframeid );
+                if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             } else if( fieldsavailable == 2 ) {
                 videoinput_free_frame( vidin, lastframeid );
+                if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
         }
 
@@ -2002,9 +2004,8 @@ int main( int argc, char **argv )
                 lastframe = curframe;
             } else {
                 videoinput_free_frame( vidin, curframeid );
+                if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
-
-            if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
     }
 
