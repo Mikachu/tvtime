@@ -1146,9 +1146,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
-              _("Input width (level of detail)") );
+              _("Horizontal resolution") );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "inputwidth" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hres" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_CLOSEDCAPTIONICON "  %s",
               _("Toggle closed captions") );
@@ -1193,9 +1193,9 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
-              _("Input width (level of detail)") );
+              _("Horizontal resolution") );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "inputwidth" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hres" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
@@ -1204,13 +1204,14 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "inputwidth" );
+    menu = menu_new( "hres" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
-              _("Setup"), _("Input configuration"), _("Input width") );
+              _("Setup"), _("Input configuration"), _("Horizontal Resolution") );
     menu_set_text( menu, 0, string );
     menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
-    reset_inputwidth_menu( commands_get_menu( cmd, "inputwidth" ), config_get_inputwidth( cfg ) );
+    reset_inputwidth_menu( commands_get_menu( cmd, "hres" ),
+                           config_get_inputwidth( cfg ) );
 
     menu = menu_new( "audiomode" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
@@ -2096,12 +2097,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_SET_INPUT_WIDTH:
         cmd->newinputwidth = atoi( arg );
         if( cmd->osd ) {
-            menu_t *sharpmenu = commands_get_menu( cmd, "inputwidth" );
+            const char *curname = menu_get_name( cmd->curusermenu );
+            menu_t *sharpmenu = commands_get_menu( cmd, "hres" );
             char message[ 128 ];
             reset_inputwidth_menu( sharpmenu, cmd->newinputwidth );
+            curname = menu_get_name( cmd->curusermenu );
             commands_refresh_menu( cmd );
-            snprintf( message, sizeof (message),
-                      _("Input width will be %d on restart."),
+            snprintf( message, sizeof( message ),
+                      _("Horizontal Resolution will be %d on restart."),
                       cmd->newinputwidth );
             tvtime_osd_show_message( cmd->osd, message );
         }
