@@ -2530,14 +2530,10 @@ int main( int argc, char **argv )
 
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
-#ifdef _POSIX_SAVED_IDS
-    if( seteuid( getuid() ) == -1 ) {
-#else
-    if( setreuid( -1, getuid() ) == -1 ) {
-#endif
-        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", 
-                 strerror( errno ) );
-        return 1;
+    if( setuid( getuid() ) == -1 ) {                                                                           
+        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n",                                
+                 strerror( errno ) );                                                                          
+        return 1;                                                                                              
     }
 
 
