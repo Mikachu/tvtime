@@ -87,6 +87,7 @@ struct tvtime_osd_s
     double framerate;
     int framerate_mode;
     int film_mode;
+    int hold;
 
     credits_t *credits;
     int show_credits;
@@ -184,6 +185,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
     osd->film_mode = -1;
+    osd->hold = 0;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -376,6 +378,16 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     free( osd );
 }
 
+void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
+{
+    int i;
+
+    osd->hold = hold;
+    for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
+        osd_string_set_hold( osd->strings[ i ].string, hold );
+    }
+}
+
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
 {
     snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, "%s", norm );
@@ -438,23 +450,24 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     char timestamp[ 50 ];
     time_t tm = time( 0 );
     char text[ 200 ];
+    int delay = OSD_FADE_DELAY;
     int i;
 
     strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, OSD_FADE_DELAY );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, delay );
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, OSD_FADE_DELAY );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, delay );
     } else {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "", OSD_FADE_DELAY );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "", delay );
     }
-    osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, OSD_FADE_DELAY );
+    osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
 
     if( strlen( osd->freqtable_text ) ) {
         sprintf( text, "%s [%s]: %s", osd->tv_norm_text, osd->audiomode_text, osd->freqtable_text );
     } else {
         sprintf( text, "%s", osd->tv_norm_text );
     }
-    osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, OSD_FADE_DELAY );
+    osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
 
     if( *(osd->hold_message) ) {
         sprintf( text, "%s", osd->hold_message );
@@ -478,16 +491,16 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
         sprintf( text, "%s - %s [%.2ffps%s%s]", osd->input_text,
                  osd->deinterlace_text, osd->framerate, rate_mode, film_mode );
     }
-    osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
+    osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
 
     /** Billy: What's up?  Are we ditching the logo for XDS?
-     *osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
+     *osd_graphic_show_graphic( osd->channel_logo, delay );
      *osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
      */
 
     for( i = OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
-        osd_string_set_timeout( osd->strings[ i ].string, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ i ].string, delay );
     }
 }
 
