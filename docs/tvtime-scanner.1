@@ -32,7 +32,18 @@ to help users of European cable providers that do not use standard frequencies
 .SH DESCRIPTION
 
 .B tvtime\-scanner
-allows a user to scan all frequencies for stations.
+allows a user to scan all frequencies for stations.  This is useful for European
+cable provides such as
+.B UPC
+or
+.B Caesema
+which do not use standard frequency tables for their channels.
+.B tvtime-scanner
+checks for frequencies across the full band and writes it to your
+stationlist.xml file in a table called "Custom".  This can be selected by
+running "tvtime --frequencies=custom" or by selecting the Custom frequency
+table within the OSD menu inside
+.B tvtime.
 
 .SH OPTIONS
 
@@ -85,4 +96,5 @@ Billy Biggs.
 .SH "SEE ALSO"
 
 .BR tvtime (1),
+.BR tvtime-configure (1),
 .IR tvtime.xml (5),
