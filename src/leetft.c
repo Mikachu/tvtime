@@ -198,6 +198,8 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
         bbox.xMin = bbox.yMin = bbox.xMax = bbox.yMax = 0;
     }
 
+    if( bbox.xMax < pen_x ) bbox.xMax = pen_x;
+
     return bbox;
 }
 
