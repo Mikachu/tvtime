@@ -20,6 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <errno.h>
+#include <signal.h>
+#include <assert.h>
+
 #include <X11/Xmd.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -28,16 +35,38 @@
 /* when do we not have XDPMS? */
 #define HAVE_XDPMS
 
-int stop_xscreensaver=0;
+int stop_xscreensaver = 1;
+int stop_kscreensaver = 1;
 
 static int dpms_disabled=0;
 static int timeout_save=0;
-static int xscreensaver_was_running=0;
+
+/* The child's PID */
+static pid_t ping_xscreensaver_child = 0;
+/* The number of seconds between pings */
+static int ping_xscreensaver_sleep = 60;
+/* Exit values */
+#define NO_XSCREENSAVER  2
+#define BAD_XSCREENSAVER 3
+
 static int kdescreensaver_was_running=0;
 
 #ifdef HAVE_XDPMS
 #include <X11/extensions/dpms.h>
 #endif
+
+/**
+ * Handle SIGCHLD signals, which tell us that xscreensaver-command
+ * doesn't work. 
+ */
+void sigchld_handler( int signum )
+{
+  assert( signum == SIGCHLD );
+  ping_xscreensaver_child = 0;
+  stop_xscreensaver = 0;
+  signal( signum, SIG_DFL );
+}
+
 
 void saver_on(Display *mDisplay) {
 
@@ -75,11 +104,15 @@ void saver_on(Display *mDisplay) {
         timeout_save=0;
     }
 
-    if (xscreensaver_was_running && stop_xscreensaver) {
-        system("cd /; xscreensaver -no-splash &");
-        xscreensaver_was_running = 0;
+    /* Re-enable xscreensaver.  This isn't performed if the
+     * ping_xscreensaver loop has been killed before. */
+    if( ping_xscreensaver_child && stop_xscreensaver ) {
+        signal( SIGCHLD, SIG_DFL );
+        kill( ping_xscreensaver_child, SIGHUP );
+        ping_xscreensaver_child = 0;
     }
-    if (kdescreensaver_was_running && stop_xscreensaver) {
+
+    if (kdescreensaver_was_running && stop_kscreensaver) {
         system("dcop kdesktop KScreensaverIface enable true 2>/dev/null >/dev/null");
         kdescreensaver_was_running = 0;
     }
@@ -114,14 +147,51 @@ void saver_off(Display *mDisplay) {
             XSetScreenSaver(mDisplay, 0, interval, prefer_blank, allow_exp);
     }
 
-    // turning off screensaver
-    if (stop_xscreensaver && !xscreensaver_was_running)
-    {
-      xscreensaver_was_running = (system("xscreensaver-command -version 2>/dev/null >/dev/null")==0);
-      if (xscreensaver_was_running)
-          system("xscreensaver-command -exit 2>/dev/null >/dev/null");    
+    /* Disabling xscreensaver by simulating activity. 
+     * http://www.jwz.org/xscreensaver/faq.html#dvd */
+    if( stop_xscreensaver && !ping_xscreensaver_child ) {
+      struct sigaction sigchld_act;
+
+      /* Set a handler for the child */
+      sigchld_act.sa_handler = sigchld_handler;
+      sigemptyset( &sigchld_act.sa_mask );
+      sigchld_act.sa_flags = SA_NOCLDSTOP;
+      sigaction( SIGCHLD, &sigchld_act, NULL );
+
+      errno = 0;
+      ping_xscreensaver_child = fork();
+      if( !ping_xscreensaver_child ) {
+        int result;
+        /* We are the child, and we will ping xscreensaver every minute,
+         * to keep it from activating on us. */
+
+        /* We don't trap for any close() errors because we don't care
+         * about data lossage. */
+        close( STDIN_FILENO );
+        close( STDOUT_FILENO );
+        close( STDERR_FILENO );
+
+        /* Ping xscreensaver once ever ping_xscreensaver_sleep 
+         * seconds. */
+        for( ;; ) {
+          errno = 0;
+          result = execlp( "xscreensaver-command", "-deactivate", NULL );
+          if( errno ) {
+            exit( NO_XSCREENSAVER );
+          }
+
+          if( result ) {
+            exit( BAD_XSCREENSAVER );
+          }
+
+          sleep( ping_xscreensaver_sleep );
+        }
+      } else if( ping_xscreensaver_child < 0 ) {
+        fprintf( stderr, "x11tools: can't fork a child.\n" );
+      }
     }
-    if (stop_xscreensaver && !kdescreensaver_was_running)
+
+    if (stop_kscreensaver && !kdescreensaver_was_running)
     {
       kdescreensaver_was_running=(system("dcop kdesktop KScreensaverIface isEnabled 2>/dev/null | sed 's/1/true/g' | grep true 2>/dev/null >/dev/null")==0);
       if (kdescreensaver_was_running)

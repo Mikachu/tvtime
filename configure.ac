@@ -22,7 +22,7 @@ AC_PROG_LIBTOOL
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([ctype.h dirent.h errno.h fcntl.h getopt.h inttypes.h langinfo.h math.h netinet/in.h pwd.h stdint.h stdio.h stdlib.h string.h sys/ioctl.h sys/mman.h sys/resource.h sys/stat.h sys/time.h sys/types.h unistd.h wordexp.h])
+AC_CHECK_HEADERS([assert.h ctype.h dirent.h errno.h fcntl.h getopt.h inttypes.h langinfo.h math.h netinet/in.h pwd.h signal.h stdint.h stdio.h stdlib.h string.h sys/ioctl.h sys/mman.h sys/resource.h sys/stat.h sys/time.h sys/types.h unistd.h wordexp.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
@@ -31,7 +31,7 @@ AC_HEADER_TIME
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_MMAP
-AC_CHECK_FUNCS([asprintf atexit gettimeofday memset strerror vsscanf wordexp wordfree])
+AC_CHECK_FUNCS([asprintf atexit fork execlp gettimeofday memset signal sigemptyset sigaction strerror vsscanf wordexp wordfree])
 
 # Let's set the group of the $(localstatedir)/run/tvtime directory
 # On most GNU/Linux systems, this should be `video', but most GNU/Linux
