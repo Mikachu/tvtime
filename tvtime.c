@@ -55,7 +55,8 @@ static void print_usage( char **argv )
                      "\t-o\tOutput mode: '422' (default) or '420'.\n"
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
                      "\t-i\tvideo4linux input number (defaults to 0).\n"
-                     "\t-l\tLuma correction value (defaults to 1.0).\n"
+                     "\t-c\tApply luma correction.\n"
+                     "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n"
                      "\t-n\tThe mode to set the tuner to: PAL, NTSC or SECAM.\n"
                      "\t  \t(defaults to NTSC)\n"
                      "\t-f\tThe channels you are receiving with the tuner\n"
@@ -95,6 +96,7 @@ int main( int argc, char **argv )
     struct timeval checkpoint6;
     struct timeval checkpoint7;
     double luma_correction = 1.0;
+    int apply_luma_correction = 0;
     video_correction_t *vc;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
@@ -127,15 +129,16 @@ int main( int argc, char **argv )
     /* Default freq */
     strcpy( freq, "us-cable" );
 
-    while( (c = getopt( argc, argv, "hw:aso:d:i:l:n:f:t:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:acso:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
         case 'w': outputwidth = atoi( optarg ); break;
         case 'a': aspect = 1; break;
         case 's': debug = 1; break;
+        case 'c': apply_luma_correction = 1; break;
         case 'o': if( strcmp( "420", optarg ) == 0 ) output420 = 1; break;
         case 'd': strncpy( v4ldev, optarg, 250 ); break;
         case 'i': inputnum = atoi( optarg ); break;
-        case 'l': luma_correction = atof( optarg ); break;
+        case 'l': luma_correction = atof( optarg ); apply_luma_correction = 1; break;
         case 'n': strncpy( norm, optarg, 6 ); break;
         case 'f': strncpy( freq, optarg, 17 ); break;
         case 't': tuner_number = atoi( optarg ); break;
@@ -245,9 +248,13 @@ int main( int argc, char **argv )
                          "Using 1.0.\n" );
         luma_correction = 1.0;
     }
-    fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-             luma_correction );
-    video_correction_set_luma_power( vc, luma_correction );
+    if( apply_luma_correction ) {
+        fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
+                 luma_correction );
+        video_correction_set_luma_power( vc, luma_correction );
+    } else {
+        fprintf( stderr, "tvtime: Luma correction disabled.\n" );
+    }
 
     /* Setup the video input. */
     videoinput_free_all_frames( vidin );
@@ -281,19 +288,27 @@ int main( int argc, char **argv )
             break;
         }
         if( commands & TVTIME_LUMA_UP ) {
-            if( luma_correction < 10.0 ) {
-                luma_correction += 0.1;
-                fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                         luma_correction );
-                video_correction_set_luma_power( vc, luma_correction );
+            if( !apply_luma_correction ) {
+                fprintf( stderr, "tvtime: Luma correction disabled.  Run with -c to use it.\n" );
+            } else {
+                if( luma_correction < 10.0 ) {
+                    luma_correction += 0.1;
+                    fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
+                             luma_correction );
+                    video_correction_set_luma_power( vc, luma_correction );
+                }
             }
         }
         if( commands & TVTIME_LUMA_DOWN ) {
-            if( luma_correction > 0.0 ) {
-                luma_correction -= 0.1;
-                fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                         luma_correction );
-                video_correction_set_luma_power( vc, luma_correction );
+            if( !apply_luma_correction ) {
+                fprintf( stderr, "tvtime: Luma correction disabled.  Run with -c to use it.\n" );
+            } else {
+                if( luma_correction > 0.0 ) {
+                    luma_correction -= 0.1;
+                    fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
+                             luma_correction );
+                    video_correction_set_luma_power( vc, luma_correction );
+                }
             }
         }
         if( commands & TVTIME_CHANNEL_UP ) {
@@ -412,12 +427,18 @@ int main( int argc, char **argv )
             chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
                                          width/2, height/2, width*2, 0 );
         } else {
-            video_correction_planar422_field_to_packed422_frame( vc,
-                                                                 sdl_get_output(),
-                                                                 curluma,
-                                                                 curcb422,
-                                                                 curcr422,
-                                                                 0, width * 2, width, width, height );
+            if( apply_luma_correction ) {
+                video_correction_planar422_field_to_packed422_frame( vc,
+                                                                     sdl_get_output(),
+                                                                     curluma,
+                                                                     curcb422,
+                                                                     curcr422,
+                                                                     0, width * 2, width, width, height );
+            } else {
+                planar422_field_to_packed422_frame( sdl_get_output(), curluma,
+                                                    curcb422, curcr422, 0, width * 2,
+                                                    width, width, height );
+            }
         }
 
 /* CHECKPOINT3 : Constructed the first field */
@@ -453,12 +474,19 @@ int main( int argc, char **argv )
             chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
                                          width/2, height/2, width*2, 1 );
         } else {
-            video_correction_planar422_field_to_packed422_frame( vc,
-                                                                 sdl_get_output(),
-                                                                 curluma + width,
-                                                                 curcb422 + (width / 2),
-                                                                 curcr422 + (width / 2),
-                                                                 1, width * 2, width, width, height );
+            if( apply_luma_correction ) {
+                video_correction_planar422_field_to_packed422_frame( vc,
+                                                                     sdl_get_output(),
+                                                                     curluma + width,
+                                                                     curcb422 + (width / 2),
+                                                                     curcr422 + (width / 2),
+                                                                     1, width * 2, width, width, height );
+            } else {
+                planar422_field_to_packed422_frame( sdl_get_output(), curluma + width,
+                                                    curcb422 + (width / 2),
+                                                    curcr422 + (width / 2),
+                                                    1, width * 2, width, width, height );
+            }
         }
 
 /* CHECKPOINT5 : Built the second field */

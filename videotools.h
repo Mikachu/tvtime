@@ -34,7 +34,8 @@ void video_correction_correct_luma_scanline( video_correction_t *vc,
 
 /**
  * Builds a packed 4:2:2 frame from a field interpolating to frame size by
- * linear interpolation.
+ * linear interpolation.  This version applies the video correction transform
+ * as it interpolates.
  */
 void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
                                                           unsigned char *output,
@@ -45,6 +46,17 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
                                                           int lstride, int cstride,
                                                           int width, int height );
 
+/**
+ * Builds a packed 4:2:2 frame from a field interpolating to frame size by
+ * linear interpolation.
+ */
+void planar422_field_to_packed422_frame( unsigned char *output,
+                                         unsigned char *fieldluma,
+                                         unsigned char *fieldcb,
+                                         unsigned char *fieldcr,
+                                         int bottom_field,
+                                         int lstride, int cstride,
+                                         int width, int height );
 
 /**
  * Builds a plane from a field interpolating to frame size by linear
