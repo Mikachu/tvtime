@@ -797,9 +797,6 @@ config_t *config_new( void )
     ct->keymap[ 't' ] = TVTIME_TOGGLE_DEINTERLACER;
     ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
     ct->keymap[ ',' ] = TVTIME_MIXER_TOGGLE_MUTE;
-    ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
-    ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
-    ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
     ct->keymap[ '=' ] = TVTIME_TOGGLE_FRAMERATE;
     ct->keymap[ I_END ] = TVTIME_TOGGLE_PAUSE;
     ct->keymap[ 'e' ] = TVTIME_TOGGLE_AUDIO_MODE;
@@ -809,7 +806,6 @@ config_t *config_new( void )
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
-    ct->keymap[ 'o' ] = TVTIME_TOGGLE_COLOUR_INVERT;
     ct->keymap[ '0' ] = TVTIME_CHANNEL_0;
     ct->keymap[ '1' ] = TVTIME_CHANNEL_1;
     ct->keymap[ '2' ] = TVTIME_CHANNEL_2;
