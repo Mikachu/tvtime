@@ -239,34 +239,6 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
     }
 }
 
-void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
-                                     int width, int height, int stride,
-                                     int xpos, int ypos, int rightjustified )
-{
-    if( !osds->efs ) return;
-    if( !osds->frames_left ) return;
-
-    if( rightjustified ) xpos -= osds->image_textwidth;
-    if( osds->frames_left < 50 ) {
-        int alpha;
-        alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
-        composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                                 osds->image4444,
-                                                 osds->image_textwidth,
-                                                 osds->image_textheight,
-                                                 osds->image_width*4,
-                                                 xpos, ypos, alpha );
-    } else {
-        composite_packed4444_to_packed422( output, width, height, stride,
-                                           osds->image4444,
-                                           osds->image_textwidth,
-                                           osds->image_textheight,
-                                           osds->image_width*4,
-                                           xpos, ypos );
-    }
-}
-
-
 /* Shape functions */
 void osd_shape_render_image4444( osd_shape_t *osds );
 struct osd_shape_s

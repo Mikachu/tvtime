@@ -48,7 +48,6 @@ struct input_s {
     int screenshot;
     int printdebug;
     int showbars;
-    int showtest;
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
@@ -77,7 +76,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->videohold = 0;
     in->quit = 0;
     in->showbars = 0;
-    in->showtest = 0;
     in->printdebug = 0;
     in->screenshot = 0;
     in->togglefullscreen = 0;
@@ -138,10 +136,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_SCREENSHOT:
              in->screenshot = 1;
-             break;
-
-         case TVTIME_SHOW_TEST:
-             in->showtest = !in->showtest;
              break;
 
          case TVTIME_SHOW_BARS:
@@ -435,11 +429,6 @@ int input_print_debug( input_t *in )
 int input_show_bars( input_t *in )
 {
     return in->showbars;
-}
-
-int input_show_test( input_t *in )
-{
-    return in->showtest;
 }
 
 int input_take_screenshot( input_t *in )

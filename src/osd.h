@@ -61,9 +61,6 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               unsigned char *output,
                                               int width, int xpos,
                                               int scanline );
-void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
-                                     int width, int height, int stride,
-                                     int xpos, int ypos, int rightjustified );
 
 osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
                             int video_height, int shape_width,

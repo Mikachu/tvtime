@@ -87,7 +87,6 @@ int input_take_screenshot( input_t *in );
 int input_videohold( input_t *in );
 int input_print_debug( input_t *in );
 int input_show_bars( input_t *in );
-int input_show_test( input_t *in );
 int input_toggle_fullscreen( input_t *in );
 int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );

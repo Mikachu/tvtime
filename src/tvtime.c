@@ -43,6 +43,7 @@
 #include "menu.h"
 #include "videocorrection.h"
 #include "plugins.h"
+#include "dfboutput.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -59,36 +60,6 @@ static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
-}
-
-static void build_test_frames( unsigned char *oddframe,
-                               unsigned char *evenframe,
-                               int width, int height )
-{
-    osd_string_t *test_string;
-
-    memset( oddframe, 0, width * height * 2 );
-    memset( evenframe, 0, width * height * 2 );
-
-    test_string = osd_string_new( DATADIR "/FreeSansBold.ttf", 80, width, height, 4.0 / 3.0 );
-    if( !test_string ) {
-        fprintf( stderr, "tvtime: Can't create string for test frame, test frames unavailable.\n" );
-        return;
-    }
-
-    blit_colour_packed422( oddframe, width, height, width*2, 16, 128, 128 );
-    blit_colour_packed422( evenframe, width, height, width*2, 80, 128, 128 );
-
-    osd_string_set_colour( test_string, 235, 128, 128 );
-    osd_string_show_text( test_string, "Odd Field", 80 );
-    osd_string_composite_packed422( test_string, oddframe, width,
-                                    height, width*2, 50, 50, 0 );
-
-    osd_string_set_colour( test_string, 235, 128, 128 );
-    osd_string_show_text( test_string, "Even Field", 80 );
-    osd_string_composite_packed422( test_string, evenframe, width,
-                                    height, width*2, 50, 150, 0 );
-    osd_string_delete( test_string );
 }
 
 static void build_colourbars( unsigned char *output, int width, int height )
@@ -365,8 +336,6 @@ int main( int argc, char **argv )
     int verbose;
     tvtime_osd_t *osd;
     int i;
-    unsigned char *testframe_odd;
-    unsigned char *testframe_even;
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
@@ -474,14 +443,12 @@ int main( int argc, char **argv )
     curmethodid = 0;
     curmethod = get_deinterlace_method( curmethodid );
 
-    testframe_odd = (unsigned char *) malloc( width * height * 2 );
-    testframe_even = (unsigned char *) malloc( width * height * 2 );
+    /* Build colourbars. */
     colourbars = (unsigned char *) malloc( width * height * 2 );
-    if( !testframe_odd || !testframe_even || !colourbars ) {
+    if( !colourbars ) {
         fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
         return 1;
     }
-    build_test_frames( testframe_odd, testframe_even, width, height );
     build_colourbars( colourbars, width, height );
 
     /* Setup OSD stuff. */
@@ -612,8 +579,8 @@ int main( int argc, char **argv )
     }
 
     /* Setup the output. */
-    //output = get_dfb_output();
-    output = get_sdl_output();
+    output = get_dfb_output();
+    //output = get_sdl_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
                        config_get_aspect( ct ) ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: "
@@ -644,7 +611,7 @@ int main( int argc, char **argv )
         struct timeval blitstart;
         struct timeval blitend;
         int printdebug = 0;
-        int showbars, showtest, videohold, screenshot;
+        int showbars, videohold, screenshot;
 
         output->poll_events( in );
 
@@ -652,7 +619,6 @@ int main( int argc, char **argv )
         videohold = input_videohold( in );
         printdebug = input_print_debug( in );
         showbars = input_show_bars( in );
-        showtest = input_show_test( in );
         screenshot = input_take_screenshot( in );
         if( input_toggle_fullscreen( in ) ) {
             output->toggle_fullscreen();
@@ -732,8 +698,6 @@ int main( int argc, char **argv )
             output->lock_output_buffer();
             if( showbars ) {
                 blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
-            } else if( showtest ) {
-                blit_packed422_scanline( output->get_output_buffer(), testframe_even, width*height );
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
                                     secondlastframe, vc, osd, menu, 0,
@@ -812,8 +776,6 @@ int main( int argc, char **argv )
             output->lock_output_buffer();
             if( showbars ) {
                 blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
-            } else if( showtest ) {
-                blit_packed422_scanline( output->get_output_buffer(), testframe_odd, width*height );
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
                                     secondlastframe, vc, osd, menu, 1,

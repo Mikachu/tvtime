@@ -145,7 +145,6 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_COLOUR_DOWN ]    = I_F7;
     ct->keymap[ TVTIME_COLOUR_UP ]      = I_F8;
     ct->keymap[ TVTIME_SHOW_BARS ]      = I_F11;
-    ct->keymap[ TVTIME_SHOW_TEST ]      = I_F12;
     ct->keymap[ TVTIME_DEBUG ]          = 'd';
     ct->keymap[ TVTIME_FULLSCREEN ]     = 'f';
     ct->keymap[ TVTIME_ASPECT ]         = 'a';
@@ -500,11 +499,6 @@ void config_init_keymap( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "key_show_bars")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_SHOW_BARS ] = key;
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "key_show_test")) ) {
-        key = string_to_key( tmp );
-        ct->keymap[ TVTIME_SHOW_TEST ] = key;
     }
 
     if( (tmp = parser_get( &(ct->pf), "key_debug")) ) {

@@ -53,7 +53,6 @@ enum tvtime_commands
     TVTIME_FINETUNE_UP,
 
     TVTIME_SHOW_BARS,
-    TVTIME_SHOW_TEST,
     TVTIME_DEBUG,
 
     TVTIME_FULLSCREEN,
