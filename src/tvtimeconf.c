@@ -107,7 +107,7 @@ struct config_s
     int *keymap;
     char *timeformat;
     int *buttonmap;
-    char *ssdir;
+    char ssdir[ 256 ];
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
@@ -261,8 +261,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ScreenShotDir" ) ) {
-            free( ct->ssdir );
-            ct->ssdir = strdup( curval );
+            if( curval[ 0 ] == '~' && getenv( "HOME" ) ) {
+                snprintf( ct->ssdir, sizeof( ct->ssdir ), "%s%s", getenv( "HOME" ), curval + 1 );
+            } else {
+                strncpy( ct->ssdir, curval, 255 );
+            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "MenuBG" ) ) {
@@ -488,7 +491,7 @@ config_t *config_new( int argc, char **argv )
     } else {
         ct->timeformat = strdup( "%r" );
     }
-    ct->ssdir = strdup( getenv( "HOME" ) );
+    strncpy( ct->ssdir, getenv( "HOME" ), 255 );
     ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
     ct->channel_text_rgb = 4294967040U; /* opaque yellow */
@@ -677,7 +680,6 @@ void config_delete( config_t *ct )
     if( ct->configsave ) configsave_close( ct->configsave );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
-    free( ct->ssdir );
     free( ct->timeformat );
     free( ct->norm );
     free( ct->freq );
