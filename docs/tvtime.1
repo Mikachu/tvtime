@@ -4,7 +4,7 @@
 .B tvtime \- a high quality television application
 .SH "SYNTAX"
 .LP 
-tvtime [\-ahmsv] [\-F <config file>] [\-r <rvrfile>] [\-H <height>]
+tvtime [\-ahmsSv] [\-F <config file>] [\-r <rvrfile>] [\-H <height>]
 [\-I <sampling>] [\-d <device>] [\-b <device>] [\-i <input>]
 [\-n <norm>] [\-f <frequencies>]
        
@@ -53,6 +53,12 @@ Start tvtime in fullscreen mode.
 .TP
 .B \-s
 Print frame skip information (for debugging).
+
+.TP
+.B \-S
+Save command line options to the config file.  This will save the V4L
+device, VBI device, input number, norm, frequency, startup fullscreen
+setting, aspect ratio, verbose mode, and output window height.
 
 .TP
 .B \-v
