@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime cvs\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-07 00:22+0200\n"
+"POT-Creation-Date: 2003-10-16 02:03+0200\n"
 "PO-Revision-Date: 2003-10-05 23:25+0200\n"
 "Last-Translator: Vincent van Adrighem <adrighem@gnome.org>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -15,212 +15,180 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:824 src/tvtime.c:842 src/tvtime.c:876 src/tvtime.c:940
-#: src/tvtime.c:968 src/tvtime.c:1094 src/commands.c:370 src/commands.c:544
-#: src/commands.c:564 src/commands.c:626 src/commands.c:672 src/commands.c:747
-#: src/commands.c:764 src/commands.c:791 src/commands.c:856
-#: src/commands.c:1114 src/commands.c:1161 src/commands.c:1197
-#: src/commands.c:1235 src/commands.c:1307 src/commands.c:1378
-#: src/commands.c:1388 src/commands.c:1436 src/commands.c:1448
-#: src/commands.c:1478 src/commands.c:1511 src/commands.c:1544
-#: src/commands.c:1576
+#: src/tvtime.c:822 src/tvtime.c:840 src/tvtime.c:874 src/tvtime.c:938
+#: src/tvtime.c:966 src/tvtime.c:1092 src/commands.c:365 src/commands.c:539
+#: src/commands.c:559 src/commands.c:621 src/commands.c:667 src/commands.c:742
+#: src/commands.c:759 src/commands.c:786 src/commands.c:851
+#: src/commands.c:1110 src/commands.c:1157 src/commands.c:1193
+#: src/commands.c:1231 src/commands.c:1303 src/commands.c:1374
+#: src/commands.c:1384 src/commands.c:1432 src/commands.c:1444
+#: src/commands.c:1474 src/commands.c:1507 src/commands.c:1540
+#: src/commands.c:1572
 msgid "Back"
 msgstr "Terug"
 
-#: src/tvtime.c:854 src/tvtime.c:980
+#: src/tvtime.c:852 src/tvtime.c:978
 #, c-format
 msgid "Full rate: %.2ffps"
 msgstr "Volledige snelheid: %.2ffps"
 
-#: src/tvtime.c:862 src/tvtime.c:984
+#: src/tvtime.c:860 src/tvtime.c:982
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2ffps"
 msgstr "Halve snelheid. bovenste veld deinterlacen: %.2ffps"
 
-#: src/tvtime.c:869 src/tvtime.c:988
+#: src/tvtime.c:867 src/tvtime.c:986
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2ffps"
 msgstr "Halve snelheid, onderste veld deinterlacen: %.2ffps"
 
-#: src/tvtime.c:892
+#: src/tvtime.c:890
 msgid "Overscan setting"
 msgstr "Overscan-instellingen"
 
-#: src/tvtime.c:899 src/commands.c:1267
+#: src/tvtime.c:897 src/commands.c:1263
 msgid "Apply matte"
 msgstr "'Matte' toepassen"
 
-#: src/tvtime.c:907
+#: src/tvtime.c:905
 msgid "16:9 output"
 msgstr "16:9 uitvoer"
 
-#: src/tvtime.c:916
+#: src/tvtime.c:914
 msgid "Fullscreen"
 msgstr "Volledig scherm"
 
-#: src/tvtime.c:923
+#: src/tvtime.c:921
 msgid "Set fullscreen position"
 msgstr "Positie volledig scherm instellen"
 
-#: src/tvtime.c:933
+#: src/tvtime.c:931
 msgid "Always-on-top"
 msgstr "Altijd bovenaan"
 
-#: src/tvtime.c:951
+#: src/tvtime.c:949
 msgid "Centre"
 msgstr "Centreren"
 
-#: src/tvtime.c:958
+#: src/tvtime.c:956
 msgid "Top"
 msgstr "Boven"
 
-#: src/tvtime.c:964
+#: src/tvtime.c:962
 msgid "Bottom"
 msgstr "Onder"
 
-#: src/tvtime.c:978
+#: src/tvtime.c:976
 msgid "Frame drop setting"
 msgstr "Framedrop-instellingen"
 
-#: src/tvtime.c:1005
+#: src/tvtime.c:1003
 msgid "Performance estimates"
 msgstr "Geschatte prestaties"
 
-#: src/tvtime.c:1007
+#: src/tvtime.c:1005
 msgid "Deinterlacer"
 msgstr "Deinterlacer"
 
-#: src/tvtime.c:1010
+#: src/tvtime.c:1008
 #, c-format
 msgid "Input: %s at %dx%d"
 msgstr "Invoer: %s op %dx%d"
 
-#: src/tvtime.c:1014
+#: src/tvtime.c:1012
 #, c-format
 msgid "Attempted framerate: %.2ffps"
 msgstr "Weergavesnelheid: %.2ffps"
 
-#: src/tvtime.c:1018
+#: src/tvtime.c:1016
 #, c-format
 msgid "Average blit time: %.2fms (%.0fMB/sec)"
 msgstr "Gemiddelde blit-snelheid: %.2fms (%.0fMB/sec)"
 
-#: src/tvtime.c:1022
+#: src/tvtime.c:1020
 #, c-format
 msgid "Average render time: %5.2fms"
 msgstr "Gemiddelde opbouw-tijd: %5.2fms"
 
-#: src/tvtime.c:1026
+#: src/tvtime.c:1024
 #, c-format
 msgid "Dropped frames: %d"
 msgstr "Overgeslagen beeldjes: %d"
 
-#: src/tvtime.c:1032
+#: src/tvtime.c:1030
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1fms (want %4.1fms)"
 msgstr "Blit-ruimte: %4.1f/%4.1fms (gewenst %4.1fms)"
 
-#: src/tvtime.c:1051 src/tvtime.c:1104
+#: src/tvtime.c:1049 src/tvtime.c:1102
 msgid "16:9 + Overscan"
 msgstr "16:9 + Overscan"
 
-#: src/tvtime.c:1056 src/tvtime.c:1083
+#: src/tvtime.c:1054 src/tvtime.c:1081
 msgid "1.85:1"
 msgstr "1.85:1"
 
-#: src/tvtime.c:1061 src/tvtime.c:1088
+#: src/tvtime.c:1059 src/tvtime.c:1086
 msgid "2.35:1"
 msgstr "2.35:1"
 
-#: src/tvtime.c:1066 src/tvtime.c:1107
+#: src/tvtime.c:1064 src/tvtime.c:1105
 msgid "4:3 centre"
 msgstr "4:3 gecentreerd"
 
-#: src/tvtime.c:1072 src/tvtime.c:1110
+#: src/tvtime.c:1070 src/tvtime.c:1108
 msgid "4:3 + Overscan"
 msgstr "4:3 + Overscan"
 
-#: src/tvtime.c:1078
+#: src/tvtime.c:1076
 msgid "16:9"
 msgstr "16:9"
 
-#: src/tvtime.c:1103
+#: src/tvtime.c:1101
 msgid "Matte setting (Anamorphic input)"
 msgstr "'Matte' instellingen (Anamorphische invoer)"
 
-#: src/tvtime.c:1109
+#: src/tvtime.c:1107
 msgid "Matte setting (4:3 input)"
 msgstr "'Matte' instellingen (4:3 invoer)"
 
-#: src/tvtime.c:1186
-msgid "tvtime: Can't set configuration options, exiting.\n"
-msgstr "tvtime: Kan configuratie-opties niet instellen. Afgebroken.\n"
-
-#: src/tvtime.c:1204
-#, c-format
-msgid "tvtime: Can't renice to %d.\n"
-msgstr "tvtime: Kan prioriteit niet instellen op %d.\n"
-
-#: src/tvtime.c:1211
-msgid "tvtime: Sending fields to interlaced output devices.\n"
+#: src/tvtime.c:1185 src/tvtime.c:1502
+msgid "tvtime: Out of memory.\n"
 msgstr ""
-"tvtime: Zenden van beeldvelden naar uitvoer-apparaten met interlace "
-"functionaliteit.\n"
 
-#: src/tvtime.c:1214
-msgid "tvtime: Sending frames to interlaced output devices.\n"
-msgstr ""
-"tvtime: Zenden van frames naar uitvoer-apparaten met interlace "
-"functionaliteit.\n"
-
-#: src/tvtime.c:1257
+#: src/tvtime.c:1246
 msgid ""
 "tvtime: Output driver failed to initialize: no video output available.\n"
 msgstr ""
 "tvtime: Initialisatie mislukt van uitvoer-driver. Geen uitvoer beschikbaar.\n"
 
-#: src/tvtime.c:1273
+#: src/tvtime.c:1262
 msgid "tvtime: Can't initialize input filters.\n"
 msgstr "tvtime: Kan invoer-filters niet initialiseren.\n"
 
-#: src/tvtime.c:1276
+#: src/tvtime.c:1265
 msgid "tvtime: Can't initialize output filters.\n"
 msgstr "tvtime: Kan uitvoer-filters niet initialiseren.\n"
 
-#: src/tvtime.c:1318
+#: src/tvtime.c:1307
 msgid "tvtime: Can't initialize performance monitor, exiting.\n"
 msgstr "tvtime: Kan prestatie-analyse niet starten. Afgebroken.\n"
 
-#: src/tvtime.c:1327
+#: src/tvtime.c:1316
 msgid "tvtime: Can't create stationmanager (no memory?), exiting.\n"
 msgstr "tvtime: Kan kanaalbeheer niet starten (geen geheugen?). Afgebroken.\n"
 
-#: src/tvtime.c:1341 src/tvtime.c:1352
-#, c-format
-msgid "Can't open rvr file '%s'."
+#: src/tvtime.c:1330
+#, fuzzy, c-format
+msgid "Can't open RVR file '%s'."
 msgstr "Kan rvr-bestand '%s' niet openen."
 
-#: src/tvtime.c:1359
-#, c-format
-msgid "tvtime: RVR frame sampling %d pixels per scanline.\n"
-msgstr "tvtime: RVR beeld, %d beeldpunten per scanline.\n"
-
-#: src/tvtime.c:1369
-#, c-format
-msgid "Can't open video4linux device '%s'."
+#: src/tvtime.c:1344
+#, fuzzy, c-format
+msgid "Can't open capture device '%s'."
 msgstr "Kan video4linux-apparaat '%s' niet openen."
 
-#: src/tvtime.c:1393
-#, c-format
-msgid "tvtime: V4L sampling %d pixels per scanline.\n"
-msgstr "tvtime: V4L beeld, %d beeldpunten per scanline.\n"
-
-#: src/tvtime.c:1401
-#, c-format
-msgid "tvtime: Can't display input size %dx%d.\n"
-msgstr "tvtime: Kan invoerafmetingen %dx%d niet weergeven.\n"
-
-#: src/tvtime.c:1421
+#: src/tvtime.c:1392
 #, c-format
 msgid ""
 "tvtime: Can only get %d frame buffers from V4L.  Not enough to continue.  "
@@ -229,7 +197,7 @@ msgstr ""
 "tvtime: Kan slechts %d frame-buffers van V4L krijgen.  Niet genoeg om door "
 "te gaan.  Afgebroken.\n"
 
-#: src/tvtime.c:1426
+#: src/tvtime.c:1397
 #, c-format
 msgid ""
 "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
@@ -240,7 +208,7 @@ msgstr ""
 "plugins\n"
 "vtime: beperkt tot degene die slechts 1 veld nodig hebben.\n"
 
-#: src/tvtime.c:1432
+#: src/tvtime.c:1403
 #, c-format
 msgid ""
 "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
@@ -251,7 +219,7 @@ msgstr ""
 "plugins\n"
 "tvtime: beperkt tot degene die slechts 2 velden nodig hebben.\n"
 
-#: src/tvtime.c:1442
+#: src/tvtime.c:1413
 #, c-format
 msgid ""
 "\n"
@@ -266,27 +234,24 @@ msgstr ""
 "*** over het verhogen van het aantal gbuffers.\n"
 "\n"
 
-#: src/tvtime.c:1459
+#: src/tvtime.c:1430
 msgid "tvtime: No deinterlacing methods available, exiting.\n"
 msgstr "tvtime: Geen interlace-compensatiemethodes beschikbaar. Afgebroken.\n"
 
-#: src/tvtime.c:1480
+#: src/tvtime.c:1451
 msgid "tvtime: Can't allocate extra frame storage memory.\n"
 msgstr "tvtime: Kan geen extra geheugen reserveren voor frame-opslag.\n"
 
-#: src/tvtime.c:1498
+#: src/tvtime.c:1469
 msgid "tvtime: OSD initialization failed, OSD disabled.\n"
 msgstr "tvtime: OSD-initialisatie mislukt. OSD uitgeschakeld.\n"
 
-#: src/tvtime.c:1514
+#: src/tvtime.c:1485
 msgid "No video source"
 msgstr "Geen video-bron"
 
-#: src/tvtime.c:1531
-msgid "tvtime: Can't create command handler.\n"
-msgstr "tvtime: Kan geen opdrachtafhandeling aanmaken.\n"
-
-#: src/tvtime.c:1558
+#: src/tvtime.c:1529
+#, fuzzy
 msgid ""
 "tvtime: Card requires conversion from UYVY, but we failed to initialize our "
 "converter!\n"
@@ -294,115 +259,120 @@ msgstr ""
 "tvtime: Kaart vereist omzetting van UYVY, maar de omzetter kan niet "
 "geïnitialiseerd worden!\n"
 
-#: src/tvtime.c:1566
+#: src/tvtime.c:1537
 msgid "tvtime: Cannot find FIFO directory.  FIFO disabled.\n"
 msgstr "tvtime: Kan FIFO-map niet vinden. FIFO uitgeschakeld.\n"
 
-#: src/tvtime.c:1573
-#, c-format
-msgid "tvtime: Cannot create directory %s.  FIFO disabled.\n"
+#: src/tvtime.c:1544
+#, fuzzy, c-format
+msgid ""
+"tvtime: Cannot create directory %s: %s\n"
+"tvtime: FIFO disabled.\n"
 msgstr "tvtime: Kan de map %s niet aanmaken. FIFO uitgeschakeld.\n"
 
-#: src/tvtime.c:1580
+#: src/tvtime.c:1552
 #, c-format
 msgid "tvtime: %s is not a directory.  FIFO disabled.\n"
 msgstr "tvtime: %s is geen map. FIFO uitgeschakeld.\n"
 
-#: src/tvtime.c:1592
+#: src/tvtime.c:1564
 #, c-format
 msgid "tvtime: You do not own %s.  FIFO disabled.\n"
 msgstr "tvtime: U bent niet de eigenaar van %s. FIFO uitgeschakeld.\n"
 
-#: src/tvtime.c:1598
-#, c-format
-msgid "tvtime: Cannot stat %s.  FIFO disabled.\n"
+#: src/tvtime.c:1569
+#, fuzzy, c-format
+msgid ""
+"tvtime: Cannot stat %s: %s\n"
+"tvtime: FIFO disabled.\n"
 msgstr "tvtime: Kan %s niet statten. FIFO uitgeschakeld.\n"
 
-#: src/tvtime.c:1611
+#: src/tvtime.c:1583
 msgid "tvtime: Cannot find FIFO file.  Failed to create FIFO object.\n"
 msgstr "tvtime: Kan FIFO-bestand niet vinden. Kan FIFO-object niet aanmaken.\n"
 
-#: src/tvtime.c:1616
+#: src/tvtime.c:1588
 msgid "tvtime: Not reading input from FIFO.  Failed to create FIFO object.\n"
 msgstr "tvtime: Kan niet lezen van FIFO. Kan FIFO-object niet aanmaken.\n"
 
-#: src/tvtime.c:1629
+#: src/tvtime.c:1601
 msgid "tvtime: Could not setup console.\n"
 msgstr "tvtime: Kan terminal niet instellen.\n"
 
-#: src/tvtime.c:1643
+#: src/tvtime.c:1615
 msgid "tvtime: Can't create input handler.\n"
 msgstr "tvtime: Kan invoerafhandeling niet aanmaken.\n"
 
-#: src/tvtime.c:1651
+#: src/tvtime.c:1623
 msgid "tvtime: Could not create vbiscreen, closed captions unavailable.\n"
 msgstr "tvtime: Kan geen vbiscreen aanmaken. Ondertiteling uitgeschakeld.\n"
 
-#: src/tvtime.c:1657
+#: src/tvtime.c:1629
 msgid "tvtime: Could not create vbidata.\n"
 msgstr "tvtime: Kan geen vbidata aanmaken.\n"
 
-#: src/tvtime.c:1906
+#: src/tvtime.c:1878
 msgid "Window set as always-on-top."
 msgstr "Venster altijd bovenaan"
 
-#: src/tvtime.c:1909
+#: src/tvtime.c:1881
 msgid "Window set to normal stacking."
 msgstr "Venster instellen op normale volgorde"
 
-#: src/tvtime.c:1926
+#: src/tvtime.c:1898
 msgid "16:9 display mode active."
 msgstr "16:9 verhouding."
 
-#: src/tvtime.c:1933
+#: src/tvtime.c:1905
 msgid "4:3 display mode active."
 msgstr "4:3 verhouding."
 
-#: src/tvtime.c:2039
+#: src/tvtime.c:2011
 msgid "2-3 Pulldown detection disabled."
 msgstr "2-3 pulldown-detectie uitgeschakeld."
 
-#: src/tvtime.c:2042
+#: src/tvtime.c:2014
 msgid "2-3 Pulldown detection enabled."
 msgstr "2-3 pulldown-detectie ingeschakeld."
 
-#: src/tvtime.c:2047
+#: src/tvtime.c:2019
 msgid "2-3 Pulldown detection is not valid with your TV norm."
 msgstr "2-3 pulldown-detectie onnodig voor uw TV-standaard."
 
-#: src/tvtime.c:2281
-#, c-format
-msgid "tvtime: Stats using '%s' at %dx%d.\n"
+#: src/tvtime.c:2253
+#, fuzzy, c-format
+msgid "tvtime: Stats using '%s' at %dx%d%s.\n"
 msgstr "tvtime: Stats voor '%s' op %dx%d.\n"
 
-#: src/tvtime.c:2419 src/tvtime.c:2560
+#: src/tvtime.c:2391 src/tvtime.c:2532
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Schermafdruk: %s"
 
-#: src/tvtime.c:2648
+#: src/tvtime.c:2620
 msgid "tvtime: Cleaning up.\n"
 msgstr "tvtime: Opruimen.\n"
 
-#: src/tvtime.c:2691
+#: src/tvtime.c:2663
 msgid "tvtime: Restarting.\n"
 msgstr "tvtime: Herstarten.\n"
 
-#: src/tvtime.c:2695
+#: src/tvtime.c:2667
 msgid "tvtime: Thank you for using tvtime.\n"
 msgstr "tvtime: Bedankt voor het gebruiken van tvtime.\n"
 
-#: src/tvtime.c:2711 src/tvtime.c:2712
+#: src/tvtime.c:2684
 #, c-format
 msgid "tvtime: Running %s.\n"
 msgstr "tvtime: Uitvoeren van %s.\n"
 
-#: src/tvtime.c:2715
+#: src/tvtime.c:2687
+#, fuzzy
 msgid ""
 "\n"
-"*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
-"*** We often break stuff during development.  Please submit bug reports\n"
-"*** based on released versions only!!\n"
+"*** WARNING: This is a DEVELOPMENT version of tvtime.\n"
+"*** Please do not redistribute snapshots, and please submit\n"
+"*** bug reports for released versions only!\n"
 "\n"
 msgstr ""
 "\n"
@@ -411,15 +381,7 @@ msgstr ""
 "*** foutrapporten in over officiële versies!!\n"
 "\n"
 
-#: src/tvtime.c:2724
-msgid ""
-"tvtime: Can't get realtime priority for better performance, need root "
-"access.\n"
-msgstr ""
-"tvtime: Kan geen realtime prioriteit krijgen. Dat kan alleen met root-"
-"toegang.\n"
-
-#: src/tvtime.c:2731
+#: src/tvtime.c:2701
 #, c-format
 msgid ""
 "\n"
@@ -436,7 +398,7 @@ msgstr ""
 "*** Kijk op de hulppagina op %s voor meer informatie\n"
 "\n"
 
-#: src/tvtime.c:2749
+#: src/tvtime.c:2719
 #, c-format
 msgid ""
 "\n"
@@ -455,511 +417,537 @@ msgstr ""
 "*** Kijk op de hulppagina op %s voor meer informatie\n"
 "\n"
 
-#: src/commands.c:185 src/commands.c:775 src/commands.c:1098
-#: src/commands.c:1462 src/commands.c:1495 src/commands.c:1528
-#: src/commands.c:1561
+#: src/tvtime.c:2739
+#, c-format
+msgid ""
+"tvtime: Failed to drop root access: %s.\n"
+"tvtime: Exiting to avoid security problems.\n"
+msgstr ""
+
+#: src/commands.c:186 src/commands.c:770 src/commands.c:1094
+#: src/commands.c:1458 src/commands.c:1491 src/commands.c:1524
+#: src/commands.c:1557
 msgid "Current"
 msgstr "Huidige"
 
-#: src/commands.c:297
+#: src/commands.c:292
 msgid "Renumber current channel"
 msgstr "Huidige kanaal hernummeren"
 
-#: src/commands.c:305 src/commands.c:308
+#: src/commands.c:300 src/commands.c:303
 msgid "Current channel active in list"
 msgstr "Huidige kanaal actief"
 
-#: src/commands.c:318
+#: src/commands.c:313
 msgid "Stop channel scan"
 msgstr "Kanaalscan stoppen"
 
-#: src/commands.c:322
+#: src/commands.c:317
 msgid "Scan channels for signal"
 msgstr "Kanalen scannen op signalen"
 
-#: src/commands.c:330
+#: src/commands.c:325
 msgid "Reset all channels as active"
 msgstr "Alle kanalen activeren"
 
-#: src/commands.c:336
+#: src/commands.c:331
 msgid "Finetune current channel"
 msgstr "Huidige kanaal fijnafstemmen"
 
-#: src/commands.c:343
+#: src/commands.c:338
 msgid "Change NTSC cable mode"
 msgstr "NTSC kabelstand veranderen"
 
-#: src/commands.c:349
+#: src/commands.c:344
 msgid "Set current channel as SECAM"
 msgstr "Huidige kanaal instellen als SECAM"
 
-#: src/commands.c:350
+#: src/commands.c:345
 msgid "Set current channel as PAL"
 msgstr "Huidige kanaal instellen als PAL"
 
-#: src/commands.c:357
+#: src/commands.c:352
 msgid "Change frequency table"
 msgstr "Frequentietabel veranderen"
 
-#: src/commands.c:363
+#: src/commands.c:358
 msgid "Disable signal detection"
 msgstr "Signaaldetectie uitschakelen"
 
-#: src/commands.c:364
+#: src/commands.c:359
 msgid "Enable signal detection"
 msgstr "Signaaldetectie inschakelen"
 
-#: src/commands.c:524 src/commands.c:551
+#: src/commands.c:519 src/commands.c:546
 msgid "Cable"
 msgstr "Kabel"
 
-#: src/commands.c:532 src/commands.c:559
+#: src/commands.c:527 src/commands.c:554
 msgid "Broadcast"
 msgstr "Via de ether"
 
-#: src/commands.c:539
+#: src/commands.c:534
 msgid "Cable with channels 100+"
 msgstr "Kabel met 100+ kanelen"
 
-#: src/commands.c:571
+#: src/commands.c:566
 msgid "Europe"
 msgstr "Europa"
 
-#: src/commands.c:579
+#: src/commands.c:574
 msgid "Russia"
 msgstr "Rusland"
 
-#: src/commands.c:586
+#: src/commands.c:581
 msgid "France"
 msgstr "Frankrijk"
 
-#: src/commands.c:593
+#: src/commands.c:588
 msgid "Australia"
 msgstr "Australië"
 
-#: src/commands.c:600
+#: src/commands.c:595
 msgid "Australia (Optus)"
 msgstr "Australië (Optus)"
 
-#: src/commands.c:607
+#: src/commands.c:602
 msgid "New Zealand"
 msgstr "Nieuw Zeeland"
 
-#: src/commands.c:614
+#: src/commands.c:609
 msgid "China Broadcast"
 msgstr "China Ether"
 
-#: src/commands.c:621
+#: src/commands.c:616
 msgid "Custom (first run tvtime-scanner)"
 msgstr "Aangepast (start tvtime-scanner)"
 
-#: src/commands.c:637
+#: src/commands.c:632
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr "%s  Huidig: %d beeldpunten"
 
-#: src/commands.c:644
+#: src/commands.c:639
 msgid "Low (360 pixels)"
 msgstr "Laag (360 beeldpunten)"
 
-#: src/commands.c:650
+#: src/commands.c:645
 msgid "Moderate (576 pixels)"
 msgstr "Gemiddeld (576 beeldpunten)"
 
-#: src/commands.c:656
+#: src/commands.c:651
 msgid "Standard (720 pixels)"
 msgstr "Standaard (720 beeldpunten)"
 
-#: src/commands.c:662
+#: src/commands.c:657
 msgid "High (768 pixels)"
 msgstr "Hoog (768 beeldpunten)"
 
-#: src/commands.c:667 src/commands.c:1230
+#: src/commands.c:662 src/commands.c:1226
 msgid "Restart with new settings"
 msgstr "Herstarten met nieuwe instellingen"
 
-#: src/commands.c:728
+#: src/commands.c:723
 msgid "Mono"
 msgstr "Mono"
 
-#: src/commands.c:735
+#: src/commands.c:730
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/commands.c:743
+#: src/commands.c:738
 msgid "SAP"
 msgstr "SAP"
 
-#: src/commands.c:754
+#: src/commands.c:749
 msgid "Primary Language"
 msgstr "Primaire taal"
 
-#: src/commands.c:759
+#: src/commands.c:754
 msgid "Secondary Language"
 msgstr "Secundaire taal"
 
-#: src/commands.c:781 src/commands.c:1104 src/commands.c:1468
-#: src/commands.c:1501 src/commands.c:1534 src/commands.c:1566
+#: src/commands.c:776 src/commands.c:1100 src/commands.c:1464
+#: src/commands.c:1497 src/commands.c:1530 src/commands.c:1562
 msgid "Increase"
 msgstr "Verhogen"
 
-#: src/commands.c:786 src/commands.c:1109 src/commands.c:1473
-#: src/commands.c:1506 src/commands.c:1539 src/commands.c:1571
+#: src/commands.c:781 src/commands.c:1105 src/commands.c:1469
+#: src/commands.c:1502 src/commands.c:1535 src/commands.c:1567
 msgid "Decrease"
 msgstr "Verlagen"
 
-#: src/commands.c:811
+#: src/commands.c:806
 msgid "BT8x8 luma correction"
 msgstr "BT8x8 luma-correctie"
 
-#: src/commands.c:821
+#: src/commands.c:816
 msgid "2-3 pulldown inversion"
 msgstr "2-3 pulldown-inversie"
 
-#: src/commands.c:830 src/commands.c:838
+#: src/commands.c:825 src/commands.c:833
 msgid "Colour invert"
 msgstr "Kleurinversie"
 
-#: src/commands.c:842
+#: src/commands.c:837
 msgid "Mirror"
 msgstr "Spiegelen"
 
 # Wat is chroma-kill in hemelsnaam?
 # Volgens dict heeft het met kleurhelderheid en verzadiging te maken.
-#: src/commands.c:850
+#: src/commands.c:845
 msgid "Chroma killer"
 msgstr "Chroma-killer"
 
-#: src/commands.c:998 src/commands.c:1033 src/commands.c:1065
-#: src/commands.c:1083 src/commands.c:1094 src/commands.c:1122
-#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
-#: src/commands.c:1226 src/commands.c:1261 src/commands.c:1267
-#: src/commands.c:1273 src/commands.c:1280 src/commands.c:1286
-#: src/commands.c:1314 src/commands.c:1320 src/commands.c:1328
-#: src/commands.c:1334 src/commands.c:1346 src/commands.c:1395
-#: src/commands.c:1458 src/commands.c:1491 src/commands.c:1524
-#: src/commands.c:1557
+#: src/commands.c:994 src/commands.c:1029 src/commands.c:1061
+#: src/commands.c:1079 src/commands.c:1090 src/commands.c:1118
+#: src/commands.c:1165 src/commands.c:1201 src/commands.c:1209
+#: src/commands.c:1222 src/commands.c:1257 src/commands.c:1263
+#: src/commands.c:1269 src/commands.c:1276 src/commands.c:1282
+#: src/commands.c:1310 src/commands.c:1316 src/commands.c:1324
+#: src/commands.c:1330 src/commands.c:1342 src/commands.c:1391
+#: src/commands.c:1454 src/commands.c:1487 src/commands.c:1520
+#: src/commands.c:1553
 msgid "Setup"
 msgstr "Instellingen"
 
-#: src/commands.c:1001 src/commands.c:1065 src/commands.c:1084
-#: src/commands.c:1095
+#: src/commands.c:997 src/commands.c:1061 src/commands.c:1080
+#: src/commands.c:1091
 msgid "Station management"
 msgstr "Kanalenbeheer"
 
-#: src/commands.c:1006 src/commands.c:1037 src/commands.c:1123
-#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
+#: src/commands.c:1002 src/commands.c:1033 src/commands.c:1119
+#: src/commands.c:1165 src/commands.c:1201 src/commands.c:1209
+#: src/commands.c:1222
 msgid "Input configuration"
 msgstr "Invoerconfiguratie"
 
-#: src/commands.c:1011 src/commands.c:1042
+#: src/commands.c:1007 src/commands.c:1038
 msgid "Picture settings"
 msgstr "Beeldinstellingen"
 
-#: src/commands.c:1016 src/commands.c:1047 src/commands.c:1286
-#: src/commands.c:1315 src/commands.c:1321 src/commands.c:1329
-#: src/commands.c:1335
+#: src/commands.c:1012 src/commands.c:1043 src/commands.c:1282
+#: src/commands.c:1311 src/commands.c:1317 src/commands.c:1325
+#: src/commands.c:1331
 msgid "Video processing"
 msgstr "Videobewerking"
 
-#: src/commands.c:1021 src/commands.c:1052 src/commands.c:1261
-#: src/commands.c:1267 src/commands.c:1273 src/commands.c:1280
+#: src/commands.c:1017 src/commands.c:1048 src/commands.c:1257
+#: src/commands.c:1263 src/commands.c:1269 src/commands.c:1276
 msgid "Output configuration"
 msgstr "Uitvoerconfiguratie"
 
-#: src/commands.c:1026 src/commands.c:1057
+#: src/commands.c:1022 src/commands.c:1053
 msgid "Exit menu"
 msgstr "Menu sluiten"
 
-#: src/commands.c:1084
+#: src/commands.c:1080
 msgid "Frequency table"
 msgstr "Frequentietabel"
 
-#: src/commands.c:1095 src/commands.c:2601
+#: src/commands.c:1091 src/commands.c:2603
 msgid "Finetune"
 msgstr "Fijnafstelling"
 
-#: src/commands.c:1127 src/commands.c:1130 src/commands.c:1173
-#: src/commands.c:1176 src/commands.c:2707
+#: src/commands.c:1123 src/commands.c:1126 src/commands.c:1169
+#: src/commands.c:1172 src/commands.c:2709
 msgid "Change video source"
 msgstr "Videobron veranderen"
 
-#: src/commands.c:1136 src/commands.c:1182 src/commands.c:1213
+#: src/commands.c:1132 src/commands.c:1178 src/commands.c:1209
 msgid "Preferred audio mode"
 msgstr "Voorkeurs-audiostand"
 
-#: src/commands.c:1141 src/commands.c:1187 src/commands.c:1226
+#: src/commands.c:1137 src/commands.c:1183 src/commands.c:1222
 msgid "Television standard"
 msgstr "Televisiestandaard"
 
-#: src/commands.c:1146 src/commands.c:1192 src/commands.c:1205
+#: src/commands.c:1142 src/commands.c:1188 src/commands.c:1201
 msgid "Sharpness"
 msgstr "Scherpte"
 
-#: src/commands.c:1151
+#: src/commands.c:1147
 msgid "Toggle closed captions"
 msgstr "Ondertiteling in-/uitschakelen"
 
-#: src/commands.c:1156
+#: src/commands.c:1152
 msgid "Toggle XDS decoding"
 msgstr "XDS-decodering in-/uitschakelen"
 
-#: src/commands.c:1226
-msgid "Input Configuration"
-msgstr "Invoerconfiguratie"
-
-#: src/commands.c:1273
+#: src/commands.c:1269
 msgid "Overscan"
 msgstr "Overscan"
 
-#: src/commands.c:1280
+#: src/commands.c:1276
 msgid "Fullscreen position"
 msgstr "Volledig scherm positie"
 
-#: src/commands.c:1290 src/commands.c:1315
+#: src/commands.c:1286 src/commands.c:1311
 msgid "Deinterlacer configuration"
 msgstr "Deinterlacer configuratie"
 
-#: src/commands.c:1295
+#: src/commands.c:1291
 msgid "Current deinterlacer description"
 msgstr "Beschrijving huidige deinterlacer"
 
-#: src/commands.c:1299 src/commands.c:1329
+#: src/commands.c:1295 src/commands.c:1325
 msgid "Attempted framerate"
 msgstr "Gewenste snelheid"
 
-#: src/commands.c:1303 src/commands.c:1335
+#: src/commands.c:1299 src/commands.c:1331
 msgid "Input filters"
 msgstr "Invoerfilters"
 
-#: src/commands.c:1321
+#: src/commands.c:1317
 msgid "Deinterlacer description"
 msgstr "Beschijving deinterlacer"
 
-#: src/commands.c:1346 src/commands.c:1395 src/commands.c:1458
-#: src/commands.c:1491 src/commands.c:1524 src/commands.c:1557
+#: src/commands.c:1342 src/commands.c:1391 src/commands.c:1454
+#: src/commands.c:1487 src/commands.c:1520 src/commands.c:1553
 msgid "Picture"
 msgstr "Beeld"
 
-#: src/commands.c:1350 src/commands.c:1400 src/commands.c:1458
-#: src/commands.c:2737 src/commands.c:2778
+#: src/commands.c:1346 src/commands.c:1396 src/commands.c:1454
+#: src/commands.c:2739 src/commands.c:2780
 msgid "Brightness"
 msgstr "Helderheid"
 
-#: src/commands.c:1355 src/commands.c:1405 src/commands.c:1491
-#: src/commands.c:2751 src/commands.c:2781
+#: src/commands.c:1351 src/commands.c:1401 src/commands.c:1487
+#: src/commands.c:2753 src/commands.c:2783
 msgid "Contrast"
 msgstr "Contrast"
 
-#: src/commands.c:1359 src/commands.c:1409 src/commands.c:1524
-#: src/commands.c:2765 src/commands.c:2784
+#: src/commands.c:1355 src/commands.c:1405 src/commands.c:1520
+#: src/commands.c:2767 src/commands.c:2786
 msgid "Colour"
 msgstr "Kleur"
 
-#: src/commands.c:1363 src/commands.c:1413 src/commands.c:1557
-#: src/commands.c:2723 src/commands.c:2787
+#: src/commands.c:1359 src/commands.c:1409 src/commands.c:1553
+#: src/commands.c:2725 src/commands.c:2789
 msgid "Hue"
 msgstr "Hue"
 
-#: src/commands.c:1370
+#: src/commands.c:1366
 msgid "Save current settings as defaults"
 msgstr "Huidige instellingen als standaard opslaan"
 
-#: src/commands.c:1374 src/commands.c:1384 src/commands.c:1431
-#: src/commands.c:1443
+#: src/commands.c:1370 src/commands.c:1380 src/commands.c:1427
+#: src/commands.c:1439
 msgid "Reset to global defaults"
 msgstr "Algemene standaardinstellingen herstellen"
 
-#: src/commands.c:1420
+#: src/commands.c:1416
 msgid "Save current settings as global defaults"
 msgstr "Huidige instellingen als algemene standaard opslaan"
 
-#: src/commands.c:1426
+#: src/commands.c:1422
 msgid "Save current settings as channel defaults"
 msgstr "Huidige instellingen als kanaalstandaard opslaan"
 
-#: src/commands.c:1703
+#: src/commands.c:1699
 msgid "Add current station"
 msgstr "Huidige station toevoegen"
 
-#: src/commands.c:1705
+#: src/commands.c:1701
 msgid "Exit"
 msgstr "Afsluiten"
 
-#: src/commands.c:1948
+#: src/commands.c:1944
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Slaapstand over %d minuten."
 
-#: src/commands.c:1951
+#: src/commands.c:1947
 msgid "Sleep off."
 msgstr "Slaapstand uit."
 
-#: src/commands.c:2002
+#: src/commands.c:2004
 msgid "Channel marked as active in the browse list."
 msgstr "Kanaal ingeschakeld als actief in de lijst"
 
-#: src/commands.c:2004
+#: src/commands.c:2006
 msgid "Channel disabled from the browse list."
 msgstr "Kanaal uitgeschakeld in de lijst."
 
-#: src/commands.c:2046
+#: src/commands.c:2048
 msgid "Processing every input field."
 msgstr "Verwerken van ieder invoerveld."
 
-#: src/commands.c:2048
+#: src/commands.c:2050
 msgid "Processing every top field."
 msgstr "Verwerken van ieder bovenste veld."
 
-#: src/commands.c:2050
+#: src/commands.c:2052
 msgid "Processing every bottom field."
 msgstr "Verwerken van ieder onderste veld."
 
-#: src/commands.c:2063
+#: src/commands.c:2065
 #, c-format
 msgid "Sharpness will be %d on restart."
 msgstr "Scherpte zal %d zijn na herstarten."
 
-#: src/commands.c:2109
+#: src/commands.c:2111
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "Televisiestandaard zal %s zijn na herstarten."
 
-#: src/commands.c:2138
+#: src/commands.c:2140
 msgid "All channels re-activated."
 msgstr "Alle kanalen geactiveerd."
 
-#: src/commands.c:2158
+#: src/commands.c:2160
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Verplaatsen van %d. Geef nieuw kanaalnummer."
 
-#: src/commands.c:2169
+#: src/commands.c:2171
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Zoeken niet beschikbaar wegens uigeschakelde signaalcontrole."
 
-#: src/commands.c:2195
+#: src/commands.c:2197
 msgid "Scanning for channels being broadcast."
 msgstr "Zoeken naar actieve kanalen."
 
-#: src/commands.c:2211
+#: src/commands.c:2213
 msgid "Closed captions disabled."
 msgstr "Ondertiteling uitgeschakeld."
 
-#: src/commands.c:2214
+#: src/commands.c:2216
 msgid "Closed captions enabled."
 msgstr "Ondertiteling ingeschakeld."
 
-#: src/commands.c:2223
+#: src/commands.c:2225
 msgid "No VBI device configured for CC decoding."
 msgstr "Geen VBI-apparaat ingesteld voor CC-decodering."
 
-#: src/commands.c:2238
+#: src/commands.c:2240
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Kleurdecodering voor dit kanaal ingesteld op %s."
 
-#: src/commands.c:2279
+#: src/commands.c:2281
 #, c-format
 msgid "Running: %s"
 msgstr "Actief: %s"
 
-#: src/commands.c:2355
+#: src/commands.c:2357
 msgid "Signal detection enabled."
 msgstr "Signaaldetectie ingeschakeld."
 
-#: src/commands.c:2357
+#: src/commands.c:2359
 msgid "Signal detection disabled."
 msgstr "Signaaldetectie uitgeschakeld."
 
-#: src/commands.c:2369
+#: src/commands.c:2371
 msgid "XDS decoding enabled."
 msgstr "XDS-decodering ingeschakeld."
 
-#: src/commands.c:2371
+#: src/commands.c:2373
 msgid "XDS decoding disabled."
 msgstr "XDS-decodering uitgeschakeld."
 
-#: src/commands.c:2417
+#: src/commands.c:2419
 msgid "Colour invert enabled."
 msgstr "Kleurinversie ingeschakeld."
 
-#: src/commands.c:2419
+#: src/commands.c:2421
 msgid "Colour invert disabled."
 msgstr "Kleurinversie uitgeschakeld."
 
-#: src/commands.c:2441
+#: src/commands.c:2443
 msgid "Mirror enabled."
 msgstr "Spiegeling ingeschakeld."
 
-#: src/commands.c:2443
+#: src/commands.c:2445
 msgid "Mirror disabled."
 msgstr "Spiegeling uitgeschakeld."
 
 # Wat is chroma-kill in hemelsnaam?
 # Volgens dict heeft het met kleurhelderheid en verzadiging te maken.
-#: src/commands.c:2465
+#: src/commands.c:2467
 msgid "Chroma kill enabled."
 msgstr "Chroma-kill ingeschakeld."
 
-#: src/commands.c:2467
+#: src/commands.c:2469
 msgid "Chroma kill disabled."
 msgstr "Chroma-kill uitgeschakeld."
 
-#: src/commands.c:2484
+#: src/commands.c:2486
 msgid "Luma correction enabled."
 msgstr "Luma-correctie ingeschakeld."
 
-#: src/commands.c:2486
+#: src/commands.c:2488
 msgid "Luma correction disabled."
 msgstr "Luma-correctie uitgeschakeld."
 
-#: src/commands.c:2503
+#: src/commands.c:2505
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Overscan: %1.f%%"
 
-#: src/commands.c:2525
+#: src/commands.c:2527
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr "Luma-correctiewaarde: %.1f"
 
-#: src/commands.c:2555
+#: src/commands.c:2557
 msgid "Picture settings reset to defaults."
 msgstr "Standaard beeldinstellingen hersteld."
 
-#: src/commands.c:2660 src/commands.c:2674
+#: src/commands.c:2662 src/commands.c:2676
 msgid "Volume"
 msgstr "Volume"
 
-#: src/commands.c:2823
+#: src/commands.c:2825
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "Huidige beeldinstellingen als algemene standaard opgeslagen.\n"
 
-#: src/commands.c:2836
+#: src/commands.c:2838
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Huidige beeldinstellingen opgeslagen voor kaneel %d.\n"
 
-#: src/commands.c:2918
+#: src/commands.c:2920
 msgid "Paused."
 msgstr "Pauze."
 
-#: src/commands.c:2918
+#: src/commands.c:2920
 msgid "Resumed."
 msgstr "Actief."
 
-#: src/tvtimeconf.c:626
+#: src/tvtimeconf.c:641 src/tvtimeconf.c:694 src/tvtimeconf.c:744
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
 "\n"
-"  -a, --widescreen           16:9 mode.\n"
-"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:642 src/tvtimeconf.c:695
+msgid "  -a, --widescreen           16:9 mode.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:643 src/tvtimeconf.c:696
+msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:644 src/tvtimeconf.c:697
+msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:645 src/tvtimeconf.c:698 src/tvtimeconf.c:745
+msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:646 src/tvtimeconf.c:699
+msgid ""
 "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
 "                             xmga, matroxtv or SDL (defaults to Xv).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:648 src/tvtimeconf.c:701
+msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
 "\n"
@@ -978,144 +966,85 @@ msgid ""
 "                                 russia\n"
 "                                 custom (first run tvtime-scanner)\n"
 "\n"
+msgstr ""
+
+#: src/tvtimeconf.c:664 src/tvtimeconf.c:717 src/tvtimeconf.c:746
+msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
-"  -h, --help                 Show this help message.\n"
-"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:665 src/tvtimeconf.c:718 src/tvtimeconf.c:747
+msgid "  -h, --help                 Show this help message.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:666 src/tvtimeconf.c:719
+msgid "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:667 src/tvtimeconf.c:720 src/tvtimeconf.c:748
+msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:668 src/tvtimeconf.c:721
+msgid ""
 "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
 "                             (defaults to 720).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:670
+msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
-"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
-"  -M, --window               Start tvtime in window mode.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:671 src/tvtimeconf.c:723
+msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:672 src/tvtimeconf.c:724
+msgid "  -M, --window               Start tvtime in window mode.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:673 src/tvtimeconf.c:725 src/tvtimeconf.c:749
+msgid ""
 "  -n, --norm=NORM            The norm to use for the input.  tvtime "
 "supports:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:676 src/tvtimeconf.c:728
+msgid ""
 "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
 "                             centre (default).\n"
-"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
-"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
-"  -S, --saveoptions          Save command line options to the config file.\n"
-"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
-"  -v, --verbose              Print debugging messages to stderr.\n"
-"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
-"                             (defaults to /dev/mixer:line)\n"
-"\n"
-"                             Valid channels are:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, "
-"line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
-"line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, "
-"phout,\n"
-"                                 video, radio, monitor\n"
 msgstr ""
-"Gebruik: %s [OPTIES]...\n"
-"\n"
-"  -a, --widescreen           16:9 stand.\n"
-"  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
-"  -c, --channel=KANAAL       Starten op dit kanaal.\n"
-"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
-"  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
-"                             xmga, matroxtv or SDL (standaard: Xv).\n"
-"  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
-"                             (standaard: us-cable).\n"
-"\n"
-"                             Geldige waarden zijn:\n"
-"                                 us-cable\n"
-"                                 us-cable100\n"
-"                                 us-broadcast\n"
-"                                 china-broadcast\n"
-"                                 japan-cable\n"
-"                                 japan-broadcast\n"
-"                                 europe\n"
-"                                 australia\n"
-"                                 australia-optus\n"
-"                                 newzealand\n"
-"                                 france\n"
-"                                 russia\n"
-"                                 custom (eerst tvtime-scanner starten)\n"
-"\n"
-"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
-"laden.\n"
-"  -h, --help                 Deze hulptekst weergeven.\n"
-"  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
-"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
-"  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
-"                             (standaard: 720).\n"
-"  -k, --slave                Schakelt invoercontrole uit (slaafstand).\n"
-"  -m, --fullscreen           tvtime schermvullend starten.\n"
-"  -M, --window               tvtime in een venster starten.\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
-"                             ondersteunt:\n"
-"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N or PAL-60 (standaard: NTSC).\n"
-"  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
-"                             centre (standaard).\n"
-"  -r, --rvr=BESTAND          Af te spelen RVR bestand (voor debuggen).\n"
-"  -s, --showdrops            Framedropstatistieken tonen (voor debuggen).\n"
-"  -S, --saveoptions          Opties van huidige opdracht opslaan in\n"
-"                             configuratie.\n"
-"  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
-"  -v, --verbose              Debug-info uitvoeren naar stderr.\n"
-"  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
-"                             (standaard: /dev/mixer:line)\n"
-"\n"
-"                             Geldige kanalen:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, "
-"line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
-"line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, "
-"phout,\n"
-"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:678
+msgid ""
+"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+msgstr ""
+
+#: src/tvtimeconf.c:679
+msgid ""
+"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+msgstr ""
 
 #: src/tvtimeconf.c:680
-#, c-format
 msgid ""
-"usage: %s [OPTION]...\n"
-"\n"
-"  -a, --widescreen           16:9 mode.\n"
-"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
-"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
-"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-"                             xmga, matroxtv or SDL (defaults to Xv).\n"
-"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
-"                             (defaults to us-cable).\n"
-"\n"
-"                             Valid values are:\n"
-"                                 us-cable\n"
-"                                 us-cable100\n"
-"                                 us-broadcast\n"
-"                                 china-broadcast\n"
-"                                 japan-cable\n"
-"                                 japan-broadcast\n"
-"                                 europe\n"
-"                                 australia\n"
-"                                 australia-optus\n"
-"                                 newzealand\n"
-"                                 france\n"
-"                                 russia\n"
-"\n"
-"  -F, --configfile=FILE      Additional config file to load settings from.\n"
-"  -h, --help                 Show this help message.\n"
-"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
-"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
-"                             (defaults to 720).\n"
-"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
-"  -M, --window               Start tvtime in window mode.\n"
-"  -n, --norm=NORM            The norm to use for the input.  tvtime "
-"supports:\n"
-"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N or PAL-60 (defaults to NTSC).\n"
-"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
-"                             centre (default).\n"
-"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
-"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
-"  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+"  -S, --saveoptions          Save command line options to the config file.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:681 src/tvtimeconf.c:731
+msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:682
+msgid "  -v, --verbose              Print debugging messages to stderr.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:683 src/tvtimeconf.c:733
+msgid ""
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
 "                             (defaults to /dev/mixer:line)\n"
 "\n"
@@ -1128,109 +1057,364 @@ msgid ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 msgstr ""
-"Gebruik: %s [OPTIES]...\n"
-"\n"
-"  -a, --widescreen           16:9 stand.\n"
-"  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
-"  -c, --channel=KANAAL       Starten op dit kanaal.\n"
-"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
-"  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
-"                             xmga, matroxtv or SDL (standaard: Xv).\n"
-"  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
-"                             (standaard: us-cable).\n"
-"\n"
-"                             Geldige waarden zijn:\n"
-"                                 us-cable\n"
-"                                 us-cable100\n"
-"                                 us-broadcast\n"
-"                                 china-broadcast\n"
-"                                 japan-cable\n"
-"                                 japan-broadcast\n"
-"                                 europe\n"
-"                                 australia\n"
-"                                 australia-optus\n"
-"                                 newzealand\n"
-"                                 france\n"
-"                                 russia\n"
-"                                 custom (eerst tvtime-scanner starten)\n"
-"\n"
-"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
-"laden.\n"
-"  -h, --help                 Deze hulptekst weergeven.\n"
-"  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
-"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
-"  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
-"                             (standaard: 720).\n"
-"  -m, --fullscreen           Tvtime schermvullend starten.\n"
-"  -M, --window               Tvtime in een venster starten.\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
-"                             ondersteunt:\n"
-"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N or PAL-60 (standaard: NTSC).\n"
-"  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
-"                             centre (standaard).\n"
-"  -R, --priority=PRI         Prioriteit van het tvtime proces.\n"
-"  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
-"  -X, --display=SCHERM       Het gegeven X-scherm gebruiken.\n"
-"  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
-"                             (standaard: /dev/mixer:line)\n"
-"\n"
-"                             Geldige kanalen:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, "
-"line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
-"line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, "
-"phout,\n"
-"                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:730
-#, c-format
 msgid ""
-"usage: %s [OPTION]...\n"
-"\n"
-"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-"  -F, --configfile=FILE      Additional config file to load settings from.\n"
-"  -h, --help                 Show this help message.\n"
-"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-"  -n, --norm=NORM            The norm to use for the input.  tvtime "
-"supports:\n"
-"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
-"Gebruik: %s [OPTIES]...\n"
-"\n"
-"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
-"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
-"laden.\n"
-"  -h, --help                 Deze hulptekst weergeven.\n"
-"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
-"                             ondersteunt:\n"
-"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N or PAL-60 (standaard: NTSC).\n"
 
-#: src/utils.c:668
+#: src/tvtimeconf.c:732
+msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+msgstr ""
+
+#: src/utils.c:674
+#, c-format
+msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
+msgstr ""
+
+#: src/utils.c:685
 #, c-format
 msgid ""
 "\n"
-"*** Since your console is set for the %s codeset, rather than UTF-8,\n"
-"*** console messages may be partially or completely illegible on your "
-"terminal.\n"
-"*** This is a known bug, and will probably be fixed for the next release of\n"
-"*** tvtime. You can work around this problem by launching tvtime using a UTF-"
-"8\n"
-"*** aware terminal. See %s for more information.\n"
+"*** Call to bind_textdomain_codeset() failed to set UTF-8 mode. (Returned %"
+"s.)\n"
+"*** This may cause GUI messages to be displayed incorrectly!\n"
+"*** Please report this as a bug at %s.\n"
 "\n"
 msgstr ""
-"\n"
-"*** Omdat uw tekenset niet op UTF-8 staat, maar op %s, zullen de\n"
-"*** berichten waarschijnlijk deels onleesbaar zijn in uw terminal.\n"
-"*** Dit is een bekend probleem en zal waarschijnlijk verholpen worden\n"
-"*** met de eerstvolgende versie van tvtime. U kunt om dit probleem\n"
-"*** heen werken door gebruik te maken van een UTF-8 compatibele\n"
-"*** terminal. Kijk op %s voor meer informatie.\n"
-"\n"
+
+#~ msgid "Input Configuration"
+#~ msgstr "Invoerconfiguratie"
+
+#~ msgid ""
+#~ "usage: %s [OPTION]...\n"
+#~ "\n"
+#~ "  -a, --widescreen           16:9 mode.\n"
+#~ "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+#~ "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+#~ "  -d, --device=DEVICE        video4linux device (defaults to /dev/"
+#~ "video0).\n"
+#~ "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv or SDL (defaults to Xv).\n"
+#~ "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+#~ "                             (defaults to us-cable).\n"
+#~ "\n"
+#~ "                             Valid values are:\n"
+#~ "                                 us-cable\n"
+#~ "                                 us-cable100\n"
+#~ "                                 us-broadcast\n"
+#~ "                                 china-broadcast\n"
+#~ "                                 japan-cable\n"
+#~ "                                 japan-broadcast\n"
+#~ "                                 europe\n"
+#~ "                                 australia\n"
+#~ "                                 australia-optus\n"
+#~ "                                 newzealand\n"
+#~ "                                 france\n"
+#~ "                                 russia\n"
+#~ "                                 custom (first run tvtime-scanner)\n"
+#~ "\n"
+#~ "  -F, --configfile=FILE      Additional config file to load settings "
+#~ "from.\n"
+#~ "  -h, --help                 Show this help message.\n"
+#~ "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+#~ "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+#~ "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+#~ "                             (defaults to 720).\n"
+#~ "  -k, --slave                Disables input handling in tvtime (slave "
+#~ "mode).\n"
+#~ "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+#~ "  -M, --window               Start tvtime in window mode.\n"
+#~ "  -n, --norm=NORM            The norm to use for the input.  tvtime "
+#~ "supports:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+#~ "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+#~ "                             centre (default).\n"
+#~ "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+#~ "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+#~ "  -S, --saveoptions          Save command line options to the config "
+#~ "file.\n"
+#~ "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+#~ "  -v, --verbose              Print debugging messages to stderr.\n"
+#~ "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+#~ "                             (defaults to /dev/mixer:line)\n"
+#~ "\n"
+#~ "                             Valid channels are:\n"
+#~ "                                 vol, bass, treble, synth, pcm, speaker, "
+#~ "line,\n"
+#~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+#~ "line1,\n"
+#~ "                                 line2, line3, dig1, dig2, dig3, phin, "
+#~ "phout,\n"
+#~ "                                 video, radio, monitor\n"
+#~ msgstr ""
+#~ "Gebruik: %s [OPTIES]...\n"
+#~ "\n"
+#~ "  -a, --widescreen           16:9 stand.\n"
+#~ "  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
+#~ "  -c, --channel=KANAAL       Starten op dit kanaal.\n"
+#~ "  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/"
+#~ "video0).\n"
+#~ "  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv or SDL (standaard: Xv).\n"
+#~ "  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
+#~ "                             (standaard: us-cable).\n"
+#~ "\n"
+#~ "                             Geldige waarden zijn:\n"
+#~ "                                 us-cable\n"
+#~ "                                 us-cable100\n"
+#~ "                                 us-broadcast\n"
+#~ "                                 china-broadcast\n"
+#~ "                                 japan-cable\n"
+#~ "                                 japan-broadcast\n"
+#~ "                                 europe\n"
+#~ "                                 australia\n"
+#~ "                                 australia-optus\n"
+#~ "                                 newzealand\n"
+#~ "                                 france\n"
+#~ "                                 russia\n"
+#~ "                                 custom (eerst tvtime-scanner starten)\n"
+#~ "\n"
+#~ "  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+#~ "laden.\n"
+#~ "  -h, --help                 Deze hulptekst weergeven.\n"
+#~ "  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
+#~ "  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+#~ "  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
+#~ "                             (standaard: 720).\n"
+#~ "  -k, --slave                Schakelt invoercontrole uit (slaafstand).\n"
+#~ "  -m, --fullscreen           tvtime schermvullend starten.\n"
+#~ "  -M, --window               tvtime in een venster starten.\n"
+#~ "  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+#~ "                             ondersteunt:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (standaard: NTSC).\n"
+#~ "  -p, --fspos=POS            Positie voor volledig scherm: top, bottom "
+#~ "of\n"
+#~ "                             centre (standaard).\n"
+#~ "  -r, --rvr=BESTAND          Af te spelen RVR bestand (voor debuggen).\n"
+#~ "  -s, --showdrops            Framedropstatistieken tonen (voor "
+#~ "debuggen).\n"
+#~ "  -S, --saveoptions          Opties van huidige opdracht opslaan in\n"
+#~ "                             configuratie.\n"
+#~ "  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
+#~ "  -v, --verbose              Debug-info uitvoeren naar stderr.\n"
+#~ "  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
+#~ "                             (standaard: /dev/mixer:line)\n"
+#~ "\n"
+#~ "                             Geldige kanalen:\n"
+#~ "                                 vol, bass, treble, synth, pcm, speaker, "
+#~ "line,\n"
+#~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+#~ "line1,\n"
+#~ "                                 line2, line3, dig1, dig2, dig3, phin, "
+#~ "phout,\n"
+#~ "                                 video, radio, monitor\n"
+
+#~ msgid ""
+#~ "usage: %s [OPTION]...\n"
+#~ "\n"
+#~ "  -a, --widescreen           16:9 mode.\n"
+#~ "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+#~ "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+#~ "  -d, --device=DEVICE        video4linux device (defaults to /dev/"
+#~ "video0).\n"
+#~ "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv or SDL (defaults to Xv).\n"
+#~ "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+#~ "                             (defaults to us-cable).\n"
+#~ "\n"
+#~ "                             Valid values are:\n"
+#~ "                                 us-cable\n"
+#~ "                                 us-cable100\n"
+#~ "                                 us-broadcast\n"
+#~ "                                 china-broadcast\n"
+#~ "                                 japan-cable\n"
+#~ "                                 japan-broadcast\n"
+#~ "                                 europe\n"
+#~ "                                 australia\n"
+#~ "                                 australia-optus\n"
+#~ "                                 newzealand\n"
+#~ "                                 france\n"
+#~ "                                 russia\n"
+#~ "\n"
+#~ "  -F, --configfile=FILE      Additional config file to load settings "
+#~ "from.\n"
+#~ "  -h, --help                 Show this help message.\n"
+#~ "  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+#~ "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+#~ "  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+#~ "                             (defaults to 720).\n"
+#~ "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+#~ "  -M, --window               Start tvtime in window mode.\n"
+#~ "  -n, --norm=NORM            The norm to use for the input.  tvtime "
+#~ "supports:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+#~ "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+#~ "                             centre (default).\n"
+#~ "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
+#~ "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+#~ "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+#~ "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+#~ "                             (defaults to /dev/mixer:line)\n"
+#~ "\n"
+#~ "                             Valid channels are:\n"
+#~ "                                 vol, bass, treble, synth, pcm, speaker, "
+#~ "line,\n"
+#~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+#~ "line1,\n"
+#~ "                                 line2, line3, dig1, dig2, dig3, phin, "
+#~ "phout,\n"
+#~ "                                 video, radio, monitor\n"
+#~ msgstr ""
+#~ "Gebruik: %s [OPTIES]...\n"
+#~ "\n"
+#~ "  -a, --widescreen           16:9 stand.\n"
+#~ "  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
+#~ "  -c, --channel=KANAAL       Starten op dit kanaal.\n"
+#~ "  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/"
+#~ "video0).\n"
+#~ "  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv or SDL (standaard: Xv).\n"
+#~ "  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
+#~ "                             (standaard: us-cable).\n"
+#~ "\n"
+#~ "                             Geldige waarden zijn:\n"
+#~ "                                 us-cable\n"
+#~ "                                 us-cable100\n"
+#~ "                                 us-broadcast\n"
+#~ "                                 china-broadcast\n"
+#~ "                                 japan-cable\n"
+#~ "                                 japan-broadcast\n"
+#~ "                                 europe\n"
+#~ "                                 australia\n"
+#~ "                                 australia-optus\n"
+#~ "                                 newzealand\n"
+#~ "                                 france\n"
+#~ "                                 russia\n"
+#~ "                                 custom (eerst tvtime-scanner starten)\n"
+#~ "\n"
+#~ "  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+#~ "laden.\n"
+#~ "  -h, --help                 Deze hulptekst weergeven.\n"
+#~ "  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
+#~ "  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+#~ "  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
+#~ "                             (standaard: 720).\n"
+#~ "  -m, --fullscreen           Tvtime schermvullend starten.\n"
+#~ "  -M, --window               Tvtime in een venster starten.\n"
+#~ "  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+#~ "                             ondersteunt:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (standaard: NTSC).\n"
+#~ "  -p, --fspos=POS            Positie voor volledig scherm: top, bottom "
+#~ "of\n"
+#~ "                             centre (standaard).\n"
+#~ "  -R, --priority=PRI         Prioriteit van het tvtime proces.\n"
+#~ "  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
+#~ "  -X, --display=SCHERM       Het gegeven X-scherm gebruiken.\n"
+#~ "  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
+#~ "                             (standaard: /dev/mixer:line)\n"
+#~ "\n"
+#~ "                             Geldige kanalen:\n"
+#~ "                                 vol, bass, treble, synth, pcm, speaker, "
+#~ "line,\n"
+#~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+#~ "line1,\n"
+#~ "                                 line2, line3, dig1, dig2, dig3, phin, "
+#~ "phout,\n"
+#~ "                                 video, radio, monitor\n"
+
+#~ msgid ""
+#~ "usage: %s [OPTION]...\n"
+#~ "\n"
+#~ "  -d, --device=DEVICE        video4linux device (defaults to /dev/"
+#~ "video0).\n"
+#~ "  -F, --configfile=FILE      Additional config file to load settings "
+#~ "from.\n"
+#~ "  -h, --help                 Show this help message.\n"
+#~ "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+#~ "  -n, --norm=NORM            The norm to use for the input.  tvtime "
+#~ "supports:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+#~ msgstr ""
+#~ "Gebruik: %s [OPTIES]...\n"
+#~ "\n"
+#~ "  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/"
+#~ "video0).\n"
+#~ "  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+#~ "laden.\n"
+#~ "  -h, --help                 Deze hulptekst weergeven.\n"
+#~ "  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+#~ "  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+#~ "                             ondersteunt:\n"
+#~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+#~ "                             PAL-N or PAL-60 (standaard: NTSC).\n"
+
+#, fuzzy
+#~ msgid "tvtime: Can't initialize configuration (no memory?), exiting.\n"
+#~ msgstr "tvtime: Kan configuratie-opties niet instellen. Afgebroken.\n"
+
+#~ msgid "tvtime: Can't renice to %d.\n"
+#~ msgstr "tvtime: Kan prioriteit niet instellen op %d.\n"
+
+#~ msgid "tvtime: Sending fields to interlaced output devices.\n"
+#~ msgstr ""
+#~ "tvtime: Zenden van beeldvelden naar uitvoer-apparaten met interlace "
+#~ "functionaliteit.\n"
+
+#~ msgid "tvtime: Sending frames to interlaced output devices.\n"
+#~ msgstr ""
+#~ "tvtime: Zenden van frames naar uitvoer-apparaten met interlace "
+#~ "functionaliteit.\n"
+
+#~ msgid "tvtime: RVR frame sampling %d pixels per scanline.\n"
+#~ msgstr "tvtime: RVR beeld, %d beeldpunten per scanline.\n"
+
+#~ msgid "tvtime: V4L sampling %d pixels per scanline.\n"
+#~ msgstr "tvtime: V4L beeld, %d beeldpunten per scanline.\n"
+
+#~ msgid "tvtime: Can't display input size %dx%d.\n"
+#~ msgstr "tvtime: Kan invoerafmetingen %dx%d niet weergeven.\n"
+
+#, fuzzy
+#~ msgid "tvtime: Can't initialize command handler.\n"
+#~ msgstr "tvtime: Kan geen opdrachtafhandeling aanmaken.\n"
+
+#, fuzzy
+#~ msgid "tvtime: Can't initialize input handler.\n"
+#~ msgstr "tvtime: Kan invoer-filters niet initialiseren.\n"
+
+#~ msgid ""
+#~ "tvtime: Can't get realtime priority for better performance, need root "
+#~ "access.\n"
+#~ msgstr ""
+#~ "tvtime: Kan geen realtime prioriteit krijgen. Dat kan alleen met root-"
+#~ "toegang.\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "*** Since your console is set for the %s codeset, rather than UTF-8,\n"
+#~ "*** console messages may be partially or completely illegible on your "
+#~ "terminal.\n"
+#~ "*** This is a known bug, and will probably be fixed for the next release "
+#~ "of\n"
+#~ "*** tvtime. You can work around this problem by launching tvtime using a "
+#~ "UTF-8\n"
+#~ "*** aware terminal. See %s for more information.\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "*** Omdat uw tekenset niet op UTF-8 staat, maar op %s, zullen de\n"
+#~ "*** berichten waarschijnlijk deels onleesbaar zijn in uw terminal.\n"
+#~ "*** Dit is een bekend probleem en zal waarschijnlijk verholpen worden\n"
+#~ "*** met de eerstvolgende versie van tvtime. U kunt om dit probleem\n"
+#~ "*** heen werken door gebruik te maken van een UTF-8 compatibele\n"
+#~ "*** terminal. Kijk op %s voor meer informatie.\n"
+#~ "\n"
 
 #~ msgid "Windowed mode active."
 #~ msgstr "TV in een venster."
