@@ -1262,8 +1262,8 @@ int main( int argc, char **argv )
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
-            snprintf(number, 3, "%d", curmethodid);
-            number[4] = '\0';
+            snprintf( number, 3, "%d", curmethodid );
+            number[3] = '\0';
             configsave( "PreferredDeinterlaceMethod", number, 1 );
         }
         if( commands_update_luma_power( commands ) ) {
@@ -1486,15 +1486,15 @@ int main( int argc, char **argv )
 
         /* We're done with the input now. */
         if( aquired ) {
-            if( fieldsavailable == 3 ) {
-                videoinput_free_frame( vidin, lastframeid );
-                lastframeid = curframeid;
-                lastframe = curframe;
-            } else if( fieldsavailable == 5 ) {
+            if( fieldsavailable == 5 ) {
                 videoinput_free_frame( vidin, secondlastframeid );
                 secondlastframeid = lastframeid;
-                lastframeid = curframeid;
                 secondlastframe = lastframe;
+                lastframeid = curframeid;
+                lastframe = curframe;
+            } else if( fieldsavailable == 3 ) {
+                videoinput_free_frame( vidin, lastframeid );
+                lastframeid = curframeid;
                 lastframe = curframe;
             } else {
                 videoinput_free_frame( vidin, curframeid );
