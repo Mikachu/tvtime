@@ -9,7 +9,10 @@ News for 0.9.10
   *  Added program listings using XMLTV.  Use with --xmltv=filename.
   *  Added commands for chroma kill, sleep timer, and enabling or
      disabling signal detection.
+  *  Added the matte mode setting to the menu.
   *  Added a DirectFB output layer by Ville Syrjala.
+  *  Significantly lowered the size of the tvtime helper executables.
+  *  Various menu system cleanups.
 
 News for 0.9.9
 
