@@ -74,6 +74,7 @@ struct config_s
     int contrast;
     int colour;
     int hue;
+    int invert;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -264,6 +265,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "DefaultHue" ) ) {
             ct->hue = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ColourInvert" ) ) {
+            ct->invert = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
@@ -753,6 +758,7 @@ config_t *config_new( void )
     ct->contrast = -1;
     ct->colour = -1;
     ct->hue = -1;
+    ct->invert = 0;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1679,5 +1685,10 @@ const char *config_get_audio_mode( config_t *ct )
 const char *config_get_xmltv_file( config_t *ct )
 {
     return ct->xmltvfile;
+}
+
+int config_get_invert( config_t *ct )
+{
+    return ct->invert;
 }
 

@@ -1020,7 +1020,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->change_channel = 0;
     cmd->renumbering = 0;
 
-    cmd->apply_invert = 0;
+    cmd->apply_invert = config_get_invert( cfg );
     cmd->apply_mirror = 0;
     cmd->apply_chroma_kill = 0;
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
@@ -2440,6 +2440,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 tvtime_osd_show_message( cmd->osd, _("Colour invert disabled.") );
             }
         }
+        if( cmd->apply_invert ) {
+            config_save( cmd->cfg, "ColourInvert", "1" );
+        } else {
+            config_save( cmd->cfg, "ColourInvert", "0" );
+        }
         break;
 
     case TVTIME_TOGGLE_MIRROR:
@@ -2493,11 +2498,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
             if( cmd->apply_luma ) {
                 tvtime_osd_show_message( cmd->osd, _("Luma correction enabled.") );
-                config_save( cmd->cfg, "ApplyLumaCorrection", "1" );
             } else {
                 tvtime_osd_show_message( cmd->osd, _("Luma correction disabled.") );
-                config_save( cmd->cfg, "ApplyLumaCorrection", "0" );
             }
+        }
+        if( cmd->apply_luma ) {
+            config_save( cmd->cfg, "ApplyLumaCorrection", "1" );
+        } else {
+            config_save( cmd->cfg, "ApplyLumaCorrection", "0" );
         }
         break;
 

@@ -201,6 +201,12 @@
   <option name="AudioMode" value="stereo"/>
 
   <!--
+    This value saves the on-off state of the colour invert filter across
+    sessions.
+  -->
+  <option name="ColourInvert" value="0"/>
+
+  <!--
     This indicates whether the luma correction option should be enabled by
     default when starting the application.  Luma correction can be turned
     on or off within the application using the "c" key.
