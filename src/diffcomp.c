@@ -270,7 +270,6 @@ static void generate_decompression_table( void )
             break;
         }
     }
-    fprintf( stderr, "first cutoff: %d\n", first_cutoff );
 
     /**
      * So, for each codeword, we just fill up every entry which
