@@ -62,7 +62,6 @@ static int screen;
 static Window wm_window;
 static Window fs_window;
 static Window output_window;
-static Window windowed_output_window;
 static GC gc;
 static int have_xtest;
 static int output_width, output_height;
