@@ -19,8 +19,25 @@
 #ifndef VSYNC_H_INCLUDED
 #define VSYNC_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * This file is the beginning of my abstraction layer for vsync
+ * interrupt handling for applications.
+ *
+ * If you intend to use this code in your application, please contact me
+ * so we can finish up the parts which are lacking.
+ *
+ *  - Billy Biggs <vektor@dumbterm.net>
+ */
+
 int vsync_init( void );
 void vsync_shutdown( void );
 void vsync_wait_for_retrace( void );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VSYNC_H_INCLUDED */
