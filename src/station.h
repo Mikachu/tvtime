@@ -60,7 +60,7 @@ int station_get_current_active( station_mgr_t *mgr );
 /**
  * The last channel we were at, before the current one.
  */
-int station_get_prev_id( station_mgr_t *mgr )
+int station_get_prev_id( station_mgr_t *mgr );
 
 /**
  * Add or update the channel list.
