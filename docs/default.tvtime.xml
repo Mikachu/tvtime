@@ -509,4 +509,8 @@
     <keyboard key="o"/>
   </bind>
 
+  <bind command="mixer_toggle_mute">
+    <keyboard key=","/>
+  </bind>
+
 </tvtime>

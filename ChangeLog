@@ -1,5 +1,6 @@
 
 0.9.8.3 -
+  * vektor: Added a command to mute the mixer volume (fixes 731817)
   * vektor: Added a config file option and command line parameter
       to set the mixer device and channel.  Syntax is
       tvtime -x /dev/mixer0:line1  or use the MixerDevice config

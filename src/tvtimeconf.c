@@ -647,6 +647,7 @@ config_t *config_new( void )
     ct->keymap[ 'm' ] = TVTIME_TOGGLE_MUTE;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
+    ct->keymap[ ',' ] = TVTIME_MIXER_TOGGLE_MUTE;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
     ct->keymap[ I_F1 ] = TVTIME_BRIGHTNESS_DOWN;
     ct->keymap[ I_F2 ] = TVTIME_BRIGHTNESS_UP;

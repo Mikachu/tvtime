@@ -97,6 +97,7 @@ static Cmd_Names cmd_table[] = {
     { "LUMA_UP", TVTIME_LUMA_UP },
 
     { "MIXER_DOWN", TVTIME_MIXER_DOWN },
+    { "MIXER_TOGGLE_MUTE", TVTIME_MIXER_DOWN },
     { "MIXER_UP", TVTIME_MIXER_UP },
 
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
@@ -709,7 +710,15 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_MIXER_UP: 
+    case TVTIME_MIXER_TOGGLE_MUTE:
+        mixer_mute( !mixer_ismute() );
+
+        if( in->osd ) {
+            tvtime_osd_show_volume_bar( in->osd, (mixer_get_volume()) & 0xff );
+        }
+        break;
+
+    case TVTIME_MIXER_UP:
     case TVTIME_MIXER_DOWN:
 
         /* If the user hits the volume control, drop us out of mute mode. */
