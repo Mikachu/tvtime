@@ -922,6 +922,26 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
 }
 
+static void build_pulldown_menu( menu_t *menu, int pulldownactive )
+{
+    char string[ 128 ];
+
+    if( pulldownactive ) {
+        snprintf( string, sizeof( string ), "%c%c%c  2-3 Pulldown Inversion", 0xee, 0x80, 0xa5 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  2-3 Pulldown Inversion", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
+    menu_set_right_command( menu, 4, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
+}
+
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1585,6 +1605,9 @@ int main( int argc, char **argv )
     }
 
     build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+    if( height == 480 ) {
+        build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
+    }
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1815,6 +1838,8 @@ int main( int argc, char **argv )
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
                         tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
                     }
+                    build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
+                    commands_refresh_menu( commands );
                 }
             } else if( osd ) {
                 tvtime_osd_show_message( osd, "Pulldown detection not available for your TV norm." );
