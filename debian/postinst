@@ -17,13 +17,13 @@ if [ "$action" = "configure" ]; then
         if [ ! -x /usr/sbin/dpkg-statoverride ] || \
            ! /usr/sbin/dpkg-statoverride --list /usr/bin/tvtime >/dev/null; then
             chmod u=rwx,go=rx /usr/bin/tvtime
-	    chown root:root /usr/bin/tvtime
+            chown root:root /usr/bin/tvtime
         fi
     else
         if [ ! -x /usr/sbin/dpkg-statoverride ] || \
            ! /usr/sbin/dpkg-statoverride --list /usr/bin/tvtime >/dev/null; then
             chmod u=rwxs,go=rx /usr/bin/tvtime
-	    chown root:root /usr/bin/tvtime
+            chown root:root /usr/bin/tvtime
         fi
     fi
 
@@ -31,7 +31,7 @@ if [ "$action" = "configure" ]; then
     if [ -d /var/run/tvtime ] ; then
         if [ ! -x /usr/sbin/dpkg-statoverride ] || \
            ! /usr/sbin/dpkg-statoverride --list /var/run/tvtime >/dev/null; then
-	    chmod ug=rwx,o=rxt /var/run/tvtime
+            chmod ug=rwx,o=rxt /var/run/tvtime
             chown root:video /var/run/tvtime
         fi
     fi
