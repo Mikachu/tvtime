@@ -988,6 +988,7 @@ int main( int argc, char **argv )
 
         dscaler_tomsmocomp_plugin_init();
         dscaler_greedyh_plugin_init();
+        greedy_plugin_init();
 
         weavetff_plugin_init();
         weavebff_plugin_init();

@@ -176,8 +176,8 @@ static deinterlace_setting_t settings[] =
 static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "DScaler: Greedy - Low motion",
-    "Greedy",
+    "Motion Adaptive: Simple Detection",
+    "AdaptiveSimple",
     3,
     MM_ACCEL_X86_MMXEXT,
     0,

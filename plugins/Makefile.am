@@ -22,7 +22,7 @@ AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
 noinst_LTLIBRARIES = libtvtimeplugins.la
 libtvtimeplugins_la_SOURCES = plugins.h linear.c weavetff.c \
-	weavebff.c double.c linearblend.c scalerbob.c \
+	weavebff.c double.c linearblend.c scalerbob.c greedy.c \
 	dscaler_greedyh.c dscaler_tomsmocomp.c vfir.c
 libtvtimeplugins_la_LDFLAGS = -static
 
