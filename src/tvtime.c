@@ -62,7 +62,6 @@
 #include "performance.h"
 #include "taglines.h"
 #include "xvoutput.h"
-#include "console.h"
 #include "vbidata.h"
 #include "vbiscreen.h"
 #include "videofilter.h"
@@ -1153,7 +1152,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     input_t *in = 0;
     output_api_t *output = 0;
     performance_t *perf = 0;
-    console_t *con = 0;
     int has_signal = 0;
     vbidata_t *vbidata = 0;
     vbiscreen_t *vs = 0;
@@ -1455,6 +1453,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
     if( tvtime->outputfilter ) {
         outputfilter_set_osd( tvtime->outputfilter, osd );
+        outputfilter_set_pixel_aspect( tvtime->outputfilter, pixel_aspect );
     }
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
@@ -1493,30 +1492,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
     }
 
-    /* Setup the console */
-    con = console_new( (width*10)/100, height - (height*20)/100,
-                       (width*80)/100, (height*20)/100, 16,
-                       width, height, pixel_aspect,
-                       config_get_other_text_rgb( ct ) );
-    if( !con ) {
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Could not setup console.\n" );
-        }
-    } else {
-        if( fifo ) {
-            console_setup_pipe( con, fifofile );
-        }
-        commands_set_console( commands, con );
-    }
-    if( tvtime->outputfilter ) {
-        outputfilter_set_console( tvtime->outputfilter, con );
-        outputfilter_set_pixel_aspect( tvtime->outputfilter, pixel_aspect );
-    }
-
     /* We no longer need the fifo filename. */
     if( fifofile ) free( fifofile );
 
-    in = input_new( ct, commands, con, verbose );
+    in = input_new( ct, commands, verbose );
     if( !in ) {
         lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
@@ -2535,9 +2514,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
     if( vbidata ) {
         vbidata_delete( vbidata );
-    }
-    if( con ) {
-        console_delete( con );
     }
     if( vs ) {
         vbiscreen_delete( vs );

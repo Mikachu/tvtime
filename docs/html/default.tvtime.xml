@@ -530,11 +530,7 @@
   <bind command="auto_adjust_window">  <keyboard key="/"/>    </bind>
   <bind command="toggle_bars">         <keyboard key="b"/>    </bind>
   <bind command="toggle_pause">        <keyboard key="end"/>  </bind>
-  <bind command="toggle_console">      <keyboard key="`"/>    </bind>
-  <bind command="scroll_console_up">   <keyboard key="pgup"/> </bind>
-  <bind command="scroll_console_down"> <keyboard key="pgdn"/> </bind>
   <bind command="mixer_toggle_mute">   <keyboard key=","/>    </bind>
   <bind command="auto_adjust_pict">    <keyboard key=" "/>    </bind>
-  <bind command="toggle_colour_invert"><keyboard key="o"/>    </bind>
 
 </tvtime>

@@ -28,7 +28,6 @@ typedef struct commands_s commands_t;
 #include "tvtimeosd.h"
 #include "videoinput.h"
 #include "tvtimeconf.h"
-#include "console.h"
 #include "vbidata.h"
 #include "station.h"
 #include "menu.h"
@@ -51,11 +50,8 @@ double commands_get_overscan( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
 int commands_get_framerate( commands_t *cmd );
 void commands_set_framerate( commands_t *cmd, int framerate );
-void commands_set_console( commands_t *cmd, console_t *con );
 void commands_set_vbidata( commands_t *cmd, vbidata_t *con );
 int commands_in_menu( commands_t *cmd );
-
-int commands_console_on( commands_t *cmd );
 
 void commands_set_half_size( commands_t *cmd, int halfsize );
 void commands_next_frame( commands_t *cmd );

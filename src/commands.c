@@ -36,7 +36,6 @@
 #include "mixer.h"
 #include "input.h"
 #include "commands.h"
-#include "console.h"
 #include "utils.h"
 #include "xmltv.h"
 #include "tvtimeglyphs.h"
@@ -162,10 +161,6 @@ struct commands_s {
     double luma_power;
 
     double overscan;
-
-    int console_on;
-    int scrollconsole;
-    console_t *console;
 
     vbidata_t *vbi;
     int capturemode;
@@ -1036,10 +1031,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->overscan = config_get_overscan( cfg );
     if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
-
-    cmd->console_on = 0;
-    cmd->scrollconsole = 0;
-    cmd->console = 0;
 
     cmd->vbi = 0;
     cmd->capturemode = config_get_cc( cfg ) ? CAPTURE_CC1 : CAPTURE_OFF;
@@ -2121,19 +2112,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->togglefullscreen = 1;
         break;
 
-    case TVTIME_SCROLL_CONSOLE_UP:
-    case TVTIME_SCROLL_CONSOLE_DOWN:
-        if( cmd->console_on )
-            console_scroll_n( cmd->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
-        break;
-
     case TVTIME_TOGGLE_FRAMERATE:
         cmd->framerate = (cmd->framerate + 1) % FRAMERATE_MAX;
-        break;
-
-    case TVTIME_TOGGLE_CONSOLE:
-        cmd->console_on = !cmd->console_on;
-        console_toggle_console( cmd->console );
         break;
 
     case TVTIME_CHANNEL_SKIP:
@@ -3300,19 +3280,9 @@ int commands_toggle_matte( commands_t *cmd )
     return cmd->togglematte;
 }
 
-void commands_set_console( commands_t *cmd, console_t *con )
-{
-    cmd->console = con;
-}
-
 void commands_set_vbidata( commands_t *cmd, vbidata_t *vbi )
 {
     cmd->vbi = vbi;
-}
-
-int commands_console_on( commands_t *cmd )
-{
-    return cmd->console_on;
 }
 
 int commands_scan_channels( commands_t *cmd )

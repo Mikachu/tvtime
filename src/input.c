@@ -33,13 +33,11 @@
 struct input_s {
     config_t *cfg;
     commands_t *com;
-    int console_on;
-    console_t *console;
     int slave_mode;
     int quit;
 };
 
-input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose )
+input_t *input_new( config_t *cfg, commands_t *com, int verbose )
 {
     input_t *in = malloc( sizeof( input_t ) );
 
@@ -50,8 +48,6 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
 
     in->cfg = cfg;
     in->com = com;
-    in->console_on = 0;
-    in->console = con;
     in->quit = 0;
     in->slave_mode = config_get_slave_mode( cfg );
 
@@ -117,31 +113,7 @@ void input_callback( input_t *in, int command, int arg )
         }
 
         if( command == I_KEYDOWN ) {
-            if( commands_console_on( in->com ) && in->console ) {
-                char blah[2];
-                blah[1] = '\0';
-
-                if( tvtime_cmd == TVTIME_TOGGLE_CONSOLE ||
-                    tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
-                    tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN )
-                    break;
-
-                blah[0] = arg & 0xFF;
-                switch( blah[0] ) {
-                case I_ENTER:
-                    blah[0] = '\n';
-                    break;
-
-                default:
-                    if( (arg & I_SHIFT) && isalpha(blah[0]) ) {
-                        blah[0] ^= 0x20;
-                    }
-                    break;
-                }
-                console_pipe_printf( in->console, blah );
-                console_printf( in->console, blah );
-                return;
-            } else if( in->slave_mode ) {
+            if( in->slave_mode ) {
                 const char *special = input_special_key_to_string( arg );
                 if( special ) {
                     fprintf( stdout, "%s\n", special );

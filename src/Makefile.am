@@ -44,13 +44,12 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	deinterlace.h leetft.h input.h mixer.h mm_accel.h mmx.h osdtools.h \
 	pnginput.h pngoutput.h rtctimer.h speedy.h taglines.h tvtimeconf.h \
 	tvtimeosd.h videocorrection.h videoinput.h videotools.h performance.h \
-	performance.c vbidata.h vbidata.c credits.c credits.h console.h \
-	console.c speedtools.h vbiscreen.h vbiscreen.c fifo.h fifo.c \
-	commands.h commands.c videofilter.h videofilter.c station.h station.c \
-	bands.h utils.h utils.c diffcomp.h diffcomp.c pulldown.h pulldown.c \
-	hashtable.h hashtable.c cpuinfo.h \
-	cpuinfo.c videodev.h videodev2.h menu.c menu.h outputfilter.h \
-	outputfilter.c xmltv.h xmltv.c gettext.h \
+	performance.c vbidata.h vbidata.c credits.c credits.h speedtools.h \
+	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
+	videofilter.h videofilter.c station.h station.c bands.h utils.h \
+	utils.c diffcomp.h diffcomp.c pulldown.h pulldown.c hashtable.h \
+	hashtable.c cpuinfo.h cpuinfo.c videodev.h videodev2.h menu.c \
+	menu.h outputfilter.h outputfilter.c xmltv.h xmltv.c gettext.h \
 	tvtimeglyphs.h
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
