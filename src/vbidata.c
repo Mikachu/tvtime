@@ -964,15 +964,6 @@ void vbidata_reset( vbidata_t *vbi )
     vbi->length_elapsed_min = 0;
     vbi->length_elapsed_sec = 0;
 
-    if( vbi->osd ) {
-        tvtime_osd_set_network_call( vbi->osd, "" );
-        tvtime_osd_set_network_name( vbi->osd, "" );
-        tvtime_osd_set_show_name( vbi->osd, "" );
-        tvtime_osd_set_show_rating( vbi->osd, "" );
-        tvtime_osd_set_show_start( vbi->osd, "" );
-        tvtime_osd_set_show_length( vbi->osd, "" );
-    }
-
     vbi->lastcode = 0;
     vbi->lastcount = 0;
     vbi->xds_packet[ 0 ] = 0;

@@ -220,25 +220,20 @@ static void reinit_tuner( commands_t *in )
 {
     /* Setup the tuner if available. */
     if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-        /**
-         * Set to the current channel, or the first channel in our
-         * frequency list.
-         */
-        //if( !frequencies_find_current_index( in->vidin ) ) {
-            /* set to a known frequency */
-            //frequencies_choose_first_frequency();
-            
+
         videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
         if( in->vbi ) {
             vbidata_reset( in->vbi );
             vbidata_capture_mode( in->vbi, in->capturemode );
         }
-        //}
 
         if( config_get_verbose( in->cfg ) ) {
             fprintf( stderr, "tvtime: Changing to channel %s.\n",
                      station_get_current_channel_name( in->stationmgr ) );
         }
+
+        videoinput_set_audio_mode( in->vidin, 1 );
+        in->audio_counter = CHANNEL_STEREO_DELAY;
 
         if( in->osd ) {
             char channel_display[ 20 ];
@@ -247,7 +242,16 @@ static void reinit_tuner( commands_t *in )
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
             tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
+            tvtime_osd_set_network_call( in->osd, "" );
+            tvtime_osd_set_network_name( in->osd, "" );
+            tvtime_osd_set_show_name( in->osd, "" );
+            tvtime_osd_set_show_rating( in->osd, "" );
+            tvtime_osd_set_show_start( in->osd, "" );
+            tvtime_osd_set_show_length( in->osd, "" );
+            tvtime_osd_show_info( in->osd );
         }
+        in->frame_counter = 0;
+
     } else if( in->osd ) {
         tvtime_osd_set_audio_mode( in->osd, "" );
         tvtime_osd_set_freq_table( in->osd, "" );
@@ -259,6 +263,7 @@ static void reinit_tuner( commands_t *in )
         tvtime_osd_set_show_rating( in->osd, "" );
         tvtime_osd_set_show_start( in->osd, "" );
         tvtime_osd_set_show_length( in->osd, "" );
+        tvtime_osd_show_info( in->osd );
     }
 }
 
@@ -337,40 +342,6 @@ void commands_delete( commands_t *in )
 void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
 {
     in->vbi = vbi;
-}
-
-static void commands_station_change( commands_t *in )
-{
-    int verbose = config_get_verbose( in->cfg );
-
-    if( !in->vidin || !videoinput_has_tuner( in->vidin ) ) {
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Can't change channel, "
-                     "no tuner available on this input!\n" );
-        }
-    } else {
-
-        videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
-        if( in->vbi ) {
-            vbidata_reset( in->vbi );
-            vbidata_capture_mode( in->vbi, in->capturemode );
-        }
-
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Changing to channel %s\n", station_get_current_channel_name( in->stationmgr ) );
-        }
-        videoinput_set_audio_mode( in->vidin, 1 );
-        in->audio_counter = CHANNEL_STEREO_DELAY;
-        if( in->osd ) {
-            sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
-            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
-            tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
-            tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
-            tvtime_osd_show_info( in->osd );
-        }
-        in->frame_counter = 0;
-    }
 }
 
 void commands_handle( commands_t *in, int tvtime_cmd, int arg )
@@ -1002,7 +973,7 @@ void commands_next_frame( commands_t *in )
     }
 
     if( in->change_channel ) {
-        commands_station_change( in );
+        reinit_tuner( in );
         in->change_channel = 0;
     }
 
