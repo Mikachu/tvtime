@@ -638,11 +638,6 @@ config_t *config_new( void )
     ct->doc = 0;
 
     ct->uid = getuid();
-    if( !getpwuid( ct->uid ) ) {
-        fprintf( stderr, "config: You don't exist, go away!\n" );
-        config_delete( ct );
-        return 0;
-    }
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
