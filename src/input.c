@@ -236,8 +236,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
                 const char *special = input_special_key_to_string( arg );
                 if( special ) {
                     fprintf( stdout, "%s\n", special );
+                    fflush( stdout );
                 } else {
                     fprintf( stdout, "%c\n", arg & 0xff );
+                    fflush( stdout );
                 }
                 return;
             }
