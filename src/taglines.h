@@ -119,7 +119,6 @@ static const char *taglines[] = {
 "tvtime: like a rock",
 "tvtime: i know something you don't know",
 "tvtime; Mikey likes it!",
-"tvtime: more than meets the eye",
 "tvtime: can you see the difference?"
 };
 
