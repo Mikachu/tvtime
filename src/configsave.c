@@ -38,11 +38,30 @@ struct configsave_s
     xmlDocPtr Doc;
 };
 
-static xmlNodePtr find_node( const char *str, xmlNodePtr node)
+static xmlNodePtr find_node( const char *str, xmlNodePtr node )
 {
     while( node ) {
         if( !xmlStrcasecmp( node->name, BAD_CAST str ) ) {
             return node;
+        }
+
+        node = node->next;
+    }
+
+    return 0;
+}
+
+static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
+            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+            if( name && !xmlStrcasecmp( name, BAD_CAST optname ) ) {
+                xmlFree( name );
+                return node;
+            }
+            if( name ) xmlFree( name );
         }
 
         node = node->next;
@@ -101,27 +120,11 @@ configsave_t *configsave_open( const char *filename )
         return 0;
     }
 
-    node = find_node( "global", top->xmlChildrenNode );
-    if( !node ) {
-        node = xmlNewTextChild( top, 0, BAD_CAST "global", 0 );
-        if( !node ) {
-            fprintf( stderr, "configsave: Could not create element 'global'.\n" );
-            xmlFreeDoc( cs->Doc );
-            free( cs->configFile );
-            free( cs );
-            return 0;
-        }
-    }
-
     node = find_node( "mousebindings", top->xmlChildrenNode );
     if( !node ) {
         node = xmlNewTextChild( top, 0, BAD_CAST "mousebindings", 0 );
         if( !node ) {
             fprintf( stderr, "configsave: Could not create element 'mousebindings'.\n" );
-            xmlFreeDoc( cs->Doc );
-            free( cs->configFile );
-            free( cs );
-            return 0;
         }
     }
 
@@ -130,10 +133,6 @@ configsave_t *configsave_open( const char *filename )
         node = xmlNewTextChild( top, 0, BAD_CAST "keybindings", 0 );
         if( !node ) {
             fprintf( stderr, "configsave: Could not create element 'keybindings'.\n" );
-            xmlFreeDoc( cs->Doc );
-            free( cs->configFile );
-            free( cs );
-            return 0;
         }
     }
 
@@ -173,15 +172,10 @@ int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, c
         }
 
     } else {
-        section = find_node( "global", top->xmlChildrenNode );
-        if( !section ) {
-            fprintf( stderr, "configsave: No 'global' section in %s. Global option not saved.\n",
-                     cs->configFile );
-            return 0;
-        }
-        node = find_node( INIT_name, section->xmlChildrenNode );
+        node = find_option( top->xmlChildrenNode, INIT_name );
         if( !node ) {
-            node = xmlNewTextChild( section, 0, BAD_CAST INIT_name, 0);
+            node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
+            attr = xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
             attr = xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
         } else {
             xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );

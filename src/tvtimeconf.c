@@ -172,93 +172,140 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     value = xmlGetProp( node, BAD_CAST "value" );
 
     if( name && value ) {
-        fprintf( stderr, "name is %s, value is %s\n", (char *) name, (char *) value );
+        char *curval = (char *) value;
+
+        if( !xmlStrcasecmp( name, BAD_CAST "OutputWidth" ) ) {
+            ct->outputwidth = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "InputWidth" ) ) {
+            ct->inputwidth = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Verbose" ) ) {
+            ct->verbose = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
+            ct->aspect = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "DebugMode" ) ) {
+            ct->debug = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ApplyLumaCorrection" ) ) {
+            ct->apply_luma_correction = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "LumaCorrection" ) ) {
+            ct->luma_correction = atof( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "V4LDevice" ) ) {
+            free( ct->v4ldev );
+            ct->v4ldev = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "VBIDevice" ) ) {
+            free( ct->vbidev );
+            ct->vbidev = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "CaptureSource" ) ) {
+            ct->inputnum = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "UseVBI" ) ) {
+            ct->use_vbi = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ProcessPriority" ) ) {
+            ct->priority = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Fullscreen" ) ) {
+            ct->fullscreen = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "FramerateMode" ) ) {
+            ct->framerate = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Norm" ) ) {
+            free( ct->norm );
+            ct->norm = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Frequencies" ) ) {
+            free( ct->freq );
+            ct->freq = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "CommandPipe" ) ) {
+            if( curval[ 0 ] == '~' && getenv( "HOME" ) ) {
+                snprintf( ct->command_pipe, sizeof( ct->command_pipe ), "%s%s", getenv( "HOME" ), curval + 1 );
+            } else {
+                strncpy( ct->command_pipe, curval, 255 );
+            }
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "TimeFormat" ) ) {
+            free( ct->timeformat );
+            ct->timeformat = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ScreenShotDir" ) ) {
+            free( ct->ssdir );
+            ct->ssdir = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "MenuBG" ) ) {
+            ct->menu_bg_rgb = parse_colour( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ChannelTextFG" ) ) {
+            ct->channel_text_rgb = parse_colour( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "OtherTextFG" ) ) {
+            ct->other_text_rgb = parse_colour( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "PrevChannel" ) ) {
+            ct->prev_channel = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "StartChannel" ) ) {
+            ct->start_channel = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "NTSCCableMode" ) ) {
+            if( !xmlStrcasecmp( value, BAD_CAST "IRC" ) ) {
+                ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
+            } else if( !xmlStrcasecmp( value, BAD_CAST "HRC" ) ) {
+                ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
+            } else {
+                ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
+            }
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "PreferredDeinterlaceMethod" ) ) {
+            ct->preferred_deinterlace_method = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "CheckForSignal" ) ) {
+            ct->preferred_deinterlace_method = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
+            ct->hoverscan = ( atof( curval ) / 2.0 ) / 100.0;
+            ct->voverscan = ( atof( curval ) / 2.0 ) / 100.0;
+        }
     }
 
     if( name ) xmlFree( name );
     if( value ) xmlFree( value );
-}
-
-static void parse_global( config_t *ct, xmlNodePtr node )
-{
-    xmlChar *buf;
-
-    while( node ) {
-        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
-
-            if( !xmlStrcasecmp( node->name, BAD_CAST "outputwidth" ) ) {
-                ct->outputwidth = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp( node->name, BAD_CAST "inputwidth" ) ) {
-                ct->inputwidth = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "verbose")) {
-                ct->verbose = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "widescreen")) {
-                ct->aspect = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "debugmode")) {
-                ct->debug = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "applylumacorrection")) {
-                ct->apply_luma_correction = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "lumacorrection")) {
-                ct->luma_correction = atof((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "v4ldevice")) {
-                free(ct->v4ldev);
-                ct->v4ldev = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "vbidevice")) {
-                free(ct->vbidev);
-                ct->vbidev = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "capturesource")) {
-                ct->inputnum = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "usevbi")) {
-                ct->use_vbi = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "processpriority")) {
-                ct->priority = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "fullscreen")) {
-                ct->fullscreen = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "norm")) {
-                free(ct->norm);
-                ct->norm = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "frequencies")) {
-                free(ct->freq);
-                ct->freq = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "commandpipe")) {
-                if(buf[0] == '~' && getenv("HOME") ) {
-                    snprintf(ct->command_pipe, sizeof(ct->command_pipe), "%s%s", getenv("HOME"), buf+1);
-                } else {
-                    strncpy(ct->command_pipe, buf, 255);
-                }
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "timeformat")) {
-                free(ct->timeformat);
-                ct->timeformat = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "screenshotdir")) {
-                free(ct->ssdir);
-                ct->ssdir = strdup(buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "menubg")) {
-                ct->menu_bg_rgb = parse_colour((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "channeltextfg")) {
-                ct->channel_text_rgb = parse_colour((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "othertextfg")) {
-                ct->other_text_rgb = parse_colour((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "startchannel")) {
-                ct->start_channel = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "ntsccablemode")) {
-                if( !strcasecmp((const char *)buf, "irc") ) {
-                    ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
-                } else if ( !strcasecmp((const char *)buf, "hrc") ) {
-                    ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
-                } else {
-                    ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
-                }
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "preferreddeinterlacemethod")) {
-                ct->preferred_deinterlace_method = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "checkforsignal")) {
-                ct->check_freq_present = atoi((const char *)buf);
-            } else if( !xmlStrcasecmp(node->name, BAD_CAST "overscan")) {
-                ct->hoverscan = (atof((const char *)buf) / 2.0) / 100.0;
-                ct->voverscan = (atof((const char *)buf) / 2.0) / 100.0;
-            }
-        }
-        node = node->next;
-    }
 }
 
 static void parse_keys( config_t *ct, xmlNodePtr node )
@@ -325,8 +372,6 @@ static int conf_xml_parse( config_t *ct, char *configFile )
         if( !xmlIsBlankNode( node ) ) {
             if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
                 parse_option( ct, node );
-            } else if( !xmlStrcasecmp( node->name, BAD_CAST "global" ) ) {
-                parse_global( ct, node->xmlChildrenNode );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "keybindings" ) ) {
                 parse_keys( ct, node->xmlChildrenNode );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "mousebindings" ) ) {
