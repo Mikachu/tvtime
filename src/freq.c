@@ -20,8 +20,6 @@
 #include "freq.h"
 #include "bands.h"
 
-
-
 band_t *getBand( char *band ) {
 	band_t *rp;
 	

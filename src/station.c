@@ -118,7 +118,7 @@ int station_init(config_t *ct) {
 	station_add( 2, "VHF E2-E12", "E8", "zdf" );
 	station_add( 3, "VHF E2-E12", "E6", "ndr" );
 
-	station_add_band("US Cable",US_CABLE_HRC);
+	station_add_band("US Cable",0);//US_CABLE_HRC);
 	
 	if ( NULL == first ) {
 		insert(newInfo( 1, "dummy", "none", "none", 0 ));
@@ -142,19 +142,19 @@ int station_set(int pos) {
 	return 0;
 }
 
-void station_next() {
-	current= current->next;
+void station_next( void )
+{
+    current = current->next;
 }
 
-void station_prev() {
-	current=current->prev;
+void station_prev( void )
+{
+    current = current->prev;
 }
 
-
-
-
-station_info_t *station_getInfo() {
-	return current->info;
+station_info_t *station_getInfo( void )
+{
+    return current->info;
 }
 
 
