@@ -80,30 +80,23 @@ Raster_Map *TTFFont::create_font_raster(int width, int height)
 
 Raster_Map *TTFFont::duplicate_raster(FT_BitmapGlyph bmap)
 {
-   Raster_Map      *new_rmap;
+    Raster_Map      *new_rmap;
 
-   new_rmap = new Raster_Map;
+    new_rmap = new Raster_Map;
 
-   new_rmap->width = bmap->bitmap.width;
-   new_rmap->rows = bmap->bitmap.rows;
-   new_rmap->cols = bmap->bitmap.pitch;
-   new_rmap->size = new_rmap->cols * new_rmap->rows;
+    new_rmap->width = bmap->bitmap.width;
+    new_rmap->rows = bmap->bitmap.rows;
+    new_rmap->cols = bmap->bitmap.pitch;
+    new_rmap->size = new_rmap->cols * new_rmap->rows;
 
-   if (new_rmap->size > 0)
-   {
-	new_rmap->bitmap = new unsigned char[new_rmap->size];
-	memcpy(new_rmap->bitmap, bmap->bitmap.buffer, new_rmap->size);
-   }
-   else
-      new_rmap->bitmap = NULL;
+    if( new_rmap->size > 0 ) {
+        new_rmap->bitmap = new unsigned char[new_rmap->size];
+        memcpy(new_rmap->bitmap, bmap->bitmap.buffer, new_rmap->size);
+    } else {
+        new_rmap->bitmap = NULL;
+    }
 
-   return new_rmap;
-}
-
-void TTFFont::clear_raster(Raster_Map * rmap)
-{
-   if (rmap->bitmap)
-       memset(rmap->bitmap, 0, rmap->size);
+    return new_rmap;
 }
 
 void TTFFont::destroy_font_raster(Raster_Map * rmap)
@@ -146,8 +139,7 @@ void TTFFont::calc_size(int *width, int *height, const char *text)
    *height = ph;
 }
 
-void TTFFont::render_text(Raster_Map *rmap, const char *text,
-	                  int *xorblah, int *yor)
+void TTFFont::render_text( Raster_Map *rmap, const char *text )
 {
    FT_F26Dot6          x, y, xmin, ymin, xmax, ymax;
    FT_BBox             bbox;
@@ -155,7 +147,6 @@ void TTFFont::render_text(Raster_Map *rmap, const char *text,
    char               *off, *read, *_off, *_read;
    int                 x_offset, y_offset;
    unsigned char       j, previous;
-   Raster_Map         *rtmp;
 
    j = text[0];
    FT_Load_Glyph(face, j, FT_LOAD_DEFAULT);
@@ -163,14 +154,11 @@ void TTFFont::render_text(Raster_Map *rmap, const char *text,
 
    y_offset = -(max_descent / 64);
 
-   *xorblah = x_offset;
-   *yor = rmap->rows - y_offset;
-
-   rtmp = NULL;
    previous = 0;
 
    for (i = 0; text[i]; i++)
    {
+       Raster_Map *rtmp;
        j = text[i];
 
        if (!FT_VALID(glyphs[j]))
@@ -272,7 +260,7 @@ void TTFFont::render_text(Raster_Map *rmap, const char *text,
 
            for (x = xmin; x <= xmax; x++)
            {
-	       *off = *read;
+               *off = *read;
                off++;
                read++;
            }
@@ -284,64 +272,7 @@ void TTFFont::render_text(Raster_Map *rmap, const char *text,
     }
 }
 
-void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x, 
-                         int offset_y, int xstart, int ystart, int width, 
-                         int height, int video_width, int video_height, 
-                         bool white)
-{
-   int                 x, y;
-   unsigned char      *ptr, *src;
-   unsigned char       a;
-
-   unsigned char *uptr, *usrc;
-   unsigned char *vptr, *vsrc;
-
-   uptr = yuv + video_height * video_width;
-   vptr = uptr + (video_height * video_width) / 4;   
-   int offset; 
-
-   if (height + ystart > video_height)
-       height = video_height - ystart - 1;
-
-   int tmp1, tmp2;
- 
-   for (y = 0; y < height; y++)
-     {
-	ptr = (unsigned char *)rmap->bitmap + offset_x + 
-              ((y + offset_y) * rmap->cols);
-	for (x = 0; x < width; x++)
-	  {
-	     if ((a = *ptr) > 0)
-	       {
-		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  if (white)
-                  {
-                      tmp1 = (255 - *src) * a;
-                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                      *src = tmp2 & 0xff;
-                      if (a == 255)
-                      {
-                          offset = ((y + ystart) / 2) * (video_width / 2) + 
-                                   (x + xstart) / 2;
-                          usrc = uptr + offset; 
-                          vsrc = vptr + offset; 
-                          *usrc = 128;
-                          *vsrc = 128;
-                      }
-                  }
-		  else
-                  {
-                      tmp1 = (0 - *src) * a;
-                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                      *src = tmp2 & 0xff;
-                  }
-	       }
-	     ptr++;
-	  }
-     }
-}
-
-TTFFont::~TTFFont()
+TTFFont::~TTFFont( void )
 {
    int                 i;
 
@@ -351,10 +282,12 @@ TTFFont::~TTFFont()
    FT_Done_Face(face);
    for (i = 0; i < num_glyph; i++)
      {
-	if (glyphs_cached[i])
-	   destroy_font_raster(glyphs_cached[i]);
-	if (FT_VALID(glyphs[i]))
-	   FT_Done_Glyph(glyphs[i]);
+        if( glyphs_cached[ i ] ) {
+            destroy_font_raster(glyphs_cached[i]);
+        }
+        if( FT_VALID( glyphs[ i ] ) ) {
+            FT_Done_Glyph( glyphs[ i ] );
+        }
      }
    if (glyphs)
       free(glyphs);
@@ -379,9 +312,9 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
 
    if (!have_library)
    {
-	error = FT_Init_FreeType(&the_library);
-	if (error) {
-	   return;
+        error = FT_Init_FreeType(&the_library);
+        if (error) {
+           return;
         }
    }
    have_library++;
@@ -396,13 +329,13 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
         if (!have_library)
             FT_Done_FreeType(the_library);
 
-	return;
+        return;
    }
 
    vid_width = video_width;
    vid_height = video_height;
    vid_aspect = aspect_ratio;
-   xdpi = (int)((((double)xdpi) * (double)(video_width / (double)(video_height * vid_aspect)))+0.5);
+   xdpi = (int) ((((double)xdpi) * (double)(video_width / (double)(video_height * vid_aspect)))+0.5);
 
    FT_Set_Char_Size(face, 0, size * 64, xdpi, ydpi);
 
@@ -411,12 +344,12 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
    for (i = 0; i < n; i++)
    {
         char_map = face->charmaps[i];
-	if ((char_map->platform_id == 3 && char_map->encoding_id == 1) ||
-	    (char_map->platform_id == 0 && char_map->encoding_id == 0))
-	{
-	     FT_Set_Charmap(face, char_map);
-	     break;
-	}
+        if ((char_map->platform_id == 3 && char_map->encoding_id == 1) ||
+            (char_map->platform_id == 0 && char_map->encoding_id == 0))
+        {
+             FT_Set_Charmap(face, char_map);
+             break;
+        }
    }
    if (i == n)
       FT_Set_Charmap(face, face->charmaps[0]);
@@ -433,20 +366,20 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
 
    for (i = 0; i < num_glyph; ++i)
    {
-	if (FT_VALID(glyphs[i]))
-	   continue;
+        if (FT_VALID(glyphs[i]))
+            continue;
 
-	code = FT_Get_Char_Index(face, i);
+        code = FT_Get_Char_Index(face, i);
 
-	FT_Load_Glyph(face, code, FT_LOAD_DEFAULT);
+        FT_Load_Glyph(face, code, FT_LOAD_DEFAULT);
         FT_Get_Glyph(face->glyph, &glyphs[i]);
 
         FT_Glyph_Get_CBox(glyphs[i], ft_glyph_bbox_subpixels, &bbox);
 
-	if ((bbox.yMin & -64) < max_descent)
-	   max_descent = (bbox.yMin & -64);
-	if (((bbox.yMax + 63) & -64) > max_ascent)
-	   max_ascent = ((bbox.yMax + 63) & -64);
+        if ((bbox.yMin & -64) < max_descent)
+           max_descent = (bbox.yMin & -64);
+        if (((bbox.yMax + 63) & -64) > max_ascent)
+           max_ascent = ((bbox.yMax + 63) & -64);
    }
 
 #ifdef USE_KERNING
@@ -461,7 +394,7 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
 void TTFFont::RenderString( unsigned char *output, const char *text,
                             int *width, int *height, int maxx, int maxy )
 {
-   int w, h, inx, iny;
+   int w, h;
    Raster_Map rmap;
 
    calc_size( &w, &h, text );
@@ -482,26 +415,6 @@ void TTFFont::RenderString( unsigned char *output, const char *text,
    rmap.bitmap = output;
    memset( output, 0, w * h );
 
-   inx = 0;
-   iny = 0;
-   render_text( &rmap, text, &inx, &iny );
+   render_text( &rmap, text );
 }
 
-void TTFFont::CalcWidth(const char *text, int *width_return)
-{
-   int                 i, pw;
-
-   pw = 0;
-
-   for (i = 0; text[i]; i++)
-   {
-	unsigned char       j = text[i];
-
-	if (!FT_VALID(glyphs[j]))
-	   continue;
-	pw += glyphs[j]->advance.x / 65535;
-   }
-
-   if (width_return)
-      *width_return = pw;
-}

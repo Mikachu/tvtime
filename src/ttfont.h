@@ -19,14 +19,12 @@ struct Raster_Map;
 class TTFFont
 {
   public:
-     TTFFont(const char *file, int size, int video_width, int video_height, double aspect_ratio);
-    ~TTFFont();
+     TTFFont( const char *file, int size, int video_width, int video_height, double aspect_ratio );
+    ~TTFFont( void );
 
-     bool isValid(void) { return valid; }
+     bool isValid( void ) const { return valid; }
 
      void RenderString( unsigned char *output, const char *text, int *width, int *height, int maxx, int maxy );
-
-     void CalcWidth(const char *text, int *width_return);
 
   private:
      Raster_Map *create_font_raster(int width, int height);
@@ -34,11 +32,7 @@ class TTFFont
      void clear_raster(Raster_Map *rmap);
      void destroy_font_raster(Raster_Map *rmap);
      void calc_size(int *width, int *height, const char *text);
-     void render_text(Raster_Map *rmap, const char *text, 
-                      int *xorblah, int *yor);
-     void merge_text(unsigned char *yuv, Raster_Map *rmap, int offset_x, 
-                     int offset_y, int xstart, int ystart, int width, 
-                     int height, int video_width, int video_height, bool white);
+     void render_text( Raster_Map *rmap, const char *text );
 
      bool         valid;
      FT_Library   library;

@@ -51,7 +51,6 @@ static struct timeval cur_end_time;
 
 #define PREFETCH_2048(x) \
     { int *pfetcha = (int *) x; \
-        int pfetchtmp; \
         prefetchnta( pfetcha ); \
         prefetchnta( pfetcha + 64 ); \
         prefetchnta( pfetcha + 128 ); \
@@ -61,7 +60,9 @@ static struct timeval cur_end_time;
         prefetchnta( pfetcha + 64 ); \
         prefetchnta( pfetcha + 128 ); \
         prefetchnta( pfetcha + 192 ); }
-/*
+
+#define READ_PREFETCH_2048(x) \
+    { int *pfetcha = (int *) x; int pfetchtmp; \
         pfetchtmp = pfetcha[ 0 ] + pfetcha[ 16 ] + pfetcha[ 32 ] + pfetcha[ 48 ] + \
             pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
             pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
@@ -71,7 +72,6 @@ static struct timeval cur_end_time;
             pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
             pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
             pfetcha[ 192 ] + pfetcha[ 208 ] + pfetcha[ 224 ] + pfetcha[ 240 ]; }
-*/
 
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
@@ -404,16 +404,6 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
       "movq 40(%0), %%mm5\n"
       "movq 48(%0), %%mm6\n"
       "movq 56(%0), %%mm7\n"
-/*
-      "movntq %%mm0, (%1)\n"
-      "movntq %%mm1, 8(%1)\n"
-      "movntq %%mm2, 16(%1)\n"
-      "movntq %%mm3, 24(%1)\n"
-      "movntq %%mm4, 32(%1)\n"
-      "movntq %%mm5, 40(%1)\n"
-      "movntq %%mm6, 48(%1)\n"
-      "movntq %%mm7, 56(%1)\n"
-*/
       "movq %%mm0, (%1)\n"
       "movq %%mm1, 8(%1)\n"
       "movq %%mm2, 16(%1)\n"
@@ -428,7 +418,7 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
     }
      /* since movntq is weakly-ordered, a "sfence"
      * is needed to become ordered again. */
-    //__asm__ __volatile__ ("sfence":::"memory");
+    /* __asm__ __volatile__ ("sfence":::"memory"); */
     __asm__ __volatile__ ("emms":::"memory");
   }
   /*
@@ -541,8 +531,8 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
     }
 
     SPEEDY_START();
-    PREFETCH_2048( input );
-    PREFETCH_2048( foreground );
+    READ_PREFETCH_2048( input );
+    READ_PREFETCH_2048( foreground );
 
     movq_m2r( alpha, mm2 );
     pshufw_r2r( mm2, mm2, 0 );
@@ -675,8 +665,8 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
     int i;
 
     SPEEDY_START();
-    PREFETCH_2048( input );
-    PREFETCH_2048( foreground );
+    READ_PREFETCH_2048( input );
+    READ_PREFETCH_2048( foreground );
 
     pxor_r2r( mm7, mm7 );
     for( i = width/2; i; i-- ) {
@@ -841,11 +831,6 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
             por_r2r( mm7, mm5 );
             packuswb_r2r( mm5, mm5 );
             movd_r2m( mm5, *output );
-/*
-            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
-                                       | (multiply_alpha( a, textcb ) << 16)
-                                       | (multiply_alpha( a, textluma ) << 8) | a;
-*/
         } else if( a ) {
 /*
             movd_m2r( a, mm0 );
