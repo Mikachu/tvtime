@@ -77,7 +77,7 @@ configuration file and the default runtime keybindings.
     Fullscreen toggle                     f
     Aspect ratio toggle                   a
     Take a screenshot                     s
-    Change overscan level                 < and >
+    Change overscan compensation          < and >
     Load next preset settings mode        *
 
   Video input keys
