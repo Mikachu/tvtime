@@ -86,7 +86,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     }
 
     vs->verbose = verbose;
-    vs->x = 0;
+    vs->x = ( video_width * 10 ) / 100;
     vs->y = 0;
     vs->frame_width = video_width;
     vs->frame_height = video_height;
