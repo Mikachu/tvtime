@@ -1,26 +1,31 @@
 <?xml version="1.0"?>
 <tvtime xmlns="http://tvtime.sourceforge.net/DTD/">
 
-  <!-- Default $HOME/.tvtime/tvtime.xml configuration file.
-       Do not edit this config file while tvtime is running, it
-       will be overwritten during runtime to update program settings. -->
+  <!--
+    Default $HOME/.tvtime/tvtime.xml configuration file.
+    Do not edit this config file while tvtime is running, it
+    will be overwritten during runtime to update program settings.
+  -->
 
 
-  <!-- The verbose setting indicates that we should print full informational
-       and warning messages to stderr while running tvtime.  Otherwise, only
-       fatal errors will be printed to the output. -->
+  <!--
+    The verbose setting indicates that we should print full informational
+    and warning messages to stderr while running tvtime.  Otherwise, only
+    fatal errors will be printed to the output.
+  -->
   <option name="Verbose" value="0"/>
 
 
   <!-- This sets the default capture device to use. -->
   <option name="V4LDevice" value="/dev/video0"/>
 
-  <!-- This sets the default capture card input to be opened by tvtime.
-       For example, for my WinTV card has the tuner as source 0, and
-       its composite input as source 1.  Sources can be changed at runtime
-       using the 'toggle_input' command, defaulting to a key
-       command of 'i'. -->
-  <option name="CaptureSource" value="0"/>
+  <!--
+    This sets the default capture card input to be opened by tvtime.
+    For example, for my WinTV card has the tuner as source 0, and
+    its composite input as source 1.  Sources can be changed at runtime
+    using the 'toggle_input' command, defaulting to a key command of 'i'.
+  -->
+  <option name="V4LInput" value="0"/>
 
 
   <!-- Default to an 800x600 window. -->
@@ -34,7 +39,7 @@
   <option name="VBIDevice" value="/dev/vbi0"/>
   <option name="UseVBI" value="0"/>
   <option name="ProcessPriority" value="-19"/>
-  <option name="Fullscreen" value="0"/>
+  <option name="StartFullscreen" value="0"/>
   <option name="FramerateMode" value="0"/>
   <option name="Norm" value="NTSC"/>
   <option name="Frequencies" value="US-Cable"/>

@@ -220,7 +220,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->vbidev = strdup( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "CaptureSource" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "V4LInput" ) ) {
             ct->inputnum = atoi( curval );
         }
 
@@ -232,7 +232,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->priority = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "Fullscreen" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "StartFullscreen" ) ) {
             ct->fullscreen = atoi( curval );
         }
 
