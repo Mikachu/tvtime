@@ -1089,6 +1089,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
                 unsigned int depth;
                 int i, score= 0;
                 
+                XLowerWindow( display, fs_window );
                 XQueryTree(display, wm_window, &root, &parent, &children, &nchildren);
                 XFree( children );
                 XQueryTree(display, root, &root, &parent, &children, &nchildren);
