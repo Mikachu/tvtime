@@ -754,6 +754,14 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
     SPEEDY_END();
 }
 
+/**
+ * um... just need some scrap paper...
+ *   D = (1 - alpha)*B + alpha*F
+ *   D = (1 - a)*B + a*textluma
+ *     = B - a*B + a*textluma
+ *     = B + a*(textluma - B)
+ *   Da = (1 - a)*b + a
+ */
 void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
                                                    unsigned char *input,
                                                    unsigned char *mask,
@@ -777,9 +785,9 @@ void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
                                        | (multiply_alpha( a, textluma ) << 8) | a;
         } else if( a ) {
             *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
-                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
-                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
-                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+                                       | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
+                                       | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
+                                       |  (input[ 0 ] + multiply_alpha( a, 0xff - input[ 0 ] ));
         }
         mask++;
         output += 4;
@@ -796,8 +804,8 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
                                                    int textcr )
 {
     unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
-    const uint64_t round  = 0x0080008000800080;
-    int i;
+    const uint64_t round = 0x0080008000800080;
+    const uint64_t fullalpha = 0x00000000000000ff;
 
     SPEEDY_START();
 
@@ -815,47 +823,57 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
     // mm1 = [ cr ][ cb ][ y ][ 0 ]
     por_r2r( mm2, mm1 );
     por_r2r( mm3, mm1 );
+    movq_r2r( mm1, mm0 );
+    // mm0 = [ cr ][ cb ][ y ][ 0xff ]
+    paddw_m2r( fullalpha, mm0 );
 
-    for( i = 0; i < width; i++ ) {
+    pxor_r2r( mm7, mm7 );
+
+    while( width-- ) {
         int a = *mask;
 
         if( a == 0xff ) {
             *((unsigned int *) output) = opaque;
         } else if( (input[ 0 ] == 0x00) ) {
-            movd_m2r( a, mm0 );
-            movq_r2r( mm0, mm7 );
-            pshufw_r2r( mm0, mm0, 0 );
+            movd_m2r( a, mm2 );
+            movq_r2r( mm2, mm3 );
+            pshufw_r2r( mm2, mm2, 0 );
             movq_r2r( mm1, mm5 );
-            pmullw_r2r( mm0, mm5 );
+            pmullw_r2r( mm2, mm5 );
             paddw_m2r( round, mm5 );
             movq_r2r( mm5, mm6 );
             psrlw_i2r( 8, mm6 );
             paddw_r2r( mm6, mm5 );
             psrlw_i2r( 8, mm5 );
-            por_r2r( mm7, mm5 );
+            por_r2r( mm3, mm5 );
             packuswb_r2r( mm5, mm5 );
             movd_r2m( mm5, *output );
         } else if( a ) {
-/*
-            movd_m2r( a, mm0 );
-            movq_r2r( mm0, mm7 );
-            pshufw_r2r( mm0, mm0, 0 );
-            movq_r2r( mm1, mm5 );
+            // mm2 = [ a ][ a ][ a ][ a ]
+            movd_m2r( a, mm2 );
+            pshufw_r2r( mm2, mm2, 0 );
 
-            pmullw_r2r( mm0, mm5 );
-            paddw_m2r( round, mm5 );
-            movq_r2r( mm5, mm6 );
-            psrlw_i2r( 8, mm6 );
-            paddw_r2r( mm6, mm5 );
-            psrlw_i2r( 8, mm5 );
-            por_r2r( mm7, mm5 );
-            packuswb_r2r( mm5, mm5 );
-            movd_r2m( mm5, *output );
-*/
-            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
-                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
-                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
-                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+            // mm3 = [ cr ][ cb ][ y ][ 0xff ]
+            movq_r2r( mm0, mm3 );
+
+            //  mm4 = [ i_cr ][ i_cb ][ i_y ][ i_a ]
+            movd_m2r( *input, mm4 );
+            punpcklbw_r2r( mm7, mm4 );
+            movq_r2r( mm4, mm5 );
+
+            // Multiply alpha.
+            psubusw_r2r( mm4, mm3 );
+            pmullw_r2r( mm2, mm3 );
+            paddw_m2r( round, mm3 );
+            movq_r2r( mm3, mm2 );
+            psrlw_i2r( 8, mm2 );
+            paddw_r2r( mm2, mm3 );
+            psrlw_i2r( 8, mm3 );
+            paddw_r2r( mm3, mm4 );
+
+            // Write result.
+            packuswb_r2r( mm4, mm4 );
+            movd_r2m( mm4, *output );
         }
         mask++;
         output += 4;
