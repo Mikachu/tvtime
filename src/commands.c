@@ -1042,7 +1042,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle NTSC cable mode", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Change NTSC cable mode", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
@@ -1373,20 +1373,20 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu = menu_new( "filters" );
     menu_set_text( menu, 0, "Setup - Video processing - Input filters" );
     if( cmd->apply_luma ) {
-        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xa5 );
+        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
     } else {
-        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xa4 );
+        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
     menu_set_right_command( menu, 1, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xa4 );
+    sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_TOGGLE_COLOUR_INVERT, "" );
     menu_set_right_command( menu, 2, TVTIME_TOGGLE_COLOUR_INVERT, "" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xa4 );
+    sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
     menu_set_right_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
@@ -2321,9 +2321,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char string[ 128 ];
 
             if( cmd->apply_invert ) {
-                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xa5 );
+                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb7 );
             } else {
-                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xa4 );
+                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
             }
             menu_set_text( filtermenu, 2, string );
             commands_refresh_menu( cmd );
@@ -2343,9 +2343,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char string[ 128 ];
 
             if( cmd->apply_mirror ) {
-                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xa5 );
+                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb7 );
             } else {
-                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xa4 );
+                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
             }
             menu_set_text( filtermenu, 3, string );
             commands_refresh_menu( cmd );
@@ -2365,9 +2365,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char string[ 128 ];
 
             if( cmd->apply_luma ) {
-                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xa5 );
+                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
             } else {
-                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xa4 );
+                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
             }
             menu_set_text( filtermenu, 1, string );
             commands_refresh_menu( cmd );

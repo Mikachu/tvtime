@@ -937,9 +937,9 @@ static void build_pulldown_menu( menu_t *menu, int pulldownactive )
     char string[ 128 ];
 
     if( pulldownactive ) {
-        snprintf( string, sizeof( string ), "%c%c%c  2-3 Pulldown Inversion", 0xee, 0x80, 0xa5 );
+        snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb7 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  2-3 Pulldown Inversion", 0xee, 0x80, 0xa4 );
+        snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb8 );
     }
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
