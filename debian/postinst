@@ -10,8 +10,7 @@ if [ "$action" = "configure" ]; then
     . /usr/share/debconf/confmodule
 
     if [ ! -e /etc/tvtime/tvtime.xml ]; then
-        cp /usr/share/doc/tvtime/examples/default.tvtime.xml.gz /etc/tvtime/tvtime.xml.gz
-        gunzip /etc/tvtime/tvtime.xml.gz
+        gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz > /etc/tvtime/tvtime.xml
     fi
 
     db_get tvtime/norm
