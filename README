@@ -25,6 +25,9 @@ computer monitor or projector.
   o   A super-slick on-screen-display for the complete television
       experience.
 
+  o   2-3 Pulldown detection for optimal quality viewing of film content
+      from NTSC sources.
+
 
   See the file docs/default.tvtime.xml for a default configuration file
 (place as ~/.tvtime/tvtime.xml) and the default runtime keybindings.  The
