@@ -33,6 +33,7 @@ struct config_s
     int verbose;
     int aspect;
     int debug;
+    int finetune;
 
     int apply_luma_correction;
     double luma_correction;
@@ -113,6 +114,7 @@ config_t *config_new( int argc, char **argv )
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
     ct->timeformat = strdup( "%r" );
+    ct->finetune = 0;
     ct->keymap = (int *) malloc( TVTIME_LAST * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -150,6 +152,8 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_SCREENSHOT ]     = 's';
     ct->keymap[ TVTIME_DEINTERLACINGMODE ] = 't';
     ct->keymap[ TVTIME_MENUMODE ]       = I_HOME;
+    ct->keymap[ TVTIME_FINETUNE_DOWN ]  = ',';
+    ct->keymap[ TVTIME_FINETUNE_UP ]    = '.';
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 245 );
@@ -269,6 +273,10 @@ void config_init( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "TimeFormat")) ) {
         free( ct->timeformat );
         ct->timeformat = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "FineTuneOffset")) ) {
+        ct->finetune = atoi( tmp );
     }
 
     config_init_keymap( ct );
@@ -528,6 +536,16 @@ void config_init_keymap( config_t *ct )
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_MENUMODE ] = key;
     }
+
+    if( (tmp = parser_get( &(ct->pf), "key_finetune_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_FINETUNE_DOWN ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_finetune_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_FINETUNE_UP ] = key;
+    }
    
 }
 
@@ -628,6 +646,11 @@ const char *config_get_v4l_freq( config_t *ct )
 const char *config_get_timeformat( config_t *ct )
 {
     return ct->timeformat;
+}
+
+int config_get_finetune( config_t *ct )
+{
+    return ct->finetune;
 }
 
 #ifdef TESTHARNESS

@@ -41,6 +41,14 @@ Norm = ntsc
 #    argentina
 Frequencies = us-cable
 
+# This sets a constant offset for all tuner frequencies, in kHz.
+# This value is always added to the frequency passed to the tuner (and may
+# be negative).  Note that since we take values in kHz, I don't think this
+# is compatible with the fine tuning parameters in xawtv, which likely
+# use the 1/16th MHz convention.  If you use a fine tuner value of '15' in
+# xawtv, first try '15*1000/16 = 937' here.
+FineTuneOffset = 0
+
 # This sets the initial width of the output window.
 OutputWidth = 800
 
@@ -126,6 +134,8 @@ DebugMode = 0
 # key_aspect                 = a
 # key_screenshot             = s
 # key_deinterlacing_mode     = t
+# key_finetune_down          = ,
+# key_finetune_up            = .
 
 key_quit                   = \0033
 key_channel_up             = \0421
@@ -152,4 +162,6 @@ key_fullscreen             = f
 key_aspect                 = a
 key_screenshot             = s
 key_deinterlacing_mode     = t
+key_finetune_down          = ,
+key_finetune_up            = .
 

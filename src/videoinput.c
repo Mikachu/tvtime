@@ -632,11 +632,11 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
     if (vidin->tuner.tuner > -1) {
         if (frequency < 0) return;
 
+        frequency *= 16;
+
         if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
             frequency /= 1000; /* switch to MHz */
         }
-
-        frequency *= 16;
 
         mute = mixer_conditional_mute();
 

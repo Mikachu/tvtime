@@ -212,13 +212,31 @@ void input_callback( input_t *in, InputEvent command, int arg )
              }
              break;
 
+         case TVTIME_FINETUNE_DOWN:
+         case TVTIME_FINETUNE_UP:
+             if( !videoinput_has_tuner( in->vidin ) && verbose ) {
+                 fprintf( stderr, "tvtime: Can't fine tune channel, "
+                          "no tuner available on this input!\n" );
+             } else if( videoinput_has_tuner( in->vidin ) ) {
+                 videoinput_set_tuner_freq( in->vidin, 
+                                            videoinput_get_tuner_freq( in->vidin ) +
+                                            config_get_finetune( in->cfg ) +
+                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
+                 if( in->osd ) {
+                     char message[ 200 ];
+                     sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+                     tvtime_osd_show_message( in->osd, message );
+                 }
+             }
+             break;
+
          case TVTIME_CHANNEL_UP: 
          case TVTIME_CHANNEL_DOWN:
              if( !videoinput_has_tuner( in->vidin ) ) {
                  if( verbose )
                      fprintf( stderr, 
                               "tvtime: Can't change channel, "
-                              "no tuner present!\n" );
+                              "no tuner available on this input!\n" );
              } else {
                  char timestamp[50];
                  time_t tm = time(NULL);
@@ -231,7 +249,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                      if( chanindex == start_index ) break;
 
                      videoinput_set_tuner_freq( in->vidin, 
-                                                chanlist[ chanindex ].freq );
+                                                chanlist[ chanindex ].freq +
+                                                config_get_finetune( in->cfg ) );
                      in->videohold = CHANNEL_HOLD;
                  } while( !videoinput_freq_present( in->vidin ) );
 
@@ -282,7 +301,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                  int rc = frequencies_find_current_index( in->vidin );
                  if( rc == -1 ) {
                      /* set to a known frequency */
-                     videoinput_set_tuner_freq( in->vidin, chanlist[ chanindex ].freq );
+                     videoinput_set_tuner_freq( in->vidin, chanlist[ chanindex ].freq +
+                                                config_get_finetune( in->cfg ) );
 
                      if( verbose ) fprintf( stderr, 
                                             "tvtime: Changing to channel %s.\n", 
@@ -360,7 +380,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                      if( found > -1 ) {
                          videoinput_set_tuner_freq( 
                              in->vidin, 
-                             chanlist[ chanindex ].freq );
+                             chanlist[ chanindex ].freq +
+                             config_get_finetune( in->cfg ) );
 
                          in->videohold = CHANNEL_HOLD;
 

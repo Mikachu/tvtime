@@ -451,7 +451,8 @@ int main( int argc, char **argv )
         int rc = frequencies_find_current_index( vidin );
         if( rc == -1 ) {
             /* set to a known frequency */
-            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq +
+                                       config_get_finetune( ct ) );
 
             if( verbose ) fprintf( stderr, 
                                    "tvtime: Changing to channel %s.\n", 

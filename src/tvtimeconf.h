@@ -49,6 +49,9 @@ enum tvtime_commands
     TVTIME_COLOUR_DOWN,
     TVTIME_COLOUR_UP,
 
+    TVTIME_FINETUNE_DOWN,
+    TVTIME_FINETUNE_UP,
+
     TVTIME_SHOW_BARS,
     TVTIME_SHOW_TEST,
     TVTIME_DEBUG,
@@ -75,6 +78,7 @@ int config_get_outputwidth( config_t *ct );
 int config_get_inputwidth( config_t *ct );
 int config_get_aspect( config_t *ct );
 int config_get_inputnum( config_t *ct );
+int config_get_finetune( config_t *ct );
 int config_get_apply_luma_correction( config_t *ct );
 double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
