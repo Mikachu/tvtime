@@ -948,6 +948,13 @@ void commands_next_frame( commands_t *in )
                 tvtime_osd_set_network_call( in->osd, station_get_current_network_call_letters( in->stationmgr ) );
             }
         }
+
+        if( in->osd ) {
+            tvtime_osd_set_show_name( in->osd, vbidata_get_program_name( in->vbi ) );
+            tvtime_osd_set_show_rating( in->osd, vbidata_get_program_rating( in->vbi ) );
+            tvtime_osd_set_show_start( in->osd, vbidata_get_program_start_time( in->vbi ) );
+            tvtime_osd_set_show_length( in->osd, vbidata_get_program_length( in->vbi ) );
+        }
     }
 
     in->printdebug = 0;

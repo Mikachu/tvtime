@@ -1357,7 +1357,7 @@ int main( int argc, char **argv )
 
     /* Open the VBI device. */
     if( usevbi ) {
-        vbidata = vbidata_new( config_get_vbidev( ct ), vs, osd, verbose );
+        vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
         if( !vbidata ) {
             fprintf( stderr, "tvtime: Could not create vbidata.\n" );
         } else {

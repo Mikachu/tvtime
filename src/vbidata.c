@@ -36,8 +36,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include "vbidata.h"
-#include "vbiscreen.h"
-#include "tvtimeosd.h"
 
 static int pll = 0;
 
@@ -45,7 +43,6 @@ struct vbidata_s
 {
     int fd;
     vbiscreen_t *vs;
-    tvtime_osd_t *osd;
     uint8_t buf[ 65536 ];
     int wanttop;
     int wanttext;
@@ -74,6 +71,8 @@ struct vbidata_s
     char program_name[ 33 ];
     char network_name[ 33 ];
     char call_letters[ 7 ];
+    char program_start_time[ 33 ];
+    char program_length[ 33 ];
     const char *rating;
     const char *program_type;
     int start_day;
@@ -236,9 +235,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
         }
         snprintf( vbi->program_name, sizeof( vbi->program_name ), "%s", packet + 2 );
-        if( vbi->osd ) {
-            tvtime_osd_set_show_name( vbi->osd, vbi->program_name );
-        }
     } else if( packet[ 0 ] == 0x03 && packet[ 1 ] == 0x03 ) {
         if( vbi->verbose ) {
             fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
@@ -297,10 +293,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             fprintf( stderr, "\n" );
         }
         vbi->rating = str;
-
-        if( vbi->osd ) {
-            tvtime_osd_set_show_rating( vbi->osd, vbi->rating );
-        }
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
         if( !strcmp( vbi->call_letters, packet + 2 ) ) {
             return;
@@ -316,7 +308,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         int day = packet[4];
         int hour = packet[3];
         int min = packet[2];
-        char str[32];
 
         if( vbi->verbose ) {
             fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
@@ -326,9 +317,8 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         vbi->start_day = day & 31;
         vbi->start_hour = hour & 31;
         vbi->start_min = hour & 63;
-        snprintf( str, 32, "%02d %s, %02d:%02d",
+        snprintf( vbi->program_start_time, sizeof( vbi->program_start_time ), "%02d %s, %02d:%02d",
                   day & 31, months[month & 15], hour & 31, min & 63 );
-        if( vbi->osd ) tvtime_osd_set_show_start( vbi->osd, str );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
         if( vbi->verbose ) {
             fprintf( stderr, "Program type: " );
@@ -356,14 +346,16 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         snprintf( vbi->program_desc[ packet[ 1 ] & 0xf ],
                   sizeof( vbi->program_desc[ packet[ 1 ] & 0xf ] ), "%s", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x02 ) {
-        char str[ 32 ];
-        str[0] = 0;
-        if( vbi->verbose ) fprintf( stderr, "Program Length: %02d:%02d", 
-                 packet[ 3 ] & 63, packet[ 2 ] & 63 ); 
+
+        if( vbi->verbose ) {
+            fprintf( stderr, "Program Length: %02d:%02d", 
+                     packet[ 3 ] & 63, packet[ 2 ] & 63 ); 
+        }
+
         vbi->length_hour = packet[ 3 ] & 63;
         vbi->length_min = packet[ 2 ] & 63;
-        snprintf( str, 32, "%02d:%02d", 
-                 packet[ 3 ] & 63, packet[ 2 ] & 63 );
+        snprintf( vbi->program_length, sizeof( vbi->program_length ),
+                  "%02d:%02d", packet[ 3 ] & 63, packet[ 2 ] & 63 );
         if( length > 4 ) {
             if( vbi->verbose ) {
                 fprintf( stderr, " Elapsed: %02d:%02d", packet[ 5 ] & 63, 
@@ -371,7 +363,8 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             }
             vbi->length_elapsed_hour = packet[ 5 ] & 63;
             vbi->length_elapsed_min = packet[ 4 ] & 63;
-            snprintf( str, 32, "%02d:%02d/%02d:%02d", 
+            snprintf( vbi->program_length, sizeof( vbi->program_length ),
+                      "%02d:%02d/%02d:%02d", 
                       packet[ 5 ] & 63, packet[ 4 ] & 63,
                       packet[ 3 ] & 63, packet[ 2 ] & 63 );
         } else {
@@ -382,14 +375,16 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( length > 6 ) {
             if( vbi->verbose ) fprintf( stderr, ".%02d", packet[ 6 ] & 63 );
             vbi->length_elapsed_hour = packet[ 6 ] & 63;
-            snprintf( str, 32, "%02d:%02d.%02d/%02d:%02d", 
+            snprintf( vbi->program_length, sizeof( vbi->program_length ),
+                      "%02d:%02d.%02d/%02d:%02d", 
                       packet[ 5 ] & 63, packet[ 4 ] & 63, packet[ 6 ] & 63, 
                       packet[ 3 ] & 63, packet[ 2 ] & 63 );
         } else {
             vbi->length_elapsed_hour = 0;
         }
-        if( vbi->osd ) tvtime_osd_set_show_length( vbi->osd, str );
-        if( vbi->verbose ) fprintf( stderr, "\n" );
+        if( vbi->verbose ) {
+            fprintf( stderr, "\n" );
+        }
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x04 ) {
         if( vbi->verbose ) fprintf( stderr, "Transmission Signal Identifier (TSID): 0x%04x\n",
                  packet[ 2 ] << 24 | packet[ 3 ] << 16 | packet[ 4 ] << 8 | packet[ 5 ] );
@@ -887,8 +882,7 @@ int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
     return 1;
 }
 
-vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
-                        tvtime_osd_t *osd, int verbose )
+vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose )
 {
     vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
 
@@ -905,7 +899,6 @@ vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs,
     }
 
     vbi->vs = vs;
-    vbi->osd = osd;
     vbi->verbose = verbose;
 
     vbidata_reset( vbi );
@@ -938,6 +931,8 @@ void vbidata_reset( vbidata_t *vbi )
     vbi->enabled = 0;
 
     memset( vbi->program_name, 0, sizeof( vbi->program_name ) );
+    memset( vbi->program_start_time, 0, sizeof( vbi->program_start_time ) );
+    memset( vbi->program_length, 0, sizeof( vbi->program_length ) );
     memset( vbi->network_name, 0, sizeof( vbi->network_name ) );
     memset( vbi->call_letters, 0, sizeof( vbi->call_letters ) );
     vbi->rating = "";
@@ -1081,6 +1076,16 @@ const char *vbidata_get_program_rating( vbidata_t *vbi )
 const char *vbidata_get_network_name( vbidata_t *vbi )
 {
     return vbi->network_name;
+}
+
+const char *vbidata_get_program_start_time( vbidata_t *vbi )
+{
+    return vbi->program_start_time;
+}
+
+const char *vbidata_get_program_length( vbidata_t *vbi )
+{
+    return vbi->program_length;
 }
 
 const char *vbidata_get_network_call_letters( vbidata_t *vbi )

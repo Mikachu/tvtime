@@ -27,7 +27,6 @@
 #define VBIDATA_H_INCLUDED
 
 #include "vbiscreen.h"
-#include "tvtimeosd.h"
 
 typedef struct vbidata_s vbidata_t;
 
@@ -41,8 +40,7 @@ typedef struct vbidata_s vbidata_t;
 #define CAPTURE_T3  8
 #define CAPTURE_T4  9
 
-vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
-                        tvtime_osd_t *osd, int verbose );
+vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose );
 
 void vbidata_delete( vbidata_t *vbi );
 void vbidata_reset( vbidata_t *vbi );
@@ -52,6 +50,8 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug );
 const char *vbidata_get_program_name( vbidata_t *vbi );
 const char *vbidata_get_program_type( vbidata_t *vbi );
 const char *vbidata_get_program_rating( vbidata_t *vbi );
+const char *vbidata_get_program_start_time( vbidata_t *vbi );
+const char *vbidata_get_program_length( vbidata_t *vbi );
 
 const char *vbidata_get_network_name( vbidata_t *vbi );
 const char *vbidata_get_network_call_letters( vbidata_t *vbi );
