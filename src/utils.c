@@ -56,6 +56,7 @@ ings in this Software without prior written authorization from him.
 #include <errno.h>
 #include <dirent.h>
 #include <pwd.h>
+#include <string.h>
 #include "tvtimeconf.h"
 #include "utils.h"
 

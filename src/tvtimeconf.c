@@ -533,6 +533,7 @@ static int conf_xml_parse( config_t *ct, char *configFile )
         node = node->next;
     }
 
+    xmlFreeDoc( doc );
     return 1;
 }
 
@@ -938,7 +939,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
-    char *configFile = 0;
     int saveoptions = 0;
     char c;
 
@@ -955,8 +955,14 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'v': ct->verbose = 1; break;
             case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
                       ct->xmltvfile = expand_user_path( optarg ); break;
-            case 'F': if( configFile ) { free( configFile ); }
-                      configFile = strdup( optarg ); break;
+            case 'F': if( ct->config_filename ) free( ct->config_filename );
+                      ct->config_filename = expand_user_path( optarg );
+                      if( ct->config_filename ) {
+                          fprintf( stderr, "config: Reading configuration from %s\n",
+                                  ct->config_filename );
+                          conf_xml_parse( ct, ct->config_filename );
+                      }
+                      break;
             case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
                       ct->rvr_filename = strdup( optarg ); break;
             case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
@@ -991,22 +997,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                 return 0;
             }
         }
-    }
-
-    /* Then read in additional settings. */
-    if( configFile ) {
-        char *temp = expand_user_path( configFile );
-        if( temp ) {
-            free( configFile );
-            configFile = temp;
-        }
-    }
-    if( configFile ) {
-        if( ct->config_filename ) free( ct->config_filename );
-        ct->config_filename = configFile;
-
-        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
-        conf_xml_parse( ct, configFile );
     }
 
     ct->doc = configsave_open( ct->config_filename );
@@ -1088,7 +1078,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
-    char *configFile = 0;
     char c;
 
     if( argc == 1 ) {
@@ -1102,8 +1091,14 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         case 'a': ct->aspect = 1; break;
         case 'm': ct->fullscreen = 1; break;
         case 'M': ct->fullscreen = 0; break;
-        case 'F': if( configFile ) { free( configFile ); }
-                  configFile = strdup( optarg ); break;
+        case 'F': if( ct->config_filename ) free( ct->config_filename );
+                  ct->config_filename = expand_user_path( optarg );
+                  if( ct->config_filename ) {
+                      fprintf( stderr, "config: Reading configuration from %s\n",
+                              ct->config_filename );
+                      conf_xml_parse( ct, ct->config_filename );
+                  }
+                  break;
         case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                   ct->mixerdev = strdup( optarg ); break;
         case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
@@ -1164,22 +1159,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
             print_config_usage( argv );
             return 0;
         }
-    }
-
-    /* Then read in additional settings. */
-    if( configFile ) {
-        char *temp = expand_user_path( configFile );
-        if( temp ) {
-            free( configFile );
-            configFile = temp;
-        }
-    }
-    if( configFile ) {
-        if( ct->config_filename ) free( ct->config_filename );
-        ct->config_filename = configFile;
-
-        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
-        conf_xml_parse( ct, configFile );
     }
 
     ct->doc = configsave_open( ct->config_filename );
@@ -1249,14 +1228,19 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **arg
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
-    char *configFile = 0;
     char c;
 
     while( (c = getopt_long( argc, argv, "hF:d:i:n:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
-        case 'F': if( configFile ) { free( configFile ); }
-                  configFile = strdup( optarg ); break;
+        case 'F': if( ct->config_filename ) free( ct->config_filename );
+                  ct->config_filename = expand_user_path( optarg );
+                  if( ct->config_filename ) {
+                      fprintf( stderr, "config: Reading configuration from %s\n",
+                              ct->config_filename );
+                      conf_xml_parse( ct, ct->config_filename );
+                  }
+                  break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
@@ -1264,22 +1248,6 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **arg
             print_scanner_usage( argv );
             return 0;
         }
-    }
-
-    /* Then read in additional settings. */
-    if( configFile ) {
-        char *temp = expand_user_path( configFile );
-        if( temp ) {
-            free( configFile );
-            configFile = temp;
-        }
-    }
-    if( configFile ) {
-        if( ct->config_filename ) free( ct->config_filename );
-        ct->config_filename = configFile;
-
-        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
-        conf_xml_parse( ct, configFile );
     }
 
     return 1;
