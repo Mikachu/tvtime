@@ -26,7 +26,7 @@ docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/tvtime-logo-banner.png html/tvtime.css \
 	html/usage.html html/why.html html/wsshot-small.jpg
 EXTRA_DIST = default.tvtime.xml example.lircrc $(man_MANS) $(docs_html) \
-	tvtime.16x16.png tvtime.32x32.png tvtime.48x48.png
+	tvtime.16x16.png tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
 
 # We use $(datadir)/applications from the freedesktop spec
 # http://www.freedesktop.org/standards/desktop-entry-spec/
@@ -42,6 +42,7 @@ install-data-local:
 	$(INSTALL) -d '$(DESTDIR)$(datadir)/pixmaps'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.16x16.png' '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.png' '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.xpm' '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.xpm'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
 
@@ -69,5 +70,6 @@ uninstall-hook:
 	-rmdir -p '$(DESTDIR)$(pkgsysconfdir)'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
+	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.xpm'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
 	-rm -f '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
