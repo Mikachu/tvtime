@@ -679,12 +679,9 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     time_t tm = time( 0 );
     char text[ 200 ];
     struct tm *curtime = localtime( &tm );
-    struct timeval tv;
 
     strftime( timestamp, 50, osd->timeformat, curtime );
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, osd->delay );
-
-    gettimeofday( &tv, 0 );
 
     if( osd->backdrop ) osd_graphic_set_timeout( osd->backdrop, osd->delay );
 
