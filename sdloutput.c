@@ -121,6 +121,17 @@ int sdl_poll_events( void )
     SDL_Event event;
     int curcommand = 0;
 
+    SDL_PumpEvents();
+    if( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_KEYDOWNMASK ) > 0 ) {
+        if( event.key.keysym.mod & KMOD_SHIFT ) {
+            SDL_PollEvent( &event );
+            curcommand |= TVTIME_CHANNEL_CHAR;
+
+            curcommand = (curcommand & 0xFF0000) | (event.key.keysym.sym & 0x0000FF);            
+            return curcommand;
+        }
+    }
+
     while( SDL_PollEvent( &event ) ) {
 
         if( event.type == SDL_QUIT ) {

@@ -47,6 +47,7 @@ enum tvtime_commands
     TVTIME_MIXER_DOWN    = (1<<17),
     TVTIME_DIGIT         = (1<<18),
     TVTIME_KP_ENTER      = (1<<19),
+    TVTIME_CHANNEL_CHAR  = (1<<20),
     TVTIME_DEBUG         = (1<<31)
 };
 
