@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003, 2005 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,26 +137,6 @@ extern void (*blend_packed422_scanline)( uint8_t *output, uint8_t *src1,
 extern unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *old, int width );
 
 /**
- * Calculates the 'comb factor' for a set of three scanlines.  This is a
- * metric where higher values indicate a more likely chance that the two
- * fields are at separate points in time.
- */
-extern unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
-                                                       uint8_t *bot, int width );
-
-/**
- * Vertical [1 2 1] chroma filter.
- */
-extern void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
-                                                      uint8_t *m, uint8_t *t, uint8_t *b );
-
-/**
- * Vertical [3 3 2] chroma filter.
- */
-extern void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
-                                                      uint8_t *m, uint8_t *t, uint8_t *b );
-
-/**
  * Sets the chroma of the scanline to neutral (128) in-place.
  */
 extern void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
@@ -179,25 +159,11 @@ extern void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
                                         uint8_t *new, int os, int ns );
 
 /**
- * Takes an alpha mask and subpixelly blits it using linear
- * interpolation.
- */
-extern void (*a8_subpix_blit_scanline)( uint8_t *output, uint8_t *input,
-                                        int lasta, int startpos, int width );
-
-/**
  * 1/4 vertical subpixel blit for packed 4:2:2 scanlines using linear
  * interpolation.
  */
 extern void (*quarter_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *one,
                                                          uint8_t *three, int width );
-
-/**
- * Vertical subpixel blit for packed 4:2:2 scanlines using linear
- * interpolation.
- */
-extern void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
-                                                        uint8_t *bot, int subpixpos, int width );
 
 /**
  * Simple function to convert a 4:4:4 scanline to a 4:4:4:4 scanline by

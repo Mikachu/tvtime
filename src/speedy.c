@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003, 2005 Billy Biggs <vektor@dumbterm.net>.
  * Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -79,18 +79,12 @@ void (*premultiply_packed4444_scanline)( uint8_t *output, uint8_t *input, int wi
 void (*blend_packed422_scanline)( uint8_t *output, uint8_t *src1,
                                   uint8_t *src2, int width, int pos );
 unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *old, int width );
-unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
-                                                uint8_t *bot, int width );
 void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
                                  uint8_t *new, int os, int ns );
-void (*a8_subpix_blit_scanline)( uint8_t *output, uint8_t *input,
-                                 int lasta, int startpos, int width );
 void (*quarter_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *one,
                                                   uint8_t *three, int width );
-void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
-                                                 uint8_t *bot, int subpixpos, int width );
 void (*packed444_to_nonpremultiplied_packed4444_scanline)( uint8_t *output, 
                                                            uint8_t *input,
                                                            int width, int alpha );
@@ -117,10 +111,6 @@ void (*rgba32_to_packed4444_rec601_scanline)( uint8_t *output,
                                               uint8_t *input,
                                               int width );
 void (*invert_colour_packed422_inplace_scanline)( uint8_t *data, int width );
-void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
-                                               uint8_t *m, uint8_t *t, uint8_t *b );
-void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
-                                               uint8_t *m, uint8_t *t, uint8_t *b );
 void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width );
 void (*composite_colour4444_alpha_to_packed422_scanline)( uint8_t *output, uint8_t *input,
                                                           int af, int y, int cb, int cr,
@@ -149,90 +139,6 @@ static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
         return x;
     }
 }
-
-unsigned long CombJaggieThreshold = 73;
-
-#ifdef ARCH_X86
-static unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
-                                                        uint8_t *bot, int width )
-{
-    const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
-    const mmx_t qwOnes = { 0x0001000100010001ULL };
-    mmx_t qwThreshold;
-    unsigned int temp1, temp2;
-
-    width /= 4;
-
-    qwThreshold.uw[ 0 ] = CombJaggieThreshold;
-    qwThreshold.uw[ 1 ] = CombJaggieThreshold;
-    qwThreshold.uw[ 2 ] = CombJaggieThreshold;
-    qwThreshold.uw[ 3 ] = CombJaggieThreshold;
-
-    movq_m2r( qwThreshold, mm0 );
-    movq_m2r( qwYMask, mm1 );
-    movq_m2r( qwOnes, mm2 );
-    pxor_r2r( mm7, mm7 );         /* mm7 = 0. */
-
-    while( width-- ) {
-        /* Load and keep just the luma. */
-        movq_m2r( *top, mm3 );
-        movq_m2r( *mid, mm4 );
-        movq_m2r( *bot, mm5 );
-
-        pand_r2r( mm1, mm3 );
-        pand_r2r( mm1, mm4 );
-        pand_r2r( mm1, mm5 );
-
-        /* Work out mm6 = (top - mid) * (bot - mid) - ( (top - mid)^2 >> 7 ) */
-        psrlw_i2r( 1, mm3 );
-        psrlw_i2r( 1, mm4 );
-        psrlw_i2r( 1, mm5 );
-
-        /* mm6 = (top - mid) */
-        movq_r2r( mm3, mm6 );
-        psubw_r2r( mm4, mm6 );
-
-        /* mm3 = (top - bot) */
-        psubw_r2r( mm5, mm3 );
-
-        /* mm5 = (bot - mid) */
-        psubw_r2r( mm4, mm5 );
-
-        /* mm6 = (top - mid) * (bot - mid) */
-        pmullw_r2r( mm5, mm6 );
-
-        /* mm3 = (top - bot)^2 >> 7 */
-        pmullw_r2r( mm3, mm3 );   /* mm3 = (top - bot)^2 */
-        psrlw_i2r( 7, mm3 );      /* mm3 = ((top - bot)^2 >> 7) */
-
-        /* mm6 is what we want. */
-        psubw_r2r( mm3, mm6 );
-
-        /* FF's if greater than qwTheshold */
-        pcmpgtw_r2r( mm0, mm6 );
-
-        /* Add to count if we are greater than threshold */
-        pand_r2r( mm2, mm6 );
-        paddw_r2r( mm6, mm7 );
-
-        top += 8;
-        mid += 8;
-        bot += 8;
-    }
-
-    movd_r2m( mm7, temp1 );
-    psrlq_i2r( 32, mm7 );
-    movd_r2m( mm7, temp2 );
-    temp1 += temp2;
-    temp2 = temp1;
-    temp1 >>= 16;
-    temp1 += temp2 & 0xffff;
-
-    emms();
-
-    return temp1;
-}
-#endif
 
 static unsigned long BitShift = 6;
 
@@ -557,146 +463,6 @@ static void packed422_to_packed444_rec601_scanline_c( uint8_t *dest, uint8_t *sr
             dest[ (i*6) + 4 ] = src[ (i*4) + 1 ];
             dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
-    }
-}
-
-#ifdef ARCH_X86
-static void vfilter_chroma_121_packed422_scanline_mmx( uint8_t *output, int width,
-                                                       uint8_t *m, uint8_t *t, uint8_t *b )
-{
-    int i;
-    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
-    const mmx_t cmask = { 0xff00ff00ff00ff00ULL };
-
-    // Get width in bytes.
-    width *= 2;
-    i = width / 8;
-    width -= i * 8;
-
-    movq_m2r( ymask, mm7 );
-    movq_m2r( cmask, mm6 );
-
-    while( i-- ) {
-        movq_m2r( *t, mm0 );
-        movq_m2r( *b, mm1 );
-        movq_m2r( *m, mm2 );
-
-        movq_r2r ( mm2, mm3 );
-        pand_r2r ( mm7, mm3 );
-
-        pand_r2r ( mm6, mm0 );
-        pand_r2r ( mm6, mm1 );
-        pand_r2r ( mm6, mm2 );
-
-        psrlq_i2r( 8, mm0 );
-        psrlq_i2r( 8, mm1 );
-        psrlq_i2r( 7, mm2 );
-
-        paddw_r2r( mm0, mm2 );
-        paddw_r2r( mm1, mm2 );
-
-        psllw_i2r( 6, mm2 );
-        pand_r2r( mm6, mm2 ); 
-
-        por_r2r ( mm3, mm2 );
-
-        movq_r2m( mm2, *output );
-        output += 8;
-        t += 8;
-        b += 8;
-        m += 8;
-    }
-    output++; t++; b++; m++;
-    while( width-- ) {
-        *output = (*t + *b + (*m << 1)) >> 2;
-        output+=2; t+=2; b+=2; m+=2;
-    }
-    
-    emms();
-}
-#endif
-
-static void vfilter_chroma_121_packed422_scanline_c( uint8_t *output, int width,
-                                                     uint8_t *m, uint8_t *t, uint8_t *b )
-{
-    output++; t++; b++; m++;
-    while( width-- ) {
-        *output = (*t + *b + (*m << 1)) >> 2;
-        output +=2; t+=2; b+=2; m+=2;
-    }
-}
-
-#ifdef ARCH_X86
-static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
-                                                       uint8_t *m, uint8_t *t, uint8_t *b )
-{
-    int i;
-    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
-    const mmx_t cmask = { 0xff00ff00ff00ff00ULL };
-
-    // Get width in bytes.
-    width *= 2; 
-    i = width / 8;
-    width -= i * 8;
-
-    movq_m2r( ymask, mm7 );
-    movq_m2r( cmask, mm6 );
-
-    while( i-- ) {
-        movq_m2r( *t, mm0 );
-        movq_m2r( *b, mm1 );
-        movq_m2r( *m, mm2 );
-
-        movq_r2r ( mm2, mm3 );
-        pand_r2r ( mm7, mm3 );
-
-        pand_r2r ( mm6, mm0 );
-        pand_r2r ( mm6, mm1 );
-        pand_r2r ( mm6, mm2 );
-
-        psrlq_i2r( 8, mm0 );
-        psrlq_i2r( 7, mm1 );
-        psrlq_i2r( 8, mm2 );
-
-        movq_r2r ( mm0, mm4 );
-        psllw_i2r( 1, mm4 );
-        paddw_r2r( mm4, mm0 );
-
-        movq_r2r ( mm2, mm4 );
-        psllw_i2r( 1, mm4 );
-        paddw_r2r( mm4, mm2 );
-
-        paddw_r2r( mm0, mm2 );
-        paddw_r2r( mm1, mm2 );
-
-        psllw_i2r( 5, mm2 );
-        pand_r2r( mm6, mm2 );
-
-        por_r2r ( mm3, mm2 );
-
-        movq_r2m( mm2, *output );
-        output += 8;
-        t += 8;
-        b += 8;
-        m += 8;
-    }
-    output++; t++; b++; m++;
-    while( width-- ) {
-        *output = (3 * *t + 3 * *m + 2 * *b) >> 3;
-        output +=2; t+=2; b+=2; m+=2;
-    }
-
-    emms();
-}
-#endif
-
-static void vfilter_chroma_332_packed422_scanline_c( uint8_t *output, int width,
-                                                     uint8_t *m, uint8_t *t, uint8_t *b )
-{
-    output++; t++; b++; m++;
-    while( width-- ) {
-        *output = (3 * *t + 3 * *m + 2 * *b) >> 3;
-        output +=2; t+=2; b+=2; m+=2;
     }
 }
 
@@ -1884,38 +1650,6 @@ static void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t
     }
 }
 
-static void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
-                                                       uint8_t *bot, int subpixpos, int width )
-{
-    if( subpixpos == 32768 ) {
-        interpolate_packed422_scanline( output, top, bot, width );
-    } else if( subpixpos == 16384 ) {
-        quarter_blit_vertical_packed422_scanline( output, top, bot, width );
-    } else if( subpixpos == 49152 ) {
-        quarter_blit_vertical_packed422_scanline( output, bot, top, width );
-    } else {
-        int x;
-
-        width *= 2;
-        for( x = 0; x < width; x++ ) {
-            output[ x ] = ( ( top[ x ] * subpixpos ) + ( bot[ x ] * ( 0xffff - subpixpos ) ) ) >> 16;
-        }
-    }
-}
-
-static void a8_subpix_blit_scanline_c( uint8_t *output, uint8_t *input,
-                                       int lasta, int startpos, int width )
-{
-    int pos = 0xffff - (startpos & 0xffff);
-    int prev = lasta;
-    int x;
-
-    for( x = 0; x < width; x++ ) {
-        output[ x ] = ( ( prev * pos ) + ( input[ x ] * ( 0xffff - pos ) ) ) >> 16;
-        prev = input[ x ];
-    }
-}
-
 /**
  * These are from lavtools in mjpegtools:
  *
@@ -2230,14 +1964,11 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
-    comb_factor_packed422_scanline = 0;
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
-    a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
     quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
-    subpix_blit_vertical_packed422_scanline = subpix_blit_vertical_packed422_scanline_c;
     packed444_to_nonpremultiplied_packed4444_scanline = packed444_to_nonpremultiplied_packed4444_scanline_c;
     aspect_adjust_packed4444_scanline = aspect_adjust_packed4444_scanline_c;
     packed444_to_packed422_scanline = packed444_to_packed422_scanline_c;
@@ -2247,8 +1978,6 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     rgb24_to_packed444_rec601_scanline = rgb24_to_packed444_rec601_scanline_c;
     rgba32_to_packed4444_rec601_scanline = rgba32_to_packed4444_rec601_scanline_c;
     invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_c;
-    vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_c;
-    vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
     convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_c;
     composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_c;
 
@@ -2266,12 +1995,9 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         blend_packed422_scanline = blend_packed422_scanline_mmxext;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
-        comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_mmxext;
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
-        vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
-        vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
         composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
@@ -2281,12 +2007,9 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
-        comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
-        vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
-        vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
     } else {
         if( verbose ) {
