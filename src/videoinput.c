@@ -347,7 +347,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
     vidin->signal_recover_wait = 0;
     vidin->signal_aquire_wait = 0;
-    vidin->muted = 0;
+    vidin->muted = 1;
     vidin->user_muted = 0;
 
     /* First, open the device. */
@@ -683,6 +683,9 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 
         vidin->muted = 1;
         videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+        vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
+        vidin->signal_aquire_wait = SIGNAL_AQUIRE_DELAY;
+        vidin->signal_recover_wait = 0;
 
         if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
@@ -870,12 +873,16 @@ int videoinput_check_for_signal( videoinput_t *vidin )
         case TUNER_STATE_SIGNAL_DETECTED:
             if( vidin->signal_aquire_wait ) {
                 vidin->signal_aquire_wait--;
+                break;
             } else {
                 vidin->cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+            }
+        default:
+            if( vidin->muted ) {
                 vidin->muted = 0;
                 videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
             }
-        default: break;
+            break;
         }
     } else {
         switch( vidin->cur_tuner_state ) {
