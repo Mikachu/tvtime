@@ -16,6 +16,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,5 +35,41 @@ int file_is_openable_for_read( const char *filename )
         close( fd );
         return 1;
     }
+}
+
+static char *check_path( const char *path, const char *filename )
+{
+    char *cur;
+
+    if( asprintf( &cur, "%s/%s", path, filename ) < 0 ) {
+        /* Memory not available, so we're not getting anywhere. */
+        return 0;
+    } else if( !file_is_openable_for_read( cur ) ) {
+        free( cur );
+        return 0;
+    }
+
+    return cur;
+}
+
+const char *get_tvtime_paths( void )
+{
+    return DATADIR ":../data:./data";
+}
+
+char *get_tvtime_file( const char *filename )
+{
+    char *cur;
+
+    cur = check_path( DATADIR, filename );
+    if( cur ) return cur;
+
+    cur = check_path( "../data", filename );
+    if( cur ) return cur;
+
+    cur = check_path( "./data", filename );
+    if( cur ) return cur;
+
+    return 0;
 }
 

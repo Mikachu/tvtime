@@ -22,6 +22,23 @@
 /**
  * Useful functions that don't belong anywhere else.
  */
+
+/**
+ * Returns true if the file is openable for read.
+ */
 int file_is_openable_for_read( const char *filename );
+
+/**
+ * Returns a string for the location of the given file, checking
+ * paths that may be used before make install.  Returns 0 if the
+ * file is not found, otherwise returns a new string that must be
+ * freed using free().
+ */
+char *get_tvtime_file( const char *filename );
+
+/**
+ * Returns the standard path list for tvtime.
+ */
+const char *get_tvtime_paths( void );
 
 #endif /* UTILS_H_INCLUDED */
