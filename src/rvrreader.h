@@ -14,7 +14,9 @@ int rvrreader_get_width( rvrreader_t *reader );
 int rvrreader_get_height( rvrreader_t *reader );
 
 int rvrreader_next_frame( rvrreader_t *reader );
-int rvrreader_get_curframe( rvrreader_t *reader );
-int rvrreader_decode_curframe( rvrreader_t *reader, unsigned char *data );
+
+unsigned char *rvrreader_get_curframe( rvrreader_t *reader );
+unsigned char *rvrreader_get_lastframe( rvrreader_t *reader );
+unsigned char *rvrreader_get_secondlastframe( rvrreader_t *reader );
 
 #endif /* RVRREADER_H_INCLUDED */

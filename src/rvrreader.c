@@ -17,11 +17,15 @@ struct rvrreader_s
     ree_packet_t *pkt;
     int dataread;
     int curframe;
+    unsigned char *framebuf[ 3 ];
+    int curdecoded;
+    unsigned char *decoded[ 3 ];
 };
 
 rvrreader_t *rvrreader_new( const char *filename )
 {
     rvrreader_t *reader = (rvrreader_t *) malloc( sizeof( rvrreader_t ) );
+    int width, height;
 
     if( !reader ) return 0;
 
@@ -55,6 +59,22 @@ rvrreader_t *rvrreader_new( const char *filename )
 
     reader->curframe = 0;
 
+    width = rvrreader_get_width( reader );
+    height = rvrreader_get_height( reader );
+    reader->decoded[ 0 ] = (unsigned char *) malloc( width * height * 2 );
+    reader->decoded[ 1 ] = (unsigned char *) malloc( width * height * 2 );
+    reader->decoded[ 2 ] = (unsigned char *) malloc( width * height * 2 );
+    reader->curdecoded = 0;
+
+    if( !reader->decoded[ 0 ] || !reader->decoded[ 1 ] || !reader->decoded[ 2 ] ) {
+        rvrreader_delete( reader );
+        return 0;
+    }
+
+    reader->framebuf[ 0 ] = reader->decoded[ 0 ];
+    reader->framebuf[ 1 ] = reader->decoded[ 1 ];
+    reader->framebuf[ 2 ] = reader->decoded[ 2 ];
+
     /* Read first packet. */
     reader->dataread = 0;
     read( reader->fd, reader->pkt, sizeof( ree_packet_header_t ) );
@@ -63,6 +83,7 @@ rvrreader_t *rvrreader_new( const char *filename )
 
 void rvrreader_delete( rvrreader_t *reader )
 {
+    /* FIXME: Free all memory. */
     close( reader->fd );
     free( reader );
 }
@@ -80,11 +101,6 @@ int rvrreader_get_width( rvrreader_t *reader )
 int rvrreader_get_height( rvrreader_t *reader )
 {
     return reader->fhdr->height;
-}
-
-int rvrreader_get_curframe( rvrreader_t *reader )
-{
-    return reader->curframe;
 }
 
 static int rvrreader_next_packet( rvrreader_t *reader )
@@ -115,22 +131,31 @@ int rvrreader_next_frame( rvrreader_t *reader )
 {
     while( rvrreader_next_packet( reader ) > 0 ) {
         if( ree_is_video_packet( reader->pkt ) ) {
+            reader->curdecoded = (reader->curdecoded + 1) % 3;
+            ree_decode_video_packet( rvrreader_cur_packet( reader ),
+                                     reader->decoded[ reader->curdecoded ],
+                                     rvrreader_get_width( reader ), rvrreader_get_height( reader ) );
+            reader->framebuf[ 0 ] = reader->decoded[ reader->curdecoded ];
+            reader->framebuf[ 1 ] = reader->decoded[ (reader->curdecoded + 3 - 1) % 3 ];
+            reader->framebuf[ 2 ] = reader->decoded[ (reader->curdecoded + 3 - 2) % 3 ];
             return 1;
         }
     }
     return 0;
 }
 
-int rvrreader_decode_curframe( rvrreader_t *reader, unsigned char *data )
+unsigned char *rvrreader_get_curframe( rvrreader_t *reader )
 {
-    int width = rvrreader_get_width( reader );
-    int height = rvrreader_get_height( reader );
+    return reader->framebuf[ 0 ];
+}
 
-    if( !ree_is_video_packet( reader->pkt ) ) {
-        ree_decode_video_packet( rvrreader_cur_packet( reader ), data, width, height );
-        return 1;
-    }
+unsigned char *rvrreader_get_lastframe( rvrreader_t *reader )
+{
+    return reader->framebuf[ 1 ];
+}
 
-    return 0;
+unsigned char *rvrreader_get_secondlastframe( rvrreader_t *reader )
+{
+    return reader->framebuf[ 2 ];
 }
 
