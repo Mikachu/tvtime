@@ -217,7 +217,11 @@ static int dfb_set_input_size( int inputwidth, int inputheight )
 
      /* Set configuration accroding to input data */
      dlc.flags = DLCONF_BUFFERMODE | DLCONF_WIDTH | DLCONF_HEIGHT | DLCONF_PIXELFORMAT | DLCONF_OPTIONS;
+#ifdef DIRECTFB_HAS_TRIPLE
      dlc.buffermode = DLBM_TRIPLE;
+#else
+    dlc.buffermode = DLBM_BACKVIDEO;
+#endif
      dlc.width = input_width;
      dlc.height = input_height;
      dlc.pixelformat = DSPF_YUY2;
@@ -293,7 +297,10 @@ static int dfb_is_fullscreen( void )
      return output_fullscreen;
 }
 
-
+static int dfb_is_alwaysontop( void )
+{
+    return alwaysontop;
+}
 
 static int dfb_is_interlaced( void )
 {
@@ -310,7 +317,11 @@ static void dfb_wait_for_sync( int field )
 
 static int dfb_show_frame( int x, int y, int width, int height )
 {
+#ifdef DIRECTFB_HAS_TRIPLE
      surface->Flip( surface, NULL, DSFLIP_ONSYNC );
+#else
+     surface->Flip( surface, NULL, 0 );
+#endif
      return 1;
 }
 
@@ -459,7 +470,7 @@ static void dfb_poll_events( input_t *in )
                case DIKS_PRINT: arg |= I_PRINT; break;
                case DIKS_MENU: arg |= I_MENU; break;
                default:
-                    if (DFB_KEY_IS_ASCII(event.key_symbol))
+                    /* if (DFB_KEY_IS_ASCII(event.key_symbol)) */
                          arg |= event.key_symbol;
                     break;
                }
@@ -521,6 +532,7 @@ static output_api_t dfboutput =
      dfb_get_visible_width,
      dfb_get_visible_height,
      dfb_is_fullscreen,
+     dfb_is_alwaysontop,
 
      dfb_is_interlaced,
      dfb_wait_for_sync,
