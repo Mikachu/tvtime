@@ -123,6 +123,12 @@ int videoinput_get_norm( videoinput_t *vidin );
 int videoinput_is_bttv( videoinput_t *vidin );
 
 /**
+ * Returns true if this input provides UYVY ordered data instead
+ * of YUYV ordered data.
+ */
+int videoinput_is_uyvy( videoinput_t *vidin );
+
+/**
  * Returns a pointer to the next image buffer.  Also returns the last field
  * number captured.
  */

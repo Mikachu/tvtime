@@ -27,6 +27,7 @@ struct videofilter_s
 {
     video_correction_t *vc;
     int bt8x8_correction;
+    int uyvy_conversion;
 
     uint8_t tempscanline[ 2048 ];
 };
@@ -38,6 +39,7 @@ videofilter_t *videofilter_new( void )
 
     vf->vc = video_correction_new( 1, 0 );
     vf->bt8x8_correction = 0;
+    vf->uyvy_conversion = 0;
 
     return vf;
 }
@@ -62,9 +64,14 @@ void videofilter_set_luma_power( videofilter_t *vf, double power )
     if( vf->vc ) video_correction_set_luma_power( vf->vc, power );
 }
 
+void videofilter_enable_uyvy_conversion( videofilter_t *vf )
+{
+    vf->uyvy_conversion = 1;
+}
+
 int videofilter_active_on_scanline( videofilter_t *vf, int scanline )
 {
-    if( vf->vc && vf->bt8x8_correction ) {
+    if( vf->uyvy_conversion || (vf->vc && vf->bt8x8_correction) ) {
         return 1;
     } else {
         return 0;
@@ -74,6 +81,10 @@ int videofilter_active_on_scanline( videofilter_t *vf, int scanline )
 void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
                                      int width, int xpos, int scanline )
 {
+    if( vf->uyvy_conversion ) {
+        convert_uyvy_to_yuyv_scanline( data, data, width );
+    }
+
     if( vf->vc && vf->bt8x8_correction ) {
         video_correction_correct_packed422_scanline( vf->vc, data, data, width );
         // filter_luma_121_packed422_inplace_scanline( data, width );

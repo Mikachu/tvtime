@@ -1115,6 +1115,16 @@ int main( int argc, char **argv )
         videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
     }
 
+    if( vidin && videoinput_is_uyvy( vidin ) ) {
+        if( filter ) {
+            videofilter_enable_uyvy_conversion( filter );
+        } else {
+            fprintf( stderr, "tvtime: Card requires conversion from UYVY, but "
+                     "we failed to initialize our converter!\n" );
+            return 1;
+        }
+    }
+
     /* Create the user's FIFO directory */
     if( !get_tvtime_fifodir( config_get_uid( ct ) ) ) {
         fprintf( stderr, "tvtime: Cannot find FIFO directory.  "

@@ -229,6 +229,7 @@ struct videoinput_s
 
     int isbttv;
     int isv4l2;
+    int isuyvy;
 
     int curframe;
     int numframes;
@@ -417,6 +418,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curinput = 0;
     vidin->numtuners = 0;
     vidin->have_mmap = 0;
+    vidin->isbttv = 0;
+    vidin->isuyvy = 0;
     memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
 
     /* First, open the device. */
@@ -495,7 +498,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 #define BTTV_VERSION            _IOR('v' , BASE_VIDIOCPRIVATE+6, int)
         /* dirty hack time / v4l design flaw -- works with bttv only
          * this adds support for a few less common PAL versions */
-        vidin->isbttv = 0;
         if( !(ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0) ) {
             vidin->isbttv = 1;
         } else if( norm > VIDEOINPUT_SECAM ) {
@@ -555,11 +557,19 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         imgformat.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
         if( ioctl( vidin->grab_fd, VIDIOC_S_FMT, &imgformat ) < 0 ) {
-            fprintf( stderr, "videoinput: video4linux device '%s' refuses "
-                     "to provide set capability information, giving up.\n", v4l_device );
-            close( vidin->grab_fd );
-            free( vidin );
-            return 0;
+            /* Try for UYVY instead. */
+            imgformat.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
+            if( ioctl( vidin->grab_fd, VIDIOC_S_FMT, &imgformat ) < 0 ) {
+                fprintf( stderr, "videoinput: video4linux device '%s' refuses "
+                         "to provide YUYV or UYVY format video: %s.\n",
+                         v4l_device, strerror( errno ) );
+                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
+                         " indicating your capture card, driver, and the error message above.\n" );
+                close( vidin->grab_fd );
+                free( vidin );
+                return 0;
+            }
+            vidin->isuyvy = 1;
         }
 
         if( vidin->verbose ) {
@@ -622,13 +632,18 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         grab_pict.depth = 16;
         grab_pict.palette = VIDEO_PALETTE_YUV422;
         if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't get Y'CbCr 4:2:2 packed images from the card, unable to"
-                     "process the output: %s.\n", strerror( errno ) );
-            fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
-                     " indicating your capture card, driver, and the error message above.\n" );
-            close( vidin->grab_fd );
-            free( vidin );
-            return 0;
+            /* Try for UYVY instead. */
+            grab_pict.palette = VIDEO_PALETTE_UYVY;
+            if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
+                fprintf( stderr, "videoinput: Can't get YUVY or UYVY images from the card, unable to"
+                         "process the output: %s.\n", strerror( errno ) );
+                fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
+                         " indicating your capture card, driver, and the error message above.\n" );
+                close( vidin->grab_fd );
+                free( vidin );
+                return 0;
+            }
+            vidin->isuyvy = 1;
         }
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: Brightness %d, hue %d, colour %d, contrast %d\n"
@@ -816,31 +831,6 @@ void videoinput_delete( videoinput_t *vidin )
     free( vidin );
 }
 
-int videoinput_get_width( videoinput_t *vidin )
-{
-    return vidin->width;
-}
-
-int videoinput_get_height( videoinput_t *vidin )
-{
-    return vidin->height;
-}
-
-int videoinput_get_norm( videoinput_t *vidin )
-{
-    return vidin->norm;
-}
-
-int videoinput_get_numframes( videoinput_t *vidin )
-{
-    return vidin->numframes;
-}
-
-int videoinput_get_num_inputs( videoinput_t *vidin )
-{
-    return vidin->numinputs;
-}
-
 int videoinput_get_hue( videoinput_t *vidin )
 {
     if( !vidin->isv4l2 ) {
@@ -977,11 +967,6 @@ void videoinput_set_colour_relative( videoinput_t *vidin, int offset )
     videoinput_set_colour( vidin, videoinput_get_colour( vidin ) + offset );
 }
 
-int videoinput_has_tuner( videoinput_t *vidin )
-{
-    return ( vidin->numtuners > 0 );
-}
-
 int videoinput_is_muted( videoinput_t *vidin )
 {
     return ( ( vidin->audio.flags & VIDEO_AUDIO_MUTE ) == VIDEO_AUDIO_MUTE );
@@ -1005,26 +990,6 @@ static void videoinput_do_mute( videoinput_t *vidin, int mute )
                 fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
         }
-    }
-}
-
-void videoinput_mute( videoinput_t *vidin, int mute )
-{
-    vidin->user_muted = mute;
-    videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
-}
-
-int videoinput_get_muted( videoinput_t *vidin )
-{
-    return vidin->user_muted;
-}
-
-int videoinput_get_audio_mode( videoinput_t *vidin )
-{
-    if( !vidin->audiomode || vidin->audiomode > VIDEO_SOUND_LANG2 ) {
-        return VIDEO_SOUND_MONO;
-    } else {
-        return vidin->audiomode;
     }
 }
 
@@ -1144,16 +1109,6 @@ int videoinput_freq_present( videoinput_t *vidin )
         }
     }
     return 1;
-}
-
-int videoinput_get_input_num( videoinput_t *vidin )
-{
-    return vidin->curinput;
-}
-
-const char *videoinput_get_input_name( videoinput_t *vidin )
-{
-    return vidin->inputname;
 }
 
 /**
@@ -1356,11 +1311,6 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
     videoinput_find_and_set_tuner( vidin );
 }
 
-int videoinput_is_bttv( videoinput_t *vidin )
-{
-    return vidin->isbttv;
-}
-
 void videoinput_reset_default_settings( videoinput_t *vidin )
 {
     if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
@@ -1433,5 +1383,75 @@ void videoinput_switch_to_compatible_norm( videoinput_t *vidin, int norm )
         vidin->norm = norm;
         videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
     }
+}
+
+void videoinput_mute( videoinput_t *vidin, int mute )
+{
+    vidin->user_muted = mute;
+    videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+}
+
+int videoinput_get_muted( videoinput_t *vidin )
+{
+    return vidin->user_muted;
+}
+
+int videoinput_get_audio_mode( videoinput_t *vidin )
+{
+    if( !vidin->audiomode || vidin->audiomode > VIDEO_SOUND_LANG2 ) {
+        return VIDEO_SOUND_MONO;
+    } else {
+        return vidin->audiomode;
+    }
+}
+
+int videoinput_has_tuner( videoinput_t *vidin )
+{
+    return ( vidin->numtuners > 0 );
+}
+
+int videoinput_get_width( videoinput_t *vidin )
+{
+    return vidin->width;
+}
+
+int videoinput_get_height( videoinput_t *vidin )
+{
+    return vidin->height;
+}
+
+int videoinput_get_norm( videoinput_t *vidin )
+{
+    return vidin->norm;
+}
+
+int videoinput_get_numframes( videoinput_t *vidin )
+{
+    return vidin->numframes;
+}
+
+int videoinput_get_num_inputs( videoinput_t *vidin )
+{
+    return vidin->numinputs;
+}
+
+int videoinput_is_bttv( videoinput_t *vidin )
+{
+    return vidin->isbttv;
+}
+
+int videoinput_is_uyvy( videoinput_t *vidin )
+{
+    return vidin->isuyvy;
+}
+
+int videoinput_get_input_num( videoinput_t *vidin )
+{
+    return vidin->curinput;
+}
+
+const char *videoinput_get_input_name( videoinput_t *vidin )
+{
+    return vidin->inputname;
 }
 

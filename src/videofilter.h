@@ -31,6 +31,7 @@ void videofilter_delete( videofilter_t *vf );
 void videofilter_set_bt8x8_correction( videofilter_t *vf, int correct );
 void videofilter_set_full_extent_correction( videofilter_t *vf, int correct );
 void videofilter_set_luma_power( videofilter_t *vf, double power );
+void videofilter_enable_uyvy_conversion( videofilter_t *vf );
 
 int videofilter_active_on_scanline( videofilter_t *vf, int scanline );
 void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
