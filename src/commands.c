@@ -117,6 +117,7 @@ struct commands_s {
 
     int displayinfo;
     int screenshot;
+    char screenshotfile[ 2048 ];
     int printdebug;
     int showbars;
     int showdeinterlacerinfo;
@@ -895,6 +896,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->displayinfo = 0;
     cmd->screenshot = 0;
+    memset( cmd->screenshotfile, 0, sizeof( cmd->screenshotfile ) );
     cmd->printdebug = 0;
     cmd->showbars = 0;
     cmd->showdeinterlacerinfo = 0;
@@ -1968,6 +1970,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_SCREENSHOT:
+        if( arg ) {
+            snprintf( cmd->screenshotfile, sizeof( cmd->screenshotfile ),
+                      "%s", arg );
+        } else {
+            *cmd->screenshotfile = 0;
+        }
         cmd->screenshot = 1;
         break;
 
@@ -3042,6 +3050,11 @@ int commands_show_bars( commands_t *cmd )
 int commands_take_screenshot( commands_t *cmd )
 {
     return cmd->screenshot;
+}
+
+const char *commands_screenshot_filename( commands_t *cmd )
+{
+    return cmd->screenshotfile;
 }
 
 int commands_toggle_fullscreen( commands_t *cmd )

@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Fixed the screenshot command to be more flexible with
+      where it takes arguments from, should work for keybindings now.
   * vektor: Fixed tvtime-command handling for commands that take
       arguments but don't get them.
   * vektor: React to button events on release not on press.

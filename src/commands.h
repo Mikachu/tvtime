@@ -77,6 +77,7 @@ int commands_toggle_alwaysontop( commands_t *cmd );
 int commands_show_bars( commands_t *cmd );
 int commands_print_debug( commands_t *cmd );
 int commands_take_screenshot( commands_t *cmd );
+const char *commands_screenshot_filename( commands_t *cmd );
 int commands_show_deinterlacer_info( commands_t *cmd );
 int commands_scan_channels( commands_t *cmd );
 int commands_resize_window( commands_t *cmd );

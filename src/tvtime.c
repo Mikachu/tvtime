@@ -2376,8 +2376,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                     char timestamp[ 256 ];
                     time_t tm = time( 0 );
 
-                    if( fifo_args && strlen( fifo_args ) ) {
-                        basename = outfile = fifo_args;
+                    if( *commands_screenshot_filename( commands ) ) {
+                        basename = outfile = commands_screenshot_filename( commands );
                     } else {
                         strftime( timestamp, 
                                   sizeof( timestamp ),
@@ -2519,8 +2519,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                     char timestamp[ 50 ];
                     time_t tm = time( 0 );
 
-                    if( fifo_args && strlen( fifo_args ) ) {
-                        basename = outfile = fifo_args;
+                    if( *commands_screenshot_filename( commands ) ) {
+                        basename = outfile = commands_screenshot_filename( commands );
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
                                   config_get_timeformat( ct ),
