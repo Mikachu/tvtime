@@ -22,6 +22,10 @@
 #include <X11/Xlib.h>
 #include "input.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     int x;
     int y;
@@ -52,4 +56,7 @@ int xcommon_is_exposed( void );
 void xcommon_set_colourkey( int colourkey );
 void xcommon_frame_drawn( void );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* XCOMMON_H_INCLUDED */

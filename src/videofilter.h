@@ -19,6 +19,10 @@
 #ifndef VIDEOFILTER_H_INCLUDED
 #define VIDEOFILTER_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct videofilter_s videofilter_t;
 
 videofilter_t *videofilter_new( void );
@@ -32,4 +36,7 @@ int videofilter_active_on_scanline( videofilter_t *vf, int scanline );
 void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
                                      int width, int xpos, int scanline );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VIDEOFILTER_H_INCLUDED */

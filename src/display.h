@@ -21,6 +21,10 @@
 
 #include <X11/Xlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
   DpyInfoOriginX11 = 1,
   DpyInfoOriginXF86VidMode,
@@ -71,4 +75,7 @@ int DpyInfoGetSAR(Display *dpy, int screen_nr,
 int DpyInfoSetEWMHFullscreen(int enabled);
 int DpyInfoGetEWMHFullscreen(void);
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* OGLE_DISPLAY_H */

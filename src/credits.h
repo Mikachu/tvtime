@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct credits_s credits_t;
 
 credits_t *credits_new( const char *filename, int output_height );
@@ -32,5 +36,7 @@ void credits_composite_packed422_scanline( credits_t *credits,
                                            int scanline );
 void credits_advance_frame( credits_t *credits );
 
-
+#ifdef __cplusplus
+};
+#endif
 #endif /* CREDITS_H_INCLUDED */

@@ -19,6 +19,10 @@
 #ifndef HAVE_FIFO_H
 #define HAVE_FIFO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct fifo_s fifo_t;
 
 fifo_t *fifo_new( const char *filename );
@@ -28,4 +32,7 @@ const char *fifo_get_filename( fifo_t *fifo );
 int fifo_get_next_command( fifo_t *fifo );
 const char *fifo_get_arguments( fifo_t *fifo );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* HAVE_FIFO_H */

@@ -19,6 +19,10 @@
 #ifndef SCOPE_H_INCLUDED
 #define SCOPE_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct scope_s scope_t;
 
 scope_t *scope_new( int width, int height );
@@ -28,5 +32,7 @@ int scope_active_on_scanline( scope_t *scope, int scanline );
 void scope_composite_packed422_scanline( scope_t *scope, uint8_t *output,
                                          int width, int xpos, int scanline );
 
-
+#ifdef __cplusplus
+};
+#endif
 #endif /* SCOPE_H_INCLUDED */

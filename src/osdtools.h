@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * This file defines some simple primitives needed for the on screen
  * display.  Each primitive can composite itself onto a packed 4:2:2
@@ -140,4 +144,7 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                int width, int xpos,
                                                int scanline );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* OSDTOOLS_H_INCLUDED */

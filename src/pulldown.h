@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include "speedy.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Possible pulldown offsets.
  */
@@ -52,4 +56,7 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak, pulldown_met
 void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
                                   uint8_t *old, uint8_t *new, int w, int h, int os, int ns );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* PULLDOWN_H_INCLUDED */

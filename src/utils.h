@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Useful functions that don't belong anywhere else.
  */
@@ -65,4 +69,7 @@ char *expand_user_path( const char *path );
  */
 uint32_t utf8_to_unicode( const char *utf, int *len );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* UTILS_H_INCLUDED */

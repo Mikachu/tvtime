@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DEINTERLACE_PLUGIN_API_VERSION 0x00000004
 
 /**
@@ -188,4 +192,7 @@ void register_deinterlace_plugin( const char *filename );
  */
 void filter_deinterlace_methods( int accel, int fieldsavailable );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* DEINTERLACE_H_INCLUDED */

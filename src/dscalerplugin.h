@@ -21,6 +21,10 @@
 
 #include "DS_Deinterlace.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void __cdecl dscaler_memcpy( void *output, void *input, size_t size );
 
 FILTER_METHOD *load_dscaler_filter( char *filename );
@@ -29,4 +33,7 @@ void unload_dscaler_filter( FILTER_METHOD *method );
 DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename );
 void unload_dscaler_deinterlacer( DEINTERLACE_METHOD *method );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* DSCALERPLUGIN_H_INCLUDED */

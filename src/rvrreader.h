@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include <ree.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct rvrreader_s rvrreader_t;
 
 rvrreader_t *rvrreader_new( const char *filename );
@@ -37,4 +41,7 @@ uint8_t *rvrreader_get_curframe( rvrreader_t *reader );
 uint8_t *rvrreader_get_lastframe( rvrreader_t *reader );
 uint8_t *rvrreader_get_secondlastframe( rvrreader_t *reader );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* RVRREADER_H_INCLUDED */

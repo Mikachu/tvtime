@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * 'ree' is short for 'reet'.
  */
@@ -87,4 +91,7 @@ int ree_is_audio_packet( ree_packet_t *pkt );
  */
 void ree_decode_video_packet( ree_packet_t *pkt, uint8_t *data, int width, int height );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* REE_H_INCLUDED */

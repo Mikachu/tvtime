@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct reepktq_s reepktq_t;
 
 /**
@@ -63,4 +67,7 @@ int reepktq_frame_size( reepktq_t *pktq );
 
 int reepktq_queue_size( reepktq_t *pktq );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* REEPKTQ_H_INCLUDED */
