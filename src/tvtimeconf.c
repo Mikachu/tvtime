@@ -839,7 +839,7 @@ config_t *config_new( void )
     /* First read in global settings. */
     asprintf( &base, "%s/tvtime.xml", CONFDIR );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, _("Reading configuration from %s\n"), base );
+        lfprintf( stderr, _("Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
@@ -848,7 +848,7 @@ config_t *config_new( void )
     asprintf( &base, "%s/.tvtime/tvtime.xml", getenv( "HOME" ) );
     ct->config_filename = strdup( base );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, _("Reading configuration from %s\n"), base );
+        lfprintf( stderr, _("Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
