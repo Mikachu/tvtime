@@ -445,52 +445,56 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_RENUMBER:
-        /* If we're scanning and suddenly want to renumber, stop scanning. */
-        if( in->scan_channels ) {
-            commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
-        }
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            /* If we're scanning and suddenly want to renumber, stop scanning. */
+            if( in->scan_channels ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
 
-        /* Accept input of the destination channel. */
-        if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-        in->frame_counter = CHANNEL_DELAY;
-        in->renumbering = 1;
-        if( in->osd ) {
-            char message[ 256 ];
-            sprintf( message, "Remapping %d.  Enter new channel number.",
-                     station_get_current_id( in->stationmgr ) );
-            tvtime_osd_set_hold_message( in->osd, message );
+            /* Accept input of the destination channel. */
+            if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
+            in->frame_counter = CHANNEL_DELAY;
+            in->renumbering = 1;
+            if( in->osd ) {
+                char message[ 256 ];
+                sprintf( message, "Remapping %d.  Enter new channel number.",
+                         station_get_current_id( in->stationmgr ) );
+                tvtime_osd_set_hold_message( in->osd, message );
+            }
         }
         break;
 
     case TVTIME_CHANNEL_SCAN:
-        in->scan_channels = !in->scan_channels;
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            in->scan_channels = !in->scan_channels;
 
-        if( in->scan_channels && in->renumbering ) {
-            memset( in->next_chan_buffer, 0, 5 );
-            in->digit_counter = 0;
-            in->frame_counter = 0;
-            if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
-            in->renumbering = 0;
-        }
+            if( in->scan_channels && in->renumbering ) {
+                memset( in->next_chan_buffer, 0, 5 );
+                in->digit_counter = 0;
+                in->frame_counter = 0;
+                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+                in->renumbering = 0;
+            }
 
-        if( in->osd ) {
-            if( in->scan_channels ) {
-                int keycode = config_command_to_key( in->cfg, TVTIME_CHANNEL_SCAN );
-                if( keycode ) {
-                    const char *special = input_special_key_to_string( keycode );
-                    char message[ 256 ];
+            if( in->osd ) {
+                if( in->scan_channels ) {
+                    int keycode = config_command_to_key( in->cfg, TVTIME_CHANNEL_SCAN );
+                    if( keycode ) {
+                        const char *special = input_special_key_to_string( keycode );
+                        char message[ 256 ];
 
-                    if( special ) {
-                        snprintf( message, sizeof( message ), "Scanning (hit %s to stop).", special );
-                    } else {
-                        snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
+                        if( special ) {
+                            snprintf( message, sizeof( message ), "Scanning (hit %s to stop).", special );
+                        } else {
+                            snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
+                        }
+                        tvtime_osd_set_hold_message( in->osd, message );
+                        tvtime_osd_show_info( in->osd );
                     }
-                    tvtime_osd_set_hold_message( in->osd, message );
+                } else {
+                    tvtime_osd_set_hold_message( in->osd, "" );
                     tvtime_osd_show_info( in->osd );
                 }
-            } else {
-                tvtime_osd_set_hold_message( in->osd, "" );
-                tvtime_osd_show_info( in->osd );
             }
         }
         break;
@@ -730,6 +734,16 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_TOGGLE_INPUT:
         if( in->vidin ) {
             in->frame_counter = 0;
+
+            if( in->renumbering ) {
+                memset( in->next_chan_buffer, 0, sizeof( in->next_chan_buffer ) );
+                commands_handle( in, TVTIME_ENTER, 0 );
+            }
+
+            if( in->scan_channels ) {
+                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
             videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
             reinit_tuner( in );
 
@@ -797,15 +811,18 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                     tvtime_osd_show_info( in->osd );
                 }
             }
-            in->frame_counter = 0;
         } else {
+            if( in->renumbering ) {
+                in->renumbering = 0;
+                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+            }
             sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
             if( in->osd ) {
                 tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
                 tvtime_osd_show_info( in->osd );
             }
-            in->frame_counter = 0;
         }
+        in->frame_counter = 0;
         break;
 
     case TVTIME_CHANNEL_1:
