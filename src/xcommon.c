@@ -931,7 +931,9 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
-    // x11_wait_mapped( display, wm_window );
+
+    /* FIXME: Do I need to wait for the window to be mapped? */
+    /* x11_wait_mapped( display, wm_window ); */
 
     /* Wait for map. */
     XMaskEvent( display, StructureNotifyMask, &xev );
@@ -1118,7 +1120,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             ev.xclient.window = wm_window;
             ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[ 0 ] = 1; // _NET_WM_STATE_ADD not an atom just a define
+            ev.xclient.data.l[ 0 ] = 1; /* _NET_WM_STATE_ADD not an atom just a define. */
             ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
             ev.xclient.data.l[ 2 ] = 0;
 
@@ -1155,7 +1157,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             ev.xclient.window = wm_window;
             ev.xclient.message_type = net_wm_state;
             ev.xclient.format = 32;
-            ev.xclient.data.l[ 0 ] = 0; // _NET_WM_STATE_REMOVE not an atom just a define
+            ev.xclient.data.l[ 0 ] = 0; /* _NET_WM_STATE_REMOVE not an atom just a define. */
             ev.xclient.data.l[ 1 ] = net_wm_state_fullscreen;
             ev.xclient.data.l[ 2 ] = 0;
 
@@ -1177,48 +1179,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
 int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
 {
-    output_fullscreen = !output_fullscreen;
-    if( output_fullscreen ) {
-        int x, y, w, h;
-
-        xfullscreen_update( xf );
-        xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
-
-        // windowed_output_window = output_window;
-        // fs_window = RootWindow( display, screen );
-        // fs_window = ScreenOfDisplay( display, screen )->root;
-        // XReparentWindow( display, output_window, fs_window, 0, 0 );
-        output_window = ScreenOfDisplay( display, screen )->root;
-
-        /* Set up our satellite window. */
-        // XResizeWindow( display, wm_window, 100, 100 );
-        XSetForeground( display, gc, BlackPixel( display, screen ) );
-        XClearWindow( display, output_window );
-
-        output_on_root = 1;
-        output_width = w;
-        output_height = h;
-        xcommon_exposed = 1;
-    } else {
-        XWindowAttributes attrs;
-        XGetWindowAttributes( display, wm_window, &attrs );
-
-        /* Clear the root window. */
-        XSetForeground( display, gc, BlackPixel( display, screen ) );
-        XClearWindow( display, output_window );
-
-        /* Back to normal. */
-        output_window = windowed_output_window;
-        output_on_root = 0;
-        output_width = attrs.width;
-        output_height = attrs.height;
-    }
-    // XResizeWindow( display, output_window, output_width, output_height );
-    // calculate_video_area();
-    xcommon_clear_screen();
-    XFlush( display );
-    XSync( display, False );
-    return output_fullscreen;
+    return 0;
 }
 
 int xcommon_toggle_aspect( void )

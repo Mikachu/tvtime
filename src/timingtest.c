@@ -142,7 +142,6 @@ int main( int argc, char **argv )
     }
 
     for( i = 0; i < width*height*2; i++ ) {
-        //source422packed[ i ] = i % 256;
         source422packed[ i ] = random() % 256;
         source422packed2[ i ] = random() % 256;
     }

@@ -171,7 +171,6 @@ int drmWaitVBlank( int fd, drmVBlankPtr vbl )
     curvbi.tv_sec = vbl->reply.tval_sec;
     curvbi.tv_usec = vbl->reply.tval_usec;
     gettimeofday( &curtime, 0 );
-    // fprintf( stderr, "time: %d, late %d\n", timediff( &curvbi, &lastvbi ), timediff( &curtime, &curvbi ) );
     lastvbi = curvbi;
 
     return ret;

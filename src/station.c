@@ -833,7 +833,7 @@ int station_get_current_active( station_mgr_t *mgr )
 
 
 int station_remove( station_mgr_t *mgr )
-{ // untested
+{ /* untested? */
     station_info_t *i = mgr->current;
     if( !mgr->current ) return 0;
     i->next->prev = i->prev;

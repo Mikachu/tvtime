@@ -98,7 +98,7 @@ static void *video_capture_thread_main( void *crap )
         gotframes++;
         ccframes = timediff( &curtime, &starttime ) / (fieldtime*2);
 
-        // We may have to drop a frame if the queue is full.
+        /* We may have to drop a frame if the queue is full. */
         if( !vpkt ) {
             fprintf( stderr, "video: Frame dropped (queue full!).\n" );
             videoinput_free_frame( vidin, frameid );
