@@ -226,9 +226,10 @@ station_mgr_t *station_init( config_t *ct )
     mgr->last_channel = 0;
 
     if( !station_readconfig( mgr ) ) {
+        fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
+
         frequencies = config_get_v4l_freq( ct );
-        fprintf( stderr, "station: Errors reading %s\n"
-                         "station: Adding frequency table %s, all channels active\n", mgr->stationrc, frequencies );
+        fprintf( stderr, "station: Adding frequency table %s, all channels active\n", frequencies );
 
         if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
             !strcasecmp( frequencies, "europe-cable" ) ) {
