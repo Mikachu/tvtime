@@ -114,7 +114,6 @@ void pnginput_delete( pnginput_t *pnginput )
 {
     if( pnginput->png_ptr && pnginput->info_ptr ) {
         png_destroy_read_struct( &(pnginput->png_ptr), &(pnginput->info_ptr), 0 );
-        png_destroy_info_struct( &(pnginput->png_ptr), &(pnginput->info_ptr) );
     }
     if( pnginput->f ) {
         fclose( pnginput->f );
