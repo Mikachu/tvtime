@@ -139,7 +139,7 @@ static void print_usage( char **argv )
     fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>] "
-			         "[-D <deinterlace method>]\n", argv[ 0 ] );
+                     "[-D <deinterlace method>]\n", argv[ 0 ] );
     fprintf( stderr, "\t-v\tShow verbose messages.\n" );
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
@@ -163,18 +163,11 @@ static void print_usage( char **argv )
                      "\t  \t\tus-broadcast\n"
                      "\t  \t\tjapan-cable\n"
                      "\t  \t\tjapan-broadcast\n"
-                     "\t  \t\teurope-cable\n"
-                     "\t  \t\teurope-west\n"
-                     "\t  \t\teurope-east\n"
-                     "\t  \t\tuk-broadcast\n"
+                     "\t  \t\teurope\n"
                      "\t  \t\taustralia\n"
-                     "\t  \t\tnewzealand\n"
-                     "\t  \t\titaly\n"
-                     "\t  \t\tfrance\n"
-                     "\t  \t\trussia\n"
-                     "\t  \t\targentina\n\n" );
+                     "\t  \t\tfrance\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
-			         "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
+                     "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
 }
 
 
@@ -322,7 +315,7 @@ config_t *config_new( int argc, char **argv )
         case 'f': ct->freq = strdup( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
         case 'm': ct->fullscreen = 1; break;
-		case 'D': ct->preferred_deinterlace_method = atoi( optarg ); break;	
+        case 'D': ct->preferred_deinterlace_method = atoi( optarg ); break;
         default:
             print_usage( argv );
             return 0;

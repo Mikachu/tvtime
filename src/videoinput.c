@@ -131,7 +131,6 @@ static void siginit( void )
     sigaction( SIGALRM, &act, &old );
 }
 
-
 static void free_frame( videoinput_t *vidin, int frameid )
 {
     if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frameid ) < 0 ) {
@@ -327,10 +326,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         return 0;
     }
 
-
     /* On initialization, set to input 0.  This is just to start things up. */
     videoinput_set_input_num( vidin, 0 );
-
 
     /**
      * Once we've done that, we've set the hardware norm.  Now confirm that
