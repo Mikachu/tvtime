@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,16 @@
  * 4:2:0 rates in my app, I'm ok with this situation, for now.
  *
  * - Billy Biggs <vektor@dumbterm.net>
+ */
+
+/**
+ * Updates:
+ * 
+ * Sat Apr 12 16:19:03 ADT 2003
+ * - Updated to have a first-8-bits lookup for decoding speed.  Works well.
+ * - Updated to include a YUY2 compressor and decompressor.
+ * - Note the code generation source we used is now here:
+ *   http://www.cs.mu.oz.au/~alistair/inplace.c
  */
 
 
