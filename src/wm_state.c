@@ -30,7 +30,6 @@
 #include <inttypes.h>
 #include <string.h>
 
-//#include "debug_print.h"
 #include "display.h"
 #include "wm_state.h"
 
@@ -40,8 +39,8 @@ static WindowState_t current_state = WINDOW_STATE_NORMAL;
 typedef struct {
   int x;
   int y;
-  int width;
-  int height;
+  unsigned int width;
+  unsigned int height;
 } geometry_t;
 
 static geometry_t normal_state_geometry;
@@ -123,7 +122,7 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
   
   if(ev->xconfigure.send_event == True) {
 
-    //fprintf(stderr,"send_event: True\n");
+    /*fprintf(stderr,"send_event: True\n");*/
 
     *x = ev->xconfigure.x;
     *y = ev->xconfigure.y;
@@ -149,7 +148,7 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
     
   } else {
     
-    //fprintf(stderr,"send_event: False\n");
+    /*fprintf(stderr,"send_event: False\n");*/
     
     XTranslateCoordinates(dpy, win, DefaultRootWindow(dpy), 
 			  0,
@@ -162,7 +161,7 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
     
   }
 
-  //fprintf(stderr,stderr, "x: %d, y: %d\n", *x, *y);
+  /*fprintf(stderr,stderr, "x: %d, y: %d\n", *x, *y);*/
 }
 
 
@@ -171,7 +170,7 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
 static void save_normal_geometry(Display *dpy, Window win)
 {
 
-  // Ugly hack so we can reposition ourself when going from fullscreen
+  /* Ugly hack so we can reposition ourself when going from fullscreen */
   
   Window root_return;
   int x,y;
@@ -209,18 +208,18 @@ static void restore_normal_geometry(Display *dpy, Window win)
   XWindowChanges win_changes;
   XEvent ev;
   
-  // Try to resize
+  /* Try to resize */
   win_changes.x = normal_state_geometry.x;
   win_changes.y = normal_state_geometry.y;
   win_changes.width = normal_state_geometry.width;
   win_changes.height = normal_state_geometry.height;
-  //win_changes.stack_mode = Above;
+  /*win_changes.stack_mode = Above; */
   XReconfigureWMWindow(dpy, win, 0,
 		       CWX | CWY |
 		       CWWidth | CWHeight,
 		       &win_changes);
 
-  // Wait for a configure notify
+  /* Wait for a configure notify */
   do {
     XNextEvent(dpy, &ev);
   } while(ev.type != ConfigureNotify);
@@ -240,20 +239,22 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   XWindowChanges win_changes;
   int x, y;
   XSizeHints *sizehints;
-  // We don't want to have to replace the window manually when remapping it
+  /* We don't want to have to replace the window manually when remapping it */
   sizehints = XAllocSizeHints();
   sizehints->flags = USPosition;
-  sizehints->x = 0; // obsolete but should be set in case
-  sizehints->y = 0; // there is an old wm used
+  sizehints->x = 0; /* obsolete but should be set in case */
+  sizehints->y = 0; /* there is an old wm used */
   
   save_normal_geometry(dpy, win);
   
   if(!has_ewmh_state_fullscreen) {
-#if 1 // bloody wm's that can't cope with unmap/map
-    // We have to be unmapped to change motif decoration hints 
+#if 1
+    /* bloody wm's that can't cope with unmap/map
+     * We have to be unmapped to change motif decoration hints 
+     */
     XUnmapWindow(dpy, win);
     
-    // Wait for window to be unmapped
+    /* Wait for window to be unmapped */
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
@@ -277,7 +278,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     
     
     
-    // Try to resize, place the window at correct place and on top
+    /* Try to resize, place the window at correct place and on top */
     
     
     XGetWindowAttributes(dpy, win, &attrs);
@@ -299,7 +300,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     
     
     
-    //todo: check if these are correct and how to detect a kwm
+    /*todo: check if these are correct and how to detect a kwm */
 #if 0
     
     /* Now try to set KWM hints */
@@ -325,8 +326,10 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     
 #endif
     
-    // If we have a gnome compliant wm that supports layers, put
-    // us above the dock/panel
+    /**
+     * If we have a gnome compliant wm that supports layers, put
+     * us above the dock/panel
+     */
     
     if(gnome_wm_layers) {
       XEvent ev;
@@ -345,7 +348,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 	  ev.xclient.window = win;
 	  ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", True);
 	  ev.xclient.format = 32;
-	  ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD
+	  ev.xclient.data.l[0] = 1; /* _NET_WM_STATE_ADD */
 	  ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_STAYS_ON_TOP", False);
 	  ev.xclient.data.l[2] = 0;
 	  
@@ -356,12 +359,12 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     }
     
     
-    // Wait for a configure notify
+    /* Wait for a configure notify */
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != ConfigureNotify);
     
-    // save the configure event so we can return it
+    /* save the configure event so we can return it */
     ret_ev = ev;
     
     calc_coords(dpy, win, &x, &y, &ev);
@@ -372,11 +375,13 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     }
     
     if(!has_ewmh_state_fullscreen) {
-      //fprintf(stderr,"no more configure notify\n");
-      
-      // ugly hack, but what can you do when the wm's not removing decorations
-      //  if we don't end up at (win_changes.x, win_changes.y)
-      //  try to compensate and move one more time
+      /*fprintf(stderr,"no more configure notify\n"); */
+
+      /** 
+       * ugly hack, but what can you do when the wm's not removing decorations
+       *  if we don't end up at (win_changes.x, win_changes.y)
+       *  try to compensate and move one more time
+       */
       if(x != win_changes.x || y != win_changes.y) {
 	XWindowChanges win_compensate;
 	fprintf(stderr,"wm_state: window is not at screen start trying to fix that\n");
@@ -403,7 +408,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 	if(x != win_changes.x || y != win_changes.y) {
 	  fprintf(stderr,"wm_state: Couldn't place window at %d,%d\n", win_changes.x, win_changes.y);
 	} else {
-	  //fprintf(stderr,"Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y);
+	  /*fprintf(stderr,"Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y); */
 	}
 	
       }
@@ -411,14 +416,14 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   
     XPutBackEvent(dpy, &ret_ev);
   } else {
-    // ewmh_state_fullscreen is supported
+    /* ewmh_state_fullscreen is supported */
     XEvent ev;
     
     ev.type = ClientMessage;
     ev.xclient.window = win;
     ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", False);
     ev.xclient.format = 32;
-    ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD not an atom just a define
+    ev.xclient.data.l[0] = 1; /* _NET_WM_STATE_ADD not an atom just a define */
     ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
     ev.xclient.data.l[2] = 0;
     
@@ -439,17 +444,20 @@ static void switch_to_normal_state(Display *dpy, Window win)
   XSizeHints *sizehints;
 
   if(!has_ewmh_state_fullscreen) {
-    // We don't want to have to replace the window manually when remapping it
+    /* We don't want to have to replace the window manually when remapping it */
     sizehints = XAllocSizeHints();
     sizehints->flags = USPosition;
-    sizehints->x = 0; // obsolete but should be set in case
-    sizehints->y = 0; // an old wm is used
+    sizehints->x = 0; /* obsolete but should be set in case */
+    sizehints->y = 0; /* an old wm is used */
     
-#if 1 //bloody wm's that can't cope with unmap/map
-    // We have to be unmapped to change motif decoration hints 
+#if 1
+    /**
+     * bloody wm's that can't cope with unmap/map
+     * We have to be unmapped to change motif decoration hints 
+     */
     XUnmapWindow(dpy, win);
     
-    // Wait for window to be unmapped
+    /* Wait for window to be unmapped */
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
@@ -473,11 +481,13 @@ static void switch_to_normal_state(Display *dpy, Window win)
     
     
     
-    // get us back to the position and size we had before fullscreen
+    /* get us back to the position and size we had before fullscreen */
     restore_normal_geometry(dpy, win);
-    
-    // If we have a gnome compliant wm that supports layers, put
-    // us in the normal layer
+
+    /** 
+     * If we have a gnome compliant wm that supports layers, put
+     * us in the normal layer
+     */
     
     if(gnome_wm_layers) {
       XEvent ev;
@@ -496,7 +506,7 @@ static void switch_to_normal_state(Display *dpy, Window win)
 	  ev.xclient.window = win;
 	  ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", True);
 	  ev.xclient.format = 32;
-	  ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE
+	  ev.xclient.data.l[0] = 0; /* _NET_WM_STATE_REMOVE */
 	  ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_STAYS_ON_TOP", False);
 	  ev.xclient.data.l[2] = 0;
 	  
@@ -506,14 +516,14 @@ static void switch_to_normal_state(Display *dpy, Window win)
       }
     }
   } else {
-    // ewmh_state_fullscreen is supported
+    /* ewmh_state_fullscreen is supported */
     XEvent ev;
     
     ev.type = ClientMessage;
     ev.xclient.window = win;
     ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", False);
     ev.xclient.format = 32;
-    ev.xclient.data.l[0] = 0; //_NET_WM_STATE_REMOVE not an atom just a define
+    ev.xclient.data.l[0] = 0; /*_NET_WM_STATE_REMOVE not an atom just a define */
     ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
     ev.xclient.data.l[2] = 0;
     
@@ -579,14 +589,16 @@ static int check_for_gnome_wm(Display *dpy)
   }
 
   if(type_return == XA_CARDINAL) {
-    //fprintf(stderr,"check_for_gnome: format: %d\n", format_return);
-    //fprintf(stderr,"check_for_gnome: nitmes: %ld\n", nitems_return);
-    //fprintf(stderr,"check_for_gnome: bytes_after: %ld\n", bytes_after_return);
+    /*
+     *fprintf(stderr,"check_for_gnome: format: %d\n", format_return);
+     *fprintf(stderr,"check_for_gnome: nitmes: %ld\n", nitems_return);
+     *fprintf(stderr,"check_for_gnome: bytes_after: %ld\n", bytes_after_return);
+     */
     if(format_return == 32 && nitems_return == 1 && bytes_after_return == 0) {
 
       win_id = *(long *)prop_return;
 
-      //fprintf(stderr,"win_id: %ld\n", win_id);
+      /*fprintf(stderr,"win_id: %ld\n", win_id); */
 
       XFree(prop_return);
       prop_return = NULL;
@@ -640,16 +652,18 @@ static int check_for_gnome_wm(Display *dpy)
       }
       
       if(type_return == XA_CARDINAL) {
-	//fprintf(stderr,"check_for_gnome: format: %d\n", format_return);
-	//fprintf(stderr,"check_for_gnome: nitmes: %ld\n", nitems_return);
-	//fprintf(stderr,"check_for_gnome: bytes_after: %ld\n", bytes_after_return);
+        /**
+	 *fprintf(stderr,"check_for_gnome: format: %d\n", format_return);
+	 *fprintf(stderr,"check_for_gnome: nitmes: %ld\n", nitems_return);
+	 *fprintf(stderr,"check_for_gnome: bytes_after: %ld\n", bytes_after_return);
+         */
 	if(format_return == 32 && nitems_return == 1 &&
 	   bytes_after_return == 0) {
 
-	  //fprintf(stderr,"win_id: %ld\n", *(long *)prop_return);
+	  /*fprintf(stderr,"win_id: %ld\n", *(long *)prop_return); */
 
 	  if(win_id == *(long *)prop_return) {
-	    // We have successfully detected a GNOME compliant Window Manager
+	    /* We have successfully detected a GNOME compliant Window Manager */
 	    XFree(prop_return);
 	    return 1;
 	  }
@@ -714,14 +728,15 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
     return 0;
   } else {
     
-    //fprintf(stderr,"check_for_EWMH: format: %d\n", format_return);
-    //fprintf(stderr,"check_for_EWMH: nitmes: %ld\n", nitems_return);
-    //fprintf(stderr,"check_for_EWMH: bytes_after: %ld\n", bytes_after_return);
+    /*fprintf(stderr,"check_for_EWMH: format: %d\n", format_return);
+     *fprintf(stderr,"check_for_EWMH: nitmes: %ld\n", nitems_return);
+     *fprintf(stderr,"check_for_EWMH: bytes_after: %ld\n", bytes_after_return);
+     */
     if(format_return == 32 && nitems_return == 1 && bytes_after_return == 0) {
 
       win_id = *(long *)prop_return;
 
-      //fprintf(stderr,"win_id: %ld\n", win_id);
+      /*fprintf(stderr,"win_id: %ld\n", win_id);*/
 
       XFree(prop_return);
       prop_return = NULL;
@@ -765,7 +780,7 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
       
       if(type_return != XA_WINDOW) {
 	fprintf(stderr,"wm_state: check_for_EWMH: property has wrong type (%d)\n",
-		type_return);
+		(int) type_return);
 	if(prop_return != NULL) {
 	  XFree(prop_return);
 	}
@@ -773,17 +788,19 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
       }
       
       if(type_return == XA_WINDOW) {
-	//fprintf(stderr,"check_for_EWMH: format: %d\n", format_return);
-	//fprintf(stderr,"check_for_EWMH: nitmes: %ld\n", nitems_return);
-	//fprintf(stderr,"check_for_EWMH: bytes_after: %ld\n", bytes_after_return);
+        /**
+	 *fprintf(stderr,"check_for_EWMH: format: %d\n", format_return);
+	 *fprintf(stderr,"check_for_EWMH: nitmes: %ld\n", nitems_return);
+	 *fprintf(stderr,"check_for_EWMH: bytes_after: %ld\n", bytes_after_return);
+         */
 
 	if(format_return == 32 && nitems_return == 1 &&
 	   bytes_after_return == 0) {
 
-	  //fprintf(stderr,"win_id: %ld\n", *(long *)prop_return);
+	  /*fprintf(stderr,"win_id: %ld\n", *(long *)prop_return);*/
 
 	  if(win_id == *(long *)prop_return) {
-	    // We have successfully detected a EWMH compliant Window Manager
+	    /* We have successfully detected a EWMH compliant Window Manager */
 	    XFree(prop_return);
 
 
@@ -827,13 +844,14 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 		    return 0;
 		  }
 
-		  //fprintf(stderr,"wm_name: property of type UTF8_STRING\n");
-		  
-		  //fprintf(stderr,"wm_name: format: %d\n", format_return);
-		  //fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
-		  //fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
+                  /**
+		   *fprintf(stderr,"wm_name: property of type UTF8_STRING\n");
+		   *fprintf(stderr,"wm_name: format: %d\n", format_return);
+		   *fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
+		   *fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
+                   */
 		  if(format_return == 8) {
-		    // fprintf(stderr,"wm_state: wm_name: %s\n", (char *)prop_return);
+		    /* fprintf(stderr,"wm_state: wm_name: %s\n", (char *)prop_return);*/
 		    *wm_name_return = strdup((char *)prop_return);
 		  }
 		  
@@ -842,12 +860,13 @@ static int check_for_EWMH_wm(Display *dpy, char **wm_name_return)
 		  XFree(prop_return);
 		}
 	      } else {
-		
-		//fprintf(stderr,"wm_name: format: %d\n", format_return);
-		//fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
-		//fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
+                /**
+		 *fprintf(stderr,"wm_name: format: %d\n", format_return);
+		 *fprintf(stderr,"wm_name: nitmes: %ld\n", nitems_return);
+		 *fprintf(stderr,"wm_name: bytes_after: %ld\n", bytes_after_return);
+                 */
 		if(format_return == 8) {
-		  // fprintf(stderr,"wm_name: %s\n", (char *)prop_return);
+		  /* fprintf(stderr,"wm_name: %s\n", (char *)prop_return);*/
 		  *wm_name_return = strdup((char *)prop_return);
 		}
 	        XFree(prop_return);
@@ -928,11 +947,13 @@ static int check_for_state_fullscreen(Display *dpy)
       }
       return 0;
     } else {
-      // _NET_SUPPORTED is set, lets see what is in it
+      /**
+       * _NET_SUPPORTED is set, lets see what is in it
       
-      //fprintf(stderr,"check_for_state_fullscreen: format: %d\n", format_return);
-      //fprintf(stderr,"check_for_state_fullscreen: nitmes: %ld\n", nitems_return);
-      //fprintf(stderr,"check_for_state_fullscreen: bytes_after: %ld\n", bytes_after_return);
+       *fprintf(stderr,"check_for_state_fullscreen: format: %d\n", format_return);
+       *fprintf(stderr,"check_for_state_fullscreen: nitmes: %ld\n", nitems_return);
+       *fprintf(stderr,"check_for_state_fullscreen: bytes_after: %ld\n", bytes_after_return);
+       */
       
       if(format_return == 32) {
 	int n;
@@ -1020,16 +1041,18 @@ static int check_for_gnome_wm_layers(Display *dpy)
     }
     
     if(type_return == XA_ATOM) {
-      //fprintf(stderr,"check_for_layer: format: %d\n", format_return);
-      //fprintf(stderr,"check_for_layer: nitmes: %ld\n", nitems_return);
-      //fprintf(stderr,"check_for_layer: bytes_after: %ld\n", bytes_after_return);
+      /**
+       *fprintf(stderr,"check_for_layer: format: %d\n", format_return);
+       *fprintf(stderr,"check_for_layer: nitmes: %ld\n", nitems_return);
+       *fprintf(stderr,"check_for_layer: bytes_after: %ld\n", bytes_after_return);
+       */
       if(format_return == 32 &&
 	 nitems_return == 1) {
 
 	if(layer_atom == *(long *)prop_return) {
-	  // we found _WIN_LAYER
+	  /* we found _WIN_LAYER */
 	  
-	  //fprintf(stderr,"_WIN_LAYER found\n");
+	  /*fprintf(stderr,"_WIN_LAYER found\n");*/
 	  XFree(prop_return);
 	  return 1;
 	}
@@ -1053,8 +1076,8 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
 
     gnome_wm = check_for_gnome_wm(dpy);
     
-    //fprintf(stderr,"EWMH_wm: %s\n", EWMH_wm ? "True" : "False");
-    //fprintf(stderr,"gnome_wm: %s\n", gnome_wm ? "True" : "False");
+    /*fprintf(stderr,"EWMH_wm: %s\n", EWMH_wm ? "True" : "False");*/
+    /*fprintf(stderr,"gnome_wm: %s\n", gnome_wm ? "True" : "False");*/
     
     if(gnome_wm) {
       gnome_wm_layers = check_for_gnome_wm_layers(dpy);

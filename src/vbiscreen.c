@@ -527,7 +527,6 @@ void copy_buf_to_screen( vbiscreen_t *vs, char *buf )
 
 void vbiscreen_end_of_caption( vbiscreen_t *vs )
 {
-    int i;
     if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in end of caption\n");
 

@@ -424,8 +424,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
 
-//    osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
-//    osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    /** Billy: What's up?  Are we ditching the logo for XDS?
+     *osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
+     *osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+     */
 
     for( i=OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ )
         osd_string_set_timeout( osd->strings[ i ].string, OSD_FADE_DELAY );
