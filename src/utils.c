@@ -670,16 +670,18 @@ void setup_i18n( void )
                    "\n*** aware terminal. See %s for more information.\n\n"),
                  codeset, PACKAGE_BUGREPORT );
         codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
-        if( strcmp( codeset, "UTF-8" ) != 0 ) {
+        if( ( codeset == NULL ) || ( strcmp( codeset, "UTF-8" ) != 0 ) ) {
           /* This string is not translated, since gettext may now be in an
              undefined state! However, we do not die here, since if the
              user has an improperly set up locale but still wants to
              display messages in English, this will allow the program
-             to function. */
+             to function. If this happens, it's probably a bug, and we'll
+             want to hear about it. */
           fprintf( stderr,
-                   "%s:%d: Failed to force UTF-8 for gettext output! Some GUI messages may not be\n"
-                   "properly displayed! Please report this bug at %s.\n"
-                   __FILE__, __LINE__, PACKAGE_BUGREPORT );
+                   "Call to bind_textdomain_codeset() failed to set UTF-8 mode.\n"
+                   "This may cause GUI messages to be displayed incorrectly!\n"
+                   "Please report this as a bug at %s.\n"
+                   PACKAGE_BUGREPORT );
         }
     }
 #endif
