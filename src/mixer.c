@@ -108,6 +108,7 @@ int mixer_set_volume( int percentdiff )
         v = ( levelpercentage << 8 ) | levelpercentage;
         ioctl( fd, cmd, &v );
         muted = 0;
+        mutecount = 0;
         return v;
     }
 
@@ -237,5 +238,11 @@ void mixer_set_state( int ismuted, int unmute_volume )
 void mixer_close_device( void )
 {
     if( fd >= 0 ) close( fd );
+    saved_volume = (50 << 8 & 0xFF00) | (50 & 0x00FF);
+    mixer_channel = SOUND_MIXER_LINE;
+    mixer_dev_mask = 1 << SOUND_MIXER_LINE;
+    muted = 0;
+    mutecount = 0;
+    fd = -1;
 }
 
