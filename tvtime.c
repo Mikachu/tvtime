@@ -37,9 +37,6 @@
 #include "config.h"
 #include "input.h"
 
-/* Number of frames to wait for next channel digit. */
-#define CHANNEL_DELAY 100
-
 /* Number of frames to pause during channel change. */
 #define CHANNEL_HOLD 2
 
@@ -212,7 +209,11 @@ int main( int argc, char **argv )
             videoinput_set_tuner( vidin, config_get_tuner_number( ct ),
                                   VIDEOINPUT_NTSC );
         }
-        /* Set to the current channel, or the first channel in our frequency list. */
+
+        /**
+         * Set to the current channel, or the first channel in our
+         * frequency list.
+         */
         if( !frequencies_set_chanlist( (char*)config_get_v4l_freq( ct ) ) ) {
             fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", 
                      config_get_v4l_freq( ct ) );
@@ -251,12 +252,16 @@ int main( int argc, char **argv )
                              "Using 1.0.\n" );
             config_set_luma_correction( ct, 1.0 );
         }
-        if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                               config_get_luma_correction( ct ) );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
+                             config_get_luma_correction( ct ) );
+        }
         video_correction_set_luma_power( vc, 
                                          config_get_luma_correction( ct ) );
     } else {
-        if( verbose ) fprintf( stderr, "tvtime: Luma correction disabled.\n" );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Luma correction disabled.\n" );
+        }
     }
 
     in = input_new( ct, vidin, osd, vc );
@@ -267,34 +272,40 @@ int main( int argc, char **argv )
 
 
     /* Steal system resources in the name of performance. */
-    if( verbose ) fprintf( stderr, "tvtime: Attempting to aquire "
-                                   "performance-enhancing features.\n" );
-    if( setpriority( 0, 0, -19 ) < 0 ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't renice to -19.\n" );
+    if( verbose ) {
+        fprintf( stderr, "tvtime: Attempting to aquire "
+                         "performance-enhancing features.\n" );
     }
-    if( mlockall( MCL_CURRENT | MCL_FUTURE ) ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't use mlockall() to "
-                                       "lock memory.\n" );
+    if( setpriority( 0, 0, -19 ) < 0 && verbose ) {
+        fprintf( stderr, "tvtime: Can't renice to -19.\n" );
     }
-    if( !set_realtime_priority( 0 ) ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't set realtime "
-                                       "priority (need root).\n" );
+    if( mlockall( MCL_CURRENT | MCL_FUTURE ) && verbose ) {
+        fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
+    }
+    if( !set_realtime_priority( 0 ) && verbose ) {
+        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
     rtctimer = rtctimer_new();
     if( !rtctimer ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't open /dev/rtc "
-                                       "(for my wakeup call).\n" );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Can't open /dev/rtc "
+                             "(for my wakeup call).\n" );
+        }
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
-            if( verbose ) fprintf( stderr, "tvtime: Can't set 1024hz "
-                                           "from /dev/rtc (need root).\n" );
+            if( verbose ) {
+                fprintf( stderr, "tvtime: Can't set 1024hz "
+                                 "from /dev/rtc (need root).\n" );
+            }
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
             rtctimer_start_clock( rtctimer );
         }
     }
-    if( verbose ) fprintf( stderr, "tvtime: Done stealing resources.\n" );
+    if( verbose ) {
+        fprintf( stderr, "tvtime: Done stealing resources.\n" );
+    }
 
     /* Setup the output. */
     if( !sdl_init( width, height, config_get_outputwidth( ct ), 
@@ -381,7 +392,10 @@ int main( int argc, char **argv )
 
         /* Wait for the next field time and display. */
         gettimeofday( &curfieldtime, 0 );
-        /* I'm commenting this out for now, tvtime takes too much CPU here -Billy
+
+        /**
+         * I'm commenting this out for now, tvtime takes
+         * too much CPU here -Billy
         while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
             if( rtctimer ) {
                 rtctimer_next_tick( rtctimer );
@@ -416,7 +430,8 @@ int main( int argc, char **argv )
                                           width, height/2, width*4 );
         }
         tvtime_osd_volume_muted( osd, mixer_ismute() );
-        tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
+        tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
+                                        height, width*2 );
 
 
         /* CHECKPOINT5 : Built the second field */
@@ -461,7 +476,9 @@ int main( int argc, char **argv )
 
     sdl_quit();
 
-    if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );
+    if( verbose ) {
+        fprintf( stderr, "tvtime: Cleaning up.\n" );
+    }
     videoinput_delete( vidin );
     config_delete( ct );
     input_delete( in );
