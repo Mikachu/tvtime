@@ -142,7 +142,7 @@ const char *get_tvtime_fifodir( config_t *ct )
                 dirhandle = opendir( fifodir );
                 if( dirhandle ) {
                     struct stat dirstat;
-		    closedir( dirhandle );
+                    closedir( dirhandle );
                     if( !stat( fifodir, &dirstat ) ) {
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             return fifodir;
@@ -174,7 +174,7 @@ const char *get_tvtime_fifodir( config_t *ct )
                 dirhandle = opendir( fifodir );
                 if( dirhandle ) {
                     struct stat dirstat;
-		    closedir( dirhandle );
+                    closedir( dirhandle );
                     if( !stat( fifodir, &dirstat ) ) {
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             return fifodir;
@@ -201,17 +201,27 @@ const char *get_tvtime_fifo( config_t *ct )
         /* We have nothing in our cache. */
         const char *fifodir = NULL;
         char *hostname = NULL;
-	char *hostenv = NULL;
+        size_t hostenv_size = 256; 
+        char *hostenv = NULL;
 
         /* Get the FIFO directory. */
-        fifodir = get_tvtime_fifo( ct );
+        fifodir = get_tvtime_fifodir( ct );
         if( !fifodir ) {
             fprintf( stderr, "utils: No FIFO directory found.!\n" );
             return NULL;
         }
 
         /* Try to get a hostname. */
-        hostenv = getenv( "HOSTNAME" );
+        hostenv = (char *) malloc( hostenv_size );
+        while( gethostname( hostenv, hostenv_size ) < 0) {
+            hostenv_size *= 2;
+            if (realloc( hostname, hostenv_size ) < 0) {
+                /* Use a partial hostname. */
+                break;
+            }
+        }
+
+        /* Use this hostname as a suffix to the FIFO */
         if( hostenv ) {
             if( asprintf( &hostname, "-%s", hostenv ) < 0 ) {
                 fprintf( stderr, "utils: Out of memory.\n" );
