@@ -454,10 +454,6 @@
     <keyboard key="F7"/>
   </bind>
 
-  <bind command="channel_renumber">
-    <keyboard key="r"/>
-  </bind>
-
   <bind command="show_stats">
     <keyboard key="d"/>
   </bind>
@@ -470,48 +466,20 @@
     <keyboard key="i"/>
   </bind>
 
-  <bind command="toggle_aspect">
-    <keyboard key="a"/>
-  </bind>
-
   <bind command="screenshot">
     <keyboard key="s"/>
-  </bind>
-
-  <bind command="toggle_deinterlacer">
-    <keyboard key="t"/>
-  </bind>
-
-  <bind command="toggle_pulldown_detection">
-    <keyboard key="p"/>
   </bind>
 
   <bind command="toggle_cc">
     <keyboard key="c"/>
   </bind>
 
-  <bind command="toggle_framerate">
-    <keyboard key="="/>
-  </bind>
-
   <bind command="toggle_audio_mode">
     <keyboard key="e"/>
   </bind>
 
-  <bind command="overscan_up">
-    <keyboard key="&gt;"/>
-  </bind>
-
-  <bind command="overscan_down">
-    <keyboard key="&lt;"/>
-  </bind>
-
   <bind command="display_info">
     <mouse button="1"/>
-  </bind>
-
-  <bind command="toggle_matte">
-    <keyboard key="insert"/>
   </bind>
 
   <bind command="toggle_alwaysontop">
@@ -541,8 +509,6 @@
    -->
 
   <bind command="auto_adjust_window">  <keyboard key="/"/>    </bind>
-  <bind command="toggle_bars">         <keyboard key="b"/>    </bind>
-  <bind command="toggle_pause">        <keyboard key="end"/>  </bind>
   <bind command="mixer_toggle_mute">   <keyboard key=","/>    </bind>
   <bind command="auto_adjust_pict">    <keyboard key=" "/>    </bind>
 
