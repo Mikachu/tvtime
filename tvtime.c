@@ -46,7 +46,7 @@ static int timediff( struct timeval *large, struct timeval *small )
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-aps] [-w <width>] [-o <mode>] "
+    fprintf( stderr, "usage: %s [-as] [-w <width>] [-o <mode>] "
                      "[-d <device> [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-a\t16:9 mode.\n"
