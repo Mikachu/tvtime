@@ -193,7 +193,7 @@ static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
         return;
     }
 
-    cmd = string_to_command( string );
+    cmd = tvtime_string_to_command( string );
 
     if( cmd != -1 ) {
         input_callback( in, I_REMOTE, cmd );

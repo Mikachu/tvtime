@@ -107,8 +107,6 @@ static Cmd_Names cmd_table[] = {
 
 struct config_s
 {
-    parser_file_t pf;
-
     int outputwidth;
     int verbose;
     int aspect;
@@ -152,10 +150,332 @@ struct config_s
     char config_filename[ 1024 ];
 };
 
-void config_init( config_t *ct );
-void config_init_keymap( config_t *ct );
-void config_init_buttonmap( config_t *ct );
-unsigned int parse_colour( const char *str );
+static int string_to_key( const char *str )
+{
+    int key = 0;
+    const char *ptr;
+
+    if( !str ) return 0;
+
+    if( strlen( str ) == 1) return (int)(*str);
+
+    ptr = str;
+    while( *ptr ) {
+        unsigned int onumber;
+        int number, digits;
+
+        /* skip spaces */
+        while( *ptr == ' ' ) ptr++;
+
+        switch( *ptr ) {
+        case 'c':
+        case 'C':
+            if( *++ptr && *ptr == '+') {
+                key |= I_CTRL;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 'm':
+        case 'M':
+            if( *++ptr && *ptr == '+') {
+                key |= I_META;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 's':
+        case 'S':
+            if( *++ptr && *ptr == '+') {
+                key |= I_SHIFT;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 'f':
+        case 'F':
+            ptr++;
+            if( *ptr && sscanf( ptr, "%d%n", &number, &digits ) ) {
+                if( number > 0 && number < 16 ) {
+                    key |= 281 + number;
+                    ptr += digits;
+                } else {
+                    fprintf( stderr, "config: Error parsing keybinding.\n" );
+                    return 0;
+                }
+            } else {
+                key |= *ptr;
+                ptr++;
+            }
+            break;
+
+        case '\\':
+            ptr++;
+            switch( *ptr ) {
+
+            case 'b':
+                key |= '\b';
+                ptr++;
+                break;
+                
+            case 't':
+                key |= '\t';
+                ptr++;
+                break;
+
+            case 's':
+                key |= ' ';
+                ptr++;
+                break;
+
+            case '0':
+                ptr++;
+                if( *ptr && sscanf( ptr, "%o%n", &onumber, &digits) ) {
+                    if( digits == 3 && onumber < 512 ) {
+                        key |= onumber;
+                        ptr += digits;
+                    } else {
+                        fprintf( stderr, "config: Invalid octal keycode.\n" );
+                        return 0;
+                    }
+                } else {
+                    fprintf( stderr, "config: Invalid escape sequence.\n" );
+                    return 0;
+                }
+                break;
+
+            default:
+                key |= *ptr;
+                ptr++;
+                break;
+            }
+            break;
+
+        default:
+            key |= *ptr;
+            ptr++;
+            break;
+        }
+    }
+    return key;
+}
+
+static unsigned int parse_colour( const char *str )
+{
+    unsigned int a,r,g,b;
+    int ret;
+    
+    if( !str || !*str ) return 0;
+
+    if( strlen( str ) == 1 ) return (unsigned int)atoi( str );
+
+    if( str[0] == '0' && str[1] == 'x' ) {
+        ret = sscanf( str, "0x%2x%2x%2x%2x", &a, &r, &g, &b );
+    } else {
+        ret = sscanf( str, "%u %u %u %u", &a, &r, &g, &b );
+    }
+    switch( ret ) {
+    case 0:
+        return 0;
+        break;
+    case 1:
+        return a;
+        break;
+    case 2:
+        return 0xff000000 | ( (a & 0xff) << 8 ) | (r & 0xff);
+        break;
+    case 3:
+        return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
+        break;
+    case 4:
+        return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
+    }
+
+    return 0;
+}
+
+
+static void config_init_keymap( config_t *ct, parser_file_t *pf )
+{
+    const char *tmp;
+    int key, cmd=0, i=1;
+    
+    if( !ct->keymap ) {
+        fprintf( stderr, "config: No keymap. No keybindings.\n" );
+        return;
+    }
+
+    for( cmd=0; cmd < NUM_CMDS; cmd++ ) {
+        char keystr[ 5+MAX_CMD_NAMELEN ];
+        sprintf( keystr, "key_%s", cmd_table[cmd].name );
+
+        for(i=1;;i++)
+            if( (tmp = parser_get( pf, keystr, i )) ) {
+                key = string_to_key( tmp );
+                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = cmd_table[ cmd ].command;
+            } else { break; }
+    }   
+}
+
+static void config_init_buttonmap( config_t *ct, parser_file_t *pf )
+{
+    int button=0, cmd=0;
+    const char *tmp;
+
+    for( button=0; button < MAX_BUTTONS; button++ ) {
+        char butstr[ 14+MAX_CMD_NAMELEN ];
+        sprintf( butstr, "mouse_button_%d", button );
+
+        if( (tmp = parser_get( pf, butstr, 1 )) ) {
+            cmd = tvtime_string_to_command( tmp );
+            if( cmd == -1 ) {
+                fprintf( stderr, 
+                         "config_init_buttonmap: %s is not a valid command.\n", 
+                         tmp );
+                continue;
+            }
+
+            ct->buttonmap[ button ] = cmd;
+        }
+    }
+
+}
+
+static void config_init( config_t *ct, parser_file_t *pf )
+{
+    const char *tmp;
+
+    if( (tmp = parser_get( pf, "OutputWidth", 1 )) ) {
+        ct->outputwidth = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "InputWidth", 1 )) ) {
+        ct->inputwidth = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "Verbose", 1 )) ) {
+        ct->verbose = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "Widescreen", 1 )) ) {
+        ct->aspect = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "DebugMode", 1 )) ) {
+        ct->debug = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "ApplyLumaCorrection", 1 )) ) {
+        ct->apply_luma_correction = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "LumaCorrection", 1 )) ) {
+        ct->luma_correction = atof( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "V4LDevice", 1 )) ) {
+        free( ct->v4ldev );
+        ct->v4ldev = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "VBIDevice", 1 )) ) {
+        free( ct->vbidev );
+        ct->vbidev = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "CaptureSource", 1 )) ) {
+        ct->inputnum = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "UseVBI", 1 )) ) {
+        ct->use_vbi = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "ProcessPriority", 1 )) ) {
+        ct->priority = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "Fullscreen", 1 )) ) {
+        ct->fullscreen = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "Norm", 1 )) ) {
+        free( ct->norm );
+        ct->norm = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "Frequencies", 1 )) ) {
+        free( ct->freq );
+        ct->freq = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "CommandPipe", 1 )) ) {
+        strncpy( ct->command_pipe, tmp, 255 );
+    }
+
+    if( (tmp = parser_get( pf, "TimeFormat", 1 )) ) {
+        free( ct->timeformat );
+        ct->timeformat = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "MenuBG", 1 )) ) {
+        ct->menu_bg_rgb = parse_colour( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "ChannelTextFG", 1 )) ) {
+        ct->channel_text_rgb = parse_colour( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "OtherTextFG", 1 )) ) {
+        ct->other_text_rgb = parse_colour( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "StartChannel", 1 )) ) {
+        ct->start_channel = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "FinetuneOffset", 1 )) ) {
+        ct->finetune = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "NTSCCableMode", 1 )) ) {
+        if( !strcasecmp( tmp, "IRC" ) ) {
+            ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
+        } else if( !strcasecmp( tmp, "HRC" ) ) {
+            ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
+        } else {
+            ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
+        }
+    }
+
+    if( (tmp = parser_get( pf, "PreferredDeinterlaceMethod", 1 )) ) {
+        ct->preferred_deinterlace_method = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "CheckForSignal", 1 )) ) {
+        ct->check_freq_present = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( pf, "LeftScanlineBias", 1 )) ) {
+        ct->left_scanline_bias = atoi( tmp );
+    }
+    if( (tmp = parser_get( pf, "RightScanlineBias", 1 )) ) {
+        ct->right_scanline_bias = atoi( tmp );
+    }
+    if( (tmp = parser_get( pf, "Overscan", 1 )) ) {
+        ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
+        ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
+    }
+
+    config_init_keymap( ct, pf );
+    config_init_buttonmap( ct, pf );
+}
 
 static void print_usage( char **argv )
 {
@@ -198,7 +518,7 @@ static void print_usage( char **argv )
 /**
  * This should be moved elsewhere.
  */
-int file_is_openable_for_read( const char *filename )
+static int file_is_openable_for_read( const char *filename )
 {
     int fd;
     fd = open( filename, O_RDONLY );
@@ -212,6 +532,7 @@ int file_is_openable_for_read( const char *filename )
 
 config_t *config_new( int argc, char **argv )
 {
+    parser_file_t pf;
     char temp_dirname[ 1024 ];
     char base[ 256 ];
     char *configFile = 0;
@@ -344,9 +665,9 @@ config_t *config_new( int argc, char **argv )
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         configFile = base;
-        if( parser_new( &(ct->pf), configFile ) ) {
-            config_init( ct );
-            parser_delete( &(ct->pf) );
+        if( parser_new( &pf, configFile ) ) {
+            config_init( ct, &pf );
+            parser_delete( &pf );
         }
     }
 
@@ -357,9 +678,9 @@ config_t *config_new( int argc, char **argv )
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         configFile = base;
-        if( parser_new( &(ct->pf), configFile ) ) {
-            config_init( ct );
-            parser_delete( &(ct->pf) );
+        if( parser_new( &pf, configFile ) ) {
+            config_init( ct, &pf );
+            parser_delete( &pf );
         }
     }
 
@@ -392,11 +713,11 @@ config_t *config_new( int argc, char **argv )
         sprintf( ct->config_filename, "%s", configFile );
         fprintf( stderr, "config: Reading configuration from %s\n", configFile );
 
-        if( !parser_new( &(ct->pf), configFile ) ) {
+        if( !parser_new( &pf, configFile ) ) {
             fprintf( stderr, "config: Could not read configuration from %s\n", configFile );
         } else {
-            config_init( ct );
-            parser_delete( &(ct->pf) );
+            config_init( ct, &pf );
+            parser_delete( &pf );
         }
         free( configFile );
     }
@@ -423,279 +744,6 @@ void config_delete( config_t *ct )
     free( ct );
 }
 
-void config_init( config_t *ct )
-{
-    const char *tmp;
-
-    if( !ct ) {
-        fprintf( stderr, "config: NULL received as config structure.\n" );
-        return;
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "OutputWidth", 1 )) ) {
-        ct->outputwidth = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "InputWidth", 1 )) ) {
-        ct->inputwidth = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "Verbose", 1 )) ) {
-        ct->verbose = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "Widescreen", 1 )) ) {
-        ct->aspect = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "DebugMode", 1 )) ) {
-        ct->debug = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "ApplyLumaCorrection", 1 )) ) {
-        ct->apply_luma_correction = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "LumaCorrection", 1 )) ) {
-        ct->luma_correction = atof( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "V4LDevice", 1 )) ) {
-        free( ct->v4ldev );
-        ct->v4ldev = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "VBIDevice", 1 )) ) {
-        free( ct->vbidev );
-        ct->vbidev = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "CaptureSource", 1 )) ) {
-        ct->inputnum = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "UseVBI", 1 )) ) {
-        ct->use_vbi = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "ProcessPriority", 1 )) ) {
-        ct->priority = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "FullScreen", 1 )) ) {
-        ct->fullscreen = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "Norm", 1 )) ) {
-        free( ct->norm );
-        ct->norm = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "Frequencies", 1 )) ) {
-        free( ct->freq );
-        ct->freq = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "CommandPipe", 1 )) ) {
-        strncpy( ct->command_pipe, tmp, 255 );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "TimeFormat", 1 )) ) {
-        free( ct->timeformat );
-        ct->timeformat = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "MenuBG", 1 )) ) {
-        ct->menu_bg_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "ChannelTextFG", 1 )) ) {
-        ct->channel_text_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "OtherTextFG", 1 )) ) {
-        ct->other_text_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "StartChannel", 1 )) ) {
-        ct->start_channel = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
-        ct->finetune = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "NTSCCableMode", 1 )) ) {
-        if( !strcasecmp( tmp, "IRC" ) ) {
-            ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
-        } else if( !strcasecmp( tmp, "HRC" ) ) {
-            ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
-        } else {
-            ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
-        }
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "PreferredDeinterlaceMethod", 1 )) ) {
-        ct->preferred_deinterlace_method = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "CheckForSignal", 1 )) ) {
-        ct->check_freq_present = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "LeftScanlineBias", 1 )) ) {
-        ct->left_scanline_bias = atoi( tmp );
-    }
-    if( (tmp = parser_get( &(ct->pf), "RightScanlineBias", 1 )) ) {
-        ct->right_scanline_bias = atoi( tmp );
-    }
-    if( (tmp = parser_get( &(ct->pf), "Overscan", 1 )) ) {
-        ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
-        ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
-    }
-
-    config_init_keymap( ct );
-    config_init_buttonmap( ct );
-}
-
-int string_to_key( const char *str )
-{
-    int key = 0;
-    const char *ptr;
-
-    if( !str ) return 0;
-
-    if( strlen( str ) == 1) return (int)(*str);
-
-    ptr = str;
-    while( *ptr ) {
-        unsigned int onumber;
-        int number, digits;
-
-        /* skip spaces */
-        while( *ptr == ' ' ) ptr++;
-
-        switch( *ptr ) {
-        case 'c':
-        case 'C':
-            if( *++ptr && *ptr == '+') {
-                key |= I_CTRL;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 'm':
-        case 'M':
-            if( *++ptr && *ptr == '+') {
-                key |= I_META;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 's':
-        case 'S':
-            if( *++ptr && *ptr == '+') {
-                key |= I_SHIFT;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 'f':
-        case 'F':
-            ptr++;
-            if( *ptr && sscanf( ptr, "%d%n", &number, &digits ) ) {
-                if( number > 0 && number < 16 ) {
-                    key |= 281 + number;
-                    ptr += digits;
-                } else {
-                    fprintf( stderr, "config: Error parsing keybinding.\n" );
-                    return 0;
-                }
-            } else {
-                key |= *ptr;
-                ptr++;
-            }
-            break;
-
-        case '\\':
-            ptr++;
-            switch( *ptr ) {
-
-            case 'b':
-                key |= '\b';
-                ptr++;
-                break;
-                
-            case 't':
-                key |= '\t';
-                ptr++;
-                break;
-
-            case 's':
-                key |= ' ';
-                ptr++;
-                break;
-
-            case '0':
-                ptr++;
-                if( *ptr && sscanf( ptr, "%o%n", &onumber, &digits) ) {
-                    if( digits == 3 && onumber < 512 ) {
-                        key |= onumber;
-                        ptr += digits;
-                    } else {
-                        fprintf( stderr, "config: Invalid octal keycode.\n" );
-                        return 0;
-                    }
-                } else {
-                    fprintf( stderr, "config: Invalid escape sequence.\n" );
-                    return 0;
-                }
-                break;
-
-            default:
-                key |= *ptr;
-                ptr++;
-                break;
-            }
-            break;
-
-        default:
-            key |= *ptr;
-            ptr++;
-            break;
-        }
-    }
-    return key;
-}
-
-void config_init_keymap( config_t *ct )
-{
-    const char *tmp;
-    int key, cmd=0, i=1;
-    
-    if( !ct->keymap ) {
-        fprintf( stderr, "config: No keymap. No keybindings.\n" );
-        return;
-    }
-
-    for( cmd=0; cmd < NUM_CMDS; cmd++ ) {
-        char keystr[ 5+MAX_CMD_NAMELEN ];
-        sprintf( keystr, "key_%s", cmd_table[cmd].name );
-
-        for(i=1;;i++)
-            if( (tmp = parser_get( &(ct->pf), keystr, i )) ) {
-                key = string_to_key( tmp );
-                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = cmd_table[ cmd ].command;
-            } else { break; }
-    }   
-}
-
 int config_key_to_command( config_t *ct, int key )
 {
     if( !ct || !ct->keymap ) {
@@ -717,7 +765,7 @@ int config_key_to_command( config_t *ct, int key )
     return TVTIME_NOCOMMAND;
 }
 
-int string_to_command( const char *str )
+int tvtime_string_to_command( const char *str )
 {
     int i=0;
 
@@ -730,30 +778,6 @@ int string_to_command( const char *str )
         i++;
     }
     return -1;
-}
-
-void config_init_buttonmap( config_t *ct )
-{
-    int button=0, cmd=0;
-    const char *tmp;
-
-    for( button=0; button < MAX_BUTTONS; button++ ) {
-        char butstr[ 14+MAX_CMD_NAMELEN ];
-        sprintf( butstr, "mouse_button_%d", button );
-
-        if( (tmp = parser_get( &(ct->pf), butstr, 1 )) ) {
-            cmd = string_to_command( tmp );
-            if( cmd == -1 ) {
-                fprintf( stderr, 
-                         "config_init_buttonmap: %s is not a valid command.\n", 
-                         tmp );
-                continue;
-            }
-
-            ct->buttonmap[ button ] = cmd;
-        }
-    }
-
 }
 
 int config_button_to_command( config_t *ct, int button )
@@ -872,63 +896,6 @@ unsigned int config_get_other_text_rgb( config_t *ct )
 {
     return ct->other_text_rgb;
 }
-
-unsigned int parse_colour( const char *str )
-{
-    unsigned int a,r,g,b;
-    int ret;
-    
-    if( !str || !*str ) return 0;
-
-    if( strlen( str ) == 1 ) return (unsigned int)atoi( str );
-
-    if( str[0] == '0' && str[1] == 'x' ) {
-        ret = sscanf( str, "0x%2x%2x%2x%2x", &a, &r, &g, &b );
-    } else {
-        ret = sscanf( str, "%u %u %u %u", &a, &r, &g, &b );
-    }
-    switch( ret ) {
-    case 0:
-        return 0;
-        break;
-    case 1:
-        return a;
-        break;
-    case 2:
-        return 0xff000000 | ( (a & 0xff) << 8 ) | (r & 0xff);
-        break;
-    case 3:
-        return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
-        break;
-    case 4:
-        return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
-    }
-
-    return 0;
-}
-
-void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr )
-{
-    unsigned int r, g, b;
-    unsigned char iconv[3], oconv[3];
-
-    if( strlen( rgbhex ) == 6 ) {
-        if( sscanf( rgbhex, "%2x%2x%2x", &r, &g, &b ) == 3 ) {
-            iconv[0] = (unsigned char)(r & 0xff);
-            iconv[1] = (unsigned char)(g & 0xff);
-            iconv[2] = (unsigned char)(b & 0xff);
-            rgb24_to_packed444_rec601_scanline(oconv, iconv, 1);
-            *y = oconv[0];
-            *cb = oconv[1];
-            *cr = oconv[2];
-            return;
-        }
-    }
-    *y = (unsigned char)16;
-    *cb = (unsigned char)128;
-    *cr = (unsigned char)128;
-}
-
 
 const char *config_get_config_filename( config_t *ct )
 {

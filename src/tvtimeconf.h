@@ -148,9 +148,7 @@ void config_set_vertical_overscan( config_t *ct, double voverscan );
 
 int config_get_check_freq_present( config_t *ct );
 
-void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr );
-
-int string_to_command( const char *str );
+int tvtime_string_to_command( const char *str );
 
 int config_get_usevbi( config_t *ct );
 char *config_get_vbidev( config_t *ct );

@@ -255,7 +255,7 @@ Conf *xml_config_set(Conf *C_root, const xmlChar *name, const xmlChar *value, co
 		    memcpy(C_cur->val, value, sizeof(double));
 		    break;
 		case 'c':
-		    i = string_to_command((const char *)value);
+		    i = tvtime_string_to_command((const char *)value);
 		    memcpy(C_cur->val, &i, sizeof(int));
 		    break;
 		case 'b':
@@ -320,7 +320,7 @@ Conf *xml_config_set(Conf *C_root, const xmlChar *name, const xmlChar *value, co
 	case 'c':
 	    if( (C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
 		(C_cur->name = strdup(name)) == NULL ) return C_root;
-	    i = string_to_command((const char *)value);
+	    i = tvtime_string_to_command((const char *)value);
 	    memcpy(C_cur->val, &i, sizeof(int));
 	    break;
 
