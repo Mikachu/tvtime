@@ -25,31 +25,39 @@
 extern "C" {
 #endif
 
-typedef struct station_info {
-    int pos;
-    char name[32];
-    const char *band;
-    const char *channel;
-    int freq;
-} station_info_t;
-
+#define US_CABLE_NOMINAL 	0
+#define US_CABLE_HRC		1
+#define US_CABLE_IRC		2
 
 int station_init( config_t *ct );
+int station_writeConfig( config_t *ct );
 
+/**
+ * Set the current channel.
+ */
 int station_set( int pos );
-
 void station_next( void );
 void station_prev( void );
-int station_hasChanged( void );
-station_info_t *station_getInfo( void );
 
-int station_add( int pos, char *band, char *channel, char* name );
+/**
+ * Set the us cable mode (global).
+ */
+void station_set_us_cable_mode( int us_cable );
 
-int station_add_band( char *band, int us_cable );
+/**
+ * Information about the current channel.
+ */
+int station_get_current_id( void );
+const char *station_get_current_channel_name( void );
+const char *station_get_current_band( void );
+int station_get_current_frequency( void );
 
-int station_scan( char *band, int us_cable );
-
-int station_writeConfig( config_t *ct );
+/**
+ * Add or update the channel list.
+ */
+int station_add( int pos, const char *band, const char *channel, const char *name );
+int station_add_band( const char *band );
+int station_scan( void );
 
 #ifdef __cplusplus
 };

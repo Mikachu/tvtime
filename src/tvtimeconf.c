@@ -210,7 +210,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
     ct->preferred_deinterlace_method = 0;
     ct->check_freq_present = 1;
-    ct->use_vbi = 1;
+    ct->use_vbi = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );

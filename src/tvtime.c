@@ -721,7 +721,7 @@ int main( int argc, char **argv )
     }
 
     /* setup the fifo */
-    /* this should not be enabled in the next release.
+    /* Fifo disabled for 0.9.7 release
     fifo = fifo_new( ct, NULL );
     if( !fifo ) {
         fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
@@ -730,12 +730,14 @@ int main( int argc, char **argv )
     */
 
     /* Setup the console */
+    /* Console disabled for 0.9.7 release
     con = console_new( ct, (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 10,
                        width, height, 
                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !con ) {
         fprintf( stderr, "tvtime: Could not setup console.\n" );
     }
+    */
 
 
     if( con ) {

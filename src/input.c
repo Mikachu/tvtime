@@ -78,6 +78,7 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
     in->console_on = 0;
     in->menu = menu;
     in->console = con;
+    in->quit = 0;
 
     in->lirc_used = 0;
 
