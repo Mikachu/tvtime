@@ -281,7 +281,11 @@ int main( int argc, char **argv )
             chanindex++;
             chanindex %= chancount;
             last_chan_time = 0;
+
+            if( !muted ) { videoinput_mute(1); }
             videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+            if( !muted ) { usleep(20000); videoinput_mute(0); }
+
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
         }
@@ -289,17 +293,20 @@ int main( int argc, char **argv )
             chanindex--;
             chanindex %= chancount;
             last_chan_time = 0;
+
+            if( !muted ) { videoinput_mute(1); }
             videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+            if( !muted ) { usleep(20000); videoinput_mute(0); }
 
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
         }
         if( commands & TVTIME_MIXER_UP ) {
-            mixer_set_volume(1);
+            mixer_set_volume(3);
             volume = mixer_get_volume();
         }
         if( commands & TVTIME_MIXER_DOWN ) {
-            mixer_set_volume(-1);
+            mixer_set_volume(-3);
             volume = mixer_get_volume();
         }
         if( commands & TVTIME_MIXER_MUTE ) {
@@ -328,7 +335,9 @@ int main( int argc, char **argv )
                     last_chan_time = time(NULL);
                     chanindex = digit - 1;
 
+                    if( !muted ) { videoinput_mute(1); }
                     videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+                    if( !muted ) { usleep(20000); videoinput_mute(0); }
 
                     fprintf( stderr, "tvtime: Changing to channel %s\n",
                              chanlist[ chanindex ].name );
@@ -342,7 +351,9 @@ int main( int argc, char **argv )
                     chanindex = (chanindex+1)*10 + digit - 1;
                 }
 
+                if( !muted ) { videoinput_mute(1); }
                 videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+                if( !muted ) { usleep(20000); videoinput_mute(0); }
 
                 fprintf( stderr, "tvtime: Changing to channel %s\n", 
                          chanlist[ chanindex ].name );                    
