@@ -72,7 +72,12 @@ distribution has been explicitly allowed.
     > not obligated to do so.  If you do not wish to do so, delete this
     > exception statement from your version.
 
+data/FreeMonoBold.sfd
 data/FreeMonoBold.ttf
+      The FreeMonoBold.ttf and source file FreeMonoBold.sfd comes from
+      the freefont project.  See  http://www.nongnu.org/freefont/
+
+      --
       freefont is a collection of free Universal Character Set outline fonts.
       Copyright (C) 2002  Free Software Foundation
 

@@ -88,8 +88,8 @@ install: build
 	$(MAKE) install prefix=$(CURDIR)/debian/tvtime/usr       \
 	                sysconfdir=$(CURDIR)/debian/tvtime/etc   \
 			localstatedir=$(CURDIR)/debian/tvtime/var
-	# Remove the freefont TTFs.
-	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/Free*.ttf
+	# Remove the freefont TTF.
+	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/FreeMonoBold.ttf
 	# Remove the configuration file.
 	-rm -f $(CURDIR)/debian/tvtime/etc/tvtime/tvtime.xml
 	# Copy HTML documentation.
