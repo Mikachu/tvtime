@@ -1021,6 +1021,10 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
         vbi->enabled = 0;
         break;
     }
+
+    if( !vbi->enabled && vbi->vs ) {
+        vbiscreen_reset( vbi->vs );
+    }
 }
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )
