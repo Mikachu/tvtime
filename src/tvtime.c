@@ -2738,15 +2738,12 @@ int main( int argc, char **argv )
 
     rtctimer = rtctimer_new( 1 );
     if( !rtctimer ) {
-        lfprintf( stderr,
-                  _("\n*** /dev/rtc support is needed for smooth video.  "
-                    "We STRONGLY recommend\n"
-                    "*** that you load the 'rtc' kernel module "
-                    "before starting tvtime,\n"
-                    "*** and make sure that your user "
-                    "has access to the device file.\n"
-                    "*** See our support page at %s"
-                    " for more information\n\n"), PACKAGE_BUGREPORT );
+        lfprintf( stderr, _("\n"
+     "    Enhanced Real Time Clock support in your kernel is necessary for\n"
+     "    smooth video.  We strongly recommend that you load the 'rtc' kernel\n"
+     "    module before starting tvtime, and make sure that your user has\n"
+     "    access to the device file (/dev/rtc or /dev/misc/rtc).  See our\n"
+     "    support page at %s for more information.\n\n"), PACKAGE_BUGREPORT );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) &&
             !rtctimer_set_interval( rtctimer, 64 ) ) {
@@ -2756,16 +2753,15 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                lfprintf( stderr,
-                          _( "\n*** Failed to get 1024hz resolution from "
-                             "/dev/rtc.  This will cause\n"
-                             "*** video to not be smooth.  Please run tvtime "
-                             "as root, or change\n"
-                             "*** the maximum resolution by running this "
-                             "command as root:\n"
-                             "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                             "*** See our support page at %s for more "
-                             "information\n\n"), PACKAGE_BUGREPORT );
+                lfprintf( stderr, _("\n"
+      "    Failed to get 1024 Hz resolution from your RTC device.  High\n"
+      "    resolution access is necessary for video to be smooth.  Please\n"
+      "    run tvtime as root, set tvtime as SUID root, or change the\n"
+      "    maximum RTC resolution allowed for user processes by running this\n"
+      "    command as root:\n"
+      "        sysctl -w dev.rtc.max-user-freq=1024\n"
+      "    See our support page at %s for more information.\n\n"),
+                    PACKAGE_BUGREPORT );
             }
         }
     }
