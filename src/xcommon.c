@@ -1583,6 +1583,11 @@ void xcommon_set_fullscreen_position( int pos )
 
 void xcommon_set_matte( int width, int height )
 {
+    if( width ) {
+        x11_aspect_hint( display, wm_window, width, height );
+    } else {
+        x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
+    }
     matte_width = width;
     matte_height = height;
     calculate_video_area();

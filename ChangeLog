@@ -1,5 +1,6 @@
 
 0.9.13 -
+  * vektor: We now set the aspect ratio hints based on the matte setting.
   * vektor: Fixed a nasty segfault when the capture card driver errors out
       on the first few frames.
   * vektor: We now always mute the sound card on channel change to protect
