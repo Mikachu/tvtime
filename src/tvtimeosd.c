@@ -82,7 +82,6 @@ struct tvtime_osd_s
 
     credits_t *credits;
     int show_credits;
-    config_t *cfg;
 };
 
 void tvtime_osd_set_scan_channels( tvtime_osd_t* osd, const char *str )
@@ -175,12 +174,12 @@ const int top_size = 7;
 const int left_size = 7;
 const int bottom_size = 13;
 
-tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frameaspect )
+tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
+                              unsigned int channel_rgb, unsigned int other_rgb )
 {
     char *fontfile;
     char *logofile;
     char *creditsfile;
-    unsigned int channel_rgb, other_rgb;
 
     tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
     if( !osd ) {
@@ -190,7 +189,6 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
 
     osd->channel_logo = 0;
-    osd->cfg = cfg;
     osd->scan_channels = "";
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
@@ -257,9 +255,6 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
         tvtime_osd_delete( osd );
         return 0;
     }
-
-    other_rgb = config_get_other_text_rgb( cfg );
-    channel_rgb = config_get_channel_text_rgb( cfg );
 
     osd_string_set_colour_rgb( osd->strings[ OSD_TUNER_INFO ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
