@@ -54,6 +54,9 @@ timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 CLEANFILES = expandpng timingtest
 
-.PHONY: ../plugins/libtvtimeplugins.la
+.PHONY: ../plugins/libtvtimeplugins.la wine/libwine.a
 ../plugins/libtvtimeplugins.la:
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
+wine/libwine.a:
+	( $(MAKE) $(AM_MAKEFLAGS) -C wine )
+

@@ -592,7 +592,7 @@ int main( int argc, char **argv )
     dscaler_videoweave_plugin_init();
     dscaler_bob_plugin_init();
     dscaler_weave_plugin_init();
-    dscaler_oldgame_plugin_init();
+    // how does this work anyway: dscaler_oldgame_plugin_init();
     dscaler_tomsmocomp_plugin_init();
 
 
