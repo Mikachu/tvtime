@@ -45,9 +45,10 @@ typedef struct rtctimer_s rtctimer_t;
 
 /**
  * Create a new timer object.  This does not initialize the clock to any
- * value.
+ * value.  The verbose flag indicates that we want to see error messages
+ * to stderr.
  */
-rtctimer_t *rtctimer_new( void );
+rtctimer_t *rtctimer_new( int verbose );
 
 /**
  * Free the timer object.  This will stop the clock first if it is

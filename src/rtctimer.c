@@ -35,23 +35,29 @@ struct rtctimer_s
     int rtc_fd;
     int current_hz;
     int rtc_running;
+    int verbose;
 };
 
-rtctimer_t *rtctimer_new( void )
+rtctimer_t *rtctimer_new( int verbose )
 {
     rtctimer_t *rtctimer = (rtctimer_t *) malloc( sizeof( rtctimer_t ) );
     if( !rtctimer ) return 0;
 
+    rtctimer->verbose = verbose;
     if( ( rtctimer->rtc_fd = open( "/dev/rtc", O_RDONLY ) ) < 0 ) {
-        fprintf( stderr, "rtctimer: Cannot open /dev/rtc: %s\n",
-                 strerror( errno ) );
+        if( rtctimer->verbose ) {
+            fprintf( stderr, "rtctimer: Cannot open /dev/rtc: %s\n",
+                     strerror( errno ) );
+        }
         free( rtctimer );
         return 0;
     }
 
     if( fcntl( rtctimer->rtc_fd, F_SETOWN, getpid() ) < 0 ) {
-        fprintf( stderr, "rtctimer: cannot set ownership of "
-                         "/dev/rtc: %s\n", strerror( errno ) );
+        if( rtctimer->verbose ) {
+            fprintf( stderr, "rtctimer: cannot set ownership of "
+                             "/dev/rtc: %s\n", strerror( errno ) );
+        }
         close( rtctimer->rtc_fd );
         free( rtctimer );
         return 0;
@@ -86,7 +92,10 @@ again:
             goto again;
         }
 
-        printf( "rtctimer: poll call failed: %s\n", strerror( errno ) );
+        if( rtctimer->verbose ) {
+            fprintf( stderr, "rtctimer: poll call failed: %s\n",
+                     strerror( errno ) );
+        }
         return 0;
     }
 
@@ -105,8 +114,10 @@ int rtctimer_set_interval( rtctimer_t *rtctimer, int hz )
     restart = rtctimer_stop_clock( rtctimer );
 
     if( ioctl( rtctimer->rtc_fd, RTC_IRQP_SET, hz ) < 0 ) {
-        printf( "rtctimer: cannot set periodic interval: %s\n",
-            strerror( errno ) );
+        if( rtctimer->verbose ) {
+            fprintf( stderr, "rtctimer: Cannot set periodic interval: %s\n",
+                     strerror( errno ) );
+        }
         return 0;
     }
 
@@ -123,8 +134,10 @@ int rtctimer_start_clock( rtctimer_t *rtctimer )
 {
     if( !rtctimer->rtc_running ) {
         if( ioctl( rtctimer->rtc_fd, RTC_PIE_ON, 0 ) < 0 ) {
-            printf( "rtctimer: cannot start periodic "
-                    "interrupts: %s\n", strerror( errno ) );
+            if( rtctimer->verbose ) {
+                fprintf( stderr, "rtctimer: cannot start periodic "
+                         "interrupts: %s\n", strerror( errno ) );
+            }
             return 0;
         }
         rtctimer->rtc_running = 1;
@@ -138,8 +151,10 @@ int rtctimer_stop_clock( rtctimer_t *rtctimer )
 
     if( rtctimer->rtc_running ) {
         if( ioctl( rtctimer->rtc_fd, RTC_PIE_OFF, 0 ) < 0 ) {
-            printf( "rtctimer: cannot stop periodic "
-                    "interrupts: %s\n", strerror( errno ) );
+            if( rtctimer->verbose ) {
+                fprintf( stderr, "rtctimer: cannot stop periodic "
+                         "interrupts: %s\n", strerror( errno ) );
+            }
             return rtctimer->rtc_running;
         }
         rtctimer->rtc_running = 0;

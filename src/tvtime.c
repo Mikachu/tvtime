@@ -512,7 +512,7 @@ int main( int argc, char **argv )
     if( !set_realtime_priority( 0 ) && verbose ) {
         fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
-    rtctimer = rtctimer_new();
+    rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
         if( verbose ) {
             fprintf( stderr, "tvtime: Can't open /dev/rtc "
