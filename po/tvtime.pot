@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-30 21:12+0100\n"
+"POT-Creation-Date: 2003-10-31 01:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -555,7 +555,7 @@ msgstr ""
 msgid "Television standard"
 msgstr ""
 
-#: src/commands.c:1150 src/commands.c:1197
+#: src/commands.c:1150 src/commands.c:1197 src/commands.c:1210
 msgid "Horizontal resolution"
 msgstr ""
 
@@ -565,10 +565,6 @@ msgstr ""
 
 #: src/commands.c:1160
 msgid "Toggle XDS decoding"
-msgstr ""
-
-#: src/commands.c:1210
-msgid "Horizontal Resolution"
 msgstr ""
 
 #: src/commands.c:1279
