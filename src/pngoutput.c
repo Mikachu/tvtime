@@ -31,6 +31,7 @@ void pngoutput_header_8bit( pngoutput_t *pngoutput, int alpha )
     png_set_gAMA( pngoutput->png_ptr, pngoutput->info_ptr, pngoutput->gamma );
     png_set_sRGB( pngoutput->png_ptr, pngoutput->info_ptr,
                   PNG_sRGB_INTENT_RELATIVE );
+    png_set_pHYs( pngoutput->png_ptr, pngoutput->info_ptr, 4, 3, 0 );
     png_set_IHDR( pngoutput->png_ptr, pngoutput->info_ptr,
                   pngoutput->width, pngoutput->height, 8,
                   alpha ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB,
