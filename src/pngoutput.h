@@ -16,7 +16,7 @@ typedef struct pngoutput_s pngoutput_t;
  * gamma should be the intended
  */
 pngoutput_t *pngoutput_new( const char *filename, int width, int height,
-                            double gamma );
+                            int alpha, double gamma );
 
 /**
  * Closes the PNG file, finishing the write.

@@ -26,22 +26,22 @@ void pngoutput_header_16bit( pngoutput_t *pngoutput )
     png_write_info( pngoutput->png_ptr, pngoutput->info_ptr );
 }
 
-void pngoutput_header_8bit( pngoutput_t *pngoutput )
+void pngoutput_header_8bit( pngoutput_t *pngoutput, int alpha )
 {
     png_set_gAMA( pngoutput->png_ptr, pngoutput->info_ptr, pngoutput->gamma );
     png_set_sRGB( pngoutput->png_ptr, pngoutput->info_ptr,
                   PNG_sRGB_INTENT_RELATIVE );
     png_set_IHDR( pngoutput->png_ptr, pngoutput->info_ptr,
                   pngoutput->width, pngoutput->height, 8,
-                  // PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
-                  PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
-                  PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+                  alpha ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB,
+                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                  PNG_FILTER_TYPE_DEFAULT );
     png_write_info( pngoutput->png_ptr, pngoutput->info_ptr );
 }
 
 pngoutput_t *pngoutput_new( const char *filename,
                             int width, int height,
-                            double gamma )
+                            int alpha, double gamma )
 {
     pngoutput_t *pngoutput = (pngoutput_t *) malloc( sizeof( pngoutput_t ) );
 
@@ -80,7 +80,7 @@ pngoutput_t *pngoutput_new( const char *filename,
     png_init_io( pngoutput->png_ptr, pngoutput->f );
     png_set_filter( pngoutput->png_ptr, 0, PNG_FILTER_PAETH );
     png_set_compression_level( pngoutput->png_ptr, Z_BEST_COMPRESSION );
-    pngoutput_header_8bit( pngoutput );
+    pngoutput_header_8bit( pngoutput, alpha );
 
     return pngoutput;
 }

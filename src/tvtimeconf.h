@@ -62,6 +62,7 @@ enum tvtime_commands
 
     TVTIME_MENUMODE,
     TVTIME_DISPLAY_INFO,
+    TVTIME_SHOW_CREDITS,
 
     TVTIME_LAST
 };

@@ -72,7 +72,7 @@ static void build_colourbars( unsigned char *output, int width, int height )
 static void pngscreenshot( const char *filename, unsigned char *frame422,
                            int width, int height, int stride )
 {
-    pngoutput_t *pngout = pngoutput_new( filename, width, height, 0.45 );
+    pngoutput_t *pngout = pngoutput_new( filename, width, height, 0, 0.45 );
     unsigned char *tempscanline = (unsigned char *) malloc( width * 3 );
     int i;
 
@@ -594,6 +594,7 @@ int main( int argc, char **argv )
 
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
+    output->set_window_caption( tagline );
 
     /* Start up our vidmode object. */
     vidmode = vidmode_new();
@@ -616,11 +617,6 @@ int main( int argc, char **argv )
         int curframeid;
         int printdebug = 0;
         int showbars, videohold, screenshot;
-
-        sprintf( caption, "[%3.0f%% dropped] %s",
-                 performance_get_percentage_dropped( perf ) * 100.0,
-                 tagline );
-        output->set_window_caption( caption );
 
         output->poll_events( in );
 

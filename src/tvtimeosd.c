@@ -22,6 +22,7 @@
 #include <string.h>
 #include "osdtools.h"
 #include "tvtimeosd.h"
+#include "credits.h"
 
 struct tvtime_osd_s
 {
@@ -56,6 +57,9 @@ struct tvtime_osd_s
     char input_text[ 128 ];
     char deinterlace_text[ 128 ];
     char timeformat[ 128 ];
+
+    credits_t *credits;
+    int show_credits;
 };
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
@@ -82,6 +86,9 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
 
     fontfile = DATADIR "/FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
+
+    osd->credits = credits_new( "credits.png", height );
+    osd->show_credits = 0;
 
     osd->channel_number = osd_string_new( fontfile, 80, width, height, frameaspect );
     if( !osd->channel_number ) {
@@ -239,12 +246,22 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
         osd_string_show_text( osd->channel_info, timestamp, chinfo_left );
     }
 
-
     osd_string_advance_frame( osd->volume_bar );
     osd_string_advance_frame( osd->data_bar );
     osd_graphic_advance_frame( osd->channel_logo );
+
+    if( osd->credits ) {
+        credits_advance_frame( osd->credits );
+    }
 }
 
+void tvtime_osd_toggle_show_credits( tvtime_osd_t *osd )
+{
+    osd->show_credits = !osd->show_credits;
+    if( osd->show_credits && osd->credits ) {
+        credits_restart( osd->credits, 3.0 );
+    }
+}
 
 int tvtime_osd_active_on_scanline( tvtime_osd_t *osd, int scanline )
 {
@@ -300,6 +317,10 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int width, int xpos,
                                               int scanline )
 {
+    if( osd->show_credits && osd->credits ) {
+        credits_composite_packed422_scanline( osd->credits, output, width, xpos, scanline );
+    }
+
     if( osd_string_visible( osd->channel_number ) ) {
         int start = osd->channel_number_ypos;
         int end = start + osd_string_get_height( osd->channel_number );

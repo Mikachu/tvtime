@@ -22,6 +22,30 @@
 #include "speedy.h"
 #include "videotools.h"
 
+static inline unsigned char clip255( int x )
+{
+    if( x > 255 ) {
+        return 255;
+    } else if( x < 0 ) {
+        return 0;
+    } else {
+        return x;
+    }
+}
+
+            /**
+             * result = (1 - alpha)B + alpha*F
+             *        =  B - alpha*B + alpha*F
+             *        =  B + alpha*(F - B)
+             */
+
+static inline int multiply_alpha( int a, int r )
+{
+    int temp;
+    temp = (r * a) + 0x80;
+    return ((temp + (temp >> 8)) >> 8);
+}
+
 void create_packed422_from_planar422_scanline( unsigned char *output,
                                                unsigned char *luma,
                                                unsigned char *cb,
@@ -109,32 +133,42 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
     }
 }
 
+void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width )
+{
+    while( width-- ) {
+        unsigned int cur_a = input[ 0 ];
+
+        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
+                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
+                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
+                                   | cur_a;
+
+        output += 4;
+        input += 4;
+    }
+}
+
 void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned char *input,
                                               unsigned char *mask, int width,
                                               int textluma, int textcb, int textcr )
 {
+    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
 
     for( i = 0; i < width; i++ ) {
-        if( mask[ 0 ] ) {
-            int a = mask[ 0 ];
-            int tmp1, tmp2;
+        int a = *mask;
 
-            tmp1 = (a - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            output[ 0 ] = tmp2 & 0xff;
-
-            tmp1 = (textluma - input[ 1 ]) * a;
-            tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            output[ 1 ] = tmp2 & 0xff;
-
-            tmp1 = (textcb - input[ 2 ]) * a;
-            tmp2 = input[ 2 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            output[ 2 ] = tmp2 & 0xff;
-
-            tmp1 = (textcr - input[ 3 ]) * a;
-            tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            output[ 3 ] = tmp2 & 0xff;
+        if( a == 0xff ) {
+            *((unsigned int *) output) = opaque;
+        } else if( (input[ 0 ] == 0x00) ) {
+            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+                                       | (multiply_alpha( a, textcb ) << 16)
+                                       | (multiply_alpha( a, textluma ) << 8) | a;
+        } else if( a ) {
+            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
+                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
+                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
         }
         mask++;
         output += 4;
@@ -197,24 +231,24 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output,
     int i;
 
     for( i = 0; i < width; i++ ) {
-        if( foreground[ 0 ] ) {
-            int a = foreground[ 0 ];
-            int tmp1, tmp2;
+        int a = foreground[ 0 ];
 
-            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *output = tmp2 & 0xff;
+        if( a == 0xff ) {
+            output[ 0 ] = foreground[ 1 ];
+            if( ( i & 1 ) == 0 ) {
+                output[ 1 ] = foreground[ 2 ];
+                output[ 3 ] = foreground[ 3 ];
+            }
+        } else if( a ) {
+
+            output[ 0 ] = foreground[ 1 ] + multiply_alpha( 0xff - a, input[ 0 ] );
 
             if( ( i & 1 ) == 0 ) {
-                tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
-                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 1 ] = tmp2 & 0xff;
-
-                tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
-                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 3 ] = tmp2 & 0xff;
+                output[ 1 ] = foreground[ 2 ] + multiply_alpha( 0xff - a, input[ 1 ] );
+                output[ 3 ] = foreground[ 3 ] + multiply_alpha( 0xff - a, input[ 3 ] );
             }
         }
+
         foreground += 4;
         output += 2;
         input += 2;
@@ -273,22 +307,39 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
     int i;
 
     for( i = 0; i < width; i++ ) {
-        if( foreground[ 0 ] ) {
-            int a = ((foreground[ 0 ]*alpha)+0x80)>>8;
-            int tmp1, tmp2;
+        int af = foreground[ 0 ];
 
-            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *output = tmp2 & 0xff;
+        if( af ) {
+            int a = ((af * alpha) + 0x80) >> 8;
 
-            if( ( i & 1 ) == 0 ) {
-                tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
-                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 1 ] = tmp2 & 0xff;
 
-                tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
-                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 3 ] = tmp2 & 0xff;
+            if( a == 0xff ) {
+                output[ 0 ] = foreground[ 1 ];
+
+                if( ( i & 1 ) == 0 ) {
+                    output[ 1 ] = foreground[ 2 ];
+                    output[ 3 ] = foreground[ 3 ];
+                }
+            } else if( a ) {
+                /**
+                 * (1 - alpha)*B + alpha*F
+                 * (1 - af*a)*B + af*a*F
+                 *  B - af*a*B + af*a*F
+                 *  B + a*(af*F - af*B)
+                 */
+
+                output[ 0 ] = input[ 0 ]
+                            + ((alpha*( foreground[ 1 ]
+                                        - multiply_alpha( foreground[ 0 ], input[ 0 ] ) ) + 0x80) >> 8);
+
+                if( ( i & 1 ) == 0 ) {
+                    output[ 1 ] = input[ 1 ]
+                                + ((alpha*( foreground[ 2 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 1 ] ) ) + 0x80) >> 8);
+                    output[ 3 ] = input[ 3 ]
+                                + ((alpha*( foreground[ 3 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 3 ] ) ) + 0x80) >> 8);
+                }
             }
         }
         foreground += 4;
@@ -357,8 +408,6 @@ void composite_bars_packed4444_scanline( unsigned char *output,
      * units out of 256.  Yes, as it so happens, that puts it equal to 'width'.
      */
     int barsize = ( width * 256 ) / 256;
-    int cursize = barsize;
-    int inbar = 1;
     int i;
 
     /* We only need to composite the bar on the pixels that matter. */
@@ -623,17 +672,6 @@ static void init_YCbCr_to_RGB_tables(void)
 		   * 255.0 / 224.0 * (double)(1<<FP_BITS));
   }
   conv_YR_inited = 1;
-}
-
-static inline unsigned char clip255( int x )
-{
-    if( x > 255 ) {
-        return 255;
-    } else if( x < 0 ) {
-        return 0;
-    } else {
-        return x;
-    }
 }
 
 void rgb24_to_packed444_rec601_scanline( unsigned char *output,

@@ -69,7 +69,8 @@ static Cmd_Names cmd_table[] = {
     { "DEINTERLACING_MODE", TVTIME_DEINTERLACINGMODE },
 
     { "MENUMODE", TVTIME_MENUMODE },
-    { "DISPLAY_INFO", TVTIME_DISPLAY_INFO }
+    { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
+    { "SHOW_CREDITS", TVTIME_SHOW_CREDITS }
 };
 
 
@@ -211,6 +212,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
     ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
+    ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;
     ct->keymap[ 'f' ] = TVTIME_FULLSCREEN;
     ct->keymap[ 'a' ] = TVTIME_ASPECT;

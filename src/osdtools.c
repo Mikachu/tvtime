@@ -134,7 +134,7 @@ void osd_string_render_image4444( osd_string_t *osds )
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
                             osds->image_textheight, osds->image_width * 4,
-                            0, 16, 128, 128 );
+                            0, 0, 0, 0 );
 
     if( osds->show_border ) {
         composite_alphamask_packed4444( osds->image4444, osds->image_width,
@@ -304,8 +304,7 @@ int osd_databars_get_frames_left( osd_databars_t *osdd )
 
 void osd_databars_prerender( osd_databars_t *osdd, int num_filled )
 {
-    blit_colour_packed4444_scanline( osdd->data, osdd->width,
-                                     0, 16, 128, 128 );
+    blit_colour_packed4444_scanline( osdd->data, osdd->width, 0, 0, 0, 0 );
     composite_bars_packed4444_scanline( osdd->data, osdd->data, osdd->width,
                                         osdd->alpha, osdd->luma, osdd->cb,
                                         osdd->cr, num_filled );
@@ -438,7 +437,7 @@ void osd_shape_render_image4444( osd_shape_t *osds )
 
         blit_colour_packed4444( osds->image4444, width,
                                 osds->shape_height, osds->image_width * 4,
-                                0, 16, 128, 128 );
+                                0, 0, 0, 0 );
 
         x0 = osds->shape_width / 2.0;
         y0 = osds->shape_height / 2.0;
@@ -462,7 +461,7 @@ void osd_shape_render_image4444( osd_shape_t *osds )
     default:
         blit_colour_packed4444( osds->image4444, width,
                                 height, osds->image_width * 4,
-                                0, 16, 128, 128 );
+                                0, 0, 0, 0 );
 
         break;
     }
@@ -668,6 +667,7 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
         scanline = pnginput_get_scanline( osdg->png, i );
         if( has_alpha ) {
             rgba32_to_packed4444_rec601_scanline( curout, scanline, width );
+            premultiply_packed4444_scanline( curout, curout, width );
         } else {
             rgb24_to_packed444_rec601_scanline( cb444, scanline, width );
             composite_packed444_to_packed4444_alpha_scanline( curout, 

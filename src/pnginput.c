@@ -85,11 +85,9 @@ pnginput_t *pnginput_new( const char *filename )
         pnginput->has_alpha = 0;
     }
 
-    /*
     fprintf( stderr, "width %u, height %u, depth %d, "
                      "colour %d, rowbytes %d, gamma %f\n",
              width, height, bit_depth, colour_type, rowbytes, gamma );
-    */
 
     return pnginput;
 }

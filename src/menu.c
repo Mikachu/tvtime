@@ -686,7 +686,7 @@ void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
 
     if( m->visible && scanline >= m->y && scanline < m->y + m->height ) {
 
-        blit_colour_packed422_scanline( output + m->x, m->width,
+        blit_colour_packed422_scanline( output + (m->x*2), m->width,
                                         m->bg_luma, m->bg_cb, m->bg_cr );
 
         if( menu_blit_scanline ) 

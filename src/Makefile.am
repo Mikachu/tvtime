@@ -34,9 +34,11 @@ COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	pngoutput.h rtctimer.h sdloutput.h speedy.h taglines.h ttfont.h \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
 	outputapi.h dfboutput.h dfboutput.c performance.h performance.c \
-	vidmode.h vidmode.c
+	vidmode.h vidmode.c credits.c credits.h
 
-bin_PROGRAMS = tvtime
+bin_PROGRAMS = tvtime expandpng
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
+
+expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 

@@ -194,6 +194,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
             tvtime_osd_show_info( in->osd );
             break;
 
+        case TVTIME_SHOW_CREDITS:
+            tvtime_osd_toggle_show_credits( in->osd );
+            break;
+
         case TVTIME_DEINTERLACINGMODE:
             in->toggledeinterlacingmode = 1;
             break;

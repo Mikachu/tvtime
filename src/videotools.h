@@ -70,6 +70,8 @@ void composite_packed4444_to_packed422_scanline( unsigned char *output,
                                                  unsigned char *foreground,
                                                  int width );
 
+void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width );
+
 /**
  * Sub-pixel data bar renderer.  There are 128 bars.
  */
