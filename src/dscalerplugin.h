@@ -4,6 +4,8 @@
 
 #include "DS_Deinterlace.h"
 
+void __cdecl dscaler_memcpy( void *output, void *input, size_t size );
+
 FILTER_METHOD *load_dscaler_filter( char *filename );
 void unload_dscaler_filter( FILTER_METHOD *method );
 

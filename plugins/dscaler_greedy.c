@@ -21,9 +21,6 @@
 #include "mmx.h"
 #include "mm_accel.h"
 
-#include "speedtools.h"
-#include "speedy.h"
-
 static DEINTERLACE_METHOD *di_greedy;
 
 static void deinterlace_frame_di_greedy( unsigned char *output,
@@ -41,7 +38,7 @@ static void deinterlace_frame_di_greedy( unsigned char *output,
     Info.InputPitch = stride*2;
     Info.LineLength = stride;
     Info.OverlayPitch = stride;
-    Info.pMemcpy = speedy_memcpy;
+    Info.pMemcpy = dscaler_memcpy;
 
     if( bottom_field ) {
         Picture[ 0 ].pData = data->f0 + stride;

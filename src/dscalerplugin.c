@@ -15,6 +15,11 @@
 #include "mm_accel.h"
 #include "speedy.h"
 
+void __cdecl dscaler_memcpy( void *output, void *input, size_t size )
+{
+    speedy_memcpy( output, input, size );
+}
+
 FILTER_METHOD *load_dscaler_filter( char *filename )
 {
     int i;
