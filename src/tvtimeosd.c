@@ -288,7 +288,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 
     osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NAME ].string,
                                (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "gY", 0 );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "0", 0 );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NAME ].string, 1 );
     osd->strings[ OSD_CHANNEL_NAME ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
     osd->strings[ OSD_CHANNEL_NAME ].ypos = osd->strings[ OSD_TUNER_INFO ].ypos
@@ -296,7 +296,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 
     osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NUM ].string,
                                (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "0", 0 );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "gY", 0 );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NUM ].string, 1 );
     osd->strings[ OSD_CHANNEL_NUM ].xpos = osd->strings[ OSD_TUNER_INFO ].xpos;
     osd->strings[ OSD_CHANNEL_NUM ].ypos = osd->strings[ OSD_CHANNEL_NAME ].ypos
@@ -490,12 +490,14 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     int i;
 
     strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, delay );
+    /* Yes, we're showing the name in the NUM spot and the number in the NAME spot. */
+    /* I will fix this up when I get a chance. -Billy */
     if( strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, delay );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_name_text, delay );
     } else {
         osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, "", delay );
     }
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_number_text, delay );
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
 
     if( strlen( osd->freqtable_text ) ) {
