@@ -947,6 +947,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     curs_col.pad = 0;
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
     XDefineCursor( display, output_window, nocursor );
+    XSetIconName( display, wm_window, "tvtime" );
 
     /* collaborate with the window manager for close requests */
     XSetWMProtocols( display, wm_window, &wm_delete_window, 1 );
@@ -1441,7 +1442,9 @@ void xcommon_close_display( void )
 void xcommon_set_window_caption( const char *caption )
 {
     XStoreName( display, wm_window, caption );
-    XSetIconName( display, wm_window, caption );
+    XChangeProperty( display, wm_window, net_wm_name, utf8_string, 8,
+                     PropModeReplace, (const unsigned char *) caption,
+                     strlen( caption ) );
 }
 
 Display *xcommon_get_display( void )
