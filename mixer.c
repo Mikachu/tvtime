@@ -29,8 +29,10 @@
 #include "mixer.h"
 
 static char *mixer_device = "/dev/mixer";
-static int mixer_usemaster = 0;
+static int mixer_usemaster = 1;
 static int levelpercentage = 0;
+static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
+static int muted = 0;
 
 int mixer_get_volume( void )
 {
@@ -58,7 +60,7 @@ int mixer_get_volume( void )
     return curvol;
 }
 
-void mixer_set_volume( int percentdiff )
+int mixer_set_volume( int percentdiff )
 {
     int fd, v, cmd, devs;
 
@@ -75,14 +77,86 @@ void mixer_set_volume( int percentdiff )
             cmd = SOUND_MIXER_WRITE_VOLUME;
         } else {
             close( fd );
-            return;
+            return 0;
         }
 
         v = ( levelpercentage << 8 ) | levelpercentage;
         ioctl( fd, cmd, &v );
         close( fd );
+        return v;
     }
 
+    return 0;
     //if( percentdiff ) osd_volume( movietime.osd, levelpercentage );
 }
 
+void mixer_mute( int mute )
+{
+    int fd, v, cmd, devs;
+
+    fd = open( mixer_device, O_RDONLY );
+
+    if( mute ) {
+        if( fd != -1 ) {
+
+            /* Save volume */
+            ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
+            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster == 0 ) ) {
+                cmd = SOUND_MIXER_READ_LINE;
+            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
+                cmd = SOUND_MIXER_READ_VOLUME;
+            } else {
+                close( fd );
+                return;
+            }
+
+            ioctl( fd,cmd,&v );
+            saved_volume = v;
+
+            /* Now set volume to 0 */
+            ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
+            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster==0 ) ) {
+                cmd = SOUND_MIXER_WRITE_LINE;
+            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
+                cmd = SOUND_MIXER_WRITE_VOLUME;
+            } else {
+                close( fd );
+                return;
+            }
+
+            v = 0;
+            ioctl( fd, cmd, &v );
+
+            muted = 1;
+            close( fd );
+            return;
+        }
+    } else {
+        if( fd != -1 ) {
+            ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
+            if( ( devs & SOUND_MASK_LINE ) && ( mixer_usemaster==0 ) ) {
+                cmd = SOUND_MIXER_WRITE_LINE;
+            } else if( ( devs & SOUND_MASK_VOLUME ) && ( mixer_usemaster==1 ) ) {
+                cmd = SOUND_MIXER_WRITE_VOLUME;
+            } else {
+                close( fd );
+                return;
+            }
+
+            v = saved_volume;
+            ioctl( fd, cmd, &v );
+            muted = 0;
+            close( fd );
+            return;
+        }
+    }
+}
+
+int mixer_conditional_mute()
+{
+    if( !muted ) {
+        mixer_mute( 1 );
+        return 1;
+    }
+    return 0;
+}

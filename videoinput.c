@@ -353,6 +353,7 @@ void videoinput_set_tuner(int tuner_number, int mode)
 void videoinput_set_tuner_freq( int freqKHz )
 {
     unsigned long frequency = freqKHz;
+    int mute;
 
     if (tuner.tuner > -1) {
         if (frequency < 0) return;
@@ -363,21 +364,20 @@ void videoinput_set_tuner_freq( int freqKHz )
 
         frequency *= 16;
 
+        mute = mixer_conditional_mute();
+
         if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
-            return;
         }
+
+        usleep( 20000 );
+
+        if( mute ) {
+            mixer_mute( 0 );
+        }
+
     } else {
         fprintf( stderr, "videoinput: cannot set tuner freq on a channel without a tuner\n" );
-    }
-}
-
-void videoinput_mute( int mute ) 
-{
-    if( mute ) {
-        mixer_set_volume( -100 );
-    } else {
-        mixer_set_volume( 100 );
     }
 }
 

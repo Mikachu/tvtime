@@ -22,6 +22,8 @@
 #define MIXER_H_INCLUDED
 
 int mixer_get_volume( void );
-void mixer_set_volume( int percentdiff );
+int mixer_set_volume( int percentdiff );
+void mixer_mute( int mute );
+int mixer_conditional_mute();
 
 #endif /* MIXER_H_INCLUDED */

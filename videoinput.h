@@ -103,11 +103,6 @@ void videoinput_set_tuner_freq( int freqKHz );
  */
 int videoinput_get_tuner_freq( void );
 
-/** 
- * Mutes the mixer, saving the current volume, if mute is true
- */
-void videoinput_mute( int mute );
-
 /**
  * Signal to the videoinput device that we're done reading the last frame, to
  * allow the hardware to use the buffer.
