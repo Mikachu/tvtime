@@ -1,5 +1,10 @@
 
 0.9.8
+  * (vektor) Wrote a videofilter object, and sped up luma correction by
+    about 2x.
+  * (mrallen/vektor) Added an insanely useful pause command for debugging,
+    defaults to I_END.
+  * (vektor) Fixed a small memleak in the screenshot code.
   * (vektor) Added a new filter for the CC data written by diz.  It's
     definitely better than the crappy averaging mess that was there before,
     but it should probably go through another revision before we release.
