@@ -1185,6 +1185,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int return_value = 0;
     int last_current_id = -1;
     int quiet_screenshots = 0;
+    char prevloc[ 256 ];
     int i;
 
     ct = config_new();
@@ -2493,9 +2494,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     snprintf( number, 4, "%d", framerate_mode );
     config_save( ct, "FramerateMode", number );
 
+    /* Make sure floating point numbers are always written to the config
+     * file in "C" locale format.
+     */
+    strncpy( prevloc, setlocale( LC_NUMERIC, NULL ), sizeof( prevloc ) );
+    setlocale( LC_NUMERIC, "C" );
     snprintf( number, 4, "%2.1f",
               commands_get_overscan( commands ) * 2.0 * 100.0 );
     config_save( ct, "OverScan", number );
+    setlocale( LC_NUMERIC, prevloc );
 
     snprintf( number, 4, "%d", commands_check_freq_present( commands ) );
     config_save( ct, "CheckForSignal", number );

@@ -373,10 +373,18 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
+            char prevloc[ 256 ];
+
+            /* Make sure floating point numbers are always written to
+             * the config file in "C" locale format.
+             */
+            strncpy( prevloc, setlocale( LC_NUMERIC, NULL ), sizeof prevloc );
+            setlocale( LC_NUMERIC, "C" );
             ct->overscan = ( atof( curval ) / 2.0 ) / 100.0;
             if( !isnormal( ct->overscan ) ) {
                 ct->overscan = 0.0;
             }
+            setlocale( LC_NUMERIC, prevloc );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "MixerDevice" ) ) {

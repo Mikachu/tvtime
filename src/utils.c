@@ -626,7 +626,6 @@ void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
     setlocale( LC_ALL, "" );
-    setlocale( LC_NUMERIC, "C" );
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
 #endif
