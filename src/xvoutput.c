@@ -454,23 +454,27 @@ static int get_colorkey( void )
     if( found_colorkey ) return colorkey;
 
     attr = XvQueryPortAttributes( display, xv_port, &nattr );
-    if( attr && nattr ) {
-        int k;
+    if( attr ) {
+        if( nattr ) {
+            int k;
 
-        for( k = 0; k < nattr; k++ ) {
-            if( (attr[ k ].flags & XvSettable) && (attr[ k ].flags & XvGettable)) {
-                if( !strcmp( attr[ k ].name, "XV_COLORKEY" ) ) {
-                    atom = XInternAtom( display, "XV_COLORKEY", False );
-                    XvGetPortAttribute( display, xv_port, atom, &value );
-                    XFree( attr );
-                    colorkey = value;
-                    found_colorkey = 1;
-                    return value;
+            for( k = 0; k < nattr; k++ ) {
+                if( (attr[ k ].flags & XvSettable) && (attr[ k ].flags & XvGettable)) {
+                    if( !strcmp( attr[ k ].name, "XV_COLORKEY" ) ) {
+                        atom = XInternAtom( display, "XV_COLORKEY", False );
+                        if( atom != None ) {
+                            XvGetPortAttribute( display, xv_port, atom, &value );
+                            XFree( attr );
+                            colorkey = value;
+                            found_colorkey = 1;
+                            return value;
+                        }
+                    }
                 }
             }
         }
+        XFree( attr );
     }
-    XFree( attr );
     return 0;
 }
 
@@ -481,6 +485,7 @@ static void xv_clear_screen( void )
     XSetForeground( display, gc, get_colorkey() );
     XFillRectangle( display, window, gc, video_area.x, video_area.y,
                     video_area.width, video_area.height );
+    XSync( display, False );
 }
 
 int xv_init( int inputwidth, int inputheight, int outputheight, int aspect, int verbose )
