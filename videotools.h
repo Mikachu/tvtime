@@ -58,10 +58,21 @@ void planar422_field_to_packed422_frame( unsigned char *output,
                                          int lstride, int cstride,
                                          int width, int height );
 
-void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
-void blit_colour_scanline_yuy2( unsigned char *output, int width, int luma, int cb, int cr );
+void blit_colour_4444_scanline( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
+void blit_colour_packed422_scanline( unsigned char *output, int width, int luma, int cb, int cr );
 void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr );
-void blit_colour_yuy2( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr );
+void blit_colour_packed422( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr );
+
+void create_packed422_from_planar422_scanline( unsigned char *output, unsigned char *luma,
+                                               unsigned char *cb, unsigned char *cr, int width );
+void interpolate_packed422_from_planar422_scanline( unsigned char *output,
+                                                    unsigned char *topluma,
+                                                    unsigned char *topcb,
+                                                    unsigned char *topcr,
+                                                    unsigned char *botluma,
+                                                    unsigned char *botcb,
+                                                    unsigned char *botcr,
+                                                    int width );
 
 /**
  * Builds a plane from a field interpolating to frame size by linear
@@ -110,6 +121,6 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth,
  * This filter actually does not meet the spec so I'm not
  * sure what to call it.  I got it from Poynton's site.
  */
-void scanline_chroma422_to_chroma444_rec601( unsigned char *dest, unsigned char *src, int srcwidth );
+void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src, int srcwidth );
 
 #endif /* VIDEOTOOLS_H_INCLUDED */

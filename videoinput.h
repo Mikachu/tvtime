@@ -33,7 +33,8 @@ typedef struct videoinput_s videoinput_t;
  * (cable, composite1, composite2, etc) to use.
  */
 videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
-                              int capwidth, int capheight, int palmode );
+                              int capwidth, int capheight, int palmode,
+                              int verbose );
 
 /**
  * Shut down the capture device.

@@ -82,6 +82,8 @@ struct videoinput_s
     int curframe;
 
     struct video_mbuf gb_buffers;
+
+    int verbose;
 };
 
 
@@ -159,7 +161,8 @@ int videoinput_get_height( videoinput_t *vidin )
  * max_buffers : 16
  */
 videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
-                              int capwidth, int capheight, int palmode )
+                              int capwidth, int capheight, int palmode,
+                              int verbose )
 {
     videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
@@ -170,6 +173,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     vidin->maxbufs = 16;
     vidin->curframe = 0;
+    vidin->verbose = verbose;
 
     /* I don't actually know what these numbers mean, I stole this from someone
      * else's code. */
@@ -227,59 +231,52 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
             return 0;
         }
 
-#ifdef VERBOSE
-        fprintf( stderr, "tuner.tuner = %d\n"
-                         "tuner.name = %s\n"
-                         "tuner.rangelow = %ld\n"
-                         "tuner.rangehigh = %ld\n"
-                         "tuner.signal = %d\n"
-                         "tuner.flags = ",
-                 vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
-                 vidin->tuner.rangehigh, vidin->tuner.signal );
+        if( vidin->verbose ) {
+            fprintf( stderr, "tuner.tuner = %d\n"
+                             "tuner.name = %s\n"
+                             "tuner.rangelow = %ld\n"
+                             "tuner.rangehigh = %ld\n"
+                             "tuner.signal = %d\n"
+                             "tuner.flags = ",
+                     vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
+                     vidin->tuner.rangehigh, vidin->tuner.signal );
 
-        if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
-        if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
-        if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
-        if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
-        if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
-        if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
-        if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
-        if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
+            if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
+            if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
+            if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
+            if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
+            if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
+            if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
+            if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
+            if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
 
-        fprintf( stderr, "\ntuner.mode = " );
-        switch (vidin->tuner.mode) {
-        case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
-        case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
-        case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
-        case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
-        default: fprintf( stderr, "UNDEFINED" ); break;
+            fprintf( stderr, "\ntuner.mode = " );
+            switch (vidin->tuner.mode) {
+            case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
+            case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
+            case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
+            case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
+            default: fprintf( stderr, "UNDEFINED" ); break;
+            }
+            fprintf( stderr, "\n");
         }
-        fprintf( stderr, "\n");
-#endif
     } else {
         vidin->tuner.tuner = -1;
-
-#ifdef VERBOSE
-
-        fprintf( stderr, "videoinput: Channel %d has no tuner.\n", vidin->grab_chan.channel );
-
-#endif
-
+        if( vidin->verbose ) {
+            fprintf( stderr, "videoinput: Channel %d has no tuner.\n", vidin->grab_chan.channel );
+        }
     }
-
 
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCGPICT" );
         return 0;
     }
 
-#ifdef VERBOSE
-
-    fprintf( stderr, "videoinput: Current brightness %d, hue %d, colour %d, contrast %d.\n",
-             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-             grab_pict.contrast );
-
-#endif
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: Current brightness %d, hue %d, colour %d, contrast %d.\n",
+                 grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+                 grab_pict.contrast );
+    }
 
     if( palmode ) {
         grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
@@ -297,12 +294,11 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         return 0;
     }
 
-#ifdef VERBOSE
-
-    fprintf( stderr, "videoinput: Set to brightness %d, hue %d, colour %d, contrast %d.\n",
-             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-             grab_pict.contrast );
-#endif
+    if( vidin->verbose ) {
+       fprintf( stderr, "videoinput: Set to brightness %d, hue %d, colour %d, contrast %d.\n",
+                grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+                grab_pict.contrast );
+    }
 
     vidin->numframes = vidin->gb_buffers.frames;
     if( vidin->maxbufs < vidin->numframes ) vidin->numframes = vidin->maxbufs;
@@ -323,11 +319,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         return vidin;
     }
 
-#ifdef VERBOSE
-
     /* Fallback to read(). */
-    fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
-#endif
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
+    }
 
     vidin->have_mmap = 0;
 
@@ -495,13 +490,8 @@ void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode )
             perror( "ioctl VIDIOCSTUNER" );
             return;
         }
-    } else {
-
-#ifdef VERBOSE
-
+    } else if( vidin->verbose ) {
         fprintf( stderr, "videoinput: cannot set tuner on a channel without a tuner\n" );
-
-#endif
     }
 }
 
@@ -532,13 +522,8 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
             mixer_mute( 0 );
         }
 
-    } else {
-
-#ifdef VERBOSE
-
+    } else if( vidin->verbose ) {
         fprintf( stderr, "videoinput: cannot set tuner freq on a channel without a tuner\n" );
-
-#endif
     }
 }
 
@@ -558,15 +543,10 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
         }
 
         return frequency/16;
-    } else {
-
-#ifdef VERBOSE
-
+    } else if( vidin->verbose ) {
         fprintf( stderr, "videoinput: cannot get tuner freq on a channel without a tuner\n" );
-
-#endif
-        return 0;
     }
+    return 0;
 }
 
 int videoinput_freq_present( videoinput_t *vidin )
@@ -580,9 +560,9 @@ int videoinput_freq_present( videoinput_t *vidin )
             return 0;
         }
 
-#ifdef VERBOSE
-        fprintf( stderr, "videoinput: strength %d\n", vidin->tuner.signal );
-#endif
+        if( vidin->verbose ) {
+            fprintf( stderr, "videoinput: strength %d\n", vidin->tuner.signal );
+        }
 
         return( vidin->tuner.signal );
     }

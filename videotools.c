@@ -118,18 +118,8 @@ void chroma_plane_field_to_frame( unsigned char *output, unsigned char *input,
     }
 }
 
-static inline void clear_scanline_packed_422( unsigned char *output, int size )
-{
-    static int clear = 128 << 24 | 16 << 16 | 128 << 8 | 16;
-    unsigned int *o = (unsigned int *) output;
-
-    for( size /= 4; size; --size ) {
-        *o++ = clear;
-    }
-}
-
-static inline void copy_scanline_packed_422( unsigned char *output, unsigned char *luma,
-                                             unsigned char *cb, unsigned char *cr, int width )
+void create_packed422_from_planar422_scanline( unsigned char *output, unsigned char *luma,
+                                               unsigned char *cb, unsigned char *cr, int width )
 {
     unsigned int *o = (unsigned int *) output;
 
@@ -163,27 +153,26 @@ void blit_colour_4444( unsigned char *output, int width, int height, int stride,
     }
 }
 
-void blit_colour_scanline_yuy2( unsigned char *output, int width, int y, int cb, int cr )
+void blit_colour_packed422_scanline( unsigned char *output, int width, int y, int cb, int cr )
 {
-    int i;
+    int colour = cr << 24 | y << 16 | cb << 8 | y;
+    unsigned int *o = (unsigned int *) output;
 
-    for( i = 0; i < width; i++ ) {
-        output[ 0 ] = y;
-        if( ( i & 1 ) == 0 ) { output[ 1 ] = cb; output[ 3 ] = cr; }
-        output += 2;
+    for( width /= 4; width; --width ) {
+        *o++ = colour;
     }
 }
 
-void blit_colour_yuy2( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr )
+void blit_colour_packed422( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr )
 {
     int i;
 
     for( i = 0; i < height; i++ ) {
-        blit_colour_scanline_yuy2( output + (i * stride), width, luma, cb, cr );
+        blit_colour_packed422_scanline( output + (i * stride), width, luma, cb, cr );
     }
 }
 
-static inline void interpolate_scanline_packed_422( unsigned char *output,
+void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,
                                                     unsigned char *topcr,
@@ -202,7 +191,6 @@ static inline void interpolate_scanline_packed_422( unsigned char *output,
     }
 }
 
-
 void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
                                                           unsigned char *output,
                                                           unsigned char *fieldluma,
@@ -216,12 +204,12 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
 
     if( bottom_field ) {
         /* Clear a scanline. */
-        clear_scanline_packed_422( output, width * 2 );
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
         output += width * 2;
 
         /* Copy a scanline. */
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
-        copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+        create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
         output += width * 2;
     }
 
@@ -231,13 +219,13 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
 
         if( !bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+            create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
             output += width * 2;
         }
 
         /* Interpolate a scanline. */
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data + width, fieldluma + lstride, width );
-        interpolate_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr,
+        interpolate_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr,
                                          vc->temp_scanline_data + width, fieldcb + cstride, fieldcr + cstride,
                                          width );
         output += width * 2;
@@ -248,7 +236,7 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
 
         if( bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, vc->temp_scanline_data + width, fieldcb, fieldcr, width );
+            create_packed422_from_planar422_scanline( output, vc->temp_scanline_data + width, fieldcb, fieldcr, width );
             output += width * 2;
         }
     }
@@ -256,11 +244,11 @@ void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc
     if( !bottom_field ) {
         /* Copy a scanline. */
         video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
-        copy_scanline_packed_422( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
+        create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
         output += width * 2;
 
         /* Clear a scanline. */
-        clear_scanline_packed_422( output, width * 2 );
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
     }
 }
 
@@ -276,23 +264,23 @@ void planar422_field_to_packed422_frame( unsigned char *output,
 
     if( bottom_field ) {
         /* Clear a scanline. */
-        clear_scanline_packed_422( output, width * 2 );
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
         output += width * 2;
 
         /* Copy a scanline. */
-        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+        create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
         output += width * 2;
     }
 
     for( i = 0; i < (height / 2) - 1; i++ ) {
         if( !bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+            create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
             output += width * 2;
         }
 
         /* Interpolate a scanline. */
-        interpolate_scanline_packed_422( output, fieldluma, fieldcb, fieldcr,
+        interpolate_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr,
                                          fieldluma + lstride, fieldcb + cstride, fieldcr + cstride,
                                          width );
         output += width * 2;
@@ -303,18 +291,18 @@ void planar422_field_to_packed422_frame( unsigned char *output,
 
         if( bottom_field ) {
             /* Copy a scanline. */
-            copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+            create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
             output += width * 2;
         }
     }
 
     if( !bottom_field ) {
         /* Copy a scanline. */
-        copy_scanline_packed_422( output, fieldluma, fieldcb, fieldcr, width );
+        create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
         output += width * 2;
 
         /* Clear a scanline. */
-        clear_scanline_packed_422( output, width * 2 );
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
     }
 }
 
@@ -727,7 +715,7 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth,
 const int filterkernel[] = { -1, 3, -6, 12, -24, 80, 80, -24, 12, -6, 3, -1 };
 const int kernelsize = sizeof( filterkernel ) / sizeof( int );
 
-void scanline_chroma422_to_chroma444_rec601( unsigned char *dest, unsigned char *src, int srcwidth )
+void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src, int srcwidth )
 {
     if( srcwidth ) {
         int halfksize = kernelsize / 2;

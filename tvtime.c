@@ -99,8 +99,8 @@ static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe
     osd_string_t *test_string;
 
     test_string = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
-    blit_colour_yuy2( oddframe, width, height, width*2, 16, 128, 128 );
-    blit_colour_yuy2( evenframe, width, height, width*2, 80, 128, 128 );
+    blit_colour_packed422( oddframe, width, height, width*2, 16, 128, 128 );
+    blit_colour_packed422( evenframe, width, height, width*2, 80, 128, 128 );
 
     osd_string_set_colour( test_string, 235, 128, 128 );
     osd_string_show_text( test_string, "Odd Field", 80 );
@@ -202,7 +202,7 @@ int main( int argc, char **argv )
     if( inputwidth != 720 && verbose ) {
         fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", inputwidth );
     }
-    vidin = videoinput_new( v4ldev, inputnum, inputwidth, palmode ? 576 : 480, palmode );
+    vidin = videoinput_new( v4ldev, inputnum, inputwidth, palmode ? 576 : 480, palmode, verbose );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
