@@ -1,5 +1,9 @@
 
 1.0RC1 -
+  * vektor: Update to the latest videodev2.h.  This will break using
+      tvtime with drivers based on v4l2 from before 2.6.0.  I hope it
+      is safe to do this now - we need to since there are some driver
+      authors which refuse to support the compatibility ioctls.
 
 0.9.15 - Sat Oct 30 11:46:07 EDT 2004
   * vektor: It seems that some systems need #include <locale.h>
