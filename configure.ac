@@ -48,10 +48,7 @@ AC_SUBST(PKGRUNDIRGROUP)
 dnl ---------------------------------------------
 dnl libsdl - Currently disabled
 dnl ---------------------------------------------
-dnl AM_PATH_SDL(1.2.2, , AC_MSG_ERROR([Requires SDL 1.2 or later]))
-dnl if 0; then
-dnl   AC_DEFINE([HAVE_SDL],,[Define this to include SDL support])
-dnl fi
+AM_PATH_SDL(1.2.2,AC_DEFINE([HAVE_SDL],,[Define this to include SDL support]),)
 
 dnl ---------------------------------------------
 dnl dynamic linker

@@ -65,6 +65,7 @@
 #include "mgaoutput.h"
 #include "xmgaoutput.h"
 #include "rvrreader.h"
+#include "sdloutput.h"
 #include "pulldown.h"
 #include "utils.h"
 #include "cpuinfo.h"
@@ -108,7 +109,8 @@ enum {
     OUTPUT_XV,
     OUTPUT_DIRECTFB,
     OUTPUT_MGA,
-    OUTPUT_XMGA
+    OUTPUT_XMGA,
+    OUTPUT_SDL
 };
 static unsigned int output_driver = 0;
 
@@ -910,6 +912,8 @@ int main( int argc, char **argv )
             output_driver = OUTPUT_MGA;
         } else if( !strcasecmp( config_get_output_driver( ct ), "xmga" ) ) {
             output_driver = OUTPUT_XMGA;
+        } else if( !strcasecmp( config_get_output_driver( ct ), "sdl" ) ) {
+            output_driver = OUTPUT_SDL;
         } else {
             output_driver = OUTPUT_XV;
         }
@@ -924,6 +928,8 @@ int main( int argc, char **argv )
         output = get_mga_output();
     } else if( output_driver == OUTPUT_XMGA ) {
         output = get_xmga_output();
+    } else if( output_driver == OUTPUT_SDL ) {
+        output = get_sdl_output();
     } else {
         output = get_xv_output();
     }

@@ -47,7 +47,7 @@ static int needresize = 0;
 static int window_width = 0;
 static int window_height = 0;
 
-unsigned char *sdl_get_output( void )
+static unsigned char *sdl_get_output( void )
 {
     return frame->pixels[ 0 ];
 }
@@ -57,13 +57,18 @@ static void sdl_reset_display( void )
     screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
 }
 
-int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
+static int sdl_init( int outputheight, int aspect, int verbose )
 {
-    SDL_Rect **modes;
-    int ret, i;
+    int ret;
 
     sdlaspect = aspect;
-    outwidth = outputwidth;
+    outheight = outputheight;
+
+    if( sdlaspect ) {
+        outwidth = (outheight / 9) * 16;
+    } else {
+        outwidth = (outheight / 3) * 4;
+    }
 
     /* Initialize SDL. */
     ret = SDL_Init( SDL_INIT_VIDEO );
@@ -72,44 +77,11 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
         return 0;
     } 
 
-    if( !outputwidth ) {
-        /* Get available fullscreen/hardware modes, choose largest. */
-        modes = SDL_ListModes( 0, sdlflags );
-
-        if( modes == (SDL_Rect **) 0 || modes == (SDL_Rect **) -1 ) {
-            fprintf( stderr, "sdloutput: No mode information available. "
-                             "Assuming width of 800.\n" );
-        } else {
-            /* Find largest mode. */
-            for( i = 0; modes[ i ]; ++i ) {
-                if( modes[ i ]->w > outputwidth ) outputwidth = modes[ i ]->w;
-            }
-        }
-    }
-
     /* Create screen surface. */
     /* Unfortunately, we always assume square pixels for now. */
-    if( sdlaspect ) {
-        /* Run in 16:9 mode. */
-        screen = SDL_SetVideoMode( outputwidth, outputwidth / 16 * 9, 0, sdlflags );
-    } else {
-        screen = SDL_SetVideoMode( outputwidth, outputwidth / 4 * 3, 0, sdlflags );
-    }
+    screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
     if( !screen ) {
         fprintf( stderr, "sdloutput: Can't open output!\n" );
-        return 0;
-    }
-    outheight = screen->h;
-
-    /* Create overlay surface. */
-    frame = SDL_CreateYUVOverlay( inputwidth, inputheight,
-                                  SDL_YUY2_OVERLAY, screen );
-    if( !frame ) {
-        fprintf( stderr, "sdloutput: Couldn't create overlay surface.\n" );
-        return 0;
-    }
-    if( !frame->hw_overlay ) {
-        fprintf( stderr, "sdloutput: Can't get a hardware YUY2 overlay surface, giving up.\n" );
         return 0;
     }
 
@@ -118,7 +90,25 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     return 1;
 }
 
-int sdl_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
+static int sdl_set_input_size( int inputwidth, int inputheight )
+{
+    /* Create overlay surface. */
+    frame = SDL_CreateYUVOverlay( inputwidth, inputheight,
+                                  SDL_YUY2_OVERLAY, screen );
+    if( !frame ) {
+        fprintf( stderr, "sdloutput: Couldn't create overlay surface.\n" );
+        return 0;
+    }
+
+    if( !frame->hw_overlay ) {
+        fprintf( stderr, "sdloutput: Can't get a hardware overlay surface!!\n"
+                         "sdloutput: Using SDL's software fallbacks!  Performance will be poor!\n" );
+    }
+
+    return 1;
+}
+
+static int sdl_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
     if( !fs && fullscreen_width && fullscreen_height ) {
         screen = SDL_SetVideoMode( fullscreen_width, fullscreen_height, 0, sdlflags );
@@ -142,14 +132,14 @@ int sdl_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     return fs;
 }
 
-int sdl_toggle_aspect( void )
+static int sdl_toggle_aspect( void )
 {
     sdlaspect = !sdlaspect;
     sdl_reset_display();
     return sdlaspect;
 }
 
-void sdl_show_frame( void )
+static int sdl_show_frame( int x, int y, int width, int height )
 {
     SDL_Rect r;
     int curwidth;
@@ -175,9 +165,10 @@ void sdl_show_frame( void )
     r.h = curheight;
 
     SDL_DisplayYUVOverlay( frame, &r );
+    return 1;
 }
 
-void sdl_poll_events( input_t *in )
+static void sdl_poll_events( input_t *in )
 {
     SDL_Event event;
     int curcommand = 0, arg = 0;
@@ -241,14 +232,12 @@ void sdl_poll_events( input_t *in )
         }
 
         if( event.type == SDL_MOUSEBUTTONDOWN ) {
-
             input_callback( in, I_BUTTONPRESS, event.button.button );
-
         }
     }
 }
 
-void sdl_quit( void )
+static void sdl_quit( void )
 {
     if( fs ) {
         SDL_WM_ToggleFullScreen( screen );
@@ -258,41 +247,112 @@ void sdl_quit( void )
     SDL_Quit();
 }
 
-int sdl_get_stride( void )
+static int sdl_get_stride( void )
 {
     return frame->w * 2;
 }
 
-int sdl_is_interlaced( void )
+static int sdl_is_interlaced( void )
 {
     return 0;
 }
 
-void sdl_wait_for_sync( int field )
+static int sdl_can_read_from_buffer( void )
+{
+    return 1;
+}
+
+static int sdl_is_exposed( void )
+{
+    return 1;
+}
+
+static int sdl_is_fullscreen( void )
+{
+    return fs;
+}
+
+static void sdl_wait_for_sync( int field )
 {
 }
 
-void sdl_lock_output( void )
+static void sdl_lock_output( void )
 {
     SDL_LockYUVOverlay( frame );
 }
 
-void sdl_unlock_output( void )
+static void sdl_unlock_output( void )
 {
     SDL_UnlockYUVOverlay( frame );
 }
-void sdl_set_window_caption( const char *caption )
+static void sdl_set_window_caption( const char *caption )
 {
     SDL_WM_SetCaption( caption, 0 );
+}
+
+static int sdl_get_visible_width( void )
+{
+    int curwidth;
+    int curheight;
+    int widthratio = sdlaspect ? 16 : 4;
+    int heightratio = sdlaspect ? 9 : 3;
+
+    curwidth = outwidth;
+    curheight = ( outwidth / widthratio ) * heightratio;
+    if( curheight > outheight ) {
+        curheight = outheight;
+        curwidth = ( outheight / heightratio ) * widthratio;
+    }
+
+    return curwidth;
+}
+
+static int sdl_get_visible_height( void )
+{
+    int curwidth;
+    int curheight;
+    int widthratio = sdlaspect ? 16 : 4;
+    int heightratio = sdlaspect ? 9 : 3;
+
+    curwidth = outwidth;
+    curheight = ( outwidth / widthratio ) * heightratio;
+    if( curheight > outheight ) {
+        curheight = outheight;
+        curwidth = ( outheight / heightratio ) * widthratio;
+    }
+
+    return curheight;
+}
+
+static void sdl_resize_window_fullscreen( void )
+{
+}
+
+static void sdl_set_window_position( int x, int y )
+{
+}
+
+static void sdl_set_window_height( int window_height )
+{
+    outheight = window_height;
+    if( sdlaspect ) {
+        outwidth = (outheight * 16) / 9;
+    } else {
+        outwidth = (outheight * 4) / 3;
+    }
+    sdl_reset_display();
 }
 
 static output_api_t sdloutput =
 {
     sdl_init,
 
+    sdl_set_input_size,
+
     sdl_lock_output,
     sdl_get_output,
     sdl_get_stride,
+    sdl_can_read_from_buffer,
     sdl_unlock_output,
 
     sdl_is_exposed,
@@ -307,8 +367,10 @@ static output_api_t sdloutput =
 
     sdl_toggle_aspect,
     sdl_toggle_fullscreen,
-    sdl_set_window_caption,
+    sdl_resize_window_fullscreen,
 
+    sdl_set_window_caption,
+    sdl_set_window_position,
     sdl_set_window_height,
 
     sdl_poll_events,

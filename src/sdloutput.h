@@ -19,7 +19,6 @@
 #ifndef SDLOUTPUT_H_INCLUDED
 #define SDLOUTPUT_H_INCLUDED
 
-#include "input.h"
 #include "outputapi.h"
 
 #ifdef __cplusplus

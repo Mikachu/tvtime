@@ -63,7 +63,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 
 OUTPUT_SRCS = display.c display.h outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
-	xcommon.h xcommon.c xmgaoutput.h xmgaoutput.c
+	xcommon.h xcommon.c xmgaoutput.h xmgaoutput.c sdloutput.h \
+	sdloutput.c
 
 bin_PROGRAMS = tvtime tvtime-command
 EXTRA_PROGRAMS = expandpng timingtest rvr
