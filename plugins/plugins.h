@@ -38,4 +38,15 @@ void linearblend_plugin_init( void );
 void scalerbob_plugin_init( void );
 void simplemo_plugin_init( void );
 
+void dscaler_greedy2frame_plugin_init( void );
+void dscaler_twoframe_plugin_init( void );
+void dscaler_greedyh_plugin_init( void );
+void dscaler_greedy_plugin_init( void );
+void dscaler_videobob_plugin_init( void );
+void dscaler_videoweave_plugin_init( void );
+void dscaler_bob_plugin_init( void );
+void dscaler_weave_plugin_init( void );
+void dscaler_oldgame_plugin_init( void );
+void dscaler_tomsmocomp_plugin_init( void );
+
 #endif /* TVTIME_PLUGINS_H_INCLUDED */
