@@ -92,11 +92,11 @@ struct commands_s {
     config_t *cfg;
     videoinput_t *vidin;
     tvtime_osd_t *osd;
+    station_mgr_t *stationmgr;
     char next_chan_buffer[ 5 ];
     int frame_counter;
     int digit_counter;
     int quit;
-    int inputnum;
     int sleeptimer;
     time_t sleeptimer_start;
 
@@ -138,13 +138,11 @@ struct commands_s {
     int delay;
 
     int change_channel;
-
     int renumbering;
 
     int apply_invert;
     int apply_mirror;
     int apply_chroma_kill;
-
     int apply_luma;
     int update_luma;
     double luma_power;
@@ -158,8 +156,6 @@ struct commands_s {
     vbidata_t *vbi;
     int capturemode;
 
-    station_mgr_t *stationmgr;
-
     int curfavorite;
     int numfavorites;
     int favorites[ NUM_FAVORITES ];
@@ -170,9 +166,6 @@ struct commands_s {
     int curmenusize;
     menu_t *curusermenu;
     menu_t *menus[ MAX_USER_MENUS ];
-
-    menu_t *root_tuner;
-    menu_t *root_notuner;
 };
 
 static void menu_set_value( menu_t *menu, int newval, int a, int b, int c )
@@ -868,28 +861,34 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         return 0;
     }
 
-    /* Number of frames to wait for next channel digit. */
-    cmd->delay = 1000000 / fieldtime;
-
     cmd->cfg = cfg;
     cmd->vidin = vidin;
     cmd->osd = osd;
     cmd->stationmgr = mgr;
+    memset( cmd->next_chan_buffer, 0, sizeof( cmd->next_chan_buffer ) );
     cmd->frame_counter = 0;
     cmd->digit_counter = 0;
-
-    cmd->displayinfo = 0;
-    cmd->checkfreq = config_get_check_freq_present( cfg );
-
+    cmd->quit = 0;
     cmd->sleeptimer = 0;
     cmd->sleeptimer_start = 0;
 
-    cmd->quit = 0;
-    cmd->showbars = 0;
+    if( config_get_xmltv_file( cfg ) && strcasecmp( config_get_xmltv_file( cfg ), "none" ) ) {
+        cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ) );
+    } else {
+        cmd->xmltv = 0;
+    }
+
     cmd->picturemode = 3;
-    cmd->showdeinterlacerinfo = 0;
-    cmd->printdebug = 0;
+    cmd->brightness = config_get_global_brightness( cfg );
+    cmd->contrast = config_get_global_contrast( cfg );
+    cmd->colour = config_get_global_colour( cfg );
+    cmd->hue = config_get_global_hue( cfg );
+
+    cmd->displayinfo = 0;
     cmd->screenshot = 0;
+    cmd->printdebug = 0;
+    cmd->showbars = 0;
+    cmd->showdeinterlacerinfo = 0;
     cmd->togglefullscreen = 0;
     cmd->toggleaspect = 0;
     cmd->togglealwaysontop = 0;
@@ -898,39 +897,54 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->togglemode = 0;
     cmd->togglematte = 0;
     cmd->framerate = FRAMERATE_FULL;
-    cmd->console_on = 0;
-    cmd->scrollconsole = 0;
     cmd->scan_channels = 0;
     cmd->pause = 0;
     cmd->halfsize = 0;
-    cmd->change_channel = 0;
-    cmd->renumbering = 0;
     cmd->resizewindow = 0;
     cmd->restarttvtime = 0;
     cmd->setdeinterlacer = 0;
     cmd->normset = 0;
+    cmd->newnorm = 0;
     cmd->newsharpness = 0;
+    memset( cmd->deinterlacer, 0, sizeof( cmd->deinterlacer ) );
     cmd->setfreqtable = 0;
-    cmd->brightness = config_get_global_brightness( cfg );
-    cmd->contrast = config_get_global_contrast( cfg );
-    cmd->colour = config_get_global_colour( cfg );
-    cmd->hue = config_get_global_hue( cfg );
+    snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", config_get_v4l_freq( cfg ) );
+    cmd->checkfreq = config_get_check_freq_present( cfg );
+
+    /* Number of frames to wait for next channel digit. */
+    cmd->delay = 1000000 / fieldtime;
+
+    cmd->change_channel = 0;
+    cmd->renumbering = 0;
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
     cmd->apply_chroma_kill = 0;
-
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
     cmd->update_luma = 0;
     cmd->luma_power = config_get_luma_correction( cfg );
 
-    snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", config_get_v4l_freq( cfg ) );
+    cmd->overscan = config_get_overscan( cfg );
+    if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
 
-    if( config_get_xmltv_file( cfg ) && strcasecmp( config_get_xmltv_file( cfg ), "none" ) ) {
-        cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ) );
-    } else {
-        cmd->xmltv = 0;
-    }
+    cmd->console_on = 0;
+    cmd->scrollconsole = 0;
+    cmd->console = 0;
+
+    cmd->vbi = 0;
+    cmd->capturemode = CAPTURE_OFF;
+
+    cmd->curfavorite = 0;
+    cmd->numfavorites = 0;
+    memset( cmd->favorites, 0, sizeof( cmd->favorites ) );
+
+    cmd->menuactive = 0;
+    cmd->curmenu = MENU_FAVORITES;
+    cmd->curmenupos = 0;
+    cmd->curmenusize = 0;
+    cmd->curusermenu = 0;
+    memset( cmd->menus, 0, sizeof( cmd->menus ) );
+
 
     if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
         cmd->apply_luma = 0;
@@ -964,21 +978,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         cmd->luma_power = 1.0;
     }
 
-    cmd->overscan = config_get_overscan( cfg );
-    if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
-
-    cmd->console = 0;
-    cmd->vbi = 0;
-    cmd->capturemode = CAPTURE_OFF;
-
-    cmd->numfavorites = 0;
-    cmd->curfavorite = 0;
-
-    cmd->menuactive = 0;
-    cmd->curmenu = MENU_FAVORITES;
-    cmd->curmenupos = 0;
-    cmd->curusermenu = 0;
-    memset( cmd->menus, 0, sizeof( cmd->menus ) );
 
     menu = menu_new( "root-tuner" );
     menu_set_text( menu, 0, "Setup" );
