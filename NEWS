@@ -10,6 +10,9 @@ News for 0.9.8
     significantly changed in this release of tvtime.  Please see the
     documentation for details on using tvtime 0.9.8.
 
+    Also, some command line options have changed or become unavailable
+    (no more -w, use -H instead).  Please consult the tvtime man page.
+
   *  New XML config file format for both the tvtime configuration,
      and the station list.
   *  tvtime now has two distinct half-framerate modes: top-field-first
