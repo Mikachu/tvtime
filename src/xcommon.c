@@ -994,6 +994,12 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     classhint.res_name = "TVFullscreen";
     XSetClassHint( display, fs_window, &classhint );
 
+    /* collaborate with the window manager for close requests */
+    XSetWMProtocols( display, wm_window, &wm_delete_window, 1 );
+
+    calculate_video_area();
+    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
+
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
 
@@ -1014,12 +1020,6 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
     XDefineCursor( display, output_window, nocursor );
     XSetIconName( display, wm_window, "tvtime" );
-
-    /* collaborate with the window manager for close requests */
-    XSetWMProtocols( display, wm_window, &wm_delete_window, 1 );
-
-    calculate_video_area();
-    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
 
     return 1;
 }
@@ -1093,8 +1093,8 @@ void xcommon_set_window_height( int window_height )
     win_changes.width = window_width;
     win_changes.height = window_height;
 
-    XResizeWindow( display, wm_window, window_width, window_height );
-    XReconfigureWMWindow( display, wm_window, 0, CWWidth | CWHeight, &win_changes );
+    XReconfigureWMWindow( display, wm_window, 0,
+                          CWWidth | CWHeight, &win_changes );
 }
 
 void xcommon_clear_screen( void )
