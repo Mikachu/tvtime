@@ -122,6 +122,7 @@ void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int widt
 void filter_luma_14641_packed422_inplace_scanline_c( unsigned char *data, int width );
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width );
+void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 
 /**
  * Here are the function pointers which will be initialized to point at the
@@ -164,6 +165,7 @@ extern unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsig
                                                        unsigned char *bot, int width );
 extern void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width );
 extern void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
+extern void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
 extern void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 /**

@@ -76,6 +76,7 @@ unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned cha
                                                 unsigned char *bot, int width );
 void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*mirror_packed422_inplace_scanline)( unsigned char *data, int width );
+void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 
@@ -288,17 +289,29 @@ void testing_packed422_inplace_scanline_c( unsigned char *data, int width, int s
 
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
-    int x = 0;
-    int tmp1 = 0;
-    int tmp2 = 0;
+    int x, tmp1, tmp2;
+
     SPEEDY_START();
-    for( x=0; x<width; x+=2 ) {
+    for( x = 0; x < width; x+=2 ) {
         tmp1 = data[ x+0 ];
         tmp2 = data[ x+1 ];
         data[ x+0 ] = data[ width*2 - x - 0 ];
         data[ x+1 ] = data[ width*2 - x + 1 ];
         data[ width*2 - x - 0 ] = tmp1;
         data[ width*2 - x + 1 ] = tmp2;
+    }
+    SPEEDY_END();
+}
+
+void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width )
+{
+    int halfw = width / 2;
+    int x;
+
+    SPEEDY_START();
+    for( x = 0; x < halfw; x += 2 ) {
+        data[ width + (x*2)     ] = data[ width - ((x+1)*2) ];
+        data[ width + (x*2) + 1 ] = data[ width - ((x+1)*2) + 1 ];
     }
     SPEEDY_END();
 }
@@ -1241,6 +1254,7 @@ void setup_speedy_calls( int verbose )
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
+    halfmirror_packed422_inplace_scanline = halfmirror_packed422_inplace_scanline_c;
     speedy_memcpy = temp_memcpy;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
