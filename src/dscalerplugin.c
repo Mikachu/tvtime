@@ -140,10 +140,12 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
             int i;
             for( i = 0; i < pMethod->nSettings; i++) {
                 // fprintf( stderr, "[%d] %s\n", i, pMethod->pSettings[i].szDisplayName );
-                Setting_ReadFromIni(&(pMethod->pSettings[i]));
-                printf("Parameter %s: %ld\n",
-                       pMethod->pSettings[i].szDisplayName,
+                // Setting_ReadFromIni(&(pMethod->pSettings[i]));
+
+                if( pMethod->pSettings[ i ].szDisplayName ) {
+                    printf("Parameter %s: %ld\n", pMethod->pSettings[i].szDisplayName,
                        *(pMethod->pSettings[i].pValue));
+                }
             }
             */
 
