@@ -827,7 +827,8 @@ int main( int argc, char **argv )
     rtctimer_t *rtctimer = 0;
     station_mgr_t *stationmgr = 0;
     rvrreader_t *rvrreader = 0;
-    int width, height;
+    int width = 720;
+    int height = 480;
     int norm = 0;
     int fieldtime;
     int safetytime;
@@ -944,34 +945,35 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    vidin = videoinput_new( config_get_v4l_device( ct ), 
-                            config_get_inputwidth( ct ), 
-                            norm, verbose );
-    if( !vidin ) {
-        fprintf( stderr, "tvtime: Can't open video input, "
-                         "maybe try a different device?\n" );
-    }
-    // rvrreader = rvrreader_new( "testfile.rvr" );
-    if( rvrreader ) {
-        width = rvrreader_get_width( rvrreader );
-        height = rvrreader_get_height( rvrreader );
-        if( verbose ) {
-            fprintf( stderr, "tvtime: RVR frame sampling %d pixels per scanline.\n", width );
-        }
-    } else if( vidin ) {
-        videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
-        width = videoinput_get_width( vidin );
-        height = videoinput_get_height( vidin );
-        if( verbose ) {
-            fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
+    if( config_get_rvr_filename( ct ) ) {
+        rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
+        if( !rvrreader ) {
+            fprintf( stderr, "tvtime: Can't open rvr file '%s'.\n",
+                     config_get_rvr_filename( ct ) );
+        } else {
+            width = rvrreader_get_width( rvrreader );
+            height = rvrreader_get_height( rvrreader );
+            if( verbose ) {
+                fprintf( stderr, "tvtime: RVR frame sampling %d pixels per scanline.\n", width );
+            }
         }
     } else {
-        width = 720;
-        height = 480;
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Blue frame sampling %d pixels per scanline.\n", width );
+        vidin = videoinput_new( config_get_v4l_device( ct ), 
+                                config_get_inputwidth( ct ), 
+                                norm, verbose );
+        if( !vidin ) {
+            fprintf( stderr, "tvtime: Can't open video input, "
+                             "maybe try a different device?\n" );
+        } else {
+            videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
+            width = videoinput_get_width( vidin );
+            height = videoinput_get_height( vidin );
+            if( verbose ) {
+                fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
+            }
         }
     }
+
 
     /**
      * 1 buffer : 0 fields available.  [t][b]
@@ -1049,14 +1051,14 @@ int main( int argc, char **argv )
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         tvtime_osd_set_deinterlace_method( osd, curmethod->name );
         if( rvrreader ) {
-            tvtime_osd_set_input( osd, "No input" );
+            tvtime_osd_set_input( osd, "RVR" );
             tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
         } else if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
             tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
         } else {
-            tvtime_osd_set_input( osd, "No input" );
-            tvtime_osd_set_norm( osd, "NTSC" );
+            tvtime_osd_set_input( osd, "No video source" );
+            tvtime_osd_set_norm( osd, "" );
         }
     }
 
