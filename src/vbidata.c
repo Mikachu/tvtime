@@ -502,8 +502,6 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 {
     int w1, b1, b2;
 
-    if( !vbi ) return 0;
-
     w1 = ccdecode(s);
 
     b1 = w1 & 0x7f;
@@ -881,6 +879,7 @@ vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs,
                         tvtime_osd_t* osd, int verbose  )
 {
     vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
+
     if( !vbi ) {
         return 0;
     }
@@ -904,15 +903,12 @@ vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs,
 
 void vbidata_delete( vbidata_t *vbi )
 {
-    if( !vbi ) return;
     close( vbi->fd );
     free( vbi );
 }
 
 void vbidata_reset( vbidata_t *vbi )
 {
-    if( !vbi ) return;
-
     vbi->wanttop = 0;
     vbi->wanttext = 0;
     vbi->colour = 0xFFFFFFFFU;
@@ -964,7 +960,6 @@ void vbidata_reset( vbidata_t *vbi )
 
 void vbidata_capture_mode( vbidata_t *vbi, int mode )
 {
-    if( !vbi ) return;
     switch( mode ) {
     case CAPTURE_OFF:
         vbi->enabled = 0;
