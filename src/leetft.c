@@ -38,31 +38,91 @@ struct ft_font_s
     int fontsize;
     int xdpi;
     FT_Face face;
-    hashtable_t *glyphs; // These contain FT_Glyph
-    hashtable_t *bitmaps;
+    hashtable_t *glyphdata; // These contain glyph_data_s
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
     int max_height;
 };
 
+struct ft_glyph_data_s
+{
+    FT_Glyph glyph;
+    FT_Glyph bitmap;
+};
+
+typedef struct ft_glyph_data_s ft_glyph_data_t;
+
+static int ft_cache_glyph (ft_font_t *font, int32_t wchar, FT_BBox *glyph_bbox)
+{
+    FT_Error error;
+    FT_UInt glyph_index;
+
+    if (hashtable_lookup (font->glyphdata, wchar))
+        return 1; // The glyph already is cached, no need to re-cache it.
+
+    glyph_index = FT_Get_Char_Index( font->face, wchar );
+
+    if( !glyph_index )
+        return 0;
+
+    ft_glyph_data_t *cur = malloc (sizeof (*cur));
+    
+    if (cur == NULL) {
+        fprintf ( stderr, "leeft: Out of memory\n");
+        return 0;
+    }
+    error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
+    if( error ) {
+        fprintf( stderr, "leetft: Can't load glyph %d\n", wchar );
+        return 0;
+    }
+    
+    error = FT_Get_Glyph( font->face->glyph, &cur->glyph );
+    if( error ) {
+        fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", wchar );
+        return 0;
+    }
+        
+    error = FT_Glyph_Copy( cur->glyph, &cur->bitmap );
+    if( error ) {
+        fprintf( stderr, "leetft: Can't copy glyph %d\n", wchar );
+        FT_Done_Glyph( cur->glyph );
+        hashtable_delete( font->glyphdata, wchar );
+        return 0;
+    }
+        
+    error = FT_Glyph_To_Bitmap( &cur->bitmap, ft_render_mode_normal, 0, 1 );
+    if( error ) {
+        fprintf( stderr, "leetft: Can't render glyph %d\n", wchar );
+        FT_Done_Glyph( cur->glyph );
+        FT_Done_Glyph( cur->bitmap );
+        hashtable_delete( font->glyphdata, wchar );
+        return 0;
+    }
+    
+    if( !hashtable_insert( font->glyphdata, wchar, cur ) ) {
+        /* No more memory in the hash table, don't insert this glyph. */
+        FT_Done_Glyph( cur->glyph );
+        FT_Done_Glyph( cur->bitmap );
+        hashtable_delete( font->glyphdata, wchar );
+        return 0;
+    }
+    
+    if (glyph_bbox != NULL) // Allow caller not to accept the BBox.
+        FT_Glyph_Get_CBox( cur->glyph, ft_glyph_bbox_subpixels, glyph_bbox );
+    return 1;
+}
+
 ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 {
     ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
-    FT_Error error;
+    FT_BBox glyph_bbox;
     FT_BBox bbox;
-    int i;
 
     if( !font ) return 0;
 
-    font->glyphs = hashtable_init( 1789 ); /* 1789 is a prime number. */
-    if( !font->glyphs ) {
-        free( font );
-        return 0;
-    }
-
-    font->bitmaps = hashtable_init( 1789 );
-    if( !font->bitmaps ) {
-        hashtable_destroy( font->glyphs );
+    font->glyphdata = hashtable_init( 1789 ); /* 1789 is a prime number. */
+    if( !font->glyphdata ) {
         free( font );
         return 0;
     }
@@ -70,8 +130,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     if( !ft_lib_refcount ) {
         if( FT_Init_FreeType( &ft_lib ) ) {
             fprintf( stderr, "ftfont: Can't load freetype library.\n" );
-            hashtable_destroy( font->glyphs );
-            hashtable_destroy( font->bitmaps );
+            hashtable_destroy( font->glyphdata );
             free( font );
             return 0;
         }
@@ -84,8 +143,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         if( !ft_lib_refcount ) {
             FT_Done_FreeType( ft_lib );
         }
-        hashtable_destroy( font->glyphs );
-        hashtable_destroy( font->bitmaps );
+        hashtable_destroy( font->glyphdata );
         free( font );
         return 0;
     }
@@ -105,66 +163,13 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     bbox.yMin = INT_MAX;
     bbox.yMax = -INT_MAX;
 
-    for( i = 0; i < 256; i++ ) {
-        FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
-
-        if( glyph_index ) {
-            FT_BBox glyph_bbox;
-            FT_Glyph curglyph;
-            FT_Glyph curbitmap;
-
-            error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
-            if( error ) {
-                fprintf( stderr, "leetft: Can't load glyph %d\n", i );
-                continue;
-            }
-
-            error = FT_Get_Glyph( font->face->glyph, &curglyph );
-            if( error ) {
-                fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", i );
-                continue;
-            }
-
-            if( !hashtable_insert( font->glyphs, i, curglyph ) ) {
-                /* No more memory in the hash table, don't insert this glyph. */
-                FT_Done_Glyph( curglyph );
-                continue;
-            }
-
-            error = FT_Glyph_Copy( curglyph, &curbitmap );
-            if( error ) {
-                fprintf( stderr, "leetft: Can't copy glyph %d\n", i );
-                FT_Done_Glyph( curglyph );
-                if( !hashtable_insert( font->glyphs, i, 0 ) ) {
-                    /* Ignore errors if we can't remove it, for now. */
-                }
-                continue;
-            }
-
-            error = FT_Glyph_To_Bitmap( &curbitmap, ft_render_mode_normal, 0, 1 );
-            if( error ) {
-                fprintf( stderr, "leetft: Can't render glyph %d\n", i );
-                FT_Done_Glyph( curglyph );
-                FT_Done_Glyph( curbitmap );
-                hashtable_delete( font->glyphs, i );
-                continue;
-            }
-
-            if( !hashtable_insert( font->bitmaps, i, curbitmap ) ) {
-                /* No more memory in the hash table, don't insert this glyph. */
-                FT_Done_Glyph( curglyph );
-                FT_Done_Glyph( curbitmap );
-                hashtable_delete( font->glyphs, i );
-                continue;
-            }
-
-            FT_Glyph_Get_CBox( curglyph, ft_glyph_bbox_subpixels, &glyph_bbox );
+    for (int i = 0; i < 128; i++) {
+        if (ft_cache_glyph (font, i, &glyph_bbox)) {
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
             if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
+            font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
         }
     }
-
-    font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
 
     return font;
 }
@@ -174,24 +179,18 @@ void ft_font_delete( ft_font_t *font )
     int i;
 
     for( i = 0; i < 256; i++ ) {
-        FT_Glyph curglyph, curbitmap;
+        ft_glyph_data_t *cur;
 
-        curglyph = (FT_Glyph) hashtable_lookup( font->glyphs, i );
-        if( curglyph ) {
-            FT_Done_Glyph( curglyph );
-            hashtable_delete( font->glyphs, i );
-        }
-
-        curbitmap = (FT_Glyph) hashtable_lookup( font->bitmaps, i );
-        if( curbitmap ) {
-            FT_Done_Glyph( curbitmap );
-            hashtable_delete( font->bitmaps, i );
+        cur = hashtable_lookup( font->glyphdata, i );
+        if( cur ) {
+            FT_Done_Glyph( cur->glyph );
+            FT_Done_Glyph( cur->bitmap );
+            hashtable_delete( font->glyphdata, i );
         }
     }
 
     FT_Done_Face( font->face );
-    hashtable_destroy( font->glyphs );
-    hashtable_destroy( font->bitmaps );
+    hashtable_destroy( font->glyphdata );
     free( font );
 
     ft_lib_refcount--;
@@ -216,7 +215,7 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points )
     return ( font->xdpi * points * 65536 ) / 72;
 }
 
-static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphs, FT_UInt *glyphpos,
+static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *glyphpos,
                                FT_UInt *glyphindex, const char *text, int len )
 {
     FT_Bool use_kerning;
@@ -236,7 +235,8 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphs, FT_UInt *glyph
         int cur = text[ i ];
         FT_Glyph curglyph;
 
-        curglyph = (FT_Glyph) hashtable_lookup( glyphs, cur );
+        curglyph = ((ft_glyph_data_t *) hashtable_lookup( glyphdata, cur ))
+            ->glyph;
         if( curglyph ) {
             FT_BBox glyph_bbox;
 
@@ -333,7 +333,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
     }
 
     len = strlen( text );
-    string_bbox = prerender_text( font->face, font->glyphs, font->glyphpos, font->glyphindex, text, len );
+    string_bbox = prerender_text( font->face, font->glyphdata, font->glyphpos, font->glyphindex, text, len );
 
     /**
      * Temporary hack.  I'm worried about strings where the bounding box
@@ -363,7 +363,9 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
         FT_BitmapGlyph curglyph;
         int cur = text[ i ];
 
-        curglyph = (FT_BitmapGlyph) hashtable_lookup( font->bitmaps, cur );
+        curglyph = (FT_BitmapGlyph)
+            ((ft_glyph_data_t *) hashtable_lookup( font->glyphdata, cur ))
+            ->bitmap;
         if( curglyph ) {
             blit_glyph_subpix( output, *width, *height, *width,
                                curglyph->bitmap.buffer, curglyph->bitmap.width,
