@@ -1050,9 +1050,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     if(EWMH_wm) {
       has_ewmh_state_fullscreen = check_for_state_fullscreen(dpy);
     }
-    /* billy: no ewmh for now */
-    //has_ewmh_state_fullscreen = 0;
-    
+
     gnome_wm = check_for_gnome_wm(dpy);
     
     //fprintf(stderr,"EWMH_wm: %s\n", EWMH_wm ? "True" : "False");
