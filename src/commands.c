@@ -59,6 +59,7 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
+    { "CHANNEL_SAVE_TUNING", TVTIME_CHANNEL_SAVE_TUNING },
     { "CHANNEL_SCAN", TVTIME_CHANNEL_SCAN },
     { "CHANNEL_SKIP", TVTIME_CHANNEL_SKIP },
     { "CHANNEL_UP", TVTIME_CHANNEL_UP },
@@ -427,6 +428,21 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             
     case TVTIME_TOGGLE_ASPECT:
         in->toggleaspect = 1;
+        break;
+
+    case TVTIME_CHANNEL_SAVE_TUNING:
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            char freq[ 32 ];
+            char freqname[ 32 ];
+            int pos;
+
+            snprintf( freq, sizeof( freq ), "%f", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+            snprintf( freqname, sizeof( freqname ), "%.2fMHz", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+            pos = station_add( in->stationmgr, 0, "Custom", freq, freqname );
+            station_writeconfig( in->stationmgr );
+            station_set( in->stationmgr, pos );
+            in->change_channel = 1;
+        }
         break;
 
     case TVTIME_CHANNEL_RENUMBER:
