@@ -10,11 +10,12 @@ depends on the ttf-freefont package.  As such, the debian/rules script
 uses the FREEFONT_CFLAGS variable in src/Makefile.am to convince
 tvtime to look in the right place.
 
-  The DScaler filters must be installed.  However, they cannot be 
+  The DScaler filters may be installed.  However, they cannot be 
 built from source on this platform.  You will find the required 
 copyright information in /usr/share/doc/tvtime/copyright.gz.
+These files are in contrib.
 
 [1]  http://savannah.nongnu.org/projects/freefont/
 [2]  http://deinterlace.sourceforge.net/
 
- -- Simon Law <sfllaw@debian.org>  Wed, 30 Apr 2003 00:31:00 -0400
+ -- Simon Law <sfllaw@debian.org>  Mon, 15 Sep 2003 12:21:25 -0400
