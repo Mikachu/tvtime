@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+     "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>tvtime: Configuring lirc for tvtime</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link href="tvtime.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<table width="728px" class="centered" border="0" cellpadding="0" cellspacing="0">
+<colgroup>
+    <col width="24px">
+    <col width="125px">
+    <col width="579px">
+</colgroup>
+
+<tr><td align="center" colspan="3"><a href="http://tvtime.sourceforge.net/"><img src="tvtime-logo-banner.png" alt="tvtime"/></a></td></tr>
+
+<tr><td class="hangspace"></td>
+    <td class="navbar">
+
+    <table class="doclist" width="95%">
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/why.html">why tvtime?</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/downloads.php">download tvtime!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table class="doclist" width="95%">
+    <tr><th class="docbox">support</td></tr>
+    <tr><td class="docentry">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="docentry">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="docentry">
+        <a href="problems.html">common problems</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="center">
+        <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+           width="88" height="31" alt="SourceForge Logo"></a></td></tr>
+    <!--
+    <tr><td class="center">
+        <a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+           alt="Valid HTML 4.01!" height="31" width="88"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+           src="http://jigsaw.w3.org/css-validator/images/vcss" 
+           height="31px" width="88px" alt="Valid CSS!" /></a></td></tr>
+    -->
+    <tr><td class="center">
+        <a href="http://tvtime.net/"><img src="http://tvtime.sourceforge.net/tvtime3.png"
+           width="88px" height="31px" alt="tvtime Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="mailto:vektor@dumbterm.net">email the webmaster</a></td></tr>
+    </table>
+    </td>
+
+    <td valign="top">
+
+    <table width="90%" class="centered">
+    <tr><td>
+
+        <h2 class="center">Configuring lirc for tvtime</h2>
+        <h4 class="center"><a href="http://www.billybiggs.com/">Billy Biggs</a>,
+        21 Sep 2003</h4>
+
+
+        <p><a href="http://www.lirc.org/">lirc</a> is a driver, client library and set
+        of utilities for using infrared remote controls with Linux applications.
+        This document describes how to configure lirc to work with tvtime.
+        Everything accessible via the keyboard can be done through your
+        remote control.</p>
+
+        <img style="float: right" src="remote-small.jpg" alt="A remote control">
+
+        <h3>1. Set up lirc</h3>
+
+        <p>lirc consists of a kernel piece and a userland daemon called
+        <b>lircd</b> which must be run.  Once this is setup, you can configure
+        lirc to signal tvtime when remote control buttons are pressed.</p>
+
+        <h3>2. All about irexec</h3>
+
+        <p>tvtime is signalled from lirc using a helper application called
+        <tt>irexec</tt>.  <tt>irexec</tt> runs as a daemon listening for
+        remote control events and executing commands specified in the
+        lirc config file.  In tvtime, we use <tt>irexec</tt> to run our own
+        helper application, <tt>tvtime-command</tt>, to send a command to a
+        running tvtime process.</p>
+
+        <p><tt>irexec</tt> should be run as the user under which tvtime will
+        run, and can be started with the <tt>--daemon</tt> option to have it
+        run in the background.  I don't know where this should be added, but
+        you must somehow ensure that <tt>irexec</tt> has been started before
+        running tvtime.  I would like to improve this somehow, but I'm not
+        sure what is best.</p>
+
+        <h3>3. Setting up your .lircrc</h3>
+
+        <p>The <tt>.lircrc</tt> entries for tvtime look like this:</p>
+
+<pre>
+    begin
+      prog = irexec
+      button = the_one_you_want_on_your_remote
+      config = tvtime-command quit
+    end
+</pre>
+
+        <p>Button names are assigned in your lircd config file, and often look
+        like <b>VOL_DOWN</b> or <b>CH+</b>.  These should be assigned to
+        corresponding tvtime commands.  A full list of commands can be
+        found on the <a href="usage.html#tvtimecommand">using tvtime webpage</a>
+        under the section <a href="usage.html#tvtimecommand">Controlling
+        tvtime via tvtime-command</a>.</p>
+
+        <h3>4. Suggested lirc setup</h3>
+
+        <p>We have put together an example <tt>.lircrc</tt> file that
+        demonstrates how we believe a user would set up their remote
+        control.</p>
+
+        <ul>
+        <li><a href="example.lircrc">An example .lircrc file</a>
+        </ul>
+
+        <p>This shows the commands that we feel are important and
+        gives a case study for how to configure lirc for tvtime.</p>
+
+        <h3>5. Configuring the power button as both tvtime start
+        and exit</h3>
+
+        <p>Many remotes have a power button, and a nifty trick is to have that
+        button map to both turning tvtime on and off.  This can be configured
+        by adding this entry to your <tt>.lircrc</tt> file:</p>
+
+<pre>
+    begin
+      prog = irexec
+      button = POWER
+      config = tvtime &amp;
+      config = tvtime-command QUIT
+    end
+</pre>
+
+        <p>This button has two commands defined, on the first press it will
+        start tvtime, and on the second press it will send a <b>QUIT</b>
+        message.</p>
+
+        <h3>6. Setting up the menu keys on remotes without menu buttons</h3>
+
+        <img style="float: right" src="remote-nomenu-small.jpg" alt="A remote control without menu buttons">
+
+        <p>Many remote controls, like the one featured on the right,
+        do not have separate menu navigation buttons but instead double-up
+        the channel up/down and volume up/down buttons for menu navigation.</p>
+
+        <p>In a future version of tvtime, we will include special commands to
+        better handle this case.  Until then, a simple hack is to use the
+        more expressive keyboard key mapping interface, where the menu commands
+        are automatically distinguished from the keyboard commands.  For
+        example:</p>
+
+<pre>
+    begin
+      prog = irexec
+      button = CH+
+      config = tvtime-command KEY_EVENT up
+      repeat = 1
+    end
+</pre>
+
+        <p>This sends the key event for the up arrow key whenever the CH+ button
+        is pressed on the remote.  When the menu is active, this key maps to
+        moving the cursor up in the menu, while when the menu is not visible,
+        this changes the channel.</p>
+
+        <h3>7. Bugs and suggestions</h3>
+
+        <p>If you have any suggestions on how we can simplify or better
+        automate the setup process of using tvtime and lirc, please
+        send an email to
+        <a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>.</p>
+
+        <h3>8. ChangeLog</h3>
+        <ul>
+        <li>Oct 9, 2003: Added a section with an example lircrc file.
+        </ul>
+
+        </td></tr>
+    </table>
+
+    </td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+     "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>tvtime: tvtime with XMLTV Listings</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link href="tvtime.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<table width="728px" class="centered" border="0" cellpadding="0" cellspacing="0">
+<colgroup>
+    <col width="24px">
+    <col width="125px">
+    <col width="579px">
+</colgroup>
+
+<tr><td align="center" colspan="3"><a href="http://tvtime.sourceforge.net/"><img src="tvtime-logo-banner.png" alt="tvtime"/></a></td></tr>
+
+<tr><td class="hangspace"></td>
+    <td class="navbar">
+
+    <table class="doclist" width="95%">
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/why.html">why tvtime?</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/downloads.php">download tvtime!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table class="doclist" width="95%">
+    <tr><th class="docbox">support</td></tr>
+    <tr><td class="docentry">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="docentry">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="docentry">
+        <a href="problems.html">common problems</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="center">
+        <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+           width="88" height="31" alt="SourceForge Logo"></a></td></tr>
+    <!--
+    <tr><td class="center">
+        <a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+           alt="Valid HTML 4.01!" height="31" width="88"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+           src="http://jigsaw.w3.org/css-validator/images/vcss" 
+           height="31px" width="88px" alt="Valid CSS!" /></a></td></tr>
+    -->
+    <tr><td class="center">
+        <a href="http://tvtime.net/"><img src="http://tvtime.sourceforge.net/tvtime3.png"
+           width="88px" height="31px" alt="tvtime Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="mailto:vektor@dumbterm.net">email the webmaster</a></td></tr>
+    </table>
+    </td>
+
+    <td valign="top">
+
+    <table width="90%" class="centered">
+    <tr><td>
+
+        <h2 class="center">Configuring tvtime for displaying XMLTV listings</h2>
+        <h4 class="center"><a href="http://www.billybiggs.com/">Billy Biggs</a> and
+        <a href="mailto:jforman_at_austin.rr.com">Jeffrey Forman</a>, 21 Sep 2003</h4>
+
+
+        <p><a href="http://membled.com/work/apps/xmltv/">XMLTV</a> is an
+        excellent application for downloading episode guide information and
+        storing it in a standardized file format.  As of tvtime version 0.9.10,
+        we support display of show title, sub-title, times and description on
+        the OSD.  This document describes how to configure and run XMLTV for
+        use with tvtime.</p> 
+
+        <div class="center">
+          <img src="xmltvshot.jpg" alt="XMLTV listings screenshot">
+        </div>
+
+        <h3>1. Run XMLTV</h3>
+
+        <p>XMLTV is a collection of scripts which download TV listings to a
+        local XML file.  The scripts are named by location, for example,
+        <tt>tv_grab_na</tt> for North America, or <tt>tv_grab_de</tt> for
+        Germany.  With the North American script, you first configure it for
+        your provider by running:</p>
+
+<pre>
+    tv_grab_na  --configure
+</pre>
+
+        <p>This runs an interactive setup to determine your cable provider.
+        Listings are then downloaded by running:</p>
+
+<pre>
+    tv_grab_na | tv_sort &gt; ~/listings.xml
+</pre>
+
+        <p>This will grab the listings for the next week and store it in the
+        file <tt>listings.xml</tt> in your home directory.  The
+        <tt>tv_grab_na</tt> command has many options to control its behavior.
+        <tt>tv_sort</tt> is a utility shipped with xmltv that will perform
+        sanity checks on the data, and add end times for many programs.
+        It will take some time to grab the listings, on Jeffrey's system, a
+        week of shows was over 4MB.</p>
+
+        <h3>2. Tell tvtime where the listings are</h3>
+
+        <p>Telling tvtime where to find the XMLTV listings is easy.  Simply
+        run:</p>
+
+<pre>
+    tvtime-configure --xmltv=~/listings.xml
+</pre>
+
+        <p>This will write to the tvtime config file the location of your
+        downloaded listings file.</p>
+
+        <h3>3. Manually configure channels</h3>
+
+        <p>Each channel in an XMLTV file is given a unique identifier and a
+        list of names for that channel.  tvtime maps XMLTV channels to
+        tvtime channels as follows:</p>
+
+        <ol>
+        <li>If the station entry in the <tt>stationlist.xml</tt> file contains
+            an <b>xmltvid</b> parameter, use that.
+        <li>Otherwise, search the channel list in the xmltv file for a channel
+            entry that matches the <b>name</b> of the current channel.
+        </ol>
+
+        <p>For example, the following is the entry for <b>CNN</b> in Billy's
+        XMLTV listings file:</p>
+
+<pre>
+    &lt;channel id="C18cnn.zap2it.com"&gt;
+      &lt;display-name&gt;18 CNN&lt;/display-name&gt;
+      &lt;display-name&gt;18&lt;/display-name&gt;
+    &lt;/channel&gt;
+</pre>
+
+        <p>And here is the default stationlist entry in tvtime:</p>
+
+<pre>
+    &lt;station name="18" active="1" position="18" band="US Cable"
+     channel="18" finetune="0" norm="NTSC"/&gt;
+</pre>
+
+        <p>In this stationlist entry, the name "18" matches the second display
+        name of in the XMLTV entry.</p>
+
+        <p>Unfortunately, many XMLTV sources do not contain enough information
+        to automatically perform this mapping.  Here is the output on Jeffrey's
+        provider:</p>
+
+<pre>
+    &lt;channel id="4 KXAN"&gt;
+      &lt;display-name&gt;Channel 4 KXAN&lt;/display-name&gt;
+    &lt;/channel&gt;
+</pre>
+
+        <p>The display name "Channel 4 KXAN" does not match the default name
+        in tvtime, nor could it.  To get around this, you can manually specify
+        an <b>xmltvid</b> parameter in the stationlist entry, as follows:</p>
+
+<pre>
+    &lt;station name="4" active="1" position="4" band="US Cable"
+        channel="4" finetune="0" norm="NTSC" xmltvid="4 KXAN"/&gt;
+</pre>
+
+        <p>The <tt>xmltvid="4 KXAN"</tt> matches the id="4 KXAN" in the
+        XMLTV &lt;channel&gt; tag, and this lets tvtime know which channel
+        information to use.</p>
+
+        <h3>4. Configure xmltv to run weekly</h3>
+
+        <p>It's easy to use <tt>cron</tt> to have your XMLTV listings
+        downloaded weekly.  Since everyone forgets the syntax, here is an
+        example of a crontab entry:</p>
+
+<pre>
+    0 2 * * 0 /usr/bin/tv_grab_na | /usr/bin/tv_sort &gt; ~/listings.xml
+</pre>
+
+        <p>This will download the listings every Sunday at 2am.</p>
+
+        <h3>5. Bugs and suggestions</h3>
+
+        <p>If you have any suggestions on how we can simplify or better
+        automate the setup process of using tvtime and XMLTV, please
+        send an email to
+        <a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>.</p>
+
+        <h3>6. Changelog</h3>
+        <ul>
+        <li>Oct 13, 2003: Update example to use <tt>tv_sort</tt>.
+        </ul>
+
+        </td></tr>
+    </table>
+
+    </td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+     "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>tvtime: Common problems</title>
+<link href="/tvtime.css" rel="stylesheet" type="text/css">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link href="tvtime.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<table width="728px" class="centered" border="0" cellpadding="0" cellspacing="0">
+<colgroup>
+    <col width="24px">
+    <col width="125px">
+    <col width="579px">
+</colgroup>
+
+<tr><td align="center" colspan="3"><a href="http://tvtime.sourceforge.net/"><img src="tvtime-logo-banner.png" alt="tvtime"/></a></td></tr>
+
+<tr><td class="hangspace"></td>
+    <td class="navbar">
+
+    <table class="doclist" width="95%">
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/why.html">why tvtime?</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/downloads.php">download tvtime!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table class="doclist" width="95%">
+    <tr><th class="docbox">support</td></tr>
+    <tr><td class="docentry">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="docentry">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="docentry">
+        <a href="problems.html">common problems</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    </table>
+
+    <p></p>
+
+    <table cellpadding="4" width="100%">
+    <tr><td class="center">
+        <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+           width="88" height="31" alt="SourceForge Logo"></a></td></tr>
+    <!--
+    <tr><td class="center">
+        <a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+           alt="Valid HTML 4.01!" height="31" width="88"></a></td></tr>
+    <tr><td class="center">
+        <a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+           src="http://jigsaw.w3.org/css-validator/images/vcss" 
+           height="31px" width="88px" alt="Valid CSS!" /></a></td></tr>
+    -->
+    <tr><td class="center">
+        <a href="http://tvtime.net/"><img src="http://tvtime.sourceforge.net/tvtime3.png"
+           width="88px" height="31px" alt="tvtime Logo"></a></td></tr>
+    <tr><td class="center">
+        <a href="mailto:vektor@dumbterm.net">email the webmaster</a></td></tr>
+    </table>
+    </td>
+
+    <td>
+
+    <table width="90%" class="centered">
+    <tr><td valign="top">
+
+        <h2 class="center">Capture card problems</h2>
+        <ol>
+        <li><a href="#tvwonder">Channels black-and-white and numbers
+            off-by-one</a>
+        <li><a href="#bttvbuffers">Too few buffers with bttv before
+            kernel 2.4.21</a>
+        <li><a href="#bttvload">bttv takes a long time to load</a>
+        <li><a href="#prolink-audio">Audio problems with Prolink PixelView
+            cards</a>
+        <li><a href="#linux-dvb">Green and corrupted frames with the
+            linux-dvb driver</a>
+        <li><a href="#zoran">Problems with the zoran driver (used by the
+            DC10 cards)</a>
+        <li><a href="#marvel">Problems with Matrox Marvel capture cards</a>
+        <li><a href="#rivatv">Poor performance with the rivatv driver</a>
+        <li><a href="#aiw">Unusable drivers for ATI All-In-Wonder
+            video+capture cards</a>
+        <li><a href="#voodoo3500">Unusable drivers for the Voodoo 3500 TV
+            card</a>
+        </ol>
+
+        <h2 class="center">Video card problems</h2>
+        <ol>
+        <li><a href="#fgloverlay">No YUY2 with the Radeon FireGL drivers</a>
+        <li><a href="#epiacorrupt">Corrupted YUY2 video with EPIA onboard
+            video</a>
+        <li><a href="#radeon-performance">Terrible XVIDEO performance with
+            Radeon cards and XFree86 4.3</a>
+        <li><a href="#sis">Poor performance with SiS driver in XFree86 4.2.1
+            and earlier</a>
+        <li><a href="#radeon">XVIDEO always-on-top with some Radeon cards</a>
+        <li><a href="#nvidia-overscan">Corrupted image borders on NVIDIA cards
+            in overscan modes</a>
+        <li><a href="#nvidia-xvideo">No XVIDEO support on pre-GeForce NVIDIA
+            cards with the "nv" driver</a>
+        <li><a href="#nvidia-tnt">Problems with NVIDIA TNT and TNT2 cards</a>
+        <li><a href="#savage">XVIDEO initialization problem with the savage
+            driver</a>
+        </ol>
+
+        <h2 class="center">Driver conflicts</h2>
+        <ol>
+        <li><a href="#overlay">Using overlay mode in xawtv or zapping causes
+            system instabilities</a>
+        <li><a href="#apm">apm driver known to cause frame drops</a>
+        <li><a href="#ntfs">ntfs driver known to cause frame drops</a>
+        </ol>
+
+
+
+        <h2>Capture card problems</h2>
+
+        <h3><a name="tvwonder">1. Channels black-and-white and numbers
+            off-by-one</a></h3>
+
+        <p>The tuner driver defaults to detecting a PAL tuner on many NTSC
+        capture cards, a notable example being the ATI TV Wonder cards.  This
+        causes all of the cable frequencies to be out of alignment, channel
+        numbers are off-by-one and slightly detuned.  To fix this, the tuner
+        module must be told explicitly the tuner type when it is loaded by doing
+        the following:</p>
+
+<pre>
+    modprobe tuner type=2
+</pre>
+
+        <p>You may have to first remove the bttv module if it is already
+        loaded.  To make this change automatic, in your
+        <tt>/etc/modules.conf</tt> file, add the following line:</p>
+
+<pre>
+    options tuner type=2
+</pre>
+
+        <p>This will ensure that whenever the tuner module is loaded, it will
+        use the correct tuner for this card.  If this does not fix the problem
+        please post a bug report on
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">the
+        tvtime bugs page</a>.</p>
+
+        <p>To attack this problem, we believe that the tuner module must be
+        fixed to correctly detect the difference in tuner, as so many users
+        are affected by this problem.  To help with this, please follow up on
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711428&amp;group_id=64301&amp;atid=506987">tvtime bug 711428</a>.</p>
+
+
+        <h3><a name="bttvbuffers">2. Too few buffers with bttv before kernel
+            2.4.21</a></h3>
+
+        <p>The popular <a href="http://bytesex.org/bttv/">bttv</a> capture
+        driver only provided applications with two buffers by default in
+        versions shipped with kernels before 2.4.21.  Our advanced
+        deinterlacing algorithms require a longer history of past input
+        frames in order to predict motion in the video stream.</p>
+
+        <p>To give applications more buffers, use this option when
+        loading the bttv driver:</p>
+
+<pre>
+    modprobe bttv gbuffers=4
+</pre>
+
+        <p>To make this change automatic, add the following in your
+        <tt>/etc/modules.conf</tt> file:</p>
+
+<pre>
+    options bttv gbuffers=4
+</pre>
+
+        <h3><a name="bttvload">3. bttv takes a long time to load</a></h3>
+
+        <p>On some cards without a tuner, bttv can take a long time to load
+        (a few minutes).  If you see this problem, try using this option
+        in your modules.conf file for loading the <tt>i2c-algo-bit</tt>
+        module:</p>
+
+<pre>
+    options i2c-algo-bit bit_test=1
+</pre>
+
+        <p>If that does not help, please post a bug report.</p>
+
+        <h3><a name="prolink-audio">4. Audio problems with Prolink PixelView
+            cards</a></h3>
+
+        <p>The bttv driver seems to misdetect Prolink Pixelview cards pretty
+        badly.  There are five Prolink cards listed in CARDLIST for the bttv
+        driver:</p>
+
+<pre>
+  card=16 - Prolink Pixelview PlayTV (bt878)
+  card=37 - Prolink PixelView PlayTV pro
+  card=50 - Prolink PV-BT878P+4E /
+            PixelView PlayTV PAK /
+            Lenco MXTV-9578 CP
+  card=70 - Prolink Pixelview PV-BT878P+ (Rev.4C)
+  card=72 - Prolink Pixelview PV-BT878P+9B
+            (PlayTV Pro rev.9B FM+NICAM)
+</pre>
+
+        <p>The bttv driver cannot seem to autodetect these cards correctly.
+        We have found that cards which should use <tt>card=70</tt> but are
+        instead loaded using <tt>card=72</tt> are causing audio mute/unmute
+        to fail randomly, or even be inverted, resulting in no audio or just
+        snippets of audio.  To avoid this, please make sure you are using the
+        correct variant of this card.  Specifically, the <b>rev 9D</b> of
+        the newer Pixelview cards should use <tt>card=70</tt> and not
+        <tt>card=72</tt>.</p>
+
+        <h3><a name="linux-dvb">5. Green and corrupted frames with the
+            linux-dvb driver</a></h3>
+
+        <p>tvtime will not work properly with the stable <b>linux-dvb</b>
+        driver found on the <a href="http://linuxtv.org/">linuxtv.org</a>
+        page.  This supports many cards including the Hauppauge Nexus-S.</p>
+
+        <p>tvtime will work find with the new <b>dvb-kernel</b> V4L2 driver
+        from CVS on the same site.  Please get this new driver for use with
+        tvtime.</p>
+
+        <p>For reference, the original project page for this driver is 
+        <a href="http://www.gdv.uni-hannover.de/~hunold1/linux/saa7146/index.html">at this link</a>
+        and and an explanation of the current DVB driver situation is at
+        <a href="http://linuxtv.org/dvb/drivers.xml">http://linuxtv.org/dvb/drivers.xml</a>.
+        As well, the thread on this issue on the linux-dvb mailing list can be
+        <a href="http://linuxtv.org/mailinglists/linux-dvb/2003/03-2003/msg00020.html">found here</a>
+        and the tvtime bug report is
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694544&amp;group_id=64301&amp;atid=506987">bug 694544</a>.</p>
+
+        <h3><a name="zoran">6. Problems with the zoran driver (used by the
+            DC10 cards)</a></h3>
+
+        <p>Once someone tried to use tvtime with the
+        <a href="http://www.cicese.mx/~mirsev/Linux/DC10plus/">zoran driver
+        for the DC10plus and related cards</a> that is part of a
+        <a href="http://mjpegtools.sourceforge.net">larger project called
+        'mjpegtools'</a>.  This is an older card, and depending on your PCI
+        configuration, many users with seemingly high powered machines
+        experience extremely poor performance.  Please read
+        <a href="zoran-email.txt">this email extract from the driver
+        authors</a>.</p>
+
+        <h3><a name="marvel">7. Problems with Matrox Marvel capture
+            cards</a></h3>
+
+        <p>A user has reported an unsuccessful attempt to use tvtime with
+        a G400 marvel card supported by
+        <a href="http://marvel.sourceforge.net">Matrox Marvel driver
+        project</a>.  To quote:</p>
+
+        <p><i>"Its taking 38ms to grab a frame, but the marvel does all
+        its own scaling in hardware (ie not via Xv, well I dont think
+        it does) the anoying thing is that if the hardware scaling is
+        in use Xv cant be used."</i></p>
+
+        <p><i>"It would be nice if tvtime supported overlay mode so that
+        us marvel users can at least use the 16:9 mode in fullscreen."</i></p>
+
+        <p>I think we may be able to get this card working, but it will take
+        someone with a bit of know-how to figure out what the card expects,
+        and I guess the ability to shut off whatever hardware scaling prevents
+        us from using XVideo.</p>
+
+        <h3><a name="rivatv">8. Poor performance with the rivatv capture
+             driver</a></h3>
+
+        <p>By default, the rivatv the driver copies frames from video memory
+        into system memory, which can harm performance.  Performance can be
+        improved by using <b>DMA</b> to transfer the frames, however, this
+        option only works when using the open-source <b>"nv"</b> driver in X,
+        not with the NVIDIA binary drivers.</p>
+
+        <p>You can turn on dma support as follows in your <b>modules.conf</b>
+        file:</p>
+
+<pre>
+    options rivatv dma=1
+</pre>
+
+        <h3><a name="aiw">9. Unusable drivers for ATI All-In-Wonder
+            video+capture cards</a></h3>
+
+        <p>ATI has a line of video cards with video capture capabilities,
+        and the <a href="http://gatos.sourceforge.net/">GATOS</a> project
+        develops drivers for these cards which includes <b>km</b>, a kernel
+        module for a Video4Linux interface to the capture components on
+        these cards.</p>
+
+        <p><i>This is <b>just</b> for video cards with capture capabilities,
+        not for the <b>ATI TV Wonder</b> line of capture cards which use the
+        BT878 chip and are supported by the bttv driver.</i></p>
+
+        <p>The Video4Linux interface provided by
+        <a href="http://gatos.sourceforge.net/">GATOS</a> is currently
+        unusable with tvtime, and at this point it seems unlikely that
+        they ever will.  The problems are:</p>
+
+        <ol>
+        <li>The rumor is that the All-In-Wonder cards cannot both capture and
+            allow an application to use the hardware overlay scaler of the
+            card.  If this is true, then tvtime would be unable to do any
+            processing on the video.
+        <li>The Video4Linux interface provided by the km driver is nonstandard.
+            It provides at field rate instead of frame rate, and does not
+            seem to provide a way of detecting this.  This may require
+            additional code to support it in tvtime.
+        <li>The km driver only supports <b>read()</b> mode, which is currently
+            untested in the tvtime code.  If someone could test this out, I
+            would appreciate it.
+        </ol>
+
+        <p>Assistance in investigating this for conclusive information would be
+        appreciated.  Please contact the tvtime developers if you can help
+        out.</p>
+
+        <h3><a name="voodoo3500">10. Unusable drivers for the Voodoo 3500
+            TV card</a></h3>
+
+        <p>An unmaintained TV card driver for the Voodoo 3500 card is located
+        at <a href="http://sourceforge.net/projects/v3tv/">http://sourceforge.net/projects/v3tv/</a>.</p>
+
+        <p>However, this driver does not support capturing, and therefore
+        cannot be used with tvtime.</p>
+
+
+
+
+        <h2>Video card problems</h2>
+
+        <h3><a name="fgloverlay">1. No YUY2 with the Radeon FireGL
+            drivers</a></h3>
+
+        <p>With the Radeon FireGL drivers, the user has the option of having
+        OpenGL use an overlay surface, giving 3D graphics without tearing,
+        or video overlay surfaces for multimedia players.  This can be set
+        in the <tt>Driver</tt> section of <tt>/etc/X11/XF86Config-4</tt>
+        using:</p>
+
+
+<pre>
+    Option  "VideoOverlay"       
+</pre>
+
+        <p>or</p>
+
+<pre>
+    Option  "OpenGLOverlay"      
+</pre>
+
+        <p>For using tvtime, you <b>MUST</b> have selected
+        <tt>VideoOverlay</tt> instead of <tt>OpenGLOverlay</tt>.  The
+        tvtime bug report on this is
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=787142&amp;group_id=64301&amp;atid=506987">bug 787142</a>.</p>
+
+        <h3><a name="epiacorrupt">2. Corrupted YUY2 video with EPIA onboard
+            video</a></h3>
+
+        <p>We have received multiple reports that the binary XFree86 drivers
+        from VIA for the EPIA onboard video have corrupted YUY2 overlay
+        surfaces, and have problems with high framerate video.  We have
+        also heard that these problems do not exist in the open source driver
+        in XFree86 CVS.  More information on either driver and their status
+        with tvtime would be appreciated.</p>
+
+        <h3><a name="radeon-performance">3. Terrible XVIDEO performance with
+            Radeon cards and XFree86 4.3</a></h3>
+
+        <p>We have had numerous reports of horrible performance from
+        Radeon cards and XFree86 4.3.  So far, nobody has been able
+        to figure out conclusively what is going on here.  See the
+        madness in
+        <a href="http://bugs.xfree86.org/cgi-bin/bugzilla/show_bug.cgi?id=414">XFree86 bug 414</a>.
+        The tvtime bug about this is
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=759804&group_id=64301&atid=506987">bug 759804</a>.</p>
+
+        <h3><a name="sis">4. Poor performance with SiS driver in X 4.2.1
+            and earlier</a></h3>
+
+        <p>The XVideo drivers in XFree86 versions up to 4.2.1 exhibit
+        extremely poor performance.  This is fixed in later versions of
+        the driver.  If you own a SiS card, please upgrade to the latest
+        driver by Thomas Winischhofer, or upgrade to X 4.3 which includes
+        a recent version of his driver.  The web page for the SiS driver
+        is at <a href="http://www.winischhofer.net/linuxsis630.shtml">http://www.winischhofer.net/linuxsis630.shtml</a>.</p>
+
+        <p>The tvtime bug report to on this is
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=636338&amp;group_id=64301&amp;atid=506987">bug
+        636338</a>.</p>
+
+        <h3><a name="radeon">5. XVideo always-on-top with some Radeon
+            cards</a></h3>
+
+        <p>Around the end of 2002, it was noted that with the <b>ATI Radeon
+        7000</b> card and the XFree86 4.2.1 packages in debian, XVideo windows
+        are "always on top" and cannot be minimized.  This was also seen in
+        RH8.0's XFree86 4.2 with a <b>Radeon 32MB DDR, R100 QD</b> (a 7200
+        card?).  We have not researched this issue enough to know the extent of
+        what cards are affected, or what versions will fix this.  More
+        information on this would be appreciated.</p>
+
+        <h3><a name="nvidia-overscan">6. Corrupted image borders on NVIDIA
+            cards in overscan modes</a></h3>
+
+        <p>There is a bug in versions of the <b>NVIDIA driver before
+        1.0-4349</b> and the <b>nv driver in 4.3.0 and earlier</b> for cards
+        which support wide filter kernels for high quality XVideo surfaces.  If
+        the overscan value is larger than 0, then the card uses memory outside
+        of the image for interpolating around the edges, causing corruption all
+        around the outside of the tvtime window.</p>
+
+        <p>NVIDIA was made aware of the problem and fixed it for driver release
+        <b>1.0-4349</b> and in the <b>nv driver in CVS XFree86</b>.  For
+        reference, the tvtime bug on this was
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694144&amp;group_id=64301&amp;atid=506987">bug
+        694144</a>.</p>
+
+
+        <h3><a name="nvidia-xvideo">7. No XVIDEO support on pre-GeForce NVIDIA
+            cards with the "nv" driver</a></h3>
+
+        <p>The open source NVIDIA driver for X ("nv" not "nvidia") does not
+        support XVideo surfaces for pre-GeForce cards like the <b>TNT2</b>.
+        To use tvtime with these cards, you must use the binary drivers.</p>
+
+        <p>The binary drivers give better performance for XVIDEO than the
+        open-source driver, since it can use the kernel module component to
+        negotiate DMA transfers for video frames.  Where possible, stick to
+        the binary drivers when using tvtime on NVIDIA hardware.</p>
+
+        <h3><a name="nvidia-tnt">8. Problems with NVIDIA TNT and TNT2
+            cards</a></h3>
+
+        <h4>Corrupted frames</h4>
+
+        <p>The TNT and TNT2 cards are very limited in their bandwidth, and this
+        problem will appear as horizontal lines in the video output unless
+        the monitor is at a low resolution.  Smaller output window sizes
+        will make the problem worse, as the DAC will have to read out more data
+        in the same amount of time.  This problem should not occur with any of
+        the GeForce series cards.</p>
+
+        <h4>Card cannot downscale</h4>
+
+        <p>A user of a <b>NV5: RIVA TNT2 Ultra (rev 11)</b> noted that the card
+        cannot downscale video, it only crops it.  This is apparently a
+        hardware deficiency of many TNT cards, and the XVIDEO API provides
+        no way to detect this case.</p>
+
+        <h4>Poor performance at high resolution and refresh rate</h4>
+
+        <p>A user of a <b>TNT2 Vanta</b> card reported that blit performance
+        was absolutely terrible until they went down to a resolution of
+        800x600, at which point speed quadrupled.  We believe this is due
+        to bandwidth problems on these cards.</p>
+
+        <h3><a name="savage">9. XVideo initialization problem with the
+            savage driver</a></h3>
+
+        <p>We've investigated a bug where the <b>savage</b> X driver does not
+        initialize its XVideo subsystem unless it starts on a modeline where
+        the resolution equals the virtual resolution.  That is, if you have
+        a virtual resolution of 1600x1200, make sure you start on a
+        1600x1200 mode, otherwise XVideo won't initialize.</p>
+
+        <p>This bug was <a href="http://www.mail-archive.com/devel%40xfree86.org/msg01248.html">noted on the XFree86 devel list</a>.</p>
+
+
+
+        <h2>Driver conflicts</h2>
+
+        <h3><a name="overlay">1. Using overlay mode in xawtv or zapping
+            causes system instabilities</a></h3>
+
+        <p>Overlay mode, as can be used in xawtv or zapping, causes system
+        instabilities.  This is because their 'overlay' mode allows the capture
+        card to write directly to video memory without locking it first, which
+        is unsafe for many video cards, specifically those which do not use a
+        linear framebuffer (such as NVIDIA cards with the binary drivers).</p>
+
+        <p>Use of the xawtv/overlay mode has caused system crashes, and
+        specifically, can cause tvtime to crash if it tries to use XVideo
+        features after the framebuffer area has been destroyed by the capture
+        card (see
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=702539&amp;group_id=64301&amp;atid=506987">tvtime bug 702539</a>).</p>
+
+        <p>A workaround for having a no-CPU-access mode is to use the XFree86
+        "v4l" extension, which allows safe use of the framebuffer by capture
+        cards.  tvtime does not support using this mode, nor do we plan to,
+        as we would not be able to composite our OSD on top of the video
+        signal or perform any processing of the video.</p>
+
+        <h3><a name="apm">2. apm driver known to cause frame drops</a></h3>
+
+        <p>We had a problem report that in RH9 (later 2.4 kernel), the
+        GNOME battery applet was polling apm every few seconds.  This caused
+        the system to block for 50-100ms causing stutters in video
+        playback.</p>
+
+        <h3><a name="ntfs">3. ntfs driver known to cause frame drops</a></h3>
+
+        <p>We had a problem report that having gkrellm running would cause
+        frame drops in tvtime.  We believe this was due to the ntfs driver,
+        as the frame drops occurred whenever gkrellm was monitoring the
+        users' other disk that had ntfs partitions.  See
+        <a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=634674&amp;group_id=64301&amp;atid=506987">tvtime bug 634674</a>.</p>
+
+        </td></tr>
+    </table>
+
+    </td></tr>
+</table>
+
+</body>
+</html>
