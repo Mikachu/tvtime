@@ -215,3 +215,14 @@ const char *config_get_v4l_freq( config_t *ct )
     return ct->freq;
 }
 
+#ifdef TESTHARNESS
+
+int main() {
+    config_t *ct;
+
+    ct = config_new( "/home/drbell/.tvtimerc" );
+    config_init( ct );
+ 
+}
+
+#endif

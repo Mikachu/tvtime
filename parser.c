@@ -121,8 +121,8 @@ int parser_readfile( parser_file_t *pf )
 
 int parser_new( parser_file_t *pf, const char *filename )
 {
-    char *ptr, *name, *value;
-    int num=0, pairs=0;
+    char *ptr, *name, *value, *start;
+    int pairs=0, saweq=0;
     
     pf->fh = NULL;
     pf->file_length = 0;
@@ -173,39 +173,68 @@ int parser_new( parser_file_t *pf, const char *filename )
             break;
 
         default:
-            if( sscanf( ptr, "%as = %n", &name, &num ) ) {
-                value = strdup( ptr+num );
-                if( !value ) {
-                    fprintf( stderr, "parser: Error doing strdup.\n" );
-                    free( pf->file_contents );
-                    pf->file_contents = NULL;
-                    return 0;
-                }
-                
-                /* keep name/value */
-                if( pairs >= pf->num_pairs ) {
-                    struct nv_pair *tmp;
-                    tmp = (struct nv_pair*)realloc( (void*)pf->nv_pairs, 
-                                                    (pf->num_pairs+25)*sizeof(struct nv_pair) );
-                    if( !tmp ) {
-                        fprintf( stderr, "parser: Error reallocing.\n" );
-                        free( pf->file_contents );
-                        pf->file_contents = NULL;
-                        return 0;
-                    }
-                    pf->num_pairs += 25;
-                    memset( (void*)tmp, 0, sizeof(struct nv_pair)*25);
-                }
-                pf->nv_pairs[pairs].name = name;
-                pf->nv_pairs[pairs].value = value;
-                pairs++;
-                ptr = ptr + num + strlen(value);
-            } else {
-                fprintf( stderr, "parser: Name without a value in input.\n" );
+            start = ptr;
+            while( *ptr && *ptr != ' ' && *ptr != '\t' && *ptr != '=') ptr++;
+            if( !*ptr ) {
+                fprintf( stderr, "parser: parse error.\n" );
                 free( pf->file_contents );
                 pf->file_contents = NULL;
                 return 0;
             }
+            saweq=0;
+            if( *ptr && *ptr == '=') saweq = 1;
+            *ptr = '\0';
+
+            name = strdup( start );
+            if( !name ) {
+                fprintf( stderr, "parser: Error doing strdup.\n" );
+                free( pf->file_contents );
+                pf->file_contents = NULL;
+                return 0;
+            }
+            ptr++;
+
+            /* skip spaces */
+            while( !saweq && *ptr && (*ptr == ' ' || *ptr == '\t') ) ptr++;
+            if( saweq || (*ptr && *ptr == '=') ) { 
+                if( !saweq ) ptr++;
+                /* skip spaces after equal sign */
+                while( *ptr && (*ptr == ' ' || *ptr == '\t') ) ptr++;
+            } else {
+                fprintf( stderr, "parser: missing equal sign in config.\n" );
+                free( pf->file_contents );
+                pf->file_contents = NULL;
+                return 0;                
+            }
+            value = strdup( ptr );
+            if( !value ) {
+                fprintf( stderr, "parser: Error doing strdup.\n" );
+                free( pf->file_contents );
+                pf->file_contents = NULL;
+                return 0;
+            }
+
+            while( *ptr ) ptr++;
+            ptr++; // skip over the 0
+
+            /* keep name/value */
+            if( pairs >= pf->num_pairs ) {
+                struct nv_pair *tmp;
+                tmp = (struct nv_pair*)realloc( (void*)pf->nv_pairs, 
+                                                (pf->num_pairs+25)*sizeof(struct nv_pair) );
+                if( !tmp ) {
+                    fprintf( stderr, "parser: Error reallocing.\n" );
+                    free( pf->file_contents );
+                    pf->file_contents = NULL;
+                    return 0;
+                }
+                pf->num_pairs += 25;
+                memset( (void*)tmp, 0, sizeof(struct nv_pair)*25);
+            }
+
+            pf->nv_pairs[pairs].name = name;
+            pf->nv_pairs[pairs].value = value;
+            pairs++;
             break;
         }
     }
