@@ -11,10 +11,10 @@ struct band_entry_s {
 };
 
 struct band_s {
-        char *name;
-        band_entry_t *channels;
-        int count;
-        int ntsc_cable;
+    const char *name;
+    band_entry_t *channels;
+    int count;
+    int ntsc_cable;
 };
 
 band_entry_t band_data_italy_vhf[] = {
