@@ -544,6 +544,13 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
             in->digit_counter++;
             in->digit_counter %= 4;
+            if( !in->digit_counter ) {
+                int i;
+                for( i = 0; i < 4; i++ ) {
+                    in->next_chan_buffer[ i ] = in->next_chan_buffer[ i + 1 ];
+                }
+                in->digit_counter = 3;
+            }
             in->frame_counter = CHANNEL_DELAY;
         }
         break;
@@ -904,6 +911,9 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter > 0 ) in->frame_counter--;
 
     if( in->frame_counter == 0 ) {
+        /* Switch to the next channel if the countdown expires. */
+        commands_handle( in, TVTIME_ENTER, 0 );
+
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
         if( in->renumbering ) {
