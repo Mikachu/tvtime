@@ -57,6 +57,7 @@ ings in this Software without prior written authorization from him.
 #include <dirent.h>
 #include <pwd.h>
 #include <string.h>
+#include <stdarg.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -764,11 +765,6 @@ int lfputs( const char *s, FILE *stream )
 #endif
 }
 
-static int lvprintf( const char *format, va_list ap )
-{
-    return lvfprintf( stdout, format, ap );
-}
-
 static int lvfprintf( FILE *stream, const char *format, va_list ap )
 {
 #ifdef ENABLE_NLS
@@ -802,6 +798,11 @@ static int lvfprintf( FILE *stream, const char *format, va_list ap )
 #endif
 }
 
+static int lvprintf( const char *format, va_list ap )
+{
+    return lvfprintf( stdout, format, ap );
+}
+
 int lprintf( const char *format, ... )
 {
     int ret;
@@ -814,10 +815,10 @@ int lprintf( const char *format, ... )
 
 int lfprintf( FILE *stream, const char *format, ... )
 {
-	int ret;
-	va_list ap;
-	va_start( ap, format );
-	ret = lvfprintf( stream, format, ap );
-	va_end( ap );
-	return ret;
+    int ret;
+    va_list ap;
+    va_start( ap, format );
+    ret = lvfprintf( stream, format, ap );
+    va_end( ap );
+    return ret;
 }
