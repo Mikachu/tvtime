@@ -1547,7 +1547,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     /* Randomly assign a tagline as the window caption. */
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
-    output->set_window_caption( tagline );
 
     /* Set the fullscreen position. */
     output->set_fullscreen_position( config_get_fullscreen_position( ct ) );
@@ -1602,6 +1601,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         int output_x, output_y, output_w, output_h;
         int output_success = 1;
         int exposed = output->is_exposed();
+        int current_id;
+        int last_current_id = -1;
+
+        if( videoinput_has_tuner( vidin ) )
+            current_id = station_get_current_id( stationmgr );
+        else
+            current_id = 0;
 
         if( matte_mode ) {
             output_x = matte_x;
@@ -2004,6 +2010,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
         }
+        if( current_id != last_current_id ) {
+            char caption[256];
+            if( current_id ) {
+                snprintf( caption, sizeof( caption ), "tvtime [%d]: %s",
+                          current_id, tagline );
+            } else {
+                snprintf( caption, sizeof( caption ), "tvtime: %s",
+                          tagline );
+            }
+            output->set_window_caption( caption );
+            last_current_id = current_id;
+        }
+
         commands_next_frame( commands );
 
         /* Notice this because it's cheap. */
