@@ -348,6 +348,22 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         vidin->has_audio = 0;
         fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
                  strerror( errno ) );
+    } else if( verbose ) {
+        fprintf( stderr, "videoinput: Audio supports " );
+        if( vidin->audio.flags & VIDEO_AUDIO_MUTE ) {
+            fprintf( stderr, "Mute " );
+        } else if( vidin->audio.flags & VIDEO_AUDIO_MUTABLE ) {
+            fprintf( stderr, "Mutable " );
+        } else if( vidin->audio.flags & VIDEO_AUDIO_VOLUME ) {
+            fprintf( stderr, "Volume " );
+        } else if( vidin->audio.flags & VIDEO_AUDIO_BASS ) {
+            fprintf( stderr, "Bass " );
+        } else if( vidin->audio.flags & VIDEO_AUDIO_TREBLE ) {
+            fprintf( stderr, "Treble " );
+        } else if( vidin->audio.flags & VIDEO_AUDIO_BALANCE ) {
+            fprintf( stderr, "Balance" );
+        }
+        fprintf( stderr, "\n" );
     }
 
     /* Set to stereo by default. */
@@ -617,6 +633,7 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
 void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 {
     vidin->audio.mode = mode;
+    // vidin->audio.volume = 65535;
     if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
                  "might cause this.  Post a bug report with your driver info to "
