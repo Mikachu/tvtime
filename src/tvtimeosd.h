@@ -60,7 +60,7 @@ void tvtime_osd_set_scan_channels( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method );
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal );
-void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate );
+void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode );
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 

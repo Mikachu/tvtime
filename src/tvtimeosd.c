@@ -23,6 +23,7 @@
 #include "osdtools.h"
 #include "tvtimeosd.h"
 #include "credits.h"
+#include "commands.h"
 
 #define OSD_FADE_DELAY  60
 
@@ -81,6 +82,7 @@ struct tvtime_osd_s
     const char *scan_channels;
 
     double framerate;
+    int framerate_mode;
 
     credits_t *credits;
     int show_credits;
@@ -176,6 +178,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd->channel_logo = 0;
     osd->scan_channels = "";
     osd->framerate = 0.0;
+    osd->framerate_mode = FRAMERATE_FULL;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
@@ -403,9 +406,10 @@ void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
     snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, "%s", format );
 }
 
-void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate )
+void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode )
 {
     osd->framerate = framerate;
+    osd->framerate_mode = mode;
 }
 
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
@@ -434,7 +438,14 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     if( *(osd->scan_channels) ) {
         sprintf( text, "%s", osd->scan_channels );
     } else {
-        sprintf( text, "%s - %s [%.2ffps]", osd->input_text, osd->deinterlace_text, osd->framerate );
+        const char *mode = "";
+        if( osd->framerate_mode == FRAMERATE_HALF_TFF ) {
+            mode = " TFF";
+        } else if( osd->framerate_mode == FRAMERATE_HALF_BFF ) {
+            mode = " BFF";
+        }
+        sprintf( text, "%s - %s [%.2ffps%s]", osd->input_text,
+                 osd->deinterlace_text, osd->framerate, mode );
     }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );

@@ -183,14 +183,17 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
     double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
     double wait_bot = ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0;
     double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
+    double blit_time = blit_top;
+
+    if( blit_bot > blit_top ) blit_time = blit_bot;
 
     fprintf( stderr, "tvtime: acquire %5.2fms, build top %5.2fms, wait top %5.2fms, blit top %5.2fms\n"
                      "tvtime:                  build bot %5.2fms, wait bot %5.2fms, blit bot %5.2fms\n",
              acquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
     fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, using %.2f%% CPU to deinterlace.\n",
-             ( ( (double) framesize ) / blit_top ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
+             ( ( (double) framesize ) / blit_time ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
              ( ( build_top + build_bot ) / (acquire+build_top+wait_top+blit_top+build_bot+wait_bot+blit_bot) ) * 100.0 );
-    fprintf( stderr, "tvtime: top-to-bot: %5.2f, bot-to-top: %5.2f\n",
+    fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2f, bot-to-top: %5.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
              (double) perf->time_bot_to_top / 1000.0 );
 }
