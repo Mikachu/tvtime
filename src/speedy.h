@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This file is subject to the terms of the GNU General Public License as
  * published by the Free Software Foundation.  A copy of this license is
