@@ -26,6 +26,8 @@
 #include "station.h"
 #include "bands.h"
 
+static band_t custom_band = { "Custom", 0, 0 };
+
 typedef struct station_info_s station_info_t;
 struct station_info_s
 {
@@ -428,17 +430,31 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
     const band_entry_t *entry;
     station_info_t *info;
 
-    if( !band ) {
-        return 0;
-    }
-
     if( !isFreePos( mgr, pos ) ) pos = getNextPos( mgr );
 
-    for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
-        if( !strcasecmp( entry->name, channel ) ) {
-            info = newInfo( pos, name, band, entry );
+    if( !strcasecmp( bandname, "Custom" ) ) {
+        int freq = (int) ((atof( channel ) * 1000.0) + 0.5);
+        band_entry_t *newentry = malloc( sizeof( band_entry_t ) );
+        if( newentry ) {
+            char *entryname = (char *) malloc( 32 );
+            if( entryname ) {
+                sprintf( entryname, "%.2fMHz", ((double) freq) / 1000.0 );
+            } else {
+                entryname = "Error";
+            }
+            newentry->name = entryname;
+            newentry->freq = freq;
+            info = newInfo( pos, name, &custom_band, newentry );
             if( info ) insert( mgr, info );
             return 1;
+        }
+    } else if( band ) {
+        for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
+            if( !strcasecmp( entry->name, channel ) ) {
+                info = newInfo( pos, name, band, entry );
+                if( info ) insert( mgr, info );
+                return 1;
+            }
         }
     }
     return 0;
