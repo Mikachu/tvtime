@@ -35,7 +35,7 @@
 #include "mm_accel.h"
 #include "deinterlace.h"
 #include "speedtools.h"
-#include "speedy.h"
+#include "copyfunctions.h"
 
 // This is a simple lightweight DeInterlace method that uses little CPU time
 // but gives very good results for low or intermedite motion.

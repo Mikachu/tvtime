@@ -22,7 +22,7 @@
 #else
 # include <stdint.h>
 #endif
-#include "speedy.h"
+#include "copyfunctions.h"
 #include "deinterlace.h"
 
 static void deinterlace_scanline_linear( uint8_t *output,

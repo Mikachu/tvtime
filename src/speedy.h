@@ -53,12 +53,6 @@ typedef struct pulldown_metrics_s {
 } pulldown_metrics_t;
 
 /**
- * Interpolates a packed 4:2:2 scanline using linear interpolation.
- */
-extern void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
-                                               uint8_t *bot, int width );
-
-/**
  * Blits a colour to a packed 4:2:2 scanline.
  */
 extern void (*blit_colour_packed422_scanline)( uint8_t *output,
@@ -71,11 +65,6 @@ extern void (*blit_colour_packed422_scanline)( uint8_t *output,
 extern void (*blit_colour_packed4444_scanline)( uint8_t *output,
                                                 int width, int alpha, int luma,
                                                 int cb, int cr );
-
-/**
- * Blit from and to packed 4:2:2 scanline.
- */
-extern void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src, int width );
 
 /**
  * Composites a premultiplied 4:4:4:4 pixel onto a packed 4:2:2 scanline.
@@ -181,12 +170,6 @@ extern void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
  * Inverts the colours on a scanline in-place.
  */
 extern void (*invert_colour_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
- * Fast memcpy function, used by all of the blit functions.  Won't blit
- * anything if dest == src.
- */
-extern void (*speedy_memcpy)( void *output, const void *input, size_t size );
 
 /**
  * Calculates the block difference metrics for dalias' pulldown

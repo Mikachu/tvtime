@@ -23,7 +23,7 @@
 
 #include "dscalerapi.h"
 #include "deinterlace.h"
-#include "speedy.h"
+#include "copyfunctions.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -48,7 +48,7 @@ static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
     Info.InputPitch = stride*2;
     Info.LineLength = stride;
     Info.OverlayPitch = outstride;
-    Info.pMemcpy = speedy_memcpy;
+    Info.pMemcpy = fast_memcpy;
 
     if( bottom_field ) {
         Picture[ 0 ].pData = data->f0 + stride;

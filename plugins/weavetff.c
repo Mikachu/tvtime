@@ -23,7 +23,7 @@
 #else
 # include <stdint.h>
 #endif
-#include "speedy.h"
+#include "copyfunctions.h"
 #include "deinterlace.h"
 
 static void deinterlace_scanline_weave( uint8_t *output,

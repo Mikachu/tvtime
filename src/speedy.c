@@ -80,19 +80,17 @@
 
 #include "speedy.h"
 #include "speedtools.h"
+#include "copyfunctions.h"
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"
 
 /* Function pointer definitions. */
-void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
-                                        uint8_t *bot, int width );
 void (*blit_colour_packed422_scanline)( uint8_t *output,
                                         int width, int y, int cb, int cr );
 void (*blit_colour_packed4444_scanline)( uint8_t *output,
                                          int width, int alpha, int luma,
                                          int cb, int cr );
-void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src, int width );
 void (*composite_packed4444_to_packed422_scanline)( uint8_t *output, uint8_t *input,
                                                     uint8_t *foreground, int width );
 void (*composite_packed4444_alpha_to_packed422_scanline)( uint8_t *output,
@@ -117,7 +115,6 @@ unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
                                                 uint8_t *bot, int width );
 void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
-void (*speedy_memcpy)( void *output, const void *input, size_t size );
 void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
                                  uint8_t *new, int os, int ns );
 void (*a8_subpix_blit_scanline)( uint8_t *output, uint8_t *input,
@@ -814,16 +811,6 @@ static void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
     }
 }
 
-static void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
-                                              uint8_t *bot, int width )
-{
-    int i;
-
-    for( i = width*2; i; --i ) {
-        *output++ = ((*top++) + (*bot++)) >> 1;
-    }
-}
-
 #ifdef ARCH_X86
 static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width )
 {
@@ -915,127 +902,6 @@ static void convert_uyvy_to_yuyv_scanline_c( uint8_t *uyvy_buf, uint8_t *yuyv_bu
         *yuyv++ = val;
     }
 }
-
-
-#ifdef ARCH_X86
-static void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
-                                                uint8_t *bot, int width )
-{
-    const mmx_t shiftmask = { 0xfefffefffefffeffULL };  /* To avoid shifting chroma to luma. */
-    int i;
-
-    for( i = width/16; i; --i ) {
-        movq_m2r( *bot, mm0 );
-        movq_m2r( *top, mm1 );
-        movq_m2r( *(bot + 8), mm2 );
-        movq_m2r( *(top + 8), mm3 );
-        movq_m2r( *(bot + 16), mm4 );
-        movq_m2r( *(top + 16), mm5 );
-        movq_m2r( *(bot + 24), mm6 );
-        movq_m2r( *(top + 24), mm7 );
-        pand_m2r( shiftmask, mm0 );
-        pand_m2r( shiftmask, mm1 );
-        pand_m2r( shiftmask, mm2 );
-        pand_m2r( shiftmask, mm3 );
-        pand_m2r( shiftmask, mm4 );
-        pand_m2r( shiftmask, mm5 );
-        pand_m2r( shiftmask, mm6 );
-        pand_m2r( shiftmask, mm7 );
-        psrlw_i2r( 1, mm0 );
-        psrlw_i2r( 1, mm1 );
-        psrlw_i2r( 1, mm2 );
-        psrlw_i2r( 1, mm3 );
-        psrlw_i2r( 1, mm4 );
-        psrlw_i2r( 1, mm5 );
-        psrlw_i2r( 1, mm6 );
-        psrlw_i2r( 1, mm7 );
-        paddb_r2r( mm1, mm0 );
-        paddb_r2r( mm3, mm2 );
-        paddb_r2r( mm5, mm4 );
-        paddb_r2r( mm7, mm6 );
-        movq_r2m( mm0, *output );
-        movq_r2m( mm2, *(output + 8) );
-        movq_r2m( mm4, *(output + 16) );
-        movq_r2m( mm6, *(output + 24) );
-        output += 32;
-        top += 32;
-        bot += 32;
-    }
-    width = (width & 0xf);
-
-    for( i = width/4; i; --i ) {
-        movq_m2r( *bot, mm0 );
-        movq_m2r( *top, mm1 );
-        pand_m2r( shiftmask, mm0 );
-        pand_m2r( shiftmask, mm1 );
-        psrlw_i2r( 1, mm0 );
-        psrlw_i2r( 1, mm1 );
-        paddb_r2r( mm1, mm0 );
-        movq_r2m( mm0, *output );
-        output += 8;
-        top += 8;
-        bot += 8;
-    }
-    width = width & 0x7;
-
-    /* Handle last few pixels. */
-    for( i = width * 2; i; --i ) {
-        *output++ = ((*top++) + (*bot++)) >> 1;
-    }
-
-    emms();
-}
-#endif
-
-#ifdef ARCH_X86
-static void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
-                                                   uint8_t *bot, int width )
-{
-    int i;
-
-    for( i = width/16; i; --i ) {
-        movq_m2r( *bot, mm0 );
-        movq_m2r( *top, mm1 );
-        movq_m2r( *(bot + 8), mm2 );
-        movq_m2r( *(top + 8), mm3 );
-        movq_m2r( *(bot + 16), mm4 );
-        movq_m2r( *(top + 16), mm5 );
-        movq_m2r( *(bot + 24), mm6 );
-        movq_m2r( *(top + 24), mm7 );
-        pavgb_r2r( mm1, mm0 );
-        pavgb_r2r( mm3, mm2 );
-        pavgb_r2r( mm5, mm4 );
-        pavgb_r2r( mm7, mm6 );
-        movntq_r2m( mm0, *output );
-        movntq_r2m( mm2, *(output + 8) );
-        movntq_r2m( mm4, *(output + 16) );
-        movntq_r2m( mm6, *(output + 24) );
-        output += 32;
-        top += 32;
-        bot += 32;
-    }
-    width = (width & 0xf);
-
-    for( i = width/4; i; --i ) {
-        movq_m2r( *bot, mm0 );
-        movq_m2r( *top, mm1 );
-        pavgb_r2r( mm1, mm0 );
-        movntq_r2m( mm0, *output );
-        output += 8;
-        top += 8;
-        bot += 8;
-    }
-    width = width & 0x7;
-
-    /* Handle last few pixels. */
-    for( i = width * 2; i; --i ) {
-        *output++ = ((*top++) + (*bot++)) >> 1;
-    }
-
-    sfence();
-    emms();
-}
-#endif
 
 static void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
 {
@@ -1217,147 +1083,6 @@ static void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
 
     sfence();
     emms();
-}
-#endif
-
-
-/**
- * Some memcpy code inspired by the xine code which originally came
- * from mplayer.
- */
-
-/* linux kernel __memcpy (from: /include/asm/string.h) */
-#ifdef ARCH_X86
-static inline __attribute__ ((always_inline,const)) void small_memcpy( void *to, const void *from, size_t n )
-{
-    int d0, d1, d2;
-    __asm__ __volatile__(
-        "rep ; movsl\n\t"
-        "testb $2,%b4\n\t"
-        "je 1f\n\t"
-        "movsw\n"
-        "1:\ttestb $1,%b4\n\t"
-        "je 2f\n\t"
-        "movsb\n"
-        "2:"
-        : "=&c" (d0), "=&D" (d1), "=&S" (d2)
-        :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
-        : "memory");
-}
-#endif
-
-static void speedy_memcpy_c( void *dest, const void *src, size_t n )
-{
-    if( dest != src ) {
-        memcpy( dest, src, n );
-    }
-}
-
-#ifdef ARCH_X86
-static void speedy_memcpy_mmx( void *d, const void *s, size_t n )
-{
-    const uint8_t *src = s;
-    uint8_t *dest = d;
-
-    if( dest != src ) {
-        while( n > 64 ) {
-            movq_m2r( src[ 0 ], mm0 );
-            movq_m2r( src[ 8 ], mm1 );
-            movq_m2r( src[ 16 ], mm2 );
-            movq_m2r( src[ 24 ], mm3 );
-            movq_m2r( src[ 32 ], mm4 );
-            movq_m2r( src[ 40 ], mm5 );
-            movq_m2r( src[ 48 ], mm6 );
-            movq_m2r( src[ 56 ], mm7 );
-            movq_r2m( mm0, dest[ 0 ] );
-            movq_r2m( mm1, dest[ 8 ] );
-            movq_r2m( mm2, dest[ 16 ] );
-            movq_r2m( mm3, dest[ 24 ] );
-            movq_r2m( mm4, dest[ 32 ] );
-            movq_r2m( mm5, dest[ 40 ] );
-            movq_r2m( mm6, dest[ 48 ] );
-            movq_r2m( mm7, dest[ 56 ] );
-            dest += 64;
-            src += 64;
-            n -= 64;
-        }
-
-        while( n > 8 ) {
-            movq_m2r( src[ 0 ], mm0 );
-            movq_r2m( mm0, dest[ 0 ] );
-            dest += 8;
-            src += 8;
-            n -= 8;
-        }
-
-        if( n ) small_memcpy( dest, src, n );
-
-        emms();
-    }
-}
-#endif
-
-#ifdef ARCH_X86
-static void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
-{
-    const uint8_t *src = s;
-    uint8_t *dest = d;
-
-    if( dest != src ) {
-        while( n > 64 ) {
-            movq_m2r( src[ 0 ], mm0 );
-            movq_m2r( src[ 8 ], mm1 );
-            movq_m2r( src[ 16 ], mm2 );
-            movq_m2r( src[ 24 ], mm3 );
-            movq_m2r( src[ 32 ], mm4 );
-            movq_m2r( src[ 40 ], mm5 );
-            movq_m2r( src[ 48 ], mm6 );
-            movq_m2r( src[ 56 ], mm7 );
-            movntq_r2m( mm0, dest[ 0 ] );
-            movntq_r2m( mm1, dest[ 8 ] );
-            movntq_r2m( mm2, dest[ 16 ] );
-            movntq_r2m( mm3, dest[ 24 ] );
-            movntq_r2m( mm4, dest[ 32 ] );
-            movntq_r2m( mm5, dest[ 40 ] );
-            movntq_r2m( mm6, dest[ 48 ] );
-            movntq_r2m( mm7, dest[ 56 ] );
-            dest += 64;
-            src += 64;
-            n -= 64;
-        }
-
-        while( n > 8 ) {
-            movq_m2r( src[ 0 ], mm0 );
-            movntq_r2m( mm0, dest[ 0 ] );
-            dest += 8;
-            src += 8;
-            n -= 8;
-        }
-
-        if( n ) small_memcpy( dest, src, n );
-
-        sfence();
-        emms();
-    }
-}
-#endif
-
-static void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
-{
-    speedy_memcpy_c( dest, src, width*2 );
-}
-
-#ifdef ARCH_X86
-static void blit_packed422_scanline_mmx( uint8_t *dest, const uint8_t *src, int width )
-{
-    speedy_memcpy_mmx( dest, src, width*2 );
-}
-#endif
-
-#ifdef ARCH_X86
-static void blit_packed422_scanline_mmxext( uint8_t *dest, const uint8_t *src, int width )
-{
-    speedy_memcpy_mmxext( dest, src, width*2 );
 }
 #endif
 
@@ -2527,10 +2252,10 @@ void setup_speedy_calls( uint32_t accel, int verbose )
 {
     speedy_accel = accel;
 
-    interpolate_packed422_scanline = interpolate_packed422_scanline_c;
+    setup_copyfunctions( accel );
+
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
     blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_c;
-    blit_packed422_scanline = blit_packed422_scanline_c;
     composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_c;
     composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_c;
     composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_c;
@@ -2541,7 +2266,6 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
-    speedy_memcpy = speedy_memcpy_c;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
     quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
@@ -2565,10 +2289,8 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
         }
-        interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
-        blit_packed422_scanline = blit_packed422_scanline_mmxext;
         composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_mmxext;
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
@@ -2584,15 +2306,12 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
         composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_mmxext;
-        speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         }
-        interpolate_packed422_scanline = interpolate_packed422_scanline_mmx;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
-        blit_packed422_scanline = blit_packed422_scanline_mmx;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
@@ -2601,7 +2320,6 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
-        speedy_memcpy = speedy_memcpy_mmx;
     } else {
         if( verbose ) {
             fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );

@@ -58,6 +58,7 @@
 #include "tvtimeconf.h"
 #include "input.h"
 #include "speedy.h"
+#include "copyfunctions.h"
 #include "deinterlace.h"
 #include "plugins.h"
 #include "performance.h"

@@ -35,7 +35,7 @@
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"
-#include "speedy.h"
+#include "copyfunctions.h"
 #include "deinterlace.h"
 
 /**
