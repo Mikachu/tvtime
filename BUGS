@@ -75,3 +75,13 @@ Known incompatibility problems
    may be some kernel driver that is blocking for a really long time,
    and screwing up our captures.
 
+General Info for improving video quality
+----------------------------------------
+
+If you are having problems with video strangeness, try disabling Macrovision 
+in your bttv driver (if you have a bttv card). See 
+http://www.colby.edu/personal/k/kjseptor/bttv.html for info on that.
+
+If you are experiencing a generally fuzzy picture, try moving your tv card 
+one or two slots away from your soundcard (inside your pc). Interference from 
+the soundcard can mess up some channels.
