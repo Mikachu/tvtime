@@ -1,5 +1,8 @@
 
 0.9.13 -
+  * bitstream: Add PalDKMode setting for forcing the use of PAL_DK norm when
+      a) in PAL mode and b) using v4l2. This resolves an issue for some cx88
+      users.
   * vektor: Added a setting called 'audio boost' to control the volume
       we set on the capture card itself.
   * vektor: Return the magic number 3 when tvtime exits from a SLEEP
