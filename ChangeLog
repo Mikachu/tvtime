@@ -1,5 +1,7 @@
 
-0.9.8.5 -
+0.9.8.6 -
+
+0.9.8.5 - Fri Jun 20 10:57:17 ADT 2003
   * vektor: tvtime now drops root access before reading any
       configuration files.
   * nitrogen: Added DirectFB version check to configure.ac
