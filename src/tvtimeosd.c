@@ -177,35 +177,6 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
     osd->ismuted = mutestate;
 }
 
-void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
-                                     int width, int height, int stride )
-{
-    osd_string_composite_packed422( osd->channel_number, output, width,
-                                    height, stride, osd->channel_number_xpos,
-                                    osd->channel_number_ypos, 0 );
-    osd_string_composite_packed422( osd->channel_info, output, width,
-                                    height, stride, osd->channel_info_xpos,
-                                    osd->channel_info_ypos, 0 );
-    osd_graphic_composite_packed422( osd->channel_logo, output, width, 
-                                     height, stride, osd->channel_logo_xpos,
-                                     osd->channel_logo_ypos );
-
-    /**
-     * For the bottom info, the data bar has priority over the
-     * muted indicator which has priority over the volume bar.
-     */
-    if( osd_string_visible( osd->data_bar ) ) {
-        osd_string_composite_packed422( osd->data_bar, output, width, height,
-                                        stride, osd->data_bar_xpos, osd->data_bar_ypos, 0 );
-    } else if( osd->ismuted ) {
-        osd_string_composite_packed422( osd->muted, output, width, height,
-                                        stride, osd->muted_xpos, osd->muted_ypos, 0 );
-    } else if( osd_string_visible( osd->volume_bar ) ) {
-        osd_string_composite_packed422( osd->volume_bar, output, width, height,
-                                        stride, osd->volume_bar_xpos, osd->volume_bar_ypos, 0 );
-    }
-}
-
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 {
     osd_string_advance_frame( osd->channel_number );
@@ -215,17 +186,69 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     osd_graphic_advance_frame( osd->channel_logo );
 }
 
+
+int tvtime_osd_active_on_scanline( tvtime_osd_t *osd, int scanline )
+{
+    int bar_start, bar_end;
+
+    if( osd_string_visible( osd->channel_number ) ) {
+        int start = osd->channel_number_ypos;
+        int end = start + osd_string_get_height( osd->channel_number );
+
+        if( scanline >= start && scanline < end ) return 1;
+    }
+
+    if( osd_string_visible( osd->channel_info ) ) {
+        int start = osd->channel_info_ypos;
+        int end = start + osd_string_get_height( osd->channel_info );
+
+        if( scanline >= start && scanline < end ) return 1;
+    }
+
+    if( osd_graphic_visible( osd->channel_logo ) ) {
+        int start = osd->channel_logo_ypos;
+        int end = start + osd_graphic_get_height( osd->channel_logo );
+
+        if( scanline >= start && scanline < end ) return 1;
+    }
+
+    bar_start = osd->data_bar_ypos;
+    if( scanline < bar_start ) return 0;
+
+    /**
+     * For the bottom info, the data bar has priority over the
+     * muted indicator which has priority over the volume bar.
+     */
+    if( osd_string_visible( osd->data_bar ) ) {
+        bar_end = bar_start + osd_string_get_height( osd->data_bar );
+
+        if( scanline < bar_end ) return 1;
+    } else if( osd->ismuted ) {
+        bar_end = bar_start + osd_string_get_height( osd->muted );
+
+        if( scanline < bar_end ) return 1;
+    } else if( osd_string_visible( osd->volume_bar ) ) {
+        bar_end = bar_start + osd_string_get_height( osd->volume_bar );
+
+        if( scanline < bar_end ) return 1;
+    }
+
+    return 0;
+}
+
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               unsigned char *output,
                                               int width, int xpos,
                                               int scanline )
 {
     if( osd_string_visible( osd->channel_number ) ) {
-        if( scanline >= osd->channel_number_ypos &&
-            scanline < osd->channel_number_ypos + osd_string_get_height( osd->channel_number ) ) {
+        int start = osd->channel_number_ypos;
+        int end = start + osd_string_get_height( osd->channel_number );
 
+        if( scanline >= start && scanline < end ) {
             int startx = osd->channel_number_xpos - xpos;
             int strx = 0;
+
             if( startx < 0 ) {
                 strx = -startx;
                 startx = 0;

@@ -302,6 +302,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            int instride,
                                            int outstride )
 {
+    unsigned char tempscanline[ 768*2 ];
     int scanline = 0;
     int i;
 

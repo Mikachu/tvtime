@@ -39,7 +39,8 @@ static const char *taglines[] = {
 "tvtime: Vorsprung durch Technik",
 "tvtime: a tvtime a day helps you work, rest and play",
 "tvtime: I liked the deinterlacer so much... I bought the company",
-"tvtime: top breeders recommend it", };
+"tvtime: top breeders recommend it",
+"tvtime: the best part of waking up", };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 
