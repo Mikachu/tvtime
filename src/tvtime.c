@@ -1969,7 +1969,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( rvrreader ) {
             tuner_state = TUNER_STATE_HAS_SIGNAL;
         } else if( vidin ) {
-            tuner_state = videoinput_check_for_signal( vidin, config_get_check_freq_present( ct ) );
+            tuner_state = videoinput_check_for_signal( vidin, commands_check_freq_present( commands ) );
         } else {
             tuner_state = TUNER_STATE_NO_SIGNAL;
         }
@@ -2388,6 +2388,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     snprintf( number, 4, "%2.1f", commands_get_overscan( commands ) * 2.0 * 100.0 );
     config_save( ct, "OverScan", number );
+
+    snprintf( number, 4, "%d", commands_check_freq_present( commands ) );
+    config_save( ct, "CheckForSignal", number );
 
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );

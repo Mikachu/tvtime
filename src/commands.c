@@ -154,6 +154,7 @@ static command_names_t command_table[] = {
     { "TOGGLE_PAL_SECAM", TVTIME_TOGGLE_PAL_SECAM },
     { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
+    { "TOGGLE_SIGNAL_DETECTION", TVTIME_TOGGLE_SIGNAL_DETECTION },
 
     { "QUIT", TVTIME_QUIT },
 };
@@ -294,6 +295,7 @@ struct commands_s {
     char deinterlacer[ 128 ];
     int setfreqtable;
     char newfreqtable[ 128 ];
+    int checkfreq;
 
     int delay;
 
@@ -871,6 +873,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->digit_counter = 0;
 
     cmd->displayinfo = 0;
+    cmd->checkfreq = config_get_check_freq_present( cfg );
 
     cmd->quit = 0;
     cmd->showbars = 0;
@@ -1057,11 +1060,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Toggle signal detection", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 8, string );
-    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 8, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
+    menu_set_right_command( menu, 8, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
     menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 9, string );
+    menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-general" );
@@ -1103,11 +1111,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Toggle signal detection", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 7, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
+    menu_set_right_command( menu, 7, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
     menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 8, string );
+    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-palsecam" );
@@ -1154,11 +1167,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Toggle signal detection", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 8, string );
-    menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 8, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
+    menu_set_right_command( menu, 8, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
     menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 9, string );
+    menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "frequencies" );
@@ -2294,6 +2312,20 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->togglepulldowndetection = 1;
         break;
 
+    case TVTIME_TOGGLE_SIGNAL_DETECTION:
+        cmd->checkfreq = !cmd->checkfreq;
+        if( !cmd->checkfreq && cmd->scan_channels ) {
+            commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
+        }
+        if( cmd->osd ) {
+            if( cmd->checkfreq ) {
+                tvtime_osd_show_message( cmd->osd, "Signal detection enabled." );
+            } else {
+                tvtime_osd_show_message( cmd->osd, "Signal detection disabled." );
+            }
+        }
+        break;
+
     case TVTIME_CHANNEL_CHAR:
         if( arg && isdigit( arg[ 0 ] ) && cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
@@ -3099,5 +3131,10 @@ int commands_set_freq_table( commands_t *cmd )
 const char *commands_get_new_freq_table( commands_t *cmd )
 {
     return cmd->newfreqtable;
+}
+
+int commands_check_freq_present( commands_t *cmd )
+{
+    return cmd->checkfreq;
 }
 
