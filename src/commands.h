@@ -110,7 +110,9 @@ enum tvtime_commands
     TVTIME_CHANNEL_9,
     TVTIME_CHANNEL_0,
 
-    TVTIME_TOGGLE_PAUSE
+    TVTIME_TOGGLE_PAUSE,
+
+    TVTIME_TOGGLE_MODE
 };
 
 enum framerate_mode
@@ -141,6 +143,7 @@ int commands_toggle_aspect( commands_t *in );
 int commands_toggle_deinterlacing_mode( commands_t *in );
 int commands_toggle_menu( commands_t *in );
 int commands_toggle_pulldown_detection( commands_t *in );
+int commands_toggle_mode( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );
 int commands_update_luma_power( commands_t *in );
 double commands_get_luma_power( commands_t *in );

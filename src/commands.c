@@ -109,6 +109,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_FRAMERATE", TVTIME_TOGGLE_FRAMERATE },
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
+    { "TOGGLE_MODE", TVTIME_TOGGLE_MODE },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
     { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
@@ -176,6 +177,7 @@ struct commands_s {
     int toggleaspect;
     int toggledeinterlacingmode;
     int togglepulldowndetection;
+    int togglemode;
     int framerate;
     int scan_channels;
     int pause;
@@ -274,6 +276,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglepulldowndetection = 0;
+    in->togglemode = 0;
     in->framerate = FRAMERATE_FULL;
     in->menu_on = 0;
     in->console_on = 0;
@@ -808,6 +811,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) tvtime_osd_show_message( in->osd, in->pause ? "Paused" : "Resumed" );
         break;
 
+    case TVTIME_TOGGLE_MODE:
+        in->togglemode = 1;
+        break;
     }
 }
 
@@ -854,6 +860,11 @@ int commands_toggle_deinterlacing_mode( commands_t *in )
 int commands_toggle_pulldown_detection( commands_t *in )
 {
     return in->togglepulldowndetection;
+}
+
+int commands_toggle_mode( commands_t *in )
+{
+    return in->togglemode;
 }
 
 int commands_toggle_menu( commands_t *in )
@@ -911,6 +922,7 @@ void commands_next_frame( commands_t *in )
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglepulldowndetection = 0;
+    in->togglemode = 0;
     in->update_luma = 0;
 }
 
