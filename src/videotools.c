@@ -361,11 +361,11 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
                                   + ( 3*(src[ (i*4) - 13] + src[ (i*4) + 23]))
                                   - (   (src[ (i*4) - 17] + src[ (i*4) + 27]))) + 64) >> 7;
         } else if( i < ((width/2) - 1) ) {
-            dest[ (i*6) + 4 ] = (src[ (i*4) + 1 ] + src[ (i*4) + 5 ] + 5) >> 1;
-            dest[ (i*6) + 5 ] = (src[ (i*4) + 3 ] + src[ (i*4) + 5 ] + 7) >> 1;
+            dest[ (i*6) + 4 ] = (src[ (i*4) + 1 ] + src[ (i*4) + 5 ] + 1) >> 1;
+            dest[ (i*6) + 5 ] = (src[ (i*4) + 3 ] + src[ (i*4) + 7 ] + 1) >> 1;
         } else {
-            dest[ (i*6) + 4 ] = 128;
-            dest[ (i*6) + 5 ] = 128;
+            dest[ (i*6) + 4 ] = src[ (i*4) + 1 ];
+            dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
     }
 }
