@@ -782,7 +782,8 @@ static void tvtime_build_copied_field( unsigned char *output,
     if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + bottom_field ) ) {
         videofilter_packed422_scanline( filter, curframe, width, 0, scanline + bottom_field );
     }
-    blit_packed422_scanline( output, curframe, width );
+    // blit_packed422_scanline( output, curframe, width );
+    quarter_blit_vertical_packed422_scanline( output, curframe, curframe + (instride*2), width );
 
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
@@ -798,12 +799,18 @@ static void tvtime_build_copied_field( unsigned char *output,
             if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
                 videofilter_packed422_scanline( filter, curframe, width, 0, scanline + 1 );
             }
-            interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
+            // interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
+            quarter_blit_vertical_packed422_scanline( output, curframe - (instride*2), curframe, width );
         } else {
             if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline ) ) {
                 videofilter_packed422_scanline( filter, curframe, width, 0, scanline );
             }
-            blit_packed422_scanline( output, curframe, width );
+            // blit_packed422_scanline( output, curframe, width );
+            if( i > 1 ) {
+                quarter_blit_vertical_packed422_scanline( output, curframe, curframe + (instride*2), width );
+            } else {
+                blit_packed422_scanline( output, curframe, width );
+            }
         }
         curframe += instride * 2;
 
@@ -874,9 +881,11 @@ int main( int argc, char **argv )
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
     /* Disable this code for a release. */
+    /* Woot, it's 0.9.8 time.
     fprintf( stderr, "\n*** WARNING: you are running a DEVELOPMENT version of tvtime.\n" );
     fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
                        "*** based on released versions only!!\n\n" );
+    */
 
     /* Ditch stdin early. */
     if( isatty( STDIN_FILENO ) ) {
