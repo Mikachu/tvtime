@@ -56,4 +56,22 @@ Setup
     Back
   Exit
 
+With the menu we can select a set of standard key bindings which are
+considered core.  For example, picture settings are not required for the
+core, as it's something one would usually expect to be in a menu and not
+its own keys on a remote.  As well, all station management functions
+should be in the menu, and not using up keys.  Our core keys are:
+
+  esc  Quit
+  i    Change input
+  p    Previous channel
+  0-9  Channel change input
+  ent  Enter
+  up   Channel up
+  down Channel down
+  m    Mute
+  +    Volume up
+  -    Volume down
+  f    Fullscreen
+  s    Screenshot
 
