@@ -171,6 +171,10 @@ void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
     }
 }
 
+const int top_size = 7;
+const int left_size = 7;
+const int bottom_size = 8;
+
 tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frameaspect )
 {
     char *fontfile;
@@ -261,8 +265,8 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, "0", 0 );
     osd_string_show_border( osd->strings[ OSD_TUNER_INFO ].string, 1 );
-    osd->strings[ OSD_TUNER_INFO ].xpos = (( width * 5 ) / 100) & ~1;
-    osd->strings[ OSD_TUNER_INFO ].ypos = ( height * 5 ) / 100;
+    osd->strings[ OSD_TUNER_INFO ].xpos = (( width * left_size ) / 100) & ~1;
+    osd->strings[ OSD_TUNER_INFO ].ypos = ( height * top_size ) / 100;
 
     osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_NUM ].string,
                                (channel_rgb >> 16) & 0xff, (channel_rgb >> 8) & 0xff, (channel_rgb & 0xff) );
@@ -284,14 +288,14 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     osd_string_set_colour_rgb( osd->strings[ OSD_CHANNEL_INFO ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_CHANNEL_INFO ].string, 1 );
-    osd->strings[ OSD_CHANNEL_INFO ].xpos = (( width * 60 ) / 100) & ~1;
-    osd->strings[ OSD_CHANNEL_INFO ].ypos = ( height * 5 ) / 100;
+    osd->strings[ OSD_CHANNEL_INFO ].xpos = (( width * 65 ) / 100) & ~1;
+    osd->strings[ OSD_CHANNEL_INFO ].ypos = ( height * top_size ) / 100;
     osd_string_show_text( osd->strings[ OSD_CHANNEL_INFO ].string, "8", 0 );
 
     osd_string_set_colour_rgb( osd->strings[ OSD_VOLUME_BAR ].string,
                                (other_rgb >> 16) & 0xff, (other_rgb >> 8) & 0xff, (other_rgb & 0xff) );
     osd_string_show_border( osd->strings[ OSD_VOLUME_BAR ].string, 1 );
-    osd->strings[ OSD_VOLUME_BAR ].xpos = (( width * 5 ) / 100) & ~1;
+    osd->strings[ OSD_VOLUME_BAR ].xpos = (( width * left_size ) / 100) & ~1;
     osd->strings[ OSD_VOLUME_BAR ].ypos = ( height * 90 ) / 100;
 
     osd_string_set_colour_rgb( osd->strings[ OSD_DATA_BAR ].string,
@@ -437,6 +441,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
         sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
     }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
+    osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
 
     /** Billy: What's up?  Are we ditching the logo for XDS?
      *osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
