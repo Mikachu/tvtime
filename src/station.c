@@ -293,16 +293,19 @@ int station_set( station_mgr_t *mgr, int pos )
 {
     station_info_t *rp = mgr->first;
 
-    mgr->last_channel = station_get_current_id( mgr );
-
-    if( !rp ) return 0;
-    do {
-        if( rp->pos == pos ) {
-            mgr->current = rp;
-            return 1;
-        }
-        rp = rp->next;
-    } while( rp != mgr->first );
+    if( rp ) {
+        do {
+            if( rp->pos == pos ) {
+                if( mgr->current == rp ) {
+                    return 0;
+                }
+                mgr->last_channel = station_get_current_id( mgr );
+                mgr->current = rp;
+                return 1;
+            }
+            rp = rp->next;
+        } while( rp != mgr->first );
+    }
 
     return 0;
 }
