@@ -168,6 +168,9 @@ void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
 void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
                                                uint8_t *m, uint8_t *t, uint8_t *b );
 void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width );
+void (*composite_colour4444_alpha_to_packed422_scanline)( uint8_t *output, uint8_t *input,
+                                                          int af, int y, int cb, int cr,
+                                                          int width, int alpha );
 
 
 /**
@@ -1405,6 +1408,49 @@ static void blit_packed422_scanline_mmxext( uint8_t *dest, const uint8_t *src, i
 }
 #endif
 
+static void composite_colour4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
+                                                                int af, int y, int cb, int cr,
+                                                                int width, int alpha )
+{
+    int a = ((af * alpha) + 0x80) >> 8;
+    if( a == 0xff ) {
+        return blit_colour_packed422_scanline( output, width, y, cb, cr );
+    } else if( a ) {
+        int i;
+
+        for( i = 0; i < width; i++ ) {
+            /**
+             * (1 - alpha)*B + alpha*F
+             * (1 - af*a)*B + af*a*F
+             *  B - af*a*B + af*a*F
+             *  B + a*(af*F - af*B)
+             */
+
+            output[ 0 ] = input[ 0 ] + ((alpha*( y - multiply_alpha( af, input[ 0 ] ) ) + 0x80) >> 8);
+
+            if( ( i & 1 ) == 0 ) {
+
+                    /**
+                     * At first I thought I was doing this incorrectly, but
+                     * the following math has convinced me otherwise.
+                     *
+                     * C_r = (1 - alpha)*B + alpha*F
+                     * C_r = B - af*a*B + af*a*F
+                     *
+                     * C_r = 128 + ((1 - af*a)*(B - 128) + a*af*(F - 128))
+                     * C_r = 128 + (B - af*a*B - 128 + af*a*128 + a*af*F - a*af*128)
+                     * C_r = B - af*a*B + a*af*F
+                     */
+
+                    output[ 1 ] = input[ 1 ] + ((alpha*( cb - multiply_alpha( af, input[ 1 ] ) ) + 0x80) >> 8);
+                    output[ 3 ] = input[ 3 ] + ((alpha*( cr - multiply_alpha( af, input[ 3 ] ) ) + 0x80) >> 8);
+            }
+            output += 2;
+            input += 2;
+        }
+    }
+}
+
 static void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
                                                                 uint8_t *foreground, int width, int alpha )
 {
@@ -2610,6 +2656,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_c;
     vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
     convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_c;
+    composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {

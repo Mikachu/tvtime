@@ -78,6 +78,13 @@ extern void (*blit_colour_packed4444_scanline)( uint8_t *output,
 extern void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src, int width );
 
 /**
+ * Composites a premultiplied 4:4:4:4 pixel onto a packed 4:2:2 scanline.
+ */
+extern void (*composite_colour4444_alpha_to_packed422_scanline)( uint8_t *output, uint8_t *input,
+                                                                 int af, int y, int cb, int cr,
+                                                                 int width, int alpha );
+
+/**
  * Composites a packed 4:4:4:4 scanline onto a packed 4:2:2 scanline.
  * Chroma is downsampled by dropping samples (nearest neighbour).
  */
