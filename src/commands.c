@@ -3289,6 +3289,7 @@ void commands_next_frame( commands_t *cmd )
         cmd->change_channel = 0;
     }
 
+    cmd->xmltvupdated = 0;
     update_xmltv_listings( cmd );
     if( cmd->vbi ) {
         if( *(vbidata_get_network_name( cmd->vbi )) ) {
@@ -3327,7 +3328,6 @@ void commands_next_frame( commands_t *cmd )
         }
     }
 
-    cmd->xmltvupdated = 0;
     cmd->printdebug = 0;
     cmd->showdeinterlacerinfo = 0;
     cmd->screenshot = 0;

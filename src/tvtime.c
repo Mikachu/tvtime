@@ -1185,7 +1185,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int kbd_available;
     char *error_string = 0;
     double pixel_aspect;
-    char number[ 4 ];
+    char number[ 6 ];
     tvtime_t *tvtime;
     deinterlace_method_t *curmethod;
     int curmethodid;
@@ -1427,7 +1427,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     blit_packed422_scanline( saveframe, blueframe, width * height );
     secondlastframe = lastframe = blueframe;
 
-
+    /* Set the mixer device. */
+    mixer_set_device( config_get_mixer_device( ct ) );
+    mixer_set_state( config_get_muted( ct ), config_get_unmute_volume( ct ) );
 
     /* Setup OSD stuff. */
     pixel_aspect = ( (double) width ) /
@@ -1561,10 +1563,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( station_is_new_install( stationmgr ) ) {
         commands_handle( commands, TVTIME_SHOW_MENU, 0 );
     }
-
-    /* Set the mier device. */
-    mixer_set_device( config_get_mixer_device( ct ) );
-    mixer_set_state( config_get_muted( ct ), config_get_unmute_volume( ct ) );
 
     /* Begin capturing frames. */
     if( vidin ) {
@@ -2535,7 +2533,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     snprintf( number, 4, "%d", quiet_screenshots );
     config_save( ct, "QuietScreenshots", number );
 
-    snprintf( number, 4, "%d", mixer_get_unmute_volume() );
+    snprintf( number, 6, "%d", mixer_get_unmute_volume() );
     config_save( ct, "UnmuteVolume", number );
 
     snprintf( number, 4, "%d", mixer_ismute() );

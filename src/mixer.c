@@ -32,7 +32,7 @@
 #include "mixer.h"
 
 static char *mixer_device = "/dev/mixer";
-static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
+static int saved_volume = (50 << 8 & 0xFF00) | (50 & 0x00FF);
 static int mixer_channel = SOUND_MIXER_LINE;
 static int mixer_dev_mask = 1 << SOUND_MIXER_LINE;
 static int muted = 0;
@@ -122,7 +122,7 @@ void mixer_mute( int mute )
      * Make sure that if multiple users mute the card,
      * we only honour the last one.
      */
-    if( !mute ) mutecount--;
+    if( !mute && mutecount ) mutecount--;
     if( mutecount ) return;
 
     if( fd < 0 ) fd = open( mixer_device, O_RDONLY );
