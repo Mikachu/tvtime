@@ -311,7 +311,7 @@ static void parse_xds_packet( const char *packet, int length )
         fprintf( stderr, "\n" );
     } else if( packet[ 0 ] < 0x03 && packet[ 1 ] >= 0x10 && packet[ 1 ] <= 0x17 ) {
         fprintf( stderr, "Program Description: Line %d", packet[1] & 0xf );
-        fprintf( stderr, "%s\n", packet[ 2 ] );
+        fprintf( stderr, "%s\n", packet + 2 );
         
     } else if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x02 ) {
         fprintf( stderr, "Program Length: Length: %02d:%02d", packet[ 3 ] & 63, 
