@@ -79,6 +79,8 @@ static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
 static int fullscreen_position = 0;
 
+static int has_focus = 0;
+
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
 
@@ -836,8 +838,9 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     xswa.backing_store = NotUseful;
     xswa.save_under = False;
     xswa.background_pixel = BlackPixel( display, screen );
-    xswa.event_mask = ButtonPressMask | StructureNotifyMask | KeyPressMask | PointerMotionMask |
-                      VisibilityChangeMask | PropertyChangeMask;
+    xswa.event_mask = ButtonPressMask | StructureNotifyMask | KeyPressMask |
+                      PointerMotionMask | VisibilityChangeMask |
+                      FocusChangeMask | PropertyChangeMask;
 
     mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWEventMask);
 
@@ -1241,6 +1244,12 @@ void xcommon_poll_events( input_t *in )
         case EnterNotify:
             XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
             break;
+        case FocusIn:
+            has_focus = 1;
+            break;
+        case FocusOut:
+            has_focus = 0;
+            break;
         case MapNotify:
             if( !output_on_root ) {
                 xcommon_exposed = 1;
@@ -1376,23 +1385,26 @@ void xcommon_poll_events( input_t *in )
         }
     }
 
-    if( !has_ewmh_state_fullscreen ) {
-        Window focus_win;
-        int focus_revert;
+    // fprintf( stderr, "fullscreen %d focus %d\n", output_fullscreen, has_focus );
 
-        XGetInputFocus( display, &focus_win, &focus_revert );
-        if( output_fullscreen ) {
-            if( reconfigure || !xcommon_exposed || (focus_win != wm_window && focus_win != fs_window) ) {
-                /* Switch back to windowed mode if we've lost focus or visibility. */
-                xcommon_toggle_fullscreen( 0, 0 );
-            }
+    if( !has_ewmh_state_fullscreen && output_fullscreen ) {
+        if( !xcommon_exposed || !has_focus ) {
+            /**
+             * Switch back to windowed mode if we have lost
+             * input focus or window visibility.
+             */
+            xcommon_toggle_fullscreen( 0, 0 );
         }
     }
 
-    if( !output_on_root && reconfigure ) {
-        output_width = reconfwidth;
-        output_height = reconfheight;
-        XResizeWindow( display, output_window, output_width, output_height );
+    if( reconfigure ) {
+        if( !output_on_root && !output_fullscreen ) {
+            output_width = reconfwidth;
+            output_height = reconfheight;
+            XResizeWindow( display, output_window,
+                           output_width, output_height );
+        }
+
         calculate_video_area();
         xcommon_clear_screen();
         XSync( display, False );
