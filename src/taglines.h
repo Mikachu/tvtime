@@ -179,7 +179,9 @@ static const char *taglines[] = {
 "tvtime: live from new york, it's saturday night",
 "tvtime: we're fresh obsessed",
 "tvtime: the best a man can get",
-"tvtime: as seen on TV"
+"tvtime: as seen on TV",
+"tvtime: blame consonants for framedrops",
+"tvtime: vad gillar du?"
 };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
