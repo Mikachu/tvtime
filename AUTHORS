@@ -45,6 +45,9 @@ Authors and contributors
   Justin A <justin@bouncybouncy.net>
     - Previous channel saved to config file
 
+  Brian Goines <bgoines78@comcast.net>
+    - Work on XML config files
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
