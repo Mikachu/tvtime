@@ -42,12 +42,7 @@ static int JaggieThreshold = 73;
  * Gunnar Thalin
  */
 static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *output,
-                                                            unsigned char *t1,
-                                                            unsigned char *m1,
-                                                            unsigned char *b1,
-                                                            unsigned char *t0,
-                                                            unsigned char *m0,
-                                                            unsigned char *b0,
+                                                            deinterlace_scanline_data_t *data,
                                                             int width )
 {
     const mmx_t YMask = { 0x00ff00ff00ff00ffULL };
@@ -64,15 +59,15 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
     qwThreshold.w[ 2 ] = JaggieThreshold;
     qwThreshold.w[ 3 ] = JaggieThreshold;
 
-    READ_PREFETCH_2048( t1 );
-    READ_PREFETCH_2048( m1 );
-    READ_PREFETCH_2048( b1 );
+    READ_PREFETCH_2048( data->t1 );
+    READ_PREFETCH_2048( data->m1 );
+    READ_PREFETCH_2048( data->b1 );
 
     width /= 4;
     while( width-- ) {
-        movq_m2r( *t1, mm0 );
-        movq_m2r( *m1, mm1 );
-        movq_m2r( *b1, mm2 );
+        movq_m2r( *data->t1, mm0 );
+        movq_m2r( *data->m1, mm1 );
+        movq_m2r( *data->b1, mm2 );
 
         // get intensities in mm3 - 4
         movq_r2r( mm0, mm3 );
@@ -120,24 +115,24 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
 
         // Advance to the next set of pixels.
         output += 8;
-        t0 += 8;
-        m0 += 8;
-        b0 += 8;
-        t1 += 8;
-        m1 += 8;
-        b1 += 8;
+        data->t0 += 8;
+        data->m0 += 8;
+        data->b0 += 8;
+        data->t1 += 8;
+        data->m1 += 8;
+        data->b1 += 8;
     }
     sfence();
     emms();
 }
 
-static void copy_scanline( unsigned char *output, unsigned char *m2,
-                           unsigned char *t1, unsigned char *m1,
-                           unsigned char *b1, unsigned char *t0,
-                           unsigned char *b0, int width )
+static void copy_scanline( unsigned char *output,
+                           deinterlace_scanline_data_t *data,
+                           int width )
 {
-    blit_packed422_scanline( output, m2, width );
+    blit_packed422_scanline( output, data->m2, width );
 }
+
 
 static deinterlace_setting_t settings[] =
 {
