@@ -37,25 +37,25 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
         return 0;
     }
 
-    osd->channel_number = osd_string_new( "n019004l.pfb", 80, width,
+    osd->channel_number = osd_string_new( "FreeSansBold.ttf", 80, width,
                                           height, frameaspect );
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
     osd_string_show_border( osd->channel_number, 1 );
 
-    osd->channel_info = osd_string_new( "n019004l.pfb", 30, width,
+    osd->channel_info = osd_string_new( "FreeSansBold.ttf", 30, width,
                                         height, frameaspect );
     osd_string_set_colour( osd->channel_info, 220, 12, 155 );
     osd_string_show_border( osd->channel_info, 1 );
 
-    osd->volume_bar = osd_string_new( "n019004l.pfb", 15, width,
+    osd->volume_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
                                       height, frameaspect );
     osd_string_set_colour( osd->volume_bar, 200, 128, 128 );
 
-    osd->data_bar = osd_string_new( "n019004l.pfb", 15, width,
+    osd->data_bar = osd_string_new( "FreeSansBold.ttf", 15, width,
                                     height, frameaspect );
     osd_string_set_colour( osd->data_bar, 200, 128, 128 );
 
-    osd->muted_osd = osd_string_new( "n019004l.pfb", 15, width,
+    osd->muted_osd = osd_string_new( "FreeSansBold.ttf", 15, width,
                                      height, frameaspect );
     osd_string_set_colour( osd->muted_osd, 200, 128, 128 );
     osd_string_show_text( osd->muted_osd, "Mute", 100 );

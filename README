@@ -146,8 +146,10 @@ Authors and contributors
     Copyright (C) 1999 Carsten Haitzler and various contributors.
   Alot of that will be cleaned up/merged to be common with mythtv, I hope.
 
-  Contains fonts contributed by:
+  Contains fonts under the freefont project:
+  http://www.nongnu.org/freefont/
 
+  Also the pfb fonts are from:
  	URW++ Design and Development Incorporated
  	Poppenbuetteler Bogen 29A
  	D-22399 Hamburg
