@@ -2616,23 +2616,26 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
-            char number[ 25 ];
             station_toggle_us_cable_mode( cmd->stationmgr );
-            if( cmd->osd ) {
-                if( station_get_us_cable_mode( cmd->stationmgr ) == 0 ) {
+            if( station_get_us_cable_mode( cmd->stationmgr ) == NTSC_CABLE_MODE_STANDARD ) {
+                config_save( cmd->cfg, "NTSCCableMode", "Nominal" );
+                if( cmd->osd ) {
                     tvtime_osd_show_message( cmd->osd,
                         _("Using nominal NTSC cable frequencies.") );
-                } else if( station_get_us_cable_mode( cmd->stationmgr ) == 1 ) {
+                }
+            } else if( station_get_us_cable_mode( cmd->stationmgr ) == NTSC_CABLE_MODE_IRC ) {
+                config_save( cmd->cfg, "NTSCCableMode", "IRC" );
+                if( cmd->osd ) {
                     tvtime_osd_show_message( cmd->osd,
                         _("Using IRC cable frequencies.") );
-                } else if( station_get_us_cable_mode( cmd->stationmgr ) == 2 ) {
+                }
+            } else if( station_get_us_cable_mode( cmd->stationmgr ) == NTSC_CABLE_MODE_HRC ) {
+                config_save( cmd->cfg, "NTSCCableMode", "HRC" );
+                if( cmd->osd ) {
                     tvtime_osd_show_message( cmd->osd,
                         _("Using HRC cable frequencies.") );
                 }
             }
-            snprintf( number, sizeof( number ), "%d",
-                      station_get_us_cable_mode( cmd->stationmgr ) );
-            config_save( cmd->cfg, "NTSCCableMode", number );
             cmd->change_channel = 1;
         }
         break;
