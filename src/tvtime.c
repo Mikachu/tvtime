@@ -822,12 +822,17 @@ static void tvtime_build_copied_field( unsigned char *output,
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
+    curframe += instride * 2;
     output += outstride;
     scanline += 2;
 
     for( i = ((frame_height - 2) / 2); i; --i ) {
-        /* Copy a scanline. */
-        blit_packed422_scanline( output, curframe, width );
+        /* Copy/interpolate a scanline. */
+        if( bottom_field ) {
+            interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
+        } else {
+            blit_packed422_scanline( output, curframe, width );
+        }
         curframe += instride * 2;
 
         if( correct_input ) {
