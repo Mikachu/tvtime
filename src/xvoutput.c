@@ -174,8 +174,8 @@ static int open_display( void )
 
     hint.x = 0;
     hint.y = 0;
-    hint.width = input_width;
-    hint.height = input_height;
+    hint.width = output_width;
+    hint.height = output_height;
     hint.flags = PPosition | PSize;
 
     XSetStandardProperties( display, window, hello, hello, None, 0, 0, &hint );
@@ -323,8 +323,8 @@ int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     output_aspect = aspect;
     input_width = inputwidth;
     input_height = inputheight;
-    output_width = inputwidth;
-    output_height = inputheight;
+    output_width = outputwidth;
+    output_height = ( output_width * 3 ) / 4;
     calculate_video_area();
     open_display();
     xv_check_extension();
