@@ -1,5 +1,6 @@
 
 0.9.11 -
+  * vektor: Added logic to decode channel names from tv_grab_na.
   * vektor: Fixed the screenshot command to be more flexible with
       where it takes arguments from, should work for keybindings now.
   * vektor: Fixed tvtime-command handling for commands that take

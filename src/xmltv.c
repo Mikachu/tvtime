@@ -34,6 +34,7 @@ struct xmltv_s
     xmlChar *display_chan;
     program_t *pro;
     program_t *next_pro;
+    int is_tv_grab_na;
 };
 
 /* This exists so that we can store program info during search without modifying xmltv */
@@ -279,6 +280,27 @@ static xmlNodePtr get_program( xmlNodePtr root, program_t *pro, const char *chan
     return 0;
 }
 
+static int xmltv_is_tv_grab_na( xmltv_t *xmltv )
+{
+    xmlNodePtr cur = xmltv->root->xmlChildrenNode;
+
+    while( cur ) {
+        if( !xmlStrcasecmp( cur->name, BAD_CAST "channel" ) ) {
+            xmlChar *id = xmlGetProp( cur, BAD_CAST "id" );
+            int is_na = 0;
+
+            if( strstr( (char *) id, ".zap2it.com" ) ) {
+                is_na = 1;
+            }
+            xmlFree( id );
+            return is_na;
+        }
+        cur = cur->next;
+    }
+
+    return 0;
+}
+
 xmltv_t *xmltv_new( const char *filename )
 {
     xmltv_t *xmltv = malloc( sizeof( xmltv_t ) );
@@ -316,6 +338,7 @@ xmltv_t *xmltv_new( const char *filename )
     xmltv->curchan = 0;
     xmltv->display_chan = 0;
     xmltv->refresh = 1;
+    xmltv->is_tv_grab_na = xmltv_is_tv_grab_na( xmltv );
 
     return xmltv;
 }
@@ -341,7 +364,8 @@ void xmltv_delete( xmltv_t *xmltv )
 void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
 {
     if( channel ) {
-        snprintf( xmltv->curchannel, sizeof( xmltv->curchannel ), "%s", channel );
+        snprintf( xmltv->curchannel, sizeof( xmltv->curchannel ),
+                  "%s", channel );
     } else {
         *xmltv->curchannel = '\0';
     }
@@ -451,6 +475,20 @@ const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )
     return 0;
 }
 
+static const char *tv_grab_na_skip( const char *name )
+{
+    const char *ret = name;
+    if( *ret == 'C' ) {
+        while( *ret && *ret != ' ' ) ret++;
+        if( *ret ) ret++;
+    }
+
+    while( *ret && *ret != ' ' ) ret++;
+    if( *ret ) ret++;
+
+    return ret;
+}
+
 const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
 {
     xmlNodePtr cur = xmltv->root->xmlChildrenNode;
@@ -470,7 +508,11 @@ const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
                     if ( sub ) {
                         xmltv->display_chan = xmlNodeGetContent( sub );
                         xmlFree( curid );
-                        return ( char * ) xmltv->display_chan;
+                        if( xmltv->is_tv_grab_na ) {
+                            return tv_grab_na_skip( (char *) xmltv->display_chan );
+                        } else {
+                            return (char *) xmltv->display_chan;
+                        }
                     }
                 }
                 xmlFree( curid );
@@ -481,3 +523,4 @@ const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
 
     return 0;
 }
+
