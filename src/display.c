@@ -194,6 +194,9 @@ static int update_resolution_xf86vidmode(dpy_info_t *info, Display *dpy,
     }
     info->resolution.horizontal_pixels = modeline.hdisplay;
     info->resolution.vertical_pixels = modeline.vdisplay;
+    fprintf( stderr, "vidmode: refresh    %5.2fhz.\n",
+             (double) ( (double) dotclk * 1000.0 ) /
+             (double) ( modeline.htotal * modeline.vtotal ) );
 
     if(XF86VidModeGetViewPort(dpy, screen_nr, &x, &y)) {
       info->screen_offset.x = x;
