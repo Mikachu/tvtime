@@ -62,6 +62,8 @@ static const char *tests[] = {
    "blend_packed422_scanline_c 720x480 120/256 frame",
    "blend_packed422_scanline_mmxext 720x480 120/256 frame",
    "comb_factor_packed422_scanline 720x480 frame",
+   "diff_factor_packed422_scanline_c 720x480 frame",
+   "diff_factor_packed422_scanline_mmx 720x480 frame",
    "leetft_render_test_string",
    "packed444_to_rgb24_rec601_scanline"
 };
@@ -72,7 +74,6 @@ int main( int argc, char **argv )
     unsigned char *source422packed;
     unsigned char *source422packed2;
     unsigned char *source444packed;
-    unsigned char *source4444packed;
     unsigned char *dest422packed;
     unsigned char *dest444packed;
     ft_font_t *font = 0;
@@ -84,7 +85,6 @@ int main( int argc, char **argv )
     uint64_t after = 0;
     int stride422 = width * 2;
     int stride444 = width * 3;
-    int stride4444 = width * 4;
     int testid = 0;
     double mhz;
     int i;
@@ -135,11 +135,10 @@ int main( int argc, char **argv )
     source422packed = (unsigned char *) malloc( width * height * 2 );
     source422packed2 = (unsigned char *) malloc( width * height * 2 );
     source444packed = (unsigned char *) malloc( width * height * 3 );
-    source4444packed = (unsigned char *) malloc( width * height * 4 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
     dest444packed = (unsigned char *) malloc( width * height * 3 );
 
-    if( !source422packed || !source422packed2 || !source4444packed || !dest422packed || !dest444packed ) {
+    if( !source422packed || !source422packed2 || !dest422packed || !dest444packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );
         return 1;
     }
@@ -148,9 +147,6 @@ int main( int argc, char **argv )
         //source422packed[ i ] = i % 256;
         source422packed[ i ] = random() % 256;
         source422packed2[ i ] = random() % 256;
-    }
-    for( i = 0; i < width*height*4; i++ ) {
-        source4444packed[ i ] = random() % 256;
     }
 
     /* Sleep to let the system cool off. */
@@ -237,6 +233,24 @@ int main( int argc, char **argv )
                                                 source422packed2 + (stride422*(j+1)*2),
                                                 source422packed + (stride422*j*2) + (stride422*2),
                                                 width );
+            }
+            rdtscll( after );
+            datasize += width * height * 2;
+        } else if( !strcmp( tests[ testid ], "diff_factor_packed422_scanline_c 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                diff_factor_packed422_scanline_c( source422packed + (stride422*j),
+                                                  source422packed2 + (stride422*j),
+                                                  width );
+            }
+            rdtscll( after );
+            datasize += width * height * 2;
+        } else if( !strcmp( tests[ testid ], "diff_factor_packed422_scanline_mmx 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                diff_factor_packed422_scanline_mmx( source422packed + (stride422*j),
+                                                    source422packed2 + (stride422*j),
+                                                    width );
             }
             rdtscll( after );
             datasize += width * height * 2;
