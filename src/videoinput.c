@@ -942,7 +942,7 @@ static double videoinput_get_control_v4l2( videoinput_t *vidin, uint32_t id )
     struct v4l2_queryctrl query;
 
     query.id = id;
-    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 && !(query.flags & V4L2_CTRL_FLAG_DISABLED) ) {
         struct v4l2_control control;
         control.id = id;
         if( ioctl( vidin->grab_fd, VIDIOC_G_CTRL, &control ) >= 0 ) {
@@ -957,7 +957,7 @@ static void videoinput_set_control_v4l2( videoinput_t *vidin, uint32_t id, doubl
     struct v4l2_queryctrl query;
 
     query.id = id;
-    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOC_QUERYCTRL, &query ) >= 0 && !(query.flags & V4L2_CTRL_FLAG_DISABLED) ) {
         struct v4l2_control control;
         control.id = id;
         control.value = query.minimum + ((int) ((val * ((double) (query.maximum - query.minimum))) + 0.5));
