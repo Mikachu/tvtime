@@ -21,19 +21,21 @@
 #include "videotools.h"
 #include "osd.h"
 
+typedef struct osd_font_s osd_font_t;
+
 struct osd_font_s
 {
     Efont *font;
 };
 
-osd_font_t *osd_font_new( const char *filename )
+osd_font_t *osd_font_new( const char *filename, int fontsize, int video_width, int video_height )
 {
     osd_font_t *osdf = (osd_font_t *) malloc( sizeof( osd_font_t ) );
     if( !osdf ) {
         return 0;
     }
 
-    osdf->font = Efont_load( filename, 80, 720, 480 );
+    osdf->font = Efont_load( filename, fontsize, video_width, video_height );
     if( !osdf->font ) {
         free( osdf );
         return 0;
@@ -63,10 +65,11 @@ struct osd_string_s
     int text_cr;
 };
 
-osd_string_t *osd_string_new( osd_font_t *font )
+osd_string_t *osd_string_new( const char *fontfile, int fontsize,
+                              int video_width, int video_height )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
-    osds->font = font;
+    osds->font = osd_font_new( fontfile, fontsize, video_width, video_height );
     osds->efs = 0;
     osds->frames_left = 0;
     osds->text_luma = 16;

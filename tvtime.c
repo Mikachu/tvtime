@@ -117,19 +117,9 @@ int main( int argc, char **argv )
     int verbose = 0;
     int volume;
     int debug = 0;
-    osd_font_t *osdf;
     osd_string_t *channel_number, *volume_bar, *muted_osd;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
-
-
-    osdf = osd_font_new( "helr.ttf" );
-    channel_number = osd_string_new( osdf );
-    volume_bar = osd_string_new( osdf );
-    muted_osd = osd_string_new( osdf );
-    osd_string_set_colour( channel_number, 200, 128, 128 );
-    osd_string_set_colour( volume_bar, 200, 128, 128 );
-    osd_string_set_colour( muted_osd, 200, 128, 128 );
 
 
     /* Default device. */
@@ -186,6 +176,17 @@ int main( int argc, char **argv )
                          "maybe try a different device?\n" );
         return 1;
     }
+    width = videoinput_get_width( vidin );
+    height = videoinput_get_height( vidin );
+
+    /* Setup OSD stuff. */
+    channel_number = osd_string_new( "helr.ttf", 80, width, height );
+    volume_bar = osd_string_new( "helr.ttf", 80, width, height );
+    muted_osd = osd_string_new( "helr.ttf", 80, width, height );
+    osd_string_set_colour( channel_number, 200, 128, 128 );
+    osd_string_set_colour( volume_bar, 200, 128, 128 );
+    osd_string_set_colour( muted_osd, 200, 128, 128 );
+
 
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( vidin ) ) {
@@ -255,9 +256,6 @@ int main( int argc, char **argv )
     if( verbose ) fprintf( stderr, "tvtime: Done stealing resources.\n" );
 
     /* Setup the output. */
-    width = videoinput_get_width( vidin );
-    height = videoinput_get_height( vidin );
-
     if( !sdl_init( width, height, output420, outputwidth, aspect ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: no video output available.\n" );
         return 1;
