@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Fixed a nasty segfault when the capture card driver errors out
+      on the first few frames.
   * vektor: We now always mute the sound card on channel change to protect
       against all of the broken drivers.
   * vektor: Removed MPEG2 support which did not work anyway.

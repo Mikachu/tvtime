@@ -2025,8 +2025,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
         if( has_signal && tuner_state != TUNER_STATE_HAS_SIGNAL ) {
             has_signal = 0;
-            save_last_frame
-                ( saveframe, lastframe, width, height, width*2, width*2 );
+            if( lastframe ) {
+                save_last_frame( saveframe, lastframe, width, height,
+                                 width * 2, width * 2 );
+            }
             fadepos = 0;
         }
 
@@ -2049,8 +2051,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
                     has_signal = 0;
-                    save_last_frame( saveframe, lastframe, 
-                                     width, height, width*2, width*2 );
+                    if( lastframe ) {
+                        save_last_frame( saveframe, lastframe, 
+                                         width, height, width*2, width*2 );
+                    }
                     fadepos = 0;
                     tuner_state = TUNER_STATE_NO_SIGNAL;
                     acquired = 0;
@@ -2237,20 +2241,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 output->lock_output_buffer();
                 if( showbars ) {
                     for( i = 0; i < height; i++ ) {
-                        blit_packed422_scanline
-                            ( output->get_output_buffer() +
+                        blit_packed422_scanline( output->get_output_buffer() +
                               i*output->get_output_stride(),
                               colourbars + (i*width*2), width );
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field
-                            ( tvtime, output->get_output_buffer(),
+                        tvtime_build_copied_field( tvtime,
+                              output->get_output_buffer(),
                               curframe, 0, width, height, width * 2,
                               output->get_output_stride () );
                     } else {
-                        tvtime_build_deinterlaced_frame
-                            ( tvtime, output->get_output_buffer(),
+                        tvtime_build_deinterlaced_frame( tvtime,
+                              output->get_output_buffer(),
                               curframe, lastframe, secondlastframe,
                               0, width, height, width * 2,
                               output->get_output_stride() );
@@ -2387,13 +2390,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field
-                            ( tvtime, output->get_output_buffer(),
+                        tvtime_build_copied_field( tvtime,
+                              output->get_output_buffer(),
                               curframe, 1, width, height, width * 2,
                               output->get_output_stride() );
                     } else {
-                        tvtime_build_deinterlaced_frame
-                            ( tvtime, output->get_output_buffer(),
+                        tvtime_build_deinterlaced_frame( tvtime,
+                              output->get_output_buffer(),
                               curframe, lastframe, secondlastframe, 1,
                               width, height, width * 2,
                               output->get_output_stride() );
