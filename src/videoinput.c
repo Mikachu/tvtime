@@ -247,12 +247,12 @@ static void videoinput_get_and_print_tuner_info( videoinput_t *vidin )
         }
 
         if( vidin->verbose ) {
-            fprintf( stderr, "tuner.tuner = %d\n"
-                             "tuner.name = %s\n"
-                             "tuner.rangelow = %ld\n"
-                             "tuner.rangehigh = %ld\n"
-                             "tuner.signal = %d\n"
-                             "tuner.flags = ",
+            fprintf( stderr, "videoinput: tuner.tuner = %d\n"
+                             "videoinput: tuner.name = %s\n"
+                             "videoinput: tuner.rangelow = %ld\n"
+                             "videoinput: tuner.rangehigh = %ld\n"
+                             "videoinput: tuner.signal = %d\n"
+                             "videoinput: tuner.flags = ",
                      vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
                      vidin->tuner.rangehigh, vidin->tuner.signal );
 
@@ -265,7 +265,7 @@ static void videoinput_get_and_print_tuner_info( videoinput_t *vidin )
             if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
             if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
 
-            fprintf( stderr, "\ntuner.mode = " );
+            fprintf( stderr, "\nvideoinput: tuner.mode = " );
             switch (vidin->tuner.mode) {
             case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
             case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
@@ -396,6 +396,11 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         close( vidin->grab_fd );
         free( vidin );
         return 0;
+    }
+
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: Using video4linux driver '%s', type is %x.\n",
+                 grab_cap.name, grab_cap.type );
     }
 
     /* The capabilities should tell us how many inputs this card has. */
