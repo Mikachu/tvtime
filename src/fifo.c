@@ -75,7 +75,7 @@ char *fifo_next_line( fifo_t *fifo )
 
     if( !fifo ) return NULL;
 
-    while( read( fifo->fd, &c, 1 ) ) {
+    while( read( fifo->fd, &c, 1 ) > 0 ) {
         if( c == '\n' ) return fifo->buf;
         if( fifo->bufpos < sizeof( fifo->buf ) - 1 )
             fifo->buf[ fifo->bufpos++ ] = c;
@@ -86,7 +86,7 @@ char *fifo_next_line( fifo_t *fifo )
 int fifo_next_command( fifo_t *fifo )
 {
     int cmd;
-    char *str;
+    char *str = NULL;
 
     if( !fifo ) return TVTIME_NOCOMMAND;
     str = fifo_next_line( fifo );
