@@ -669,7 +669,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
         /* Set the format using the SPICT ioctl. */
         if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
+            fprintf( stderr, "videoinput: Can't get image information from the card, unable to "
                      "process the output: %s.\n", strerror( errno ) );
             fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
                      " indicating your capture card, driver, and the error message above.\n" );
@@ -711,20 +711,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             close( vidin->grab_fd );
             free( vidin );
             return 0;
-        }
-        if( ioctl( vidin->grab_fd, VIDIOCGWIN, &grab_win ) < 0 ) {
-            fprintf( stderr, "videoinput: Failed to get the V4L window size (capture width and height): %s\n",
-                     strerror( errno ) );
-            fprintf( stderr, "videoinput: Not important, but please send a bug report including what driver "
-                             "you're using and output of 'tvtime -v' to our bug report page off of "
-                             PACKAGE_BUGREPORT "\n" );
-        }
-
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: Window set to (%d,%d/%dx%d), chromakey %d, flags %d, clips %d.\n",
-                 grab_win.x, grab_win.y, grab_win.width,
-                 grab_win.height, grab_win.chromakey,
-                 grab_win.flags, grab_win.clipcount );
         }
     }
 
@@ -850,7 +836,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         }
 
         vidin->have_mmap = 0;
-        vidin->grab_size = (grab_win.width * grab_win.height * 2);
+        vidin->grab_size = (capwidth * vidin->height * 2);
         vidin->grab_data = malloc( vidin->grab_size );
         vidin->numframes = 2;
 
