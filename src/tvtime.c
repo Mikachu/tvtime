@@ -796,10 +796,10 @@ static void build_deinterlacer_menu( menu_t *menu, int curmethod )
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     for( i = 0; i < nummethods; i++ ) {
         if( i == curmethod ) {
-            snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5,
+            snprintf( string, sizeof( string ), TVTIME_ICON_RADIOON "  %s",
                       get_deinterlace_method( i )->name );
         } else {
-            snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4,
+            snprintf( string, sizeof( string ), TVTIME_ICON_RADIOOFF "  %s",
                       get_deinterlace_method( i )->name );
         }
         menu_set_text( menu, i + 1, string );
