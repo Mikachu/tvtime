@@ -208,27 +208,27 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  * Each deinterlacing routine can require data from up to four fields.
  * The current field is being output is Field 4:
  *
- * | Field 1 | Field 2 | Field 3 | Field 4 |
- * |         |   T0    |         |   T1    |
- * |   M0    |         |    M1   |         |
- * |         |   B0    |         |   B1    |
- * |  NX0    |         |   NX1   |         |
+ * | Field 3 | Field 2 | Field 1 | Field 0 |
+ * |         |   T2    |         |   T0    |
+ * |   M3    |         |    M1   |         |
+ * |         |   B2    |         |   B0    |
+ * |  NX3    |         |   NX1   |         |
  *
  * So, since we currently get frames not individual fields from V4L, there
  * are two possibilities for where these come from:
  *
  * CASE 1: Deinterlacing the top field:
- * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
- * |   T-1   |         |   T0    |         |   T1    |
- * |         |   M0    |         |    M1   |         |
- * |   B-1   |         |   B0    |         |   B1    |
+ * | Field 4 | Field 3 | Field 2 | Field 1 | Field 0 |
+ * |   T4    |         |   T2    |         |   T0    |
+ * |         |   M3    |         |    M1   |         |
+ * |   B4    |         |   B2    |         |   B0    |
  *  [--  secondlast --] [--  lastframe  --] [--  curframe   --]
  *
  * CASE 2: Deinterlacing the bottom field:
- * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
- * |   T-1   |         |   T0    |         |   T1    |
- * |         |   M0    |         |    M1   |         |
- * |   B-1   |         |   B0    |         |   B1    |
+ * | Field 4 | Field 3 | Field 2 | Field 1 | Field 0 |
+ * |   T4    |         |   T2    |         |   T0    |
+ * |         |   M3    |         |    M1   |         |
+ * |   B4    |         |   B2    |         |   B0    |
  * ndlast --] [--  lastframe  --] [--  curframe   --]
  *
  * So, in case 1, we need the previous 2 frames as well as the current
