@@ -61,6 +61,7 @@ void commands_set_half_size( commands_t *cmd, int halfsize );
 void commands_next_frame( commands_t *cmd );
 int commands_pause( commands_t *cmd );
 int commands_check_freq_present( commands_t *cmd );
+void commands_set_pulldown_alg( commands_t *cmd, int pulldown_alg );
 
 /**
  * These are commands sent back to tvtime to tell it to do things.
