@@ -70,6 +70,7 @@
 #include "pulldown.h"
 #include "utils.h"
 #include "cpuinfo.h"
+#include "outputfilter.h"
 #include "mm_accel.h"
 #include "menu.h"
 
@@ -134,7 +135,8 @@ typedef struct tvtime_deinterlacer_s
 typedef struct tvtime_s
 {
     deinterlace_method_t *curmethod;
-    videofilter_t *filter;
+    videofilter_t *inputfilter;
+    outputfilter_t *outputfilter;
     int filtered_curframe;
     int last_topdiff;
     int last_botdiff;
@@ -153,7 +155,8 @@ tvtime_t *tvtime_new( void )
     if( !tvtime ) return 0;
 
     tvtime->curmethod = 0;
-    tvtime->filter = videofilter_new();
+    tvtime->inputfilter = videofilter_new();
+    tvtime->outputfilter = outputfilter_new();
     tvtime->filtered_curframe = 0;
     tvtime->last_topdiff = 0;
     tvtime->last_botdiff = 0;
@@ -169,8 +172,11 @@ tvtime_t *tvtime_new( void )
 
 void tvtime_delete( tvtime_t *tvtime )
 {
-    if( tvtime->filter ) {
-        videofilter_delete( tvtime->filter );
+    if( tvtime->inputfilter ) {
+        videofilter_delete( tvtime->inputfilter );
+    }
+    if( tvtime->outputfilter ) {
+        outputfilter_delete( tvtime->outputfilter );
     }
     free( tvtime );
 }
@@ -330,9 +336,7 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
 static void pulldown_merge_fields( uint8_t *output,
                                    uint8_t *topfield,
                                    uint8_t *botfield,
-                                   tvtime_osd_t *osd,
-                                   console_t *con,
-                                   vbiscreen_t *vs,
+                                   outputfilter_t *of,
                                    int width,
                                    int frame_height,
                                    int fieldstride,
@@ -349,9 +353,7 @@ static void pulldown_merge_fields( uint8_t *output,
             blit_packed422_scanline( curoutput, topfield + ((i / 2) * fieldstride), width );
         }
 
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-        if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+        if( of ) outputfilter_composite_packed422_scanline( of, curoutput, width, 0, i );
     }
 }
 
@@ -368,8 +370,8 @@ static void calculate_pulldown_score_vektor( tvtime_t *tvtime,
     tvtime->last_botdiff = 0;
 
     for( i = 0; i < frame_height; i++ ) {
-        if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, i ) ) {
-            videofilter_packed422_scanline( tvtime->filter, curframe + (i*instride), width, 0, i );
+        if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, i ) ) {
+            videofilter_packed422_scanline( tvtime->inputfilter, curframe + (i*instride), width, 0, i );
         }
 
         if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
@@ -389,9 +391,6 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                                              uint8_t *curframe,
                                              uint8_t *lastframe,
                                              uint8_t *secondlastframe,
-                                             tvtime_osd_t *osd,
-                                             console_t *con,
-                                             vbiscreen_t *vs,
                                              int bottom_field,
                                              int width,
                                              int frame_height,
@@ -399,12 +398,6 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                                              int outstride )
 {
     int i;
-
-    if( osd ) tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );
-
-    if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
-        if( osd ) tvtime_osd_set_film_mode( osd, -1 );
-    }
 
     if( tvtime->pulldown_alg != PULLDOWN_VEKTOR ) {
         /* If we leave vektor pulldown mode, lose our state. */
@@ -452,33 +445,31 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                 /* We're in pulldown, reverse it. */
                 if( !tvtime->filmmode ) {
                     fprintf( stderr, "Film mode enabled.\n" );
-                    if( osd ) tvtime_osd_set_film_mode( osd, tvtime->pdoffset );
                     tvtime->filmmode = 1;
                 }
 
                 if( pulldown_source( tvtime->pdoffset, 0 ) ) {
                     pulldown_merge_fields( output, lastframe, lastframe + instride,
-                                           osd, con, vs, width, frame_height, instride*2, outstride );
+                                           tvtime->outputfilter, width, frame_height, instride*2, outstride );
                 } else {
                     pulldown_merge_fields( output, curframe, lastframe + instride,
-                                           osd, con, vs, width, frame_height, instride*2, outstride );
+                                           tvtime->outputfilter, width, frame_height, instride*2, outstride );
                 }
 
                 return;
             } else {
                 if( tvtime->filmmode ) {
                     fprintf( stderr, "Film mode disabled.\n" );
-                    if( osd ) tvtime_osd_set_film_mode( osd, -1 );
                     tvtime->filmmode = 0;
                 }
             }
         } else if( !tvtime->pderror ) {
             if( pulldown_source( tvtime->pdoffset, 1 ) ) {
                 pulldown_merge_fields( output, curframe, lastframe + instride,
-                                       osd, con, vs, width, frame_height, instride*2, outstride );
+                                       tvtime->outputfilter, width, frame_height, instride*2, outstride );
             } else {
                 pulldown_merge_fields( output, curframe, curframe + instride,
-                                       osd, con, vs, width, frame_height, instride*2, outstride );
+                                       tvtime->outputfilter, width, frame_height, instride*2, outstride );
             }
 
             return;
@@ -488,10 +479,10 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
     if( !tvtime->curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( tvtime->filter && !tvtime->filtered_curframe ) {
+        if( tvtime->inputfilter && !tvtime->filtered_curframe ) {
             for( i = 0; i < frame_height; i++ ) {
-                if( videofilter_active_on_scanline( tvtime->filter, i ) ) {
-                    videofilter_packed422_scanline( tvtime->filter, curframe + (i*instride), width, 0, i );
+                if( videofilter_active_on_scanline( tvtime->inputfilter, i ) ) {
+                    videofilter_packed422_scanline( tvtime->inputfilter, curframe + (i*instride), width, 0, i );
                 }
             }
         }
@@ -502,11 +493,11 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
 
         tvtime->curmethod->deinterlace_frame( output, outstride, &data, bottom_field, width, frame_height );
 
-        for( i = 0; i < frame_height; i++ ) {
-            uint8_t *curoutput = output + (i * outstride);
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-            if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+        if( tvtime->outputfilter ) {
+            for( i = 0; i < frame_height; i++ ) {
+                uint8_t *curoutput = output + (i * outstride);
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, curoutput, width, 0, i );
+            }
         }
     } else {
         int loop_size;
@@ -520,22 +511,22 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
 
             /* Double the top scanline a scanline. */
             blit_packed422_scanline( output, curframe, width );
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
 
             output += outstride;
             scanline++;
         }
 
         /* Copy a scanline. */
-        if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline ) ) {
-            videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, scanline );
+        if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline ) ) {
+            videofilter_packed422_scanline( tvtime->inputfilter, curframe, width, 0, scanline );
         }
         blit_packed422_scanline( output, curframe, width );
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+        if( tvtime->outputfilter ) {
+            outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+        }
 
         output += outstride;
         scanline++;
@@ -550,9 +541,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             data.t0 = curframe;
             data.b0 = curframe + (instride*2);
 
-            if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ) {
-                videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, scanline );
-                videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, scanline + 1 );
+            if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + 1 ) ) {
+                videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, scanline );
+                videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, scanline + 1 );
             }
 
             if( bottom_field ) {
@@ -579,9 +570,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             }
 
             tvtime->curmethod->interpolate_scanline( output, &data, width );
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
 
             output += outstride;
             scanline++;
@@ -616,9 +607,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             lastframe += instride * 2;
             secondlastframe += instride * 2;
 
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
 
             output += outstride;
             scanline++;
@@ -628,10 +619,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             /* Double the bottom scanline. */
             blit_packed422_scanline( output, curframe, width );
 
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
 
             output += outstride;
             scanline++;
@@ -641,11 +631,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
     tvtime->filtered_curframe = 1;
 }
 
-static void tvtime_build_interlaced_frame( uint8_t *output,
+static void tvtime_build_interlaced_frame( tvtime_t *tvtime,
+                                           uint8_t *output,
                                            uint8_t *curframe,
-                                           tvtime_osd_t *osd,
-                                           console_t *con,
-                                           vbiscreen_t *vs,
                                            int bottom_field,
                                            int width,
                                            int frame_height,
@@ -669,7 +657,9 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
 
         /* Copy a scanline. */
         blit_packed422_scanline( output, curframe, width );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( tvtime->outputfilter ) {
+            outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+        }
 
         output += outstride;
         scanline++;
@@ -682,9 +672,11 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
             /* Copy a scanline. */
             curframe += instride * 2;
             blit_packed422_scanline( output, curframe, width );
-  
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
 
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
+  
             output += outstride;
             scanline++;
         }
@@ -693,8 +685,11 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
 
             /* Copy a scanline. */
             blit_packed422_scanline( output, curframe, width );
+
+            if( tvtime->outputfilter ) {
+                outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+            }
   
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
             curframe += instride;         
             output += outstride;
             scanline++;
@@ -705,9 +700,6 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
 static void tvtime_build_copied_field( tvtime_t *tvtime,
                                        uint8_t *output,
                                        uint8_t *curframe,
-                                       tvtime_osd_t *osd,
-                                       console_t *con,
-                                       vbiscreen_t *vs,
                                        int bottom_field,
                                        int width,
                                        int frame_height,
@@ -723,29 +715,29 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     }
 
     /* Interpolate the top scanline as a special case. */
-    if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + bottom_field ) ) {
-        videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, 0 );
-        videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, 1 );
-        videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, 2 );
+    if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + bottom_field ) ) {
+        videofilter_packed422_scanline( tvtime->inputfilter, curframe, width, 0, 0 );
+        videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, 1 );
+        videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, 2 );
     }
     quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
 
-    if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
+    if( tvtime->outputfilter ) {
+        outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+    }
+  
     curframe += instride * 2;
     output += outstride;
     scanline += 2;
 
     for( i = ((frame_height - 2) / 2); i; --i ) {
 
-        if( tvtime->filter && !tvtime->filtered_curframe && 
-                (videofilter_active_on_scanline( tvtime->filter, scanline + 1 ) ||
-                 videofilter_active_on_scanline( tvtime->filter, scanline + 2 )) ) {
-            videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, scanline + 1 );
+        if( tvtime->inputfilter && !tvtime->filtered_curframe && 
+                (videofilter_active_on_scanline( tvtime->inputfilter, scanline + 1 ) ||
+                 videofilter_active_on_scanline( tvtime->inputfilter, scanline + 2 )) ) {
+            videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, scanline + 1 );
             if( i > 1 ) {
-                videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, scanline + 2 );
+                videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, scanline + 2 );
             }
         }
 
@@ -761,9 +753,9 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
         }
         curframe += instride * 2;
 
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+        if( tvtime->outputfilter ) {
+            outputfilter_composite_packed422_scanline( tvtime->outputfilter, output, width, 0, scanline );
+        }
 
         output += outstride;
         scanline += 2;
@@ -1083,8 +1075,11 @@ int main( int argc, char **argv )
 
     /* Setup the tvtime object. */
     tvtime = tvtime_new();
-    if( !tvtime->filter ) {
-        fprintf( stderr, "tvtime: Can't initialize filters.\n" );
+    if( !tvtime->inputfilter ) {
+        fprintf( stderr, "tvtime: Can't initialize input filters.\n" );
+    }
+    if( !tvtime->outputfilter ) {
+        fprintf( stderr, "tvtime: Can't initialize output filters.\n" );
     }
 
     if( !output->is_interlaced() ) {
@@ -1094,8 +1089,8 @@ int main( int argc, char **argv )
         linearblend_plugin_init();
         vfir_plugin_init();
 
-        dscaler_tomsmocomp_plugin_init();
-        dscaler_greedyh_plugin_init();
+        // dscaler_tomsmocomp_plugin_init();
+        // dscaler_greedyh_plugin_init();
         greedy_plugin_init();
 
         weavetff_plugin_init();
@@ -1290,6 +1285,9 @@ int main( int argc, char **argv )
             error_string = 0;
         }
     }
+    if( tvtime->outputfilter ) {
+        outputfilter_set_osd( tvtime->outputfilter, osd );
+    }
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
@@ -1297,15 +1295,15 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    if( tvtime->filter ) {
+    if( tvtime->inputfilter ) {
         /* Setup the video correction tables. */
-        videofilter_set_bt8x8_correction( tvtime->filter, commands_apply_luma_correction( commands ) );
-        videofilter_set_luma_power( tvtime->filter, commands_get_luma_power( commands ) );
+        videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
+        videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
     }
 
     if( vidin && videoinput_is_uyvy( vidin ) ) {
-        if( tvtime->filter ) {
-            videofilter_enable_uyvy_conversion( tvtime->filter );
+        if( tvtime->inputfilter ) {
+            videofilter_enable_uyvy_conversion( tvtime->inputfilter );
         } else {
             fprintf( stderr, "tvtime: Card requires conversion from UYVY, but "
                      "we failed to initialize our converter!\n" );
@@ -1379,6 +1377,9 @@ int main( int argc, char **argv )
         }
         commands_set_console( commands, con );
     }
+    if( tvtime->outputfilter ) {
+        outputfilter_set_console( tvtime->outputfilter, con );
+    }
 
     in = input_new( ct, commands, con, verbose );
     if( !in ) {
@@ -1392,6 +1393,9 @@ int main( int argc, char **argv )
         if( !vs ) {
             fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
         }
+    }
+    if( tvtime->outputfilter ) {
+        outputfilter_set_vbiscreen( tvtime->outputfilter, vs );
     }
 
     /* Open the VBI device. */
@@ -1687,7 +1691,7 @@ int main( int argc, char **argv )
             config_save( ct, "DeinterlaceMethod", curmethod->short_name );
         }
         if( commands_update_luma_power( commands ) ) {
-            videofilter_set_luma_power( tvtime->filter, commands_get_luma_power( commands ) );
+            videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
         }
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
@@ -1696,7 +1700,15 @@ int main( int argc, char **argv )
         input_next_frame( in );
 
         /* Notice this because it's cheap. */
-        videofilter_set_bt8x8_correction( tvtime->filter, commands_apply_luma_correction( commands ) );
+        videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
+        if( osd ) {
+            tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );
+            if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
+                tvtime_osd_set_film_mode( osd, -1 );
+            } else {
+                tvtime_osd_set_film_mode( osd, tvtime->filmmode );
+            }
+        }
 
 
         /**
@@ -1873,18 +1885,16 @@ int main( int argc, char **argv )
                     output->wait_for_sync( 0 );
 
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( output->get_output_buffer(),
-                                                   curframe, osd, con, vs, 0,
-                                                   width, height, width * 2, 
+                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
+                                                   curframe, 0, width, height, width * 2, 
                                                    output->get_output_stride(), 0);
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
                 } else {
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( output->get_output_buffer(),
-                                                   curframe, osd, con, vs, 0,
-                                                   width, height, width * 2, 
+                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
+                                                   curframe, 0, width, height, width * 2, 
                                                    output->get_output_stride(), 1 );
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
@@ -1901,13 +1911,13 @@ int main( int argc, char **argv )
                 } else {
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( tvtime, output->get_output_buffer(),
-                                           curframe, osd, con, vs, 0,
-                                           width, height, width * 2, output->get_output_stride() );
+                                                   curframe, 0, width, height, width * 2,
+                                                   output->get_output_stride() );
                     } else {
                         tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
-                                           curframe, lastframe, secondlastframe,
-                                           osd, con, vs, 0,
-                                           width, height, width * 2, output->get_output_stride() );
+                                                         curframe, lastframe, secondlastframe,
+                                                         0, width, height, width * 2,
+                                                         output->get_output_stride() );
                     }
                 }
 
@@ -2010,11 +2020,9 @@ int main( int argc, char **argv )
                     output->wait_for_sync( 1 );
                     
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( output->get_output_buffer(),
-                                                   curframe, osd, con, vs, 1,
-                                                   width, height, width * 2, 
-                                                   output->get_output_stride(),
-                                                   0);
+                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
+                                                   curframe, 1, width, height, width * 2, 
+                                                   output->get_output_stride(), 0 );
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
@@ -2030,13 +2038,12 @@ int main( int argc, char **argv )
                 } else {
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( tvtime, output->get_output_buffer(),
-                                          curframe, osd, con, vs, 1,
-                                          width, height, width * 2, output->get_output_stride() );
+                                                   curframe, 1, width, height, width * 2,
+                                                   output->get_output_stride() );
                     } else {
                         tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
-                                          curframe, lastframe,
-                                          secondlastframe, osd, con, vs, 1,
-                                          width, height, width * 2, output->get_output_stride() );
+                                                         curframe, lastframe, secondlastframe, 1,
+                                                         width, height, width * 2, output->get_output_stride() );
                     }
                 }
 

@@ -24,7 +24,9 @@
 #else
 # include <stdint.h>
 #endif
+#include "tvtimeosd.h"
 #include "vbiscreen.h"
+#include "console.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,10 +34,12 @@ extern "C" {
 
 typedef struct outputfilter_s outputfilter_t;
 
-outputfilter_t *outputfilter_new( int width, int height, double frameaspect, int verbose );
+outputfilter_t *outputfilter_new( void );
 void outputfilter_delete( outputfilter_t *of );
 
-vbiscreen_t *outputfilter_get_vbiscreen( outputfilter_t *of );
+void outputfilter_set_vbiscreen( outputfilter_t *of, vbiscreen_t *vbiscreen );
+void outputfilter_set_osd( outputfilter_t *of, tvtime_osd_t *osd );
+void outputfilter_set_console( outputfilter_t *of, console_t *console );
 
 int outputfilter_active_on_scanline( outputfilter_t *of, int scanline );
 void outputfilter_composite_packed422_scanline( outputfilter_t *of,

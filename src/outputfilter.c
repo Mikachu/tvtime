@@ -21,21 +21,21 @@
 
 struct outputfilter_s
 {
-    int width;
-    int height;
     vbiscreen_t *vs;
+    tvtime_osd_t *osd;
+    console_t *con;
 };
 
-outputfilter_t *outputfilter_new( int width, int height, double frameaspect, int verbose )
+outputfilter_t *outputfilter_new( void )
 {
     outputfilter_t *of = malloc( sizeof( outputfilter_t ) );
     if( !of ) {
         return 0;
     }
 
-    of->width = width;
-    of->height = height;
-    of->vs = vbiscreen_new( of->width, of->height, frameaspect, verbose );
+    of->vs = 0;
+    of->osd = 0;
+    of->con = 0;
 
     return of;
 }
@@ -45,20 +45,30 @@ void outputfilter_delete( outputfilter_t *of )
     free( of );
 }
 
-vbiscreen_t *outputfilter_get_vbiscreen( outputfilter_t *of )
+void outputfilter_set_vbiscreen( outputfilter_t *of, vbiscreen_t *vbiscreen )
 {
-    return of->vs;
+    of->vs = vbiscreen;
+}
+
+void outputfilter_set_osd( outputfilter_t *of, tvtime_osd_t *osd )
+{
+    of->osd = osd;
+}
+
+void outputfilter_set_console( outputfilter_t *of, console_t *console )
+{
+    of->con = console;
 }
 
 int outputfilter_active_on_scanline( outputfilter_t *of, int scanline )
 {
-    int active = 0;
-
-    if( of->vs ) {
-        active += vbiscreen_active_on_scanline( of->vs, scanline );
+    if( of->con || of->osd ) {
+        return 1;
+    } else if( of->vs ) {
+        return vbiscreen_active_on_scanline( of->vs, scanline );
     }
 
-    return active;
+    return 0;
 }
 
 void outputfilter_composite_packed422_scanline( outputfilter_t *of,
@@ -69,6 +79,11 @@ void outputfilter_composite_packed422_scanline( outputfilter_t *of,
     if( of->vs ) {
         vbiscreen_composite_packed422_scanline( of->vs, output, width, xpos, scanline );
     }
+    if( of->osd ) {
+        tvtime_osd_composite_packed422_scanline( of->osd, output, width, xpos, scanline );
+    }
+    if( of->con ) {
+        console_composite_packed422_scanline( of->con, output, width, xpos, scanline );
+    }
 }
-
 
