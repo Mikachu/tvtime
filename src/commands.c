@@ -341,6 +341,8 @@ static void reinit_tuner( commands_t *cmd )
 
         if( cmd->osd ) {
             char channel_display[ 20 ];
+            char string[ 128 ];
+
             snprintf( channel_display, sizeof( channel_display ), "%d",
                       station_get_current_id( cmd->stationmgr ) );
             tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
@@ -355,6 +357,15 @@ static void reinit_tuner( commands_t *cmd )
             tvtime_osd_set_show_start( cmd->osd, "" );
             tvtime_osd_set_show_length( cmd->osd, "" );
             tvtime_osd_show_info( cmd->osd );
+
+            if( station_get_current_active( cmd->stationmgr ) ) {
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+                menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
+            } else {
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa4 );
+                menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
+            }
+            commands_refresh_menu( cmd );
         }
         cmd->frame_counter = 0;
 
@@ -762,16 +773,21 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     */
-    sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SCAN, "" );
-    menu_set_right_command( menu, 2, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
+    menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
+    menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
@@ -1468,6 +1484,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_CHANNEL_SKIP:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            char string[ 128 ];
             station_set_current_active( cmd->stationmgr, !station_get_current_active( cmd->stationmgr ) );
             if( cmd->osd ) {
                 if( station_get_current_active( cmd->stationmgr ) ) {
@@ -1476,6 +1493,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     tvtime_osd_show_message( cmd->osd, "Channel disabled from list." );
                 }
             }
+            if( station_get_current_active( cmd->stationmgr ) ) {
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+                menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
+            } else {
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa4 );
+                menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
+            }
+            commands_refresh_menu( cmd );
             station_writeconfig( cmd->stationmgr );
         }
         break;
@@ -1623,7 +1648,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     } else {
                         sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
                     }
-                    menu_set_text( stationmenu, 2, string );
+                    menu_set_text( stationmenu, 3, string );
                     commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
