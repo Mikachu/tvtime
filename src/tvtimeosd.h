@@ -118,9 +118,8 @@ void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str );
 void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str );
 void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str );
 
-void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
-                                   const char *message2, const char *message3,
-                                   const char *message4, const char *message5 );
+void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *title,
+                                   const char *subtitle, const char *next );
 
 #ifdef __cplusplus
 };

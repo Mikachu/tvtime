@@ -197,7 +197,7 @@ static void update_xmltv_channel( commands_t *cmd )
                                station_get_current_channel_name( cmd->stationmgr ) ) );
         }
     } else if( cmd->osd ) {
-        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
     }
 }
 
@@ -292,14 +292,14 @@ static void update_xmltv_display( commands_t *cmd )
         }
 
         if( !cmd->displayinfo || cmd->menuactive ) {
-            tvtime_osd_show_program_info( cmd->osd, title, subtitle, 0, 0, next_title );
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle, next_title );
             if( line1 || line2 ) {
                 tvtime_osd_set_info_available( cmd->osd, 1 );
             } else {
                 tvtime_osd_set_info_available( cmd->osd, 0 );
             }
         } else {
-            tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
+            tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
             display_xmltv_description( cmd, title, subtitle, line1,
                                        line2, next_title );
             tvtime_osd_set_info_available( cmd->osd, 0 );
@@ -513,7 +513,7 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_rating( cmd->osd, "" );
         tvtime_osd_set_show_start( cmd->osd, "" );
         tvtime_osd_set_show_length( cmd->osd, "" );
-        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
         tvtime_osd_show_info( cmd->osd );
     }
 

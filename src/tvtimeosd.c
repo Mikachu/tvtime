@@ -879,6 +879,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int width, int xpos,
                                               int scanline )
 {
+    int iconpush = 0;
     int i;
 
     if( osd->backdrop && osd_graphic_visible( osd->backdrop ) && osd_graphic_active_on_scanline( osd->backdrop, scanline ) ) {
@@ -949,7 +950,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( scanline >= osd->film_logo_ypos &&
                 scanline < osd->film_logo_ypos + osd_animation_get_height( osd->film_logo ) ) {
 
-                int startx = osd->film_logo_xpos - osd_animation_get_width( osd->film_logo ) - xpos;
+                int startx = (osd->film_logo_xpos - iconpush - osd_animation_get_width( osd->film_logo ) - xpos) & ~1;
                 int strx = 0;
                 if( startx < 0 ) {
                     strx = -startx;
@@ -964,6 +965,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                                 scanline - osd->film_logo_ypos );
                 }
             }
+            iconpush += osd_animation_get_width( osd->film_logo );
         }
     }
 
@@ -972,7 +974,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
             if( scanline >= osd->info_icon_ypos &&
                 scanline < osd->info_icon_ypos + osd_animation_get_height( osd->info_icon ) ) {
 
-                int startx = osd->info_icon_xpos - osd_animation_get_width( osd->info_icon ) - xpos;
+                int startx = (osd->info_icon_xpos - iconpush - osd_animation_get_width( osd->info_icon ) - xpos) & ~1;
                 int strx = 0;
                 if( startx < 0 ) {
                     strx = -startx;
@@ -987,6 +989,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                                 scanline - osd->info_icon_ypos );
                 }
             }
+            iconpush += osd_animation_get_width( osd->info_icon );
         }
     }
 
@@ -1017,56 +1020,34 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
     }
 }
 
-void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
-                                   const char *message2, const char *message3,
-                                   const char *message4, const char *next_title )
+void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *title,
+                                   const char *subtitle, const char *next )
 {
-    const char *message5 = 0;
-
-    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
-                               osd->other_r, osd->other_g, osd->other_b );
-    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
-                               osd->other_r, osd->other_g, osd->other_b );
-    if ( next_title ) {
-        if ( !message3 ) {
-            message3 = next_title;
-            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
-                                       osd->other_r, osd->other_g, osd->channel_b );
-        }
-        else if ( !message4 ) {
-            message4 = next_title;
-            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
-                                       osd->other_r, osd->other_g, osd->channel_b );
-        }
-        else {
-            message5 = next_title;
-        }
+    if( title ) {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string,
+                              title, osd->delay );
+    } else {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string,
+                              "", osd->delay );
     }
 
-    if( message1 ) {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, message1, osd->delay );
+    if( subtitle ) {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string,
+                              subtitle, osd->delay );
     } else {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, "", osd->delay );
+        osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string,
+                              "", osd->delay );
     }
-    if( message2 ) {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string, message2, osd->delay );
+
+    if( next ) {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                              next, osd->delay );
     } else {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string, "", osd->delay );
+        osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                              "", osd->delay );
     }
-    if( message3 ) {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string, message3, osd->delay );
-    } else {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string, "", osd->delay );
-    }
-    if( message4 ) {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, message4, osd->delay );
-    } else {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, "", osd->delay );
-    }
-    if( message5 ) {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, message5, osd->delay );
-    } else {
-        osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "", osd->delay );
-    }
+
+    osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, "", osd->delay );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "", osd->delay );
 }
 
