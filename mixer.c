@@ -152,7 +152,7 @@ void mixer_mute( int mute )
     }
 }
 
-int mixer_conditional_mute()
+int mixer_conditional_mute( void )
 {
     if( !muted ) {
         mixer_mute( 1 );
