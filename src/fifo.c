@@ -39,15 +39,21 @@ struct fifo_s {
 fifo_t *fifo_new( config_t *ct, char *givenname )
 {
     char *filename = config_get_command_pipe( ct );
-    fifo_t *fifo = (fifo_t *)malloc( sizeof(struct fifo_s) );
+    fifo_t *fifo = (fifo_t *) malloc( sizeof( struct fifo_s ) );
+    char temp_filename[ 1024 ];
 
     if( !fifo ) {
         return 0;
     }
 
     fifo->filename = 0;
-
     if( givenname ) filename = givenname;
+
+    if( filename[ 0 ] == '~' && getenv( "HOME" ) ) {
+        snprintf( temp_filename, sizeof( temp_filename ), "%s%s", getenv( "HOME" ), filename + 1 );
+        temp_filename[ sizeof( temp_filename ) - 1 ] = '\0';
+        filename = temp_filename;
+    }
 
     fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
     if( fifo->fd == -1 ) {

@@ -1,6 +1,13 @@
 ########################################
 #
-# Default .tvtimerc file with comments
+# Default $HOME/.tvtime/tvtimerc file with comments
+#
+# This file will be written to during running of tvtime for adding run-time
+# settings.  Settings currently saved across sessions are:
+#  a) Channel
+#  b) Fullscreen setting
+#  c) Deinterlacing mode
+#  d) 16:9 mode
 #
 
 # The verbose setting indicates that we should print full informational
@@ -8,19 +15,13 @@
 # fatal errors will be printed to the output.
 verbose = 0
 
+# This sets the default capture device to use.
+V4LDevice = /dev/video0
+
 # This sets the default capture source to be opened by tvtime.  Cards
 # commonly have a bunch of sources, for example, for my WinTV card source
 # 0 is my tuner and source 1 is the composite input.
 CaptureSource = 0
-
-# This sets the default capture device to use.
-V4LDevice = /dev/video0
-
-# This sets the default vbi device to use
-VBIDevice = /dev/vbi0
-
-# This enables the usage of VBI data (XDS, Closed Captioning)
-UseVBI = 0
 
 # This sets the default TV norm.  Valid options are "ntsc", "pal",
 # "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
@@ -54,7 +55,8 @@ FineTuneOffset = 0
 
 # Toggle whether tvtime should check if there is a signal present when
 # changing channels etc.  If your card doesn't suck, you shouldn't need
-# to shut this off
+# to shut this off.  Disabling this feature will also disable the
+# channel scanner.
 CheckForSignal = 1
 
 # This sets the initial width of the output window.
@@ -90,9 +92,9 @@ LumaCorrection = 1.0
 # meaning higher priority (blame UNIX for that).
 ProcessPriority = -19
 
-# This option enables a special debug mode.  In debug mode, if we are
-# running behind and cannot keep up with the number of frames being provided
-# by the capture card, we will print frame drop information to stderr.
+# This option enables debug mode.  In debug mode, if we are running
+# behind and cannot keep up with the number of frames being provided by
+# the capture card, we will print frame drop information to stderr.
 DebugMode = 0
 
 # This option is the ARGB colour used for the Channel Number in the OSD.
@@ -105,14 +107,15 @@ ChannelTextFG = 0xFFFFFF00
 OtherTextFG = 0xFFF5DEB3
 
 # Set this to the full path + file name of the named pipe you wish tvtime
-# to use. You can send commands to this file the same way as entering them
-# in tvtime's "console"
-# CommandPipe = /path/to/your/home/directory/.tvtime/tvtimefifo
+# to use.  The default pipe file is ~/.tvtime/tvtimefifo.  You can send
+# commands to this file, and they take the same form as the mouse button
+# bindings, that is, key_channel_prev should be sent as 'channel_prev'.
+CommandPipe = ~/.tvtime/tvtimefifo
 
 # This sets the scanline bias, that is, how many pixels to drop of the left
 # and right side of every scanline.  For my capture card, about 7 pixels on
 # the left and right of every scanline are oversamples which are always
-# black.
+# black, so I can use a bias of 7 on each side.
 LeftScanlineBias = 0
 RightScanlineBias = 0
 
@@ -122,6 +125,12 @@ RightScanlineBias = 0
 # a TV, a good value is about 8%.  The value is in percent, so for 8%
 # use 8.0.
 Overscan = 0.0
+
+# This sets the default vbi device to use
+VBIDevice = /dev/vbi0
+
+# This enables the usage of VBI data (XDS, Closed Captioning)
+UseVBI = 0
 
 ########################################
 #
