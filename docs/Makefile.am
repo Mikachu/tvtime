@@ -25,7 +25,7 @@ docs_html = html/default.tvtime.xml html/help.html html/index.html \
 	html/tvtime-logo-banner.png html/tvtime.css html/usage.html \
 	html/wsshot-small.jpg html/xmltv.html html/xmltvshot.jpg \
 	html/remote-small.jpg html/remote-nomenu-small.jpg \
-	html/example.lircrc
+	html/example.lircrc html/zoran-email.txt
 
 EXTRA_DIST = $(man_MANS) $(docs_html) tvtime.16x16.png \
 	tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
