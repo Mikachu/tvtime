@@ -76,6 +76,8 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
     in->com = com;
     in->menu_on = 0;
     in->console_on = 0;
+    in->menu = menu;
+    in->console = con;
 
     in->lirc_used = 0;
 
@@ -167,7 +169,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
             }
             console_pipe_printf( in->console, blah );
             console_printf( in->console, blah );
-            break;
+            return;
         }
         break;
 
