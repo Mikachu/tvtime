@@ -188,48 +188,6 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
     osds->border_cr = cr;
 }
 
-static void osd_string_render_dropshadow_image4444( osd_string_t *osds, const char *text )
-{
-    int stringwidth, stringheight;
-    ft_font_t *font = osd_font_get_font( osds->font );
-    int pushsize_y = 2;
-    int pushsize_x = ft_font_points_to_subpix_width( font, pushsize_y );
-
-    ft_string_set_text( osds->fts, text, pushsize_x );
-    stringwidth = ft_string_get_width( osds->fts );
-    stringheight = ft_string_get_height( osds->fts );
-
-    osds->image_textwidth = stringwidth + ( ( pushsize_x + 32768 ) / 65536 );
-    osds->image_textheight = stringheight + pushsize_y;
-
-    if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
-        osds->image_textwidth = (((osds->image_size/4) / osds->image_textheight) | 0xf) - 0xf;
-    }
-
-    blit_colour_packed4444( osds->image4444, osds->image_textwidth,
-                            osds->image_textheight, osds->image_textwidth * 4,
-                            0, 0, 0, 0 );
-
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_textwidth,
-                                             osds->image_textheight, osds->image_textwidth * 4,
-                                             ft_string_get_buffer( osds->fts ),
-                                             stringwidth, stringheight,
-                                             ft_string_get_stride( osds->fts ),
-                                             osds->border_luma, osds->border_cb,
-                                             osds->border_cr, 128, 0, pushsize_y );
-
-    ft_string_set_text( osds->fts, text, 0 );
-    stringwidth = ft_string_get_width( osds->fts );
-    stringheight = ft_string_get_height( osds->fts );
-
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
-                                       osds->image_textheight, osds->image_textwidth * 4,
-                                       ft_string_get_buffer( osds->fts ),
-                                       stringwidth, stringheight,
-                                       ft_string_get_stride( osds->fts ),
-                                       osds->text_luma, osds->text_cb, osds->text_cr, 0, 0 );
-}
-
 static void osd_string_render_bordered_image4444( osd_string_t *osds, const char *text )
 {
     int stringwidth, stringheight;
