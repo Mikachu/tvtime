@@ -4,5 +4,6 @@ Makefile.in
 *.o
 *.swp
 *.lo
+*.la
 .libs
 
