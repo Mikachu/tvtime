@@ -209,6 +209,7 @@ static int open_display( void )
     XSelectInput( display, window, ButtonPressMask | StructureNotifyMask |
                                    KeyPressMask | ExposureMask | PropertyChangeMask );
 
+    XSetWindowBackgroundPixmap( display, window, None );
     XMapWindow( display, window );
 
     /* Wait for map. */
