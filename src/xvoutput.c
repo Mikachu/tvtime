@@ -44,6 +44,8 @@
 #include "display.h"
 #include "wm_state.h"
 
+#include "x11tools.h"
+
 #define FOURCC_YUY2 0x32595559
 
 static XvImage *image;
@@ -355,6 +357,7 @@ int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     xv_check_extension();
     xv_alloc_frame();
     xv_clear_screen();
+    saver_off( display );
     return 1;
 }
 
@@ -550,6 +553,7 @@ void xv_poll_events( input_t *in )
 
 void xv_quit( void )
 {
+    saver_on( display );
     XShmDetach( display, &shminfo );
     shmdt( shminfo.shmaddr );
     XDestroyWindow( display, window );

@@ -519,13 +519,12 @@ int main( int argc, char **argv )
     }
     verbose = config_get_verbose( ct );
 
-    if( !configsave_open(config_get_parsed_file(ct)->filename)) {
-        fprintf( stderr, "tvtime: Configuration options wasn't saving.\n" );
+    if( config_get_parsed_file( ct )->filename && !configsave_open( config_get_parsed_file( ct )->filename ) ) {
+        fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
     }
 
-    station_init(ct);
-    
-    
+    station_init( ct );
+
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         norm = VIDEOINPUT_PAL;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {
@@ -834,17 +833,17 @@ int main( int argc, char **argv )
         screenshot = commands_take_screenshot( commands );
         if( commands_toggle_fullscreen( commands ) ) {
 	    if( output->toggle_fullscreen( 0, 0 ) )
-		configsave("FullScreen", "1", 1);
+		configsave( "FullScreen", "1", 1 );
 	    else
-		configsave("FullScreen", "0", 1);
+		configsave( "FullScreen", "0", 1 );
 	}
 	if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
                 tvtime_osd_show_message( osd, "16:9 display mode" );
-		configsave("WideScreen", "1", 1);
+		configsave( "WideScreen", "1", 1 );
             } else {
                 tvtime_osd_show_message( osd, "4:3 display mode" );
-		configsave("WideScreen", "0", 1);
+		configsave( "WideScreen", "0", 1 );
             }
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
@@ -857,7 +856,7 @@ int main( int argc, char **argv )
             }
 	    snprintf(number, 3, "%d", curmethodid);
 	    number[4] = '\0';
-	    configsave("PreferredDeinterlaceMethod", number, 1);
+	    configsave( "PreferredDeinterlaceMethod", number, 1 );
         }
         commands_next_frame( commands );
         input_next_frame( in );
