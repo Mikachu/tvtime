@@ -68,6 +68,7 @@ static int found_colorkey = 0;
 static int colorkey = 0;
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
+static int motion_timeout = 0;
 
 static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
 
@@ -246,7 +247,8 @@ static int open_display( void )
     XSetStandardProperties( display, window, hello, hello, None, 0, 0, &hint );
 
     XSelectInput( display, window, ButtonPressMask | StructureNotifyMask |
-                                   KeyPressMask | ExposureMask | PropertyChangeMask );
+                                   KeyPressMask | PointerMotionMask |
+                                   ExposureMask | PropertyChangeMask );
 
     XMapWindow( display, window );
 
@@ -274,6 +276,8 @@ static int open_display( void )
 
     /* collaborate with the window manager for close requests */
     XSetWMProtocols( display, window, &wmDeleteAtom, 1 );
+
+    XDefineCursor( display, window, nocursor );
 
     return 1;
 }
@@ -439,14 +443,12 @@ int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
                       window, None, CurrentTime );
         XGrabKeyboard( display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime );
         */
-        XDefineCursor( display, window, nocursor );
     } else {
         ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
         /*
         XUngrabPointer( display, CurrentTime );
         XUngrabKeyboard( display, CurrentTime );
         */
-        XUndefineCursor( display, window );
     }
 
     XFlush( display );
@@ -472,6 +474,12 @@ void xv_show_frame( int x, int y, int width, int height )
     XFlush( display );
     XUnlockDisplay( display );
     XSync( display, False );
+    if( motion_timeout ) {
+        motion_timeout--;
+        if( !motion_timeout ) {
+            XDefineCursor( display, window, nocursor );
+        }
+    }
 }
 
 void xv_poll_events( input_t *in )
@@ -500,6 +508,10 @@ void xv_poll_events( input_t *in )
                 break;
             }
             input_callback( in, I_QUIT, 0 );
+            break;
+        case MotionNotify:
+            XUndefineCursor( display, window );
+            motion_timeout = 30;
             break;
         case Expose:
             break;
