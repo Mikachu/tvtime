@@ -17,7 +17,6 @@
 
 tvtimedatadir = $(pkgdatadir)
 dist_tvtimedata_DATA = FreeMonoBold.ttf tvtimeSansBold.ttf \
-	DI_GreedyH.dll DI_TomsMoComp.dll \
 	tvtimelogo-small.png tvtimelogo-large.png \
 	tvtimelogo_0000.png tvtimelogo_0001.png tvtimelogo_0002.png \
 	tvtimelogo_0003.png tvtimelogo_0004.png tvtimelogo_0005.png \
@@ -31,10 +30,11 @@ dist_tvtimedata_DATA = FreeMonoBold.ttf tvtimeSansBold.ttf \
 	tvtimelogo_0027.png tvtimelogo_0028.png tvtimelogo_0029.png \
 	tvtimelogo_0030.png tvtimelogo_0031.png \
 	filmstrip_0000.png filmstrip_0001.png filmstrip_0002.png \
-	filmstrip_0003.png filmstrip_0004.png
+	filmstrip_0003.png filmstrip_0004.png \
+	README.DScalerModules
 
 EXTRA_DIST = COPYING.DScaler COPYING.tvtimeSansBold COPYING.FreeMonoBold \
-	tvtimeSansBold.sfd FreeMonoBold.sfd DScaler401src.zip
+	tvtimeSansBold.sfd FreeMonoBold.sfd
 
 .PHONY: uninstall-hook
 uninstall-hook:
