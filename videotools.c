@@ -178,9 +178,16 @@ video_correction_t *video_correction_new( void )
         return 0;
     }
 
-    /* These are set this way to compensate for the bttv. */
+    /*
     vc->source_black_level = 0;
     vc->source_white_level = 255;
+    vc->target_black_level = 16;
+    vc->target_white_level = 235;
+    */
+
+    /* These are set this way to compensate for the bttv. */
+    vc->source_black_level = 16;
+    vc->source_white_level = 253;
     vc->target_black_level = 16;
     vc->target_white_level = 235;
 
