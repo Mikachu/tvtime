@@ -33,7 +33,7 @@ struct videofilter_s
 
 videofilter_t *videofilter_new( void )
 {
-    videofilter_t *vf = (videofilter_t *) malloc( sizeof( videofilter_t ) );
+    videofilter_t *vf = malloc( sizeof( videofilter_t ) );
     if( !vf ) return 0;
 
     vf->vc = video_correction_new( 1, 0 );

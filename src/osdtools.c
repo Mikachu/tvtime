@@ -43,7 +43,7 @@ struct osd_font_s
 
 osd_font_t *osd_font_new( const char *fontfile, int fontsize, double pixel_aspect )
 {
-    osd_font_t *font = (osd_font_t *) malloc( sizeof( osd_font_t ) );
+    osd_font_t *font = malloc( sizeof( osd_font_t ) );
     char *fontfilename;
 
     if( !font ) {
@@ -106,14 +106,14 @@ struct osd_string_s
 
 osd_string_t *osd_string_new( osd_font_t *font )
 {
-    osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
+    osd_string_t *osds = malloc( sizeof( osd_string_t ) );
 
     if( !osds ) {
         return 0;
     }
 
     osds->font = font;
-    osds->image4444 = (uint8_t *) malloc( MEMORY_PER_STRING );
+    osds->image4444 = malloc( MEMORY_PER_STRING );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
@@ -422,12 +422,12 @@ struct osd_databars_s
 
 osd_databars_t *osd_databars_new( int width )
 {
-    osd_databars_t *osdd = (osd_databars_t *) malloc( sizeof( osd_databars_t ) );
+    osd_databars_t *osdd = malloc( sizeof( osd_databars_t ) );
     if( !osdd ) {
         return 0;
     }
 
-    osdd->data = (uint8_t *) malloc( width * 4 );
+    osdd->data = malloc( width * 4 );
     if( !osdd->data ) {
         free( osdd );
         return 0;
@@ -519,7 +519,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
                             int video_height, int shape_width,
                             int shape_height, double aspect, int alpha )
 {
-    osd_shape_t *osds = (osd_shape_t *) malloc( sizeof( osd_shape_t ) );
+    osd_shape_t *osds = malloc( sizeof( osd_shape_t ) );
     osds->frames_left = 0;
     osds->shape_luma = 16;
     osds->shape_cb = 128;
@@ -533,7 +533,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->shape_adjusted_width = shape_width;
     osds->type = shape_type;
 
-    osds->image4444 = (uint8_t *) malloc( video_width * video_height * 4);
+    osds->image4444 = malloc( video_width * video_height * 4);
     if( !osds ) {
         free( osds );
         return 0;
@@ -704,7 +704,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int video_height, double video_aspect, 
                                 int alpha )
 {
-    osd_graphic_t *osdg = (osd_graphic_t *) malloc( sizeof( struct osd_graphic_s ) );
+    osd_graphic_t *osdg = malloc( sizeof( struct osd_graphic_s ) );
     char *fullfilename;
 
     if( !osdg ) {
@@ -727,7 +727,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
     }
 
     osdg->frames_left = 0;
-    osdg->image4444 = (uint8_t *) malloc( video_width * video_height * 4);
+    osdg->image4444 = malloc( video_width * video_height * 4);
     if( !osdg->image4444 ) {
         pnginput_delete( osdg->png );
         free( osdg );
@@ -826,16 +826,17 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
     height = pnginput_get_height( osdg->png );
     osdg->image_graphic_height = height;
 
-    cb444 = (uint8_t *) malloc( (width * 3) );
+    cb444 = malloc( width * 3 );
     if( !cb444 ) return;
 
 
-    curout = (uint8_t *)malloc( width*4 );
-    if( !curout) return;
-
+    curout = malloc( width * 4 );
+    if( !curout ) {
+        free( cb444 );
+        return;
+    }
 
     for( i=0; i < height; i++ ) {
-
         scanline = pnginput_get_scanline( osdg->png, i );
         if( has_alpha ) {
             rgba32_to_packed4444_rec601_scanline( curout, scanline, width );

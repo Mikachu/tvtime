@@ -134,7 +134,7 @@ struct input_s {
 
 input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose )
 {
-    input_t *in = (input_t *) malloc( sizeof( input_t ) );
+    input_t *in = malloc( sizeof( input_t ) );
 
     if( !in ) {
         fprintf( stderr, "input: Could not create new input object.\n" );

@@ -336,7 +336,7 @@ static void parse_mode( config_t *ct, xmlNodePtr node )
     xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
 
     if( name ) {
-        tvtime_modelist_t *mode = (tvtime_modelist_t *) malloc( sizeof( tvtime_modelist_t ) );
+        tvtime_modelist_t *mode = malloc( sizeof( tvtime_modelist_t ) );
         if( mode ) {
 
             /* Start with the default settings from the config file. */
@@ -456,7 +456,7 @@ config_t *config_new( void )
     char base[ 256 ];
     struct passwd *pwuid = 0;
 
-    config_t *ct = (config_t *) malloc( sizeof( config_t ) );
+    config_t *ct = malloc( sizeof( config_t ) );
     if( !ct ) {
         return 0;
     }
@@ -519,14 +519,14 @@ config_t *config_new( void )
         return 0;
     }
 
-    ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
+    ct->keymap = malloc( 8*MAX_KEYSYMS * sizeof( int ) );
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not allocate memory for keymap.\n" );
         config_delete( ct );
         return 0;
     }
 
-    ct->buttonmap = (int *) malloc( MAX_BUTTONS * sizeof( int ) );
+    ct->buttonmap = malloc( MAX_BUTTONS * sizeof( int ) );
     if( !ct->buttonmap ) {
         fprintf( stderr, "config: Could not allocate memory for buttonmap.\n" );
         config_delete( ct );

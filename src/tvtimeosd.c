@@ -102,7 +102,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     char *fontfile;
     char *logofile;
 
-    tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
+    tvtime_osd_t *osd = malloc( sizeof( tvtime_osd_t ) );
     if( !osd ) {
         return 0;
     }
@@ -145,7 +145,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         return 0;
     }
 
-    osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
+    osd->strings = malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
     if( !osd->strings ) {
         osd_font_delete( osd->smallfont );
         osd_font_delete( osd->medfont );

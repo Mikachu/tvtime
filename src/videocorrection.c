@@ -86,7 +86,7 @@ static void video_correction_update_table( video_correction_t *vc )
 
 video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_correction )
 {
-    video_correction_t *vc = (video_correction_t *) malloc( sizeof( video_correction_t ) );
+    video_correction_t *vc = malloc( sizeof( video_correction_t ) );
     if( !vc ) {
         return 0;
     }
@@ -124,9 +124,9 @@ video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_
     vc->target_chroma_end   = 240;
 
     vc->luma_correction = 1.0;
-    vc->luma_table = (unsigned int *) malloc( 256 * sizeof( int ) );
-    vc->chroma_table = (unsigned int *) malloc( 256* sizeof( int ) );
-    vc->temp_scanline_data = (uint8_t *) malloc( 2048 * 2 );
+    vc->luma_table = malloc( 256 * sizeof( int ) );
+    vc->chroma_table = malloc( 256* sizeof( int ) );
+    vc->temp_scanline_data = malloc( 2048 * 2 );
     if( !vc->luma_table || !vc->chroma_table ) {
         if( vc->luma_table ) free( vc->luma_table );
         if( vc->chroma_table ) free( vc->chroma_table );

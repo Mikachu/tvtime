@@ -32,7 +32,7 @@ int main( int argc, char **argv )
     greyimage = pnginput_new( argv[ 1 ] );
     width = pnginput_get_width( greyimage );
     height = pnginput_get_height( greyimage );
-    temp = (uint8_t *) malloc( width * 4 );
+    temp = malloc( width * 4 );
 
     outimage = pngoutput_new( argv[ 2 ], width, height, 1, 0.45 );
 

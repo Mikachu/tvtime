@@ -28,7 +28,7 @@ struct outputfilter_s
 
 outputfilter_t *outputfilter_new( int width, int height, double frameaspect, int verbose )
 {
-    outputfilter_t *of = (outputfilter_t *) malloc( sizeof( outputfilter_t ) );
+    outputfilter_t *of = malloc( sizeof( outputfilter_t ) );
     if( !of ) {
         return 0;
     }

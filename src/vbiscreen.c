@@ -79,7 +79,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
                             double pixel_aspect, int verbose )
 {
     int i=0, fontsize = FONT_SIZE;
-    vbiscreen_t *vs = (vbiscreen_t *)malloc(sizeof(struct vbiscreen_s));
+    vbiscreen_t *vs = malloc( sizeof( vbiscreen_t ) );
 
     if( !vs ) {
         return 0;

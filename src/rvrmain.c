@@ -254,7 +254,7 @@ int main( int argc, char **argv )
     videoinput_set_input_num( vidin, config_get_inputnum( cfg ) );
 
     /* Create our file header. */
-    fileheader = (ree_file_header_t *) malloc( sizeof( ree_file_header_t ) );
+    fileheader = malloc( sizeof( ree_file_header_t ) );
     if( !fileheader ) {
         fprintf( stderr, "rvr: Can't allocate file header.\n" );
         videoinput_delete( vidin );

@@ -258,7 +258,7 @@ static void videoinput_free_all_frames( videoinput_t *vidin )
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                               int norm, int verbose )
 {
-    videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
+    videoinput_t *vidin = malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
     struct video_picture grab_pict;
     int i;
@@ -464,7 +464,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             vidin->numframes = vidin->gb_buffers.frames;
         }
 
-        vidin->grab_buf = (struct video_mmap *) malloc( sizeof( struct video_mmap ) * vidin->numframes );
+        vidin->grab_buf = malloc( sizeof( struct video_mmap ) * vidin->numframes );
         if( !vidin->grab_buf ) {
             fprintf( stderr, "videoinput: Can't allocate grab_buf memory.\n" );
             close( vidin->grab_fd );
@@ -499,7 +499,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     vidin->have_mmap = 0;
     vidin->grab_size = (vidin->grab_win.width * vidin->grab_win.height * 2);
-    vidin->grab_data = (uint8_t *) malloc( vidin->grab_size );
+    vidin->grab_data = malloc( vidin->grab_size );
     vidin->numframes = 2;
 
     return vidin;

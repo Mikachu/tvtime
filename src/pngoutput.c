@@ -58,7 +58,7 @@ pngoutput_t *pngoutput_new( const char *filename,
                             int width, int height,
                             int alpha, double gamma, int compression )
 {
-    pngoutput_t *pngoutput = (pngoutput_t *) malloc( sizeof( pngoutput_t ) );
+    pngoutput_t *pngoutput = malloc( sizeof( pngoutput_t ) );
 
     if( !pngoutput ) return 0;
 

@@ -271,7 +271,7 @@ static void reinit_tuner( commands_t *in )
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd )
 {
-    commands_t *in = (commands_t *) malloc( sizeof( struct commands_s ) );
+    commands_t *in = malloc( sizeof( struct commands_s ) );
 
     if( !in ) {
         return NULL;

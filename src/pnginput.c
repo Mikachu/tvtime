@@ -31,7 +31,7 @@ struct pnginput_s
 
 pnginput_t *pnginput_new( const char *filename )
 {
-    pnginput_t *pnginput = (pnginput_t *) malloc( sizeof( pnginput_t ) );
+    pnginput_t *pnginput = malloc( sizeof( pnginput_t ) );
     png_uint_32 width, height;
     int bit_depth, colour_type, channels, rowbytes;
     double gamma;

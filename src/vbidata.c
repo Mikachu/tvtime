@@ -884,7 +884,7 @@ int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
 
 vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, int verbose )
 {
-    vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
+    vbidata_t *vbi = malloc( sizeof( vbidata_t ) );
 
     if( !vbi ) {
         return 0;

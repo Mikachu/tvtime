@@ -62,7 +62,7 @@ static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
 /* Attempt to parse the file for key elements and create them if they don't exist */
 configsave_t *configsave_open( const char *filename )
 {
-    configsave_t *cs = (configsave_t *) malloc( sizeof( configsave_t ) );
+    configsave_t *cs = malloc( sizeof( configsave_t ) );
     xmlNodePtr top;
 
     if( !cs ) {

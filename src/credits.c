@@ -40,7 +40,7 @@ struct credits_s
 
 credits_t *credits_new( const char *filename, int output_height )
 {
-    credits_t *credits = (credits_t *) malloc( sizeof( credits_t ) );
+    credits_t *credits = malloc( sizeof( credits_t ) );
     pnginput_t *pngin;
     char *fullfilename;
     int i;
@@ -78,8 +78,8 @@ credits_t *credits_new( const char *filename, int output_height )
     credits->height = pnginput_get_height( pngin );
     credits->stride = credits->width * 4;
     credits->curspeed = 0;
-    credits->data = (uint8_t *) malloc( credits->stride * credits->height );
-    credits->blanks = (int *) malloc( credits->height * sizeof( int ) );
+    credits->data = malloc( credits->stride * credits->height );
+    credits->blanks = malloc( credits->height * sizeof( int ) );
     if( !credits->data || !credits->blanks ) {
         pnginput_delete( pngin );
         free( credits );

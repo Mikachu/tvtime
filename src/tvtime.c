@@ -114,7 +114,7 @@ const int scan_delay = 10;
 
 static void build_colourbars( uint8_t *output, int width, int height )
 {
-    uint8_t *cb444 = (uint8_t *) malloc( width * height * 3 );
+    uint8_t *cb444 = malloc( width * height * 3 );
     int i;
     if( !cb444 ) { memset( output, 255, width * height * 2 ); return; }
 
@@ -175,7 +175,7 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
                            int width, int height, int stride )
 {
     pngoutput_t *pngout = pngoutput_new( filename, width, height, 0, 0.45, 0 );
-    uint8_t *tempscanline = (uint8_t *) malloc( width * 3 );
+    uint8_t *tempscanline = malloc( width * 3 );
     int i;
 
     if( !tempscanline ) {
@@ -1163,10 +1163,10 @@ int main( int argc, char **argv )
     }
 
     /* Build colourbars. */
-    colourbars = (uint8_t *) malloc( width * height * 2 );
-    saveframe = (uint8_t *) malloc( width * height * 2 );
-    fadeframe = (uint8_t *) malloc( width * height * 2 );
-    blueframe = (uint8_t *) malloc( width * height * 2 );
+    colourbars = malloc( width * height * 2 );
+    saveframe = malloc( width * height * 2 );
+    fadeframe = malloc( width * height * 2 );
+    blueframe = malloc( width * height * 2 );
     if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
         fprintf( stderr, "tvtime: Can't allocate extra frame storage memory.\n" );
         return 1;

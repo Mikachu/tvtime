@@ -29,7 +29,7 @@ struct scope_s
 
 scope_t *scope_new( int width, int height )
 {
-    scope_t *scope = (scope_t *) malloc( sizeof( scope_t ) );
+    scope_t *scope = malloc( sizeof( scope_t ) );
     if( !scope ) {
         return 0;
     }

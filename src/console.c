@@ -84,7 +84,7 @@ console_t *console_new( int x, int y, int width, int height,
                         double pixel_aspect, unsigned int fgcolour )
 {
     int i=0, rowheight;
-    console_t *con = (console_t *)malloc(sizeof(struct console_s));
+    console_t *con = malloc( sizeof( console_t ) );
 
     if( !con ) {
         return NULL;
@@ -119,14 +119,14 @@ console_t *console_new( int x, int y, int width, int height,
     con->font = 0;
 
     /*
-    con->text = (char *)malloc( con->rows * con->cols ); 
+    con->text = malloc( con->rows * con->cols ); 
     if( !con->text ) {
         console_delete( con );
         return 0;
     }
     */
 
-    con->line = (osd_string_t **) malloc( 1 * sizeof( osd_string_t * ) );
+    con->line = malloc( 1 * sizeof( osd_string_t * ) );
     if( !con->line ) {
         console_delete( con );
         return 0;
@@ -165,7 +165,7 @@ console_t *console_new( int x, int y, int width, int height,
     free( con->line );
     con->line = NULL;
 
-    con->coords = (struct console_line_coords *) malloc( con->rows * sizeof( struct console_line_coords ) );
+    con->coords = malloc( con->rows * sizeof( struct console_line_coords ) );
     if( !con->coords ) {
         console_delete( con );
         return NULL;
@@ -186,7 +186,7 @@ console_t *console_new( int x, int y, int width, int height,
     }
 
     if( !con->line ) {
-        con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
+        con->line = malloc( sizeof( osd_string_t * ) );
         if( !con->line ) {
             fprintf( stderr, "console: Couldn't add a line.\n" );
 
@@ -254,7 +254,7 @@ void update_osd_strings( console_t *con )
     tmpstr[0] = '\0';
 
     if( !con->line && con->maxrows ) {
-        con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
+        con->line = malloc( sizeof( osd_string_t * ) );
         if( !con->line ) {
             fprintf( stderr, "console: Couldn't add a line.\n" );
 
@@ -394,13 +394,13 @@ void console_printf( console_t *con, char *format, ... )
     size = strlen( format ) * 3;
 
     va_start( ap, format );
-    str = (char *)malloc( size );
+    str = malloc( size );
     if( !str ) return;
     n = vsnprintf( str, size-1, format, ap );
     if( n > size ) {
         free( str );
         size = n+1;
-        str = (char *)malloc( size );
+        str = malloc( size );
         if( !str ) return;
         n = vsnprintf( str, size, format, ap );
         if ( n > size ) {

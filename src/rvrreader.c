@@ -41,7 +41,7 @@ struct rvrreader_s
 
 rvrreader_t *rvrreader_new( const char *filename )
 {
-    rvrreader_t *reader = (rvrreader_t *) malloc( sizeof( rvrreader_t ) );
+    rvrreader_t *reader = malloc( sizeof( rvrreader_t ) );
     int width, height;
 
     if( !reader ) return 0;
@@ -53,7 +53,7 @@ rvrreader_t *rvrreader_new( const char *filename )
         return 0;
     }
 
-    reader->fhdr = (ree_file_header_t *) malloc( sizeof( ree_file_header_t ) );
+    reader->fhdr = malloc( sizeof( ree_file_header_t ) );
     if( !reader->fhdr ) {
         fprintf( stderr, "rvrreader: Can't allocate file header.\n" );
         close( reader->fd );
@@ -61,7 +61,7 @@ rvrreader_t *rvrreader_new( const char *filename )
         return 0;
     }
 
-    reader->pkt = (ree_packet_t *) malloc( sizeof( ree_packet_t ) );
+    reader->pkt = malloc( sizeof( ree_packet_t ) );
     if( !reader->pkt ) {
         fprintf( stderr, "rvrreader: Can't allocate data packet.\n" );
         free( reader->fhdr );
@@ -78,9 +78,9 @@ rvrreader_t *rvrreader_new( const char *filename )
 
     width = rvrreader_get_width( reader );
     height = rvrreader_get_height( reader );
-    reader->decoded[ 0 ] = (uint8_t *) malloc( width * height * 2 );
-    reader->decoded[ 1 ] = (uint8_t *) malloc( width * height * 2 );
-    reader->decoded[ 2 ] = (uint8_t *) malloc( width * height * 2 );
+    reader->decoded[ 0 ] = malloc( width * height * 2 );
+    reader->decoded[ 1 ] = malloc( width * height * 2 );
+    reader->decoded[ 2 ] = malloc( width * height * 2 );
     reader->curdecoded = 0;
 
     if( !reader->decoded[ 0 ] || !reader->decoded[ 1 ] || !reader->decoded[ 2 ] ) {

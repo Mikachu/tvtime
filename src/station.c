@@ -96,9 +96,8 @@ static int getNextPos( station_mgr_t *mgr )
 static station_info_t *station_info_new( int pos, const char *name, const band_t *band,
                                          const band_entry_t *channel )
 {
-    station_info_t *i;
+    station_info_t *i = malloc( sizeof( station_info_t ) );
 
-    i = malloc( sizeof( station_info_t ) );
     if( i ) {
         i->pos = pos;
         i->active = 1;
@@ -281,7 +280,7 @@ int station_readconfig( station_mgr_t *mgr )
 
 station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mode, int verbose )
 {
-    station_mgr_t *mgr = (station_mgr_t *) malloc( sizeof( station_mgr_t ) );
+    station_mgr_t *mgr = malloc( sizeof( station_mgr_t ) );
     const char *frequencies;
 
     if( !mgr ) return 0;

@@ -72,7 +72,7 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
                   tvtime_osd_t *osd, int width, 
                   int height, double aspect )
 {
-    menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
+    menu_t *m = malloc( sizeof( menu_t ) );
     // int i;
 
     if( !m ) {
@@ -270,7 +270,7 @@ void menu_pict( menu_t *m, int key )
     menu_blit_scanline = pict_blit_scanline;
 
     if( m->menu_data == NULL ) {
-        m->menu_data = (void *)malloc( sizeof(struct pict_data) );
+        m->menu_data = malloc( sizeof( struct pict_data ) );
         ((struct pict_data *)(m->menu_data))->bright = osd_databars_new( (m->width * 80) / 100 );
         ((struct pict_data *)(m->menu_data))->cont = osd_databars_new( (m->width * 80) / 100 );
         ((struct pict_data *)(m->menu_data))->col = osd_databars_new( (m->width * 80) / 100 );

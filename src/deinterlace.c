@@ -43,7 +43,7 @@ void register_deinterlace_method( deinterlace_method_t *method )
         dest = &(cur->next);
     }
 
-    *dest = (methodlist_item_t *) malloc( sizeof( methodlist_item_t ) );
+    *dest = malloc( sizeof( methodlist_item_t ) );
     if( *dest ) {
         (*dest)->method = method;
         (*dest)->next = 0;

@@ -70,7 +70,7 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
     if( !glyph_index )
         return 0;
 
-    cur = malloc (sizeof (*cur));
+    cur = malloc( sizeof( *cur ) );
     
     if (cur == NULL) {
         fprintf ( stderr, "leeft: Out of memory\n");
@@ -123,7 +123,7 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
 
 ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 {
-    ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
+    ft_font_t *font = malloc( sizeof( ft_font_t ) );
     int i;
 
     if( !font ) return 0;
@@ -416,12 +416,12 @@ struct ft_string_s
 
 ft_string_t *ft_string_new( ft_font_t *font )
 {
-    ft_string_t *fts = (ft_string_t *) malloc( sizeof( ft_string_t ) );
+    ft_string_t *fts = malloc( sizeof( ft_string_t ) );
     if( !fts ) return 0;
 
     fts->font = font;
     fts->datasize = 262144;
-    fts->data = (uint8_t *) malloc( fts->datasize );
+    fts->data = malloc( fts->datasize );
     if( !fts->data ) {
         free( fts );
         return 0;

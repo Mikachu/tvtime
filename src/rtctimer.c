@@ -41,7 +41,7 @@ struct rtctimer_s
 
 rtctimer_t *rtctimer_new( int verbose )
 {
-    rtctimer_t *rtctimer = (rtctimer_t *) malloc( sizeof( rtctimer_t ) );
+    rtctimer_t *rtctimer = malloc( sizeof( rtctimer_t ) );
     if( !rtctimer ) return 0;
 
     rtctimer->verbose = verbose;

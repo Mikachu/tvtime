@@ -39,7 +39,7 @@ struct fifo_s {
 
 fifo_t *fifo_new( const char *filename )
 {
-    fifo_t *fifo = (fifo_t *) malloc( sizeof( struct fifo_s ) );
+    fifo_t *fifo = malloc( sizeof( struct fifo_s ) );
 
     if( !fifo ) {
         return 0;

@@ -38,7 +38,7 @@ struct reepktq_s
 
 reepktq_t *reepktq_new( int numframes, int framesize )
 {
-    reepktq_t *pktq = (reepktq_t *) malloc( sizeof( reepktq_t ) );
+    reepktq_t *pktq = malloc( sizeof( reepktq_t ) );
     int i;
 
     if( !pktq ) return 0;
@@ -51,7 +51,7 @@ reepktq_t *reepktq_new( int numframes, int framesize )
     pktq->itemwaiting = 0;
     pthread_mutex_init( &(pktq->lock), 0 );
 
-    pktq->data = (uint8_t *) malloc( pktq->numframes * pktq->framesize );
+    pktq->data = malloc( pktq->numframes * pktq->framesize );
     if( !pktq->data ) { free( pktq ); return 0; }
 
     for( i = 0; i < numframes * framesize; i++ ) pktq->data[ i ] = 0;

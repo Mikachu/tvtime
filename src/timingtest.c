@@ -134,11 +134,11 @@ int main( int argc, char **argv )
     /* Always use the same random seed. */
     srandom( seed );
 
-    source422packed = (uint8_t *) malloc( width * height * 2 );
-    source422packed2 = (uint8_t *) malloc( width * height * 2 );
-    source444packed = (uint8_t *) malloc( width * height * 3 );
-    dest422packed = (uint8_t *) malloc( width * height * 2 );
-    dest444packed = (uint8_t *) malloc( width * height * 3 );
+    source422packed = malloc( width * height * 2 );
+    source422packed2 = malloc( width * height * 2 );
+    source444packed = malloc( width * height * 3 );
+    dest422packed = malloc( width * height * 2 );
+    dest444packed = malloc( width * height * 3 );
 
     if( !source422packed || !source422packed2 || !dest422packed || !dest444packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );

@@ -63,7 +63,7 @@ struct performance_s
 
 performance_t *performance_new( int fieldtimeus )
 {
-    performance_t *perf = (performance_t *) malloc( sizeof( performance_t ) );
+    performance_t *perf = malloc( sizeof( performance_t ) );
     if( !perf ) {
         return 0;
     }
