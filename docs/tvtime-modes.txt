@@ -62,22 +62,6 @@
      - Some higher budget television dramas
      - Older video gaming consoles.
 
-     2-3 Pulldown Detection
-
-         What does it do?
-         - tvtime detects a 2-3 pulldown sequence in the
-           video stream and uses this information to
-           intelligently reconstruct frames.
-         When do I use it?
-         - Watching an NTSC broadcast of a cartoon,
-           film, or television program shot on film.
-
-         Modes available:
-         - 2-3 pulldown detection can be enabled at any
-           time.  This will use more CPU to analyze
-           the input and detect pulldown, entering "film
-           mode" when detection is successful.
-
      Progressive (top or bottom field first)
 
          What does it do?
@@ -93,7 +77,7 @@
            it is being sent, and select the appropriate
            mode in tvtime to match it.
 
-     2-2 Pulldown Detection
+     Progressive Detection
 
          What does it do?
          - While not currently available in tvtime, this
@@ -104,4 +88,20 @@
          - Using a video game from a console system which
            sends a progressive signal.
          - Watching a film broadcast or DVD in a PAL area.
+
+     NTSC Film Mode
+
+         What does it do?
+         - tvtime detects a 2-3 pulldown sequence in the
+           video stream and uses this information to
+           intelligently reconstruct frames.
+         When do I use it?
+         - Watching an NTSC broadcast of a cartoon,
+           film, or television program shot on film.
+
+         How do I use it?
+         - NTSC film detection can be enabled at any
+           time.  This will use more CPU to analyze
+           the input and detect pulldown, entering film
+           mode when detection is successful.
 
