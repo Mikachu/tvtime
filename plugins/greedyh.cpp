@@ -23,11 +23,11 @@
 #define MOTIONTHRESHOLD_DEFAULT 25
 #define MOTIONSENSE_DEFAULT     30
 
-class GreedyHImageFilter
+class DScalerFilterGreedyH
 {
 public:
-    GreedyHImageFilter() {}
-    virtual ~GreedyHImageFilter() {}
+    DScalerFilterGreedyH() {}
+    virtual ~DScalerFilterGreedyH() {}
 
 #define IS_SSE
 #define SSE_TYPE SSE
@@ -58,11 +58,11 @@ public:
     unsigned int GreedyMotionSense;
 };
 
-static GreedyHImageFilter *filter;
+static DScalerFilterGreedyH *filter;
 
 void greedyh_init( void )
 {
-    filter = new GreedyHImageFilter();
+    filter = new DScalerFilterGreedyH();
     filter->GreedyMaxComb = MAXCOMB_DEFAULT;
     filter->GreedyMotionThreshold = MOTIONTHRESHOLD_DEFAULT;
     filter->GreedyMotionSense = MOTIONSENSE_DEFAULT;

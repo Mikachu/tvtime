@@ -18,7 +18,7 @@
 
 #include "x86-64_macros.inc"
 
-void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
+void DScalerFilterGreedyH::FUNCT_NAME(TDeinterlaceInfo* pInfo)
 {
     int64_t i;
     bool InfoIsOdd = (pInfo->PictureHistory[0]->Flags & PICTURE_INTERLACED_ODD) ? 1 : 0;
@@ -29,18 +29,18 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
     int64_t ShiftMask    = 0xfefffefffefffeffull; // to avoid shifting chroma to luma
     int64_t QW256        = 0x0100010001000100ull; // 4 256's
 
-	// Set up our two parms that are actually evaluated for each pixel
-	i=GreedyMaxComb;
-	int64_t MaxComb = i << 56 | i << 48 | i << 40 | i << 32 | i << 24 | i << 16 | i << 8 | i;
-
-	i = GreedyMotionThreshold;		// scale to range of 0-257
-	int64_t MotionThreshold = i << 48 | i << 32 | i << 16 | i | UVMask;
-
-	i = GreedyMotionSense;		// scale to range of 0-257
-	int64_t MotionSense = i << 48 | i << 32 | i << 16 | i;
+    // Set up our two parms that are actually evaluated for each pixel
+    i=GreedyMaxComb;
+    int64_t MaxComb = i << 56 | i << 48 | i << 40 | i << 32 | i << 24 | i << 16 | i << 8 | i;
+    
+    i = GreedyMotionThreshold;		// scale to range of 0-257
+    int64_t MotionThreshold = i << 48 | i << 32 | i << 16 | i | UVMask;
+    
+    i = GreedyMotionSense;		// scale to range of 0-257
+    int64_t MotionSense = i << 48 | i << 32 | i << 16 | i;
 
     int Line;
-    int LoopCtr;
+    long LoopCtr;
     unsigned int Pitch = pInfo->InputPitch;
 
     unsigned char* L1;					// ptr to Line1, of 3
@@ -81,6 +81,8 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
         Dest += pInfo->OverlayPitch;
     }
 
+    long oldbx;
+
     for (Line = 0; Line < (pInfo->FieldHeight - 1); ++Line) {
         LoopCtr = pInfo->LineLength / 8 - 1; // there are LineLength / 8 qwords per line but do 1 less, adj at end of loop
 
@@ -88,35 +90,16 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
         // field (i.e., that InfoIsOdd is true).  Assume the obvious for even lines..
         __asm__ __volatile__
             (
-
-#ifndef _LastAvg
-#define _LastAvg          "%0"
-#define _L1               "%1"
-#define _L3               "%2"
-#define _L2P              "%3"
-#define _L2               "%4"
-#define _Dest             "%5"
-#define _ShiftMask        "%6"
-#define _MaxComb          "%7"
-#define _MotionThreshold  "%8"
-#define _MotionSense      "%9"
-#define _QW256B           "%10"
-#define _YMask            "%11"
-#define _UVMask           "%12"
-#define _LoopCtr          "%13"
-#define _QW256            "%14"
-#endif
-
              // save ebx (-fPIC)
-             PUSHX" %%"XBX"\n\t"
+	     MOVX" %%"XBX", %[oldbx]\n\t"
 
-             MOVX"  "_L1",          %%"XAX"\n\t"
+             MOVX"  %[L1],          %%"XAX"\n\t"
              LEAX"  8(%%"XAX"),     %%"XBX"\n\t"    // next qword needed by DJR
-             MOVX"  "_L3",          %%"XCX"\n\t"
+             MOVX"  %[L3],          %%"XCX"\n\t"
              SUBX"  %%"XAX",        %%"XCX"\n\t"    // carry L3 addr as an offset
-             MOVX"  "_L2P",         %%"XDX"\n\t"
-             MOVX"  "_L2",          %%"XSI"\n\t"
-             MOVX"  "_Dest",        %%"XDI"\n\t"    // DL1 if Odd or DL2 if Even
+             MOVX"  %[L2P],         %%"XDX"\n\t"
+             MOVX"  %[L2],          %%"XSI"\n\t"
+             MOVX"  %[Dest],        %%"XDI"\n\t"    // DL1 if Odd or DL2 if Even
 
              ".align 8\n\t"
              "1:\n\t"
@@ -127,15 +110,15 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
              "movq  (%%"XAX", %%"XCX"), %%mm3\n\t"  // L3, next odd row
              "movq  %%mm1,          %%mm6\n\t"      // L1 - get simple single pixel interp
              //	pavgb   mm6, mm3                    // use macro below
-             V_PAVGB ("%%mm6", "%%mm3", "%%mm4", _ShiftMask)
+             V_PAVGB ("%%mm6", "%%mm3", "%%mm4", "%[ShiftMask]")
 
              // DJR - Diagonal Jaggie Reduction
              // In the event that we are going to use an average (Bob) pixel we do not want a jagged
              // stair step effect.  To combat this we avg in the 2 horizontally adjacen pixels into the
              // interpolated Bob mix. This will do horizontal smoothing for only the Bob'd pixels.
 
-             "movq  "_LastAvg",     %%mm4\n\t"      // the bob value from prev qword in row
-             "movq  %%mm6,          "_LastAvg"\n\t" // save for next pass
+             "movq  %[LastAvg],     %%mm4\n\t"      // the bob value from prev qword in row
+             "movq  %%mm6,          %[LastAvg]\n\t" // save for next pass
              "psrlq $48,            %%mm4\n\t"      // right justify 1 pixel
              "movq  %%mm6,          %%mm7\n\t"      // copy of simple bob pixel
              "psllq $16,            %%mm7\n\t"      // left justify 3 pixels
@@ -143,22 +126,22 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
 
              "movq  (%%"XBX"),      %%mm5\n\t"      // next horiz qword from L1
              //			pavgb   mm5, qword ptr[ebx+ecx] // next horiz qword from L3, use macro below
-             V_PAVGB ("%%mm5", "(%%"XBX",%%"XCX")", "%%mm7", _ShiftMask)
+             V_PAVGB ("%%mm5", "(%%"XBX",%%"XCX")", "%%mm7", "%[ShiftMask]")
              "psllq $48,            %%mm5\n\t"      // left just 1 pixel
              "movq  %%mm6,          %%mm7\n\t"      // another copy of simple bob pixel
              "psrlq $16,            %%mm7\n\t"      // right just 3 pixels
              "por   %%mm7,          %%mm5\n\t"      // combine
              //			pavgb	mm4, mm5			// avg of forward and prev by 1 pixel, use macro
-             V_PAVGB ("%%mm4", "%%mm5", "%%mm5", _ShiftMask)   // mm5 gets modified if MMX
+             V_PAVGB ("%%mm4", "%%mm5", "%%mm5", "%[ShiftMask]")   // mm5 gets modified if MMX
              //			pavgb	mm6, mm4			// avg of center and surround interp vals, use macro
-             V_PAVGB ("%%mm6", "%%mm4", "%%mm7", _ShiftMask)
+             V_PAVGB ("%%mm6", "%%mm4", "%%mm7", "%[ShiftMask]")
 
              // Don't do any more averaging than needed for mmx. It hurts performance and causes rounding errors.
 #ifndef IS_MMX
              //          pavgb	mm4, mm6			// 1/4 center, 3/4 adjacent
-             V_PAVGB ("%%mm4", "%%mm6", "%%mm7", _ShiftMask)
+             V_PAVGB ("%%mm4", "%%mm6", "%%mm7", "%[ShiftMask]")
              //    		pavgb	mm6, mm4			// 3/8 center, 5/8 adjacent
-             V_PAVGB ("%%mm6", "%%mm4", "%%mm7", _ShiftMask)
+             V_PAVGB ("%%mm6", "%%mm4", "%%mm7", "%[ShiftMask]")
 #endif
 
              // get abs value of possible L2 comb
@@ -211,34 +194,34 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
              // pminub	mm5, mm3                    // now = Min(L1,L3), use macro
              V_PMINUB ("%%mm5", "%%mm3", "%%mm7")
              // allow the value to be above the high or below the low by amt of MaxComb
-             "psubusb "_MaxComb",   %%mm5\n\t"      // lower min by diff
-             "paddusb "_MaxComb",   %%mm2\n\t"      // increase max by diff
+             "psubusb %[MaxComb],   %%mm5\n\t"      // lower min by diff
+             "paddusb %[MaxComb],   %%mm2\n\t"      // increase max by diff
              // pmaxub	mm4, mm5                    // now = Max(best,Min(L1,L3) use macro
              V_PMAXUB ("%%mm4", "%%mm5")
              // pminub	mm4, mm2                    // now = Min( Max(best, Min(L1,L3), L2 )=L2 clipped
              V_PMINUB ("%%mm4", "%%mm2", "%%mm7")
 
              // Blend weave pixel with bob pixel, depending on motion val in mm0
-             "psubusb "_MotionThreshold", %%mm0\n\t"// test Threshold, clear chroma change >>>??
-             "pmullw  "_MotionSense", %%mm0\n\t"    // mul by user factor, keep low 16 bits
-             "movq    "_QW256", %%mm7\n\t"
+             "psubusb %[MotionThreshold], %%mm0\n\t"// test Threshold, clear chroma change >>>??
+             "pmullw  %[MotionSense], %%mm0\n\t"    // mul by user factor, keep low 16 bits
+             "movq    %[QW256], %%mm7\n\t"
 #ifdef IS_SSE
              "pminsw  %%mm7,        %%mm0\n\t"      // max = 256
 #else
-             "paddusw "_QW256B",    %%mm0\n\t"      // add, may sat at fff..
-             "psubusw "_QW256B",    %%mm0\n\t"      // now = Min(L1,256)
+             "paddusw %[QW256B],    %%mm0\n\t"      // add, may sat at fff..
+             "psubusw %[QW256B],    %%mm0\n\t"      // now = Min(L1,256)
 #endif
              "psubusw %%mm0,        %%mm7\n\t"      // so the 2 sum to 256, weighted avg
              "movq    %%mm4,        %%mm2\n\t"      // save weave chroma info before trashing
-             "pand    "_YMask",     %%mm4\n\t"      // keep only luma from calc'd value
+             "pand    %[YMask],     %%mm4\n\t"      // keep only luma from calc'd value
              "pmullw  %%mm7,        %%mm4\n\t"      // use more weave for less motion
-             "pand    "_YMask",     %%mm6\n\t"      // keep only luma from calc'd value
+             "pand    %[YMask],     %%mm6\n\t"      // keep only luma from calc'd value
              "pmullw  %%mm0,        %%mm6\n\t"      // use more bob for large motion
              "paddusw %%mm6,        %%mm4\n\t"      // combine
              "psrlw   $8,           %%mm4\n\t"      // div by 256 to get weighted avg
 
              // chroma comes from weave pixel
-             "pand    "_UVMask",    %%mm2\n\t"      // keep chroma
+             "pand    %[UVMask],    %%mm2\n\t"      // keep chroma
              "por     %%mm4,        %%mm2\n\t"      // and combine
 
              V_MOVNTQ ("(%%"XDI")", "%%mm2")        // move in our clipped best, use macro
@@ -249,7 +232,7 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
              LEAX"    8(%%"XDX"),   %%"XDX"\n\t"
              LEAX"    8(%%"XDI"),   %%"XDI"\n\t"
              LEAX"    8(%%"XSI"),   %%"XSI"\n\t"
-             DECX"    "_LoopCtr"\n\t"
+             DECX"    %[LoopCtr]\n\t"
              "jg      1b\n\t"                       // loop if not to last line
                                                     // note P-III default assumes backward branches taken
              "jl      1f\n\t"                       // done
@@ -257,25 +240,26 @@ void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
              "jmp     1b\n\t"
 
              "1:\n\t"
-             POPX" %%"XBX"\n\t"
+	     MOVX" %[oldbx], %%"XBX"\n\t"
 
              : /* no outputs */
 
-             : "m"(LastAvg),
-               "m"(L1),
-               "m"(L3),
-               "m"(L2P),
-               "m"(L2),
-               "m"(Dest),
-               "m"(ShiftMask),
-               "m"(MaxComb),
-               "m"(MotionThreshold),
-               "m"(MotionSense),
-               "m"(QW256B),
-               "m"(YMask),
-               "m"(UVMask),
-               "m"(LoopCtr),
-               "m"(QW256)
+             : [LastAvg]         "m"(LastAvg),
+               [L1]              "m"(L1),
+               [L3]              "m"(L3),
+               [L2P]             "m"(L2P),
+               [L2]              "m"(L2),
+               [Dest]            "m"(Dest),
+               [ShiftMask]       "m"(ShiftMask),
+               [MaxComb]         "m"(MaxComb),
+               [MotionThreshold] "m"(MotionThreshold),
+               [MotionSense]     "m"(MotionSense),
+               [QW256B]          "m"(QW256B),
+               [YMask]           "m"(YMask),
+               [UVMask]          "m"(UVMask),
+               [LoopCtr]         "m"(LoopCtr),
+               [QW256]           "m"(QW256),
+	       [oldbx]           "m"(oldbx)
 
              : XAX, XCX, XDX, XSI, XDI,
 #ifdef ARCH_386

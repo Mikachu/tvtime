@@ -1,24 +1,24 @@
 // -*- c++ -*-
 
-unsigned char*	     pDest;
+unsigned char* pDest;
 const unsigned char* pSrcP;
 const unsigned char* pSrc;
 const unsigned char* pBob;
 const unsigned char* pBobP;
 
-Q_INT64 Max_Mov   = 0x0404040404040404ull; 
-Q_INT64 DiffThres = 0x0f0f0f0f0f0f0f0full; 
-Q_INT64 YMask     = 0x00ff00ff00ff00ffull; // keeps only luma
-Q_INT64 UVMask    = 0xff00ff00ff00ff00ull; // keeps only chroma
-Q_INT64 TENS      = 0x0a0a0a0a0a0a0a0aull; 
-Q_INT64 FOURS     = 0x0404040404040404ull; 
-Q_INT64 ONES      = 0x0101010101010101ull; 
-Q_INT64 Min_Vals  = 0x0000000000000000ull;
-Q_INT64 Max_Vals  = 0x0000000000000000ull;
-Q_INT64 ShiftMask = 0xfefffefffefffeffull;
+int64_t Max_Mov   = 0x0404040404040404ull; 
+int64_t DiffThres = 0x0f0f0f0f0f0f0f0full; 
+int64_t YMask     = 0x00ff00ff00ff00ffull; // keeps only luma
+int64_t UVMask    = 0xff00ff00ff00ff00ull; // keeps only chroma
+int64_t TENS      = 0x0a0a0a0a0a0a0a0aull; 
+int64_t FOURS     = 0x0404040404040404ull; 
+int64_t ONES      = 0x0101010101010101ull; 
+int64_t Min_Vals  = 0x0000000000000000ull;
+int64_t Max_Vals  = 0x0000000000000000ull;
+int64_t ShiftMask = 0xfefffefffefffeffull;
 
 // long is int32 on ARCH_368, int64 on ARCH_AMD64. Declaring it this way
-// saves a lot of xor's to delete big-endian garbage.
+// saves a lot of xor's to delete 64bit garbage.
 
 #if defined(DBL_RESIZE) || defined(USE_FOR_DSCALER)
 long	    src_pitch2 = src_pitch;			// even & odd lines are not longerleaved in DScaler
@@ -87,7 +87,10 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
 #define _UVMask     "%15"
 #define _Max_Mov    "%16"
 #define _YMask      "%17"
+#define _oldbx      "%18"
 #endif
+
+        long oldbx;
 
 	for (y=1; y < FldHeight-1; y++)	
 	{
@@ -96,15 +99,15 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
             (
              // Loop general reg usage
              //
-             // "XAX" - pBobP, then pDest 
+             // XAX - pBobP, then pDest 
              // XBX - pBob
-             // "XCX" - src_pitch2
-             // "XDX" - current offset
+             // XCX - src_pitch2
+             // XDX - current offset
              // XDI - prev weave pixels, 1 line up
              // XSI - next weave pixels, 1 line up
 
              // Save "XBX" (-fPIC)
-             ""PUSHX" %%"XBX"\n\t"
+	     MOVX" %%"XBX", "_oldbx"\n\t"
              
 #ifdef IS_SSE2
              
@@ -112,8 +115,8 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
 
 #else
              // simple bob first 8 bytes
-             ""MOVX"		"_pBob",        %%"XBX"\n\t"
-             ""MOVX"	"_src_pitch2",  %%"XCX"\n\t"
+             MOVX"	"_pBob",        %%"XBX"\n\t"
+             MOVX"	"_src_pitch2",  %%"XCX"\n\t"
 
 #ifdef USE_VERTICAL_FILTER
              "movq	    (%%"XBX"),        %%mm0\n\t"
@@ -122,21 +125,21 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
              V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)		// halfway between
              V_PAVGB ("%%mm0", "%%mm2", "%%mm3", _ShiftMask)		// 1/4 way
              V_PAVGB ("%%mm1", "%%mm2", "%%mm3", _ShiftMask)		// 3/4 way
-             ""MOVX"		"_pDest",       %%"XDI"\n\t"
-             ""MOVX"		"_dst_pitchw",  %%"XAX"\n\t"
+             MOVX"		"_pDest",       %%"XDI"\n\t"
+             MOVX"		"_dst_pitchw",  %%"XAX"\n\t"
              V_MOVNTQ	("(%%"XDI")", "%%mm0")
              V_MOVNTQ	("(%%"XDI", %%"XAX")", "%%mm1") // qword ptr["XDI"+"XAX"], mm1
 
              // simple bob last 8 bytes
-             ""MOVX"		"_Last8", %%"XDX"\n\t"
-             ""LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t"  // ["XBX"+"XDX"]
+             MOVX"		"_Last8", %%"XDX"\n\t"
+             LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t"  // ["XBX"+"XDX"]
              "movq	    (%%"XSI"), %%mm0\n\t"
              "movq	    (%%"XSI", %%"XCX"), %%mm1\n\t"    // qword ptr["XSI"+"XCX"]
              "movq	    %%mm0, %%mm2\n\t"
              V_PAVGB ("%%mm2", "%%mm1", "%%mm3", _ShiftMask)		// halfway between
              V_PAVGB ("%%mm0", "%%mm2", "%%mm3", _ShiftMask)		// 1/4 way
              V_PAVGB ("%%mm1", "%%mm2", "%%mm3", _ShiftMask)		// 3/4 way
-             ""ADDX"		%%"XDX", %%"XDI"\n\t"						// last 8 bytes of dest
+             ADDX"		%%"XDX", %%"XDI"\n\t"						// last 8 bytes of dest
              V_MOVNTQ	("%%"XDI"", "%%mm0")
              V_MOVNTQ	("(%%"XDI", %%"XAX")", "%%mm1") // qword ptr["XDI"+"XAX"], mm1)
 
@@ -144,28 +147,28 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
              "movq	(%%"XBX"), %%mm0\n\t"
              //		pavgb	mm0, qword ptr["XBX"+"XCX"]
              V_PAVGB ("%%mm0", "(%%"XBX", %%"XCX")", "%%mm2", _ShiftMask) // qword ptr["XBX"+"XCX"], mm2, ShiftMask)
-             ""MOVX"		"_pDest", %%"XDI"\n\t"
+             MOVX"		"_pDest", %%"XDI"\n\t"
              V_MOVNTQ	("(%%"XDI")", "%%mm0")
 
              // simple bob last 8 bytes
-             ""MOVX"		"_Last8", %%"XDX"\n\t"
-             ""LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t" //"XSI", ["XBX"+"XDX"]
+             MOVX"		"_Last8", %%"XDX"\n\t"
+             LEAX"		(%%"XBX", %%"XDX"), %%"XSI"\n\t" //"XSI", ["XBX"+"XDX"]
              "movq	    (%%"XSI"), %%mm0\n\t"
              //		pavgb	mm0, qword ptr["XSI"+"XCX"]
              V_PAVGB	("%%mm0", "(%%"XSI", %%"XCX")", "%%mm2", _ShiftMask) // qword ptr["XSI"+"XCX"], mm2, ShiftMask)
              V_MOVNTQ	("(%%"XDI", %%"XDX")", "%%mm0") // qword ptr["XDI"+"XDX"], mm0)
 #endif
              // now loop and get the middle qwords
-             ""MOVX"		"_pSrc", %%"XSI"\n\t"
-             ""MOVX"		"_pSrcP", %%"XDI"\n\t"
-             ""MOVX"		$8, %%"XDX"\n\t"				// curr offset longo all lines
+             MOVX"		"_pSrc", %%"XSI"\n\t"
+             MOVX"		"_pSrcP", %%"XDI"\n\t"
+             MOVX"		$8, %%"XDX"\n\t"				// curr offset longo all lines
 
              "1:\n\t"	
-             ""MOVX"		"_pBobP", %%"XAX"\n\t"
-             ""ADDX"		$8, %%"XDI"\n\t"
-             ""ADDX"		$8, %%"XSI"\n\t"
-             ""ADDX"		$8, %%"XBX"\n\t"
-             ""ADDX"		%%"XDX", %%"XAX"\n\t"
+             MOVX"		"_pBobP", %%"XAX"\n\t"
+             ADDX"		$8, %%"XDI"\n\t"
+             ADDX"		$8, %%"XSI"\n\t"
+             ADDX"		$8, %%"XBX"\n\t"
+             ADDX"		%%"XDX", %%"XAX"\n\t"
 
 #ifdef USE_STRANGE_BOB
 #include "StrangeBob.inc"
@@ -177,7 +180,7 @@ long		dst_pitchw = dst_pitch; // local stor so asm can ref
              // through out most of the rest of this loop we will malongain
              //	mm4		our min bob value
              //	mm5		best weave pixels so far
-             //  mm6		our max Bob value 
+             // mm6		our max Bob value 
              //	mm7		best weighted pixel ratings so far
              
              // We will keep a slight bias to using the weave pixels

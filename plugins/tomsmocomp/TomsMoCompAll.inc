@@ -21,11 +21,6 @@
 //  See www.eff.org for details
 /////////////////////////////////////////////////////////////////////////////
 
-// Qt 3.1.1 compatibility
-#ifndef Q_INT64
-#define Q_INT64 long long
-#endif
-
 #ifndef TopFirst
 #define TopFirst IsOdd
 #endif
@@ -98,7 +93,7 @@ void FUNCT_NAME(TDeinterlaceInfo* pInfo)
     if(UseStrangeBob == false) {
 		if (SearchEffort == 0)
 		{
-            SEFUNC(0);
+		        SEFUNC(0);
 		}
 		else if (SearchEffort <= 1)
 		{
