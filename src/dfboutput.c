@@ -22,11 +22,10 @@
 
 #include "dfboutput.h"
 
-#if 0
-// #ifdef HAVE_DIRECTFB
-#define DIRECTFB_HAS_TRIPLE
+#ifdef HAVE_DIRECTFB
 /* directfb includes */
 #include <directfb.h>
+#define DIRECTFB_VERSION (directfb_major_version*100+directfb_minor_version)*100+directfb_micro_version
 
 /* other things */
 #include <stdio.h>
@@ -50,8 +49,8 @@ static DFBSurfacePixelFormat  frame_format;
 static IDirectFBInputDevice  *keyboard;
 static IDirectFBEventBuffer  *buffer = NULL;
 
-static int output_width = 0;
-static int output_height = 0;
+static unsigned int output_width = 0;
+static unsigned int output_height = 0;
 static int input_width = 0;
 static int input_height = 0;
 
@@ -141,6 +140,12 @@ int dfb_init( int outputheight, int aspect, int verbose )
     DFBDisplayLayerConfig dlc;
     DFBDisplayLayerConfigFlags failed;
 
+    if (verbose)
+	fprintf(stderr,"Using directfb version:%d\n",DIRECTFB_VERSION);
+    if (DIRECTFB_VERSION < 918)
+	fprintf(stderr,"\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
+		       "*** this may lead to less than optimal output\n");
+
     DirectFBInit( 0, 0 );
 
     DirectFBSetOption( "fbdev", fb_dev_name );
@@ -165,14 +170,25 @@ int dfb_init( int outputheight, int aspect, int verbose )
     dlc.flags      = DLCONF_PIXELFORMAT | DLCONF_BUFFERMODE | DLCONF_OPTIONS;
 
 #ifdef DIRECTFB_HAS_TRIPLE
+    if (verbose)
+	fprintf(stderr,"Using triple buffering\n");
     dlc.buffermode = DLBM_TRIPLE;/*DLBM_BACKVIDEO;DLBM_FRONTONLY;*/
 #else
+    if (verbose)
+	fprintf(stderr,"Using double buffering\n");
     dlc.buffermode = DLBM_BACKVIDEO;
 #endif
-
+    
     dlc.pixelformat = DSPF_YUY2; 
+    dlc.options = 0;
+    
+#ifdef DIRECTFB_HAS_FLICKER_FILTERING
     dlc.options = DLOP_FLICKER_FILTERING;
+#endif
+
+#ifdef DIRECTFB_HAS_FIELD_PARITY
     dlc.options |=  DLOP_FIELD_PARITY;
+#endif
 
     if( crtc2->TestConfiguration( crtc2, &dlc, &failed ) != DFB_OK ) {
         fprintf( stderr, "config tested and failed.\n" );
@@ -180,7 +196,21 @@ int dfb_init( int outputheight, int aspect, int verbose )
         return 0;
     }
     crtc2->SetConfiguration( crtc2, &dlc );
-    crtc2->SetFieldParity( crtc2, 1 );
+
+    if (DIRECTFB_VERSION > 917)
+    {
+	parity = 0;
+    }
+    else
+    {
+	parity = 1;
+    }
+
+    if (verbose)
+	fprintf(stderr,"Using initial field parity:%d\n",parity);
+#ifdef DIRECTFB_HAS_FIELD_PARITY
+    crtc2->SetFieldParity( crtc2, parity );
+#endif
     crtc2->GetSurface( crtc2, &c2frame );
 
     c2frame->SetBlittingFlags( c2frame, DSBLIT_NOFX );
@@ -257,13 +287,18 @@ void dfb_wait_for_sync( int field )
 int dfb_show_frame( int x, int y, int width, int height )
 {
 
-   IDirectFBSurface *blitsrc = current_frame;
-   /* Allow for input versus output height here later FIX */
-   /* c2frame->StretchBlit( c2frame, blitsrc, NULL, NULL); */
-   c2frame->Blit( c2frame, blitsrc, NULL, 0,0);
-   c2frame->Flip( c2frame, NULL,0);/* DSFLIP_WAITFORSYNC ); */
-
-   return 1;
+    IDirectFBSurface *blitsrc = current_frame;
+    /* Allow for input versus output height here later FIX */
+    /* c2frame->StretchBlit( c2frame, blitsrc, NULL, NULL); */
+    c2frame->Blit( c2frame, blitsrc, NULL, 0,0);
+    
+#ifdef DIRECTFB_HAS_TRIPLE
+    c2frame->Flip( c2frame, NULL,0);
+#else
+    c2frame->Flip( c2frame, NULL,DSFLIP_WAITFORSYNC );
+#endif
+    
+    return 1;
 }
 
 int dfb_toggle_aspect( void )
@@ -335,8 +370,11 @@ void dfb_poll_events( input_t *in )
 
 
                 case DIKI_INSERT: 
-                    if (parity == 0) parity = 1; else parity = 0;
-                    crtc2->SetFieldParity( crtc2, parity );
+#ifdef DIRECTFB_HAS_FIELD_PARITY
+		    if (parity == 0) parity = 1; else parity = 0;
+		    fprintf(stderr,"Setting parity to:%d\n",parity);
+		    crtc2->SetFieldParity( crtc2, parity );
+#endif
                     break;
                 default:
                     cur = 'a' + ( event.key_id - DIKI_A );
