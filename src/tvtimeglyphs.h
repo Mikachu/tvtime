@@ -65,7 +65,6 @@
 #define TVTIME_ICON_RADIOOFF           "\xee\x80\xa4" /* Radio off           */
 #define TVTIME_ICON_RADIOON            "\xee\x80\xa5" /* Radio on            */
 #define TVTIME_ICON_DEVICESETUP        "\xee\x80\xa6" /* Device setup        */
-#define TVTIME_ICON_SHARPNESS          "\xee\x80\xa7" /* Sharpness           */
 #define TVTIME_ICON_PLUSBUTTON         "\xee\x80\xa8" /* Plus Button         */
 #define TVTIME_ICON_MINUSBUTTON        "\xee\x80\xa9" /* Minus Button        */
 #define TVTIME_ICON_FAVORITESICON      "\xee\x80\xaa" /* Favorites Icon      */
@@ -89,3 +88,17 @@
 #define TVTIME_ICON_RESETTODEFAULTS    "\xee\x80\xbe" /* Reset to Defaults   */
 #define TVTIME_ICON_CHANGENTSCMODE     "\xee\x80\xbf" /* Change NTSC Mode    */
 #define TVTIME_ICON_APPLYMATTE         "\xee\x81\x80" /* Apply Matte         */
+
+/*
+ * Both "Reset all channels as active" and "Sharpness" are currently
+ * represented as the same glyph -- a stylisized exclamation point.
+ * 
+ * I do not envy the role of silvarian for having to come up with an icon
+ * to represent either of these concepts.
+ *
+ * TVTIME_ICON_EXCLAMATION is only indended for local consumption in this
+ * file, and may be removed at any time.
+ */
+#define TVTIME_ICON_EXCLAMATION        "\xee\x80\xa7"
+#define TVTIME_ICON_SHARPNESS          TVTIME_ICON_EXCLAMATION
+#define TVTIME_ICON_ALLCHANNELSACTIVE  TVTIME_ICON_EXCLAMATION
