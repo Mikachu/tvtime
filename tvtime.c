@@ -39,6 +39,7 @@
 #include "tvtimeconf.h"
 #include "input.h"
 #include "speedy.h"
+#include "deinterlace.h"
 #include "menu.h"
 
 /**
@@ -74,7 +75,7 @@ static void build_test_frames( unsigned char *oddframe,
     osd_string_delete( test_string );
 }
 
-void build_colourbars( unsigned char *output, int width, int height )
+static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * 3 );
     pnginput_t *cb;
@@ -134,6 +135,24 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
+static deinterlace_method_t *curmethod = 0;
+int curmethodid = 0;
+deinterlace_scanline_t deinterlace_scanline;
+
+const char *next_deinterlacing_method( void )
+{
+    if( !curmethod ) {
+        curmethod = get_deinterlace_method( 0 );
+    } else {
+        curmethodid = ( curmethodid + 1 ) % get_num_deinterlace_methods();
+        curmethod = get_deinterlace_method( curmethodid );
+    }
+    if( curmethod ) {
+        return curmethod->name;
+    } else {
+        return 0;
+    }
+}
 
 /**
  *  Top field:      Bot field:
@@ -153,19 +172,19 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  *  The top field therefore handles n-2 scanlines in the loop.
  *  The bot field handles n-2 scanlines in the loop.
  */
-void tvtime_build_frame( unsigned char *output,
-                         unsigned char *curframe,
-                         unsigned char *lastframe,
-                         video_correction_t *vc,
-                         tvtime_osd_t *osd,
-                         menu_t *menu,
-                         int copy_to_lastframe,
-                         int bottom_field,
-                         int correct_input,
-                         int width,
-                         int frame_height,
-                         int instride,
-                         int outstride )
+static void tvtime_build_frame( unsigned char *output,
+                                unsigned char *curframe,
+                                unsigned char *lastframe,
+                                video_correction_t *vc,
+                                tvtime_osd_t *osd,
+                                menu_t *menu,
+                                int copy_to_lastframe,
+                                int bottom_field,
+                                int correct_input,
+                                int width,
+                                int frame_height,
+                                int instride,
+                                int outstride )
 {
     unsigned char *out = output;
     int i;
@@ -199,14 +218,23 @@ void tvtime_build_frame( unsigned char *output,
         unsigned char *mid0 = lastframe + instride;
         unsigned char *bot0 = lastframe + (instride*2);
 
-        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
-                                                 bot1, top0, mid0,
-                                                 bot0, width );
+        if( curmethod ) {
+            deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
+        } else {
+            blit_packed422_scanline( output, top1, width );
+        }
         output += outstride;
 
-        blit_packed422_scanline( lastframe, curframe, instride*2 );
-        curframe += (instride*2);
-        lastframe += (instride*2);
+        if( copy_to_lastframe ) {
+            blit_packed422_scanline( lastframe, curframe, width );
+        }
+        curframe += instride;
+        lastframe += instride;
+        if( copy_to_lastframe ) {
+            blit_packed422_scanline( lastframe, curframe, width );
+        }
+        curframe += instride;
+        lastframe += instride;
 
         /* Copy a scanline. */
         if( correct_input ) {
@@ -216,7 +244,6 @@ void tvtime_build_frame( unsigned char *output,
         }
         output += outstride;
     }
-
 
     if( !bottom_field ) {
         /* Clear a scanline. */
@@ -259,6 +286,9 @@ int main( int argc, char **argv )
     menu_t *menu;
 
     setup_speedy_calls();
+    register_deinterlace_plugin( "plugins/linear.so" );
+    register_deinterlace_plugin( "plugins/twoframe.so" );
+    register_deinterlace_plugin( "plugins/greedy2frame.so" );
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -496,7 +526,7 @@ int main( int argc, char **argv )
             sdl_toggle_aspect();
         }
         if( input_toggle_deinterlacing_mode( in ) ) {
-            const char *mode = speedy_next_deinterlacing_mode();
+            const char *mode = next_deinterlacing_method();
             tvtime_osd_show_message( osd, mode );
         }
         tvtime_osd_volume_muted( osd, mixer_ismute() );

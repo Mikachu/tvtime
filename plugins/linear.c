@@ -25,6 +25,7 @@ static deinterlace_method_t linearmethod =
 
 deinterlace_method_t *deinterlace_plugin_init( void )
 {
+    fprintf( stderr, "linear: Registering linear interpolation deinterlacing algorithm.\n" );
     return &linearmethod;
 }
 

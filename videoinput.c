@@ -518,7 +518,7 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
         if (frequency < 0) return;
 
         if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-            frequency /= 1000; // switch to MHz
+            frequency /= 1000; /* switch to MHz */
         }
 
         frequency *= 16;
@@ -552,7 +552,7 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
         }
 
         if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-            frequency *= 1000; // switch from MHz to KHz
+            frequency *= 1000; /* switch from MHz to KHz */
         }
 
         return frequency/16;

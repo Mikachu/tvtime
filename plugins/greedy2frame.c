@@ -165,8 +165,10 @@ static deinterlace_method_t greedymethod =
 deinterlace_method_t *deinterlace_plugin_init( int accel )
 {
     if( accel & MM_ACCEL_X86_MMXEXT ) {
+        fprintf( stderr, "greedy2frame: Registering Greedy 2-Frame deinterlacing algorithm (DScaler).\n" );
         return &greedymethod;
     } else {
+        fprintf( stderr, "greedy2frame: MMXEXT not available, plugin not being registered.\n" );
         return 0;
     }
 }

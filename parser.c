@@ -206,7 +206,7 @@ int parser_new( parser_file_t *pf, const char *filename )
             }
 
             while( *ptr ) ptr++;
-            ptr++; // skip over the 0
+            ptr++; /* skip over the 0 */
 
             /* keep name/value */
             if( pairs >= pf->num_pairs ) {

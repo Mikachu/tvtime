@@ -42,56 +42,6 @@ void video_correction_correct_packed422_scanline( video_correction_t *vc,
                                                   int width );
 
 /**
- * Builds a packed 4:2:2 frame from a field, interpolating to frame size by
- * linear interpolation.  This version applies the video correction transform
- * as it interpolates.
- */
-void video_correction_packed422_field_to_frame_top( video_correction_t *vc,
-                                                    unsigned char *output,
-                                                    int outstride,
-                                                    unsigned char *field,
-                                                    int fieldwidth,
-                                                    int fieldheight,
-                                                    int fieldstride );
-void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
-                                                    unsigned char *output,
-                                                    int outstride,
-                                                    unsigned char *field,
-                                                    int fieldwidth,
-                                                    int fieldheight,
-                                                    int fieldstride );
-void video_correction_packed422_field_to_frame_top_twoframe( video_correction_t *vc,
-    unsigned char *output, int outstride, unsigned char *curframe,
-    unsigned char *lastframe, int width, int height, int linestride );
-void video_correction_packed422_field_to_frame_bot_twoframe_copy( video_correction_t *vc,
-    unsigned char *output, int outstride, unsigned char *curframe,
-    unsigned char *lastframe, int width, int height, int linestride );
-
-/**
- * Builds a packed 4:2:2 frame from a field, interpolating to frame size by
- * linear interpolation.
- */
-void packed422_field_to_frame_top( unsigned char *output, int outstride,
-                                   unsigned char *field, int fieldwidth,
-                                   int fieldheight, int fieldstride );
-void packed422_field_to_frame_bot( unsigned char *output, int outstride,
-                                   unsigned char *field, int fieldwidth,
-                                   int fieldheight, int fieldstride );
-/* Dangerous... */
-void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride,
-                                            unsigned char *curframe,
-                                            unsigned char *lastframe,
-                                            int width, int height, int linestride );
-void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride,
-                                            unsigned char *curframe,
-                                            unsigned char *lastframe,
-                                            int width, int height, int linestride );
-void packed422_field_to_frame_bot_twoframe_copy( unsigned char *output, int outstride,
-                                                 unsigned char *curframe,
-                                                 unsigned char *lastframe,
-                                                 int width, int height, int linestride );
-
-/**
  * Scanline functions.
  */
 void create_packed422_from_planar422_scanline( unsigned char *output,
