@@ -141,12 +141,18 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
 
         do {
             if( rp->pos == i->pos ) {
-                fprintf( stderr, "station: Position %d already in use.\n", i->pos );
+                if( mgr->verbose ) {
+                    fprintf( stderr, "station: Position %d already in use.\n",
+                             i->pos );
+                }
                 return 0;
             }
 
             if( rp->channel->freq == i->channel->freq ) {
-                fprintf( stderr, "station: Frequency %d already in use.\n", i->channel->freq );
+                if( mgr->verbose ) {
+                    fprintf( stderr, "station: Frequency %d already in use.\n",
+                             i->channel->freq );
+                }
                 return 0;
             }
             
