@@ -14,6 +14,9 @@ Authors and contributors
   Paul Jara <rascasse@users.sourceforge.net>
     - man pages and the RPM spec file
 
+  Robert Högberg <cogline@linux.se>
+    - added lirc support
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler

@@ -7,6 +7,7 @@
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"
+#include "speedtools.h"
 #include "speedy.h"
 
 /* Function pointer definitions. */
@@ -52,30 +53,6 @@ static struct timeval cur_end_time;
     speedy_time += (   ( ( cur_end_time.tv_sec * 1000 * 1000 ) + cur_end_time.tv_usec ) \
                      - ( ( cur_start_time.tv_sec * 1000 * 1000 ) + cur_start_time.tv_usec ) )
 
-#define PREFETCH_2048(x) \
-    { int *pfetcha = (int *) x; \
-        prefetchnta( pfetcha ); \
-        prefetchnta( pfetcha + 64 ); \
-        prefetchnta( pfetcha + 128 ); \
-        prefetchnta( pfetcha + 192 ); \
-        pfetcha += 256; \
-        prefetchnta( pfetcha ); \
-        prefetchnta( pfetcha + 64 ); \
-        prefetchnta( pfetcha + 128 ); \
-        prefetchnta( pfetcha + 192 ); }
-
-#define READ_PREFETCH_2048(x) \
-    { int *pfetcha = (int *) x; int pfetchtmp; \
-        pfetchtmp = pfetcha[ 0 ] + pfetcha[ 16 ] + pfetcha[ 32 ] + pfetcha[ 48 ] + \
-            pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
-            pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
-            pfetcha[ 192 ] + pfetcha[ 208 ] + pfetcha[ 224 ] + pfetcha[ 240 ]; \
-        pfetcha += 256; \
-        pfetchtmp = pfetcha[ 0 ] + pfetcha[ 16 ] + pfetcha[ 32 ] + pfetcha[ 48 ] + \
-            pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
-            pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
-            pfetcha[ 192 ] + pfetcha[ 208 ] + pfetcha[ 224 ] + pfetcha[ 240 ]; }
-
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
     int temp;
@@ -87,9 +64,9 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
 void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
                                      unsigned char *bot, int width )
 {
-    const uint64_t qwYMask = 0x00ff00ff00ff00ffULL;
-    const uint64_t qwOnes = 0x0001000100010001ULL;
-    uint64_t qwThreshold;
+    const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
+    const mmx_t qwOnes = { 0x0001000100010001ULL };
+    mmx_t qwThreshold;
 
     SPEEDY_START();
 
@@ -202,7 +179,7 @@ void interpolate_packed422_scanline_mmxext( unsigned char *output,
 void blit_colour_packed422_scanline_c( unsigned char *output,
                                        int width, int y, int cb, int cr )
 {
-    int colour = cr << 24 | y << 16 | cb << 8 | y;
+    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
     unsigned int *o = (unsigned int *) output;
 
     SPEEDY_START();
@@ -217,7 +194,7 @@ void blit_colour_packed422_scanline_c( unsigned char *output,
 void blit_colour_packed422_scanline_mmx( unsigned char *output,
                                          int width, int y, int cb, int cr )
 {
-    int colour = cr << 24 | y << 16 | cb << 8 | y;
+    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
 
     SPEEDY_START();
 
@@ -239,7 +216,7 @@ void blit_colour_packed422_scanline_mmx( unsigned char *output,
 void blit_colour_packed422_scanline_mmxext( unsigned char *output,
                                             int width, int y, int cb, int cr )
 {
-    int colour = cr << 24 | y << 16 | cb << 8 | y;
+    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
 
     SPEEDY_START();
 
@@ -279,7 +256,7 @@ void blit_colour_packed4444_scanline_mmx( unsigned char *output, int width,
                                           int alpha, int luma,
                                           int cb, int cr )
 {
-    int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
 
     SPEEDY_START();
 
@@ -302,7 +279,7 @@ void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr )
 {
-    int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
     SPEEDY_START();
@@ -326,118 +303,33 @@ void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
 }
 
 
-/* Some memcpy code from xine which originally came from mplayer. */
-
-/* for small memory blocks (<256 bytes) this version is faster */
-#define small_memcpy(to,from,n)\
-{\
-register unsigned long int dummy;\
-__asm__ __volatile__(\
-  "rep; movsb"\
-  :"=&D"(to), "=&S"(from), "=&c"(dummy)\
-  :"0" (to), "1" (from),"2" (n)\
-  : "memory");\
-}
+/**
+ * Some memcpy code inspired by the xine code which originally came
+ * from mplayer.
+ */
 
 /* linux kernel __memcpy (from: /include/asm/string.h) */
 static inline void * __memcpy(void * to, const void * from, size_t n)
 {
 int d0, d1, d2;
-
-  if( n < 4 ) {
-    small_memcpy(to,from,n);
-  }
-  else
-    __asm__ __volatile__(
-    "rep ; movsl\n\t"
-    "testb $2,%b4\n\t"
-    "je 1f\n\t"
-    "movsw\n"
-    "1:\ttestb $1,%b4\n\t"
-    "je 2f\n\t"
-    "movsb\n"
-    "2:"
-    : "=&c" (d0), "=&D" (d1), "=&S" (d2)
-    :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
-    : "memory");
-  
-  return (to);
+__asm__ __volatile__(
+        "rep ; movsl\n\t"
+        "testb $2,%b4\n\t"
+        "je 1f\n\t"
+        "movsw\n"
+        "1:\ttestb $1,%b4\n\t"
+        "je 2f\n\t"
+        "movsb\n"
+        "2:"
+        : "=&c" (d0), "=&D" (d1), "=&S" (d2)
+        :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
+        : "memory");
+return (to);
 }
 
-#define MMX_MMREG_SIZE 8
-#define MIN_LEN 0x40  /* 64-byte blocks */
-
-static void * mmx2_memcpy(void * to, const void * from, size_t len)
-{
-  void *retval;
-  size_t i;
-  retval = to;
-
-  /* PREFETCH has effect even for MOVSB instruction ;) */
-  __asm__ __volatile__ (
-    "   prefetchnta (%0)\n"
-    "   prefetchnta 64(%0)\n"
-    "   prefetchnta 128(%0)\n"
-    "   prefetchnta 192(%0)\n"
-    "   prefetchnta 256(%0)\n"
-    : : "r" (from) );
-
-  if(len >= MIN_LEN)
-  {
-    register unsigned long int delta;
-    /* Align destinition to MMREG_SIZE -boundary */
-    delta = ((unsigned long int)to)&(MMX_MMREG_SIZE-1);
-    if(delta)
-    {
-      delta=MMX_MMREG_SIZE-delta;
-      len -= delta;
-      small_memcpy(to, from, delta);
-    }
-    i = len >> 6; /* len/64 */
-    len&=63;
-    for(; i>0; i--)
-    {
-      __asm__ __volatile__ (
-      "prefetchnta 320(%0)\n"
-      "movq (%0), %%mm0\n"
-      "movq 8(%0), %%mm1\n"
-      "movq 16(%0), %%mm2\n"
-      "movq 24(%0), %%mm3\n"
-      "movq 32(%0), %%mm4\n"
-      "movq 40(%0), %%mm5\n"
-      "movq 48(%0), %%mm6\n"
-      "movq 56(%0), %%mm7\n"
-      "movq %%mm0, (%1)\n"
-      "movq %%mm1, 8(%1)\n"
-      "movq %%mm2, 16(%1)\n"
-      "movq %%mm3, 24(%1)\n"
-      "movq %%mm4, 32(%1)\n"
-      "movq %%mm5, 40(%1)\n"
-      "movq %%mm6, 48(%1)\n"
-      "movq %%mm7, 56(%1)\n"
-      :: "r" (from), "r" (to) : "memory");
-      ((const unsigned char *)from)+=64;
-      ((unsigned char *)to)+=64;
-    }
-     /* since movntq is weakly-ordered, a "sfence"
-     * is needed to become ordered again. */
-    /* __asm__ __volatile__ ("sfence":::"memory"); */
-    __asm__ __volatile__ ("emms":::"memory");
-  }
-  /*
-   *	Now do the tail of the block
-   */
-  if( len ) __memcpy(to, from, len);
-  return retval;
-}
-
-void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned char *src, int width )
-{
-    SPEEDY_START();
-    if( dest != src ) mmx2_memcpy( dest, src, width*2 );
-    SPEEDY_END();
-}
-
+/**
+ * Scanlines are assumed to be approximately 2048 bytes.
+ */
 void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned char *src, int width )
 {
     SPEEDY_START();
@@ -467,7 +359,8 @@ void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned c
             dest += 64;
             src += 64;
         }
-        memcpy( dest, src, (width*2) & 63 );
+        i = (width * 2) & 63;
+        if( i ) __memcpy( dest, src, i );
         emms();
     }
 
@@ -555,9 +448,9 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
                                                               unsigned char *foreground,
                                                               int width, int alpha )
 {
-    const uint64_t alpha2 = 0x0000FFFF00000000;
-    const uint64_t alpha1 = 0xFFFF0000FFFFFFFF;
-    const uint64_t round  = 0x0080008000800080;
+    const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
+    const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
+    const mmx_t round  = { 0x0080008000800080ULL };
     int i;
 
     if( !alpha ) {
@@ -699,9 +592,9 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
                                                         unsigned char *input,
                                                         unsigned char *foreground, int width )
 {
-    const uint64_t alpha2 = 0x0000FFFF00000000;
-    const uint64_t alpha1 = 0xFFFF0000FFFFFFFF;
-    const uint64_t round  = 0x0080008000800080;
+    const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
+    const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
+    const mmx_t round  = { 0x0080008000800080ULL };
     int i;
 
     SPEEDY_START();
@@ -841,8 +734,8 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
                                                    int textcr )
 {
     unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
-    const uint64_t round = 0x0080008000800080;
-    const uint64_t fullalpha = 0x00000000000000ff;
+    const mmx_t round = { 0x0080008000800080ULL };
+    const mmx_t fullalpha = { 0x00000000000000ffULL };
 
     SPEEDY_START();
 
@@ -979,9 +872,9 @@ void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *in
 
 void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width )
 {
-    const uint64_t round  = 0x0080008000800080;
-    const uint64_t alpha  = 0x00000000000000ff;
-    const uint64_t noalp  = 0xffffffffffff0000;
+    const mmx_t round  = { 0x0080008000800080ULL };
+    const mmx_t alpha  = { 0x00000000000000ffULL };
+    const mmx_t noalp  = { 0xffffffffffff0000ULL };
 
     SPEEDY_START();
 
@@ -1040,8 +933,8 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
     } else if( pos >= 256 ) {
         blit_packed422_scanline( output, src2, width );
     } else {
-        const int64_t all256 = 0x0100010001000100;
-        const int64_t round  = 0x0080008000800080;
+        const mmx_t all256 = { 0x0100010001000100ULL };
+        const mmx_t round  = { 0x0080008000800080ULL };
 
         SPEEDY_START();
 

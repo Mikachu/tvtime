@@ -25,6 +25,7 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedtools.h"
 #include "speedy.h"
 
 static int EdgeDetect = 625;
@@ -49,14 +50,23 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
                                                             unsigned char *b0,
                                                             int width )
 {
-    int64_t qwEdgeDetect;
-    int64_t qwThreshold;
-    const int64_t YMask = 0x00ff00ff00ff00ff;
+    const mmx_t YMask = { 0x00ff00ff00ff00ffULL };
+    mmx_t qwEdgeDetect;
+    mmx_t qwThreshold;
 
-    qwEdgeDetect = EdgeDetect;
-    qwEdgeDetect += (qwEdgeDetect << 48) + (qwEdgeDetect << 32) + (qwEdgeDetect << 16);
-    qwThreshold = JaggieThreshold;
-    qwThreshold += (qwThreshold << 48) + (qwThreshold << 32) + (qwThreshold << 16);
+    qwEdgeDetect.w[ 0 ] = EdgeDetect;
+    qwEdgeDetect.w[ 1 ] = EdgeDetect;
+    qwEdgeDetect.w[ 2 ] = EdgeDetect;
+    qwEdgeDetect.w[ 3 ] = EdgeDetect;
+
+    qwThreshold.w[ 0 ] = JaggieThreshold;
+    qwThreshold.w[ 1 ] = JaggieThreshold;
+    qwThreshold.w[ 2 ] = JaggieThreshold;
+    qwThreshold.w[ 3 ] = JaggieThreshold;
+
+    READ_PREFETCH_2048( t1 );
+    READ_PREFETCH_2048( m1 );
+    READ_PREFETCH_2048( b1 );
 
     width /= 4;
     while( width-- ) {

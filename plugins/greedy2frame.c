@@ -23,6 +23,7 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedtools.h"
 #include "speedy.h"
 
 static int GreedyTwoFrameThreshold = 4;
@@ -37,16 +38,21 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
                                                                   unsigned char *b0,
                                                                   int width )
 {
-    const int64_t Mask = 0x7f7f7f7f7f7f7f7f;
-    const int64_t DwordOne = 0x0000000100000001;    
-    const int64_t DwordTwo = 0x0000000200000002;    
-    int64_t qwGreedyTwoFrameThreshold;
+    const mmx_t Mask = { 0x7f7f7f7f7f7f7f7fULL };
+    const mmx_t DwordOne = { 0x0000000100000001ULL };    
+    const mmx_t DwordTwo = { 0x0000000200000002ULL };    
+    mmx_t qwGreedyTwoFrameThreshold;
 
-    qwGreedyTwoFrameThreshold = (int64_t) GreedyTwoFrameThreshold;
-    qwGreedyTwoFrameThreshold += (((int64_t) GreedyTwoFrameThreshold2) << 8);
-    qwGreedyTwoFrameThreshold += (qwGreedyTwoFrameThreshold << 48) +
-                                (qwGreedyTwoFrameThreshold << 32) + 
-                                (qwGreedyTwoFrameThreshold << 16);
+    qwGreedyTwoFrameThreshold.b[ 0 ] = GreedyTwoFrameThreshold;
+    qwGreedyTwoFrameThreshold.b[ 1 ] = GreedyTwoFrameThreshold2;
+    qwGreedyTwoFrameThreshold.b[ 2 ] = GreedyTwoFrameThreshold;
+    qwGreedyTwoFrameThreshold.b[ 4 ] = GreedyTwoFrameThreshold;
+    qwGreedyTwoFrameThreshold.b[ 6 ] = GreedyTwoFrameThreshold;
+
+    READ_PREFETCH_2048( t1 );
+    READ_PREFETCH_2048( m2 );
+    READ_PREFETCH_2048( b1 );
+    READ_PREFETCH_2048( m1 );
 
     width /= 4;
     while( width-- ) {

@@ -9,6 +9,7 @@
 #include "mmx.h"
 #include "mm_accel.h"
 #include "deinterlace.h"
+#include "speedtools.h"
 #include "speedy.h"
 
 // This is a simple lightweight DeInterlace method that uses little CPU time
@@ -38,16 +39,27 @@ static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
                                                           unsigned char *b1, unsigned char *t0,
                                                           unsigned char *b0, int width )
 {
-    int64_t MaxComb;
-    int64_t i;
+    mmx_t MaxComb;
 
-    i = GreedyMaxComb;          // How badly do we let it weave? 0-255
-    MaxComb = i << 56 | i << 48 | i << 40 | i << 32 | i << 24 | i << 16 | i << 8 | i;    
+    // How badly do we let it weave? 0-255
+    MaxComb.ub[ 0 ] = GreedyMaxComb;
+    MaxComb.ub[ 1 ] = GreedyMaxComb;
+    MaxComb.ub[ 2 ] = GreedyMaxComb;
+    MaxComb.ub[ 3 ] = GreedyMaxComb;
+    MaxComb.ub[ 4 ] = GreedyMaxComb;
+    MaxComb.ub[ 5 ] = GreedyMaxComb;
+    MaxComb.ub[ 6 ] = GreedyMaxComb;
+    MaxComb.ub[ 7 ] = GreedyMaxComb;
 
     // L2 = m2;
     // L1 = t1;
     // L3 = b1;
     // LP2 = m1;
+
+    PREFETCH_2048( t1 );
+    PREFETCH_2048( m2 );
+    PREFETCH_2048( b1 );
+    PREFETCH_2048( m1 );
 
     width /= 4;
     while( width-- ) {

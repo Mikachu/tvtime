@@ -22,6 +22,12 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
+#include "config.h"
+#include "attributes.h"
+#include "mmx.h"
+#include "mm_accel.h"
+#include "speedtools.h"
 #include "speedy.h"
 #include "deinterlace.h"
 

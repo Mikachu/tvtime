@@ -35,7 +35,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
 	outputapi.h performance.h performance.c \
 	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
-	wm_state.h wm_state.c console.h console.c
+	wm_state.h wm_state.c console.h console.c speedtools.h
 
 bin_PROGRAMS = tvtime
 

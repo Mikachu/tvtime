@@ -79,19 +79,22 @@ static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *outpu
                                                             unsigned char *b0,
                                                             int width )
 {
-    const int64_t YMask = 0x00ff00ff00ff00ff;
-    const int64_t qwAllOnes = 0xffffffffffffffff;
-    int64_t qwBobbedPixels;
-    int64_t qwSpatialTolerance;
-    int64_t qwTemporalTolerance;
+    const mmx_t YMask = { 0x00ff00ff00ff00ffULL };
+    const mmx_t qwAllOnes = { 0xffffffffffffffffULL };
+    mmx_t qwBobbedPixels;
+    mmx_t qwSpatialTolerance;
+    mmx_t qwTemporalTolerance;
 
     // divide by 4 because of squaring behavior.
-    qwSpatialTolerance = ((int64_t) TwoFrameSpatialTolerance) / 4;
-    qwSpatialTolerance += (qwSpatialTolerance << 48) + (qwSpatialTolerance << 32)
-                                                     + (qwSpatialTolerance << 16);
-    qwTemporalTolerance = ((int64_t) TwoFrameTemporalTolerance) / 4;
-    qwTemporalTolerance += (qwTemporalTolerance << 48) + (qwTemporalTolerance << 32)
-                                                       + (qwTemporalTolerance << 16);
+    qwSpatialTolerance.w[ 0 ] = TwoFrameSpatialTolerance / 4;
+    qwSpatialTolerance.w[ 1 ] = TwoFrameSpatialTolerance / 4;
+    qwSpatialTolerance.w[ 2 ] = TwoFrameSpatialTolerance / 4;
+    qwSpatialTolerance.w[ 3 ] = TwoFrameSpatialTolerance / 4;
+
+    qwTemporalTolerance.w[ 0 ] = TwoFrameTemporalTolerance / 4;
+    qwTemporalTolerance.w[ 1 ] = TwoFrameTemporalTolerance / 4;
+    qwTemporalTolerance.w[ 2 ] = TwoFrameTemporalTolerance / 4;
+    qwTemporalTolerance.w[ 3 ] = TwoFrameTemporalTolerance / 4;
 
     // TODO: Just bob any extra pixels.
 

@@ -363,6 +363,10 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
 
 void input_delete( input_t *in )
 {
+#ifdef HAVE_LIRC
+    lirc_freeconfig( in->lirc_conf );
+    lirc_deinit();
+#endif
     free( in );
 }
 
@@ -790,15 +794,21 @@ static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
 
     lirc_code2char( lirc_conf, code, &string );
 
-    if( string == NULL ) /* No tvtime action for this code. */
+    if( string == NULL ) {
+        /* No tvtime action for this code. */
+        free( code );
         return;
+    }
 
-    cmd = string_to_command(string);
+    cmd = string_to_command( string );
         
-    if( cmd != -1 )
+    if( cmd != -1 ) {
         input_callback( in, I_REMOTE, cmd );
-    else
+    } else {
         fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
+    }
+
+    free( code );
 }
 #endif
 
