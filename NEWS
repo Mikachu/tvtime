@@ -13,6 +13,7 @@ News for 0.9.10
   *  Added a DirectFB output layer by Ville Syrjala.
   *  Significantly lowered the size of the tvtime helper executables.
   *  Various menu system cleanups.
+  *  Fixed a ton of bugs.
 
 News for 0.9.9
 

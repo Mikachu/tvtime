@@ -1,6 +1,6 @@
 
-  Bug summary for tvtime 0.9.9
-  ============================
+  Bug summary for tvtime 0.9.10
+  =============================
 
   For detailed information on each of the following bugs, please see our
 bug tracker on our sourceforge webpage:
@@ -10,15 +10,22 @@ bug tracker on our sourceforge webpage:
   Known bugs
   ----------
 
-751093 dalias' pulldown algorithm needs work
-726822 Filter not hitting all scanlines when using dalias' pulldown
+803752 tvtime 0.9.9 noise sound with alsa
 727947 tvtime needs a -geometry environment variable
 736098 Start on fullscreen broken in some cases?
-752604 [Debian] The setuid question should use dpkg-statoverride
 730565 OSD crashes for UTF-8 characters
-727946 tvtime needs a -display command line flag.
 735053 tvtime should use SIGALRM to watch for hangs
-726638 No way to enable VBI decoding at runtime
+800001 restore XVideo visual parameters
+801849 tvtime -c switch is broken or documentation not right
+698712 MPEG source
+694683 GUI to control the fifo?
+779410 tvtime showing teletext
+747413 Support different norms per input, not just per channel
+761417 Add recording to raw or MPEG
+801007 Teletext subtitles
+759808 Bridge between two sound devices (IN-OUT)
+694509 tvtime should remember window position and size
+640910 Flash Interface
 793615 Frame capture timed out, hardware/driver problems?
 789556 Can't play tvtime and mplayer in one time
 788412 feature request: preferred language for specific channels
@@ -26,19 +33,15 @@ bug tracker on our sourceforge webpage:
 788872 Getting errors and green frames with rivatv 0.8.3
 787121 video quit updating
 787142 ATI's fglxr drivers cause complaint about missing YUY2
-787398 High cpu load jitery video
-712050 XMLTV support
+787398 High cpu load jitery video 
 738588 OSD quality poor in 'overlay bob' mode
-707738 No way to disable signal detection at runtime
 729713 It would be nice to use backspace during renumbering
 739376 Should use a different state directory for fifos
 733568 Confusing fullscreen behaviour
-731637 Controlling the output of screenshot
 707615 full-screen + no window manager == X restart
 694681 No way to change deinterlacer settings
 732469 Controlling OSD Output
 634674 tvtime drops frames when gkrellm running
-732827 shortcut to external
 723926 icons should be installed by the source distribution
 727949 Need a user-configurable fullscreen size
 715054 screenshot too slow
@@ -48,7 +51,6 @@ bug tracker on our sourceforge webpage:
 728259 tvtime needs a multiscreen mode
 732468 Channel Preview Window Addition
 746284 ft2build.h not always present. Wrong dirs -Included some tim
-776172 Save audio mode
 725830 BadAtom errors from something
 738167 Problems with changed option/bind names
 759785 key for rename channel
@@ -58,20 +60,18 @@ bug tracker on our sourceforge webpage:
 720075 client / server mode
 735554 Buffer problems with closed captioning?
 720072 Closed Caption text messed up
-770701 varable, zoomable aspect ratio
-743918 tvtime should have runtime norm selection (50/60Hz)
+770701 varable, zoomable aspect ratio 
 770653 Fullscreen always at 0,0 when res less than virutal res
 781231 GL output layer
 698201 XVideo output failed to initialize
 770285 Segfaults in CVS
 777397 "Screenshot saved" text captured in next shot
 727069 Can't display on the root window
-744631 Compile error on dfboutput.c
 691892 Fullscreen doesn't follow virtual desktop position
 630236 No MMX versions of MMXEXT functions
 768596 tvtime fails with Kensington SE401 USB camera
 724354 tvtime should not clobber settings as aggressively
-704780 greedy2frame and twoframe ports busted
+
 
   Known incompatibility problems
   ------------------------------
@@ -84,10 +84,8 @@ bug tracker on our sourceforge webpage:
 691315 i845G XVideo crashes
 672810 g400 marvel
 694144 Overscan feature vs nvidia driver: corrupted borders
-766373 bttv9 returns incorrect audio mode settings
 738524 mga_vid does not provide a sane API for our overscan feature
 743785 Odd Screensaver-related problem?
-766232 bttv9 always claims unmuted - tvtime won't unmute audio
 702539 Using overlay mode in xawtv/zapping causes system crashes
 767527 Long window titles muck up metacity
 628292 Voodoo 3500 driver does not support capture

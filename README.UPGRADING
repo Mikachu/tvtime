@@ -1,7 +1,7 @@
 This file contains important messages about upgrading tvtime.
 
-Upgrading to tvtime 0.9.9 from previous versions
-------------------------------------------------
+Upgrading to tvtime 0.9.9 or 0.9.10 from previous versions
+----------------------------------------------------------
 
 tvtime in 0.9.9 is quite changed from previous versions.  Because of
 this, we have made some incompatible key binding changes that may cause
