@@ -152,8 +152,6 @@ static deinterlace_method_t vfirmethod =
     0,
 #endif
     0,
-    0,
-    0,
     1,
     deinterlace_scanline_vfir,
     copy_scanline,

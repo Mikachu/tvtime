@@ -177,8 +177,6 @@ static deinterlace_method_t linearblendmethod =
     0,
 #endif
     0,
-    0,
-    0,
     1,
     deinterlace_scanline_linear_blend,
     deinterlace_scanline_linear_blend2,

@@ -52,8 +52,6 @@ static deinterlace_method_t weavemethod =
     3,
     0,
     0,
-    0,
-    0,
     1,
     deinterlace_scanline_weave,
     copy_scanline,

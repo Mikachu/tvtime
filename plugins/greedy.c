@@ -162,17 +162,6 @@ static void deinterlace_greedy_packed422_scanline_mmxext( uint8_t *output,
 #endif
 }
 
-static deinterlace_setting_t settings[] =
-{
-    {
-        "Greedy Max Comb",
-        SETTING_SLIDER,
-        &GreedyMaxComb,
-        15, 0, 255, 1,
-        0
-    }
-};
-
 static deinterlace_method_t greedymethod =
 {
     "Motion Adaptive: Simple Detection",
@@ -180,8 +169,6 @@ static deinterlace_method_t greedymethod =
     3,
     MM_ACCEL_X86_MMXEXT,
     0,
-    1,
-    settings,
     1,
     copy_scanline,
     deinterlace_greedy_packed422_scanline_mmxext,

@@ -108,8 +108,6 @@ static deinterlace_method_t tomsmocompmethod =
     0,
     0,
     0,
-    0,
-    0,
     deinterlace_frame_di_tomsmocomp,
     { "Uses heuristics to detect motion in the input",
       "frames and reconstruct image detail where",

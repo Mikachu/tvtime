@@ -47,8 +47,6 @@ static deinterlace_method_t linearmethod =
     1,
     0,
     0,
-    0,
-    0,
     1,
     deinterlace_scanline_linear,
     copy_scanline,
