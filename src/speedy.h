@@ -314,6 +314,12 @@ extern void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf,
                                               uint8_t *yuyv_buf, int width );
 
 /**
+ * Point sampler.
+ */
+extern void (*pointsample_packed422_image)( uint8_t *dst, int dwidth, int dheight, int dstride,
+                                            uint8_t *src, int swidth, int sheight, int sstride );
+
+/**
  * Sets up the function pointers to point at the fastest function
  * available.  Requires accelleration settings (see mm_accel.h).
  */

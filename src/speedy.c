@@ -167,6 +167,8 @@ void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int
 void (*composite_colour4444_alpha_to_packed422_scanline)( uint8_t *output, uint8_t *input,
                                                           int af, int y, int cb, int cr,
                                                           int width, int alpha );
+void (*pointsample_packed422_image)( uint8_t *dst, int dwidth, int dheight, int dstride,
+                                     uint8_t *src, int swidth, int sheight, int sstride );
 
 
 /**
@@ -2657,6 +2659,24 @@ static void chroma_420_to_422_mpeg2_plane_c( uint8_t *dst, uint8_t *src,
     }
 }
 
+void pointsample_packed422_image_c( uint8_t *dst, int dwidth, int dheight, int dstride,
+                                    uint8_t *src, int swidth, int sheight, int sstride )
+{
+    int x, y;
+    int qdwidth = (dwidth * 2) / 4;
+    int qswidth = (swidth * 2) / 4;
+
+    for( y = 0; y < dheight; y++ ) {
+        uint8_t *curdst = dst + (y * dstride);
+        uint8_t *cursrc = src + (((y * (sheight - 1)) / (dheight - 1)) * sstride);
+
+        for( x = 0; x < qdwidth; x++ ) {
+            uint8_t *srcpx = cursrc + (((x * (qswidth - 1)) / (qdwidth - 1)) * 4);
+            *((uint32_t *) (curdst + (x * 4))) = *((uint32_t *) srcpx);
+        }
+    }
+}
+
 static uint32_t speedy_accel;
 
 void setup_speedy_calls( uint32_t accel, int verbose )
@@ -2700,6 +2720,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
     convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_c;
     composite_colour4444_alpha_to_packed422_scanline = composite_colour4444_alpha_to_packed422_scanline_c;
+    pointsample_packed422_image = pointsample_packed422_image_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
