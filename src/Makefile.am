@@ -66,7 +66,7 @@ tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) -lm
+	$(DYNAMIC_LD_LIBS) -lm -lstdc++
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
