@@ -36,7 +36,7 @@ enum input_event
     I_KEYDOWN,
     I_QUIT,
     I_BUTTONPRESS,
-    I_REMOTE,
+    I_REMOTE
 };
 
 /* Modifiers */

@@ -116,6 +116,7 @@ const char *fb_dev_name = "/dev/fb0";
 
 int dfb_setup_temp_buffer()
 {
+  int res;
 
   /* Draw to a temporary surface */
   DFBSurfaceDescription dsc;
@@ -124,8 +125,7 @@ int dfb_setup_temp_buffer()
   dsc.width       = input_width;
   dsc.height      = input_height;
   dsc.pixelformat = DSPF_YUY2;
-  int res;
-  
+
   if ((res = dfb->CreateSurface( dfb, &dsc, &current_frame )) != DFB_OK) {
       fprintf(stderr,"dgboutput: Can't create surfaces - %s!\n",
               DirectFBErrorString( res ) );
