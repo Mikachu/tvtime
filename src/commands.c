@@ -501,6 +501,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_AUTO_ADJUST_PICT:
         videoinput_reset_default_settings( in->vidin );
+        if( in->osd ) {
+            tvtime_osd_show_message( in->osd, "Picture settings reset to defaults." );
+        }
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
