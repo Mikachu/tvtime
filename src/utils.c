@@ -97,38 +97,33 @@ const char *get_tvtime_paths( void )
 
 const char *get_tvtime_fifodir( uid_t uid )
 {
-    static char *fifodir = NULL;
+    static char *fifodir = 0;
 
     if( !fifodir ) {
         /* We have nothing in our cache. */
-        struct passwd *pwuid = NULL;
-        char *user = NULL;
-        DIR *dirhandle = NULL;
+        struct passwd *pwuid = 0;
+        char *user = 0;
+        DIR *dirhandle = 0;
 
         /* Check for the user's existance. */
         pwuid = getpwuid( uid );
         if( pwuid ) {
-            if( asprintf( &user,
-                          "%s",
-                          pwuid->pw_name) < 0 ) {
+            if( asprintf( &user, "%s", pwuid->pw_name) < 0 ) {
                 fprintf( stderr, "utils: Out of memory.\n" );
-                return NULL;
+                return 0;
             }
         } else {
             if( asprintf( &user, "%u", uid ) < 0 ) {
                 fprintf( stderr, "utils: Out of memory.\n" );
-                return NULL;
+                return 0;
             }
         }
 
         /* First try the FIFODIR. */
-        if( asprintf( &fifodir, 
-                      "%s/TV-%s",
-                      FIFODIR,
-                      user ) < 0 ) {
+        if( asprintf( &fifodir, "%s/TV-%s", FIFODIR, user ) < 0 ) {
             free( user );
             fprintf( stderr, "utils: Out of memory.\n" );
-            return NULL;
+            return 0;
         }
         free( user );
 
@@ -155,15 +150,12 @@ const char *get_tvtime_fifodir( uid_t uid )
         user = getenv( "HOME" );
         if( !user ) {
             fprintf( stderr, "utils: You're HOMEless, go away!\n" );
-            return NULL;
+            return 0;
         }
-        if( asprintf( &fifodir,
-                      "%s/.tvtime",
-                      user ) < 0 ) {
+        if( asprintf( &fifodir, "%s/.tvtime", user ) < 0 ) {
             fprintf( stderr, "utils: Out of memory.\n" );
-            return NULL;
+            return 0;
         }
-        free( user );
 
         /* We will try to ensure that the FIFO directory exists. */
         errno = 0;
@@ -184,7 +176,7 @@ const char *get_tvtime_fifodir( uid_t uid )
 
         /* It appears we failed.  Bail out. */
         free( fifodir );
-        return NULL;
+        return 0;
     }
 
     /* Return the value in the cache. */
@@ -193,15 +185,15 @@ const char *get_tvtime_fifodir( uid_t uid )
 
 const char *get_tvtime_fifo( uid_t uid )
 {
-    static char *fifo = NULL;
+    static char *fifo = 0;
 
     if( !fifo ) {
         /* We have nothing in our cache. */
-        const char *fifodir = NULL;
-        char *hostname = NULL;
+        const char *fifodir = 0;
+        char *hostname = 0;
         size_t hostenv_size = 256; 
-        char *hostenv = NULL;
-	char *hostenv_realloc = NULL;
+        char *hostenv = 0;
+	char *hostenv_realloc = 0;
 
         /* Get the FIFO directory. */
         fifodir = get_tvtime_fifodir( uid );
@@ -211,11 +203,11 @@ const char *get_tvtime_fifo( uid_t uid )
         }
 
         /* Try to get a hostname. */
-        hostenv = (char *) malloc( hostenv_size );
+        hostenv = malloc( hostenv_size );
         while( gethostname( hostenv, hostenv_size ) < 0 ) {
             hostenv_size *= 2;
             hostenv_realloc = realloc( hostenv, hostenv_size );
-            if( hostenv_realloc == NULL ) {
+            if( !hostenv_realloc ) {
                 /* Use a partial hostname. */
                 hostenv_size /= 2;
                 break;
@@ -231,24 +223,22 @@ const char *get_tvtime_fifo( uid_t uid )
                 /* Try to get away with no hostname. */
                 if( asprintf( &hostname, "%s", "" ) < 0 ) {
                     fprintf( stderr, "utils: Really out of memory.\n" );
-                    return NULL;
+                    return 0;
                 }
             }
         } else {
             if( asprintf( &hostname, "%s", "" ) < 0 ) {
                 fprintf( stderr, "utils: Really out of memory.\n" );
-                return NULL;
+                return 0;
             }
         }
 
-        if( asprintf( &fifo,
-                      "%s/tvtimefifo%s",
-                      fifodir,
+        if( asprintf( &fifo, "%s/tvtimefifo%s", fifodir,
                       hostname ) < 0 ) {
             fprintf( stderr, "utils: Out of memory.\n" );
             if( asprintf( &fifo, "%s", "" ) < 0 ) {
                 fprintf( stderr, "utils: Really out of memory.\n" );
-                return NULL;
+                return 0;
             }
         }
     }
