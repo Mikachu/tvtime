@@ -95,18 +95,15 @@ tz_map_t date_manip_timezones[] = {
 
 const int num_timezones = sizeof( date_manip_timezones ) / sizeof( tz_map_t );
 
-
 /**
  * Timezone parsing code based loosely on the algorithm in
  * filldata.cpp of MythTV.
  */
 static int parse_xmltv_timezone( const char *tzstring )
 {
-    /* We signal an error by setting it invalid (> 720min = 12hr). */
-    int result = 721;
-
     if( strlen( tzstring ) == 5 && (tzstring[ 0 ] == '+' || tzstring[ 0 ] == '-') ) {
         char hour[ 3 ];
+        int result;
         int min;
 
         hour[ 0 ] = tzstring[ 1 ];
@@ -122,6 +119,8 @@ static int parse_xmltv_timezone( const char *tzstring )
         if( tzstring[ 0 ] == '-' ) {
             result *= -1;
         }
+
+        return result;
     } else {
         int i;
 
@@ -132,16 +131,18 @@ static int parse_xmltv_timezone( const char *tzstring )
         }
     }
 
-    return result;
+    return 0;
 }
 
-static void parse_xmltv_date( int *year, int *month, int *day, int *hour, int *min, const char *date )
+static void parse_xmltv_date( int *year, int *month, int *day, int *hour,
+                              int *min, int *tz, const char *date )
 {
     char syear[ 6 ];
     char smonth[ 3 ];
     char sday[ 3 ];
     char shour[ 3 ];
     char smin[ 3 ];
+    int len = strlen( date );
 
     memset( syear, 0, sizeof( syear ) );
     memset( smonth, 0, sizeof( smonth ) );
@@ -149,17 +150,18 @@ static void parse_xmltv_date( int *year, int *month, int *day, int *hour, int *m
     memset( shour, 0, sizeof( shour ) );
     memset( smin, 0, sizeof( smin ) );
 
-    memcpy( syear, date, 4 );
-    memcpy( smonth, date + 4, 2 );
-    memcpy( sday, date + 6, 2 );
-    memcpy( shour, date + 8, 2 );
-    memcpy( smin, date + 10, 2 );
+    if( len > 4 ) memcpy( syear, date, 4 );
+    if( len > 6 ) memcpy( smonth, date + 4, 2 );
+    if( len > 8 ) memcpy( sday, date + 6, 2 );
+    if( len > 10 ) memcpy( shour, date + 8, 2 );
+    if( len > 12 ) memcpy( smin, date + 10, 2 );
 
     *year = atoi( syear );
     *month = atoi( smonth );
     *day = atoi( sday );
     *hour = atoi( shour );
     *min = atoi( smin );
+    if( len > 15 ) *tz = parse_xmltv_timezone( date + 15 ); else *tz = 0;
 }
 
 static int date_compare( int year1, int month1, int day1, int hour1, int min1,
@@ -191,11 +193,14 @@ static xmlNodePtr get_next_program( xmlNodePtr cur, const char *channelid,
                     int start_day;
                     int start_hour;
                     int start_min;
+                    int start_tz;
                     int diff = 0;
 
                     parse_xmltv_date( &start_year, &start_month, &start_day,
-                                      &start_hour, &start_min, (char *) start );
-                    diff = date_compare( start_year, start_month, start_day, start_hour, start_min,
+                                      &start_hour, &start_min, &start_tz,
+                                      (char *) start );
+                    diff = date_compare( start_year, start_month, start_day,
+                                         start_hour, start_min,
                                          year, month, day, hour, min );
                     if ( diff > 0 ) { // if diff == 0, it's the same show
                         if ( min_diff == 0 || diff < min_diff ) {
@@ -229,8 +234,10 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, int end_year, int en
             int start_day;
             int start_hour;
             int start_min;
+            int start_tz;
             parse_xmltv_date( &start_year, &start_month, &start_day,
-                              &start_hour, &start_min, (char *) start );
+                              &start_hour, &start_min, &start_tz,
+                              (char *) start );
             sprintf( pro->times, "%2d:%02d - %2d:%02d",
                      start_hour, start_min, end_hour, end_min  );
             xmlFree( start );
@@ -279,19 +286,24 @@ static xmlNodePtr get_program( xmlNodePtr root, program_t *pro, const char *chan
                     int start_day;
                     int start_hour;
                     int start_min;
+                    int start_tz;
                     int end_year;
                     int end_month;
                     int end_day;
                     int end_hour;
                     int end_min;
+                    int end_tz;
                     parse_xmltv_date( &start_year, &start_month, &start_day,
-                                      &start_hour, &start_min, (char *) start );
-                    if( date_compare( start_year, start_month, start_day, start_hour, start_min,
+                                      &start_hour, &start_min, &start_tz,
+                                      (char *) start );
+                    if( date_compare( start_year, start_month, start_day,
+                                      start_hour, start_min,
                                       year, month, day, hour, min ) <= 0 ) {
                         xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
                         if( stop ) {
-                            parse_xmltv_date( &end_year, &end_month, &end_day, &end_hour,
-                                              &end_min, (char *) stop );
+                            parse_xmltv_date( &end_year, &end_month, &end_day,
+                                              &end_hour, &end_min, &end_tz,
+                                              (char *) stop );
                             xmlFree( stop );
                         } else {
                             xmlNodePtr next_program = get_next_program(root, channelid,
@@ -301,8 +313,10 @@ static xmlNodePtr get_program( xmlNodePtr root, program_t *pro, const char *chan
                             if ( next_program ) {
                                 next_start = xmlGetProp( next_program, BAD_CAST "start" );
                                 if ( next_start ) {
-                                    parse_xmltv_date( &end_year, &end_month, &end_day,
-                                                      &end_hour, &end_min, (char *) next_start );
+                                    parse_xmltv_date( &end_year, &end_month,
+                                                      &end_day, &end_hour,
+                                                      &end_min, &end_tz,
+                                                      (char *) next_start );
                                 }
                             }
                             if ( !next_program || !next_start ) {
