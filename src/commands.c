@@ -43,8 +43,8 @@ static Cmd_Names cmd_table[] = {
 
     { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
 
-    { "BRIGHT_DOWN", TVTIME_BRIGHT_DOWN },
-    { "BRIGHT_UP", TVTIME_BRIGHT_UP },
+    { "BRIGHTNESS_DOWN", TVTIME_BRIGHTNESS_DOWN },
+    { "BRIGHTNESS_UP", TVTIME_BRIGHTNESS_UP },
 
     { "CHANNEL_1", TVTIME_CHANNEL_1 },
     { "CHANNEL_2", TVTIME_CHANNEL_2 },
@@ -68,10 +68,9 @@ static Cmd_Names cmd_table[] = {
     { "COLOR_DOWN", TVTIME_COLOUR_DOWN },
     { "COLOR_UP", TVTIME_COLOUR_UP },
 
-    { "CONT_DOWN", TVTIME_CONT_DOWN },
-    { "CONT_UP", TVTIME_CONT_UP },
+    { "CONTRAST_DOWN", TVTIME_CONTRAST_DOWN },
+    { "CONTRAST_UP", TVTIME_CONTRAST_UP },
 
-    { "DEINTERLACING_MODE", TVTIME_DEINTERLACINGMODE },
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
 
     { "ENTER", TVTIME_ENTER },
@@ -84,8 +83,6 @@ static Cmd_Names cmd_table[] = {
 
     { "LUMA_UP", TVTIME_LUMA_UP },
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
-
-    { "MENUMODE", TVTIME_MENUMODE },
 
     { "MIXER_MUTE", TVTIME_MIXER_MUTE },
     { "MIXER_UP", TVTIME_MIXER_UP },
@@ -108,8 +105,9 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
     { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS },
+    { "TOGGLE_DEINTERLACER", TVTIME_TOGGLE_DEINTERLACER },
     { "TOGGLE_FULLSCREEN", TVTIME_TOGGLE_FULLSCREEN },
-    { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
+    { "TOGGLE_FRAMERATE", TVTIME_TOGGLE_FRAMERATE },
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
@@ -404,7 +402,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             console_scroll_n( in->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
         break;
             
-    case TVTIME_TOGGLE_HALF_FRAMERATE:
+    case TVTIME_TOGGLE_FRAMERATE:
         in->framerate = (in->framerate + 1) % FRAMERATE_MAX;
         break;
 
@@ -507,7 +505,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_DEINTERLACINGMODE:
+    case TVTIME_TOGGLE_DEINTERLACER:
         in->toggledeinterlacingmode = 1;
         break;
 
@@ -719,20 +717,20 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_BRIGHT_UP: 
-    case TVTIME_BRIGHT_DOWN:
+    case TVTIME_BRIGHTNESS_UP: 
+    case TVTIME_BRIGHTNESS_DOWN:
         if( in->vidin ) {
-            videoinput_set_brightness_relative( in->vidin, (tvtime_cmd == TVTIME_BRIGHT_UP) ? 1 : -1 );
+            videoinput_set_brightness_relative( in->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );
             if( in->osd ) {
                 tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
             }
         }
         break;
 
-    case TVTIME_CONT_UP:
-    case TVTIME_CONT_DOWN:
+    case TVTIME_CONTRAST_UP:
+    case TVTIME_CONTRAST_DOWN:
         if( in->vidin ) {
-            videoinput_set_contrast_relative( in->vidin, (tvtime_cmd == TVTIME_CONT_UP) ? 1 : -1 );
+            videoinput_set_contrast_relative( in->vidin, (tvtime_cmd == TVTIME_CONTRAST_UP) ? 1 : -1 );
             if( in->osd ) {
                 tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
             }

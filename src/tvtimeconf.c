@@ -533,10 +533,10 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
     ct->keymap[ I_F1 ] = TVTIME_HUE_DOWN;
     ct->keymap[ I_F2 ] = TVTIME_HUE_UP;
-    ct->keymap[ I_F3 ] = TVTIME_BRIGHT_DOWN;
-    ct->keymap[ I_F4 ] = TVTIME_BRIGHT_UP;
-    ct->keymap[ I_F5 ] = TVTIME_CONT_DOWN;
-    ct->keymap[ I_F6 ] = TVTIME_CONT_UP;
+    ct->keymap[ I_F3 ] = TVTIME_BRIGHTNESS_DOWN;
+    ct->keymap[ I_F4 ] = TVTIME_BRIGHTNESS_UP;
+    ct->keymap[ I_F5 ] = TVTIME_CONTRAST_DOWN;
+    ct->keymap[ I_F6 ] = TVTIME_CONTRAST_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
     ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
@@ -547,7 +547,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
     ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
-    ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
+    ct->keymap[ 't' ] = TVTIME_TOGGLE_DEINTERLACER;
     ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
@@ -556,7 +556,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
     ct->keymap[ 'w' ] = TVTIME_TOGGLE_CC;
-    ct->keymap[ '=' ] = TVTIME_TOGGLE_HALF_FRAMERATE;
+    ct->keymap[ '=' ] = TVTIME_TOGGLE_FRAMERATE;
     ct->keymap[ I_END ] = TVTIME_TOGGLE_PAUSE;
     ct->keymap[ 'e' ] = TVTIME_TOGGLE_AUDIO_MODE;
     ct->keymap[ '<' ] = TVTIME_OVERSCAN_DOWN;

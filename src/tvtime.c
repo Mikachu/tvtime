@@ -1207,7 +1207,7 @@ int main( int argc, char **argv )
     }
     /* If we start half-framerate, toggle that now. */
     for( i = 0; i < config_get_framerate_mode( ct ); i++ ) {
-        commands_handle( commands, TVTIME_TOGGLE_HALF_FRAMERATE, 0 );
+        commands_handle( commands, TVTIME_TOGGLE_FRAMERATE, 0 );
     }
     /* If we are a new install, start scanning channels. */
     if( station_is_new_install( stationmgr ) ) {

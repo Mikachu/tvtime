@@ -95,17 +95,17 @@
     <keyboard key="F2"/>
   </bind>
 
-  <bind command="bright_down">
+  <bind command="brightness_down">
     <keyboard key="F3"/>
   </bind>
-  <bind command="bright_up">
+  <bind command="brightness_up">
     <keyboard key="F4"/>
   </bind>
 
-  <bind command="cont_down">
+  <bind command="contrast_down">
     <keyboard key="F5"/>
   </bind>
-  <bind command="cont_up">
+  <bind command="contrast_up">
     <keyboard key="F6"/>
   </bind>
 
@@ -153,7 +153,7 @@
     <keyboard key="s"/>
   </bind>
 
-  <bind command="deinterlacingmode">
+  <bind command="toggle_deinterlacer">
     <keyboard key="t"/>
   </bind>
 
@@ -189,7 +189,7 @@
     <keyboard key="w"/>
   </bind>
 
-  <bind command="toggle_half_framerate">
+  <bind command="toggle_framerate">
     <keyboard key="="/>
   </bind>
 
