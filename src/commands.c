@@ -114,6 +114,7 @@ struct commands_s {
     int resizewindow;
     int restarttvtime;
     int setdeinterlacer;
+    int normset;
     const char *newnorm;
     int newsharpness;
     char deinterlacer[ 128 ];
@@ -779,6 +780,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->resizewindow = 0;
     cmd->restarttvtime = 0;
     cmd->setdeinterlacer = 0;
+    cmd->normset = 0;
     cmd->newsharpness = 0;
     cmd->setfreqtable = 0;
     cmd->brightness = config_get_global_brightness( cfg );
@@ -2123,6 +2125,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         } else {
             cmd->newnorm = "NTSC";
         }
+        cmd->normset = 1;
 
         if( cmd->osd ) {
             menu_t *normmenu = commands_get_menu( cmd, "norm" );
@@ -3121,7 +3124,11 @@ int commands_restart_tvtime( commands_t *cmd )
 
 const char *commands_get_new_norm( commands_t *cmd )
 {
-    return cmd->newnorm;
+    if( cmd->normset ) {
+        return cmd->newnorm;
+    } else {
+        return 0;
+    }
 }
 
 int commands_set_deinterlacer( commands_t *cmd )

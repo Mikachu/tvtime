@@ -1588,6 +1588,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     }
     if( tvtime->outputfilter ) {
         outputfilter_set_console( tvtime->outputfilter, con );
+        outputfilter_set_pixel_aspect( tvtime->outputfilter, pixel_aspect );
     }
 
     in = input_new( ct, commands, con, verbose );
@@ -2375,7 +2376,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     snprintf( number, 4, "%d", commands_get_global_hue( commands ) );
     config_save( ct, "DefaultHue", number );
 
-    config_save( ct, "Norm", commands_get_new_norm( commands ) );
+    if( commands_get_new_norm( commands ) ) {
+        config_save( ct, "Norm", commands_get_new_norm( commands ) );
+    }
 
     snprintf( number, 4, "%d", station_get_prev_id( stationmgr ) );
     config_save( ct, "PrevChannel", number );

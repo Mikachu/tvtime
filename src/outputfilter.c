@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include "osdtools.h"
 #include "outputfilter.h"
 
 struct outputfilter_s
@@ -24,6 +25,7 @@ struct outputfilter_s
     vbiscreen_t *vs;
     tvtime_osd_t *osd;
     console_t *con;
+    double pixelaspect;
 };
 
 outputfilter_t *outputfilter_new( void )
@@ -58,6 +60,11 @@ void outputfilter_set_osd( outputfilter_t *of, tvtime_osd_t *osd )
 void outputfilter_set_console( outputfilter_t *of, console_t *console )
 {
     of->con = console;
+}
+
+void outputfilter_set_pixel_aspect( outputfilter_t *of, double pixelaspect )
+{
+    of->pixelaspect = pixelaspect;
 }
 
 int outputfilter_active_on_scanline( outputfilter_t *of, int scanline )
