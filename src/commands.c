@@ -483,7 +483,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 5, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
@@ -504,7 +505,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_right_command( menu, 3, TVTIME_RESTART, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
-    menu_set_text( menu, 4, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
@@ -524,7 +526,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 4, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
@@ -552,7 +555,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 5, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
@@ -567,7 +571,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_BRIGHTNESS_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_BRIGHTNESS_DOWN, "" );
-    menu_set_text( menu, 2, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
@@ -582,7 +587,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_CONTRAST_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_CONTRAST_DOWN, "" );
-    menu_set_text( menu, 2, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
@@ -597,7 +603,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_COLOUR_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_COLOUR_DOWN, "" );
-    menu_set_text( menu, 2, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
@@ -612,7 +619,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_HUE_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_HUE_DOWN, "" );
-    menu_set_text( menu, 2, "Back" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
