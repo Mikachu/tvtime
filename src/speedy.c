@@ -217,21 +217,43 @@ void interpolate_packed422_scanline_mmxext( unsigned char *output,
 
     SPEEDY_START();
 
-    for( i = width/4; i; --i ) {
-        movq_m2r( *bot, mm2 );
-        movq_m2r( *top, mm3 );
+    for( i = width/16; i; --i ) {
+        movq_m2r( *bot, mm0 );
+        movq_m2r( *top, mm1 );
+        movq_m2r( *(bot + 8), mm2 );
+        movq_m2r( *(top + 8), mm3 );
+        movq_m2r( *(bot + 16), mm4 );
+        movq_m2r( *(top + 16), mm5 );
+        movq_m2r( *(bot + 24), mm6 );
+        movq_m2r( *(top + 24), mm7 );
+        pavgb_r2r( mm1, mm0 );
         pavgb_r2r( mm3, mm2 );
-        movq_r2m( mm2, *output );
+        pavgb_r2r( mm5, mm4 );
+        pavgb_r2r( mm7, mm6 );
+        movntq_r2m( mm0, *output );
+        movntq_r2m( mm2, *(output + 8) );
+        movntq_r2m( mm4, *(output + 16) );
+        movntq_r2m( mm6, *(output + 24) );
+        output += 32;
+        top += 32;
+        bot += 32;
+    }
+    width = (width & 0xf);
+
+    for( i = width/4; i; --i ) {
+        movq_m2r( *bot, mm0 );
+        movq_m2r( *top, mm1 );
+        pavgb_r2r( mm1, mm0 );
+        movntq_r2m( mm0, *output );
         output += 8;
         top += 8;
         bot += 8;
     }
+    width = width & 0x7;
 
     /* Handle last few pixels. */
-    if( width & 0x0f ) {
-        for( i = (width & 0x0f)*2; i; --i ) {
-            *output++ = ((*top++) + (*bot++)) >> 1;
-        }
+    for( i = width * 2; i; --i ) {
+        *output++ = ((*top++) + (*bot++)) >> 1;
     }
 
     emms();
@@ -254,32 +276,11 @@ void blit_colour_packed422_scanline_c( unsigned char *output,
     SPEEDY_END();
 }
 
-void blit_colour_packed422_scanline_mmx( unsigned char *output,
-                                         int width, int y, int cb, int cr )
-{
-    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
-
-    SPEEDY_START();
-
-    movd_m2r( colour, mm1 );
-    movd_m2r( colour, mm2 );
-    psllq_i2r( 32, mm1 );
-    por_r2r( mm1, mm2 );
-
-    for( width /= 4; width; --width ) {
-        movq_r2m( mm2, *output );
-        output += 8;
-    }
-
-    emms();
-
-    SPEEDY_END();
-}
-
 void blit_colour_packed422_scanline_mmxext( unsigned char *output,
                                             int width, int y, int cb, int cr )
 {
     unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
+    int i;
 
     SPEEDY_START();
 
@@ -288,9 +289,29 @@ void blit_colour_packed422_scanline_mmxext( unsigned char *output,
     psllq_i2r( 32, mm1 );
     por_r2r( mm1, mm2 );
 
-    for( width /= 4; width; --width ) {
-        movq_r2m( mm2, *output );
+    for( i = width / 16; i; --i ) {
+        movntq_r2m( mm2, *output );
+        movntq_r2m( mm2, *(output + 8) );
+        movntq_r2m( mm2, *(output + 16) );
+        movntq_r2m( mm2, *(output + 24) );
+        output += 32;
+    }
+    width = (width & 0xf);
+
+    for( i = width / 4; i; --i ) {
+        movntq_r2m( mm2, *output );
         output += 8;
+    }
+    width = (width & 0x7);
+
+    for( i = width / 2; i; --i ) {
+        *((unsigned int *) output) = colour;
+        output += 4;
+    }
+
+    if( width & 1 ) {
+        *output = y;
+        *(output + 1) = cb;
     }
 
     emms();
@@ -315,29 +336,6 @@ void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
     SPEEDY_END();
 }
 
-void blit_colour_packed4444_scanline_mmx( unsigned char *output, int width,
-                                          int alpha, int luma,
-                                          int cb, int cr )
-{
-    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
-
-    SPEEDY_START();
-
-    movd_m2r( colour, mm1 );
-    movd_m2r( colour, mm2 );
-    psllq_i2r( 32, mm1 );
-    por_r2r( mm1, mm2 );
-
-    for( width /= 2; width; --width ) {
-        movq_r2m( mm2, *output );
-        output += 8;
-    }
-
-    emms();
-
-    SPEEDY_END();
-}
-
 void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr )
@@ -352,14 +350,26 @@ void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
     psllq_i2r( 32, mm1 );
     por_r2r( mm1, mm2 );
 
-    i = (width*4)/8;
-    for(; i; --i ) {
-        movq_r2m( mm2, *output );
+    for( i = width / 8; i; --i ) {
+        movntq_r2m( mm2, *output );
+        movntq_r2m( mm2, *(output + 8) );
+        movntq_r2m( mm2, *(output + 16) );
+        movntq_r2m( mm2, *(output + 24) );
+        output += 32;
+    }
+    width = (width & 0x7);
+
+    for( i = width / 2; i; --i ) {
+        movntq_r2m( mm2, *output );
         output += 8;
     }
-    if( width & 1 ) {
+    width = (width & 0x1);
+
+    if( width ) {
         *((unsigned int *) output) = colour;
+        output += 4;
     }
+
     emms();
 
     SPEEDY_END();
@@ -1095,8 +1105,6 @@ void setup_speedy_calls( int verbose )
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         }
-        blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
-        blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
     } else {
         if( verbose ) {
             fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );

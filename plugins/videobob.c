@@ -116,7 +116,7 @@ static void deinterlace_videobob_packed422_scanline_mmxext( unsigned char *outpu
         pandn_r2r( mm1, mm7 );
         por_r2r( mm0, mm7 );
 
-        movq_r2m( mm7, *output );
+        movntq_r2m( mm7, *output );
 
         // Advance to the next set of pixels.
         output += 8;

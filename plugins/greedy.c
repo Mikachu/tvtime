@@ -136,7 +136,7 @@ static void deinterlace_greedy_packed422_scanline_mmxext( unsigned char *output,
         paddusb_r2r( mm7, mm2 );        // add may sat at FFF..
         psubusb_r2r( mm7, mm2 );        // now = Min( Max(best, Min(L1,L3), L2 )=L2 clipped
 
-        movq_r2m( mm2, *output );     // move in our clipped best
+        movntq_r2m( mm2, *output );     // move in our clipped best
 
         // Advance to the next set of pixels.
         output += 8;
