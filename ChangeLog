@@ -1,4 +1,7 @@
 
+0.9.9.1
+  * vektor: Added Ville Syrjala's DirectFB output layer.
+
 0.9.9 - Tue Sep  2 16:28:48 ADT 2003
   * vektor: Lots of fixes and features made it into this release
       that aren't in this changelog.  We should try to improve
