@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <sys/time.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -61,6 +62,12 @@ static int gnome_wm_layers;
 static int has_ewmh_state_fullscreen;
 static char *wm_name = NULL;
 
+
+static int timediff( struct timeval *large, struct timeval *small )
+{
+    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
+             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
+}
 
 
 
@@ -316,7 +323,26 @@ static void restore_normal_geometry(Display *dpy, Window win)
   
 }
 
+static int is_withdrawn(Display *dpy, Window win)
+{
+  Atom type;
+  Atom WM_STATE;
+  unsigned long length, after;
+  unsigned char *data;
+  int withdrawn = 1;
+  int format;
+  int r;
 
+  WM_STATE = XInternAtom(dpy, "WM_STATE", True);
+  r = XGetWindowProperty(dpy, win, WM_STATE, 0, 2, 0, AnyPropertyType,
+                         &type, &format, &length, &after, &data);
+  if( r == Success && data && format == 32 ) {
+    unsigned int *wstate = (unsigned int *) data;
+    withdrawn = (*wstate == WithdrawnState);
+    XFree( (char *) data );
+  }
+  return withdrawn;
+}
 
 
 static void switch_to_fullscreen_state(Display *dpy, Window win)
@@ -338,14 +364,20 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   save_normal_geometry(dpy, win);
   
   if(!has_ewmh_state_fullscreen) {
+    struct timeval starttime;
+
 #if 1 // bloody wm's that can't cope with unmap/map
     // We have to be unmapped to change motif decoration hints 
     XUnmapWindow(dpy, win);
-    
+
     // Wait for window to be unmapped
-    do {
-      XNextEvent(dpy, &ev);
-    } while(ev.type != UnmapNotify);
+    gettimeofday( &starttime, 0 );
+    while( !is_withdrawn(dpy, win) ) {
+        struct timeval curtime;
+        gettimeofday( &curtime, 0 );
+        if( timediff( &curtime, &starttime ) > 500000 ) break;
+        usleep( 10000 );
+    }
     
     remove_motif_decorations(dpy, win);
     
@@ -569,6 +601,8 @@ static void switch_to_normal_state(Display *dpy, Window win)
   XSizeHints *sizehints;
 
   if(!has_ewmh_state_fullscreen) {
+    struct timeval starttime;
+
     // We don't want to have to replace the window manually when remapping it
     sizehints = XAllocSizeHints();
     sizehints->flags = USPosition;
@@ -580,9 +614,13 @@ static void switch_to_normal_state(Display *dpy, Window win)
     XUnmapWindow(dpy, win);
     
     // Wait for window to be unmapped
-    do {
-      XNextEvent(dpy, &ev);
-    } while(ev.type != UnmapNotify);
+    gettimeofday( &starttime, 0 );
+    while( !is_withdrawn(dpy, win) ) {
+        struct timeval curtime;
+        gettimeofday( &curtime, 0 );
+        if( timediff( &curtime, &starttime ) > 500000 ) break;
+        usleep( 10000 );
+    }
     
     disable_motif_decorations(dpy, win);
     
