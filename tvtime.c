@@ -33,6 +33,7 @@
 #include "videotools.h"
 #include "mixer.h"
 #include "osd.h"
+#include "tvtimeosd.h"
 #include "config.h"
 
 /* Number of frames to wait for next channel digit. */
@@ -126,8 +127,8 @@ int main( int argc, char **argv )
     int skipped = 0;
     int volume;
     int verbose;
+    tvtime_osd_t *osd;
     int videohold = CHANNEL_HOLD;
-    osd_string_t *channel_number, *volume_bar, *muted_osd;
     int i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
     unsigned char *testframe_odd;
@@ -191,13 +192,7 @@ int main( int argc, char **argv )
     build_colourbars( colourbars, width, height );
 
     /* Setup OSD stuff. */
-    channel_number = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
-    volume_bar = osd_string_new( "helr.ttf", 15, width, height, 4.0 / 3.0 );
-    muted_osd = osd_string_new( "helr.ttf", 15, width, height, 4.0 / 3.0 );
-    osd_string_set_colour( channel_number, 220, 12, 155 );
-    osd_string_set_colour( volume_bar, 200, 128, 128 );
-    osd_string_set_colour( muted_osd, 200, 128, 128 );
-    osd_string_show_border( channel_number, 1 );
+    osd = tvtime_osd_new( width, height, 4.0 / 3.0 );
 
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( vidin ) ) {
@@ -229,15 +224,12 @@ int main( int argc, char **argv )
                 if( verbose ) fprintf( stderr, 
                                        "tvtime: Changing to channel %s.\n", 
                                        chanlist[ chanindex ].name );
-                osd_string_show_text( channel_number, 
-                                      chanlist[ chanindex ].name, 80 );
             } else if( rc > 0 ) {
                 if( verbose ) fprintf( stderr, 
                                        "tvtime: Changing to channel %s.\n",
                                        chanlist[ chanindex ].name );
-                osd_string_show_text( channel_number, 
-                                      chanlist[ chanindex ].name, 80 );
             }
+            tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
         }
     }
 
@@ -383,55 +375,35 @@ int main( int argc, char **argv )
                     if( verbose ) fprintf( stderr, "tvtime: Changing to "
                                            "channel %s\n", 
                                            chanlist[ chanindex ].name );
-                    osd_string_show_text( channel_number, 
-                                          chanlist[ chanindex ].name, 80 );
+                    tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
                 }
             }
             if( commands & TVTIME_MIXER_UP || commands & TVTIME_MIXER_DOWN ) {
-                char bar[108];
                 volume = mixer_set_volume( ( (commands & TVTIME_MIXER_UP) ? 1 : -1 ) );
-                if( verbose )
+                if( verbose ) {
                     fprintf( stderr, "tvtime: volume %d\n", (volume & 0xFF) );
+                }
 
-                memset( bar, 0, 108 );
-                strcpy( bar, "Volume " );
-                memset( bar+7, '|', volume & 0xFF );
-                osd_string_show_text( volume_bar, bar, 80 );
+                tvtime_osd_show_volume_bar( osd, volume & 0xff );
             }
             if( commands & TVTIME_MIXER_MUTE ) {
                 mixer_toggle_mute();
             }
             if( commands & TVTIME_HUE_UP || commands & TVTIME_HUE_DOWN ) {
-                char bar[108];
                 videoinput_set_hue_relative( vidin, (commands & TVTIME_HUE_UP) ? 1 : -1 );
-                memset( bar, 0, 108 );
-                strcpy( bar, "Hue    " );
-                memset( bar+7, '|', videoinput_get_hue( vidin ) );
-                osd_string_show_text( volume_bar, bar, 80 );
+                tvtime_osd_show_data_bar( osd, "Hue    ", videoinput_get_hue( vidin ) );
             }
             if( commands & TVTIME_BRIGHT_UP || commands & TVTIME_BRIGHT_DOWN ) {
-                char bar[108];
                 videoinput_set_brightness_relative( vidin, (commands & TVTIME_BRIGHT_UP) ? 1 : -1 );
-                memset( bar, 0, 108 );
-                strcpy( bar, "Bright " );
-                memset( bar+7, '|', videoinput_get_brightness( vidin ) );
-                osd_string_show_text( volume_bar, bar, 80 );
+                tvtime_osd_show_data_bar( osd, "Bright ", videoinput_get_brightness( vidin ) );
             }
             if( commands & TVTIME_CONT_UP || commands & TVTIME_CONT_DOWN ) {
-                char bar[108];
                 videoinput_set_contrast_relative( vidin, (commands & TVTIME_CONT_UP) ? 1 : -1 );
-                memset( bar, 0, 108 );
-                strcpy( bar, "Cont   " );
-                memset( bar+7, '|', videoinput_get_contrast( vidin ) );
-                osd_string_show_text( volume_bar, bar, 80 );
+                tvtime_osd_show_data_bar( osd, "Cont   ", videoinput_get_contrast( vidin ) );
             }
             if( commands & TVTIME_COLOUR_UP || commands & TVTIME_COLOUR_DOWN ) {
-                char bar[108];
                 videoinput_set_colour_relative( vidin, (commands & TVTIME_COLOUR_UP) ? 1 : -1 );
-                memset( bar, 0, 108 );
-                strcpy( bar, "Colour " );
-                memset( bar+7, '|', videoinput_get_colour( vidin ) );
-                osd_string_show_text( volume_bar, bar, 80 );
+                tvtime_osd_show_data_bar( osd, "Colour ", videoinput_get_colour( vidin ) );
             }
             if( commands & TVTIME_DIGIT ) {
                 char digit = '0';
@@ -469,8 +441,7 @@ int main( int argc, char **argv )
                                          "tvtime: Changing to channel %s\n", 
                                          chanlist[ chanindex ].name );
 
-                            osd_string_show_text( channel_number, 
-                                                  chanlist[ chanindex ].name, 80 );
+                            tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
                             frame_counter = 0;
                         } else {
                             /* no valid channel */
@@ -494,8 +465,7 @@ int main( int argc, char **argv )
             strcpy( input_text, next_chan_buffer );
             if( !(frame_counter % 10) )
                 strcat( input_text, "_" );
-            osd_string_show_text( channel_number, 
-                                  input_text, CHANNEL_DELAY );
+            tvtime_osd_show_channel_number( osd, input_text );
         }
 
         /* CHECKPOINT1 : Blit the second field */
@@ -549,19 +519,8 @@ int main( int argc, char **argv )
                                               curframe,
                                               width, height/2, width*4 );
             }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), 
-                                            width, height,
-                                            width*2, 50, 50, 0 );
-            if( mixer_ismute() ) {
-                osd_string_show_text( muted_osd, "Mute", 100 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), 
-                                                width, height,
-                                                width*2, 20, height-40, 0 );
-            } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), 
-                                                width, height,
-                                                width*2, 20, height-40, 0 );
-            }
+            tvtime_osd_volume_muted( osd, mixer_ismute() );
+            tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
         }
 
 
@@ -610,20 +569,8 @@ int main( int argc, char **argv )
                                               curframe + (width*2),
                                               width, height/2, width*4 );
             }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), 
-                                            width, height,
-                                            width*2, 50, 50, 0 );
-
-            if( mixer_ismute() ) {
-                osd_string_show_text( muted_osd, "Mute", 51 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), 
-                                                width, height,
-                                                width*2, 20, height-40, 0 );
-            } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), 
-                                                width, height,
-                                                width*2, 20, height-40, 0 );
-            }
+            tvtime_osd_volume_muted( osd, mixer_ismute() );
+            tvtime_osd_composite_packed422( osd, sdl_get_output(), width, height, width*2 );
         }
 
 
@@ -661,9 +608,7 @@ int main( int argc, char **argv )
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
 
-        osd_string_advance_frame( channel_number );
-        osd_string_advance_frame( muted_osd );
-        osd_string_advance_frame( volume_bar );
+        tvtime_osd_advance_frame( osd );
 
         if( videohold ) videohold--;
     }

@@ -18,7 +18,8 @@ CXXFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS) -I/usr/include/freetype2
 LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS)
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
-	videotools.o ttfont.o efs.o osd.o parser.o config.o pngoutput.o
+	videotools.o ttfont.o efs.o osd.o parser.o config.o \
+	pngoutput.o tvtimeosd.o
 
 all: tvtime
 
