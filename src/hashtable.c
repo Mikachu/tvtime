@@ -128,25 +128,27 @@ void *hashtable_lookup( hashtable_t *ht, int index )
 // BEWARE. Untested code. (pvz)
 int hashtable_resize( hashtable_t *htold )
 {
-    fprintf( stderr, "resizing.\n" );
-        // Resizes the hash table to be 5 times bigger than before.
+    // Resizes the hash table to be 5 times bigger than before.
     // Better by 5 than by 4, since 4 == 2*2. The fewer factors
     // in a hash table size the better. (Optimally, the number
     // is prime, but calculating prime numbers runtime is expensive.)
-        hashtable_t *htnew = hashtable_init (htold->size * 5);
+    hashtable_t *htnew = hashtable_init( htold->size * 5 );
     struct hashtable_object *p;
 
-        if (htnew == NULL)
-                return 0;
-        for (p = &htold->table[0]; p < &htold->table[htold->size]; p++) {
-                if (p->status == IN_USE)
-                        hashtable_insert (htnew, p->index, p->data);
+    if( !htnew ) {
+        return 0;
+    }
+
+    for( p = &htold->table[ 0 ]; p < &htold->table[ htold->size ]; p++ ) {
+        if( p->status == IN_USE ) {
+            hashtable_insert( htnew, p->index, p->data );
         }
-        free (htold->table);
-        htold->table = htnew->table;
-        htold->size = htnew->size;
-        free (htnew);
-        return 1;
+    }
+    free( htold->table );
+    htold->table = htnew->table;
+    htold->size = htnew->size;
+    free( htnew );
+    return 1;
 }
 
 int hashtable_insert( hashtable_t *ht, int index, void *data )
