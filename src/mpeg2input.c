@@ -210,6 +210,10 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 	switch (state) {
 	case -1:
 	    return;
+#ifdef MPEG2_RELEASE
+	case STATE_BUFFER:
+		return;
+#endif
 	case STATE_SEQUENCE:
 	    /* might set nb fbuf, convert format, stride */
 	    /* might set fbufs */
