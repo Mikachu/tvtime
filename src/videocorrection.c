@@ -33,9 +33,9 @@ struct video_correction_s
     int target_chroma_end;
 
     double luma_correction;
-    unsigned int *luma_table;
-    unsigned int *chroma_table;
-    uint8_t *temp_scanline_data;
+    unsigned int luma_table[ 256 ];
+    unsigned int chroma_table[ 256 ];
+    uint8_t temp_scanline_data[ 2048 * 2 ];
 };
 
 
@@ -124,15 +124,6 @@ video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_
     vc->target_chroma_end   = 240;
 
     vc->luma_correction = 1.0;
-    vc->luma_table = malloc( 256 * sizeof( int ) );
-    vc->chroma_table = malloc( 256* sizeof( int ) );
-    vc->temp_scanline_data = malloc( 2048 * 2 );
-    if( !vc->luma_table || !vc->chroma_table ) {
-        if( vc->luma_table ) free( vc->luma_table );
-        if( vc->chroma_table ) free( vc->chroma_table );
-        free( vc );
-        return 0;
-    }
     video_correction_update_table( vc );
 
     return vc;
@@ -140,9 +131,6 @@ video_correction_t *video_correction_new( int bt8x8_correction, int full_extent_
 
 void video_correction_delete( video_correction_t *vc )
 {
-    free( vc->luma_table );
-    free( vc->chroma_table );
-    free( vc->temp_scanline_data );
     free( vc );
 }
 
