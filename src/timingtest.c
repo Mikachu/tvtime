@@ -65,6 +65,7 @@ int main( int argc, char **argv )
     unsigned char *source422packed2;
     unsigned char *source4444packed;
     unsigned char *dest422packed;
+    unsigned int datasize = 0;
     uint64_t avg_sum = 0;
     uint64_t avg_count = 0;
     uint64_t before = 0;
@@ -135,30 +136,35 @@ int main( int argc, char **argv )
                 blit_colour_packed422_scanline_c( dest422packed + (stride*j), width, 128, 128, 128 );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_colour_packed422_scanline_mmxext( dest422packed + (stride*j), width, 128, 128, 128 );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_c 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_packed422_scanline_c( dest422packed + (stride*j), source422packed + (stride*j), width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_i386_linux 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_packed422_scanline_i386_linux( dest422packed + (stride*j), source422packed + (stride*j), width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmxext_billy 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_packed422_scanline_mmxext_billy( dest422packed + (stride*j), source422packed + (stride*j), width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_c 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
@@ -167,6 +173,7 @@ int main( int argc, char **argv )
                                                   source422packed2 + (stride*j), width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
@@ -175,6 +182,7 @@ int main( int argc, char **argv )
                                                        source422packed2 + (stride*j), width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_c 720x480 120/256 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height/2; j++ ) {
@@ -183,6 +191,7 @@ int main( int argc, char **argv )
                                             source422packed2 + (stride*j), width, 120 );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_mmxext 720x480 120/256 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height/2; j++ ) {
@@ -191,6 +200,7 @@ int main( int argc, char **argv )
                                                  source422packed2 + (stride*j), width, 120 );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "comb_factor_packed422_scanline 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height/2; j++ ) {
@@ -200,6 +210,7 @@ int main( int argc, char **argv )
                                                 width );
             }
             rdtscll( after );
+            datasize += width * height * 2;
         }
 
         fprintf( stderr, "[%4d] Cycles: %7d\r", i, (int) (after - before) );
@@ -207,8 +218,9 @@ int main( int argc, char **argv )
         avg_count++;
     }
 
-    fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles (%.2f ms).\n",
-             avg_count, (avg_sum/avg_count ), ((double) (avg_sum/avg_count)) / (mhz * 1000.0) );
+    fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles (%.2f ms), throughput %.2fMB/sec.\n",
+             avg_count, (avg_sum/avg_count ), ((double) (avg_sum/avg_count)) / (mhz * 1000.0),
+             (( (double) datasize / (  ((double) avg_sum) / (mhz * 1000.0) ) ) * 1000.0) / (1024.0 * 1024.0) );
 
     free( source422packed );
     free( source422packed2 );
