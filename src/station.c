@@ -518,18 +518,18 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
             newentry->freq = freq;
             info = newInfo( pos, name, &custom_band, newentry );
             if( info ) insert( mgr, info );
-            return 1;
+            return pos;
         }
     } else if( band ) {
         for( entry = band->channels; entry < &(band->channels[ band->count ]); entry++ ) {
             if( !strcasecmp( entry->name, channel ) ) {
                 info = newInfo( pos, name, band, entry );
                 if( info ) insert( mgr, info );
-                return 1;
+                return pos;
             }
         }
     }
-    return 0;
+    return -1;
 }
 
 int station_add_band( station_mgr_t *mgr, const char *bandname )
