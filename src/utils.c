@@ -14,6 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Contains UTF-8 to unicode conversion from encoding.c in libxml2.
+
+Except where otherwise noted in the source code (trio files, hash.c and list.c)
+covered by a similar licence but with different Copyright notices:
+
+ Copyright (C) 1998-2002 Daniel Veillard.  All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is fur-
+nished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FIT-
+NESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+DANIEL VEILLARD BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CON-
+NECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Except as contained in this notice, the name of Daniel Veillard shall not
+be used in advertising or otherwise to promote the sale, use or other deal-
+ings in this Software without prior written authorization from him.
+
  */
 
 #define _GNU_SOURCE
@@ -111,5 +140,71 @@ char *expand_user_path( const char *path )
 
     wordfree( &result );
     return ret;
+}
+
+/**
+ * xmlGetUTF8Char:
+ *  utf:  a sequence of UTF-8 encoded bytes
+ *  len:  a pointer to @bytes len
+ *
+ * Read one UTF8 Char from @utf
+ * Returns the char value or -1 in case of error and update
+ * len with the number of bytes used.
+ */
+uint32_t utf8_to_unicode( const char *utf, int *len )
+{
+    unsigned int c;
+    
+    if (utf == NULL)
+   goto error; 
+    if (len == NULL)
+   goto error; 
+    if (*len < 1)
+   goto error; 
+   
+    c = utf[0];
+    if (c & 0x80) {
+   if (*len < 2)
+       goto error;
+   if ((utf[1] & 0xc0) != 0x80)
+       goto error;
+   if ((c & 0xe0) == 0xe0) {
+       if (*len < 3) 
+      goto error; 
+       if ((utf[2] & 0xc0) != 0x80)
+      goto error;
+       if ((c & 0xf0) == 0xf0) {
+      if (*len < 4)
+          goto error;
+      if ((c & 0xf8) != 0xf0 || (utf[3] & 0xc0) != 0x80)
+          goto error;
+      *len = 4;
+      /* 4-byte code */
+      c = (utf[0] & 0x7) << 18;
+      c |= (utf[1] & 0x3f) << 12;
+      c |= (utf[2] & 0x3f) << 6;
+      c |= utf[3] & 0x3f;
+       } else {
+         /* 3-byte code */
+      *len = 3;
+      c = (utf[0] & 0xf) << 12;
+      c |= (utf[1] & 0x3f) << 6;
+      c |= utf[2] & 0x3f;
+       }
+   } else {
+     /* 2-byte code */
+       *len = 2;
+       c = (utf[0] & 0x1f) << 6;
+       c |= utf[1] & 0x3f;
+   }
+    } else {
+   /* 1-byte code */
+   *len = 1;
+    }
+    return c;
+
+error:
+    *len = 0;
+    return 0;
 }
 

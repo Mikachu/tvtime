@@ -19,6 +19,8 @@
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
+#include <stdint.h>
+
 /**
  * Useful functions that don't belong anywhere else.
  */
@@ -46,5 +48,10 @@ const char *get_tvtime_paths( void );
  * and ~username/foo to full paths.
  */
 char *expand_user_path( const char *path );
+
+/**
+ * Returns a UCS4 (is this right?) character from a UTF-8 buffer.
+ */
+uint32_t utf8_to_unicode( const char *utf, int *len );
 
 #endif /* UTILS_H_INCLUDED */
