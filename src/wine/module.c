@@ -10,7 +10,9 @@
 // define for quicktime debugging (verbose logging):
 //#define DEBUG_QTX_API
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <assert.h>
 #include <errno.h>

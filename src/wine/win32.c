@@ -11,7 +11,9 @@ for DLL to know too much about its environment.
 
 ************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #define QTX
 

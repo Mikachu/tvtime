@@ -8,7 +8,9 @@
 #define __WINE_WINDEF_H
 
 #ifdef __WINE__
-# include "config.h"
+# ifdef HAVE_CONFIG_H
+#  include "config.h"
+# endif
 # undef UNICODE
 #endif
 

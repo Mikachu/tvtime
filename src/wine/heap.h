@@ -7,7 +7,9 @@
 #ifndef __WINE_HEAP_H
 #define __WINE_HEAP_H
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "winbase.h"
 

@@ -31,7 +31,11 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"

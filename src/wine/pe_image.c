@@ -33,7 +33,9 @@
  *   newer pe binaries produced by MSVC 5 and later, since they are also aligned
  *   to 4096 byte boundaries on disk.
  */
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <errno.h>
 #include <assert.h>

@@ -7,7 +7,9 @@
 #define __WINE_BASETSD_H
 
 #ifdef __WINE__
-#include "config.h"
+# ifdef HAVE_CONFIG_H
+#  include "config.h"
+# endif
 #endif /* defined(__WINE__) */
 
 #ifdef __cplusplus

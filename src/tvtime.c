@@ -54,7 +54,11 @@
 #include "fifo.h"
 #include "commands.h"
 #include "station.h"
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "vgasync.h"
 #include "rvrreader.h"
 #include "pulldown.h"

@@ -5,7 +5,11 @@
 //#ifdef __WINE__  /* Debugging interface is internal to Wine */
 
 #include <stdarg.h>
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "windef.h"
 
 // #include "compat.h"

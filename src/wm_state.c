@@ -34,7 +34,9 @@
 #include "display.h"
 #include "wm_state.h"
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 
 static WindowState_t current_state = WINDOW_STATE_NORMAL;

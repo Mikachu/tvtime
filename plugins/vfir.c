@@ -23,7 +23,11 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"
