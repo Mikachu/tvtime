@@ -71,6 +71,13 @@ void packed422_field_to_frame_top( unsigned char *output, int outstride,
 void packed422_field_to_frame_bot( unsigned char *output, int outstride,
                                    unsigned char *field, int fieldwidth,
                                    int fieldheight, int fieldstride );
+/* These functions will get better names */
+void packed422_field_to_frame_bot_filter( unsigned char *output, int outstride,
+                                          unsigned char *field, int fieldwidth,
+                                          int fieldheight, int fieldstride );
+void packed422_field_to_frame_top_filter( unsigned char *output, int outstride,
+                                          unsigned char *field, int fieldwidth,
+                                          int fieldheight, int fieldstride );
 
 /**
  * Scanline functions.

@@ -105,7 +105,7 @@ config_t *config_new( int argc, char **argv )
     ct->verbose = 0;
     ct->aspect = 0;
     ct->debug = 0;
-    ct->apply_luma_correction = 1;
+    ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
     ct->inputnum = 0;
     ct->tuner_number = 0;
