@@ -114,7 +114,7 @@ int parser_readfile( parser_file_t *pf )
 
 int parser_new( parser_file_t *pf, const char *filename )
 {
-    char *ptr, *name, *value, *start;
+    char *ptr, *name, *value, *start, *tmp;
     int pairs=0, saweq=0;
     
     pf->fh = NULL;
@@ -198,6 +198,13 @@ int parser_new( parser_file_t *pf, const char *filename )
                 return 0;                
             }
             value = strdup( ptr );
+            /* remove spaces from end of value */
+            tmp = value + strlen( value ) - 1;
+            while( *tmp == ' ' || *tmp == '\t' ) {
+                *tmp = '\0';
+                tmp--;
+            }
+
             if( !value ) {
                 fprintf( stderr, "parser: Error doing strdup.\n" );
                 free( pf->file_contents );
