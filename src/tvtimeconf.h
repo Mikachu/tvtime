@@ -66,21 +66,14 @@ const char *config_get_command_pipe( config_t *ct );
 int config_get_preferred_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );
 int config_get_prev_channel( config_t *ct );
-int config_get_left_scanline_bias( config_t *ct );
-int config_get_right_scanline_bias( config_t *ct );
 const char *config_get_screenshot_dir( config_t *ct );
 const char *config_get_rvr_filename( config_t *ct );
 int config_get_framerate_mode( config_t *ct );
 int config_get_slave_mode( config_t *ct );
 
-const char *config_get_config_filename( config_t *ct );
-
-double config_get_horizontal_overscan( config_t *ct );
-double config_get_vertical_overscan( config_t *ct );
+double config_get_overscan( config_t *ct );
 
 int config_get_check_freq_present( config_t *ct );
-
-int tvtime_string_to_command( const char *str );
 
 int config_get_usevbi( config_t *ct );
 char *config_get_vbidev( config_t *ct );

@@ -141,8 +141,7 @@ struct config_s
     int framerate;
     int slave_mode;
 
-    double hoverscan;
-    double voverscan;
+    double overscan;
 
     char config_filename[ 1024 ];
 
@@ -324,8 +323,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Overscan" ) ) {
-            ct->hoverscan = ( atof( curval ) / 2.0 ) / 100.0;
-            ct->voverscan = ( atof( curval ) / 2.0 ) / 100.0;
+            ct->overscan = ( atof( curval ) / 2.0 ) / 100.0;
         }
     }
 
@@ -588,8 +586,7 @@ config_t *config_new( int argc, char **argv )
     ct->use_vbi = 0;
     ct->start_channel = 1;
     ct->prev_channel = 1;
-    ct->hoverscan = 0.0;
-    ct->voverscan = 0.0;
+    ct->overscan = 0.0;
     ct->rvr_filename = 0;
     ct->framerate = FRAMERATE_FULL;
 
@@ -933,11 +930,6 @@ unsigned int config_get_other_text_rgb( config_t *ct )
     return ct->other_text_rgb;
 }
 
-const char *config_get_config_filename( config_t *ct )
-{
-    return ct->config_filename;
-}
-
 uid_t config_get_uid( config_t *ct )
 {
     return ct->uid;
@@ -968,14 +960,9 @@ int config_get_check_freq_present( config_t *ct )
     return ct->check_freq_present;
 }
 
-double config_get_horizontal_overscan( config_t *ct )
+double config_get_overscan( config_t *ct )
 {
-    return ct->hoverscan;
-}
-
-double config_get_vertical_overscan( config_t *ct )
-{
-    return ct->voverscan;
+    return ct->overscan;
 }
 
 int config_get_ntsc_cable_mode( config_t *ct )

@@ -1274,10 +1274,10 @@ int main( int argc, char **argv )
         int output_x, output_y, output_w, output_h;
         int output_success = 1;
 
-        output_x = (int) ((((double) width) * commands_get_horizontal_overscan( commands )) + 0.5);
-        output_w = (int) ((((double) width) - (((double) width) * commands_get_horizontal_overscan( commands ) * 2.0)) + 0.5);
-        output_y = (int) ((((double) height) * commands_get_vertical_overscan( commands )) + 0.5);
-        output_h = (int) ((((double) height) - (((double) height) * commands_get_vertical_overscan( commands ) * 2.0)) + 0.5);
+        output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
+        output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
+        output_y = (int) ((((double) height) * commands_get_overscan( commands )) + 0.5);
+        output_h = (int) ((((double) height) - (((double) height) * commands_get_overscan( commands ) * 2.0)) + 0.5);
 
         if( fifo ) {
             int cmd;

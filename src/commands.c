@@ -190,8 +190,7 @@ struct commands_s {
     int update_luma;
     double luma_power;
 
-    double hoverscan;
-    double voverscan;
+    double overscan;
 
     int audio_counter;
     
@@ -305,10 +304,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         fprintf( stderr, "commands: Luma correction value: %.1f\n", in->luma_power );
     }
 
-    in->hoverscan = config_get_horizontal_overscan( cfg );
-    in->voverscan = config_get_vertical_overscan( cfg );
-    if( in->hoverscan > 0.4 ) in->hoverscan = 0.4; if( in->hoverscan < 0.0 ) in->hoverscan = 0.0;
-    if( in->voverscan > 0.4 ) in->voverscan = 0.4; if( in->voverscan < 0.0 ) in->voverscan = 0.0;
+    in->overscan = config_get_overscan( cfg );
+    if( in->overscan > 0.4 ) in->overscan = 0.4; if( in->overscan < 0.0 ) in->overscan = 0.0;
 
     in->console = 0;
     in->vbi = 0;
@@ -554,14 +551,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_OVERSCAN_UP:
     case TVTIME_OVERSCAN_DOWN:
-        in->hoverscan = in->hoverscan + ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 );
-        in->voverscan = in->voverscan + ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 );
-        if( in->hoverscan > 0.4 ) in->hoverscan = 0.4; if( in->hoverscan < 0.0 ) in->hoverscan = 0.0;
-        if( in->voverscan > 0.4 ) in->voverscan = 0.4; if( in->voverscan < 0.0 ) in->voverscan = 0.0;
+        in->overscan = in->overscan + ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 );
+        if( in->overscan > 0.4 ) in->overscan = 0.4; if( in->overscan < 0.0 ) in->overscan = 0.0;
 
         if( in->osd ) {
             char message[ 200 ];
-            sprintf( message, "Overscan: %.1f%%", in->hoverscan * 2.0 * 100.0 );
+            sprintf( message, "Overscan: %.1f%%", in->overscan * 2.0 * 100.0 );
             tvtime_osd_show_message( in->osd, message );
         }
         break;
@@ -986,14 +981,9 @@ double commands_get_luma_power( commands_t *in )
     return in->luma_power;
 }
 
-double commands_get_horizontal_overscan( commands_t *in )
+double commands_get_overscan( commands_t *in )
 {
-    return in->hoverscan;
-}
-
-double commands_get_vertical_overscan( commands_t *in )
-{
-    return in->voverscan;
+    return in->overscan;
 }
 
 void commands_set_framerate( commands_t *in, int framerate )
