@@ -144,6 +144,11 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
                 fprintf( stderr, "station: Position %d already in use.\n", i->pos );
                 return 0;
             }
+
+            if( rp->channel->freq == i->channel->freq ) {
+                fprintf( stderr, "station: Frequency %d already in use.\n", i->channel->freq );
+                return 0;
+            }
             
             if( rp->pos > i->pos ) break;
 
@@ -341,6 +346,9 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
 
         if( !strcasecmp( frequencies, "us-cable" ) ) {
             station_add_band( mgr, "us cable" );
+        } else if( !strcasecmp( frequencies, "us-cable100" ) ) {
+            station_add_band( mgr, "us cable" );
+            station_add_band( mgr, "us cable 100" );
         } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
             station_add_band( mgr, "us broadcast" );
         } else if( !strcasecmp( frequencies, "china-broadcast" ) ) {

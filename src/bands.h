@@ -202,7 +202,10 @@ const band_entry_t band_data_us_catv[] = {
     { "88",  607250 }, { "89",  613250 }, { "90",  619250 },
     { "91",  625250 }, { "92",  631250 }, { "93",  637250 },
     { "94",  643250 }, { "95",   91250 }, { "96",   97250 },
-    { "97",  103250 }, { "98",  109250 }, { "99",  115250 },
+    { "97",  103250 }, { "98",  109250 }, { "99",  115250 }
+};
+
+const band_entry_t band_data_us_catv_100[] = {
     { "100", 649250 }, { "101", 655250 }, { "102", 661250 },
     { "103", 667250 }, { "104", 673250 }, { "105", 679250 },
     { "106", 685250 }, { "107", 691250 }, { "108", 697250 },
@@ -362,6 +365,7 @@ const band_entry_t band_data_australia_optus[] = {
 
 const band_t bands[] = {
     { "US Cable", band_data_us_catv, sizeof( band_data_us_catv ) / sizeof( band_entry_t ) },
+    { "US Cable 100", band_data_us_catv_100, sizeof( band_data_us_catv_100 ) / sizeof( band_entry_t ) },
     { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
     { "US Broadcast", band_data_us_bcast, sizeof( band_data_us_bcast ) / sizeof( band_entry_t ) },
     { "China Broadcast", band_data_cn_bcast, sizeof( band_data_cn_bcast ) / sizeof( band_entry_t ) },

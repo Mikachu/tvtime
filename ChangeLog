@@ -1,5 +1,7 @@
 
 0.9.9 -
+  * vektor: Added a us-cable100 frequency list, which includes
+      channels over 99.
   * vektor: Removed lirc support in favour of just using
       tvtime-command.  lirc is too difficult for tvtime
       packages and configuration seems difficult.
