@@ -37,8 +37,6 @@
 #include <errno.h>
 #include "vbidata.h"
 
-static int pll = 0;
-
 struct vbidata_s
 {
     int fd;
@@ -147,7 +145,6 @@ int ccdecode( uint8_t *vbiline )
             break;
     }
     sample = ((maxval + minval) >> 1);
-    pll = max;
 
     /* found clock lead-in, double-check start */
 #ifndef PAL_DECODE

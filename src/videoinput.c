@@ -241,6 +241,8 @@ struct videoinput_s
     int signal_recover_wait;
     int signal_acquire_wait;
 
+    int frames_since_start;
+
     /* V4L2 capture state. */
     capture_buffer_t capbuffers[ MAX_CAPTURE_BUFFERS ];
     int is_streaming;
@@ -277,8 +279,6 @@ const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode )
     return "ERROR";
 }
 
-static int frames_since_start = 0;
-
 static void videoinput_start_capture_v4l2( videoinput_t *vidin )
 {
     if( !vidin->is_streaming ) {
@@ -287,7 +287,7 @@ static void videoinput_start_capture_v4l2( videoinput_t *vidin )
                      strerror( errno ) );
         }
         vidin->is_streaming = 1;
-        frames_since_start = 0;
+        vidin->frames_since_start = 0;
     }
 }
 
@@ -396,7 +396,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
         cur_buf.type = vidin->capbuffers[ 0 ].vidbuf.type;
         if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
             fprintf( stderr, "videoinput: Can't read frame. Error was: %s (%d).\n",
-                     strerror( errno ), frames_since_start );
+                     strerror( errno ), vidin->frames_since_start );
             /* We must now restart capture. */
             videoinput_stop_capture_v4l2( vidin );
             videoinput_free_all_frames( vidin );
@@ -404,7 +404,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
             *frameid = -1;
             return 0;
         }
-        frames_since_start++;
+        vidin->frames_since_start++;
         vidin->capbuffers[ cur_buf.index ].free = 0;
         *frameid = cur_buf.index;
         return vidin->capbuffers[ cur_buf.index ].data;

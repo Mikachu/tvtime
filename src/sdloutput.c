@@ -34,18 +34,17 @@
 #include "input.h"
 
 const int resize_frame_delay = 10;
+const int sdlflags = SDL_HWSURFACE | SDL_RESIZABLE;
 
-static SDL_Surface *screen = 0;
-static SDL_Overlay *frame = 0;
-static int sdlaspect = 0;
-static int outwidth = 0;
-static int outheight = 0;
-static int fs = 0;
-static int sdlflags = SDL_HWSURFACE | SDL_RESIZABLE;
-static int needresize = 0;
-
-static int window_width = 0;
-static int window_height = 0;
+static SDL_Surface *screen;
+static SDL_Overlay *frame;
+static int sdlaspect;
+static int outwidth;
+static int outheight;
+static int fs;
+static int needresize;
+static int window_width;
+static int window_height;
 
 static unsigned char *sdl_get_output( void )
 {
@@ -69,6 +68,12 @@ static int sdl_init( int outputheight, int aspect, int verbose )
     } else {
         outwidth = (outheight / 3) * 4;
     }
+
+    frame = 0;
+    fs = 0;
+    needresize = 0;
+    window_width = 0;
+    window_height = 0;
 
     /* Initialize SDL. */
     ret = SDL_Init( SDL_INIT_VIDEO );
