@@ -91,6 +91,7 @@ install: build
 	-rm -f $(CURDIR)/debian/tvtime/etc/tvtime/tvtime.xml
 	# Copy HTML documentation.
 	-cp -f $(CURDIR)/docs/html/*.html $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
+	-cp -f $(CURDIR)/docs/html/*.txt $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
 	-cp -f $(CURDIR)/docs/html/*.png $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
 	-cp -f $(CURDIR)/docs/html/*.jpg $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
 	-cp -f $(CURDIR)/docs/html/*.css $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
