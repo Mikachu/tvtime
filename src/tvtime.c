@@ -1845,7 +1845,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             if( output->toggle_alwaysontop() ) {
                 if( osd ) tvtime_osd_show_message( osd, "Window set as always-on-top." );
             } else {
-                if( osd ) tvtime_osd_show_message( osd, "Window not set always-on-top." );
+                if( osd ) tvtime_osd_show_message( osd, "Window set to normal stacking." );
             }
             build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                                output->is_fullscreen(), output->is_alwaysontop(),
@@ -1921,15 +1921,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
-                        tvtime_osd_show_message( osd, "Pulldown detection disabled." );
+                        tvtime_osd_show_message( osd, "2-3 Pulldown detection disabled." );
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
-                        tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
+                        tvtime_osd_show_message( osd, "2-3 Pulldown detection enabled." );
                     }
                     build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
                     commands_refresh_menu( commands );
                 }
             } else if( osd ) {
-                tvtime_osd_show_message( osd, "Pulldown detection not available for your TV norm." );
+                tvtime_osd_show_message( osd, "2-3 Pulldown detection is not valid with your TV norm." );
             }
         }
         if( commands_show_deinterlacer_info( commands ) ) {
@@ -2244,7 +2244,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                        width, height, width * 2 );
                     }
                     asprintf( &message,
-                              "Screenshot saved: %s",
+                              "Screenshot: %s",
                               basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
@@ -2362,7 +2362,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
-                    snprintf( message, sizeof( message ), "Screenshot saved: %s", basename );
+                    snprintf( message, sizeof( message ), "Screenshot: %s", basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
                 }
