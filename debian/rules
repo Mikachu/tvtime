@@ -88,6 +88,10 @@ install: build
 			localstatedir=$(CURDIR)/debian/tvtime/var
 	# Remove the extra TTFs.
 	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/*.ttf
+	# Remove the configuration file.
+	-rm -f $(CURDIR)/debian/tvtime/etc/tvtime/tvtime.xml
+	# Copy HTML documentation.
+	-cp -f $(CURDIR)/docs/html/* $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
 
 
 # Build architecture-independent files here.
@@ -98,7 +102,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-#	dh_installdebconf	
+	dh_installdebconf	
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu

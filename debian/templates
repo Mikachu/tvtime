@@ -1,0 +1,63 @@
+Template: tvtime/norm-menu
+Type: select
+Choices: NTSC, NTSC-JP, SECAM, PAL, PAL-NC, PAL-M, PAL-N, Other
+Description: Select the `Norm' of your television feed?
+
+Template: tvtime/norm
+Type: string
+Description: Specify the `Norm' of by your television feed.
+
+Template: tvtime/frequencies-menu
+Type: select
+Choices: Australia, Australia-Optus, Europe, France, Japan-Cable, Japan-Broadcast, NewZealand, Russia, US-Cable, US-Broadcast, Other
+Description: Select the default frequency table.
+
+Template: tvtime/frequencies
+Type: string
+Description: Specify the default frequency table.
+
+Template: tvtime/v4ldevice
+Type: string
+Default: /dev/video0
+Description: Specify your television capture device.
+
+Template: tvtime/v4linput
+Type: string
+Default: 0
+Description: Specify the default capture input.
+
+Template: tvtime/ntsccablemode
+Type: select
+Choices: Standard, IRC, HRC
+Default: Standard
+Description: Select the NTSC cable standard for your television feed.
+
+Template: tvtime/usevbi
+Type: boolean
+Default: false
+Description: Do you wish to use VBI?
+
+Template: tvtime/vbidevice
+Type: string
+Default: /dev/vbi0
+Description: Specify the VBI device.
+
+Template: tvtime/deinterlacemethod-menu
+Type: select
+Choices: Linear, LinearBlend, LineDoubler, Greedy, Greedy2Frame, GreedyH, TomsMoComp, TwoFrame, Vertical, VideoBob, VideoWeave, Weave, Other
+Default: Linear
+Description: Select the deinterlacing method to use.
+
+Template: tvtime/deinterlacemethod
+Type: string
+Description: Specify the deinterlacing method to use.
+
+Template: tvtime/setuid
+Type: boolean
+Default: false
+Description: Do you wish to make `/usr/bin/tvtime' setuid root?
+
+Template: tvtime/processpriority
+Type: string
+Default: -19
+Description: Specify the process priority for the tvtime binary.

@@ -25,8 +25,18 @@ set -e
 
 case "$1" in
     configure)
-    echo "Creating video devices in \`/dev'."
-    ( cd /dev; ./MAKEDEV video )
+        # Load Debconf library
+        . /usr/share/debconf/confmodule
+
+        # If the /etc/tvtime/tvtime.xml doesn't exist, create it after
+        # unpacking
+        /var/lib/dpkg/info/tvtime.config 'postinst'
+
+        # Create the video devices if they don't exist.
+        if [ ! -c '/dev/video0' ]; then
+            echo "Creating video devices in \`/dev'."
+            ( cd /dev; ./MAKEDEV video )
+        fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -47,3 +57,4 @@ esac
 exit 0
 
 
+# vim: sw=4 ts=4 et ai si

@@ -1,0 +1,468 @@
+#! /usr/bin/perl
+# config - Debconf configuration for tvtime
+# Copyright (C) 2003  Billy Biggs
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+use strict;
+use warnings;
+use English;
+use Fcntl ':mode';
+use File::Copy;
+
+# Source debconf library
+use Debconf::Client::ConfModule ':all';
+# Declare the version, and the ability to back up.
+version(2.0);
+capb('backup');
+
+
+                            ### GLOBAL VARIABLES ###
+
+# We only want to care about /etc/tvtime/tvtime.xml once postinst is called.
+my $postinst = 0;
+if ((scalar @ARGV > 0) and ($ARGV[0] eq 'postinst')) {
+  $postinst = 1;
+}
+  
+# Let's grab each "tag" and the contents within.
+my $old_IRS = $INPUT_RECORD_SEPARATOR;
+$INPUT_RECORD_SEPARATOR = '<';
+
+# We are in a <!-- --> section.
+my $comment_mode = 0;
+# We are in a <mode> section.
+my $mode_mode = 0;
+# The end line of the file </tvtime>
+my $tvtime_end_line = 0;
+# Did /etc/tvtime/tvtime.xml exist before this?
+my $tvtime_xml_exists = 0;
+
+                         ### CONFIG FILE ARGUMENTS ###
+
+# Get the name of the XML config file
+my $pkgsysconfdir = '/etc/tvtime';
+my $tvtime_xml = "$pkgsysconfdir/tvtime.xml";
+my $default_tvtime_xml = '/usr/share/doc/tvtime/examples/default.tvtime.xml.gz';
+
+if (-e $default_tvtime_xml) {
+  # We have unpacked the configuration file
+  if (not -d $pkgsysconfdir) {
+    mkdir $pkgsysconfdir or die "cannot create $pkgsysconfdir.";
+  }
+  if (not -f $tvtime_xml) {
+    copy("$default_tvtime_xml", "$tvtime_xml.gz");
+    system("gunzip '$tvtime_xml.gz'");
+  }
+  else {
+    $tvtime_xml_exists = 1;
+  }
+}
+
+                            ### DATA STRUCTURES ###
+
+# Each $options{} consists of a key with the name of the <option>.
+# and the value is a reference to another hash.
+my %options;
+
+# We want to be able to add to %options.
+sub add_to_options ($) {
+  my $option_name = shift;
+  $options{$option_name}{'index'} = -1;
+}
+
+                                ### OPTIONS ###
+
+# These are the options to look for.
+# High priority Debconf questions.
+add_to_options("Norm");
+add_to_options("Frequencies");
+# Low priority Debconf questions.
+add_to_options("V4LDevice");
+add_to_options("V4LInput");
+add_to_options("NTSCCableMode");
+add_to_options("UseVBI");
+add_to_options("VBIDevice");
+add_to_options("DeinterlaceMethod");
+add_to_options("ProcessPriority");
+
+                              ### PARSE FILES ###
+
+# Loop through the file, storing the final file in a buffer called 
+# @output.  Each index stores an entire tag and its data.
+my @output;
+if (-e $tvtime_xml) {
+    # We are not in postinst mode, but the config file already exists.
+    # Let's parse the user edited defaults out of it.
+    open(CONFFILE, "< $tvtime_xml") or die "can't open $tvtime_xml: $!";
+    while (<CONFFILE>) {
+    
+      # Determine the current line number, as we push an item on the end
+      # of the @output list.
+      my $line = push(@output, $_) - 1;
+      
+      # We must strip out comments.
+      if (/^!--/) {
+        unless (/-->/) {
+          $comment_mode = 1;
+        }
+        next;
+      }
+      # Here we deal with comments that are hiding tags within them.
+      if ($comment_mode) {
+        if (/-->/) {
+          $comment_mode = 0;
+        }
+        next;
+      }
+    
+      # Watch for <mode> sections, which we will completely ignore.
+      # This is because I know of no better way to deal with this.
+      if (/^mode/) {
+        $mode_mode = 1;
+        next;
+      }
+      # Until we hit a </mode>
+      if ($mode_mode) {
+        if (m:^/mode:) {
+          $mode_mode = 0;
+        }
+        next;
+      }
+    
+      # Here we can match names.
+      for my $option_name (keys %options) {
+        # Parse out the option name and value.
+        if (m:^option\s
+              .*?
+              name="$option_name"\s
+              .*?
+              value="(.*?)"
+              .*?/>:ismx) {
+          if ($tvtime_xml_exists) {
+            # We only read the file's value if the file existed before the
+            # script started
+            $options{$option_name}{'value'} = $1;
+          }
+          $options{$option_name}{'index'} = $line;
+        }
+      }
+  
+      # Detect </tvtime> so that we can prefix it with new options, if
+      # necessary.
+      if (m:^/tvtime:) {
+        $tvtime_end_line = $line;
+      }
+    }
+    close(CONFFILE);
+}
+$INPUT_RECORD_SEPARATOR = $old_IRS;
+
+# Detect setuid on the binary
+my $tvtime_bin = '/usr/bin/tvtime';
+my $tvtime_setuid;
+my $tvtime_mode;
+if (-x $tvtime_bin) {
+  $tvtime_mode = (stat($tvtime_bin))[2];
+  $tvtime_setuid = $tvtime_mode & S_ISUID;
+}
+
+                             ### DEBCONF STUFF ###
+
+# Set defaults for "Type: Select" with Other.
+# These have 'tvtime/foo' and 'tvtime/foo-menu' questions.
+sub set_select_other ($$@) {
+  my $name= shift;
+  my $priority = shift;
+  my @select_values = @_;
+
+  my $template = 'tvtime/' . lc($name);
+  my $template_menu = 'tvtime/' . lc($name) . '-menu';
+
+  if (lc(get($template_menu)) eq 'other') {
+    for my $k (@select_values) {
+      if (lc(get($template)) eq $k) {
+        set($template_menu, scalar get($template));
+        last;
+      }
+    }
+  }
+  if (    defined $options{$name}{'value'}
+      and lc(get($template_menu)) ne lc($options{$name}{'value'})) {
+    my $other = 1;
+    for my $k (@select_values) {
+      if (lc($options{$name}{'value'}) eq $k) {
+        set($template_menu, $options{$name}{'value'});
+        $other = 0;
+        last;
+      }
+    }
+    if ($other) {
+      set($template_menu, 'Other');
+    }
+    set($template, $options{$name}{'value'});
+  }
+  input($priority, $template_menu);
+}
+
+# Set defaults for "Type: Select" with Other, when Other was selected.
+# These have 'tvtime/foo' and 'tvtime/foo-menu' questions.
+sub set_other ($$) {
+  my $name = shift;
+  my $priority = shift;
+
+  my $template = 'tvtime/' . lc($name);
+  my $template_menu = 'tvtime/' . lc($name) . '-menu';
+
+  if (lc(get($template_menu)) eq 'other') {
+    if (defined $options{$name}{'value'}) {
+      set($template, $options{$name}{'value'});
+    }
+    input($priority, $template);
+  }
+  else {
+    set($template, scalar get($template_menu));
+  }
+}
+
+# Set defaults for "Type: Select"
+sub set_select ($$$@) {
+  my $name = shift;
+  my $priority = shift;
+  my $default = shift;
+  my @select_values = @_;
+
+  my $template = 'tvtime/' . lc($name);
+
+  if (    defined $options{$name}{'value'}
+      and lc(get($template)) ne lc($options{$name}{'value'})) {
+    my $other = 1;
+    for my $k (@select_values) {
+      if (lc($options{$name}{'value'}) eq $k) {
+        set($template, $options{$name}{'value'});
+        $other = 0;
+        last;
+      }
+    }
+    if ($other) {
+      set($template, $default);
+    }
+  }
+  input($priority, $template);
+}
+
+# Set defaults for "Type: String"
+sub set_string ($$) {
+  my $name = shift;
+  my $priority = shift;
+
+  my $template = 'tvtime/' . lc($name);
+
+  if (    defined $options{$name}{'value'}
+      and get($template) ne $options{$name}{'value'}) {
+    set($template, $options{$name}{'value'});
+  }
+  input($priority, $template);
+}
+
+# Set defaults for "Type: Boolean"
+sub set_boolean ($$) {
+  my $name = shift;
+  my $priority = shift;
+
+  my $template = 'tvtime/' . lc($name);
+
+  if (defined $options{$name}{'value'}) {
+    my $boolean;
+    if ($options{$name}{'value'} eq '0') {
+      $boolean = 'false';
+    }
+    elsif ($options{$name}{'value'} eq '1') {
+      $boolean = 'true';
+    }
+
+    if (get($template) ne $boolean) {
+      set($template, $boolean);
+    }
+  }
+  input($priority, $template);
+}
+
+# Setup the state machine for Q&A
+my $debconf_state=1;
+while (!$postinst and ($debconf_state != 0) and ($debconf_state != 14)) {
+  if ($debconf_state == 1) {
+    # Select the Norm
+    set_select_other('Norm', 'high',
+                     ('ntsc','ntsc-jp','pal','pal-m','pal-n',
+                      'pal-nc','secam'));
+  }
+  elsif ($debconf_state == 2) {
+    set_other('Norm', 'high');
+  }
+  elsif ($debconf_state == 3) {
+    # Select the frequency table.
+    set_select_other('Frequencies', 'high',
+                     ('australia','australia-optus','europe','france',
+                      'japan-cable','japan-broadcast','newzealand','russia',
+                      'us-cable','us-broadcast'));
+  }
+  elsif ($debconf_state == 4) {
+    # Specify the frequency table, if necessary.
+    set_other('Frequencies', 'high');
+  }
+  elsif ($debconf_state == 5) {
+    # Specify the television capture device.
+    set_string('V4LDevice', 'low');
+  }
+  elsif ($debconf_state == 6) {
+    # Specify the default capture input
+    set_string('V4LInput', 'low');
+  }
+  elsif ($debconf_state == 7) {
+    # Specify the NTSC cable mode.
+    if (lc(get('tvtime/norm')) eq 'ntsc') {
+      set_select('NTSCCableMode', 'low', 'Standard',
+                 ('standard','irc','hrc'));
+    }
+  }
+  elsif ($debconf_state == 8) {
+    # Specify whether to use VBI.
+    set_boolean('UseVBI', 'low');
+  }
+  elsif ($debconf_state == 9) {
+    # Choose the VBI device, if necessary.
+    if (    defined $options{'VBIDevice'}{'value'}
+        and get('tvtime/vbidevice') ne $options{'VBIDevice'}{'value'}) {
+      set('tvtime/vbidevice', $options{'VBIDevice'}{'value'});
+    }
+    if (get('tvtime/usevbi') eq 'true') {
+      input('low', 'tvtime/vbidevice');
+    }
+  }
+  if ($debconf_state == 10) {
+    # Select the deinterlace method
+    set_select_other('DeinterlaceMethod', 'medium',
+                     ('greedy','greedy2frame','greedyh','linear','linearblend',
+                      'linedoubler','overlaybob','tomsmocomp','twoframe',
+                      'vertical','videobob','videoweave','weave'));
+  }
+  elsif ($debconf_state == 11) {
+    # Specify the deinterlace method, if necessary.
+    set_other('DeinterlaceMethod', 'medium');
+  }
+  elsif ($debconf_state == 12) {
+    # Specify whether to setuid root /usr/bin/tvtime.
+    if (defined $tvtime_setuid) {
+      my $setuid;
+      if ($tvtime_setuid) {
+        $setuid = 'true';
+      }
+      else {
+        $setuid = 'false';
+      }
+
+      if (get('tvtime/setuid') ne $setuid) {
+        set('tvtime/setuid', $setuid);
+      }
+    }
+    input('low', 'tvtime/setuid');
+  }
+  elsif ($debconf_state == 13) {
+    # Specify the process priority if tvtime is setuid.
+    if (    defined $options{'ProcessPriority'}{'value'}
+        and 
+            get('tvtime/processpriority') 
+         ne $options{'ProcessPriority'}{'value'}) {
+      set('tvtime/processpriority', $options{'ProcessPriority'}{'value'});
+    }
+    if (get('tvtime/setuid') eq 'true') {
+      input('low', 'tvtime/processpriority');
+    }
+  }
+
+  my @return;
+  if (@return = go()) {
+    if ($return[0] == 30) {
+      # Back button was pushed.
+      $debconf_state--;
+    }
+    else {
+      $debconf_state++;
+    }
+  }
+  else {
+    $debconf_state--;
+  }
+}
+
+                           ### WRITING FILES ###
+  
+# Don't write the configuration file if one doesn't exist already.
+if ($postinst and -e $tvtime_xml) {
+  # Does a </tvtime> even exist?!?  If not, we'll add one.
+  unless ($tvtime_end_line) {
+    $tvtime_end_line = push(@output, "/tvtime>\n") - 1;
+    $output[$tvtime_end_line-1] .= "<";
+  }
+  
+  # Now we revise the values.
+  for my $option_name (keys %options) {
+    # First suck in the Debconf value.
+    $options{$option_name}{'value'} = get('tvtime/' . lc($option_name));
+
+    # Hack UseVBI to use `0' or `1'
+    if ($option_name eq 'UseVBI') {
+      if ($options{$option_name}{'value'} eq 'true') {
+        $options{$option_name}{'value'} = '1';
+      }
+      else {
+        $options{$option_name}{'value'} = '0';
+      }
+    }
+
+    if ($options{$option_name}{'index'} >= 0) {
+      # The option exists in the file, so we'll change it.
+      $output[$options{$option_name}{'index'}] 
+        =~ s+^(option.*?)value=".*?"+$1value="$options{$option_name}{'value'}"+;
+    }
+    else {
+      # This option doesn't exist.  We will add it just before </tvtime>
+      $output[$tvtime_end_line] 
+        = "option " .
+          "name=\"$option_name\" " .
+          "value=\"$options{$option_name}{'value'}\"/>\n<" .
+          $output[$tvtime_end_line];
+    }
+  }
+  
+  # Now we print out the revised configuration file.
+  open(CONFFILE, "> $tvtime_xml") or die "can't open $tvtime_xml: $!";
+  print CONFFILE @output;
+  close(CONFFILE);
+}
+  
+if (-x $tvtime_bin) {
+  # Finally, setuid if the user wanted to.
+  $tvtime_mode = (stat($tvtime_bin))[2];
+  $tvtime_setuid = get('tvtime/setuid');
+  if ($tvtime_setuid eq 'true') {
+    chmod (($tvtime_mode | S_ISUID), $tvtime_bin);
+  }
+  else {
+    chmod (($tvtime_mode & ~S_ISUID), $tvtime_bin);
+  }
+}
+# vim: sw=2 ts=2 et si ai
