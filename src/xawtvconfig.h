@@ -1,12 +1,11 @@
-
-#ifndef XAWTVCONFIG_H_INCLUDED
-#define XAWTVCONFIG_H_INCLUDED
-
 /**
  * This code comes from xawtv, http://bytesex.org/xawtv/
  * Copyright Gerd Knorr <kraxel@bytesex.org>
  * Relased under the GNU GPL v2.
  */
+
+#ifndef XAWTVCONFIG_H_INCLUDED
+#define XAWTVCONFIG_H_INCLUDED
 
 int    cfg_parse_file(char *filename);
 void   cfg_parse_option(char *section, char *tag, char *value);

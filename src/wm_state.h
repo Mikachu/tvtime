@@ -1,4 +1,3 @@
-
 /* Ogle - A video player
  * Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort
  *
