@@ -454,10 +454,12 @@ static void reinit_tuner( commands_t *cmd )
         }
     }
 
-    menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
-    menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
-    menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
-    menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+    if( cmd->vidin ) {
+        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+    }
 }
 
 static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename )
