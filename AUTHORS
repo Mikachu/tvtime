@@ -16,13 +16,14 @@ Authors and contributors
     - man pages and the RPM spec file
 
   Robert Högberg <cogline@linux.se>
-    - added lirc support
+    - Added lirc support
 
   Craig Dooley <cd5697@albany.edu>
-    - added a previous channel command
+    - Added a previous channel command
 
   Alexander S. Belov <asbel@sice.ru>
-    - config file work, check for signal present config parameter
+    - Config file work and XMLification, check for signal present
+      config parameter
 
   Bart Dorsey <echo@thebucket.org>
   Nicolas Boos <nicolaxx@free.fr>
@@ -30,13 +31,16 @@ Authors and contributors
     - Work on the debian packages
 
   Achim Schneider <batchall@mordor.ch>
-    - frequency table conversion script from xawtv's file format
+    - Frequency table conversion script from xawtv's file format
 
   Mark Trolley <mtrolley@scs.carleton.ca>
     - Added the numeric channel commands for better lirc support
 
   Joachim Koenig <Joachim.Koenig@tecnomen.fi>
     - Wrote the dscaler plugin loader using the wine code
+
+  Stewart Allen <mrallen@users.sourceforge.net>
+    - Cleanup of the command names, various bugfixes
 
 Code we stole (well, used under the GPL)
 
