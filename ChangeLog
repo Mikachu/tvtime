@@ -1,5 +1,7 @@
 
-0.9.7
+0.9.8
+
+0.9.7 - Wed Feb 26 21:58:13 AST 2003
   * (vektor) Added a temporary and nasty hack to avoid fullscreen problems
     with KWin from KDE 3.1 (avoids bug 692137)
   * (vektor) tvtime now creates the ~/.tvtime/tvtimerc file on startup
