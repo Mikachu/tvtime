@@ -941,20 +941,28 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't initialize performance monitor, exiting.\n" );
         return 1;
     }
+
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputwidth( ct ), 
                             norm, verbose );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
-        return 1;
     }
 
-    videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
-    width = videoinput_get_width( vidin );
-    height = videoinput_get_height( vidin );
-    if( verbose ) {
-        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
+    if( vidin ) {
+        videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
+        width = videoinput_get_width( vidin );
+        height = videoinput_get_height( vidin );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
+        }
+    } else {
+        width = 720;
+        height = 480;
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Blue frame sampling %d pixels per scanline.\n", width );
+        }
     }
 
     /**
@@ -966,29 +974,34 @@ int main( int argc, char **argv )
      * 4 buffers: 5 fields available.  [t][b][t][b][t][b][-][-]
      *                                 ^^^^^^^^^^^^^^^
      */
-    if( videoinput_get_numframes( vidin ) < 2 ) {
-        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
-                 "Not enough to continue.  Exiting.\n",
-                 videoinput_get_numframes( vidin ) );
-        return 1;
-    } else if( videoinput_get_numframes( vidin ) == 2 ) {
-        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
-                 "tvtime: to those which only need 1 field.\n",
-                 videoinput_get_numframes( vidin ) );
-        fieldsavailable = 1;
-    } else if( videoinput_get_numframes( vidin ) == 3 ) {
-        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
-                 "tvtime: to those which only need 3 fields.\n",
-                 videoinput_get_numframes( vidin ) );
-        fieldsavailable = 3;
+    if( vidin ) {
+        if( videoinput_get_numframes( vidin ) < 2 ) {
+            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
+                     "Not enough to continue.  Exiting.\n",
+                     videoinput_get_numframes( vidin ) );
+            return 1;
+        } else if( videoinput_get_numframes( vidin ) == 2 ) {
+            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
+                     "tvtime: to those which only need 1 field.\n",
+                     videoinput_get_numframes( vidin ) );
+            fieldsavailable = 1;
+        } else if( videoinput_get_numframes( vidin ) == 3 ) {
+            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
+                     "tvtime: to those which only need 3 fields.\n",
+                     videoinput_get_numframes( vidin ) );
+            fieldsavailable = 3;
+        } else {
+            fieldsavailable = 5;
+        }
+        if( fieldsavailable < 5 && videoinput_is_bttv( vidin ) ) {
+            fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
+                               "*** See the support page at http://tvtime.sourceforge.net/ for information\n"
+                               "*** on how to increase your gbuffers setting.\n\n" );
+        }
     } else {
-        fieldsavailable = 5;
+        fieldsavailable = 1;
     }
-    if( fieldsavailable < 5 && videoinput_is_bttv( vidin ) ) {
-        fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
-                           "*** See the support page at http://tvtime.sourceforge.net/ for information\n"
-                           "*** on how to increase your gbuffers setting.\n\n" );
-    }
+
     filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
     if( !get_num_deinterlace_methods() ) {
         fprintf( stderr, "tvtime: No deinterlacing methods "
@@ -1024,9 +1037,14 @@ int main( int argc, char **argv )
         fprintf( stderr, "Can't initialize OSD object, OSD disabled.\n" );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
-        tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
-        tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
         tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+        if( vidin ) {
+            tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
+            tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
+        } else {
+            tvtime_osd_set_input( osd, "No input" );
+            tvtime_osd_set_norm( osd, "NTSC" );
+        }
     }
 
     commands = commands_new( ct, vidin, stationmgr, osd );
@@ -1166,7 +1184,7 @@ int main( int argc, char **argv )
                        config_get_aspect( ct ), verbose ) ) {
         fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );
-        videoinput_delete( vidin );
+        if( vidin ) videoinput_delete( vidin );
         return 1;
     }
 
@@ -1184,11 +1202,13 @@ int main( int argc, char **argv )
     mixer_set_volume( mixer_get_volume() );
 
     /* Begin capturing frames. */
-    if( fieldsavailable == 3 ) {
-        lastframe = videoinput_next_frame( vidin, &lastframeid );
-    } else if( fieldsavailable == 5 ) {
-        secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
-        lastframe = videoinput_next_frame( vidin, &lastframeid );
+    if( vidin ) {
+        if( fieldsavailable == 3 ) {
+            lastframe = videoinput_next_frame( vidin, &lastframeid );
+        } else if( fieldsavailable == 5 ) {
+            secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
+            lastframe = videoinput_next_frame( vidin, &lastframeid );
+        }
     }
 
 
@@ -1270,7 +1290,11 @@ int main( int argc, char **argv )
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
 
         /* Aquire the next frame. */
-        tuner_state = videoinput_check_for_signal( vidin, config_get_check_freq_present( ct ) );
+        if( vidin ) {
+            tuner_state = videoinput_check_for_signal( vidin, config_get_check_freq_present( ct ) );
+        } else {
+            tuner_state = TUNER_STATE_NO_SIGNAL;
+        }
 
         if( has_signal && tuner_state != TUNER_STATE_HAS_SIGNAL ) {
             has_signal = 0;
@@ -1478,7 +1502,7 @@ int main( int argc, char **argv )
         performance_checkpoint_constructed_bot_field( perf );
 
         /* We're done with the input now. */
-        if( aquired ) {
+        if( vidin && aquired ) {
             if( fieldsavailable == 5 ) {
                 videoinput_free_frame( vidin, secondlastframeid );
                 secondlastframeid = lastframeid;
@@ -1533,14 +1557,18 @@ int main( int argc, char **argv )
 
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
     configsave( "StartChannel", number, 1 );
-    snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
-    configsave( "CaptureSource", number, 1 );
+    if( vidin ) {
+        snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
+        configsave( "CaptureSource", number, 1 );
+    }
     output->shutdown();
 
     if( verbose ) {
         fprintf( stderr, "tvtime: Cleaning up.\n" );
     }
-    videoinput_delete( vidin );
+    if( vidin ) {
+        videoinput_delete( vidin );
+    }
     config_delete( ct );
     input_delete( in );
     commands_delete( commands );

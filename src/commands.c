@@ -205,7 +205,7 @@ struct commands_s {
 static void reinit_tuner( commands_t *in )
 {
     /* Setup the tuner if available. */
-    if( videoinput_has_tuner( in->vidin ) ) {
+    if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
         /**
          * Set to the current channel, or the first channel in our
          * frequency list.
@@ -282,7 +282,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->update_luma = 0;
     in->luma_power = config_get_luma_correction( cfg );
 
-    if( !videoinput_is_bttv( vidin ) && in->apply_luma ) {
+    if( vidin && !videoinput_is_bttv( vidin ) && in->apply_luma ) {
         in->apply_luma = 0;
         fprintf( stderr, "commands: Input isn't from a bt8x8, disabling luma correction.\n" );
     }
@@ -327,7 +327,7 @@ static void commands_station_change( commands_t *in )
 {
     int verbose = config_get_verbose( in->cfg );
 
-    if( !videoinput_has_tuner( in->vidin ) ) {
+    if( !in->vidin || !videoinput_has_tuner( in->vidin ) ) {
         if( verbose ) {
             fprintf( stderr, "tvtime: Can't change channel, "
                      "no tuner available on this input!\n" );
@@ -463,11 +463,13 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_AUDIO_MODE:
-        in->audio_counter = -1;
-        videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
-        if( in->osd ) {
-            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_show_info( in->osd );
+        if( in->vidin ) {
+            in->audio_counter = -1;
+            videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
+            if( in->osd ) {
+                tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+                tvtime_osd_show_info( in->osd );
+            }
         }
         break;
 
@@ -480,7 +482,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_CHAR:
-        if( videoinput_has_tuner( in->vidin ) ) {
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             /* decode the input char from commands  */
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
             in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
@@ -549,14 +551,16 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_AUTO_ADJUST_PICT:
-        videoinput_reset_default_settings( in->vidin );
-        if( in->osd ) {
-            tvtime_osd_show_message( in->osd, "Picture settings reset to defaults." );
+        if( in->vidin ) {
+            videoinput_reset_default_settings( in->vidin );
+            if( in->osd ) {
+                tvtime_osd_show_message( in->osd, "Picture settings reset to defaults." );
+            }
         }
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
-        if( videoinput_has_tuner( in->vidin ) ) {
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_toggle_us_cable_mode( in->stationmgr );
             commands_station_change( in );
         }
@@ -564,41 +568,43 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_FINETUNE_DOWN:
     case TVTIME_FINETUNE_UP:
-        if( !videoinput_has_tuner( in->vidin ) && verbose ) {
-            fprintf( stderr, "tvtime: Can't fine tune channel, "
-                     "no tuner available on this input!\n" );
-        } else if( videoinput_has_tuner( in->vidin ) ) {
-            videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
-                                       ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
+        if( in->vidin ) {
+            if( !videoinput_has_tuner( in->vidin ) && verbose ) {
+                fprintf( stderr, "tvtime: Can't fine tune channel, "
+                         "no tuner available on this input!\n" );
+            } else if( videoinput_has_tuner( in->vidin ) ) {
+                videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
+                                           ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
-            if( in->vbi ) {
-                vbidata_reset( in->vbi );
-                vbidata_capture_mode( in->vbi, in->capturemode );
-            }
+                if( in->vbi ) {
+                    vbidata_reset( in->vbi );
+                    vbidata_capture_mode( in->vbi, in->capturemode );
+                }
 
-            if( in->osd ) {
-                char message[ 200 ];
-                sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-                tvtime_osd_show_message( in->osd, message );
+                if( in->osd ) {
+                    char message[ 200 ];
+                    sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+                    tvtime_osd_show_message( in->osd, message );
+                }
             }
         }
         break;
 
     case TVTIME_CHANNEL_UP: 
-        if( videoinput_has_tuner( in->vidin ) ) {
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_next( in->stationmgr );
             commands_station_change( in );
         }
         break;
     case TVTIME_CHANNEL_DOWN:
-        if( videoinput_has_tuner( in->vidin ) ) {
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_prev( in->stationmgr );
             commands_station_change( in );
         }
         break;
 
     case TVTIME_CHANNEL_PREV:
-        if( videoinput_has_tuner( in->vidin ) ) {
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
             station_last( in->stationmgr );
             commands_station_change( in );
         }
@@ -619,59 +625,62 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_MIXER_MUTE:
-        videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
-        if( in->osd ) {
-            tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
+        if( in->vidin ) {
+            videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
+            if( in->osd ) {
+                tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
+            }
         }
         break;
 
     case TVTIME_TOGGLE_INPUT:
-        in->frame_counter = 0;
-        videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
-        if( in->osd ) {
-            tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
+        if( in->vidin ) {
+            in->frame_counter = 0;
+            videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
+            if( in->osd ) {
+                tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
+            }
+            reinit_tuner( in );
         }
-        reinit_tuner( in );
         break;
 
     case TVTIME_HUE_UP:
     case TVTIME_HUE_DOWN:
-        videoinput_set_hue_relative( 
-            in->vidin, 
-            (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Hue    ", videoinput_get_hue( in->vidin ) );
+        if( in->vidin ) {
+            videoinput_set_hue_relative( in->vidin, (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
+            if( in->osd ) {
+                tvtime_osd_show_data_bar( in->osd, "Hue    ", videoinput_get_hue( in->vidin ) );
+            }
         }
         break;
 
     case TVTIME_BRIGHT_UP: 
     case TVTIME_BRIGHT_DOWN:
-        videoinput_set_brightness_relative( 
-            in->vidin, 
-            (tvtime_cmd == TVTIME_BRIGHT_UP) ? 1 : -1 );
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
+        if( in->vidin ) {
+            videoinput_set_brightness_relative( in->vidin, (tvtime_cmd == TVTIME_BRIGHT_UP) ? 1 : -1 );
+            if( in->osd ) {
+                tvtime_osd_show_data_bar( in->osd, "Bright ", videoinput_get_brightness( in->vidin ) );
+            }
         }
         break;
 
     case TVTIME_CONT_UP:
     case TVTIME_CONT_DOWN:
-        videoinput_set_contrast_relative( 
-            in->vidin, 
-            (tvtime_cmd == TVTIME_CONT_UP) ? 1 : -1 );
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
+        if( in->vidin ) {
+            videoinput_set_contrast_relative( in->vidin, (tvtime_cmd == TVTIME_CONT_UP) ? 1 : -1 );
+            if( in->osd ) {
+                tvtime_osd_show_data_bar( in->osd, "Cont   ", videoinput_get_contrast( in->vidin ) );
+            }
         }
-
         break;
 
     case TVTIME_COLOUR_UP:
     case TVTIME_COLOUR_DOWN:
-        videoinput_set_colour_relative( 
-            in->vidin, 
-            (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Colour ", videoinput_get_colour( in->vidin ) );
+        if( in->vidin ) {
+            videoinput_set_colour_relative( in->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
+            if( in->osd ) {
+                tvtime_osd_show_data_bar( in->osd, "Colour ", videoinput_get_colour( in->vidin ) );
+            }
         }
         break;
 
