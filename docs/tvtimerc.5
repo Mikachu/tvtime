@@ -17,13 +17,18 @@ page.
 
 .SH SYNTAX
 .B tvtimerc
-is structured very simply, with one option per line. The following options are available:
+is structured very simply, with one option per line. The following
+options are available:
 .TP
 .B verbose = 0 | 1
-The verbose setting indicates that we should print full informational and warning messages to stderr while running tvtime.  Otherwise, only fatal errors will be printed to the output. Default: 0.
+The verbose setting indicates that we should print full informational
+and warning messages to stderr while running tvtime.  Otherwise, only
+fatal errors will be printed to the output. Default: 0.
 .TP
 .B CaptureSource = n
-This sets the default capture source to be opened by tvtime.  Cards commonly have several sources (i.e. '0' and '1' are the tuner and composite inputs, respectively on a WinTV card). Default: 0.
+This sets the default capture source to be opened by tvtime.  Cards
+commonly have several sources (i.e. '0' and '1' are the tuner and
+composite inputs, respectively on a WinTV card). Default: 0.
 .TP
 .B V4LDevice = /dev/video<n>
 This sets the default capture device to use.
@@ -37,58 +42,91 @@ This enables the usage of VBI data (XDS, Closed Captioning).
 .B Norm = ntsc | pal | secam | pal-nc | pal-m| pal-n | ntsc-jp
 This sets the default TV norm. Default: ntsc.
 .TP
-.B Frequencies = us-bcast | us-cable | us-cable-hrc | canada-cable | japan-bcast | japan-cable | europe-west | europe-east | italy | newzeland | australia | australia-optus | ireland | france | china-bcast | southafrica | argentina
+.B Frequencies = us-cable | us-broadcast | japan-cable | japan-broadcast | europe | australia | newzealand | france | russia
 This sets the default frequency.
 .TP
 .B FineTuneOffset = n
-This sets a constant offset for all tuner frequencies, in kHz.  This value is always added to the frequency passed to the tuner (and may be negative).  Note that since these values are in kHz, they may be incompatible with the fine tuning parameters in xawtv which likely use the 1/16th MHz convention.  If you use a fine tuner value of 'm' in xawtv, first try n=m*1000/16 (i.e. '15' in xawtv is '15*1000/16 = 937' here).
+This sets a constant offset for all tuner frequencies, in kHz.  This
+value is always added to the frequency passed to the tuner (and may be
+negative).  Note that since these values are in kHz, they may be
+incompatible with the fine tuning parameters in xawtv which likely use
+the 1/16th MHz convention.  If you use a fine tuner value of 'm' in
+xawtv, first try n=m*1000/16 (i.e. '15' in xawtv is '15*1000/16 = 937'
+here).
 .TP
 .B OutputWidth = n
 This sets the initial width, in pixels, of the output window.
 .TP
 .B InputWidth = n
-This sets how many pixels per scanline to request from the capture card.  A higher setting gives better quality, while a lower setting requires less work, which means tvtime runs faster.  With a slower CPU (i.e. < 500 MHz) values of 480 or 400 may be best.  For best quality, use a high value like 720 or 768.  Many capture cards cannot sample higher than 768 pixels per scanline.
+This sets how many pixels per scanline to request from the capture card.
+A higher setting gives better quality, while a lower setting requires
+less work, which means tvtime runs faster.  With a slower CPU (i.e. <
+500 MHz) values of 480 or 400 may be best.  For best quality, use a high
+value like 720 or 768.  Many capture cards cannot sample higher than 768
+pixels per scanline.
 .TP
 .B WideScreen = 0 | 1
 This enables 16:9 mode by default on startup.
 .TP
 .B ApplyLumaCorrection = 0 | 1
-This enables luma correction functionality on startup.  Luma correction can be toggled on/off from within tvtime using the 'c' key.
+This enables luma correction functionality on startup.  Luma correction
+can be toggled on/off from within tvtime using the 'c' key.
 .TP
 .B LumaCorrection = n
-This sets the magnitude of the luma correction.  A value of 1.0 does nothing except apply Bt8x8 correction on a Bt8x8-based capture card.  Values less than one make the output darker, and values greater than one make the output brighter.  The valid range is 0.1 to 10.0 in increments of 0.1.
+This sets the magnitude of the luma correction.  A value of 1.0 does
+nothing except apply Bt8x8 correction on a Bt8x8-based capture card.
+Values less than one make the output darker, and values greater than one
+make the output brighter.  The valid range is 0.1 to 10.0 in increments
+of 0.1.
 .TP
 .B DebugMode = 0 | 1
-This option enables a special debug mode.  In debug mode, frame drop information is printed to stderr if tvtime cannot keep up with the number of frames provided by the capture card.
+This option enables a special debug mode.  In debug mode, frame drop
+information is printed to stderr if tvtime cannot keep up with the
+number of frames provided by the capture card.
 .TP
 .B PreferredDeinterlaceMethod = n
-Sets the deinterlace method that will be used by default when tvtime starts up. Default: 0.
+Sets the deinterlace method that will be used by default when tvtime
+starts up. Default: 0.
 .TP
 .B ProcessPriority = n
-Sets the default process priority.  Acceptable values are from -20 to 20, with lower values meaning higher priority. Default: -19.
+Sets the default process priority.  Acceptable values are from -20 to
+20, with lower values meaning higher priority. Default: -19.
 .TP
 .B CommandPipe = <path to file>
-Tvtime can be controlled by issuing commands (the same as used in the console) to a file.  This option sets the location of the file you wish to use as this 'command queue'.  Default: $HOME/.tvtime/tvtimefifo
-.TP
-.B LeftScanlineBias = n
-Drop n pixels from the left side of every scanline, where n is a positive integer. Default: 0.
-.TP
-.B RightScanlineBias = n
-Drop n pixels from the right side of every scanline, where n is a positive integer. Default: 0.
+Tvtime can be controlled by issuing commands (the same as used in the
+console) to a file.  This option sets the location of the file you wish
+to use as this 'command queue'.  Default: $HOME/.tvtime/tvtimefifo
 .TP
 .B CheckForSignal = 1 | 0
-Toggle whether tvtime should check if there is a signal present when changing channels.  Owners of quality cards will likely not need to set this. Default: 0.
+Toggle whether tvtime should check if there is a signal present when
+changing channels.  Owners of quality cards will likely not need to set
+this. Default: 0.
 .TP
 .B NTSCCableMode = Nominal
-There are two special NTSC cable standards in the US: IRC and HRC.  In IRC, channels 5 and 6 are on different frequencies, and HRC mode shifts all frequencies up by 1.25 MHz (and is also weird on channels 5 and 6). Default: null value/not set.
+There are two special NTSC cable standards in the US: IRC and HRC.  In
+IRC, channels 5 and 6 are on different frequencies, and HRC mode shifts
+all frequencies up by 1.25 MHz (and is also weird on channels 5 and 6).
+Default: null value/not set.
 .TP
 .B ChannelTextFG = colour
-This option is the ARGB colour used for the Channel Number in the OSD. The default is 0xFFFFFF00 (yellow). The colour format can be hex or decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If the alpha channel is not specified the default is 255 (opaque).
+This option is the ARGB colour used for the Channel Number in the OSD.
+The default is 0xFFFFFF00 (yellow). The colour format can be hex or
+decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0,
+16777215. If the alpha channel is not specified the default is 255
+(opaque).
 .TP
 .B OtherTextFG = colour
-This option is the ARGB colour used for all other text in the OSD. The default is 0xFFF5DEB3 (wheat). The colour format can be hex or decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If the alpha channel is not specified the default is 255 (opaque).
+This option is the ARGB colour used for all other text in the OSD. The
+default is 0xFFF5DEB3 (wheat). The colour format can be hex or decimal.
+examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If
+the alpha channel is not specified the default is 255 (opaque).
+
 .SH KEYBINDINGS
-The keybindings for controlling tvtime can be altered by explicitly declaring the preferred keybindings in the tvtimerc file.  These keybinding declarations take the form: key_<name> = <key(s)>.  Listed below, is a key value reference chart, example keybindings, and the tvtime default keybindings.
+The keybindings for controlling tvtime can be altered by explicitly
+declaring the preferred keybindings in the tvtimerc file.  These
+keybinding declarations take the form: key_<name> = <key(s)>.  Listed
+below, is a key value reference chart, example keybindings, and the
+tvtime default keybindings.
 .P
 .B Reference Chart
 .TP
