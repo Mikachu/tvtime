@@ -107,8 +107,11 @@ void *hashtable_lookup( hashtable_t *ht, int index )
 // BEWARE. Untested code. (pvz)
 int hashtable_resize( hashtable_t *htold )
 {
-        // Resizes the hash table to be 4 times bigger than before.
-        hashtable_t *htnew = hashtable_init (htold->size * 4);
+        // Resizes the hash table to be 5 times bigger than before.
+	// Better by 5 than by 4, since 4 == 2*2. The fewer factors
+	// in a hash table size the better. (Optimally, the number
+	// is prime, but calculating prime numbers runtime is expensive.)
+        hashtable_t *htnew = hashtable_init (htold->size * 5);
         if (htnew == NULL)
                 return 0;
         for (struct hashtable_object *p = &htold->table[0];

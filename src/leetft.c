@@ -54,13 +54,13 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     if( !font ) return 0;
 
-    font->glyphs = hashtable_init( 307 ); /* 307 is a prime number. */
+    font->glyphs = hashtable_init( 1789 ); /* 1789 is a prime number. */
     if( !font->glyphs ) {
         free( font );
         return 0;
     }
 
-    font->bitmaps = hashtable_init( 307 );
+    font->bitmaps = hashtable_init( 1789 );
     if( !font->bitmaps ) {
         hashtable_destroy( font->glyphs );
         free( font );
