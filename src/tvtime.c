@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <termio.h>
 #include <ctype.h>

@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <langinfo.h>
+#include <locale.h>
 #include <pwd.h>
 #include <errno.h>
 #include <libxml/parser.h>
