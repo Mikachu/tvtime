@@ -18,7 +18,7 @@
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 
 man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5 \
-	tvtime-configure.1
+	tvtime-configure.1 tvtime-scanner.1
 docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/index.html html/little-screenshot.jpg html/nyse.png \
 	html/screenshot-small.jpg html/setws.png html/sun-greedy.png \
