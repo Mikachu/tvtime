@@ -31,6 +31,9 @@
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
 
+/* Number of frames to wait until trying stereo mode. */
+#define CHANNEL_STEREO_DELAY 30
+
 typedef struct {
     char name[MAX_CMD_NAMELEN];
     int command;
@@ -97,6 +100,7 @@ static Cmd_Names cmd_table[] = {
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
     { "TOGGLE_ASPECT", TVTIME_TOGGLE_ASPECT },
+    { "TOGGLE_AUDIO_MODE", TVTIME_TOGGLE_AUDIO_MODE },
     { "TOGGLE_BARS", TVTIME_TOGGLE_BARS },
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
@@ -182,6 +186,8 @@ struct commands_s {
 
     double hoverscan;
     double voverscan;
+
+    int audio_counter;
     
     int menu_on;
     menu_t *menu;
@@ -220,11 +226,13 @@ static void reinit_tuner( commands_t *in )
         }
 
         if( in->osd ) {
+            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
     } else if( in->osd ) {
+        tvtime_osd_set_audio_mode( in->osd, "" );
         tvtime_osd_set_freq_table( in->osd, "" );
         tvtime_osd_set_channel_number( in->osd, "" );
         tvtime_osd_show_info( in->osd );
@@ -268,6 +276,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->scrollconsole = 0;
     in->scan_channels = 0;
     in->pause = 0;
+    in->audio_counter = -1;
 
     in->apply_luma = config_get_apply_luma_correction( cfg );
     in->update_luma = 0;
@@ -334,8 +343,11 @@ static void commands_station_change( commands_t *in )
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", station_get_current_channel_name( in->stationmgr ) );
         }
+        videoinput_set_audio_mode( in->vidin, 1 );
+        in->audio_counter = CHANNEL_STEREO_DELAY;
         if( in->osd ) {
             //tvtime_osd_set_station_name( in->osd, i->name );
+            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
@@ -447,6 +459,15 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_TOGGLE_CREDITS:
         if( in->osd ) {
             tvtime_osd_toggle_show_credits( in->osd );
+        }
+        break;
+
+    case TVTIME_TOGGLE_AUDIO_MODE:
+        in->audio_counter = -1;
+        videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
+        if( in->osd ) {
+            tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+            tvtime_osd_show_info( in->osd );
         }
         break;
 
@@ -767,6 +788,17 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter == 0 ) {
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
+    }
+
+    /* Decrement the stereo wait counter. */
+    if( in->audio_counter > 0 ) in->audio_counter--;
+
+    if( in->audio_counter == 0 ) {
+        videoinput_set_audio_mode( in->vidin, 2 );
+        tvtime_osd_set_audio_mode( in->osd,
+                                   videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
+        tvtime_osd_show_info( in->osd );
+        in->audio_counter = -1;
     }
 
     if( in->frame_counter > 0 && !(in->frame_counter % 5)) {

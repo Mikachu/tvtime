@@ -53,6 +53,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd );
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm );
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable );
+void tvtime_osd_set_audio_mode( tvtime_osd_t *osd, const char *audiomode );
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_scan_channels( tvtime_osd_t *osd, const char *text );

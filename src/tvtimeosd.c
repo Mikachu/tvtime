@@ -67,6 +67,7 @@ struct tvtime_osd_s
     char tv_norm_text[ 20 ];
     char input_text[ 128 ];
     char freqtable_text[ 128 ];
+    char audiomode_text[ 128 ];
     char deinterlace_text[ 128 ];
     char timeformat[ 128 ];
 
@@ -176,6 +177,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
     memset( osd->freqtable_text, 0, sizeof( osd->freqtable_text ) );
+    memset( osd->audiomode_text, 0, sizeof( osd->audiomode_text ) );
     memset( osd->input_text, 0, sizeof( osd->input_text ) );
     memset( osd->deinterlace_text, 0, sizeof( osd->deinterlace_text ) );
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
@@ -374,6 +376,13 @@ void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
     }
 }
 
+void tvtime_osd_set_audio_mode( tvtime_osd_t *osd, const char *audiomode )
+{
+    if( osd->audiomode_text ) {
+        snprintf( osd->audiomode_text, sizeof( osd->audiomode_text ) - 1, audiomode );
+    }
+}
+
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
 {
     if( osd->channel_number_text ) {
@@ -407,8 +416,11 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, OSD_FADE_DELAY );
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, OSD_FADE_DELAY );
 
-    sprintf( text, "%s%s%s", osd->tv_norm_text,
-             strlen( osd->freqtable_text ) ? ": " : "", osd->freqtable_text );
+    if( strlen( osd->freqtable_text ) ) {
+        sprintf( text, "%s [%s]: %s", osd->tv_norm_text, osd->audiomode_text, osd->freqtable_text );
+    } else {
+        sprintf( text, "%s", osd->tv_norm_text );
+    }
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, OSD_FADE_DELAY );
 
     if( *(osd->scan_channels) ) {

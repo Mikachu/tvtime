@@ -99,6 +99,7 @@ struct videoinput_s
     int curframe;
 
     int has_audio;
+    int audiomode;
 
     int tuner_number;
     struct video_tuner tuner;
@@ -247,7 +248,10 @@ const char *videoinput_audio_mode_name( int mode )
         return "Language 1";
     } else if( mode == VIDEO_SOUND_LANG2 ) {
         return "Language 2";
+    } else if( mode == 0 ) {
+        return "Unset";
     } else {
+        fprintf( stderr, "error: %d\n", mode );
         return "ERROR";
     }
 }
@@ -335,11 +339,15 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
 
     /* Test for audio support. */
+    memset( &(vidin->audio), 0, sizeof( struct video_audio ) );
     if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
         vidin->has_audio = 0;
         fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
                  strerror( errno ) );
     }
+
+    /* Set to stereo by default. */
+    videoinput_set_audio_mode( vidin, VIDEO_SOUND_STEREO );
 
     /**
      * Once we've done that, we've set the hardware norm.  Now confirm that
@@ -631,6 +639,36 @@ int videoinput_has_tuner( videoinput_t *vidin )
     return (vidin->tuner_number > -1);
 }
 
+int videoinput_get_audio_mode( videoinput_t *vidin )
+{
+    return vidin->audiomode;
+}
+
+void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
+{
+    vidin->audio.mode = mode;
+    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+        fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
+                 "might cause this.  Post a bug report with your driver info to "
+                 "http://www.sourceforge.net/projects/tvtime/\n" );
+        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+    }
+    if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
+        vidin->has_audio = 0;
+        fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
+                 strerror( errno ) );
+    }
+    if( vidin->audio.mode & mode ) {
+        vidin->audiomode = mode;
+    } else {
+        if( mode != VIDEO_SOUND_MONO ) {
+            videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
+        } else {
+            vidin->audiomode = VIDEO_SOUND_MONO;
+        }
+    }
+}
+
 int videoinput_is_muted( videoinput_t *vidin )
 {
     return ( ( vidin->audio.flags & VIDEO_AUDIO_MUTE ) == VIDEO_AUDIO_MUTE );
@@ -652,22 +690,6 @@ void videoinput_do_mute( videoinput_t *vidin, int mute )
                      "http://www.sourceforge.net/projects/tvtime/\n" );
             fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
         }
-    }
-}
-
-int videoinput_get_audio_mode( videoinput_t *vidin )
-{
-    return vidin->audio.mode;
-}
-
-void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
-{
-    vidin->audio.mode = mode;
-    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
-                 "might cause this.  Post a bug report with your driver info to "
-                 "http://www.sourceforge.net/projects/tvtime/\n" );
-        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
     }
 }
 
