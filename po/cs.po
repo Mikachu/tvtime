@@ -158,7 +158,7 @@ msgstr "Nastavení ořezání (vstup 4:3)"
 #: src/tvtime-configure.c:48 src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
-msgstr "%s: Nemohu naalokovat paměť.\n"
+msgstr "%s: Nelze naalokovat paměť.\n"
 
 #: src/tvtime.c:1333
 #, c-format
@@ -186,7 +186,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Váš ovladač zachytávací karty (%s) nejspíš nepoporuje\n"
+"    Váš ovladač zachytávací karty (%s) nejspíš nepodporuje\n"
 "    zachytávání plnou rychlostí. Zkontrolujte prosím zda není špatně\n"
 "    nakonfigurován nebo zda jste nezvolili špatné zachytávací\n"
 "    zařízení (%s).\n"
@@ -341,7 +341,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Nelze se zbavit rootových priledií: %s.\n"
+"    Nelze se zbavit rootových prilegií: %s.\n"
 "    tvtime se nyní ukončí, aby předešel bezpečnostním problémům.\n"
 "\n"
 
@@ -403,11 +403,11 @@ msgstr "Změna frekvenční tabulky"
 
 #: src/commands.c:372
 msgid "Disable signal detection"
-msgstr "Detekce signálu vypnuta"
+msgstr "Vypnou detekci signálu"
 
 #: src/commands.c:373
 msgid "Enable signal detection"
-msgstr "Detekce signálu zapnuta"
+msgstr "Zapnout detekci signálu"
 
 #: src/commands.c:535 src/commands.c:562
 msgid "Cable"
@@ -472,7 +472,7 @@ msgstr "Normální (720 bodů)"
 
 #: src/commands.c:673
 msgid "High (768 pixels)"
-msgstr "Vyskoé (768 bodů)"
+msgstr "Vysoké (768 bodů)"
 
 #: src/commands.c:678 src/commands.c:1236
 msgid "Restart with new settings"
@@ -660,7 +660,7 @@ msgstr "Uložení současného nastavení jako předdefinované hodnoty"
 #: src/commands.c:1380 src/commands.c:1390 src/commands.c:1437
 #: src/commands.c:1449
 msgid "Reset to global defaults"
-msgstr "Nastavení globálních předdefinovaných hodnot"
+msgstr "Nastavení ne globální předdefinované hodnoty"
 
 #: src/commands.c:1426
 msgid "Save current settings as global defaults"
@@ -701,15 +701,15 @@ msgstr "V seznamu byl kanál deaktivován."
 
 #: src/commands.c:2087
 msgid "Processing every input field."
-msgstr "Zpracovávám každý snímek."
+msgstr "Zpracování každého snímku."
 
 #: src/commands.c:2090
 msgid "Processing every top field."
-msgstr "Zpracovávám každý horní půlsnímek."
+msgstr "Zpracování každého horního půlsnímku."
 
 #: src/commands.c:2093
 msgid "Processing every bottom field."
-msgstr "Zpracovávám každý spodní půlsnímek."
+msgstr "Zpracování každého spodního půlsnímku."
 
 #: src/commands.c:2108
 #, c-format
@@ -728,11 +728,11 @@ msgstr "Všechny kanály byly aktivovány."
 #: src/commands.c:2206
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
-msgstr "Přemapovávám %d. Vložte nové číslo kanálu."
+msgstr "Přemapování %d. Vložte nové číslo kanálu."
 
 #: src/commands.c:2218
 msgid "Scanner unavailable with signal checking disabled."
-msgstr "Skener kanálu není dostupnýpři vypnuté kontrole signálu."
+msgstr "Skener kanálu není dostupný při vypnuté kontrole signálu."
 
 #: src/commands.c:2245
 msgid "Scanning for channels being broadcast."
@@ -986,7 +986,7 @@ msgstr ""
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
-"  -F, --configfile=SOUBOR    Další konfigurační soubor pro čtení voleb.\n"
+"  -F, --configfile=SOUBOR    Další konfigurační soubor pro čtení nastavení.\n"
 
 #: src/tvtimeconf.c:666 src/tvtimeconf.c:719 src/tvtimeconf.c:748
 msgid "  -h, --help                 Show this help message.\n"
@@ -1108,7 +1108,7 @@ msgstr ""
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
-"  -R, --priority=PRIORITA    Nastav9 prioritu, pod kterou m8 tvtime běžet.\n"
+"  -R, --priority=PRIORITA    Nastavit prioritu, pod kterou má tvtime běžet.\n"
 
 #: src/tvtimeconf.c:733
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
@@ -1171,7 +1171,7 @@ msgid ""
 "Available commands:\n"
 msgstr ""
 "\n"
-"Dostupné příkezy:\n"
+"Dostupné příkazy:\n"
 
 #: src/tvtime-command.c:80
 msgid "tvtime not running.\n"
