@@ -50,6 +50,7 @@ static void print_usage( char **argv )
                      "[-d <device> [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-a\t16:9 mode.\n"
+                     "\t-s\tPrint frame skip information (for debugging).\n"
                      "\t-w\tOutput window width, defaults to 800.\n"
                      "\t-o\tOutput mode: '422' (default) or '420'.\n"
                      "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
@@ -107,6 +108,7 @@ int main( int argc, char **argv )
     int c;
     long last_chan_time = 0;
     int volume;
+    int debug = 0;
     int muted = 0;
 
     /* Default device. */
@@ -118,10 +120,11 @@ int main( int argc, char **argv )
     /* Default freq */
     strcpy( freq, "us-cable" );
 
-    while( (c = getopt( argc, argv, "hw:ao:d:i:l:n:f:t:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:aso:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
         case 'w': outputwidth = atoi( optarg ); break;
         case 'a': aspect = 1; break;
+        case 's': debug = 1; break;
         case 'o': if( strcmp( "420", optarg ) == 0 ) output420 = 1; break;
         case 'd': strncpy( v4ldev, optarg, 250 ); break;
         case 'i': inputnum = atoi( optarg ); break;
@@ -372,7 +375,7 @@ int main( int argc, char **argv )
         curcr422 = curcb422 + ( width/2 * height );
 
         gettimeofday( &curframetime, 0 );
-        if( (timediff( &curframetime, &lastframetime ) + tolerance) > (fieldtime*2) ) {
+        if( debug && ((timediff( &curframetime, &lastframetime ) + tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, fieldtime %dus\n",
                      skipped++, timediff( &curframetime, &lastframetime ),
                      (fieldtime*2) );
