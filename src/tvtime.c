@@ -1160,24 +1160,21 @@ int main( int argc, char **argv )
     if( !fifodir ) {
         fprintf( stderr, "tvtime: Not reading input from fifo.  "
                          "Directory %s does not exist.\n", FIFODIR );
-    }
-    else {
+    } else {
         closedir( fifodir );
 	/* Create the user's FIFO directory */
         if( mkdir( config_get_command_pipe_dir( ct ), S_IRWXU ) < 0 ) {
             if( errno != EEXIST ) {
                 fprintf( stderr, "tvtime: Cannot create FIFO directory %s.\n", 
                         config_get_command_pipe_dir( ct ) );
-                return 1;
-            }
-            else {
+            } else {
                 fifodir = opendir( config_get_command_pipe_dir( ct ) );
                 if( !fifodir ) {
                     fprintf( stderr, "tvtime: %s is not a directory.\n", 
                             config_get_command_pipe_dir( ct ) );
-                    return 0;
+                } else {
+                    closedir( fifodir );
                 }
-                closedir( fifodir );
             }
         }
         /* Setup the FIFO */
