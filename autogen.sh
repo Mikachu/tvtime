@@ -1,2 +1,2 @@
-./bootstrap
+./bootstrap && \
 ./configure --enable-maintainer-mode $@

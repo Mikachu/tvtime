@@ -1,11 +1,56 @@
 #! /bin/sh
-set -x
 
-aclocal
-libtoolize --force --copy
-autoheader
-#add --include-deps if you want to bootstrap with any other compiler than gcc
-#automake --add-missing --copy --include-deps
-automake --add-missing --copy
-autoconf
-rm -f config.cache
+# If you are not compiling with GCC, you should set $CC_NOTGCC to 1.
+test -z "${CC_NOTGCC}" || CC_NOTGCC='--include-deps'
+
+# We will attempt to auto-detect the existance of the correct
+# GNU Autotools binaries.  We will prefer specific versions over others.
+# To manually override, set the appropriate $AUTOCONF, $AUTOHEADER,
+# $AUTOMAKE, $ACLOCAL, and $LIBTOOLIZE environment variables
+
+test -x "$AUTOCONF" ||
+  AUTOCONF=`type -p autoconf2.50` ||
+    AUTOCONF=`type -p autoconf` ||
+      {
+        echo `basename $0`: cannot find GNU Autoconf 1>&2 && 
+          exit 1;
+      }
+
+test -x "$AUTOHEADER" ||
+  AUTOHEADER="autoheader`echo "$AUTOCONF" | sed 's/.*autoconf//'`" &&
+    AUTOHEADER=`type -p "$AUTOHEADER"` ||
+      {
+        echo `basename $0`: GNU Autoconf installed improperly 1>&2 && 
+          exit 2;
+      }
+
+test -x "$AUTOMAKE" ||
+  AUTOMAKE=`type -p automake-1.7` ||
+    AUTOMAKE=`type -p automake-1.6` ||
+      AUTOMAKE=`type -p automake` ||
+        {
+          echo `basename $0`: cannot find GNU Automake 1>&2 &&
+            exit 3;
+        }
+
+test -x "$ACLOCAL" ||
+  ACLOCAL="aclocal`echo "$AUTOMAKE" | sed 's/.*automake//'`" &&
+    ACLOCAL=`type -p "$ACLOCAL"` ||
+      {
+        echo `basename $0`: GNU Automake installed improperly 1>&2 && 
+          exit 4;
+      }
+
+test -x "$LIBTOOLIZE" ||
+  LIBTOOLIZE=`type -p libtoolize` ||
+    {
+      echo `basename $0`: cannot find GNU libtool 1>&2 &&
+        exit 5;
+    }
+
+${ACLOCAL} &&
+  ${LIBTOOLIZE} --force --copy &&
+    ${AUTOHEADER} &&
+      ${AUTOMAKE} --add-missing --copy ${CC_NOTGCC} &&
+        ${AUTOCONF} &&
+          rm -f config.cache
