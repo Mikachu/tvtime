@@ -551,8 +551,10 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
 
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 {
-    osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, message, OSD_FADE_DELAY );
-    osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    if( !*(osd->hold_message) ) {
+        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, message, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    }
 }
 
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
