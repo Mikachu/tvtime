@@ -104,6 +104,7 @@ static KeyCode kc_shift_l; /* Fake key to send. */
 
 static area_t video_area;
 static area_t window_area;
+static area_t scale_area;
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -1245,6 +1246,9 @@ void xcommon_poll_events( input_t *in )
     int reconfwidth = 0;
     int reconfheight = 0;
     int getfocus = 0;
+    int motion = 0;
+    int motion_x = 0;
+    int motion_y = 0;
 
     while( XPending( display ) ) {
         KeySym mykey;
@@ -1269,6 +1273,19 @@ void xcommon_poll_events( input_t *in )
             input_callback( in, I_QUIT, 0 );
             break;
         case MotionNotify:
+            if( event.xmotion.x >= video_area.x && event.xmotion.x < (video_area.x + video_area.width) &&
+                event.xmotion.y >= video_area.y && event.xmotion.y < (video_area.y + video_area.height) &&
+                video_area.width && video_area.height ) {
+
+                int videox = event.xmotion.x - video_area.x;
+                int videoy = event.xmotion.y - video_area.y;
+                int imagex = scale_area.x + ((scale_area.width * videox) / video_area.width);
+                int imagey = scale_area.y + ((scale_area.height * videoy) / video_area.height);
+
+                motion = 1;
+                motion_x = imagex;
+                motion_y = imagey;
+            }
             XUndefineCursor( display, output_window );
             motion_timeout = 30;
             break;
@@ -1420,6 +1437,10 @@ void xcommon_poll_events( input_t *in )
         }
     }
 
+    if( motion ) {
+        input_callback( in, I_MOUSEMOVE, ((motion_x & 0xffff) << 16 | (motion_y & 0xffff)) );
+    }
+
     if( getfocus ) {
         XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
     }
@@ -1529,5 +1550,10 @@ void xcommon_set_matte( int width, int height )
     calculate_video_area();
     xcommon_clear_screen();
     XSync( display, False );
+}
+
+void xcommon_set_video_scale( area_t scalearea )
+{
+    scale_area = scalearea;
 }
 

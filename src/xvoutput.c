@@ -270,6 +270,14 @@ static int xv_init( int outputheight, int aspect, int verbose )
 static int xv_show_frame( int x, int y, int width, int height )
 {
     area_t video_area = xcommon_get_video_area();
+    area_t scale_area;
+
+    scale_area.x = x;
+    scale_area.y = y;
+    scale_area.width = width;
+    scale_area.height = height;
+
+    xcommon_set_video_scale( scale_area );
 
     xcommon_ping_screensaver();
     XvShmPutImage( display, xv_port, output_window, xcommon_get_gc(), image,

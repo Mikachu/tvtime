@@ -36,6 +36,7 @@ enum input_event
     I_KEYDOWN,
     I_QUIT,
     I_BUTTONPRESS,
+    I_MOUSEMOVE,
     I_REMOTE
 };
 

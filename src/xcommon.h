@@ -46,6 +46,7 @@ int xcommon_get_visible_height( void );
 void xcommon_ping_screensaver( void );
 area_t xcommon_get_video_area( void );
 area_t xcommon_get_window_area( void );
+void xcommon_set_video_scale( area_t scalearea );
 void xcommon_clear_screen( void );
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height );
 int xcommon_toggle_root( int fullscreen_width, int fullscreen_height );

@@ -186,6 +186,7 @@ void input_delete( input_t *in )
 
 void input_callback( input_t *in, int command, int arg )
 {
+    char temp[ 128 ];
     char argument[ 2 ];
     int tvtime_cmd = 0;
 
@@ -198,6 +199,11 @@ void input_callback( input_t *in, int command, int arg )
         commands_handle( in->com, TVTIME_QUIT, 0 );
         return;
         break;
+
+    case I_MOUSEMOVE:
+        sprintf( temp, "%d %d", arg >> 16, arg & 0xffff );
+        commands_handle( in->com, TVTIME_MOUSE_MOVE, temp );
+        return;
 
     case I_BUTTONPRESS:
     case I_REMOTE:
