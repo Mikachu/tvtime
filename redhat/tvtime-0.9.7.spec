@@ -1,7 +1,7 @@
 # Some useful constants
 %define ver 0.9.7
 #%define beta beta
-%define rpm_ver 1
+%define rpm_ver 2
 %define rh_addon tvtime-redhat.tar.gz
 %define docsdir docs
 %define rhdocsdir redhat
@@ -38,6 +38,9 @@ Requires: sh-utils desktop-file-utils
 %{__rm} -rf %{buildroot}
 %makeinstall
 
+# Remove freefont source from binary
+%{__rm} %{buildroot}%{_datadir}/%{name}/freefont-sfd.tar.gz
+
 # On RedHat 8.0+ distributions, add a menu entry
 %if "%{rh_ver}" >= "8.0"
 
@@ -68,6 +71,8 @@ install -D -m 644 %{docsdir}/%{name}rc.5 %{buildroot}%{_mandir}/man5/%{name}rc.5
 %{_mandir}/man5/%{name}rc.5*
 
 %changelog
+* Thu Feb 27 2003 Paul Jara <rascasse at users.sourceforge.net>
+- Binary RPM no longer contains freefont source code
 * Wed Feb 26 2003 Paul Jara <rascasse at users.sourceforge.net>
 - Initial build with official tvtime 0.9.7 source
 * Mon Feb 24 2003 Paul Jara <rascasse at users.sourceforge.net>
