@@ -26,7 +26,8 @@ docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/tvtime-logo-banner.png html/tvtime.css \
 	html/usage.html html/why.html html/wsshot-small.jpg
 EXTRA_DIST = default.tvtime.xml example.lircrc tvtime.desktop \
-             $(man_MANS) $(docs_html)
+	tvtime-icon-100x100.png tvtime-icon-50x50.png tvtime-icon-48x48.png \
+	$(man_MANS) $(docs_html)
 
 .PHONY: install-exec-hook
 install-exec-hook:
