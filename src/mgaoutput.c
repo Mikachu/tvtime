@@ -102,8 +102,8 @@ static void mga_lock_output_buffer( void )
 
 static uint8_t *mga_get_output_buffer( void )
 {
-    // return backbuffer;
-    return mga_vid_base + (curframe*mga_frame_size);
+    return backbuffer;
+    // return mga_vid_base + (curframe*mga_frame_size);
 }
 
 static int mga_get_output_stride( void )
@@ -146,16 +146,16 @@ static void mga_wait_for_sync( int field )
 
 static int mga_show_frame( int x, int y, int width, int height )
 {
-    static int foobar = 0;
+    // static int foobar = 0;
     uint8_t *base = mga_vid_base + (curframe*mga_frame_size);
     int i;
 
     for( i = 0; i < mga_height; i++ ) {
-      blit_colour_packed422_scanline( base + (i * mga_get_output_stride()),
-                                      mga_input_width, foobar, 128, 128 );
-        // blit_packed422_scanline( base + (i * mga_stride), backbuffer + (i * mga_stride), width );
+        // blit_colour_packed422_scanline( base + (i * mga_get_output_stride()),
+        //                                 mga_input_width, foobar, 128, 128 );
+        blit_packed422_scanline( base + (i * mga_stride), backbuffer + (i * mga_stride), width );
     }
-    foobar = (foobar + 1) % 256;
+    // foobar = (foobar + 1) % 256;
 
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
