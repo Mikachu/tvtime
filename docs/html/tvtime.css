@@ -4,6 +4,7 @@ th.version {
   background: #7777aa;
   color: #ffffff;
   vertical-align: top;
+  text-align: left;
 }
 th.doctable {
   background: #7777aa;
@@ -17,6 +18,17 @@ td.navbar {
 }
 td.hangspace {
   width: 24px;
+}
+td.reason {
+  background: #ddddee;
+  color: #000000;
+}
+.whyuse {
+  text-align: center;
+  vertical-align: top;
+  border: solid 1px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .center { text-align: center }
 img { border: 0 }

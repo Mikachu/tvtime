@@ -24,6 +24,8 @@
 
     <table cellpadding="4" width="100%">
     <tr><td class="box">
+        <a href="why.html">why tvtime?</a></td></tr>
+    <tr><td class="box">
         <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">get tvtime!</a></td></tr>
     <tr><td class="box">
         <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
@@ -72,37 +74,51 @@
         <table class="centered">
         <tr><td>
             <ol>
-            <li><a href="#resources">Support resources</a><br>
-            <li><a href="#tested">Summary of tested hardware by release</a><br>
-            <li><a href="#tvwonder">NTSC tuner problems (including the ATI TV Wonder cards)</a><br>
-            <li><a href="#canadacable">No "canada-cable" frequency table?</a><br>
-            <li><a href="#bttvinfo">Information for users of the bttv driver</a><br>
+            <li><a href="#resources">Support resources</a>
+            <li><a href="#tested">Summary of tested hardware by release</a>
+            <li><a href="#tvwonder">NTSC tuner problems
+                (including the ATI TV Wonder cards)</a>
+            <li><a href="#canadacable">No "canada-cable" frequency table?</a>
+            <li><a href="#bttvinfo">Information for users of the bttv driver</a>
                 <ol>
-                <li>Optimal driver configuration: The gbuffers setting<br>
-                <li>Special bttv luma correction mode<br>
-                <li>bttv takes a long time to load!<br>
+                <li>Optimal driver configuration: The gbuffers setting
+                <li>Special bttv luma correction mode
+                <li>bttv takes a long time to load!
                 </ol>
-            <li><a href="#saa7134">Known SAA7134 driver issues</a><br>
+            <li><a href="#saa7134">Known SAA7134 driver issues</a>
                 <ol>
-                <li>Frames all green<br>
-                <li>Window setup failures<br>
-                <li>Field parity swapped (jerky motion)<br>
-                <li>Timeouts/invalid argument errors<br>
+                <li>Frames all green
+                <li>Window setup failures
+                <li>Field parity swapped (jerky motion)
+                <li>Timeouts/invalid argument errors
                 </ol>
-            <li><a href="#aiw">ATI All-In-Wonder video/capture cards: The GATOS driver</a><br>
-            <li><a href="#zoran">Cards which use the Zoran driver (including the DC10)</a><br>
-            <li><a href="#marvel">Matrox Marvel capture cards</a><br>
-            <li><a href="#rivatv">Information for users of the rivatv capture driver</a><br>
-            <li><a href="#voodoo3500">Unusable drivers for the Voodoo 3500 TV card</a><br>
-            <li><a href="#sis">Poor performance with SiS driver in XFree86 4.2.1 and earlier</a><br>
-            <li><a href="#radeon">XVideo always-on-top with some Radeon cards</a><br>
-            <li><a href="#nvidia-overscan">Corrupted image borders on nVidia cards in overscan modes</a><br>
-            <li><a href="#nvidia-xvideo">No XVideo support in open-source nVidia driver for older cards</a><br>
-            <li><a href="#nvidia-tnt">Problems with nVidia TNT and TNT2 cards</a><br>
-            <li><a href="#prolink-audio">Audio problems with Prolink PixelView cards</a><br>
-            <li><a href="#linux-dvb">Driver problems with SAA7146/linux-dvb supported cards</a><br>
-            <li><a href="#savage">XVideo initialization problem with the savage driver</a><br>
-            <li><a href="#overlay">Using 'overlay' mode in xawtv/zapping causes system instabilities</a><br>
+            <li><a href="#aiw">ATI All-In-Wonder video/capture cards:
+                The GATOS driver</a>
+            <li><a href="#zoran">Cards which use the Zoran driver
+                (including the DC10)</a>
+            <li><a href="#marvel">Matrox Marvel capture cards</a>
+            <li><a href="#rivatv">Information for users of the rivatv
+                capture driver</a>
+            <li><a href="#voodoo3500">Unusable drivers for the Voodoo
+                3500 TV card</a>
+            <li><a href="#sis">Poor performance with SiS driver in
+                XFree86 4.2.1 and earlier</a>
+            <li><a href="#radeon">XVideo always-on-top with some
+                Radeon cards</a>
+            <li><a href="#nvidia-overscan">Corrupted image borders on
+                NVIDIA cards in overscan modes</a>
+            <li><a href="#nvidia-xvideo">No XVideo support in open-source
+                NVIDIA driver for older cards</a>
+            <li><a href="#nvidia-tnt">Problems with NVIDIA TNT and TNT2
+                cards</a>
+            <li><a href="#prolink-audio">Audio problems with Prolink
+                PixelView cards</a>
+            <li><a href="#linux-dvb">Driver problems with SAA7146/linux-dvb
+                supported cards</a>
+            <li><a href="#savage">XVideo initialization problem with the
+                savage driver</a>
+            <li><a href="#overlay">Using 'overlay' mode in xawtv or zapping
+                causes system instabilities</a>
             </ol>
         </td></tr></table>
 
@@ -128,8 +144,8 @@ card and driver combination not on this list, please
 can add it to the list.</p>
 
 <table border="0" width="100%">
-<tr><th class="version"><b>tvtime 0.9.7</b>
-<td>
+<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.7</b>
+<tr><td>
 <ol>
 <li>Hauppauge WinTV Go [<b>bttv</b> / debian sid 2.4.20-686 2.4.20-5]
 <li>ATI TV Wonder [<b>bttv</b> / debian sid 2.4.20-686 2.4.20-5]
@@ -461,7 +477,7 @@ conversion process.
 <li>By default the driver copies frames from video memory into system memory.
 Performance can be improved by using <b>DMA</b> to transfer the frames, however,
 this option only works when using the open-source <b>"nv"</b> driver in X, not
-with the nVidia binary drivers.
+with the NVIDIA binary drivers.
 </ol>
 
 <p>You can turn on dma support as follows in your <b>modules.conf</b> file:</p>
@@ -513,16 +529,16 @@ what cards are affected, or what versions will fix this.  More
 information on this would be appreciated.</p>
 
 <hr>
-<h3><a name="nvidia-overscan">14. Corrupted image borders on nVidia cards in overscan modes</a></h3>
+<h3><a name="nvidia-overscan">14. Corrupted image borders on NVIDIA cards in overscan modes</a></h3>
 
-<p>There is a bug in versions of the <b>nVidia driver before
+<p>There is a bug in versions of the <b>NVIDIA driver before
 1.0-4349</b> and the <b>nv driver in 4.3.0 and earlier</b> for cards
 which support wide filter kernels for high quality XVideo surfaces.  If
 the overscan value is larger than 0, then the card uses memory outside
 of the image for interpolating around the edges, causing corruption all
 around the outside of the tvtime window.</p>
 
-<p>nVidia was made aware of the problem and fixed it for driver release
+<p>NVIDIA was made aware of the problem and fixed it for driver release
 <b>1.0-4349</b> and in the <b>nv driver in CVS XFree86</b>.  For
 reference, the tvtime bug on this was <a
 href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694144&amp;group_id=64301&amp;atid=506987">bug
@@ -530,18 +546,18 @@ href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694144&amp;gr
 
 
 <hr>
-<h3><a name="nvidia-xvideo">15. No XVideo support in open-source nVidia driver for older cards</a></h3>
+<h3><a name="nvidia-xvideo">15. No XVideo support in open-source NVIDIA driver for older cards</a></h3>
 
-<p>The open source nVidia driver for X ("nv" not "nvidia") does not support XVideo surfaces for
+<p>The open source NVIDIA driver for X ("nv" not "nvidia") does not support XVideo surfaces for
 pre-GeForce cards like the <b>TNT2</b>.  To use tvtime with these cards, you must use
 the binary drivers.</p>
 
 <p>That said, the binary drivers should give better performance for XVideo than the open-source
 driver, since it can use the kernel module component to negotiate DMA transfers for video
-frames.  If possible, stick to the binary drivers when using tvtime on nVidia hardware.</p>
+frames.  If possible, stick to the binary drivers when using tvtime on NVIDIA hardware.</p>
 
 <hr>
-<h3><a name="nvidia-tnt">16. Problems with nVidia TNT and TNT2 cards</a></h3>
+<h3><a name="nvidia-tnt">16. Problems with NVIDIA TNT and TNT2 cards</a></h3>
 
 <h3>5.1 Corrupted frames</h3>
 
@@ -646,7 +662,7 @@ http://www.mail-archive.com/devel%40xfree86.org/msg01248.html</a></p>
 instabilities.  This is because their 'overlay' mode allows the capture
 card to write directly to video memory without locking it first, which
 is unsafe for many video cards, specifically those which do not use a
-linear framebuffer (such as nVidia cards with the binary drivers).</p>
+linear framebuffer (such as NVIDIA cards with the binary drivers).</p>
 
 <p>Use of the xawtv/overlay mode has caused system crashes, and
 specifically, can cause tvtime to crash if it tries to use XVideo
