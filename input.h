@@ -31,8 +31,8 @@ typedef enum InputEvent_e {
 
 #include "tvtimeosd.h"
 #include "videoinput.h"
-#include "videotools.h"
 #include "tvtimeconf.h"
+#include "videocorrection.h"
 #include "menu.h"
 
 /* Modifiers */

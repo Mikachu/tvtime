@@ -25,23 +25,6 @@ extern "C" {
 #endif
 
 /**
- * Extent/scale correction code for luma and chroma.  This can
- * be used to do some tricks for increasing the brightness, and
- * fixing the broken bt878 luma extents.
- */
-typedef struct video_correction_s video_correction_t;
-video_correction_t *video_correction_new( void );
-void video_correction_delete( video_correction_t *vc );
-void video_correction_set_luma_power( video_correction_t *vc, double power );
-void video_correction_correct_luma_scanline( video_correction_t *vc,
-                                             unsigned char *output,
-                                             unsigned char *luma, int width );
-void video_correction_correct_packed422_scanline( video_correction_t *vc,
-                                                  unsigned char *output,
-                                                  unsigned char *input,
-                                                  int width );
-
-/**
  * Scanline functions.
  */
 void create_packed422_from_planar422_scanline( unsigned char *output,

@@ -1,14 +1,6 @@
 /**
  * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
  *
- * This includes code from DScaler: http://deinterlace.sf.net/
- *
- * TwoFrame deinterlacing code:
- *   Copyright (c) 2000 Steven Grimm.  All rights reserved.
- * Greedy2Frame deinterlacing code:
- *   Copyright (c) 2000 John Adcock, Tom Barry, Steve Grimm.
- *   All rights reserved.
- *
  * This file is subject to the terms of the GNU General Public License as
  * published by the Free Software Foundation.  A copy of this license is
  * included with this software distribution in the file COPYING.  If you
@@ -24,18 +16,40 @@
 #ifndef SPEEDY_H_INCLUDED
 #define SPEEDY_H_INCLUDED
 
+/**
+ * Speedy is a collection of optimized functions plus their C fallbacks.
+ * This includes a simple system to select which functions to use
+ * at runtime.
+ *
+ * The optimizations are done with the help of the mmx.h system, from
+ * libmpeg2 by Michel Lespinasse and Aaron Holtzman.
+ */
+
+
+/**
+ * Interpolates a packed 4:2:2 scanline using linear interpolation.
+ */
 void interpolate_packed422_scanline_c( unsigned char *output,
                                        unsigned char *top,
                                        unsigned char *bot, int width );
 void interpolate_packed422_scanline_mmxext( unsigned char *output,
                                             unsigned char *top,
                                             unsigned char *bot, int width );
+
+/**
+ * Blits a colour to a packed 4:2:2 scanline.
+ */
 void blit_colour_packed422_scanline_c( unsigned char *output,
                                        int width, int y, int cb, int cr );
 void blit_colour_packed422_scanline_mmx( unsigned char *output,
                                          int width, int y, int cb, int cr );
 void blit_colour_packed422_scanline_mmxext( unsigned char *output,
                                             int width, int y, int cb, int cr );
+
+/**
+ * Blits a colour to a packed 4:4:4:4 scanline.  I use luma/cb/cr instead of
+ * RGB but this will of course work for either.
+ */
 void blit_colour_packed4444_scanline_mmxext( unsigned char *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr );
@@ -44,10 +58,22 @@ void blit_colour_packed4444_scanline_mmx( unsigned char *output, int width,
                                           int cb, int cr );
 void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
                                         int alpha, int luma, int cb, int cr );
-void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned char *src, int width );
-void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width );
-void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src, int width );
 
+/**
+ * Scanline blitter for packed 4:2:2 scanlines.  This implementation uses
+ * the fast memcpy code from xine which got it from mplayer.
+ */
+void blit_packed422_scanline_mmxext_xine( unsigned char *dest,
+                                          const unsigned char *src, int width );
+void blit_packed422_scanline_i386_linux( unsigned char *dest,
+                                         const unsigned char *src, int width );
+void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src,
+                                int width );
+
+/**
+ * Here are the function pointers which will be initialized to point at the
+ * fastest available version of the above after a call to setup_speedy_calls().
+ */
 extern void (*interpolate_packed422_scanline)( unsigned char *output,
                                                unsigned char *top,
                                                unsigned char *bot, int width );
@@ -58,9 +84,14 @@ extern void (*blit_colour_packed4444_scanline)( unsigned char *output,
                                                 int cb, int cr );
 extern void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
 
-const char *speedy_get_deinterlacing_mode( void );
-const char *speedy_next_deinterlacing_mode( void );
+/**
+ * Sets up the function pointers to point at the fastest function available.
+ */
 void setup_speedy_calls( void );
+
+/**
+ * Returns a bitfield of what accellerations are available.  See mm_accel.h.
+ */
 int speedy_get_accel( void );
 
 #endif /* SPEEDY_H_INCLUDED */

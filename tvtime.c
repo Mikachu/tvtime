@@ -41,6 +41,7 @@
 #include "speedy.h"
 #include "deinterlace.h"
 #include "menu.h"
+#include "videocorrection.h"
 #include "plugins/plugins.h"
 
 /**

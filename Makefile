@@ -16,12 +16,12 @@ PNGLIBS = -lpng
 
 CFLAGS = -I. $(SDLFLAGS) $(TTFFLAGS) $(PNGFLAGS)
 CXXFLAGS = -I. $(SDLFLAGS) $(TTFFLAGS)
-LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS)
+LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS) -lm
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
 	videotools.o ttfont.o efs.o osd.o parser.o tvtimeconf.o \
 	pngoutput.o tvtimeosd.o input.o cpu_accel.o speedy.o \
-	pnginput.o menu.o deinterlace.o \
+	pnginput.o menu.o deinterlace.o videocorrection.o \
 	plugins/greedy2frame.o plugins/twoframe.o \
 	plugins/linear.o
 

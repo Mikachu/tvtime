@@ -1,0 +1,76 @@
+
+tvtime design doc
+-----------------
+
+This document describes some of the basic design of tvtime: the code
+structure and organization, the coding style, philosophies, etc.
+
+
+Program structure
+-----------------
+
+
+Initialization
+
+1. Startup and load configuration
+2. Steal performance as much as possible
+3. Open video input
+4. Start the main loop
+
+
+/**
+ * Explination of the loop:
+ *
+ * We want to build frames so that they look like this:
+ *  Top field:      Bot field:
+ *     Copy            Blank
+ *     Interp          Copy
+ *     Copy            Interp
+ *     Interp          Copy
+ *     Copy            --
+ *     --              --
+ *     --              Interp
+ *     Blank           Copy
+ *
+ *  So, say a frame is n high.
+ *  For the bottom field, the first scanline is blank (special case).
+ *  For the top field, the final scanline is blank (special case).
+ *  For the rest of the scanlines, we alternate between Copy then Interpolate.
+ *
+ *  To do the loop, I go 'Interp then Copy', and handle the first copy
+ *  outside the loop for both top and bottom.
+ *  The top field therefore handles n-2 scanlines in the loop.
+ *  The bot field handles n-2 scanlines in the loop.
+ *
+ * What we pass to the deinterlacing routines:
+ *
+ * Each deinterlacing routine can require data from up to four fields.
+ * The current field is being output is Field 4:
+ *
+ * | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |         |   T0    |         |   T1    |
+ * |   M0    |         |    M1   |         |
+ * |         |   B0    |         |   B1    |
+ *
+ * So, since we currently get frames not individual fields from V4L, there
+ * are two possibilities for where these come from:
+ *
+ * CASE 1: Deinterlacing the top field:
+ * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |   T-1   |         |   T0    |         |   T1    |
+ * |         |   M0    |         |    M1   |         |
+ * |   B-1   |         |   B0    |         |   B1    |
+ *  [--  secondlast --] [--  lastframe  --] [--  curframe   --]
+ *
+ * CASE 2: Deinterlacing the bottom field:
+ * | Field 0 | Field 1 | Field 2 | Field 3 | Field 4 |
+ * |   T-1   |         |   T0    |         |   T1    |
+ * |         |   M0    |         |    M1   |         |
+ * |   B-1   |         |   B0    |         |   B1    |
+ * ndlast --] [--  lastframe  --] [--  curframe   --]
+ *
+ * So, in case 1, we need the previous 2 frames as well as the current
+ * frame, and in case 2, we only need the previous frame, since the
+ * current frame contains both Field 3 and Field 4.
+ */
+
