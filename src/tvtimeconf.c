@@ -692,6 +692,7 @@ static void print_usage( char **argv )
     lfputs( _("  -s, --showdrops            Print stats on frame drops (for debugging).\n"), stderr );
     lfputs( _("  -S, --saveoptions          Save command line options to the config file.\n"), stderr );
     lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
+    lfputs( _("  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if available.\n"), stderr );
     lfputs( _("  -v, --verbose              Print debugging messages to stderr.\n"), stderr );
     lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
               "                             (defaults to /dev/mixer:line)\n\n"
@@ -742,6 +743,7 @@ static void print_config_usage( char **argv )
               "                             centre (default).\n"), stderr );
     lfputs( _("  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"), stderr );
     lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
+    lfputs( _("  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if available.\n"), stderr );
     lfputs( _("  -X, --display=DISPLAY      Use the given X display to connect to.\n"), stderr );
     lfputs( _("  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
               "                             (defaults to /dev/mixer:line)\n\n"
@@ -982,6 +984,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "mpeg", 1, 0, 'g' },
         { "fspos", 1, 0, 'p' },
         { "xmltv", 1, 0, 't' },
+        { "xmltvlanguage", 1, 0, 'l' },
         { "display", 1, 0, 'X' },
         { "version", 0, 0, 'Q' },
         { 0, 0, 0, 0 }
@@ -991,7 +994,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     char c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:Qg:",
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:l:Qg:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
@@ -1003,6 +1006,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'v': ct->verbose = 1; break;
             case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
                       ct->xmltvfile = expand_user_path( optarg ); break;
+            case 'l': if( ct->xmltvlanguage ) { free( ct->xmltvlanguage ); }
+                      ct->xmltvlanguage = strdup( optarg ); break;
             case 'F': if( ct->config_filename ) free( ct->config_filename );
                       ct->config_filename = expand_user_path( optarg );
                       if( ct->config_filename ) {
@@ -1122,6 +1127,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "widescreen", 0, 0, 'a' },
         { "fspos", 1, 0, 'p' },
         { "xmltv", 2, 0, 't' },
+        { "xmltvlanguage", 2, 0, 'l' },
         { "priority", 2, 0, 'R' },
         { 0, 0, 0, 0 }
     };
@@ -1133,7 +1139,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:R:",
+    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:l:R:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -1188,6 +1194,14 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   } else {
                       if( ct->xmltvfile ) free( ct->xmltvfile );
                       ct->xmltvfile = expand_user_path( optarg );
+                  }
+                  break;
+        case 'l': if( !optarg ) {
+                      fprintf( stdout, "XMLTVLanguage:%s\n",
+                               config_get_xmltv_language( ct ) );
+                  } else {
+                      if( ct->xmltvlanguage ) free( ct->xmltvlanguage );
+                      ct->xmltvlanguage = strdup( optarg );
                   }
                   break;
         case 'n': if( !optarg ) {

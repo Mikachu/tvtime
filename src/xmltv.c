@@ -252,7 +252,7 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
                 if( !lang || !locale ) {
                     if ( pro->title ) xmlFree ( pro->title );
                     pro->title = xmlNodeGetContent( cur );
-                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                } else if( !xmlStrncasecmp( lang, locale, 2 ) ) {
                     if ( pro->title_local ) xmlFree ( pro->title_local );
                     pro->title_local = xmlNodeGetContent( cur );
                 } else if( !pro->title ) {
@@ -262,7 +262,7 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
                 if( !lang || !locale ) {
                     if ( pro->subtitle ) xmlFree ( pro->subtitle );
                     pro->subtitle = xmlNodeGetContent( cur );
-                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                } else if( !xmlStrncasecmp( lang, locale, 2 ) ) {
                     if ( pro->subtitle_local )
                         xmlFree ( pro->subtitle_local );
                     pro->subtitle_local = xmlNodeGetContent( cur );
@@ -273,7 +273,7 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
                 if( !lang || !locale ) {
                     if ( pro->description ) xmlFree ( pro->description );
                     pro->description = xmlNodeGetContent( cur );
-                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                } else if( !xmlStrncasecmp( lang, locale, 2 ) ) {
                     if ( pro->description_local )
                         xmlFree ( pro->description_local );
                     pro->description_local = xmlNodeGetContent( cur );
@@ -434,6 +434,16 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
         *xmltv->curchannel = '\0';
     }
     xmltv->refresh = 1;
+}
+
+void xmltv_set_language( xmltv_t *xmltv, const char *locale )
+{
+    if( xmltv->locale ) free( xmltv->locale );
+    if( locale ) {
+        xmltv->locale = BAD_CAST strdup( locale );
+    } else {
+        xmltv->locale = 0;
+    }
 }
 
 void xmltv_refresh( xmltv_t *xmltv )
