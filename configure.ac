@@ -65,6 +65,16 @@ if test "$FREETYPE_CONFIG" = "no" ; then
   AC_MSG_ERROR(freetype2 needed and freetype-config not found)
 fi
 
+dnl ---------------------------------------------
+dnl directfb
+dnl ---------------------------------------------
+dnl Test for directfb
+AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
+AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
+dnl if test "$DIRECTFB_CONFIG" != "no" ; then
+dnl   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
+dnl fi
+
 
 
 AC_ARG_ENABLE([warnings],

@@ -1,4 +1,9 @@
 
+#include "config.h"
+#include "dfboutput.h"
+
+#ifdef HAVE_DIRECTFB
+
 /* directfb includes */
 #include <directfb.h>
 
@@ -15,8 +20,6 @@
 #include <sys/ioctl.h>
 #include <sys/kd.h>
 #include <linux/fb.h>
-
-#include "dfboutput.h"
 
 static IDirectFB             *dfb;
 static IDirectFBDisplayLayer *crtc2;
@@ -297,4 +300,13 @@ output_api_t *get_dfb_output( void )
 {
     return &dfboutput;
 }
+
+#else /* no DirectFB support */
+
+output_api_t *get_dfb_output( void )
+{
+    return 0;
+}
+
+#endif
 
