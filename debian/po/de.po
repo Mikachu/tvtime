@@ -1,0 +1,168 @@
+#
+#    Translators, if you are not familiar with the PO format, gettext
+#    documentation is worth reading, especially sections dedicated to
+#    this format, e.g. by running:
+#         info -n '(gettext)PO Files'
+#         info -n '(gettext)Header Entry'
+#
+#    Some information specific to po-debconf are available at
+#            /usr/share/doc/po-debconf/README-trans
+#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+#    Developers do not need to manually edit POT or PO files.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
+"PO-Revision-Date: 2004-06-16 15:13-0200\n"
+"Last-Translator: Helge Kreutzmann <kreutzm@itp.uni-hannover.de>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: select
+#. Choices
+#: ../templates:3
+msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid "Select the default television standard for your location"
+msgstr "Wählen Sie den Fehrnseh-Standard für Ihren Ort aus"
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid ""
+"North American users should select NTSC.  Most areas in the world use PAL."
+msgstr ""
+"Benutzer in Nordamerika sollten NTSC auswählen. Die meisten Gegenden in der "
+"Welt verwenden PAL."
+
+#. Type: select
+#. Choices
+#: ../templates:9
+msgid "Cable, Broadcast, Cable including channels 100+"
+msgstr "Kabel, Antenne, Kabel inklusive Kanäle über 100"
+
+#. Type: select
+#. Choices
+#: ../templates:17
+msgid "Cable, Broadcast"
+msgstr "Kabel, Antenne"
+
+#. Type: select
+#. Description
+#: ../templates:18
+msgid ""
+"The frequency table specifies which frequencies correspond to the familiar "
+"channel numbers.  Select broadcast if you use an antenna for over-the-air "
+"signals."
+msgstr ""
+"Die Frequenztabelle gibt die Frequenzen, die zu bekannten Kanalnummern "
+"gehören, an. Wählen Sie »Antenne« falls Sie eine Antenne für "
+"terrestische Signale einsetzen."
+
+#. Type: select
+#. Choices
+#: ../templates:25
+msgid ""
+"Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
+"Optus, Custom (must run tvtime-scanner first)"
+msgstr ""
+"Europa, Frankreich, Russland, Australien, Neuseeland, China Antenne, "
+"Australien Optus, Angepaßt (zuerst muß »tvtime-scanner« verwendet werden)"
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid "Select the default frequency table"
+msgstr "Wählen Sie die Standard-Frequenztabelle aus"
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid ""
+"Users of the Optus cable company in Australia should select Australia "
+"Optus.  If you are a user of a cable company that does not use standard "
+"frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
+"the tvtime-scanner application before using tvtime."
+msgstr ""
+"Abonnenten der Optus-Kabelgesellschaft in Australien sollten Australien-"
+"Optus auswählen. Falls Sie ein Abonnent einer Kabelgesellschaft sind, die "
+"nicht-Standard-Frequenzen verwendet, wie beispielsweise Casema, UPC oder "
+"Mixtics, wählen Sie bitte »Angepaßt« aus und verwenden Sie die »tvtime-"
+"scanner«-Anwendung vor der Benutzung von tvtime."
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid "Specify your default television capture device"
+msgstr "Geben Sie das standardmäßig verwendete Fehrnseh-Eingangs-Gerät an"
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid ""
+"This should be the video4linux device which corresponds to your capture card."
+msgstr ""
+"Dies sollte das video4linux-Gerät sein, das Ihrer Fehrnseh-Karte entspricht."
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid "Specify a device to use for VBI decoding"
+msgstr "Geben Sie das Gerät für Teletext-Dekodierung an"
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid ""
+"This will only be used in NTSC areas for decoding closed captions and XDS "
+"channel information."
+msgstr ""
+"Dies wird nur in NTSC-Gegenden verwendet, um »Closed Caption« und XDS-"
+"Kanalinformation zu dekodieren."
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
+msgstr "Wollen Sie »/usr/bin/tvtime« setuid root setzen?"
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid ""
+"This allows tvtime to run at a high priority to ensure smooth video and "
+"should be used for high quality video output even during high CPU load."
+msgstr ""
+"Dies ermöglicht es, tvtime mit hoher Priorität laufen zu lassen, um "
+"problemloses Bild sicherzustellen und sollte selbst bei hoher CPU-Last für "
+"hochqualitative Videoausgabe sorgen."
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid "Specify the process priority for the tvtime binary"
+msgstr "Geben Sie die Prozeß-Priorität für tvtime an"
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid ""
+"This setting controls the priority of the tvtime process relative to other "
+"processes on the system.  The allowed range is from -19 to 19. Lower values "
+"indicate higher priority, and a value of 0 would give tvtime the same "
+"priority as a normal process."
+msgstr ""
+"Diese Einstellung regelt die Priorität des tvtime-Prozesses relativ zu "
+"anderen Prozessen im System. Der erlaubte Bereich ist von -19 bis 19. "
+"Niedrigere Werte zeigen eine höhere Priorität an, und ein Wert von 0 "
+"würde tvtime die gleiche Priorität wie normale Prozesse geben."
