@@ -70,7 +70,7 @@ static int HandleXError( Display *display, XErrorEvent *xevent )
             "    tvtime.\n\n" );
     } else {
         XGetErrorText( display, xevent->error_code, str, 1024 );
-        fprintf( stderr, "xvoutput: Received X error event: %s\n", str );
+        fprintf( stderr, "xvoutput: Received X error: %s\n", str );
     }
     xvoutput_error = 1;
     return 0;
@@ -263,7 +263,8 @@ static int get_colourkey( void )
                     if( !strcmp( attr[ k ].name, "XV_COLORKEY" ) ) {
                         atom = XInternAtom( display, "XV_COLORKEY", False );
                         if( atom != None ) {
-                            XvSetPortAttribute( display, xv_port, atom, 16740766 );
+                            XvGetPortAttribute( display, xv_port, atom, &value );
+                            XvSetPortAttribute( display, xv_port, atom, value );
                             XvGetPortAttribute( display, xv_port, atom, &value );
                             XFree( attr );
                             return value;
