@@ -49,7 +49,9 @@ int parser_openfile( parser_file_t *pf, const char *filename )
         pf->fh = NULL;
     }
 
-    pf->fh = fopen( filename, "r" );
+    if( filename && *filename ) {
+        pf->fh = fopen( filename, "r" );
+    }
     if( !(pf->fh) ) {
         return 0;
     }
@@ -117,7 +119,7 @@ int parser_readfile( parser_file_t *pf )
     fseek( pf->fh, 0L, SEEK_END );
     length = ftell( pf->fh );
     fseek( pf->fh, 0L, SEEK_SET );
-    file = (char *)malloc(length+1);
+    file = (char *)malloc(length+2);
     if( !file ) {
         fprintf( stderr, "parser: Insufficient memory to read file.\n" );
         return 0;
