@@ -360,14 +360,14 @@ static void commands_station_change( commands_t *in )
         videoinput_set_audio_mode( in->vidin, 1 );
         in->audio_counter = CHANNEL_STEREO_DELAY;
         if( in->osd ) {
-            char channel_display[ 20 ];
-            sprintf( channel_display, "%d", station_get_current_id( in->stationmgr ) );
+            sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_set_channel_number( in->osd, channel_display );
+            tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
             tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
+        in->frame_counter = 0;
     }
 }
 
@@ -986,8 +986,11 @@ void commands_next_frame( commands_t *in )
         char input_text[6];
 
         strcpy( input_text, in->next_chan_buffer );
-        if( !(in->frame_counter % 10) )
+        if( !(in->frame_counter % 10) ) {
             strcat( input_text, "_" );
+        } else {
+            strcat( input_text, " " );
+        }
         if( in->osd ) {
             tvtime_osd_set_channel_number( in->osd, input_text );
             tvtime_osd_show_info( in->osd );
