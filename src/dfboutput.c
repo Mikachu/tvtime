@@ -378,7 +378,7 @@ int dfb_get_visible_height( void )
     return output_height; 
 } 
 
-void dfb_set_input_size( int inputwidth, int inputheight )
+int dfb_set_input_size( int inputwidth, int inputheight )
 {
     int need_input_resize = (current_frame == NULL ||
                             (input_width != inputwidth) || (input_height != inputheight));
@@ -389,6 +389,7 @@ void dfb_set_input_size( int inputwidth, int inputheight )
     if( need_input_resize ) {
         dfb_setup_temp_buffer();
     }
+    return 1;
 }
 
 int dfb_is_fullscreen( void )

@@ -38,7 +38,7 @@ static int mga_stride;
 static int mga_frame_size;
 static int curframe;
 
-int mga_init( int outputheight, int aspect, int verbose )
+static int mga_init( int outputheight, int aspect, int verbose )
 {
     mga_fd = open( "/dev/mga_vid", O_RDWR );
     if( mga_fd < 0 ) {
@@ -50,7 +50,7 @@ int mga_init( int outputheight, int aspect, int verbose )
     return 1;
 }
 
-void mga_set_input_size( int inputwidth, int inputheight )
+static int mga_set_input_size( int inputwidth, int inputheight )
 {
     mga_width = (inputwidth + 31) & ~31;
     mga_stride = mga_width * 2;
@@ -81,56 +81,58 @@ void mga_set_input_size( int inputwidth, int inputheight )
     mga_vid_base = mmap( 0, mga_frame_size * mga_config.num_frames, PROT_WRITE, MAP_SHARED, mga_fd, 0 );
     fprintf( stderr, "mgaoutput: Base address = %8p.\n", mga_vid_base );
     memset( mga_vid_base, 0, mga_frame_size );
+
+    return 1;
 }
 
-void mga_lock_output_buffer( void )
+static void mga_lock_output_buffer( void )
 {
 }
 
-uint8_t *mga_get_output_buffer( void )
+static uint8_t *mga_get_output_buffer( void )
 {
     return mga_vid_base + (curframe*mga_frame_size);
 }
 
-int mga_get_output_stride( void )
+static int mga_get_output_stride( void )
 {
     return mga_width * 2;
 }
 
-void mga_unlock_output_buffer( void )
+static void mga_unlock_output_buffer( void )
 {
 }
 
-int mga_is_exposed( void )
-{
-    return 1;
-}
-
-int mga_get_visible_width( void )
-{
-    return 0;
-}
-
-int mga_get_visible_height( void )
-{
-    return 0;
-}
-
-int mga_is_fullscreen( void )
+static int mga_is_exposed( void )
 {
     return 1;
 }
 
-int mga_is_interlaced( void )
+static int mga_get_visible_width( void )
 {
     return 0;
 }
 
-void mga_wait_for_sync( int field )
+static int mga_get_visible_height( void )
+{
+    return 0;
+}
+
+static int mga_is_fullscreen( void )
+{
+    return 1;
+}
+
+static int mga_is_interlaced( void )
+{
+    return 0;
+}
+
+static void mga_wait_for_sync( int field )
 {
 }
 
-int mga_show_frame( int x, int y, int width, int height )
+static int mga_show_frame( int x, int y, int width, int height )
 {
     int id = curframe;
     ioctl( mga_fd, MGA_VID_FSEL, &id );
@@ -138,35 +140,35 @@ int mga_show_frame( int x, int y, int width, int height )
     return 1;
 }
 
-int mga_toggle_aspect( void )
+static int mga_toggle_aspect( void )
 {
     return 0;
 }
 
-int mga_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
+static int mga_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
     return 1;
 }
 
-void mga_set_window_caption( const char *caption )
+static void mga_set_window_caption( const char *caption )
 {
 }
 
-void mga_set_window_height( int window_height )
+static void mga_set_window_height( int window_height )
 {
 }
 
-void mga_poll_events( input_t *in )
+static void mga_poll_events( input_t *in )
 {
 }
 
-void mga_shutdown( void )
+static void mga_shutdown( void )
 {
     ioctl( mga_fd, MGA_VID_OFF, 0 );
     close( mga_fd );
 }
 
-output_api_t mgaoutput =
+static output_api_t mgaoutput =
 {
     mga_init,
 
