@@ -62,7 +62,6 @@ struct config_s
     int priority;
     int ntsc_mode;
     int send_fields;
-    char *output_driver;
     int apply_luma_correction;
     double luma_correction;
     int useposition;
@@ -148,7 +147,6 @@ static void copy_config( config_t *dest, config_t *src )
     dest->modelist = 0;
     dest->nummodes = 0;
     dest->doc = 0;
-    dest->output_driver = 0;
     dest->audiomode = 0;
     dest->xmltvfile = 0;
 
@@ -295,11 +293,6 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "XMLTVFile" ) ) {
             if( ct->xmltvfile ) free( ct->xmltvfile );
             ct->xmltvfile = expand_user_path( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "OutputDriver" ) ) {
-            if( ct->output_driver ) free( ct->output_driver );
-            ct->output_driver = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "FullscreenPosition" ) ) {
@@ -771,7 +764,6 @@ config_t *config_new( void )
     ct->priority = -19;
     ct->ntsc_mode = 0;
     ct->send_fields = 0;
-    ct->output_driver = strdup( "xv" );
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
     ct->useposition = 0;
@@ -1019,8 +1011,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'c': ct->prev_channel = ct->start_channel;
                       ct->start_channel = atoi( optarg ); break;
             case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
-            case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
-                      ct->output_driver = strdup( optarg ); break;
             case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
                           ct->fspos = 1;
                       } else if( tolower( optarg[ 0 ] ) == 'b' ) {
@@ -1057,8 +1047,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
-
-        config_save( ct, "OutputDriver", ct->output_driver );
 
         if( ct->fspos == 0 ) {
             config_save( ct, "FullscreenPosition", "Centre" );
@@ -1186,8 +1174,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                       ct->norm = strdup( optarg );
                   }
                   break;
-        case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
-                  ct->output_driver = strdup( optarg ); break;
         case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
                       ct->fspos = 1;
                   } else if( tolower( optarg[ 0 ] ) == 'b' ) {
@@ -1235,8 +1221,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
-
-        config_save( ct, "OutputDriver", ct->output_driver );
 
         if( ct->fspos == 0 ) {
             config_save( ct, "FullscreenPosition", "Centre" );
@@ -1324,7 +1308,6 @@ void config_free_data( config_t *ct )
     if( ct->audiomode ) free( ct->audiomode );
     if( ct->xmltvfile ) free( ct->xmltvfile );
     if( ct->timeformat ) free( ct->timeformat );
-    if( ct->output_driver ) free( ct->output_driver );
     if( ct->rvr_filename ) free( ct->rvr_filename );
     if( ct->mpeg_filename ) free( ct->mpeg_filename );
     if( ct->mixerdev ) free( ct->mixerdev );
@@ -1529,11 +1512,6 @@ int config_get_verbose( config_t *ct )
 int config_get_send_fields( config_t *ct )
 {
     return ct->send_fields;
-}
-
-const char *config_get_output_driver( config_t *ct )
-{
-    return ct->output_driver;
 }
 
 int config_get_debug( config_t *ct )

@@ -69,11 +69,6 @@
 #include "fifo.h"
 #include "commands.h"
 #include "station.h"
-#include "dfboutput.h"
-#include "mgaoutput.h"
-#include "rvrreader.h"
-#include "mpeg2input.h"
-#include "sdloutput.h"
 #include "pulldown.h"
 #include "utils.h"
 #include "cpuinfo.h"
@@ -1133,8 +1128,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 {
     videoinput_t *vidin = 0;
     station_mgr_t *stationmgr = 0;
-    rvrreader_t *rvrreader = 0;
-    mpeg2input_t *mpegin = 0;
     int width = 720;
     int height = 480;
     int norm = 0;
@@ -1180,7 +1173,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     double pixel_aspect;
     char number[ 4 ];
     tvtime_t *tvtime;
-    unsigned int output_driver = 0;
     deinterlace_method_t *curmethod;
     int curmethodid;
     int matte_x = 0;
@@ -1217,35 +1209,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     send_fields = config_get_send_fields( ct );
 
-    if( config_get_output_driver( ct ) ) {
-        if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
-            output_driver = OUTPUT_DIRECTFB;
-        } else if( !strcasecmp
-                   ( config_get_output_driver( ct ), "matroxtv" ) ) {
-            output_driver = OUTPUT_DIRECTFB_MATROXTV;
-        } else if( !strcasecmp( config_get_output_driver( ct ), "mga" ) ) {
-            output_driver = OUTPUT_MGA;
-        } else if( !strcasecmp( config_get_output_driver( ct ), "sdl" ) ) {
-            output_driver = OUTPUT_SDL;
-        } else {
-            output_driver = OUTPUT_XV;
-        }
-    } else {
-        output_driver = OUTPUT_XV;
-    }
-
     /* Setup the output. */
-    if( output_driver == OUTPUT_DIRECTFB ) {
-        output = get_dfb_output();
-    } else if( output_driver == OUTPUT_DIRECTFB_MATROXTV ) {
-        output = get_dfb_matroxtv_output();
-    } else if( output_driver == OUTPUT_MGA ) {
-        output = get_mga_output();
-    } else if( output_driver == OUTPUT_SDL ) {
-        output = get_sdl_output();
-    } else {
-        output = get_xv_output();
-    }
+    output = get_xv_output();
 
     sixteennine = config_get_aspect( ct );
 
@@ -1328,69 +1293,45 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     /* Default to a width specified on the command line. */
     width = config_get_inputwidth( ct );
 
-    if( config_get_mpeg_filename( ct ) ) {
-        mpegin = mpeg2input_new( config_get_mpeg_filename( ct ), 0, mm_accel() );
-        if( !mpegin ) {
-            if( asprintf( &error_string, _("Cannot open MPEG file %s."),
-                          config_get_mpeg_filename( ct ) ) < 0 ) {
-                error_string = 0;
-            }
-        } else {
-            width = mpeg2input_get_width( mpegin );
-            height = mpeg2input_get_height( mpegin );
+    vidin = videoinput_new( config_get_v4l_device( ct ), 
+                            config_get_inputwidth( ct ), 
+                            norm, verbose );
+    if( !vidin ) {
+        if( asprintf( &error_string,
+                      _("Cannot open capture device %s."),
+                      config_get_v4l_device( ct ) ) < 0 ) {
+            error_string = 0;
         }
-    } else if( config_get_rvr_filename( ct ) ) {
-        rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
-        if( !rvrreader ) {
-            if( asprintf( &error_string, _("Cannot open RVR file %s."),
-                          config_get_rvr_filename( ct ) ) < 0 ) {
-                error_string = 0;
-            }
-        } else {
-            width = rvrreader_get_width( rvrreader );
-            height = rvrreader_get_height( rvrreader );
-        }
-    } else {
-        vidin = videoinput_new( config_get_v4l_device( ct ), 
-                                config_get_inputwidth( ct ), 
-                                norm, verbose );
-        if( !vidin ) {
-            if( asprintf( &error_string,
-                          _("Cannot open capture device %s."),
-                          config_get_v4l_device( ct ) ) < 0 ) {
-                error_string = 0;
-            }
-        } else if( videoinput_get_numframes( vidin ) < 2 ) {
-            lfprintf( stderr, _("\n"
+    } else if( videoinput_get_numframes( vidin ) < 2 ) {
+        lfprintf( stderr, _("\n"
     "    Your capture card driver, %s, does not seem\n"
     "    to support full framerate capture.  Please check to see if it is\n"
     "    misconfigured, or if you have selected the wrong capture\n"
     "    device (%s).\n\n"), videoinput_get_driver_name( vidin ),
                              config_get_v4l_device( ct ) );
-            videoinput_delete( vidin );
-            vidin = 0;
-         } else {
-            const char *audiomode = config_get_audio_mode( ct );
-            videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
+        videoinput_delete( vidin );
+        vidin = 0;
+     } else {
+        const char *audiomode = config_get_audio_mode( ct );
+        videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
 
-            if( audiomode ) {
-                if( !strcasecmp( audiomode, "mono" ) ) {
-                    videoinput_set_audio_mode( vidin, VIDEOINPUT_MONO );
-                } else if( !strcasecmp( audiomode, "stereo" ) ) {
-                    videoinput_set_audio_mode( vidin, VIDEOINPUT_STEREO );
-                } else if( !strcasecmp( audiomode, "sap" )
-                           || !strcasecmp( audiomode, "lang1" ) ) {
-                    videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG1 );
-                } else {
-                    videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
-                }
+        if( audiomode ) {
+            if( !strcasecmp( audiomode, "mono" ) ) {
+                videoinput_set_audio_mode( vidin, VIDEOINPUT_MONO );
+            } else if( !strcasecmp( audiomode, "stereo" ) ) {
+                videoinput_set_audio_mode( vidin, VIDEOINPUT_STEREO );
+            } else if( !strcasecmp( audiomode, "sap" )
+                       || !strcasecmp( audiomode, "lang1" ) ) {
+                videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG1 );
+            } else {
+                videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
             }
-            width = videoinput_get_width( vidin );
-            height = videoinput_get_height( vidin );
-            if( verbose ) {
-                fprintf( stderr, "tvtime: Sampling input at %d pixels "
-                                   "per scanline.\n", width );
-            }
+        }
+        width = videoinput_get_width( vidin );
+        height = videoinput_get_height( vidin );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Sampling input at %d pixels "
+                               "per scanline.\n", width );
         }
     }
 
@@ -1409,11 +1350,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
      * 4 buffers: 5 fields available.  [t][b][t][b][t][b][-][-]
      *                                 ^^^^^^^^^^^^^^^
      */
-    if( rvrreader ) {
-        fieldsavailable = 4;
-    } else if( mpegin ) {
-        fieldsavailable = 4;
-    } else if( vidin ) {
+    if( vidin ) {
         if( videoinput_get_numframes( vidin ) == 2 ) {
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
@@ -1491,13 +1428,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( curmethod ) {
             tvtime_osd_set_deinterlace_method( osd, curmethod->name );
         }
-        if( rvrreader ) {
-            tvtime_osd_set_input( osd, "RVR" );
-            tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
-        } else if( mpegin ) {
-            tvtime_osd_set_input( osd, "MPEG2" );
-            tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
-        } else if( vidin ) {
+        if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
             tvtime_osd_set_norm
                 ( osd,
@@ -2085,11 +2016,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         /**
          * Acquire the next frame.
          */
-        if( rvrreader ) {
-            tuner_state = TUNER_STATE_HAS_SIGNAL;
-        } else if( mpegin ) {
-            tuner_state = TUNER_STATE_HAS_SIGNAL;
-        } else if( vidin ) {
+        if( vidin ) {
             tuner_state = videoinput_check_for_signal
                 ( vidin, commands_check_freq_present( commands ) );
         } else {
@@ -2118,17 +2045,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL ||
                         tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
             acquired = 1;
-            if( rvrreader ) {
-                if( !rvrreader_next_frame( rvrreader ) ) break;
-                curframe = rvrreader_get_curframe( rvrreader );
-                lastframe = rvrreader_get_lastframe( rvrreader );
-                secondlastframe = rvrreader_get_secondlastframe( rvrreader );
-            } else if( mpegin ) {
-                if( !mpeg2input_next_frame( mpegin ) ) break;
-                curframe = mpeg2input_get_curframe( mpegin );
-                lastframe = mpeg2input_get_lastframe( mpegin );
-                secondlastframe = mpeg2input_get_secondlastframe( mpegin );
-            } else if( vidin ) {
+            if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
                     has_signal = 0;
@@ -2607,12 +2524,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     if( verbose ) {
         fprintf( stderr, "tvtime: Cleaning up.\n" );
-    }
-    if( mpegin ) {
-        mpeg2input_delete( mpegin );
-    }
-    if( rvrreader ) {
-        rvrreader_delete( rvrreader );
     }
     if( vidin ) {
         videoinput_delete( vidin );
