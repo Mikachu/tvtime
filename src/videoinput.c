@@ -891,9 +891,9 @@ void videoinput_delete( videoinput_t *vidin )
     free( vidin );
 }
 
-int videoinput_check_for_signal( videoinput_t *vidin )
+int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
 {
-    if( videoinput_freq_present( vidin ) ) {
+    if( videoinput_freq_present( vidin ) || !check_freq_present ) {
         switch( vidin->cur_tuner_state ) {
         case TUNER_STATE_NO_SIGNAL:
         case TUNER_STATE_SIGNAL_LOST:

@@ -779,7 +779,7 @@ int main( int argc, char **argv )
         input_next_frame( in );
 
         /* Aquire the next frame. */
-        tuner_state = videoinput_check_for_signal( vidin );
+        tuner_state = videoinput_check_for_signal( vidin, config_get_check_freq_present( ct ) );
 
         if( has_signal && tuner_state != TUNER_STATE_HAS_SIGNAL ) {
             has_signal = 0;

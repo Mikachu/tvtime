@@ -186,7 +186,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum );
 /**
  * Returns the current tuner state.
  */
-int videoinput_check_for_signal( videoinput_t *vidin );
+int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present );
 
 #ifdef __cplusplus
 };

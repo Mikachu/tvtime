@@ -119,7 +119,8 @@ struct config_s
     unsigned int other_text_rgb;
     char command_pipe[ 256 ];
 
-	int preferred_deinterlace_method;
+    int preferred_deinterlace_method;
+    int check_freq_present;
 
     int use_vbi;
     char *vbidev;
@@ -205,7 +206,8 @@ config_t *config_new( int argc, char **argv )
     ct->channel_text_rgb = 4294967040U; /* opaque yellow */
     ct->other_text_rgb = 4294303411U; /* opaque wheat */
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
-	ct->preferred_deinterlace_method = 0;
+    ct->preferred_deinterlace_method = 0;
+    ct->check_freq_present = 1;
     ct->use_vbi = 1;
 
     if( !ct->keymap ) {
@@ -461,6 +463,10 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "PreferredDeinterlaceMethod", 1 )) ) {
         ct->preferred_deinterlace_method = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "CheckForSignal", 1 )) ) {
+        ct->check_freq_present = atoi( tmp );
     }
 
     config_init_keymap( ct );
@@ -865,3 +871,9 @@ char *config_get_vbidev( config_t *ct )
 {
     return ct->vbidev;
 }
+
+int config_get_check_freq_present( config_t *ct )
+{
+    return ct->check_freq_present;
+}
+
