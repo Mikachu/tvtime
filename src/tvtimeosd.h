@@ -62,6 +62,7 @@ void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage );
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 
+int tvtime_osd_data_bar_visible( tvtime_osd_t *osd );
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                                int percentage );
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message );

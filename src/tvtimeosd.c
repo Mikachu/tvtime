@@ -183,6 +183,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_set_timeout( osd->volume_bar, 0 );
 }
 
+int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
+{
+    return osd_string_visible( osd->data_bar );
+}
 
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                                int percentage )

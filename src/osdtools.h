@@ -81,6 +81,7 @@ void osd_databars_set_colour( osd_databars_t *osdd, int alpha, int luma,
 void osd_databars_advance_frame( osd_databars_t *osdd );
 int osd_databars_get_frames_left( osd_databars_t *osdd );
 void osd_databars_prerender( osd_databars_t *osdd, int num_filled );
+void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames );
 void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
                                                 unsigned char *output,
                                                 unsigned char *background,

@@ -304,9 +304,17 @@ int osd_databars_get_frames_left( osd_databars_t *osdd )
 
 void osd_databars_prerender( osd_databars_t *osdd, int num_filled )
 {
+
+    memset( osdd->data, 0, osdd->width * 4 );
     composite_bars_packed4444_scanline( osdd->data, osdd->data, osdd->width,
                                         osdd->alpha, osdd->luma, osdd->cb,
                                         osdd->cr, num_filled );
+}
+
+void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames )
+{
+    osd_databars_prerender( osdd, num_filled );
+    osdd->frames_left = frames;
 }
 
 void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,

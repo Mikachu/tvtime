@@ -501,6 +501,8 @@ void input_next_frame( input_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    
+    if( in->togglemenumode ) menu_refresh( in->menu );
 }
 
 

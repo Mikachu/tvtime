@@ -21,6 +21,8 @@
 
 #include "input.h"
 #include "tvtimeconf.h"
+#include "videoinput.h"
+#include "tvtimeosd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,11 +30,13 @@ extern "C" {
 
 typedef struct menu_s menu_t;
 
-menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width, 
+menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, 
+                  tvtime_osd_t *osd, int width, 
                   int height, double aspect );
 void menu_delete( menu_t *m );
 
 void menu_init( menu_t *m );
+void menu_refresh( menu_t *m );
 int menu_callback( menu_t *m, InputEvent command, int arg );
 void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
                                         int width, int xpos, int scanline );

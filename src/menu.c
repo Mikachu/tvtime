@@ -50,6 +50,7 @@ struct menu_s {
     MenuScreen menu_previous_screen;
     unsigned int menu_state;
     menu_text menu_line[MENU_LINES];
+    void *menu_data;
 
     int bg_luma, bg_cb, bg_cr;
 
@@ -63,10 +64,12 @@ struct menu_s {
     input_t *in;
     config_t *cfg;
     videoinput_t *vidin;
+    tvtime_osd_t *osd;
 };
 
 
-menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width, 
+menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, 
+                  tvtime_osd_t *osd, int width, 
                   int height, double aspect )
 {
     menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
@@ -81,6 +84,7 @@ menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width,
     m->in = in;
     m->cfg = cfg;
     m->vidin = vidin;
+    m->osd = osd;
     m->frame_width = width;
     m->frame_height = height;
     m->frame_aspect = aspect;
@@ -92,6 +96,7 @@ menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width,
     m->bg_luma = 16;
     m->bg_cb = 128;
     m->bg_cr = 128;
+    m->menu_data = NULL;
 
     if( !cfg ) {
         menu_delete( m );
@@ -138,6 +143,10 @@ void menu_delete( menu_t *m )
 }
 
 /* Menus */
+void (*menu_blit_scanline)( menu_t *m, unsigned char *output,
+                            int width, int xpos, int scanline );
+
+
 void menu_main( menu_t *m, int key );
 void menu_init( menu_t *m )
 {
@@ -155,6 +164,8 @@ void menu_main( menu_t *m, int key )
 {
     int i, start=0;
     if( !m ) return;
+
+    menu_blit_scanline = NULL;
 
     switch( key ) {
     case I_UP:
@@ -240,12 +251,35 @@ void menu_main( menu_t *m, int key )
     }
 }
 
+struct pict_data {
+    osd_databars_t *bright;
+    osd_databars_t *cont;
+    osd_databars_t *col;
+    osd_databars_t *hue;
+};
+
+void pict_blit_scanline( menu_t *m, unsigned char *output,
+                         int width, int xpos, int scanline );
 void menu_pict( menu_t *m, int key )
 {
-    int i, start=0;
+    int i;
     int NUM_ITEMS = 4;
 
     if( !m ) return;
+
+    menu_blit_scanline = pict_blit_scanline;
+
+    if( m->menu_data == NULL ) {
+        m->menu_data = (void *)malloc( sizeof(struct pict_data) );
+        ((struct pict_data *)(m->menu_data))->bright = osd_databars_new( (m->width * 80) / 100 );
+        ((struct pict_data *)(m->menu_data))->cont = osd_databars_new( (m->width * 80) / 100 );
+        ((struct pict_data *)(m->menu_data))->col = osd_databars_new( (m->width * 80) / 100 );
+        ((struct pict_data *)(m->menu_data))->hue = osd_databars_new( (m->width * 80) / 100 );
+    }
+
+    if( !tvtime_osd_data_bar_visible( m->osd ) ) {
+        m->visible=1;
+    }
 
     switch( key ) {
     case I_UP:
@@ -269,25 +303,41 @@ void menu_pict( menu_t *m, int key )
             videoinput_set_brightness_relative( 
                 m->vidin, 
                 (key == I_RIGHT) ? 1 : -1 );
+            m->visible = 0;
+            if( m->osd ) 
+                tvtime_osd_show_data_bar( m->osd, "Bright ", videoinput_get_brightness( m->vidin ) );
+
+
             break;
 
         case 1:
             videoinput_set_colour_relative( 
                 m->vidin, 
                 (key == I_RIGHT) ? 1 : -1 );
+            m->visible = 0;
+            if( m->osd )
+                tvtime_osd_show_data_bar( m->osd, "Colour ", videoinput_get_colour( m->vidin ) );
+
             break;
 
         case 2:
             videoinput_set_contrast_relative( 
                 m->vidin, 
                 (key == I_RIGHT) ? 1 : -1 );
-            videoinput_get_contrast( m->vidin );
+            m->visible = 0;
+            if( m->osd ) 
+                tvtime_osd_show_data_bar( m->osd, "Cont   ", videoinput_get_contrast( m->vidin ) );
+
             break;
 
         case 3:
             videoinput_set_hue_relative( 
                 m->vidin, 
                 (key == I_RIGHT) ? 1 : -1 );
+            m->visible = 0;
+            if( m->osd ) 
+                tvtime_osd_show_data_bar( m->osd, "Hue    ", videoinput_get_hue( m->vidin ) );
+
             break;
 
         default:
@@ -309,34 +359,80 @@ void menu_pict( menu_t *m, int key )
         char tmpstr[50];
         if( m->menu_state == i ) {
             osd_string_set_colour( m->menu_line[i*2].line, 220, 12, 155 );
-            osd_string_set_colour( m->menu_line[i*2+1].line, 220, 12, 155 );
         } else {
             osd_string_set_colour( m->menu_line[i*2].line, 200, 128, 128 );
-            osd_string_set_colour( m->menu_line[i*2+1].line, 200, 128, 128 );
         }
         switch( i ) {
         case 0:
             osd_string_show_text( m->menu_line[i*2].line, "Brightness", 51);
-            snprintf( tmpstr, 49, "%d%%", videoinput_get_brightness( m->vidin ));
-            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            if( m->menu_state == i ) {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->bright,
+                    255, 220, 12, 155);
+            } else {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->bright,
+                    255, 200, 128, 128);
+            }
+
+            osd_databars_show_bar( 
+                ((struct pict_data *)(m->menu_data))->bright, 
+                videoinput_get_brightness( m->vidin ), 51);
+            osd_string_show_text( m->menu_line[i*2+1].line, "", 0 );
             break;
 
         case 1:
             osd_string_show_text( m->menu_line[i*2].line, "Colour", 51);
-            snprintf( tmpstr, 49, "%d%%", videoinput_get_colour( m->vidin ));
-            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            if( m->menu_state == i ) {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->col,
+                    255, 220, 12, 155);
+            } else {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->col,
+                    255, 200, 128, 128);
+            }
+
+            osd_databars_show_bar( 
+                ((struct pict_data *)(m->menu_data))->col, 
+                videoinput_get_colour( m->vidin ), 51);
+            osd_string_show_text( m->menu_line[i*2+1].line, "", 0 );
             break;
 
         case 2:
             osd_string_show_text( m->menu_line[i*2].line, "Contrast", 51);
-            snprintf( tmpstr, 49, "%d%%", videoinput_get_contrast( m->vidin ));
-            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            if( m->menu_state == i ) {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->cont,
+                    255, 220, 12, 155);
+            } else {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->cont,
+                    255, 200, 128, 128);
+            }
+
+            osd_databars_show_bar( 
+                ((struct pict_data *)(m->menu_data))->cont, 
+                videoinput_get_contrast( m->vidin ), 51);
+            osd_string_show_text( m->menu_line[i*2+1].line, "", 0 );
             break;
 
         case 3:
             osd_string_show_text( m->menu_line[i*2].line, "Hue", 51);
-            snprintf( tmpstr, 49, "%d%%", videoinput_get_hue( m->vidin ));
-            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            if( m->menu_state == i ) {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->hue,
+                    255, 220, 12, 155);
+            } else {
+                osd_databars_set_colour( 
+                    ((struct pict_data *)(m->menu_data))->hue,
+                    255, 200, 128, 128);
+            }
+
+            osd_databars_show_bar( 
+                ((struct pict_data *)(m->menu_data))->hue, 
+                videoinput_get_hue( m->vidin ), 51);
+            osd_string_show_text( m->menu_line[i*2+1].line, "", 0 );
             break;
 
         default:
@@ -344,6 +440,39 @@ void menu_pict( menu_t *m, int key )
             osd_string_show_text( m->menu_line[i*2+1].line, "", 0);
             break;
         }
+    }
+}
+
+void pict_blit_scanline( menu_t *m, unsigned char *output,
+                         int width, int xpos, int scanline )
+{
+
+    if( scanline >= m->menu_line[7].y && scanline < (m->menu_line[7].y + 10) ) {
+        osd_databars_composite_packed422_scanline( 
+            ((struct pict_data *)(m->menu_data))->hue, 
+            output + m->menu_line[7].x*2, output + m->menu_line[7].x*2,
+            (m->width * 80) / 100);
+    }
+
+    if( scanline >= m->menu_line[3].y && scanline < (m->menu_line[3].y + 10) ) {
+        osd_databars_composite_packed422_scanline( 
+            ((struct pict_data *)(m->menu_data))->col, 
+            output + m->menu_line[3].x*2, output + m->menu_line[3].x*2,
+            (m->width * 80) / 100);
+    }
+
+    if( scanline >= m->menu_line[5].y && scanline < (m->menu_line[5].y + 10) ) {
+        osd_databars_composite_packed422_scanline( 
+            ((struct pict_data *)(m->menu_data))->cont, 
+            output + m->menu_line[5].x*2, output + m->menu_line[5].x*2,
+            (m->width * 80) / 100);
+    }
+
+    if( scanline >= m->menu_line[1].y && scanline < (m->menu_line[1].y + 10) ) {
+        osd_databars_composite_packed422_scanline( 
+            ((struct pict_data *)(m->menu_data))->bright, 
+            output + m->menu_line[1].x*2, output + m->menu_line[1].x*2,
+            (m->width * 80) / 100);
     }
 
 }
@@ -454,6 +583,16 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
             if( fixed_arg == I_ESCAPE ) {
                 MenuScreen tmp = m->menu_previous_screen;
                 m->menu_previous_screen = MENU_MAIN;
+                if( m->menu_screen == MENU_MAIN ) {
+                    input_toggle_menu( m->in );
+                    m->menu_screen = MENU_MAIN;
+                    /* now remove OSD */
+                    m->visible = 0;
+                    for( i=0; i < MENU_LINES; i++ ) {
+                        osd_string_show_text(m->menu_line[i].line, "", 0);
+                    }
+                    return 1;
+                }
                 m->menu_screen = tmp;
                 m->menu_state = 0;
             }
@@ -502,7 +641,6 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
             default:
                 break;
             }
-            menu_refresh( m );
             return 1;
             break;
 
@@ -550,6 +688,9 @@ void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
 
         blit_colour_packed422_scanline( output + m->x, m->width,
                                         m->bg_luma, m->bg_cb, m->bg_cr );
+
+        if( menu_blit_scanline ) 
+            menu_blit_scanline( m, output, width, xpos, scanline );
 
         for( i = 0; i < MENU_LINES; i++ ) {
             if( osd_string_visible( m->menu_line[i].line ) ) {
