@@ -339,7 +339,6 @@ int main( int argc, char **argv )
         /* Aquire the next frame. */
         curframe = videoinput_next_image( vidin );
 
-
         /* CHECKPOINT2 : Got the frame */
         gettimeofday( &(checkpoint[ 1 ]), 0 );
 

@@ -112,7 +112,7 @@ config_t *config_new( int argc, char **argv )
     ct->v4ldev = strdup("/dev/video0");
     ct->norm = strdup("ntsc");
     ct->freq = strdup("us-cable");
-    ct->keymap = (int *)malloc( TVTIME_LAST * sizeof(int) );
+    ct->keymap = (int *) malloc( TVTIME_LAST * sizeof( int ) );
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -143,7 +143,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_DEBUG ]          = 'd';
 
     if( !configFile ) {
-        strncpy( base, getenv("HOME"), 245 );
+        strncpy( base, getenv( "HOME" ), 245 );
         strcat( base, "/.tvtime" );
         configFile = base;
     }
