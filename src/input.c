@@ -308,6 +308,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
     in->toggleconsole = 0;
+    in->scrollconsole = 0;
 
     /**
      * Set the current channel list.
