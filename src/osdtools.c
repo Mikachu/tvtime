@@ -357,7 +357,7 @@ void osd_string_set_timeout( osd_string_t *osds, int timeout )
 
 int osd_string_visible( osd_string_t *osds )
 {
-    return ( osds->fts && (osds->frames_left > 0) );
+    return (osds->frames_left > 0);
 }
 
 void osd_string_advance_frame( osd_string_t *osds )
@@ -378,24 +378,24 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               int width, int xpos,
                                               int scanline )
 {
-    if( !osds->fts || !osds->frames_left ) return;
+    if( osds->frames_left ) {
+        if( scanline < osds->image_textheight && xpos < osds->image_textwidth ) {
 
-    if( scanline < osds->image_textheight && xpos < osds->image_textwidth ) {
+            if( (xpos+width) > osds->image_textwidth ) {
+                width = osds->image_textwidth - xpos;
+            }
 
-        if( (xpos+width) > osds->image_textwidth ) {
-            width = osds->image_textwidth - xpos;
-        }
-
-        if( osds->frames_left < OSD_FADEOUT_TIME ) {
-            int alpha;
-            alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
-            composite_packed4444_alpha_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
-                width, alpha );
-        } else {
-            composite_packed4444_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
-                width );
+            if( osds->frames_left < OSD_FADEOUT_TIME ) {
+                int alpha;
+                alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
+                composite_packed4444_alpha_to_packed422_scanline( output, background,
+                    osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
+                    width, alpha );
+            } else {
+                composite_packed4444_to_packed422_scanline( output, background,
+                    osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
+                    width );
+            }
         }
     }
 }
@@ -476,21 +476,20 @@ void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
                                                 uint8_t *background,
                                                 int width )
 {
-    if( !osdd->frames_left ) return;
-
-    if( osdd->frames_left < OSD_FADEOUT_TIME ) {
-        int alpha;
-        alpha = (int) (((((double) osdd->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
-        composite_packed4444_alpha_to_packed422_scanline( output, background,
-            osdd->data, width, alpha );
-    } else {
-        composite_packed4444_to_packed422_scanline( output, background,
-            osdd->data, width );
+    if( osdd->frames_left ) {
+        if( osdd->frames_left < OSD_FADEOUT_TIME ) {
+            int alpha;
+            alpha = (int) (((((double) osdd->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
+            composite_packed4444_alpha_to_packed422_scanline( output, background,
+                osdd->data, width, alpha );
+        } else {
+            composite_packed4444_to_packed422_scanline( output, background,
+                osdd->data, width );
+        }
     }
 }
 
 /* Shape functions */
-void osd_shape_render_image4444( osd_shape_t *osds );
 struct osd_shape_s
 {
     int type;
@@ -526,7 +525,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->shape_adjusted_width = shape_width;
     osds->type = shape_type;
 
-    osds->image4444 = malloc( video_width * video_height * 4);
+    osds->image4444 = malloc( video_width * video_height * 4 );
     if( !osds ) {
         free( osds );
         return 0;
@@ -537,38 +536,13 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
 
 void osd_shape_delete( osd_shape_t *osds )
 {
-    if( osds->image4444 ) free( osds->image4444 );
+    free( osds->image4444 );
     free( osds );
 }
 
 void osd_shape_set_timeout( osd_shape_t *osds, int timeout )
 {
     osds->frames_left = timeout;
-}
-
-void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
-{
-    osds->shape_luma = luma;
-    osds->shape_cb = cb;
-    osds->shape_cr = cr;
-    osd_shape_render_image4444( osds );
-}
-
-void osd_shape_show_shape( osd_shape_t *osds, int timeout )
-{
-    osds->frames_left = timeout;
-}
-
-int osd_shape_visible( osd_shape_t *osds )
-{
-    return ( osds->frames_left != 0 );
-}
-
-void osd_shape_advance_frame( osd_shape_t *osds )
-{
-    if( osds->frames_left > 0 ) {
-        osds->frames_left--;
-    }
 }
 
 void osd_shape_render_image4444( osd_shape_t *osds )
@@ -623,27 +597,29 @@ void osd_shape_render_image4444( osd_shape_t *osds )
     osds->shape_adjusted_width = width;
 }
 
-void osd_shape_composite_packed422( osd_shape_t *osds, 
-                                    uint8_t *output,
-                                    int width, int height, int stride,
-                                    int xpos, int ypos )
+void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
 {
-    int alpha;
+    osds->shape_luma = luma;
+    osds->shape_cb = cb;
+    osds->shape_cr = cr;
+    osd_shape_render_image4444( osds );
+}
 
-    if( !osds->frames_left ) return;
+void osd_shape_show_shape( osd_shape_t *osds, int timeout )
+{
+    osds->frames_left = timeout;
+}
 
-    if( osds->frames_left < OSD_FADEOUT_TIME ) {
-        alpha = (int) ( ( ( ( (double) osds->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osds->alpha ) + 0.5 );
-    } else {
-        alpha = osds->alpha;
+int osd_shape_visible( osd_shape_t *osds )
+{
+    return (osds->frames_left > 0);
+}
+
+void osd_shape_advance_frame( osd_shape_t *osds )
+{
+    if( osds->frames_left > 0 ) {
+        osds->frames_left--;
     }
-
-    composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                             osds->image4444, 
-                                             osds->shape_adjusted_width,
-                                             osds->shape_height,
-                                             osds->image_width*4,
-                                             xpos, ypos, alpha );
 }
 
 void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
@@ -652,25 +628,24 @@ void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
                                              int width, int xpos,
                                              int scanline )
 {
-    if( !osds ) return;
-    if( !osds->frames_left ) return;
+    if( osds->frames_left ) {
+        if( scanline < osds->shape_height && xpos < osds->shape_adjusted_width ) {
 
-    if( scanline < osds->shape_height && xpos < osds->shape_adjusted_width ) {
+            if( (xpos+width) > osds->shape_adjusted_width ) {
+                width = osds->shape_adjusted_width - xpos;
+            }
 
-        if( (xpos+width) > osds->shape_adjusted_width ) {
-            width = osds->shape_adjusted_width - xpos;
-        }
-
-        if( osds->frames_left < OSD_FADEOUT_TIME ) {
-            int alpha;
-            alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
-            composite_packed4444_alpha_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
-                width, alpha );
-        } else {
-            composite_packed4444_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
-                width );
+            if( osds->frames_left < OSD_FADEOUT_TIME ) {
+                int alpha;
+                alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
+                composite_packed4444_alpha_to_packed422_scanline( output, background,
+                    osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                    width, alpha );
+            } else {
+                composite_packed4444_to_packed422_scanline( output, background,
+                    osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                    width );
+            }
         }
     }
 }
@@ -720,7 +695,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
     }
 
     osdg->frames_left = 0;
-    osdg->image4444 = malloc( video_width * video_height * 4);
+    osdg->image4444 = malloc( video_width * video_height * 4 );
     if( !osdg->image4444 ) {
         pnginput_delete( osdg->png );
         free( osdg );
@@ -738,8 +713,6 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
 
 void osd_graphic_delete( osd_graphic_t *osdg )
 {
-    if( !osdg ) return;
-
     pnginput_delete( osdg->png );
     free( osdg->image4444 );
     free( osdg );
@@ -750,8 +723,6 @@ void composite_packed444_to_packed4444_alpha_scanline( uint8_t *output,
                                                        int width, int alpha )
 {
     int i;
-
-    if( !alpha ) return;
 
     for( i = 0; i < width; i++ ) {
         output[ 0 ] = alpha & 0xff;
@@ -771,12 +742,11 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
                                        double aspectratio )
 {
     double i;
-    int w=0, prev_i=0, j, pos;
-    int avg_a=0, avg_y=0, avg_cb=0, avg_cr=0, c=0;
-    uint8_t *curin;
+    int prev_i = 0;
+    int w = 0;
 
-    for( i=0; i < width; i += aspectratio ) {
-        curin = input + ((int)i)*4;
+    for( i = 0.0; i < width; i += aspectratio ) {
+        uint8_t *curin = input + ((int) i)*4;
 
         if( !prev_i ) {
             output[ 0 ] = curin[ 0 ];
@@ -784,15 +754,20 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
             output[ 2 ] = curin[ 2 ];
             output[ 3 ] = curin[ 3 ];
         } else {
-            avg_a = 0;
-            avg_y = 0;
-            avg_cb = 0;
-            avg_cr = 0;
-            for( c=0,j=prev_i,pos=prev_i*4; j <= (int)i; j++,c++ ) {
+            int avg_a = 0;
+            int avg_y = 0;
+            int avg_cb = 0;
+            int avg_cr = 0;
+            int pos = prev_i * 4;
+            int c = 0;
+            int j;
+
+            for( j = prev_i; j <= (int) i; j++ ) {
                 avg_a += input[ pos++ ];
                 avg_y += input[ pos++ ];
                 avg_cb += input[ pos++ ];
                 avg_cr += input[ pos++ ];
+                c++;
             }
             output[ 0 ] = avg_a / c;
             output[ 1 ] = avg_y / c;
@@ -800,7 +775,7 @@ int aspect_adjust_packed4444_scanline( uint8_t *output,
             output[ 3 ] = avg_cr / c;
         }
         output += 4;
-        prev_i = (int)i;
+        prev_i = (int) i;
         w++;
     }
 
@@ -821,7 +796,6 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
 
     cb444 = malloc( width * 3 );
     if( !cb444 ) return;
-
 
     curout = malloc( width * 4 );
     if( !curout ) {
@@ -874,13 +848,14 @@ void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout )
 
 int osd_graphic_visible( osd_graphic_t *osdg )
 {
-    return (osdg->frames_left != 0);
+    return (osdg->frames_left > 0);
 }
 
 void osd_graphic_advance_frame( osd_graphic_t *osdg )
 {
-    if( osdg->frames_left > 0)
+    if( osdg->frames_left > 0) {
         osdg->frames_left--;
+    }
 }
 
 void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
@@ -889,24 +864,24 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                int width, int xpos,
                                                int scanline )
 {
-    if( !osdg->png || !osdg->frames_left ) return;
+    if( osdg->frames_left ) {
+        if( scanline < osdg->image_graphic_height && xpos < osdg->image_adjusted_width ) {
+            int alpha;
 
-    if( scanline < osdg->image_graphic_height && xpos < osdg->image_adjusted_width ) {
-        int alpha;
+            if( (xpos+width) > osdg->image_adjusted_width ) {
+                width = osdg->image_adjusted_width - xpos;
+            }
 
-        if( (xpos+width) > osdg->image_adjusted_width ) {
-            width = osdg->image_adjusted_width - xpos;
+            if( osdg->frames_left < OSD_FADEOUT_TIME ) {
+                alpha = (int) ( ( ( ( (double) osdg->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osdg->alpha ) + 0.5 );
+            } else {
+                alpha = osdg->alpha;
+            }
+
+            composite_packed4444_alpha_to_packed422_scanline( output, background,
+                osdg->image4444 + (osdg->image_width*4*scanline) + (xpos*4),
+                width, alpha );
         }
-
-        if( osdg->frames_left < OSD_FADEOUT_TIME ) {
-            alpha = (int) ( ( ( ( (double) osdg->frames_left ) / ((double) OSD_FADEOUT_TIME) ) * osdg->alpha ) + 0.5 );
-        } else {
-            alpha = osdg->alpha;
-        }
-
-        composite_packed4444_alpha_to_packed422_scanline( output, background,
-            osdg->image4444 + (osdg->image_width*4*scanline) + (xpos*4),
-            width, alpha );
     }
 }
 
