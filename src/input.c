@@ -23,6 +23,7 @@
 #include "config.h"
 
 #ifdef HAVE_LIRC
+#include <fcntl.h>
 #include <lirc/lirc_client.h>
 #endif
 
@@ -769,7 +770,7 @@ void input_next_frame( input_t *in )
 {
     if( in->lirc_used ) {
 #ifdef HAVE_LIRC
-        poll_lirc( in, lirc_conf );
+        poll_lirc( in, in->lirc_conf );
 #endif
     }
 
