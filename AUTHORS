@@ -18,7 +18,7 @@ Authors and contributors
       DScaler to gcc.
 
   Joachim Koenig <Joachim.Koenig@tecnomen.fi>
-    - Wrote the dscaler plugin loader using the wine code.
+    - Wrote the original dscaler plugin loader using the wine code.
 
   David I. Lehn <dlehn@users.sourceforge.net>
     - autoconf setup, taken from his autoconf'ing of movietime.
@@ -36,11 +36,12 @@ Authors and contributors
     - Config file work and XMLification, check for signal present
       config parameter.
 
+  Simon Law <sfllaw@debian.org>
+    - Various cleanups and bugfixes
+
   Bart Dorsey <echo@thebucket.org>
   Nicolas Boos <nicolaxx@free.fr>
-  Matt Zimmerman <mdz@debian.org>
-  Simon Law <sfllaw@debian.org>
-    - Work on the debian packages.
+    - Fixes from their work on the debian packages.
 
   Mark Trolley <mtrolley@scs.carleton.ca>
     - Added the numeric channel commands for better lirc support.
@@ -125,6 +126,17 @@ Translators
 
   Ingo van Lil <inguin@gmx.de>
     - German translation.
+
+  Michael Kim <lavnrose@e.sarang.net>
+    - Korean translation.
+
+Packagers
+
+  Bart Dorsey <echo@thebucket.org>
+  Nicolas Boos <nicolaxx@free.fr>
+  Matt Zimmerman <mdz@debian.org>
+  Simon Law <sfllaw@debian.org>
+    - Work on the debian packages.
 
 Code we stole (well, used under the GPL)
 
