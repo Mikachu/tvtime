@@ -620,61 +620,57 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
 {
     char string[ 128 ];
 
-    sprintf( string, "%c%c%c  Current: %d pixels", 0xee, 0x80, 0x80, sharpness );
+    sprintf( string, "%c%c%c  Current: %d pixels", 0xee, 0x80, 0xa7, sharpness );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness <= 180  ) {
-        sprintf( string, "%c%c%c  Poor (180 pixels)", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Poor (180 pixels)", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SET_SHARPNESS, "180" );
-    menu_set_right_command( menu, 2, TVTIME_SET_SHARPNESS, "180" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
-
-    if( sharpness > 180 && sharpness <= 360 ) {
+    if( sharpness <= 360 ) {
         sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa4 );
     }
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SET_SHARPNESS, "360" );
-    menu_set_right_command( menu, 3, TVTIME_SET_SHARPNESS, "360" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
+    menu_set_right_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
     if( sharpness > 360 && sharpness <= 576 ) {
         sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa4 );
     }
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SET_SHARPNESS, "576" );
-    menu_set_right_command( menu, 4, TVTIME_SET_SHARPNESS, "576" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
+    menu_set_right_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
 
     if( sharpness > 576 && sharpness <= 720 ) {
         sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa4 );
     }
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SET_SHARPNESS, "720" );
-    menu_set_right_command( menu, 5, TVTIME_SET_SHARPNESS, "720" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
+    menu_set_right_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
 
     if( sharpness > 720 ) {
         sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa5 );
     } else {
         sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa4 );
     }
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SET_SHARPNESS, "768" );
+    menu_set_right_command( menu, 5, TVTIME_SET_SHARPNESS, "768" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
+
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SET_SHARPNESS, "768" );
-    menu_set_right_command( menu, 6, TVTIME_SET_SHARPNESS, "768" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "input" );
+    menu_set_enter_command( menu, 6, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 6, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
 
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 7, string );
@@ -1128,16 +1124,11 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_CC, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 6, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 7, string );
-    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );
@@ -1167,16 +1158,11 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 5, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "sharpness" );
@@ -1198,11 +1184,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "norm" );
     menu_set_text( menu, 0, "Setup - Input configuration - Television standard" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 9, string );
-    menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+    menu_set_enter_command( menu, 9, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 9, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 10, string );
+    menu_set_enter_command( menu, 10, TVTIME_SHOW_MENU, "input" );
+    menu_set_right_command( menu, 10, TVTIME_SHOW_MENU, "input" );
+    menu_set_left_command( menu, 10, TVTIME_SHOW_MENU, "input" );
 
     if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {
         cmd->newnorm = "PAL";
