@@ -602,7 +602,7 @@ int console_scanf( console_t *con, char *format, ... )
     return ret;
 }
 
-void console_setup_pipe( console_t *con, char *pipename )
+void console_setup_pipe( console_t *con, const char *pipename )
 {
     int fd;
 

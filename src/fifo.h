@@ -19,14 +19,14 @@
 #ifndef HAVE_FIFO_H
 #define HAVE_FIFO_H
 
-#include "tvtimeconf.h"
-
 typedef struct fifo_s fifo_t;
 
-fifo_t *fifo_new( config_t *ct, char *givenname );
-char *fifo_next_line( fifo_t *fifo );
-int fifo_next_command( fifo_t *fifo );
+fifo_t *fifo_new( const char *filename );
 void fifo_delete( fifo_t *fifo );
-char *fifo_get_filename( fifo_t *fifo );
+
+const char *fifo_get_filename( fifo_t *fifo );
+
+const char *fifo_next_line( fifo_t *fifo );
+int fifo_next_command( fifo_t *fifo );
 
 #endif /* HAVE_FIFO_H */

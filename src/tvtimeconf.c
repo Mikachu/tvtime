@@ -416,7 +416,11 @@ static void config_init( config_t *ct, parser_file_t *pf )
     }
 
     if( (tmp = parser_get( pf, "CommandPipe", 1 )) ) {
-        strncpy( ct->command_pipe, tmp, 255 );
+        if( tmp[ 0 ] == '~' && getenv( "HOME" ) ) {
+            snprintf( ct->command_pipe, sizeof( ct->command_pipe ), "%s%s", getenv( "HOME" ), tmp + 1 );
+        } else {
+            strncpy( ct->command_pipe, tmp, 255 );
+        }
     }
 
     if( (tmp = parser_get( pf, "TimeFormat", 1 )) ) {

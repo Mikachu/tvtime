@@ -19,7 +19,9 @@
 #ifndef CONSOLE_H_INCLUDED
 #define CONSOLE_H_INCLUDED
 
-#include "tvtimeconf.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct console_s console_t;
 
@@ -34,11 +36,14 @@ void console_setfg( console_t *con, unsigned int fg );
 void console_setbg( console_t *con, unsigned int bg );
 void console_toggle_console( console_t *con );
 void console_scroll_n( console_t *con, int n );
-void console_setup_pipe( console_t *con, char *pipename );
+void console_setup_pipe( console_t *con, const char *pipename );
 int console_scanf( console_t *con, char *format, ... );
 void console_pipe_printf( console_t *con, char * format, ... );
 void console_composite_packed422_scanline( console_t *con, 
                                            unsigned char *output,
                                            int width, int xpos, int scanline );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* CONSOLE_H_INCLUDED */

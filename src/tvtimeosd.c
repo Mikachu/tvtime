@@ -21,10 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "osdtools.h"
-#include "tvtimeconf.h"
 #include "tvtimeosd.h"
 #include "credits.h"
-
 
 #define OSD_FADE_DELAY  160
 

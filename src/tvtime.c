@@ -790,7 +790,7 @@ int main( int argc, char **argv )
     }
 
     /* setup the fifo */
-    fifo = fifo_new( ct, NULL );
+    fifo = fifo_new( config_get_command_pipe( ct ) );
     if( !fifo ) {
         fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
                          "fifo object failed.\n" );

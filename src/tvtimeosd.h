@@ -19,8 +19,6 @@
 #ifndef TVTIMEOSD_H_INCLUDED
 #define TVTIMEOSD_H_INCLUDED
 
-#include "tvtimeconf.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

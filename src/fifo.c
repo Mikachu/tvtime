@@ -35,28 +35,20 @@ struct fifo_s {
     char *filename;
 };
 
-/* use NULL for givenname to use the default named pipe */
-fifo_t *fifo_new( config_t *ct, char *givenname )
+fifo_t *fifo_new( const char *filename )
 {
-    char *filename = config_get_command_pipe( ct );
     fifo_t *fifo = (fifo_t *) malloc( sizeof( struct fifo_s ) );
-    char temp_filename[ 1024 ];
 
     if( !fifo ) {
         return 0;
     }
 
-    fifo->filename = 0;
-    if( givenname ) filename = givenname;
+    memset( fifo->buf, 0, sizeof( fifo->buf ) );
+    fifo->bufpos = 0;
 
-    if( filename[ 0 ] == '~' && getenv( "HOME" ) ) {
-        snprintf( temp_filename, sizeof( temp_filename ), "%s%s", getenv( "HOME" ), filename + 1 );
-        temp_filename[ sizeof( temp_filename ) - 1 ] = '\0';
-        filename = temp_filename;
-    }
-
-    fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
+    fifo->fd = open( filename, O_RDONLY | O_NONBLOCK );
     if( fifo->fd == -1 ) {
+
         /* attempt to create it */
         if( mkfifo( filename, S_IREAD | S_IWRITE ) == -1 ) {
             /* failed */
@@ -65,22 +57,20 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
             free( fifo );
             return 0;
         }
-        fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
+        fifo->fd = open( filename, O_RDONLY | O_NONBLOCK );
         if( fifo->fd == -1 ) {
             free( fifo );
             return 0;
         }
     }
 
-    memset( fifo->buf, 0, sizeof( fifo->buf ) );
-    fifo->bufpos = 0;
-    fifo->filename = filename;
+    fifo->filename = strdup( filename );
 
     /* our fifo is open for reading */
     return fifo;
 }
 
-char *fifo_next_line( fifo_t *fifo )
+const char *fifo_next_line( fifo_t *fifo )
 {
     char c;
 
@@ -101,29 +91,28 @@ char *fifo_next_line( fifo_t *fifo )
 
 int fifo_next_command( fifo_t *fifo )
 {
-    int cmd;
-    char *str = 0;
+    const char *str = fifo_next_line( fifo );
 
-    if( !fifo ) return TVTIME_NOCOMMAND;
-    str = fifo_next_line( fifo );
-    if( !str ) return TVTIME_NOCOMMAND;
+    if( str ) {
+        int cmd = tvtime_string_to_command( str );
 
-    cmd = tvtime_string_to_command( str );
-
-    memset( fifo->buf, 0, sizeof( fifo->buf ) );
-    fifo->bufpos = 0;
+        memset( fifo->buf, 0, sizeof( fifo->buf ) );
+        fifo->bufpos = 0;
     
-    return cmd;
+        return cmd;
+    }
+
+    return TVTIME_NOCOMMAND;
 }
 
 void fifo_delete( fifo_t *fifo )
 {
-    if( !fifo ) return;
+    free( fifo->filename );
     close( fifo->fd );
     free( fifo );
 }
 
-char *fifo_get_filename( fifo_t *fifo )
+const char *fifo_get_filename( fifo_t *fifo )
 {
     if( !fifo ) return 0;
     return fifo->filename;
