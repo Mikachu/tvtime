@@ -699,7 +699,6 @@ int main( int argc, char **argv )
                     break;
                 } else {
                     cur_tuner_state = TUNER_STATE_NO_SIGNAL;
-                    /* OSD should say something here */
                     tvtime_osd_show_message( osd, "No signal" );
                 }
             default:
