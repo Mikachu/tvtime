@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "videotools.h"
 #include "speedy.h"
@@ -87,6 +88,7 @@ struct osd_string_s
     osd_font_t *font;
     ft_string_t *fts;
     int frames_left;
+    char curtext[ 256 ];
     int hold;
 
     int text_luma;
@@ -128,6 +130,8 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
         return 0;
     }
 
+    /* Initially, our string is empty. */
+    memset( osds->curtext, 0, sizeof( osds->curtext ) );
     osds->frames_left = 0;
     osds->hold = 0;
 
@@ -335,10 +339,13 @@ static void osd_string_render_plain_image4444( osd_string_t *osds, const char *t
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
-    if( osds->show_border ) {
-        osd_string_render_bordered_image4444( osds, text );
-    } else {
-        osd_string_render_plain_image4444( osds, text );
+    if( strcmp( text, osds->curtext ) ) {
+        if( osds->show_border ) {
+            osd_string_render_bordered_image4444( osds, text );
+        } else {
+            osd_string_render_plain_image4444( osds, text );
+        }
+        snprintf( osds->curtext, sizeof( osds->curtext ), "%s", text );
     }
     osds->frames_left = timeout;
 }

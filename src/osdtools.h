@@ -38,9 +38,8 @@ typedef enum OSD_Shapes_e {
 } OSD_Shape;
 
 /**
- * Creates a new string with the given truetype font at the given point size.
- * I don't understand point size vs pixel size, so, uh, whatever.  Maybe it's
- * just pixel height I have no clue.
+ * Creates a new string with the given truetype font at the given size.
+ * Font size is in pixels.
  *
  * Right now we require the video width, height, and the aspect ratio.
  * Eventually I'll just take one parameter: pixel aspect, which would
@@ -51,21 +50,31 @@ osd_font_t *osd_font_new( const char *fontfile, int fontsize,
                           double video_aspect );
 void osd_font_delete( osd_font_t *font );
 
+/**
+ * Creates a new string for a given font, with a given maximum width
+ * that it will be asked to render to (for its back buffer).
+ */
 osd_string_t *osd_string_new( osd_font_t *font, int video_width );
 void osd_string_delete( osd_string_t *osds );
+
+/**
+ * Asks for the given text to be shown.  If the text given matches our
+ * current back buffer, it will not be re-rendered.  The maximum size of
+ * a string is 256 characters.
+ */
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );
 int osd_string_get_width( osd_string_t *osds );
 int osd_string_get_height( osd_string_t *osds );
 void osd_string_set_hold( osd_string_t *osds, int hold );
 void osd_string_set_timeout( osd_string_t *osds, int timeout );
+int osd_string_get_frames_left( osd_string_t *osds );
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
 void osd_string_set_colour_rgb( osd_string_t *osds, int r, int g, int b );
 void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma,
                                    int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
-int osd_string_get_frames_left( osd_string_t *osds );
 
 /**
  * Composites a scanline of the string on top of the background and writes to
