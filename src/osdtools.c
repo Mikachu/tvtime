@@ -22,7 +22,7 @@
 #include "videotools.h"
 #include "speedy.h"
 #include "pnginput.h"
-#include "efs.h"
+#include "leetft.h"
 #include "osdtools.h"
 
 
@@ -33,8 +33,8 @@ int aspect_adjust_packed4444_scanline( unsigned char *output,
 
 struct osd_string_s
 {
-    efont_t *font;
-    efont_string_t *efs;
+    ft_font_t *font;
+    ft_string_t *fts;
     int frames_left;
     int hold;
 
@@ -58,6 +58,8 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
                               int video_width, int video_height, double video_aspect )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
+    double pixel_aspect;
+
     if( !osds ) {
         return 0;
     }
@@ -68,17 +70,18 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         return 0;
     }
 
-    osds->font = efont_new( fontfile, fontsize, video_width, video_height, video_aspect );
+    pixel_aspect = ( (double) video_width ) / ( ( (double) video_height ) * video_aspect );
+    osds->font = ft_font_new( fontfile, fontsize, pixel_aspect );
     if( !osds->font ) {
         fprintf( stderr, "osd_string: Can't open font '%s'\n", fontfile );
         free( osds );
         return 0;
     }
 
-    osds->efs = efs_new( osds->font );
-    if( !osds->efs ) {
+    osds->fts = ft_string_new( osds->font );
+    if( !osds->fts ) {
         fprintf( stderr, "osd_string: Can't create string.\n" );
-        efont_delete( osds->font );
+        ft_font_delete( osds->font );
         free( osds );
         return 0;
     }
@@ -105,8 +108,8 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 
 void osd_string_delete( osd_string_t *osds )
 {
-    efs_delete( osds->efs );
-    efont_delete( osds->font );
+    ft_string_delete( osds->fts );
+    ft_font_delete( osds->font );
     free( osds->image4444 );
     free( osds );
 }
@@ -150,8 +153,8 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
 
 void osd_string_render_image4444( osd_string_t *osds )
 {
-    osds->image_textwidth = efs_get_width( osds->efs ) + 2;
-    osds->image_textheight = efs_get_height( osds->efs ) + 3;
+    osds->image_textwidth = ft_string_get_width( osds->fts ) + 2;
+    osds->image_textheight = ft_string_get_height( osds->fts ) + 3;
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
                             osds->image_textheight, osds->image_width * 4,
@@ -160,24 +163,24 @@ void osd_string_render_image4444( osd_string_t *osds )
     if( osds->show_border ) {
         composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
                                                  osds->image_height, osds->image_width * 4,
-                                                 efs_get_buffer( osds->efs ),
-                                                 efs_get_width( osds->efs ),
-                                                 efs_get_height( osds->efs ),
-                                                 efs_get_stride( osds->efs ),
+                                                 ft_string_get_buffer( osds->fts ),
+                                                 ft_string_get_width( osds->fts ),
+                                                 ft_string_get_height( osds->fts ),
+                                                 ft_string_get_stride( osds->fts ),
                                                  osds->border_luma, osds->border_cb,
                                                  osds->border_cr, 128, 3, 2 );
     }
 
     composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
                                        osds->image_height, osds->image_width * 4,
-                                       efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
-                                       efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
+                                       ft_string_get_buffer( osds->fts ), ft_string_get_width( osds->fts ),
+                                       ft_string_get_height( osds->fts ), ft_string_get_stride( osds->fts ),
                                        osds->text_luma, osds->text_cb, osds->text_cr, 0, 0 );
 }
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
-    efs_set_text( osds->efs, text );
+    ft_string_set_text( osds->fts, text );
     osd_string_render_image4444( osds );
     osds->frames_left = timeout;
 }
@@ -199,7 +202,7 @@ void osd_string_set_timeout( osd_string_t *osds, int timeout )
 
 int osd_string_visible( osd_string_t *osds )
 {
-    return ( osds->efs && (osds->frames_left > 0) );
+    return ( osds->fts && (osds->frames_left > 0) );
 }
 
 void osd_string_advance_frame( osd_string_t *osds )
@@ -220,7 +223,7 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               int width, int xpos,
                                               int scanline )
 {
-    if( !osds->efs || !osds->frames_left ) return;
+    if( !osds->fts || !osds->frames_left ) return;
 
     if( scanline < osds->image_textheight && xpos < osds->image_textwidth ) {
 

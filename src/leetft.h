@@ -16,16 +16,11 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef EFS_H_INCLUDED
-#define EFS_H_INCLUDED
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef LEETFT_H_INCLUDED
+#define LEETFT_H_INCLUDED
 
 /**
- * Simple font object with a C API.  Basically just a wrapper for
- * the C++ TTFFont object from mythtv defined in ttfont.h.
+ * Simple font object.
  * 
  * You first create a font object at the given font size.  To be honest,
  * I don't know the units for the font size, it might be 'points' or
@@ -33,8 +28,8 @@ extern "C" {
  * which are 1-byte-per-pixel alphamaps.
  */
 
-typedef struct efont_s efont_t;
-typedef struct efont_string_s efont_string_t;
+typedef struct ft_font_s ft_font_t;
+typedef struct ft_string_s ft_string_t;
 
 /**
  * Creates a new font object from the font file.  Opened using Freetype2
@@ -43,53 +38,51 @@ typedef struct efont_string_s efont_string_t;
  * height, and aspect ratio are used to determine the dpi at which to
  * render the font.
  */
-efont_t *efont_new( const char *fontfile, int fontsize, int video_width,
-                    int video_height, double pixel_aspect );
+ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect );
 
 /**
  * Frees the font object.  Make sure you have no strings still active.
  */
-void efont_delete( efont_t *font );
+void ft_font_delete( ft_font_t *font );
+
+void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
+                     int *width, int *height, int outsize );
 
 /**
  * Creates a new string object for the given font.  You can reset the
  * string as many times as you like with new text.
  */
-efont_string_t *efs_new( efont_t *font );
+ft_string_t *ft_string_new( ft_font_t *font );
 
 /**
  * Deletes the string object.
  */
-void efs_delete( efont_string_t *efs );
+void ft_string_delete( ft_string_t *efs );
 
 /**
  * Sets the text of the string object.
  */
-void efs_set_text( efont_string_t *efs, const char *text );
+void ft_string_set_text( ft_string_t *efs, const char *text );
 
 /**
  * Returns the width in pixels.
  */
-int efs_get_width( efont_string_t *efs );
+int ft_string_get_width( ft_string_t *efs );
 
 /**
  * Returns the height in pixels.
  */
-int efs_get_height( efont_string_t *efs );
+int ft_string_get_height( ft_string_t *efs );
 
 /**
  * Returns the number of bytes per scanline.
  */
-int efs_get_stride( efont_string_t *efs );
+int ft_string_get_stride( ft_string_t *efs );
 
 /**
  * Returns the buffer.  The buffer is a 1-byte-per-pixel alphamap with
  * values from 0-255.
  */
-unsigned char *efs_get_buffer( efont_string_t *efs );
+unsigned char *ft_string_get_buffer( ft_string_t *efs );
 
-
-#ifdef __cplusplus
-};
-#endif
-#endif /* EFS_H_INCLUDED */
+#endif /* LEETFT_H_INCLUDED */
