@@ -153,10 +153,12 @@ static int xv_check_extension( void )
 
 static void *create_shm( int size )
 {
+    struct shmid_ds shm_info;
     int error = 1;
     int major;
     int minor;
     Bool pixmaps;
+    int maxid;
 
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
          (major < 1) || ((major == 1) && (minor < 1))) {
@@ -164,9 +166,14 @@ static void *create_shm( int size )
         return 0;
     }
 
+    maxid = shmctl( 0, SHM_INFO, &shm_info );
+    if( maxid < 0 ) {
+        fprintf( stderr, "xvoutput: kernel not configured for shared memory\n" );
+        return 0;
+    }
+
     shminfo.shmid = shmget( IPC_PRIVATE, size, IPC_CREAT | 0777 );
     if( shminfo.shmid != -1 ) {
-
         shminfo.shmaddr = (char *) shmat( shminfo.shmid, 0, 0 );
         if( shminfo.shmaddr != (char *)-1 ) {
 
