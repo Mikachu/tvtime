@@ -36,7 +36,7 @@ int main( int argc, char **argv )
     config_t *cfg = config_new( 0, 0 );
     FILE *fifo;
     int i;
-	int nc = tvtime_num_commands();
+    int nc = tvtime_num_commands();
 
     if( !cfg ) {
         fprintf( stderr, "tvtime-command: Can't initialize tvtime configuration, exiting.\n" );
@@ -47,9 +47,9 @@ int main( int argc, char **argv )
         fprintf( stdout, "tvtime-command: Available commands:\n" );
         for( i = 0; i < (nc+1)/2; i++ ) {
             fprintf( stdout, "    %-25s  %-25s\n", tvtime_get_command( i ),
-				(nc/2+i+1 < nc ? tvtime_get_command(nc/2+i+1) : ""));
+                (nc/2+i+1 < nc ? tvtime_get_command(nc/2+i+1) : ""));
         }
-	}
+    }
 
     /* check if fifo can be written (tvtime running) */
     i = open( config_get_command_pipe( cfg ), O_WRONLY | O_NONBLOCK);
