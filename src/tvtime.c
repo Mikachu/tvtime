@@ -1012,7 +1012,7 @@ int main( int argc, char **argv )
                 videoinput_free_frame( vidin, curframeid );
             }
 
-            if( vbidata ) vbidata_process_frame( vbidata, printdebug );
+            // if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
 
