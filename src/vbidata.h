@@ -26,7 +26,17 @@
 #ifndef VBIDATA_H_INCLUDED
 #define VBIDATA_H_INCLUDED
 
-#include "vbiscreen.h"
+#include <vbiscreen.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * The VBI data object handles parsing of the VBI for NTSC sources.  We
+ * handle XDS and closed caption parsing.  Closed captions are sent to
+ * the vbiscreen object which handles rendering of the caption output.
+ */
 
 typedef struct vbidata_s vbidata_t;
 
@@ -56,4 +66,7 @@ const char *vbidata_get_program_length( vbidata_t *vbi );
 const char *vbidata_get_network_name( vbidata_t *vbi );
 const char *vbidata_get_network_call_letters( vbidata_t *vbi );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* VBIDATA_H_INCLUDED */
