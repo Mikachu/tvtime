@@ -9,7 +9,7 @@ News for 0.9.7
   *  Reworked the frequency tables, merging europe-cable, europe-west,
      europe-east all into 'europe'.  Added the 'russia' frequency table.
   *  Added a channel scanner.  F10 walks through the channel list and
-     disables active channels.
+     disables inactive channels.
   *  Added the 'XVideo Bob' deinterlacer filter.
   *  Added lirc support.
   *  Added the overscan feature.
