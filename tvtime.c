@@ -491,7 +491,6 @@ int main( int argc, char **argv )
                      timediff( &(checkpoint[ 5 ]), &(checkpoint[ 4 ]) ),
                      timediff( &(checkpoint[ 6 ]), &(checkpoint[ 5 ]) ),
                      timediff( &(checkpoint[ 0 ]), &(checkpoint[ 6 ]) ) );
-            pngscreenshot( "testshot.png", curframe, width, height, width*2 );
         }
         if( config_get_debug( ct ) && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
