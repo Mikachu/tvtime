@@ -420,14 +420,14 @@ void xv_poll_events( input_t *in )
     while (XPending(display)) {
         XNextEvent(display, &event);
 
-        /* X sucks this way.  Thanks to walken for help on this one. */
-        if( ( event.xclient.message_type == wmProtocolsAtom ) && ( event.xclient.format == 32 ) &&
-            ( event.xclient.data.l[ 0 ] == wmDeleteAtom ) ) {
-            input_callback( in, I_QUIT, 0 );
-            continue;
-        }
-
         switch( event.type ) {
+        case ClientMessage:
+            /* X sucks this way.  Thanks to walken for help on this one. */
+            if( ( event.xclient.message_type == wmProtocolsAtom ) && ( event.xclient.format == 32 ) &&
+                ( event.xclient.data.l[ 0 ] == wmDeleteAtom ) ) {
+                input_callback( in, I_QUIT, 0 );
+            }
+            break;
         case DestroyNotify:
             if( event.xdestroywindow.window != window ) {
                 break;
