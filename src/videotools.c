@@ -430,6 +430,19 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
                                         - multiply_alpha( foreground[ 0 ], input[ 0 ] ) ) + 0x80) >> 8);
 
                 if( ( i & 1 ) == 0 ) {
+
+                    /**
+                     * At first I thought I was doing this incorrectly, but
+                     * the following math has convinced me otherwise.
+                     *
+                     * C_r = (1 - alpha)*B + alpha*F
+                     * C_r = B - af*a*B + af*a*F
+                     *
+                     * C_r = 128 + ((1 - af*a)*(B - 128) + a*af*(F - 128))
+                     * C_r = 128 + (B - af*a*B - 128 + af*a*128 + a*af*F - a*af*128)
+                     * C_r = B - af*a*B + a*af*F
+                     */
+
                     output[ 1 ] = input[ 1 ] + ((alpha*( foreground[ 2 ]
                                             - multiply_alpha( foreground[ 0 ], input[ 1 ] ) ) + 0x80) >> 8);
                     output[ 3 ] = input[ 3 ] + ((alpha*( foreground[ 3 ]
