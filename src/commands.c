@@ -2908,7 +2908,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                       "%d", station_get_current_id( cmd->stationmgr ) );
             if( cmd->osd ) {
                 tvtime_osd_set_channel_number( cmd->osd, cmd->next_chan_buffer );
-                tvtime_osd_show_info( cmd->osd );
+                commands_handle( cmd, TVTIME_DISPLAY_INFO, "" );
             }
         }
         cmd->frame_counter = 0;
