@@ -382,7 +382,7 @@ void setup_speedy_calls( void )
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
     } else {
-        fprintf( stderr, "speedycode: No optimizations detected, "
+        fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, "
                          "using C fallbacks.\n" );
     }
 }
