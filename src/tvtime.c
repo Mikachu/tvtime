@@ -638,11 +638,11 @@ int main( int argc, char **argv )
                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !con ) {
         fprintf( stderr, "tvtime: Could not setup console.\n" );
-        return 1;
     }
 
 
-    console_printf( con, "You should also get your employer (if you work as a programmer) or your
+    if( con ) {
+console_printf( con, "You should also get your employer (if you work as a programmer) or your
 school, if any, to sign a copyright disclaimer for the program, if
 necessary.  Here is a sample; alter the names:
 
@@ -658,6 +658,7 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
 " );
+    }
 
 
     /* Setup the output. */
@@ -722,9 +723,9 @@ Public License instead of this License.
             }
         }
         if( input_toggle_console( in ) ) {
-            console_toggle_console( con );
+            if( con ) console_toggle_console( con );
         }
-        console_scroll_n( con, input_scroll_console( in ) );
+        if( con ) console_scroll_n( con, input_scroll_console( in ) );
 
         input_next_frame( in );
 

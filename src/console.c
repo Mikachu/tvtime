@@ -117,7 +117,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
                                    video_height,
                                    video_aspect );
 
-    if( !con->line ) {
+    if( !con->line[0] ) {
         con->fontfile = "./FreeSansBold.ttf";
 
         con->line[0] = osd_string_new( con->fontfile, fontsize, 
@@ -126,7 +126,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
                                        video_aspect );
     }
 
-    if( !con->line ) {
+    if( !con->line[0] ) {
         fprintf( stderr, "console: Could not find my font (%s)!\n", 
                  con->fontfile );
         console_delete( con );
