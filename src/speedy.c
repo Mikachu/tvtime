@@ -69,7 +69,10 @@ void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
 void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                   unsigned char *src2, int width, int pos );
-void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
+void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int width );
+unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
+unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
+                                                unsigned char *bot, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 
@@ -94,8 +97,8 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
 
 unsigned long CombJaggieThreshold = 73;
 
-unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
-                                             unsigned char *bot, int width )
+unsigned int comb_factor_packed422_scanline_mmx( unsigned char *top, unsigned char *mid,
+                                                 unsigned char *bot, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     const mmx_t qwOnes = { 0x0001000100010001ULL };
@@ -180,7 +183,30 @@ unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *
 
 static unsigned long BitShift = 6;
 
-unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *old, int width )
+unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char *old, int width )
+{
+    unsigned int ret = 0;
+
+    SPEEDY_START();
+
+    width /= 4;
+
+    while( width-- ) {
+        unsigned int tmp1 = (cur[ 0 ] + cur[ 2 ] + cur[ 4 ] + cur[ 6 ])>>2;
+        unsigned int tmp2 = (old[ 0 ] + old[ 2 ] + old[ 4 ] + old[ 6 ])>>2;
+        tmp1  = (tmp1 - tmp2);
+        tmp1 *= tmp1;
+        tmp1 >>= BitShift;
+        ret += tmp1;
+        cur += 8;
+        old += 8;
+    }
+    SPEEDY_END();
+
+    return ret;
+}
+
+unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned char *old, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     unsigned int temp1, temp2;
@@ -213,9 +239,6 @@ unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *
     psrlq_i2r( 32, mm0 );
     movd_r2m( mm0, temp2 );
     temp1 += temp2;
-    temp2 = temp1;
-    temp1 >>= 16;
-    temp1 += temp2 & 0xffff;
 
     emms();
 
@@ -224,39 +247,24 @@ unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *
     return temp1;
 }
 
-
-/*
-void filter_luma_14641_packed422_scanline_c( unsigned char *output, unsigned char *input, int width )
+void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
-    SPEEDY_START();
-
-    if( width >= 4 ) {
-        
-        width -= 4;
-        while( width-- ) {
-            *output = input[ 0 ] + ((input[ 2 ] + input[ 6 ])<<2) + (input[ 4 ] * 6) + input[ 8 ];
-            output += 2;
-        }
-    }
-
-    SPEEDY_END();
-}
-*/
-
-void filter_luma_11_packed422_scanline_c( unsigned char *output, unsigned char *input, int width )
-{
-    int delay = 0;
+    int r1 = *data;
+    int r2 = 0;
+    data += 2;
 
     SPEEDY_START();
+    width--;
     while( width-- ) {
-        int cur = input[ 0 ];
-        *((unsigned short *) output) = (input[ 1 ] << 8) | ((cur + delay + 1)>>1);
-        delay = cur;
-        input += 2;
-        output += 2;
+        int s1, s2;
+        s1 = *data + r1; r1 = *data;
+        s2 = s1    + r2; r2 = s1;
+        *(data - 2) = s2 >> 2;
+        data += 2;
     }
     SPEEDY_END();
 }
+
 
 void interpolate_packed422_scanline_c( unsigned char *output,
                                        unsigned char *top,
@@ -1150,7 +1158,9 @@ void setup_speedy_calls( int verbose )
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
-    filter_luma_11_packed422_scanline = filter_luma_11_packed422_scanline_c;
+    filter_luma_121_packed422_inplace_scanline = filter_luma_121_packed422_inplace_scanline_c;
+    comb_factor_packed422_scanline = 0;
+    diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
     speedy_memcpy = temp_memcpy;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
@@ -1166,10 +1176,14 @@ void setup_speedy_calls( int verbose )
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
         premultiply_packed4444_scanline = premultiply_packed4444_scanline_mmxext;
         blend_packed422_scanline = blend_packed422_scanline_mmxext;
+        diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
+        comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         }
+        diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
+        comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
     } else {
         if( verbose ) {
             fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );

@@ -113,9 +113,12 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
 void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width );
 void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width );
 
-unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
-                                             unsigned char *bot, int width );
-unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *old, int width );
+unsigned int comb_factor_packed422_scanline_mmx( unsigned char *top, unsigned char *mid,
+                                                 unsigned char *bot, int width );
+unsigned int diff_factor_packed422_scanline_c( unsigned char *cur, unsigned char *old, int width );
+unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned char *old, int width );
+
+void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width );
 
 /**
  * Here are the function pointers which will be initialized to point at the
@@ -151,7 +154,10 @@ extern void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *
 extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 extern void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                          unsigned char *src2, int width, int pos );
-extern void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
+extern void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int width );
+extern unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
+extern unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
+                                                       unsigned char *bot, int width );
 extern void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 /**
