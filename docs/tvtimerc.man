@@ -1,0 +1,131 @@
+.TH tvtimerc 1 "06 November 2002" "Version 1.0"
+.SH NAME
+tvtimerc -- tvtime configuration file
+.SH SYNOPSIS
+.br
+$HOME/.tvtimerc
+.SH DESCRIPTION
+.B tvtimerc
+is the configuration file used by tvtime.
+.IP
+You can find a default tvtimerc file in the 'docs' subdirectory of the tvtime source distribution and online at http://tvtime.sourceforge.net/default.tvtimerc.
+.SH SYNTAX
+.B tvtimerc
+is structured very simply, with one option per line. The following options are available:
+.TP
+.B verbose = 0 | 1
+The verbose setting indicates that we should print full informational and warning messages to stderr while running tvtime.  Otherwise, only fatal errors will be printed to the output. Default: 0.
+.TP
+.B CaptureSource = n
+This sets the default capture source to be opened by tvtime.  Cards commonly have several sources (i.e. '0' and '1' are the tuner and composite inputs, respectively on a WinTV card). Default: 0.
+.TP
+.B V4LDevice = /dev/video<n>
+This sets the default capture device to use.
+.TP
+.B Norm = ntsc | pal | secam | pal-nc | pal-m| pal-n | ntsc-jp
+This sets the default TV norm. Default: ntsc.
+.TP
+.B Frequencies = us-bcast | us-cable | us-cable-hrc | canada-cable | japan-bcast | japan-cable | europe-west | europe-east | italy | newzeland | australia | australia-optus | ireland | france | china-bcast | southafrica | argentina
+This sets the default frequency.
+.TP
+.B FineTuneOffset = n
+This sets a constant offset for all tuner frequencies, in kHz.  This value is always added to the frequency passed to the tuner (and may be negative).  Note that since these values are in kHz, they may be incompatible with the fine tuning parameters in xawtv which likely use the 1/16th MHz convention.  If you use a fine tuner value of 'm' in xawtv, first try n=m*1000/16 (i.e. '15' in xawtv is '15*1000/16 = 937' here).
+.TP
+.B OutputWidth = n
+This sets the initial width, in pixels, of the output window.
+.TP
+.B InputWidth = n
+This sets how many pixels per scanline to request from the capture card.  A higher setting gives better quality, while a lower setting requires less work, which means tvtime runs faster.  With a slower CPU (i.e. < 500 MHz) values of 480 or 400 may be best.  For best quality, use a high value like 720 or 768.  Many capture cards cannot sample higher than 768 pixels per scanline.
+.TP
+.B WideScreen = 0 | 1
+This enables 16:9 mode by default on startup.
+.TP
+.B ApplyLumaCorrection = 0 | 1
+This enables luma correction functionality on startup.  Luma correction can be toggled on/off from within tvtime using the 'c' key.
+.TP
+.B LumaCorrection = n
+This sets the magnitude of the luma correction.  A value of 1.0 does nothing except apply Bt8x8 correction on a Bt8x8-based capture card.  Values less than one make the output darker, and values greater than one make the output brighter.  The valid range is 0.1 to 10.0 in increments of 0.1.
+.TP
+.B DebugMode = 0 | 1
+This option enables a special debug mode.  In debug mode, frame drop information is printed to stderr if tvtime cannot keep up with the number of frames provided by the capture card.
+.SH KEYBINDINGS
+The keybindings for controlling tvtime can be altered by explicitly declaring the preferred keybindings in the tvtimerc file.  These keybinding declarations take the form: key_<name> = <key(s)>.  Listed below, is a key value reference chart, example keybindings, and the tvtime default keybindings.
+.P
+.B Reference Chart
+.TP
+CTRL=C, META=M, SHIFT=S
+.TP
+F1=F1 ... F15=F15
+.TP
+ESC=\\0033, UP=\\0421, DOWN=\\0422, LEFT=\\0424, RIGHT=\\0423
+.TP
+INSERT=\\0425, HOME=\\0426, END=\\0427, PGUP=\\0430, PGDN=\\0431
+.TP
+PRINTSC=\\0474
+.P
+.B Examples
+.TP
+To set the debug key to CTRL + d:
+key_debug = C + d
+.TP
+To set the quit key to CTRL+META+SHIFT+q:
+key_quit = C+M+S+q
+.TP
+To set the volume up key to Right Arrow (RIGHT):
+key_mixer_up = \\0423
+.P
+.B Defaults
+.TP
+key_quit                   = \\0033
+.TP
+key_channel_up             = \\0421
+.TP
+key_channel_down           = \\0422
+.TP
+key_luma_correction_toggle = c
+.TP
+key_luma_up                = j
+.TP
+key_luma_down              = h
+.TP
+key_mixer_mute             = m
+.TP
+key_mixer_up               = +
+.TP
+key_mixer_down             = -
+.TP
+key_hue_down               = F1
+.TP
+key_hue_up                 = F2
+.TP
+key_bright_down            = F3
+.TP
+key_bright_up              = F4
+.TP
+key_cont_down              = F5
+.TP
+key_cont_up                = F6
+.TP
+key_colour_down            = F7
+.TP
+key_colour_up              = F8
+.TP
+key_tv_video               = F9
+.TP
+key_show_bars              = F11
+.TP
+key_debug                  = d
+.TP
+key_fullscreen             = f
+.TP
+key_aspect                 = a
+.TP
+key_screenshot             = s
+.TP
+key_deinterlacing_mode     = t
+.TP
+key_finetune_down          = ,
+.TP
+key_finetune_up            = .
+.SH SEE ALSO
+tvtime(1)
