@@ -224,6 +224,10 @@ int sdl_poll_events( void )
                 curcommand |= TVTIME_KP9;
                 break;
 
+            case SDLK_d:
+                curcommand |= TVTIME_DEBUG;
+                break;
+
             default:
                 break;
             }

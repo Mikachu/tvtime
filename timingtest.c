@@ -22,6 +22,8 @@ int main( int argc, char **argv )
     unsigned char *source422planar;
     unsigned char *dest422packed;
     int width, height;
+    int avg_sum = 0;
+    int avg_count = 0;
     int i = 0;
     int64_t before;
     int64_t after;
@@ -40,6 +42,7 @@ int main( int argc, char **argv )
     for( i = 0; i < 100; i++ ) {
         struct timeval time_before;
         struct timeval time_after;
+        usleep( 20 );
         gettimeofday( &time_before, 0 );
         get_time( &before );
         video_correction_planar422_field_to_packed422_frame( vc, dest422packed,
@@ -48,6 +51,9 @@ int main( int argc, char **argv )
         get_time( &after );
         gettimeofday( &time_after, 0 );
         fprintf( stderr, "top: %10d\n", timediff( &time_after, &time_before ) );
+        avg_sum += timediff( &time_after, &time_before );
+        avg_count++;
+        usleep( 20 );
         gettimeofday( &time_before, 0 );
         get_time( &before );
         video_correction_planar422_field_to_packed422_frame( vc, dest422packed,
@@ -56,7 +62,10 @@ int main( int argc, char **argv )
         get_time( &after );
         gettimeofday( &time_after, 0 );
         fprintf( stderr, "bot: %10d\n", timediff( &time_after, &time_before ) );
+        avg_sum += timediff( &time_after, &time_before );
+        avg_count++;
     }
+    fprintf( stderr, "%d tested, average was %f.\n", avg_count, ((double) avg_sum) / ((double) avg_count) );
 
     free( source422planar );
     free( dest422packed );

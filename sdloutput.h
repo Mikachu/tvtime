@@ -45,7 +45,8 @@ enum tvtime_commands
     TVTIME_MIXER_MUTE    = (1<<15),
     TVTIME_MIXER_UP      = (1<<16),
     TVTIME_MIXER_DOWN    = (1<<17),
-    TVTIME_DIGIT         = (1<<18)
+    TVTIME_DIGIT         = (1<<18),
+    TVTIME_DEBUG         = (1<<31)
 };
 
 /**

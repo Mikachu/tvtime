@@ -24,7 +24,7 @@
  * You can comment this out to get better performance, but lose
  * the luma correction feature.
  */
-#define APPLY_CORRECTION
+// #define APPLY_CORRECTION
 
 struct video_correction_s
 {

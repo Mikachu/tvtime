@@ -258,6 +258,7 @@ int main( int argc, char **argv )
         struct timeval curfieldtime;
         struct timeval blitstart;
         struct timeval blitend;
+        int printdebug = 0;
         int commands;
 
         commands = sdl_poll_events();
@@ -352,6 +353,9 @@ int main( int argc, char **argv )
                          chanlist[ chanindex ].name );                    
             }
         }
+        if( commands & TVTIME_DEBUG ) {
+            printdebug = 1;
+        }
 
 
         /* Aquire the next frame. */
@@ -360,10 +364,9 @@ int main( int argc, char **argv )
         curcr422 = curcb422 + ( width/2 * height );
 
         gettimeofday( &curframetime, 0 );
-        if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
-            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, last blittime %dus, fieldtime %dus\n",
-                     skipped++, timediff( &curframetime, &lastframetime ), blittime,
-                     (fieldtime*2) );
+        if( printdebug || (debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2))) ) {
+            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, last blittime %dus, frametime %dus\n",
+                     skipped++, timediff( &curframetime, &lastframetime ), blittime, (fieldtime*2) );
         }
         lastframetime = curframetime;
 
