@@ -2231,7 +2231,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
-                        tvtime_osd_set_hold_message( cmd->osd, _("Scanning for channels with signal.") );
+                        tvtime_osd_set_hold_message( cmd->osd, _("Scanning for channels being broadcast.") );
                     } else {
                         /* Nuke the hold message, and make sure we show nothing (hack). */
                         tvtime_osd_set_hold_message( cmd->osd, "" );
