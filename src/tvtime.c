@@ -370,7 +370,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     int i;
 
     if( pulldown_alg == PULLDOWN_NONE ) {
-        tvtime_osd_set_film_mode( osd, -1 );
+        if( osd ) tvtime_osd_set_film_mode( osd, -1 );
     }
 
     if( pulldown_alg != PULLDOWN_VEKTOR ) {
@@ -424,7 +424,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             // We're in pulldown, reverse it.
             if( !filmmode ) {
                 fprintf( stderr, "Film mode enabled.\n" );
-                tvtime_osd_set_film_mode( osd, curoffset );
+                if( osd ) tvtime_osd_set_film_mode( osd, curoffset );
                 filmmode = 1;
             }
             if( curoffset == PULLDOWN_OFFSET_2 ) {
@@ -450,7 +450,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         } else {
             if( filmmode ) {
                 fprintf( stderr, "Film mode disabled.\n" );
-                tvtime_osd_set_film_mode( osd, -1 );
+                if( osd ) tvtime_osd_set_film_mode( osd, -1 );
                 filmmode = 0;
             }
         }
@@ -475,7 +475,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     }
 
     if( pulldown_alg == PULLDOWN_DALIAS ) {
-        tvtime_osd_set_film_mode( osd, 0 );
+        if( osd ) tvtime_osd_set_film_mode( osd, 0 );
 
         last_fieldcount++;
 
