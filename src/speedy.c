@@ -491,7 +491,7 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
         int fg2 = *(((unsigned int *) foreground)+1);
 
         if( fg1 || fg2 ) {
-            // mm1 = [ cr ][ y ][ cb ][ y ]
+            /* mm1 = [ cr ][ y ][ cb ][ y ] */
             movd_m2r( *input, mm1 );
             punpcklbw_r2r( mm7, mm1 );
 
@@ -499,14 +499,14 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
             movq_r2r( mm3, mm4 );
             punpcklbw_r2r( mm7, mm3 );
             punpckhbw_r2r( mm7, mm4 );
-            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
+            /* mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha. */
 
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ] */
             pshufw_r2r( mm3, mm5, 0 );
             pshufw_r2r( mm4, mm6, 0 );
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201 */
             pshufw_r2r( mm3, mm3, 201 );
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16 */
             pshufw_r2r( mm4, mm4, 16 );
 
             pand_m2r( alpha1, mm3 );
@@ -516,37 +516,37 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
             por_r2r( mm4, mm3 );
             por_r2r( mm6, mm5 );
 
-            // now, mm5 is af and mm1 is B.  Need to multiply them.
+            /* now, mm5 is af and mm1 is B.  Need to multiply them. */
             pmullw_r2r( mm1, mm5 );
 
-            // Multiply by appalpha.
+            /* Multiply by appalpha. */
             pmullw_r2r( mm2, mm3 );
             paddw_m2r( round, mm3 );
             psrlw_i2r( 8, mm3 );
-            // Result is now B + F.
+            /* Result is now B + F. */
             paddw_r2r( mm3, mm1 );
 
-            // Round up appropriately.
+            /* Round up appropriately. */
             paddw_m2r( round, mm5 );
 
-            // mm6 contains our i>>8;
+            /* mm6 contains our i>>8; */
             movq_r2r( mm5, mm6 );
             psrlw_i2r( 8, mm6 );
 
-            // Add mm6 back into mm5.  Now our result is in the high bytes.
+            /* Add mm6 back into mm5.  Now our result is in the high bytes. */
             paddw_r2r( mm6, mm5 );
 
-            // Shift down.
+            /* Shift down. */
             psrlw_i2r( 8, mm5 );
 
-            // Multiply by appalpha.
+            /* Multiply by appalpha. */
             pmullw_r2r( mm2, mm5 );
             paddw_m2r( round, mm5 );
             psrlw_i2r( 8, mm5 );
 
             psubusw_r2r( mm5, mm1 );
 
-            // mm1 = [ B + F - af*B ]
+            /* mm1 = [ B + F - af*B ] */
             packuswb_r2r( mm1, mm1 );
             movd_r2m( mm1, *output );
         }
@@ -626,20 +626,20 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
             movq_r2r( mm3, mm4 );
             punpcklbw_r2r( mm7, mm3 );
             punpckhbw_r2r( mm7, mm4 );
-            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            /* mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha. */
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201 */
             pshufw_r2r( mm3, mm3, 201 );
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16 */
             pshufw_r2r( mm4, mm4, 16 );
             pand_m2r( alpha1, mm3 );
             pand_m2r( alpha2, mm4 );
             por_r2r( mm4, mm3 );
-            // mm1 = [ B + F - af*B ]
+            /* mm1 = [ B + F - af*B ] */
             packuswb_r2r( mm3, mm3 );
             movd_r2m( mm3, *output );
         } else if( fg1 || fg2 ) {
 
-            // mm1 = [ cr ][ y ][ cb ][ y ]
+            /* mm1 = [ cr ][ y ][ cb ][ y ] */
             movd_m2r( *input, mm1 );
             punpcklbw_r2r( mm7, mm1 );
 
@@ -647,14 +647,14 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
             movq_r2r( mm3, mm4 );
             punpcklbw_r2r( mm7, mm3 );
             punpckhbw_r2r( mm7, mm4 );
-            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
+            /* mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha. */
 
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ] */
             pshufw_r2r( mm3, mm5, 0 );
             pshufw_r2r( mm4, mm6, 0 );
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201 */
             pshufw_r2r( mm3, mm3, 201 );
-            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16
+            /* [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16 */
             pshufw_r2r( mm4, mm4, 16 );
 
             pand_m2r( alpha1, mm3 );
@@ -664,28 +664,28 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
             por_r2r( mm4, mm3 );
             por_r2r( mm6, mm5 );
 
-            // now, mm5 is af and mm1 is B.  Need to multiply them.
+            /* now, mm5 is af and mm1 is B.  Need to multiply them. */
             pmullw_r2r( mm1, mm5 );
 
-            // Result is now B + F.
+            /* Result is now B + F. */
             paddw_r2r( mm3, mm1 );
 
-            // Round up appropriately.
+            /* Round up appropriately. */
             paddw_m2r( round, mm5 );
 
-            // mm6 contains our i>>8;
+            /* mm6 contains our i>>8; */
             movq_r2r( mm5, mm6 );
             psrlw_i2r( 8, mm6 );
 
-            // Add mm6 back into mm5.  Now our result is in the high bytes.
+            /* Add mm6 back into mm5.  Now our result is in the high bytes. */
             paddw_r2r( mm6, mm5 );
 
-            // Shift down.
+            /* Shift down. */
             psrlw_i2r( 8, mm5 );
 
             psubusw_r2r( mm5, mm1 );
 
-            // mm1 = [ B + F - af*B ]
+            /* mm1 = [ B + F - af*B ] */
             packuswb_r2r( mm1, mm1 );
             movd_r2m( mm1, *output );
         }
@@ -758,18 +758,18 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
     movd_m2r( textcb, mm2 );
     movd_m2r( textcr, mm3 );
 
-    // mm1 = [  0 ][  0 ][ y ][ 0 ] == 11110011 == 243
+    /* mm1 = [  0 ][  0 ][ y ][ 0 ] == 11110011 == 243 */
     pshufw_r2r( mm1, mm1, 243 );
-    // mm2 = [  0 ][ cb ][ 0 ][ 0 ] == 11001111 == 207
+    /* mm2 = [  0 ][ cb ][ 0 ][ 0 ] == 11001111 == 207 */
     pshufw_r2r( mm2, mm2, 207 );
-    // mm3 = [ cr ][  0 ][ 0 ][ 0 ] == 00111111 == 63
+    /* mm3 = [ cr ][  0 ][ 0 ][ 0 ] == 00111111 == 63 */
     pshufw_r2r( mm3, mm3, 63 );
 
-    // mm1 = [ cr ][ cb ][ y ][ 0 ]
+    /* mm1 = [ cr ][ cb ][ y ][ 0 ] */
     por_r2r( mm2, mm1 );
     por_r2r( mm3, mm1 );
     movq_r2r( mm1, mm0 );
-    // mm0 = [ cr ][ cb ][ y ][ 0xff ]
+    /* mm0 = [ cr ][ cb ][ y ][ 0xff ] */
     paddw_m2r( fullalpha, mm0 );
 
     pxor_r2r( mm7, mm7 );
@@ -794,19 +794,19 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
             packuswb_r2r( mm5, mm5 );
             movd_r2m( mm5, *output );
         } else if( a ) {
-            // mm2 = [ a ][ a ][ a ][ a ]
+            /* mm2 = [ a ][ a ][ a ][ a ] */
             movd_m2r( a, mm2 );
             pshufw_r2r( mm2, mm2, 0 );
 
-            // mm3 = [ cr ][ cb ][ y ][ 0xff ]
+            /* mm3 = [ cr ][ cb ][ y ][ 0xff ] */
             movq_r2r( mm0, mm3 );
 
-            //  mm4 = [ i_cr ][ i_cb ][ i_y ][ i_a ]
+            /*  mm4 = [ i_cr ][ i_cb ][ i_y ][ i_a ] */
             movd_m2r( *input, mm4 );
             punpcklbw_r2r( mm7, mm4 );
             movq_r2r( mm4, mm5 );
 
-            // Multiply alpha.
+            /* Multiply alpha. */
             psubusw_r2r( mm4, mm3 );
             pmullw_r2r( mm2, mm3 );
             paddw_m2r( round, mm3 );
@@ -816,7 +816,7 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
             psrlw_i2r( 8, mm3 );
             paddw_r2r( mm3, mm4 );
 
-            // Write result.
+            /* Write result. */
             packuswb_r2r( mm4, mm4 );
             movd_r2m( mm4, *output );
         }

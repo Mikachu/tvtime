@@ -266,7 +266,7 @@ void update_row( vbiscreen_t *vs )
     if( !vs ) return;
 
     update_row_x( vs, vs->cury );
-    //vbiscreen_dump_screen_text( vs );
+    /*vbiscreen_dump_screen_text( vs );*/
 }
 
 void update_all_rows( vbiscreen_t *vs )
@@ -278,7 +278,7 @@ void update_all_rows( vbiscreen_t *vs )
     for( row = 0; row < ROWS; row++ ) {
         update_row_x( vs, row );
     }
-    //vbiscreen_dump_screen_text( vs );
+    /*vbiscreen_dump_screen_text( vs );*/
 }
 
 void vbiscreen_delete( vbiscreen_t *vs )
@@ -332,7 +332,7 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
             vs->cury = row - 1;
             clear_hidden_roll( vs );
         } else {
-//            scroll_screen( vs );
+/*            scroll_screen( vs );*/
         }
     }
 
@@ -486,7 +486,7 @@ void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 
     if( vs->captions && vs->style == POP_UP ) {
         memset( vs->buffers + vs->curbuffer * COLS * ROWS + vs->cury * COLS, 0, COLS );
-//        clear_hidden_pop( vs );
+/*        clear_hidden_pop( vs );*/
     } else if( vs->captions && vs->style && vs->style <= ROLL_4 ) {
         clear_hidden_roll( vs );
     }

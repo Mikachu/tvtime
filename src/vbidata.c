@@ -44,7 +44,7 @@ struct vbidata_s
     int fd;
     vbiscreen_t *vs;
     tvtime_osd_t *osd;
-    char buf[ 65536 ];
+    unsigned char buf[ 65536 ];
     int wanttop;
     int wanttext;
 
@@ -88,13 +88,13 @@ struct vbidata_s
 
 
 /* this is NOT exactly right */
-//static char *ccode = " !\"#$%&'()\0341+,-./0123456789:;<=>?@"
+/*static char *ccode = " !\"#$%&'()\0341+,-./0123456789:;<=>?@"*/
 static char *ccode = " !\"#$%&'()a+,-./0123456789:;<=>?@"
                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-//                     "abcdefghijklmnopqrstuvwxyz"
-//                     "[\0351]\0355\0363\0372abcdefghijklmnopqr"
+/*                     "abcdefghijklmnopqrstuvwxyz"*/
+/*                     "[\0351]\0355\0363\0372abcdefghijklmnopqr"*/
                      "[e]iouabcdefghijklmnopqr"
-//                     "stuvwxyz\0347\0367\0245\0244\0240";
+/*                     "stuvwxyz\0347\0367\0245\0244\0240";*/
                      "stuvwxyzcoNn ";
 static char *wccode = "\0256\0260\0275\0277T\0242\0243#\0340 "
                       "\0350\0354\0362\0371";
@@ -313,15 +313,13 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         vbi->call_letters = strdup( packet + 2 );
         tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
-                        int month = packet[5];// & 15;
-                        int day = packet[4];// & 31;
-                        int hour = packet[3];// & 31;
-                        int min = packet[2];// & 63;
-                        char str[33];
+        int month = packet[5];
+        int day = packet[4];
+        int hour = packet[3];
+        int min = packet[2];
+        char str[33];
         if( vbi->verbose ) fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
                  day & 31, months[month & 15], hour & 31, min & 63 );
-                 // packet[ 3 ], packet[ 4 ], packet[ 5 ], packet[ 6 ] );
-                 //packet[ 5 ] & 31, packet[ 6 ], packet[ 4 ] & 31, packet[ 3 ] & 63 );
         vbi->start_month = month & 15;
         vbi->start_day = day & 31;
         vbi->start_hour = hour & 31;
@@ -505,7 +503,6 @@ const int rows[] = {
 int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 {
     int w1, b1, b2;
-    char *outbuf = NULL;
 
     if( !vbi ) return 0;
 

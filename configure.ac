@@ -163,6 +163,10 @@ if test x"$GCC" = x"yes"; then
     OPT_CFLAGS="$CFLAGS -fomit-frame-pointer"
     AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS])
 
+    dnl -std=gnu99
+    OPT_CFLAGS="$CFLAGS -std=gnu99"
+    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS])
+
     dnl arch-specific flags
     case "$host_alias" in
     i?86-* | k?-*)

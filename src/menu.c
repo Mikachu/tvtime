@@ -74,8 +74,6 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
 {
     menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
     int i;
-    unsigned int rgb;
-    unsigned char oconv[3];
 
     if( !m ) {
         return 0;

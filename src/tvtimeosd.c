@@ -71,19 +71,19 @@ struct tvtime_osd_s
     char deinterlace_text[ 128 ];
     char timeformat[ 128 ];
 
-    char *network_name;
-    char *network_call;
-    char *show_rating;
-    char *show_start;
-    char *show_length;
-    char *show_name;
+    const char *network_name;
+    const char *network_call;
+    const char *show_rating;
+    const char *show_start;
+    const char *show_length;
+    const char *show_name;
 
     credits_t *credits;
     int show_credits;
     config_t *cfg;
 };
 
-void tvtime_osd_set_network_name( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
@@ -96,7 +96,7 @@ void tvtime_osd_set_network_name( tvtime_osd_t* osd, char *str )
     }
 }
 
-void tvtime_osd_set_show_name( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_show_name( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
@@ -110,7 +110,7 @@ void tvtime_osd_set_show_name( tvtime_osd_t* osd, char *str )
     }
 }
 
-void tvtime_osd_set_network_call( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_network_call( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
@@ -125,7 +125,7 @@ void tvtime_osd_set_network_call( tvtime_osd_t* osd, char *str )
     }
 }
 
-void tvtime_osd_set_show_rating( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
@@ -138,7 +138,7 @@ void tvtime_osd_set_show_rating( tvtime_osd_t* osd, char *str )
     }
 }
 
-void tvtime_osd_set_show_start( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
@@ -151,7 +151,7 @@ void tvtime_osd_set_show_start( tvtime_osd_t* osd, char *str )
     }
 }
 
-void tvtime_osd_set_show_length( tvtime_osd_t* osd, char *str )
+void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
 {
     if( osd ) {
         char fullstr[ 128 ];
