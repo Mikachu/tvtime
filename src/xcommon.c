@@ -618,7 +618,6 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             XReparentWindow( display, output_window, fs_window, 0, 0);
             XMoveWindow( display, fs_window, x, y );
-            XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
             output_width = w;
             output_height = h;
         }
