@@ -53,6 +53,7 @@ typedef struct videoinput_s videoinput_t;
 #define VIDEOINPUT_PAL_M   4
 #define VIDEOINPUT_PAL_N   5
 #define VIDEOINPUT_NTSC_JP 6
+#define VIDEOINPUT_PAL_60  7
 
 /** 
  * Possible tuner signal states.
