@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-09-11 00:24-0300\n"
+"POT-Creation-Date: 2003-09-16 11:48-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,7 +52,7 @@ msgstr ""
 msgid "2-3 Pulldown detection is not valid with your TV norm."
 msgstr ""
 
-#: src/tvtime.c:2248 src/tvtime.c:2365
+#: src/tvtime.c:2250 src/tvtime.c:2367
 #, c-format
 msgid "Screenshot: %s"
 msgstr ""
@@ -188,29 +188,53 @@ msgstr ""
 msgid "Overscan: %.1f%%"
 msgstr ""
 
-#: src/commands.c:2524
+#: src/commands.c:2521
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr ""
 
-#: src/commands.c:2554
+#: src/commands.c:2551
 msgid "Picture settings reset to defaults."
 msgstr ""
 
-#: src/commands.c:2806
+#: src/commands.c:2587
+msgid "Finetune"
+msgstr ""
+
+#: src/commands.c:2646 src/commands.c:2660
+msgid "Volume"
+msgstr ""
+
+#: src/commands.c:2707 src/commands.c:2767
+msgid "Hue"
+msgstr ""
+
+#: src/commands.c:2720 src/commands.c:2758
+msgid "Brightness"
+msgstr ""
+
+#: src/commands.c:2733 src/commands.c:2761
+msgid "Contrast"
+msgstr ""
+
+#: src/commands.c:2746 src/commands.c:2764
+msgid "Colour"
+msgstr ""
+
+#: src/commands.c:2803
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 
-#: src/commands.c:2818
+#: src/commands.c:2815
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr ""
 
-#: src/commands.c:2900
+#: src/commands.c:2897
 msgid "Paused."
 msgstr ""
 
-#: src/commands.c:2900
+#: src/commands.c:2897
 msgid "Resumed."
 msgstr ""
 
