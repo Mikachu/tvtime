@@ -666,6 +666,8 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    input_set_vbidata( in, vbidata );
+
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
     output->set_window_caption( tagline );

@@ -40,6 +40,7 @@ typedef enum InputEvent_e {
 #include "videocorrection.h"
 #include "menu.h"
 #include "console.h"
+#include "vbidata.h"
 
 /* Modifiers */
 #define I_SHIFT                 (1<<16)
@@ -94,6 +95,7 @@ int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );
 int input_toggle_menu( input_t *in );
 void input_set_console( input_t *in, console_t *con );
+void input_set_vbidata( input_t *in, vbidata_t *con );
 
 void input_set_menu( input_t *in, menu_t *m );
 

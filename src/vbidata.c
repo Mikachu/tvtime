@@ -35,6 +35,26 @@ struct vbidata_s
     int topindent, botindent, topul, botul;
     int topchan, botchan;
     int initialised;
+    int lastcode;
+    int lastcount;
+    int topcapmode, botcapmode;
+
+    /* XDS data */
+    char *program_name;
+    char *network_name;
+    char *call_letters;
+    char *rating;
+    char *program_type;
+    int start_day;
+    int start_month;
+    int start_min;
+    int start_hour;
+    int length_hour;
+    int length_min;
+    int length_elapsed_hour;
+    int length_elapsed_min;
+    int length_elapsed_sec;
+    char *program_desc[8];
 };
 
 
@@ -167,10 +187,12 @@ static const char *eia608_program_type[ 96 ] = {
 };
 
 
-static void parse_xds_packet( const char *packet, int length )
+static void parse_xds_packet( vbidata_t *vbi, const char *packet, int length )
 {
     int sum = 0;
     int i;
+
+    if( !vbi ) return;
 
     /* Check the checksum for validity of the packet. */
     for( i = 0; i < length - 1; i++ ) {
@@ -184,12 +206,23 @@ static void parse_xds_packet( const char *packet, int length )
     packet[ length - 2 ] = '\0';
     length -= 2;
 
-    if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x03 ) {
+    if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x03 ) {
+        if( vbi->program_name && !strcmp(vbi->program_name, packet + 2 ) ) {
+            return;
+        }
         fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
-    } else if( packet[ 0 ] < 0x05 && packet[ 1 ] == 0x03 ) {
+        if( vbi->program_name ) free( vbi->program_name );
+        vbi->program_name = strdup(packet + 2);
+    } else if( packet[ 0 ] == 0x03 && packet[ 1 ] == 0x03 ) {
         fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
+        if( vbi->network_name && !strcmp(vbi->network_name, packet + 2 ) ) {
+            return;
+        }
+
         fprintf( stderr, "Network name: '%s'\n", packet + 2 );
+        if( vbi->network_name ) free( vbi->network_name );
+        vbi->network_name = strdup( packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
         int movie_rating = packet[ 2 ] & 7;
         int scheme = (packet[ 2 ] & 56) >> 3;
@@ -218,6 +251,11 @@ static void parse_xds_packet( const char *packet, int length )
             }
             break;
         }
+
+        if( vbi->rating && !strcmp(vbi->rating, str ) ) {
+            return;
+        }
+
         fprintf( stderr, "Show rating: %s", str );
         if( ((VSL | scheme) & 3) == 1 || ((VSL | scheme) & 3) == 0 ) {
             /* show VSLD for the americans */
@@ -235,8 +273,15 @@ static void parse_xds_packet( const char *packet, int length )
             }
         }
         fprintf( stderr, "\n" );
+        vbi->rating = str;
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
+        if( vbi->call_letters && !strcmp(vbi->call_letters, packet + 2 ) ) {
+            return;
+        }
+
         fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
+        if( vbi->call_letters ) free( vbi->call_letters );
+        vbi->call_letters = strdup( packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
                         int month = packet[5];// & 15;
                         int day = packet[4];// & 31;
@@ -246,30 +291,54 @@ static void parse_xds_packet( const char *packet, int length )
                  day & 31, months[month & 15], hour & 31, min & 63 );
                  // packet[ 3 ], packet[ 4 ], packet[ 5 ], packet[ 6 ] );
                  //packet[ 5 ] & 31, packet[ 6 ], packet[ 4 ] & 31, packet[ 3 ] & 63 );
+        vbi->start_month = month & 15;
+        vbi->start_day = day & 31;
+        vbi->start_hour = hour & 31;
+        vbi->start_min = hour & 63;
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
         fprintf( stderr, "Program type: " );
         for( i = 0; i < length - 2; i++ ) {
             int cur = packet[ 2 + i ] - 0x20;
             if( cur >= 0 && cur < 96 ) {
                 fprintf( stderr, "%s%s", i ? ", " : "", eia608_program_type[ cur ] );
+                /* this will cause us to keep only the last type we check */
+                vbi->program_type = eia608_program_type[ cur ];
             }
         }
         fprintf( stderr, "\n" );
     } else if( packet[ 0 ] < 0x03 && packet[ 1 ] >= 0x10 && packet[ 1 ] <= 0x17 ) {
+
+        if( vbi->program_desc[ packet[1] & 0xf ] && 
+            !strcmp(vbi->program_desc[ packet[1] & 0xf ], packet + 2 ) ) {
+            return;
+        }
+
         fprintf( stderr, "Program Description: Line %d", packet[1] & 0xf );
         fprintf( stderr, "%s\n", packet + 2 );
-        
-    } else if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x02 ) {
-        fprintf( stderr, "Program Length: Length: %02d:%02d", packet[ 3 ] & 63, 
-                 packet[ 2 ] & 63 ); 
+        if( vbi->program_desc[ packet[1] & 0xf ] ) 
+            free( vbi->program_desc[ packet[1] & 0xf ] );
+        vbi->program_desc[ packet[1] & 0xf ] = strdup( packet + 2 );
+    } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x02 ) {
+        fprintf( stderr, "Program Length: Length: %02d:%02d", 
+                 packet[ 3 ] & 63, packet[ 2 ] & 63 ); 
+        vbi->length_hour = packet[ 3 ] & 63;
+        vbi->length_min = packet[ 2 ] & 63;
         if( length > 4 ) {
             fprintf( stderr, " Elapsed: %02d:%02d", packet[ 5 ] & 63, 
                      packet[ 4 ] & 63 );
+        vbi->length_elapsed_hour = packet[ 5 ] & 63;
+        vbi->length_elapsed_min = packet[ 4 ] & 63;
+
         }
+
         if( length > 6 ) {
             fprintf( stderr, ".%02d", packet[ 6 ] & 63 );
+            vbi->length_elapsed_hour = packet[ 6 ] & 63;
         }
         fprintf( stderr, "\n" );
+    } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x04 ) {
+        fprintf( stderr, "Transmission Signal Identifier (TSID): 0x%04x\n",
+                 packet[ 2 ] << 24 | packet[ 3 ] << 16 | packet[ 4 ] << 8 | packet[ 5 ] );
     } else {
         /* unknown */
 
@@ -303,7 +372,7 @@ static void parse_xds_packet( const char *packet, int length )
     }
 }
 
-static int xds_decode( int b1, int b2 )
+static int xds_decode( vbidata_t *vbi, int b1, int b2 )
 {
     if( xds_cursor > 2046 ) {
         xds_cursor = 0;
@@ -328,7 +397,7 @@ static int xds_decode( int b1, int b2 )
     xds_cursor += 2;
 
     if( b1 == 0xf ) {
-        parse_xds_packet( xds_packet, xds_cursor );
+        parse_xds_packet( vbi, xds_packet, xds_cursor );
         xds_cursor = 0;
     }
 
@@ -375,6 +444,14 @@ const int rows[] = {
     9,
     10    
 };
+
+#define ROLL_2      2
+#define ROLL_3      3
+#define ROLL_4      4
+#define POP_ON      5
+#define PAINT_ON    6
+
+
 int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 {
     int w1, b1, b2;
@@ -396,6 +473,11 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             /* Preamble Code */
             /* This sets up colors and indenting */
             if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
                 vbi->topital = (b2 & 1);
                 if( !(b2 & 16) ) {
                     vbi->topcolour = colours[ (b2 & 30) >> 1 ];
@@ -414,7 +496,6 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                          vbi->toprow );
             } else {
                 vbi->botital = (b2 & 1);
-                vbi->botcolour = colours[ (b2 & 30) >> 1 ];
                 if( !(b2 & 16) ) {
                     vbi->botcolour = colours[ (b2 & 30) >> 1 ];
                     vbi->botindent = 0;
@@ -431,37 +512,67 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                          vbi->botul, vbi->botcolour, vbi->botindent, 
                          vbi->botrow );
 
-            } 
+            }
+
+            vbi->lastcode = ( b1 << 8) | b2;
+            vbi->lastcount = 0;
             return 1;
         }
 
         if( (b1 & 8) == 1 ) {
             /* Midrow code */
             /* we dont change colour midrow sorry */
+
+            if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+            }
+
             fprintf( stderr, "Midrow: We don't change mid-row.\n" );
+            if( !bottom && vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+                return 1;
+            }
+
+            vbi->lastcode = ( b1 << 8) | b2;
             return 1;
         }
 
         fprintf( stderr, "Channel: %d ", (b1 & 8) >> 4 );
-        if( b1 & 2 ) {
+        if( (b1 & 2) && !(b2 & 64) ) {
+            if( !bottom && vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+                return 0;
+            }
+
             fprintf( stderr, "Tab Offset: %d (We ignore this)\n", b2 & 3 );
+            vbi->lastcode = ( b1 << 8) | b2;
             return 0;
         }
         fprintf( stderr, "Field: %d Cmd: ", b1 & 1 );
-        switch( b2 & 7 ) {
+        switch( b2 & 15 ) {
         case 0:
             if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = CC2;
                 } else {
                     vbi->topmode = CC1;
                 }
+                vbi->topcapmode = POP_ON;
             } else {
                 if( vbi->botchan ) {
                     vbi->botmode = CC3;
                 } else {
                     vbi->botmode = CC4;
                 }
+                vbi->botcapmode = POP_ON;
             }
             vbi->initialised = 1;
             fprintf( stderr, "Resume Caption Loading\n");
@@ -473,13 +584,17 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             *outbuf = 0;
             break;
         case 1:
+            if( !bottom && vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+            }
+
             if( vbi->initialised && !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
             } else if( vbi->botmode ) {
                 outbuf = (char *)( vbi->botbuf + (vbi->botmode - 1)*2048 );
             }
             fprintf( stderr, "Backspace\n");
-            if( outbuf && *outbuf ) {
+            if( outbuf && *outbuf && !vbi->lastcount ) {
                 outbuf[ strlen(outbuf) - 1 ] = 0;
             }
             break;
@@ -488,6 +603,10 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             fprintf( stderr, "Reserved\n");
             break;
         case 4:
+            if( !bottom && vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+            }
+
             if( vbi->initialised && !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
             } else if( vbi->botmode ) {
@@ -495,24 +614,34 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "Delete to End of Row\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 outbuf[ strlen(outbuf) ] = 0;
             }
             break;
         case 5:
             vbi->initialised = 1;
             if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = CC2;
                 } else {
                     vbi->topmode = CC1;
                 }
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                }
+                vbi->topcapmode = ROLL_2;
             } else {
                 if( vbi->botchan ) {
                     vbi->botmode = CC3;
                 } else {
                     vbi->botmode = CC4;
                 }
+                vbi->botcapmode = ROLL_2;
             }
             if( !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
@@ -521,7 +650,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "Roll Up Captions, 2 rows\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -534,17 +663,25 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         case 6:
             vbi->initialised = 1;
             if( !bottom ) {
+
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = CC2;
                 } else {
                     vbi->topmode = CC1;
                 }
+                vbi->topcapmode = ROLL_3;
             } else {
                 if( vbi->botchan ) {
                     vbi->botmode = CC3;
                 } else {
                     vbi->botmode = CC4;
                 }
+                vbi->botcapmode = ROLL_3;
             }
 
             if( !bottom && vbi->topmode ) {
@@ -555,7 +692,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 
 
             fprintf( stderr, "Roll Up Captions, 3 rows\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -568,17 +705,24 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         case 7:
             vbi->initialised = 1;
             if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = CC2;
                 } else {
                     vbi->topmode = CC1;
                 }
+                vbi->topcapmode = ROLL_4;
             } else {
                 if( vbi->botchan ) {
                     vbi->botmode = CC3;
                 } else {
                     vbi->botmode = CC4;
                 }
+                vbi->botcapmode = ROLL_4;
             }
             if( !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
@@ -587,7 +731,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "Roll Up Captions, 4 rows\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -601,11 +745,38 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             fprintf( stderr, "Flash On\n");
             break;
         case 9:
+            vbi->initialised = 1;
+            if( !bottom ) {
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                    return 1;
+                }
+
+                if( vbi->topchan ) {
+                    vbi->topmode = CC2;
+                } else {
+                    vbi->topmode = CC1;
+                }
+                vbi->topcapmode = PAINT_ON;
+            } else {
+                if( vbi->botchan ) {
+                    vbi->botmode = CC3;
+                } else {
+                    vbi->botmode = CC4;
+                }
+                vbi->botcapmode = PAINT_ON;
+            }
             fprintf( stderr, "Resume Direct Captioning\n");
+            
             break;
         case 10:
             vbi->initialised = 1;
             if( !bottom ) {
+
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = T2;
                 } else {
@@ -624,7 +795,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                 outbuf = (char *)( vbi->botbuf + (vbi->botmode - 1)*2048 );
             }
             fprintf( stderr, "Text Restart\n");
-            if( outbuf && *outbuf ) {
+            if( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -636,6 +807,11 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         case 11:
             vbi->initialised = 1;
             if( !bottom ) {
+
+                if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                    vbi->lastcount = (vbi->lastcount + 1) % 2;
+                }
+
                 if( vbi->topchan ) {
                     vbi->topmode = T2;
                 } else {
@@ -655,7 +831,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "Resume Text Display\n");
-            if( outbuf && *outbuf ) {
+            if( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -665,9 +841,36 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
             break;
         case 12:
+
+            if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+                return 1;
+            }
+
+            if( vbi->initialised && !bottom && vbi->topmode ) {
+                outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
+            } else if( vbi->botmode ) {
+                outbuf = (char *)( vbi->botbuf + (vbi->botmode - 1)*2048 );
+            }
             fprintf( stderr, "Erase Displayed Memory\n");
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+                *outbuf = 0;
+            } else if( !vbi->lastcount && outbuf ) {
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+            }
+
             break;
         case 13:
+            if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+            }
+
             if( vbi->initialised && !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
             } else if( vbi->botmode ) {
@@ -675,19 +878,51 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "Carriage Return\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
                 }
                 *outbuf = 0;
+            } else if( !vbi->lastcount && outbuf ) {
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
             }
 
             break;
         case 14:
+            if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+                return 1;
+            }
+
+            if( vbi->initialised && !bottom && vbi->topmode ) {
+                outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
+            } else if( vbi->botmode ) {
+                outbuf = (char *)( vbi->botbuf + (vbi->botmode - 1)*2048 );
+            }
+
             fprintf( stderr, "Erase Non-Displayed Memory\n");
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+                *outbuf = 0;
+            } else if( !vbi->lastcount && outbuf ) {
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+            }
+
             break;
         case 15:
+            if( vbi->lastcode == ( (b1 << 8) | b2 ) ) {
+                vbi->lastcount = (vbi->lastcount + 1) % 2;
+                return 1;
+            }
+
             if( vbi->initialised && !bottom && vbi->topmode ) {
                 outbuf = (char *)( vbi->topbuf + (vbi->topmode - 1)*2048 );
             } else if( vbi->botmode ) {
@@ -695,7 +930,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
             }
 
             fprintf( stderr, "End Of Caption\n");
-            if ( outbuf && *outbuf ) {
+            if ( !vbi->lastcount && outbuf && *outbuf ) {
                 fprintf(stderr, "%s\n", outbuf);
                 if( vbi->con ) {
                     console_printf( vbi->con, "%s\n", outbuf );
@@ -706,16 +941,24 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 
             break;
         default:
-            fprintf( stderr, "Unknown Control Chars: 0x%02x 0x%02x\n", b1, b2 );
+            fprintf( stderr, "Unknown Control Chars: 0x%02x 0x%02x\n", b1, b2 );            vbi->lastcode = (b1 << 8) | b2;
             return 0;
             break;
         }
 
+        if( vbi->lastcode != ((b1 << 8) | b2) ) {
+            vbi->lastcount = 0;
+        }
+
+        vbi->lastcode =  (b1 << 8) | b2;
         return 1;
 
     }
 
-    if( bottom && xds_decode( b1, b2 ) ) {
+    vbi->lastcode = 0;
+    vbi->lastcount = 0;
+
+    if( bottom && xds_decode( vbi, b1, b2 ) ) {
         return 0;
     }
 
@@ -761,10 +1004,41 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
         if( outbuf && b1 > 31 ) {
             char blah = b1;
             strncat(outbuf, &ccode[blah-32], 1 );
+            if( !bottom ) {
+                if( vbi->topmode < 3 && 
+                    vbi->topcapmode == PAINT_ON  &&
+                    strlen(outbuf) > 38 ) {
+                    blah = '\n';
+                    strncat( outbuf, &blah, 1 );
+                }
+            } else {
+                if( vbi->botmode < 3 && 
+                    vbi->botcapmode == PAINT_ON  &&
+                    strlen(outbuf) > 38 ) {
+                    blah = '\n';
+                    strncat( outbuf, &blah, 1 );
+                }
+            }
         }
         if( outbuf && b2 > 31 ) {
             char blah = b2;
             strncat(outbuf, &ccode[blah-32], 1 );
+            if( !bottom ) {
+                if( vbi->topmode < 3 && 
+                    vbi->topcapmode == PAINT_ON  &&
+                    strlen(outbuf) > 38 ) {
+                    blah = '\n';
+                    strncat( outbuf, &blah, 1 );
+                }
+            } else {
+                if( vbi->botmode < 3 && 
+                    vbi->botcapmode == PAINT_ON  &&
+                    strlen(outbuf) > 38 ) {
+                    blah = '\n';
+                    strncat( outbuf, &blah, 1 );
+                }
+            }
+
         }
 
     }
@@ -791,6 +1065,20 @@ vbidata_t *vbidata_new( const char *filename, console_t *con  )
     }
 
     vbi->con = con;
+
+    vbidata_reset( vbi );
+
+    return vbi;
+}
+
+void vbidata_delete( vbidata_t *vbi )
+{
+    free( vbi );
+}
+
+void vbidata_reset( vbidata_t *vbi )
+{
+    if( !vbi ) return;
 
     vbi->topbuf[0 * 2048] = 0;
     vbi->topbuf[1 * 2048] = 0;
@@ -823,12 +1111,16 @@ vbidata_t *vbidata_new( const char *filename, console_t *con  )
     
     vbi->initialised = 0;
 
-    return vbi;
-}
-
-void vbidata_delete( vbidata_t *vbi )
-{
-    free( vbi );
+    memset(vbi->program_desc, 0, 8*sizeof(char*) );
+    vbi->program_name = NULL;
+    vbi->network_name = NULL;
+    vbi->call_letters = NULL;
+    vbi->rating = NULL;
+    vbi->program_type = NULL;
+    vbi->lastcode = 0;
+    vbi->lastcount = 0;
+    vbi->topcapmode = 0;
+    vbi->botcapmode = 0;
 }
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )

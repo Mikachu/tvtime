@@ -59,6 +59,8 @@ struct console_s {
 
     int show_cursor;
 
+    int maxrows;
+
 };
 
 console_t *console_new( config_t *cfg, int x, int y, int width, int height,
@@ -203,6 +205,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
         con->num_lines++;
     }
 
+    con->maxrows = con->rows;
 
     return con;
 }
@@ -244,7 +247,7 @@ void update_osd_strings( console_t *con )
     ptr = con->text + con->curx;
     tmpstr[0] = '\0';
 
-    if( !con->line ) {
+    if( !con->line && con->maxrows ) {
         con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
         if( !con->line ) {
             fprintf(stderr, 
@@ -316,7 +319,7 @@ void update_osd_strings( console_t *con )
         
         if( *ptr == '\n' 
             || osd_string_get_width( con->line[ con->cury ] ) > maxwidth ) {
-            if( con->line ) {
+            if( con->line && con->cury < con->maxrows-1 ) {
                 osd_string_t **hmm;
                 hmm = (osd_string_t **)realloc( (void *)con->line, sizeof(osd_string_t*)*(con->num_lines+1) );
                 if( hmm ) {
@@ -328,6 +331,7 @@ void update_osd_strings( console_t *con )
                     return;
                 }
             }
+
             con->curx += strlen( tmpstr );
             if( *ptr == '\n' ) con->curx++;
             if( strlen( tmpstr ) != 0 )
@@ -342,6 +346,14 @@ void update_osd_strings( console_t *con )
                                        (con->fgcolour & 0xff) );
 
             osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
+            if( con->line && con->cury >= con->maxrows-1 ) {
+                int i;
+                osd_string_delete( con->line[ 0 ] );
+                for( i = 0; i < con->num_lines-1; i++ ) {
+                    con->line[ i ] = con->line[ i + 1 ];
+                }
+                con->cury--;
+            }
             con->cury++;
             tmpstr[0] = '\0';
 

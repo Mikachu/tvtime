@@ -36,6 +36,7 @@
 #include "menu.h"
 #include "parser.h"
 #include "console.h"
+#include "vbidata.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -71,6 +72,8 @@ struct input_s {
     int lirc_fd;
     struct lirc_config *lirc_conf;
 #endif
+
+    vbidata_t *vbi;
 
 };
 
@@ -274,6 +277,8 @@ static void reinit_tuner( input_t *in )
             /* set to a known frequency */
             frequencies_choose_first_frequency();
             videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
+            if( in->vbi )
+                vbidata_reset( in->vbi );
         }
 
         if( config_get_verbose( in->cfg ) ) {
@@ -330,6 +335,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->scrollconsole = 0;
 
     in->console = 0;
+    in->vbi = 0;
 
     in->lirc_used = 0;
 
@@ -380,6 +386,12 @@ void input_set_console( input_t *in, console_t *con )
     in->console = con;
 }
 
+void input_set_vbidata( input_t *in, vbidata_t *vbi )
+{
+    in->vbi = vbi;
+}
+
+
 static void input_channel_change_relative( input_t *in, int offset )
 {
     int verbose = config_get_verbose( in->cfg );
@@ -396,7 +408,10 @@ static void input_channel_change_relative( input_t *in, int offset )
                 break;
         }
 
+        
         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
+        if( in->vbi )
+            vbidata_reset( in->vbi );
 
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
@@ -616,6 +631,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
                 videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
+                if( in->vbi )
+                    vbidata_reset( in->vbi );
+
                 if( in->osd ) {
                     char message[ 200 ];
                     sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
@@ -707,6 +725,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             cur_channel = (cur_channel + 1 + CHAN_ENTRIES) % CHAN_ENTRIES;
                         }
                         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
+                        if( in->vbi )
+                            vbidata_reset( in->vbi );
+
 
                         if( verbose ) {
                             fprintf( stderr, "tvtime: Changing to channel %s\n", 
