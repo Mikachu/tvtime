@@ -943,7 +943,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     char c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:",
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
