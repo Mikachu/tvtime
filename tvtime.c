@@ -77,25 +77,6 @@ static void build_test_frames( unsigned char *oddframe,
 
 static void build_colourbars( unsigned char *output, int width, int height )
 {
-    unsigned char *cb444 = (unsigned char *) malloc( width * 3 );
-    pnginput_t *cb;
-    int i;
-
-    if( !cb444 ) {
-        memset( output, 255, width * height * 2 );
-        return;
-    }
-
-    cb = pnginput_new( "smptebars.png" );
-    for( i = 0; i < pnginput_get_height( cb ); i++ ) {
-        unsigned char *curout = output + (i * width * 2);
-        rgb24_to_packed444_rec601_scanline( cb444, pnginput_get_scanline( cb, i ), width );
-        cheap_packed444_to_packed422_scanline( curout, cb444, width );
-    }
-    pnginput_delete( cb );
-    free( cb444 );
-
-/*
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
     int i;
     if( !cb444 ) { memset( output, 255, width * height * 2 ); return; }
@@ -108,7 +89,6 @@ static void build_colourbars( unsigned char *output, int width, int height )
     }
 
     free( cb444 );
-*/
 }
 
 static void pngscreenshot( const char *filename, unsigned char *frame422,
@@ -176,6 +156,7 @@ const char *next_deinterlacing_method( void )
 static void tvtime_build_frame( unsigned char *output,
                                 unsigned char *curframe,
                                 unsigned char *lastframe,
+                                unsigned char *secondlastframe,
                                 video_correction_t *vc,
                                 tvtime_osd_t *osd,
                                 menu_t *menu,
@@ -271,6 +252,7 @@ int main( int argc, char **argv )
     int blittime = 0;
     int curframeid;
     int lastframeid;
+    int secondlastframeid;
     int skipped = 0;
     int copymode = 1;
     int verbose;
@@ -280,6 +262,7 @@ int main( int argc, char **argv )
     unsigned char *testframe_even;
     unsigned char *colourbars;
     unsigned char *lastframe;
+    unsigned char *secondlastframe;
     config_t *ct;
     input_t *in;
     menu_t *menu;
@@ -578,7 +561,7 @@ int main( int argc, char **argv )
         } else if( showtest ) {
             blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
-            tvtime_build_frame( sdl_get_output(), curframe, lastframe, vc,
+            tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
                                 osd, menu, copymode, 0,
                                 config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
@@ -630,7 +613,7 @@ int main( int argc, char **argv )
         } else if( showtest ) {
             blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
-            tvtime_build_frame( sdl_get_output(), curframe, lastframe, vc,
+            tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
                                 osd, menu, copymode, 1,
                                 config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
