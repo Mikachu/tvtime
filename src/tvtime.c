@@ -1652,6 +1652,9 @@ int main( int argc, char **argv )
             tvtime_osd_advance_frame( osd );
         }
 
+        if( curmethod ) {
+            commands_set_half_size( commands, curmethod->doscalerbob );
+        }
         output->poll_events( in );
 
         if( commands_quit( commands ) ) break;

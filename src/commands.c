@@ -266,6 +266,7 @@ struct commands_s {
     int framerate;
     int scan_channels;
     int pause;
+    int halfsize;
     int resizewindow;
     int restarttvtime;
     int setdeinterlacer;
@@ -566,6 +567,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->scrollconsole = 0;
     cmd->scan_channels = 0;
     cmd->pause = 0;
+    cmd->halfsize = 0;
     cmd->change_channel = 0;
     cmd->renumbering = 0;
     cmd->resizewindow = 0;
@@ -1302,6 +1304,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             break;
         case TVTIME_MOUSE_MOVE:
             sscanf( arg, "%d %d", &x, &y );
+            if( cmd->halfsize ) y *= 2;
             line = tvtime_osd_list_get_line_pos( cmd->osd, y );
             if( line > 0 ) {
                 cmd->curmenupos = (line - 1);
@@ -2295,5 +2298,10 @@ const char *commands_get_new_deinterlacer( commands_t *cmd )
 int commands_menu_active( commands_t *cmd )
 {
     return cmd->menuactive;
+}
+
+void commands_set_half_size( commands_t *cmd, int halfsize )
+{
+    cmd->halfsize = halfsize;
 }
 

@@ -184,6 +184,7 @@ int commands_in_menu( commands_t *cmd );
 
 int commands_console_on( commands_t *cmd );
 
+void commands_set_half_size( commands_t *cmd, int halfsize );
 void commands_next_frame( commands_t *cmd );
 int commands_pause( commands_t *cmd );
 
