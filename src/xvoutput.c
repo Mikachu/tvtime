@@ -542,14 +542,15 @@ void xv_show_frame( int x, int y, int width, int height )
 void xv_poll_events( input_t *in )
 {
     XEvent event;
-    KeySym mykey;
-    int arg = 0;
-    char mykey_string;
     int reconfigure = 0;
     int reconfwidth = 0;
     int reconfheight = 0;
 
     while( XPending( display ) ) {
+        KeySym mykey;
+        char mykey_string;
+        int arg = 0;
+
         XNextEvent( display, &event );
 
         switch( event.type ) {
