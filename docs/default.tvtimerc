@@ -13,9 +13,37 @@ verbose = 0
 # 0 is my tuner and source 1 is the composite input.
 CaptureSource = 0
 
+# This sets the default capture device to use.
 V4LDevice = /dev/video0
+
+# This sets the default TV norm.  Valid options are "ntsc", "pal"
+# or "secam".
 Norm = ntsc
+
+# This sets the default frequency table to use for any tuners found.
+# Possibilities are:
+#    us-bcast
+#    us-cable
+#    us-cable-hrc
+#    canada-cable
+#    japan-bcast
+#    japan-cable
+#    europe-west
+#    europe-east
+#    italy
+#    newzeland
+#    australia
+#    australia-optus
+#    ireland
+#    france
+#    china-bcast
+#    southafrica
+#    argentina
 Frequencies = us-cable
+
+# This sets the default tuner number to use.  I have no idea what
+# this really means.  If you can explain this one, let me know:
+# vektor@dumbterm.net
 TunerNumber = 0
 
 # This sets the initial width of the output window.
@@ -32,8 +60,20 @@ InputWidth = 720
 # This option enables 16:9 mode by default on startup.
 WideScreen = 0
 
+# This indicates whether the luma correction option should be enabled by
+# default when starting the application.  Luma correction can be turned
+# on or off within the application using the 'c' key.
 ApplyLumaCorrection = 0
+
+# This indicates the power for correction.  A value of 1.0 does nothing
+# (except apply Bt8x8 correction, if enabled).  Values less than one make
+# the output darker, and values greater than one make the output brighter.
+# The valid range is 0.1 to 10.0 in increments of 0.1.
 LumaCorrection = 1.0
+
+# This indicates whether Bt8x8 correction is enabled or not.  If you have
+# a Bt8x8-based card, it is recommended you turn this on.  See the
+# help page off the tvtime website for more details on this feature.
 Bt8x8Correction = 0
 
 # This option enables a special debug mode.  In debug mode, if we are
