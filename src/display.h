@@ -1,3 +1,6 @@
+#ifndef OGLE_DISPLAY_H
+#define OGLE_DISPLAY_H
+
 /* Ogle - A video player
  * Copyright (C) 2001, 2002 Björn Englund, Håkan Hjort
  *
@@ -15,9 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-#ifndef OGLE_DISPLAY_H
-#define OGLE_DISPLAY_H
 
 #include <X11/Xlib.h>
 
@@ -67,5 +67,7 @@ int DpyInfoGetGeometry(Display *dpy, int screen_nr,
 int DpyInfoGetSAR(Display *dpy, int screen_nr,
 		  int *sar_frac_n, int *sar_frac_d);
 
-#endif /* OGLE_DISPLAY_H */
+int DpyInfoSetEWMHFullscreen(int enabled);
+int DpyInfoGetEWMHFullscreen(void);
 
+#endif /* OGLE_DISPLAY_H */

@@ -17,8 +17,6 @@
  */
 
 #include "config.h"
-
-#include <stdio.h>
 #include <X11/Xlib.h>
 #ifdef HAVE_XF86VIDMODE
 #include <X11/extensions/xf86vmode.h>
@@ -28,24 +26,12 @@
 #endif
 
 #include "display.h"
+#include "debug_print.h"
 
-/* Why aren't these in the damn vidmode extension header??? */
-/* Mode flags -- ignore flags not in V_FLAG_MASK */
-#define V_FLAG_MASK     0x1FF;
-#define V_PHSYNC        0x001 
-#define V_NHSYNC        0x002
-#define V_PVSYNC        0x004
-#define V_NVSYNC        0x008
-#define V_INTERLACE     0x010 
-#define V_DBLSCAN       0x020
-#define V_CSYNC         0x040
-#define V_PCSYNC        0x080
-#define V_NCSYNC        0x100
 
 typedef struct {
   int horizontal_pixels;
   int vertical_pixels;
-  double refresh_rate;
 } resolution_t;
 
 typedef struct {
@@ -77,6 +63,7 @@ typedef struct {
   DpyInfoOrigin_t resolution_origin;
   resolution_t normal_dpy_res;
   fullscreen_resolution_t *fullscreen_dpy_res;
+  int ewmh_fullscreen;
 } dpy_info_t;
 
 dpy_info_t dpyinfo;
@@ -207,8 +194,6 @@ static int update_resolution_xf86vidmode(dpy_info_t *info, Display *dpy,
     }
     info->resolution.horizontal_pixels = modeline.hdisplay;
     info->resolution.vertical_pixels = modeline.vdisplay;
-    info->resolution.refresh_rate = ( (double) ( (double) dotclk * 1000.0 ) ) /
-                                    ( (double) ( modeline.htotal * modeline.vtotal ) );
 
     if(XF86VidModeGetViewPort(dpy, screen_nr, &x, &y)) {
       info->screen_offset.x = x;
@@ -243,7 +228,7 @@ static int update_resolution_xinerama(dpy_info_t *info, Display *dpy,
       s = &xinerama_screens[n];
       if((s->x_org <= x) && (x < (s->x_org + s->width)) &&
 	 (s->y_org <= y) && (y < (s->y_org + s->height))) {
-	/* we have found our screen */
+	// we have found our screen
 	
 	info->screen_offset.x = s->x_org;
 	info->screen_offset.y = s->y_org;
@@ -256,8 +241,8 @@ static int update_resolution_xinerama(dpy_info_t *info, Display *dpy,
 	return 1;
       }
     }
-    /* the window isn't positioned on a screen, use the first */
-    /* TODO maybe this should be fixed to use the closest instead? */
+    // the window isn't positioned on a screen, use the first
+    // TODO maybe this should be fixed to use the closest instead?
     s = &xinerama_screens[0];
 
     info->screen_offset.x = s->x_org;
@@ -402,8 +387,10 @@ DpyInfoOrigin_t DpyInfoSetUpdateGeometry(Display *dpy, int screen_nr,
 DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 					     DpyInfoOrigin_t origin)
 {
+#if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
   int event_base, error_base;
-  
+#endif
+
   switch(origin) {
   case DpyInfoOriginUser:
     if(update_resolution_user(&dpyinfo, dpy, screen_nr)) {
@@ -419,7 +406,7 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	return dpyinfo.resolution_origin;
       }
     } else {
-      fprintf(stderr,"display: Xinerama extension not found/active\n");
+      NOTE("%s", "Xinerama extension not found/active\n");
     }
 #endif
 #ifdef HAVE_XF86VIDMODE
@@ -430,7 +417,7 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	return dpyinfo.resolution_origin;
       }
     } else {
-      fprintf(stderr,"display: XF86VidMode extension not found\n");
+      NOTE("%s", "XF86VidMode extension not found\n");
     }
 #endif
   case DpyInfoOriginX11:
@@ -444,4 +431,13 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
   return 0;
 }
 
+int DpyInfoSetEWMHFullscreen(int enabled)
+{
+  dpyinfo.ewmh_fullscreen = enabled;
+  return 1;
+}
 
+int DpyInfoGetEWMHFullscreen(void)
+{
+  return dpyinfo.ewmh_fullscreen;
+}
