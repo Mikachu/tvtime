@@ -141,6 +141,7 @@ void (*chroma_422_to_444_mpeg2_plane)( uint8_t *dst, uint8_t *src,
                                        int width, int height );
 void (*chroma_420_to_422_mpeg2_plane)( uint8_t *dst, uint8_t *src,
                                        int width, int height, int progressive );
+void (*invert_colour_packed422_inplace_scanline)( uint8_t *data, int width );
 
 
 /**
@@ -606,6 +607,38 @@ static void kill_chroma_packed422_inplace_scanline_c( uint8_t *data, int width )
     while( width-- ) {
         data[ 1 ] = 128;
         data += 2;
+    }
+}
+
+#ifdef ARCH_X86
+static void invert_colour_packed422_inplace_scanline_mmx( uint8_t *data, int width )
+{
+    const mmx_t allones = { 0xffffffffffffffffULL };
+
+    movq_m2r( allones, mm1 );
+    for(; width > 4; width -= 4 ) {
+        movq_r2r( mm1, mm2 );
+        movq_m2r( *data, mm0 );
+        psubb_r2r( mm0, mm2 );
+        movq_r2m( mm2, *data );
+        data += 8;
+    }
+    emms();
+
+    width *= 2;
+    while( width-- ) {
+        *data = 255 - *data;
+        data++;
+    }
+}
+#endif
+
+static void invert_colour_packed422_inplace_scanline_c( uint8_t *data, int width )
+{
+    width *= 2;
+    while( width-- ) {
+        *data = 255 - *data;
+        data++;
     }
 }
 
@@ -2345,6 +2378,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     rgba32_to_packed4444_rec601_scanline = rgba32_to_packed4444_rec601_scanline_c;
     chroma_422_to_444_mpeg2_plane = chroma_422_to_444_mpeg2_plane_c;
     chroma_420_to_422_mpeg2_plane = chroma_420_to_422_mpeg2_plane_c;
+    invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
@@ -2365,6 +2399,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_mmxext;
+        invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
@@ -2378,6 +2413,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
+        invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmx;
     } else {
         if( verbose ) {

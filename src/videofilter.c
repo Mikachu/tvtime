@@ -82,6 +82,7 @@ void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
         // halfmirror_packed422_inplace_scanline( data, width );
         // kill_chroma_packed422_inplace_scanline( data, width );
         // testing_packed422_inplace_scanline( data, width, scanline );
+        // invert_colour_packed422_inplace_scanline( data, width );
     }
 }
 

@@ -139,16 +139,6 @@ extern void (*blend_packed422_scanline)( uint8_t *output, uint8_t *src1,
                                          uint8_t *src2, int width, int pos );
 
 /**
- * In-place [1 2 1] filter.
- */
-extern void (*filter_luma_121_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
- * In-place [1 4 6 4 1] filter.
- */
-extern void (*filter_luma_14641_packed422_inplace_scanline)( uint8_t *data, int width );
-
-/**
  * Calculates the 'difference factor' for two scanlines.  This is a
  * metric where higher values indicate that the two scanlines are more
  * different.
@@ -162,6 +152,17 @@ extern unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *ol
  */
 extern unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
                                                        uint8_t *bot, int width );
+
+
+/**
+ * In-place [1 2 1] filter.
+ */
+extern void (*filter_luma_121_packed422_inplace_scanline)( uint8_t *data, int width );
+
+/**
+ * In-place [1 4 6 4 1] filter.
+ */
+extern void (*filter_luma_14641_packed422_inplace_scanline)( uint8_t *data, int width );
 
 /**
  * Sets the chroma of the scanline to neutral (128) in-place.
@@ -177,6 +178,11 @@ extern void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
  * Mirrors the first half of the scanline onto the second half in-place.
  */
 extern void (*halfmirror_packed422_inplace_scanline)( uint8_t *data, int width );
+
+/**
+ * Inverts the colours on a scanline in-place.
+ */
+extern void (*invert_colour_packed422_inplace_scanline)( uint8_t *data, int width );
 
 /**
  * Fast memcpy function, used by all of the blit functions.  Won't blit
