@@ -195,7 +195,7 @@ static void update_xmltv_channel( commands_t *cmd )
             xmltv_set_channel( cmd->xmltv, xmltv_lookup_channel( cmd->xmltv, station_get_current_channel_name( cmd->stationmgr ) ) );
         }
     } else if( cmd->osd ) {
-        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0 );
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
     }
 }
 
@@ -213,10 +213,12 @@ static void update_xmltv_listings( commands_t *cmd )
         if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
             const char *desc;
             char title[ 128 ];
+            char next_title[ 128 ];
             char subtitle[ 1024 ];
             char descdata[ 1024 ];
             char *line1 = 0;
             char *line2 = 0;
+            char *line3 = 0;
 
             xmltv_refresh( cmd->xmltv, year, month, day, hour, min );
 
@@ -262,7 +264,20 @@ static void update_xmltv_listings( commands_t *cmd )
                 *title = '\0';
             }
 
-            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2 );
+            if( xmltv_get_next_title( cmd->xmltv ) ) {
+                sprintf( next_title, "Next: " );
+                snprintf( next_title + 6, sizeof( next_title ), "%s", xmltv_get_next_title( cmd->xmltv ) );
+                if( strlen( next_title ) > 40 ) {
+                    sprintf( next_title + 40, "..." );
+                }
+            }
+            if ( !line1 )
+                line1 = next_title;
+            else if ( !line2 )
+                line2 = next_title;
+            else line3 = next_title;
+
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2, line3 );
         }
     }
 }
@@ -456,7 +471,7 @@ static void reinit_tuner( commands_t *cmd )
         tvtime_osd_set_show_rating( cmd->osd, "" );
         tvtime_osd_set_show_start( cmd->osd, "" );
         tvtime_osd_set_show_length( cmd->osd, "" );
-        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0 );
+        tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
         tvtime_osd_show_info( cmd->osd );
     }
 

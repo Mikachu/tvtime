@@ -1,5 +1,6 @@
 
 0.9.11 -
+  * larman: Display the upcoming show name from XMLTV.
   * vektor: Added CHANNEL_JUMP as a name alias for CHANNEL_PREV.
   * vektor: Documents some commands which we forgot about in the man
       page for tvtime-command: DISPLAY_MESSAGE, KEY_EVENT,

@@ -67,6 +67,11 @@ const char *xmltv_get_description( xmltv_t *xmltv );
 const char *xmltv_get_times( xmltv_t *xmltv );
 
 /**
+ * Returns the title of the next show (preview)
+ */
+const char *xmltv_get_next_title( xmltv_t *xmltv );
+
+/**
  * Returns true if the show information must be updated (the current
  * program has ended.
  */

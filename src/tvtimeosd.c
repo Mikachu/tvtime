@@ -54,7 +54,8 @@ enum osd_objects
     OSD_PROGRAM1_BAR,
     OSD_PROGRAM2_BAR,
     OSD_PROGRAM3_BAR,
-    OSD_PROGRAM4_BAR,     
+    OSD_PROGRAM4_BAR,
+    OSD_PROGRAM5_BAR,
     OSD_DATA_VALUE,
     OSD_MUTED,
     OSD_TIME_STRING,
@@ -262,6 +263,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_PROGRAM2_BAR ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_PROGRAM3_BAR ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_PROGRAM4_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_PROGRAM5_BAR ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_DATA_VALUE ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_MUTED ].string = osd_string_new( osd->smallfont );
 
@@ -274,8 +276,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         !osd->strings[ OSD_MESSAGE1_BAR ].string || !osd->strings[ OSD_MESSAGE2_BAR ].string ||
         !osd->strings[ OSD_PROGRAM1_BAR ].string || !osd->strings[ OSD_PROGRAM2_BAR ].string ||
         !osd->strings[ OSD_PROGRAM3_BAR ].string || !osd->strings[ OSD_PROGRAM4_BAR ].string ||
-        !osd->strings[ OSD_DATA_VALUE ].string || !osd->strings[ OSD_MUTED ].string ||
-        !osd->strings[ OSD_SHOW_INFO ].string ) {
+        !osd->strings[ OSD_PROGRAM5_BAR ].string || !osd->strings[ OSD_DATA_VALUE ].string ||
+        !osd->strings[ OSD_MUTED ].string || !osd->strings[ OSD_SHOW_INFO ].string ) {
 
         fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
         tvtime_osd_delete( osd );
@@ -388,6 +390,13 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_PROGRAM4_BAR ].ypos = osd->strings[ OSD_PROGRAM3_BAR ].ypos
                                           + osd_string_get_height( osd->strings[ OSD_PROGRAM3_BAR ].string );
 
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM5_BAR ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_PROGRAM5_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "8", 0 );
+    osd->strings[ OSD_PROGRAM5_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_PROGRAM5_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_PROGRAM5_BAR ].ypos = osd->strings[ OSD_PROGRAM4_BAR ].ypos
+                                          + osd_string_get_height( osd->strings[ OSD_PROGRAM5_BAR ].string );
 
     /* Bottom. */
     osd_string_set_colour_rgb( osd->strings[ OSD_MESSAGE2_BAR ].string, other_r, other_g, other_b );
@@ -625,6 +634,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_set_timeout( osd->strings[ OSD_PROGRAM2_BAR ].string, osd->delay );
     osd_string_set_timeout( osd->strings[ OSD_PROGRAM3_BAR ].string, osd->delay );
     osd_string_set_timeout( osd->strings[ OSD_PROGRAM4_BAR ].string, osd->delay );
+    osd_string_set_timeout( osd->strings[ OSD_PROGRAM5_BAR ].string, osd->delay );
 
     if( *(osd->channel_name_text) && strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
         osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, osd->delay );
@@ -672,7 +682,7 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
         sprintf( bar, "%s", barname );
         osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
-   
+
         sprintf( bar, " %d", percentage );
         osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, osd->delay );
 
@@ -699,7 +709,7 @@ void tvtime_osd_show_data_bar_centered( tvtime_osd_t *osd, const char *barname,
         sprintf( bar, "%s", barname );
         osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
-   
+
         sprintf( bar, " %d", percentage );
         osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, osd->delay );
 
@@ -937,7 +947,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
 
 void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
                                    const char *message2, const char *message3,
-                                   const char *message4 )
+                                   const char *message4, const char *message5 )
 {
     if( message1 ) {
         osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, message1, osd->delay );
@@ -958,6 +968,11 @@ void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
         osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, message4, osd->delay );
     } else {
         osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, "", osd->delay );
+    }
+    if( message5 ) {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, message5, osd->delay );
+    } else {
+        osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "", osd->delay );
     }
 }
 
