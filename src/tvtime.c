@@ -888,6 +888,10 @@ int main( int argc, char **argv )
         output_y = (int) ((((double) height) * config_get_vertical_overscan( ct )) + 0.5);
         output_h = (int) ((((double) height) - (((double) height) * config_get_vertical_overscan( ct ) * 2.0)) + 0.5);
 
+        output_x = output_x & ~1;
+        output_y = output_y & ~1;
+        output_h = output_h & ~1;
+
         if( fifo ) {
             int cmd;
             cmd = fifo_next_command( fifo );
