@@ -4,11 +4,6 @@
 #include "videotools.h"
 
 /**
- * Set this to 0 to see b/w output.
- */
-#define SHOW_COLOUR 1
-
-/**
  * Define this to 1 not fade out the phosphors on the opposite field.
  * Try out 2 to have it faded.
  */
@@ -28,11 +23,7 @@ void build_plane( unsigned char *output, unsigned char *field,
         }
         output += width;
 
-        if( chroma && !SHOW_COLOUR ) {
-            if( chroma ) memset( output, 128, width );
-        } else {
-            memcpy( output, field, width );
-        }
+        memcpy( output, field, width );
         output += width;
     }
 
@@ -40,28 +31,17 @@ void build_plane( unsigned char *output, unsigned char *field,
         unsigned char *c;
 
         if( !bottom_field ) {
-            if( chroma && !SHOW_COLOUR ) {
-                if( chroma ) memset( output, 128, width );
-            } else {
-                memcpy( output, field, width );
-            }
+            memcpy( output, field, width );
             output += width;
         }
 
         c = field;
         if( chroma ) {
-            if( SHOW_COLOUR ) {
-                for( j = 0; j < width; j++ ) {
-                    *output = ((*c + *(c+fieldstride) - 256) >> BRIGHT_FACTOR)
-                              + 128;
-                    output++;
-                    c++;
-                }
-            } else {
-                for( j = 0; j < width; j++ ) {
-                    *output = 128;
-                    output++;
-                }
+            for( j = 0; j < width; j++ ) {
+                *output = ((*c + *(c+fieldstride) - 256) >> BRIGHT_FACTOR)
+                          + 128;
+                output++;
+                c++;
             }
         } else {
             for( j = 0; j < width; j++ ) {
@@ -73,21 +53,13 @@ void build_plane( unsigned char *output, unsigned char *field,
         field += fieldstride;
 
         if( bottom_field ) {
-            if( chroma && !SHOW_COLOUR ) {
-                if( chroma ) memset( output, 128, width );
-            } else {
-                memcpy( output, field, width );
-            }
+            memcpy( output, field, width );
             output += width;
         }
     }
 
     if( !bottom_field ) {
-        if( chroma && !SHOW_COLOUR ) {
-            if( chroma ) memset( output, 128, width );
-        } else {
-            memcpy( output, field, width );
-        }
+        memcpy( output, field, width );
         output += width;
 
         if( chroma ) {
@@ -113,20 +85,12 @@ static inline void copy_scanline_packed_422( unsigned char *output, unsigned cha
 {
     unsigned int *o = (unsigned int *) output;
 
-    if( SHOW_COLOUR ) {
-        for( width /= 2; width; --width ) {
-            *o = (*cr << 24) | (*(luma + 1) << 16) | (*cb << 8) | (*luma);
-            o++;
-            luma += 2;
-            cb++;
-            cr++;
-        }
-    } else {
-        for( width /= 2; width; --width ) {
-            *o = (128 << 24) | (*(luma + 1) << 16) | (128 << 8) | (*luma);
-            o++;
-            luma += 2;
-        }
+    for( width /= 2; width; --width ) {
+        *o = (*cr << 24) | (*(luma + 1) << 16) | (*cb << 8) | (*luma);
+        o++;
+        luma += 2;
+        cb++;
+        cr++;
     }
 }
 
@@ -139,27 +103,17 @@ static inline void interpolate_scanline_packed_422( unsigned char *output,
         output++;
         luma++;
 
-        if( SHOW_COLOUR ) {
-            *output = ((*cb + *(cb+cstride) - 256) >> BRIGHT_FACTOR) + 128;
-            output++;
-            cb++;
-        } else {
-            *output = 128;
-            output++;
-        }
+        *output = ((*cb + *(cb+cstride) - 256) >> BRIGHT_FACTOR) + 128;
+        output++;
+        cb++;
 
         *output = (*luma + *(luma+lstride)) >> BRIGHT_FACTOR;
         output++;
         luma++;
 
-        if( SHOW_COLOUR ) {
-            *output = ((*cr + *(cr+cstride) - 256) >> BRIGHT_FACTOR) + 128;
-            output++;
-            cr++;
-        } else {
-            *output = 128;
-            output++;
-        }
+        *output = ((*cr + *(cr+cstride) - 256) >> BRIGHT_FACTOR) + 128;
+        output++;
+        cr++;
     }
 }
 
