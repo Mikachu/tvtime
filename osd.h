@@ -61,13 +61,20 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,
                                      int xpos, int ypos, int rightjustified );
 
-osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_height );
+osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
+                            int video_height, int shape_width,
+                            int shape_height, double aspect, int alpha );
+
 void osd_shape_delete( osd_shape_t *osds );
 void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr );
 void osd_shape_show_shape( osd_shape_t *osds, int timeout );
 int osd_shape_visible( osd_shape_t *osds );
+void osd_shape_set_timeout( osd_shape_t *osds, int timeout );
 void osd_shape_advance_frame( osd_shape_t *osds );
-
+void osd_shape_composite_packed422( osd_shape_t *osds, 
+                                    unsigned char *output,
+                                    int width, int height, int stride,
+                                    int xpos, int ypos );
 
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int video_height, double aspect, int alpha );

@@ -24,6 +24,12 @@ struct menu_s {
     osd_graphic_t *bg;
     int bgx, bgy;
 
+    osd_shape_t *box;
+    int box_x, box_y;
+
+    osd_shape_t *circle;
+    int circle_x, circle_y;
+
     MenuScreen menu_screen;
     MenuScreen menu_previous_screen;
     unsigned int menu_state;
@@ -48,13 +54,36 @@ menu_t *menu_new( input_t *in, config_t *cfg, int width,
     m->frame_width = width;
     m->frame_height = height;
     m->frame_aspect = aspect;
-    m->bg = osd_graphic_new( "menubg.png" , width, height, aspect, 256 );
+    m->bg = osd_graphic_new( "menubg.png" , width, height, aspect, 255 );
     if( !m->bg ) {
         free( m );
         return NULL;
     }
     m->bgx = 10;
     m->bgy = 10;
+
+    m->box = osd_shape_new( OSD_Rect, width, height, 50, 50, aspect, 255 );
+    if( !m->box ) {
+        osd_graphic_delete( m->bg );
+        free( m );
+        return NULL;
+    }
+    m->box_x = width-55;
+    m->box_y = height-70;
+
+
+    m->circle = osd_shape_new( OSD_Circle, width, height, 50, 50, aspect, 255 );
+    if( !m->circle ) {
+        osd_graphic_delete( m->bg );
+        osd_shape_delete( m->box );
+        free( m );
+        return NULL;
+    }
+    m->circle_x = width-55;
+    m->circle_y = 10;
+
+    osd_shape_set_colour( m->box, 200, 200, 200 );
+    osd_shape_set_colour( m->circle, 200, 200, 200 );
 
     return m;
 }
@@ -67,6 +96,8 @@ void menu_init( menu_t *m )
     m->menu_previous_screen = MENU_MAIN;
     
     osd_graphic_show_graphic( m->bg, 51 );
+    osd_shape_show_shape( m->box, 51 );
+    osd_shape_show_shape( m->circle, 51 );
 }
 
 void menu_main( menu_t *m, int key )
@@ -220,6 +251,8 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
                 m->menu_screen = MENU_MAIN;
                 /* now remove OSD */
                 osd_graphic_set_timeout( m->bg, 0 );
+                osd_shape_set_timeout( m->box, 0 );
+                osd_shape_set_timeout( m->circle, 0 );
                 return 1;
                 break;
 
@@ -249,4 +282,19 @@ void menu_composite_packed422( menu_t *m, unsigned char *output,
                                          width, height, stride,
                                          m->bgx, m->bgy );
     }
+
+    if( osd_shape_visible( m->box ) ) {
+        osd_shape_composite_packed422( m->box, 
+                                       output,
+                                       width, height, stride,
+                                       m->box_x, m->box_y );
+    }
+
+    if( osd_shape_visible( m->circle ) ) {
+        osd_shape_composite_packed422( m->circle, 
+                                       output,
+                                       width, height, stride,
+                                       m->circle_x, m->circle_y );
+    }
+
 }

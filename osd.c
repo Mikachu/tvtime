@@ -25,6 +25,12 @@
 #include "efs.h"
 #include "osd.h"
 
+
+int aspect_adjust_packed4444_scanline( unsigned char *output,
+                                       unsigned char *input, 
+                                       int width,
+                                       double aspectratio );
+
 struct osd_string_s
 {
     efont_t *font;
@@ -203,6 +209,7 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
 
 
 /* Shape functions */
+void osd_shape_render_image4444( osd_shape_t *osds );
 struct osd_shape_s
 {
     int type;
@@ -212,49 +219,36 @@ struct osd_shape_s
     int shape_cr;
     int shape_height;
     int shape_width;
-    unsigned char *shape_mask;
+    int shape_adjusted_width;
+    int image_width;
+    int image_height;
+    double aspect_ratio;
+    int alpha;
+    unsigned char *image4444;
 };
 
-osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_height )
+osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
+                            int video_height, int shape_width,
+                            int shape_height, double aspect, int alpha )
 {
-
-    int x,y;
-    double radius_sqrd,x0;
-
     osd_shape_t *osds = (osd_shape_t *) malloc( sizeof( osd_shape_t ) );
     osds->frames_left = 0;
     osds->shape_luma = 16;
     osds->shape_cb = 128;
     osds->shape_cr = 128;
+    osds->image_width = video_width;
+    osds->image_height = video_height;
+    osds->alpha = alpha;
+    osds->aspect_ratio = aspect;
     osds->shape_width = shape_width;
     osds->shape_height = shape_height;
+    osds->shape_adjusted_width = shape_width;
     osds->type = shape_type;
 
-    switch( shape_type ) {
-    case OSD_Rect:
-        osds->shape_mask = (unsigned char*)malloc( osds->shape_width );
-        memset( osds->shape_mask, 5, osds->shape_width );
-        break;
-
-    case OSD_Circle:
-        osds->shape_mask = (unsigned char*)malloc( shape_width * shape_width );
-        memset( osds->shape_mask, 0, shape_width * shape_width );
-
-        x0 = (double)(((double)shape_width)/2.0);
-        radius_sqrd = pow((double)x0,(double)2);
-        for( x = 0; x < shape_width; x++ ) {
-            for( y = 0; y < shape_width; y++ ) {
-                if( (pow((x-x0),(double)2) + pow((double)(y-x0),(double)2)) <= radius_sqrd ) {
-                    osds->shape_mask[y*shape_width+x] = 255;
-                }
-            }
-        }
-
-        break;
-
-    default:
-        osds->shape_mask = NULL;
-        break;
+    osds->image4444 = (unsigned char *)malloc( video_width *video_height * 4);
+    if( !osds ) {
+        free( osds );
+        return NULL;
     }
 
     return osds;
@@ -262,8 +256,13 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_hei
 
 void osd_shape_delete( osd_shape_t *osds )
 {
-    if( osds->shape_mask ) free( osds->shape_mask );
+    if( osds->image4444 ) free( osds->image4444 );
     free( osds );
+}
+
+void osd_shape_set_timeout( osd_shape_t *osds, int timeout )
+{
+    osds->frames_left = timeout;
 }
 
 void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
@@ -271,6 +270,7 @@ void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
     osds->shape_luma = luma;
     osds->shape_cb = cb;
     osds->shape_cr = cr;
+    osd_shape_render_image4444( osds );
 }
 
 void osd_shape_show_shape( osd_shape_t *osds, int timeout )
@@ -290,26 +290,98 @@ void osd_shape_advance_frame( osd_shape_t *osds )
     }
 }
 
-
-unsigned char *osd_shape_get_scanline( osd_shape_t *osds, int line )
+void osd_shape_render_image4444( osd_shape_t *osds )
 {
-    unsigned char *scanline;
+    double radius_sqrd,x0;
+    int x,y,i;
+    unsigned char *tmp;
+    int width = osds->shape_width;
+    int height = osds->shape_height;
+    
+    tmp = (unsigned char *)malloc( osds->image_width * height * 4 );
+    if( !tmp ) return;
+
+    blit_colour_packed4444( osds->image4444, width,
+                            height, osds->image_width * 4,
+                            0, 16, 128, 128 );
+
 
     switch( osds->type ) {
     case OSD_Rect:
-        scanline = osds->shape_mask;
+        blit_colour_packed4444( tmp, width,
+                                height, osds->image_width * 4,
+                                osds->alpha, osds->shape_luma, osds->shape_cb,
+                                osds->shape_cr );
+
         break;
+
     case OSD_Circle:
-        scanline = (unsigned char*)(osds->shape_mask + osds->shape_width*line);
+
+        blit_colour_packed4444( tmp, width,
+                                width, osds->image_width * 4,
+                                0, 16, 128, 128 );
+
+        x0 = width>>1;
+        radius_sqrd = x0*x0;
+        for( x = 0; x < width; x++ ) {
+            for( y = 0; y < width; y++ ) {
+                int xoffset = x*4;
+                if( (x-x0)*(x-x0) + (y-x0)*(y-x0) <= radius_sqrd ) {
+                    int offset = y*osds->image_width + xoffset;
+                    tmp[ offset ] = osds->alpha;
+                    tmp[ offset + 1 ] = osds->shape_luma;
+                    tmp[ offset + 2 ] = osds->shape_cb;
+                    tmp[ offset + 3 ] = osds->shape_cr;
+                }
+            }
+        }
+        
+        osds->shape_height = width;
         break;
+
     default:
-        scanline = NULL;
+        blit_colour_packed4444( tmp, width,
+                                height, osds->image_width * 4,
+                                0, 16, 128, 128 );
+
         break;
     }
 
-    return scanline;
+    for( i=0; i < osds->shape_height; i++ ) {
+        osds->shape_adjusted_width = aspect_adjust_packed4444_scanline( 
+            osds->image4444+(i*osds->image_width*4),
+            tmp+(i*osds->image_width*4), 
+            width,
+            osds->aspect_ratio );
+    }
+    free( tmp );
+
 }
 
+void osd_shape_composite_packed422( osd_shape_t *osds, 
+                                    unsigned char *output,
+                                    int width, int height, int stride,
+                                    int xpos, int ypos )
+{
+    int alpha;
+
+    if( !osds->frames_left ) return;
+
+    if( osds->frames_left < 50 ) {
+        alpha = (int) ( ( ( ( (double) osds->frames_left ) / 50.0 ) * osds->alpha ) + 0.5 );
+    } else {
+        alpha = osds->alpha;
+    }
+
+    composite_packed4444_alpha_to_packed422( output, width, height, stride,
+                                             osds->image4444, 
+                                             osds->shape_adjusted_width,
+                                             osds->shape_height,
+                                             osds->image_width*4,
+                                             xpos, ypos, alpha );
+}
+
+/* Graphic functions */
 struct osd_graphic_s
 {
     pnginput_t *png;
