@@ -1103,10 +1103,6 @@ int main( int argc, char **argv )
     */
 
     /* Steal system resources in the name of performance. */
-    if( verbose ) {
-        fprintf( stderr, "tvtime: Attempting to acquire "
-                         "performance-enhancing features.\n" );
-    }
     if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
         fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
         use_vgasync = 1;
@@ -1140,9 +1136,6 @@ int main( int argc, char **argv )
                          "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
             }
         }
-    }
-    if( verbose ) {
-        fprintf( stderr, "tvtime: Done stealing resources.\n" );
     }
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
@@ -1524,7 +1517,7 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
-        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
+        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the even field. */
                 output->wait_for_sync( 0 );
@@ -1621,7 +1614,7 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_blit_top_field_end( perf );
 
-        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
+        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the odd field. */
                 output->wait_for_sync( 1 );
@@ -1705,7 +1698,7 @@ int main( int argc, char **argv )
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
-        if( (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF)  && !output->is_interlaced() ) {
+        if( (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF)  && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 
