@@ -37,6 +37,7 @@ struct ft_font_s
     int fontsize;
     FT_Face face;
     FT_Glyph glyphs[ 256 ];
+    FT_Glyph bitmaps[ 256 ];
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
 };
@@ -86,8 +87,27 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
         if( glyph_index ) {
             error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
-            if( !error ) {
-                FT_Get_Glyph( font->face->glyph, &(font->glyphs[ i ]) );
+            if( error ) {
+                fprintf( stderr, "leetft: Can't load glyph %d\n", i );
+                continue;
+            }
+            error = FT_Get_Glyph( font->face->glyph, &(font->glyphs[ i ]) );
+            if( error ) {
+                fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", i );
+                continue;
+            }
+            error = FT_Glyph_Copy( font->glyphs[ i ], &font->bitmaps[ i ] );
+            if( error ) {
+                fprintf( stderr, "leetft: Can't copy glyph %d\n", i );
+                FT_Done_Glyph( font->glyphs[ i ] );
+                font->glyphs[ i ] = 0;
+                continue;
+            }
+            error = FT_Glyph_To_Bitmap( &font->bitmaps[ i ], ft_render_mode_normal, 0, 1 );
+            if( error ) {
+                fprintf( stderr, "leetft: Can't render glyph %d\n", i );
+                FT_Done_Glyph( font->glyphs[ i ] );
+                font->glyphs[ i ] = 0;
             }
         }
     }
@@ -102,6 +122,7 @@ void ft_font_delete( ft_font_t *font )
     for( i = 0; i < 256; i++ ) {
         if( font->glyphs[ i ] ) {
             FT_Done_Glyph( font->glyphs[ i ] );
+            FT_Done_Glyph( font->bitmaps[ i ] );
         }
     }
     FT_Done_Face( font->face );
@@ -254,29 +275,16 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
     memset( output, 0, *width * *height );
 
     for( i = 0; i < len; i++ ) {
-        FT_Glyph image;
-        FT_Error error;
         int cur = text[ i ];
 
         if( font->glyphs[ cur ] ) {
+            FT_BitmapGlyph bit = (FT_BitmapGlyph) font->bitmaps[ cur ];
 
-            /* Create a copy of the original glyph. */
-            error = FT_Glyph_Copy( font->glyphs[ cur ], &image );
-            if( !error ) {
-                /* Convert glyph image to bitmap, overwriting the glyph copy. */
-                error = FT_Glyph_To_Bitmap( &image, ft_render_mode_normal, 0, 1 );
-                if( !error ) {
-                    FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
-
-                    blit_glyph_subpix( output, *width, *height, *width,
-                                       bit->bitmap.buffer, bit->bitmap.width,
-                                       bit->bitmap.rows, bit->bitmap.pitch,
-                                       push_x + font->glyphpos[ i ] + (bit->left*65536),
-                                       font->fontsize - bit->top );
-
-                    FT_Done_Glyph( image );
-                }
-            }
+            blit_glyph_subpix( output, *width, *height, *width,
+                               bit->bitmap.buffer, bit->bitmap.width,
+                               bit->bitmap.rows, bit->bitmap.pitch,
+                               push_x + font->glyphpos[ i ] + (bit->left*65536),
+                               font->fontsize - bit->top );
         }
     }
 }
