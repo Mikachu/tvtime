@@ -48,6 +48,9 @@ Authors and contributors
   Brian Goines <bgoines78@comcast.net>
     - Work on XML config files
 
+  Krister Lagerstrom <krister@kmlager.com>
+    - Support for reading commands on stdin
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
