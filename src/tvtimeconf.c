@@ -38,6 +38,16 @@
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
 
+/* Mode list. */
+
+typedef struct tvtime_modelist_s tvtime_modelist_t;
+
+struct tvtime_modelist_s
+{
+    tvtime_mode_settings_t settings;
+    tvtime_modelist_t *next;
+};
+
 /* Key names. */
 typedef struct key_name_s key_name_t;
 
@@ -133,6 +143,9 @@ struct config_s
     char config_filename[ 1024 ];
 
     configsave_t *configsave;
+
+    int nummodes;
+    tvtime_modelist_t *modelist;
 };
 
 static unsigned int parse_colour( const char *str )
@@ -475,6 +488,8 @@ config_t *config_new( int argc, char **argv )
     ct->vbidev = strdup( "/dev/vbi0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
+    ct->nummodes = 0;
+    ct->modelist = 0;
 
     ct->uid = getuid( );
     pwuid = getpwuid( ct->uid );
@@ -879,5 +894,28 @@ int config_get_framerate_mode( config_t *ct )
 configsave_t *config_get_configsave( config_t *ct )
 {
     return ct->configsave;
+}
+
+int config_get_num_modes( config_t *ct )
+{
+    return ct->nummodes;
+}
+
+tvtime_mode_settings_t *config_get_mode_info( config_t *ct, int mode )
+{
+    tvtime_modelist_t *cur = ct->modelist;
+    int i;
+
+    if( !cur ) {
+        /* No modes. */
+        return 0;
+    }
+
+    while( i && cur->next ) {
+        cur = cur->next;
+        i--;
+    }
+
+    return cur;
 }
 
