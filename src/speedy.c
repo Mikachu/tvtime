@@ -903,7 +903,7 @@ static void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
 #ifdef ARCH_X86
 static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width )
 {
-#ifdef ARCH_368
+#ifdef ARCH_386
     __asm__ __volatile__(
         "   movl      %0, %%esi         \n"
         "   movl      %1, %%edi         \n"
