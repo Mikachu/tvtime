@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libxml/tree.h>
 #include "station.h"
 #include "bands.h"
 
@@ -44,6 +45,7 @@ struct station_mgr_s
     int us_cable_mode;
     int last_channel;
     char band_and_frequency[ 1024 ];
+    char stationrc[255];
 };
 
 static const band_t *get_band( const char *band )
@@ -89,12 +91,10 @@ static station_info_t *newInfo( int pos, const char *name, const band_t *band, c
         i->channel = channel;
         i->band = band;
         if( name ) {
-            snprintf( i->name, 32, "%d [%s]", pos, name );
+            snprintf( i->name, 32, "%s", name );
         } else {
             sprintf( i->name, "%d", pos );
         }
-        // strncpy( i->name, name, 32 );
-        i->name[ 31 ] = '\0';
 
         i->next = 0;
         i->prev = 0;
@@ -110,6 +110,7 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
         mgr->first = i;
         mgr->first->next = mgr->first;
         mgr->first->prev = mgr->first;
+        mgr->current= i;
     } else {
         station_info_t *rp = mgr->first;
 
@@ -132,6 +133,7 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
         if( rp == mgr->first && i->pos < mgr->first->pos ) {
             mgr->first = i;
         }
+        mgr->current= i;
     }
 
     return 1;
@@ -144,33 +146,67 @@ static void station_dump( station_mgr_t *mgr )
     station_info_t *rp = mgr->first;
     if( !rp ) return;
 
-    fprintf( stderr, "#\tBand\t\tChannel\tFreq\tName\n" );
+    fprintf( stderr, "#\tBand\t\tChannel\tFreq\tActive\tName\n" );
     do {
-        fprintf( stderr, "%d\t%s\t%s\t%d\t%s\n",rp->pos, rp->band->name,
-            rp->channel->name, rp->channel->freq, rp->name);
+        fprintf( stderr, "%d\t%s\t%s\t%d\t%s\t%s\n",rp->pos, rp->band->name,
+            rp->channel->name, rp->channel->freq, rp->active ? "true" : "false", rp->name);
         rp = rp->next;
     } while( rp != mgr->first );
 }
 
-static void station_readconfig( station_mgr_t *mgr )
+
+int station_readconfig( station_mgr_t *mgr )
 {
-    char name[256];
-    FILE *f;
+    xmlDocPtr doc;
+    xmlNodePtr cur;
+    xmlNodePtr station;
+    char *name= "", *active_s, *pos_s, *band= "", *channel= "";
     int pos;
-
-    strncpy( name, getenv( "HOME" ), 235 );
-    strncat( name, "/.tvtime/stations", 255 );
-
-    f = fopen( name, "r");
-    if( !f ) { 
-        fprintf( stderr, "station: No saved station data found in %s.\n"
-                         "station: Initially, all stations will be active.\n", name );
-    } else {
-        while ( EOF != fscanf( f, "%d\n", &pos ) ) {
-            station_set( mgr, pos );
-            station_set_current_active( mgr, 0 );
-        }
+    
+    doc = xmlParseFile(mgr->stationrc);
+    if( doc == NULL ) return 0;
+    
+    cur = xmlDocGetRootElement(doc);
+    if( cur == NULL ) {
+        fprintf( stderr, "station: %s: empty document\n", mgr->stationrc );
+        xmlFreeDoc(doc);
+        return( 0 );
     }
+    
+    if( xmlStrcmp( cur->name, (const xmlChar *) "STATIONRC" ) ) {
+        fprintf( stderr,"station: %s: document of the wrong type", mgr->stationrc );
+        xmlFreeDoc( doc );
+        return( 0 );
+    }
+    
+    station= cur->xmlChildrenNode;
+    while( station != NULL ) {
+        if( !xmlStrcmp( station->name, (const xmlChar *) "station" ) ) {
+            cur = station->xmlChildrenNode;
+            while (cur != NULL) {
+                if (!strcmp(cur->name, "name"))
+                    name = xmlNodeGetContent( cur->xmlChildrenNode );
+                else if (!strcmp(cur->name, "active"))
+                    active_s = xmlNodeGetContent( cur->xmlChildrenNode );
+                else if (!strcmp(cur->name, "pos"))
+                    pos_s = xmlNodeGetContent( cur->xmlChildrenNode );
+                else if (!strcmp(cur->name, "band"))
+                    band = xmlNodeGetContent( cur->xmlChildrenNode );
+                else if (!strcmp(cur->name, "channel"))
+                    channel = xmlNodeGetContent( cur->xmlChildrenNode );
+                
+                cur = cur->next;
+            }
+             
+            if( pos_s && ( 1 != sscanf( pos_s, "%d", &pos ) ) )
+                pos= 0;
+            station_add( mgr, pos, band, channel, name );
+            station_set_current_active( mgr, !( active_s && ( !strcmp( active_s, "false" ) ) ) );
+        }
+        station=station->next;
+    }
+    xmlFreeDoc( doc );
+    return 1;
 }
 
 station_mgr_t *station_init( config_t *ct )
@@ -180,6 +216,8 @@ station_mgr_t *station_init( config_t *ct )
 
     if( !mgr ) return 0;
 
+    strncpy( mgr->stationrc, getenv( "HOME" ), 235 );
+    strncat( mgr->stationrc, "/.tvtime/stationrc", 255 );
     mgr->debug = config_get_debug( ct );
     mgr->verbose = config_get_verbose( ct );
     mgr->first = 0;
@@ -187,54 +225,56 @@ station_mgr_t *station_init( config_t *ct )
     mgr->us_cable_mode = 0;
     mgr->last_channel = 0;
 
-    frequencies = config_get_v4l_freq( ct );
+    if( !station_readconfig( mgr ) ) {
+        frequencies = config_get_v4l_freq( ct );
+        fprintf( stderr, "station: Errors reading %s\n"
+                         "station: Adding frequency table %s, all channels active\n", mgr->stationrc, frequencies );
 
-    if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
-        !strcasecmp( frequencies, "europe-cable" ) ) {
-        fprintf( stderr, "\n*** Frequency list %s has been changed to be called %s in tvtime 0.9.7.\n",
-                 frequencies, "europe" );
-        fprintf( stderr, "*** Please update your configuration.  Comments?  tvtime-devel@lists.sourceforge.net\n\n" );
-        frequencies = "europe";
+        if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
+            !strcasecmp( frequencies, "europe-cable" ) ) {
+            fprintf( stderr, "\n*** Frequency list %s has been changed to be called %s in tvtime 0.9.7.\n",
+                     frequencies, "europe" );
+            fprintf( stderr, "*** Please update your configuration.  Comments?  tvtime-devel@lists.sourceforge.net\n\n" );
+            frequencies = "europe";
+        }
+
+        if( !strcasecmp( frequencies, "us-cable" ) ) {
+            station_add_band( mgr, "us cable" );
+        } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
+            station_add_band( mgr, "us broadcast" );
+        } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
+            station_add_band( mgr, "japan cable" );
+        } else if( !strcasecmp( frequencies, "japan-broadcast" ) ) {
+            station_add_band( mgr, "japan broadcast" );
+        } else if( !strcasecmp( frequencies, "russia" ) ) {
+            station_add_band( mgr, "vhf russia" );
+            station_add_band( mgr, "uhf" );
+            station_add_band( mgr, "vhf s1-s41" );
+        } else if( !strcasecmp( frequencies, "europe" ) ) {
+            station_add_band( mgr, "vhf e2-e12" );
+            station_add_band( mgr, "vhf s1-s41" );
+            station_add_band( mgr, "vhf misc" );
+            station_add_band( mgr, "vhf russia" );
+            station_add_band( mgr, "vhf italy" );
+            station_add_band( mgr, "vhf ireland" );
+            station_add_band( mgr, "uhf" );
+        } else if( !strcasecmp( frequencies, "france" ) ) {
+            station_add_band( mgr, "vhf france" );
+            station_add_band( mgr, "vhf e2-e12" );
+            station_add_band( mgr, "vhf s1-s41" );
+            station_add_band( mgr, "uhf" );
+        } else if( !strcasecmp( frequencies, "australia" ) ) {
+            station_add_band( mgr, "vhf australia" );
+            station_add_band( mgr, "vhf e2-e12" );
+            station_add_band( mgr, "uhf" );
+        } else if( !strcasecmp( frequencies, "newzealand" ) ) {
+            /* Billy: It's unclear to me if we should keep this around. */
+            station_add_band( mgr, "vhf e2-e12" );
+            station_add_band( mgr, "uhf" );
+        }
+        mgr->current = mgr->first;
     }
-
-    if( !strcasecmp( frequencies, "us-cable" ) ) {
-        station_add_band( mgr, "us cable" );
-    } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
-        station_add_band( mgr, "us broadcast" );
-    } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
-        station_add_band( mgr, "japan cable" );
-    } else if( !strcasecmp( frequencies, "japan-broadcast" ) ) {
-        station_add_band( mgr, "japan broadcast" );
-    } else if( !strcasecmp( frequencies, "russia" ) ) {
-        station_add_band( mgr, "vhf russia" );
-        station_add_band( mgr, "uhf" );
-        station_add_band( mgr, "vhf s1-s41" );
-    } else if( !strcasecmp( frequencies, "europe" ) ) {
-        station_add_band( mgr, "vhf e2-e12" );
-        station_add_band( mgr, "vhf s1-s41" );
-        station_add_band( mgr, "vhf misc" );
-        station_add_band( mgr, "vhf russia" );
-        station_add_band( mgr, "vhf italy" );
-        station_add_band( mgr, "vhf ireland" );
-        station_add_band( mgr, "uhf" );
-    } else if( !strcasecmp( frequencies, "france" ) ) {
-        station_add_band( mgr, "vhf france" );
-        station_add_band( mgr, "vhf e2-e12" );
-        station_add_band( mgr, "vhf s1-s41" );
-        station_add_band( mgr, "uhf" );
-    } else if( !strcasecmp( frequencies, "australia" ) ) {
-        station_add_band( mgr, "vhf australia" );
-        station_add_band( mgr, "vhf e2-e12" );
-        station_add_band( mgr, "uhf" );
-    } else if( !strcasecmp( frequencies, "newzealand" ) ) {
-        /* Billy: It's unclear to me if we should keep this around. */
-        station_add_band( mgr, "vhf e2-e12" );
-        station_add_band( mgr, "uhf" );
-    }
-
-    station_readconfig( mgr );
-
-    mgr->current = mgr->first;
+    
     if( mgr->verbose ) {
         station_dump( mgr );
     }
@@ -478,32 +518,38 @@ int station_remap( station_mgr_t *mgr, int pos )
 }
 
 int station_writeconfig( station_mgr_t *mgr)
-{ // FIXME: this is a damn ugly hack. I should write a bug report for it...
-    
-    char name[256];
-    FILE *f;
-    station_info_t *rp;
-    
-    strncpy( name, getenv( "HOME" ), 235 );
-    strncat( name, "/.tvtime/stations", 255 );
-    
-    f= fopen( name, "w");
-    if( !f ) { 
-        fprintf( stderr, "station: Couldn't open %s for writing\n", name );
-        return 0;
-    }
+{
+    xmlDocPtr doc;
+    xmlNodePtr tree, subtree;
+    char buf[255];
+    station_info_t *rp = mgr->first;
 
-    fprintf( stderr, "station: Writing station file '~/.tvtime/stations'.\n" );    
-    rp= mgr->first;
-    if( mgr->first ) {
-        do {
-            if( !rp->active ) fprintf( f, "%d\n", rp->pos );
-            rp= rp->next;
-        } while ( rp != mgr->first );
-    }
+    if( !rp ) return 1;
+    
+    doc= xmlNewDoc( "1.0" );
+    doc->children = xmlNewDocNode(doc, NULL, "STATIONRC", NULL);
+    
+    sprintf( buf, "%d", mgr->current->pos );
+    
+    do {
+        tree= xmlNewChild( doc->children, NULL, "station", NULL );
+        
+        subtree= xmlNewChild( tree, NULL, "name", rp->name );
+        
+        subtree= xmlNewChild( tree, NULL, "active", rp->active ? "true" : "false" );
+        
+        sprintf( buf, "%d", rp->pos );
+        subtree= xmlNewChild( tree, NULL, "pos", buf );
+        
+        subtree= xmlNewChild( tree, NULL, "band", rp->band->name );
+        subtree= xmlNewChild( tree, NULL, "channel", rp->channel->name );
+        rp= rp->next;
+    } while( rp != mgr->first );
 
-    fclose( f );
-    return 1;
+    strncpy( buf, getenv( "HOME" ), 235 );
+    strncat( buf, "/.tvtime/stationrc", 255 );
+    return xmlSaveFormatFile( buf, doc, 1);
 }
 
-// vim: expandtab
+
+// vim: set et
