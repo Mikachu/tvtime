@@ -23,6 +23,7 @@
 struct outputfilter_s
 {
     vbiscreen_t *vs;
+	vtscreen_t *vts;
     tvtime_osd_t *osd;
     console_t *con;
     double pixelaspect;
@@ -36,6 +37,7 @@ outputfilter_t *outputfilter_new( void )
     }
 
     of->vs = 0;
+    of->vts = 0;
     of->osd = 0;
     of->con = 0;
 
@@ -50,6 +52,11 @@ void outputfilter_delete( outputfilter_t *of )
 void outputfilter_set_vbiscreen( outputfilter_t *of, vbiscreen_t *vbiscreen )
 {
     of->vs = vbiscreen;
+}
+
+void outputfilter_set_vtscreen( outputfilter_t *of, vtscreen_t *vts )
+{
+    of->vts= vts;
 }
 
 void outputfilter_set_osd( outputfilter_t *of, tvtime_osd_t *osd )
@@ -69,7 +76,7 @@ void outputfilter_set_pixel_aspect( outputfilter_t *of, double pixelaspect )
 
 int outputfilter_active_on_scanline( outputfilter_t *of, int scanline )
 {
-    if( of->con || of->osd ) {
+    if( of->con || of->osd || of->vts ) { // FIXME
         return 1;
     } else if( of->vs ) {
         return vbiscreen_active_on_scanline( of->vs, scanline );
@@ -85,6 +92,9 @@ void outputfilter_composite_packed422_scanline( outputfilter_t *of,
 {
     if( of->vs ) {
         vbiscreen_composite_packed422_scanline( of->vs, output, width, xpos, scanline );
+    }
+    if( of->vts ) {
+        vtscreen_composite_packed422_scanline( of->vts, output, width, xpos, scanline );
     }
     if( of->osd ) {
         tvtime_osd_composite_packed422_scanline( of->osd, output, width, xpos, scanline );

@@ -64,6 +64,7 @@
 #include "xvoutput.h"
 #include "console.h"
 #include "vbidata.h"
+#include "vtdata.h"
 #include "vbiscreen.h"
 #include "videofilter.h"
 #include "fifo.h"
@@ -1165,6 +1166,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int has_signal = 0;
     vbidata_t *vbidata = 0;
     vbiscreen_t *vs = 0;
+    vtdata_t *vtdata = 0;
+    vtscreen_t *vtscreen = 0;
     DIR *fifodir = 0;
     fifo_t *fifo = 0;
     commands_t *commands = 0;
@@ -1655,9 +1658,24 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             vbidata_capture_xds( vbidata, config_get_usexds( ct ) );
         }
         commands_set_vbidata( commands, vbidata );
+        if( tvtime->outputfilter ) {
+            outputfilter_set_vbiscreen( tvtime->outputfilter, vs );
+        }
     }
-    if( tvtime->outputfilter ) {
-        outputfilter_set_vbiscreen( tvtime->outputfilter, vs );
+    else if( vidin && height == 576 ) {
+        vtscreen= vtscreen_new( width, height, pixel_aspect, verbose );
+        if( vtscreen ) {
+            vtdata = vtdata_new( config_get_vbi_device( ct ), vtscreen, verbose );
+            if( !vtdata || !tvtime->outputfilter ) {
+                fprintf( stderr, "tvtime: Could not initialize VT decoding.\n" );
+                vtscreen_delete( vtscreen );
+                vtscreen= 0;
+            }
+            else if( tvtime->outputfilter ) {
+                outputfilter_set_vbiscreen( tvtime->outputfilter, vs );
+            }
+                
+        }
     }
 
     /* Randomly assign a tagline as the window caption. */
@@ -2444,10 +2462,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     videoinput_free_frame( vidin, secondlastframeid );
                 if( vbidata )
                     vbidata_process_frame( vbidata, printdebug );
+                if( vtdata ) 
+                    vtdata_process_frame( vtdata, 1 );
             } else if( fieldsavailable == 2 ) {
                if( lastframeid >= 0 )
                    videoinput_free_frame( vidin, lastframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
+                if( vtdata ) vtdata_process_frame( vtdata, 1 );
             }
         }
 
@@ -2589,6 +2610,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 if( curframeid >= 0 )
                     videoinput_free_frame( vidin, curframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
+                if( vtdata ) vtdata_process_frame( vtdata, 1 );
             }
         }
     }
@@ -2675,6 +2697,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
     if( vbidata ) {
         vbidata_delete( vbidata );
+    }
+    if( vtdata ) {
+        vtdata_delete( vtdata );
+    }
+    if( rtctimer ) {
+        rtctimer_delete( rtctimer );
     }
     if( con ) {
         console_delete( con );
