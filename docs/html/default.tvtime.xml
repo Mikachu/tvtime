@@ -253,6 +253,14 @@
   -->
   <option name="LumaCorrection" value="1.0"/>
 
+  <!--
+    When this option is turned on, screenshots will not announce
+    themselves on the OSD.  This is useful if you intend to take a
+    lot of screenshots, and don't want the text to interrupt your TV
+    watching or appear in other screenshots.
+  -->
+  <option name="QuietScreenshots" value="0"/>
+
 
   <!--
     Sets the default process priority.  By default, tvtime tries to be

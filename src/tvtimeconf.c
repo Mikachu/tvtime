@@ -72,6 +72,7 @@ struct config_s
     int cc;
     int mirror;
     int boost;
+    int quiet_screenshots;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -218,6 +219,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "AudioBoost" ) ) {
             ct->boost = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "QuietScreenshots" ) ) {
+            ct->quiet_screenshots = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
@@ -695,6 +700,7 @@ config_t *config_new( void )
     ct->cc = 0;
     ct->mirror = 0;
     ct->boost = -1;
+    ct->quiet_screenshots = 0;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1570,5 +1576,10 @@ int config_get_pal_audio_mode( config_t *ct )
 int config_get_audio_boost( config_t *ct )
 {
     return ct->boost;
+}
+
+int config_get_quiet_screenshots( config_t *ct )
+{
+    return ct->quiet_screenshots;
 }
 

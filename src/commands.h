@@ -69,6 +69,7 @@ int commands_toggle_deinterlacer( commands_t *cmd );
 int commands_toggle_pulldown_detection( commands_t *cmd );
 int commands_toggle_matte( commands_t *cmd );
 int commands_toggle_alwaysontop( commands_t *cmd );
+int commands_toggle_quiet_screenshots( commands_t *cmd );
 int commands_show_bars( commands_t *cmd );
 int commands_print_debug( commands_t *cmd );
 int commands_take_screenshot( commands_t *cmd );

@@ -882,8 +882,10 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
 
 static void build_output_menu( menu_t *menu, int widescreen,
                                int fullscreen, int alwaysontop,
-                               int fullscreen_supported, int alwaysontop_supported,
-                               int overscan_supported )
+                               int fullscreen_supported,
+                               int alwaysontop_supported,
+                               int overscan_supported,
+                               int quiet_screenshots )
 {
     char string[ 128 ];
     int cur = 1;
@@ -937,6 +939,14 @@ static void build_output_menu( menu_t *menu, int widescreen,
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ALWAYSONTOP, "" );
         cur++;
     }
+
+    snprintf( string, sizeof( string ), quiet_screenshots ?
+              TVTIME_ICON_GENERALTOGGLEON "  %s" :
+              TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+              _("Quiet screenshots") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_TOGGLE_QUIET_SCREENSHOTS, "" );
+    cur++;
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
@@ -1180,6 +1190,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int restarttvtime = 0;
     int return_value = 0;
     int last_current_id = -1;
+    int quiet_screenshots = 0;
     int i;
 
     ct = config_new();
@@ -1541,6 +1552,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         commands_handle( commands, TVTIME_TOGGLE_FRAMERATE, 0 );
     }
 
+    /* If we want quiet screenshots, make sure we do that. */
+    quiet_screenshots = config_get_quiet_screenshots( ct );
+
     /* If we are a new install, show the menu. */
     if( station_is_new_install( stationmgr ) ) {
         commands_handle( commands, TVTIME_SHOW_MENU, 0 );
@@ -1564,7 +1578,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                        output->is_fullscreen(), output->is_alwaysontop(),
                        output->is_fullscreen_supported(),
                        output->is_alwaysontop_supported(),
-                       output->is_overscan_supported() );
+                       output->is_overscan_supported(),
+                       quiet_screenshots );
     build_matte_menu( commands_get_menu( commands, "matte" ),
                       matte_mode, sixteennine );
     build_fspos_menu( commands_get_menu( commands, "fspos" ),
@@ -1714,7 +1729,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                output->is_alwaysontop(),
                                output->is_fullscreen_supported(),
                                output->is_alwaysontop_supported(),
-                               output->is_overscan_supported() );
+                               output->is_overscan_supported(),
+                               quiet_screenshots );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_alwaysontop( commands ) ) {
@@ -1735,7 +1751,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                output->is_alwaysontop(),
                                output->is_fullscreen_supported(),
                                output->is_alwaysontop_supported(),
-                               output->is_overscan_supported() );
+                               output->is_overscan_supported(),
+                               quiet_screenshots );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_aspect( commands ) ) {
@@ -1770,7 +1787,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                output->is_alwaysontop(),
                                output->is_fullscreen_supported(),
                                output->is_alwaysontop_supported(),
-                               output->is_overscan_supported() );
+                               output->is_overscan_supported(),
+                               quiet_screenshots );
             build_matte_menu( commands_get_menu( commands, "matte" ),
                               matte_mode, sixteennine );
             commands_refresh_menu( commands );
@@ -1789,6 +1807,25 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             config_save( ct, "FullscreenPosition",
                          commands_get_fs_pos( commands ) );
             build_fspos_menu( commands_get_menu( commands, "fspos" ), newpos );
+            commands_refresh_menu( commands );
+        }
+        if( commands_toggle_quiet_screenshots( commands ) ) {
+            quiet_screenshots = !quiet_screenshots;
+            build_output_menu( commands_get_menu( commands, "output" ),
+                               sixteennine,
+                               output->is_fullscreen(),
+                               output->is_alwaysontop(),
+                               output->is_fullscreen_supported(),
+                               output->is_alwaysontop_supported(),
+                               output->is_overscan_supported(),
+                               quiet_screenshots );
+            if( osd ) {
+                if( quiet_screenshots ) {
+                    tvtime_osd_show_message( osd, _("Screenshot messages disabled.") );
+                } else {
+                    tvtime_osd_show_message( osd, _("Screenshot messages enabled.") );
+                }
+            }
             commands_refresh_menu( commands );
         }
         if( commands_toggle_matte( commands ) ||
@@ -2268,7 +2305,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                                        width, height, width * 2 );
                     }
                     asprintf( &message, _("Screenshot: %s"), basename );
-                    if( osd ) tvtime_osd_show_message( osd, message );
+                    if( osd && !quiet_screenshots ) {
+                        tvtime_osd_show_message( osd, message );
+                    }
                     screenshot = 0;
                 }
                 output->unlock_output_buffer();
@@ -2411,7 +2450,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     }
                     snprintf( message, sizeof( message ),
                               _("Screenshot: %s"), basename );
-                    if( osd ) tvtime_osd_show_message( osd, message );
+                    if( osd && !quiet_screenshots ) {
+                        tvtime_osd_show_message( osd, message );
+                    }
                     screenshot = 0;
                 }
                 output->unlock_output_buffer();
@@ -2485,6 +2526,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     snprintf( number, 4, "%d", output->is_alwaysontop() );
     config_save( ct, "AlwaysOnTop", number );
+
+    snprintf( number, 4, "%d", quiet_screenshots );
+    config_save( ct, "QuietScreenshots", number );
 
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );

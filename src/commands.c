@@ -128,6 +128,7 @@ struct commands_s {
     int toggledeinterlacer;
     int togglepulldowndetection;
     int togglematte;
+    int togglequiet;
     int framerate;
     int scan_channels;
     int pause;
@@ -997,6 +998,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->toggledeinterlacer = 0;
     cmd->togglepulldowndetection = 0;
     cmd->togglematte = 0;
+    cmd->togglequiet = 0;
     cmd->framerate = FRAMERATE_FULL;
     cmd->scan_channels = 0;
     cmd->pause = 0;
@@ -3125,6 +3127,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_MATTE:
         cmd->togglematte = 1;
         break;
+
+    case TVTIME_TOGGLE_QUIET_SCREENSHOTS:
+        cmd->togglequiet = 1;
+        break;
     }
 }
 
@@ -3218,6 +3224,7 @@ void commands_next_frame( commands_t *cmd )
     cmd->toggledeinterlacer = 0;
     cmd->togglepulldowndetection = 0;
     cmd->togglematte = 0;
+    cmd->togglequiet = 0;
     cmd->update_luma = 0;
     cmd->resizewindow = 0;
     cmd->setdeinterlacer = 0;
@@ -3284,6 +3291,11 @@ int commands_toggle_pulldown_detection( commands_t *cmd )
 int commands_toggle_matte( commands_t *cmd )
 {
     return cmd->togglematte;
+}
+
+int commands_toggle_quiet_screenshots( commands_t *cmd )
+{
+    return cmd->togglequiet;
 }
 
 void commands_set_vbidata( commands_t *cmd, vbidata_t *vbi )

@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Added an option for making screenshots "quiet", where they
+      will not announce themselves on the OSD.
   * vektor: Added a compatibility layer for xawtv-remote and the
       corresponding _XAWTV_REMOTE window property.
   * vektor: Added support for the _XAWTV_STATION window property, which
