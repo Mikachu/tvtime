@@ -43,53 +43,6 @@
 /* Mode list. */
 typedef struct tvtime_modelist_s tvtime_modelist_t;
 
-/* Key names. */
-typedef struct key_name_s key_name_t;
-
-struct key_name_s {
-    char *name;
-    int key;
-};
-
-static key_name_t key_names[] = {
-    { "Up", I_UP },
-    { "Down", I_DOWN },
-    { "Left", I_LEFT },
-    { "Right", I_RIGHT },
-    { "Insert", I_INSERT },
-    { "Home", I_HOME },
-    { "End", I_END },
-    { "pgup", I_PGUP },
-    { "pgdn", I_PGDN },
-    { "pg up", I_PGUP },
-    { "pg dn", I_PGDN },
-    { "PageUp", I_PGUP },
-    { "PageDown", I_PGDN },
-    { "Page Up", I_PGUP },
-    { "Page Down", I_PGDN },
-    { "F1", I_F1 },
-    { "F2", I_F2 },
-    { "F3", I_F3 },
-    { "F4", I_F4 },
-    { "F5", I_F5 },
-    { "F6", I_F6 },
-    { "F7", I_F7 },
-    { "F8", I_F8 },
-    { "F9", I_F9 },
-    { "F10", I_F10 },
-    { "F11", I_F11 },
-    { "F12", I_F12 },
-    { "F13", I_F13 },
-    { "F14", I_F14 },
-    { "F15", I_F15 },
-    { "Backspace", I_BACKSPACE },
-    { "Escape", I_ESCAPE },
-    { "Enter", I_ENTER },
-    { "Print", I_PRINT },
-    { "Menu", I_MENU },
-    { 0, 0 }
-};
-
 struct config_s
 {
     int outputheight;
@@ -199,19 +152,6 @@ static unsigned int parse_colour( const char *str )
         return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
     } else if( ret == 4 ) {
         return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
-    }
-
-    return 0;
-}
-
-static int match_special_key( const char *str )
-{
-    int count;
-
-    for( count = 0; key_names[ count ].name; count++ ) {
-        if( !xmlStrcasecmp( BAD_CAST str, BAD_CAST key_names[ count ].name ) ) {
-            return key_names[ count ].key;
-        }
     }
 
     return 0;
@@ -371,7 +311,7 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
             if( !xmlStrcasecmp( binding->name, BAD_CAST "keyboard" ) ) {
                 xmlChar *key = xmlGetProp( binding, BAD_CAST "key" );
                 if( key ) {
-                    int keycode = match_special_key( (const char *) key );
+                    int keycode = input_string_to_special_key( (const char *) key );
                     if( !keycode ) {
                         keycode = (*key);
                     }
