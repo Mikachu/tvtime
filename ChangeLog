@@ -1,5 +1,7 @@
 
 0.9.8
+  * (vektor) Completely removed the scanline bias code, I don't think it's
+    the right hting to do.
   * (vektor) We now depend on libxml2 in our configure script.
   * (vektor) Enabled the console code.
   * (batchall) Stations are now saved in ~/.tvime/stationrc. Happy editing.

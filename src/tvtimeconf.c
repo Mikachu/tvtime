@@ -90,7 +90,6 @@ static Cmd_Names cmd_table[] = {
     { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
-    { "DETECT_SCANLINE_BIAS", TVTIME_DETECT_SCANLINE_BIAS },
     { "CHANNEL_1", TVTIME_CHANNEL_1 },
     { "CHANNEL_2", TVTIME_CHANNEL_2 },
     { "CHANNEL_3", TVTIME_CHANNEL_3 },
@@ -143,9 +142,6 @@ struct config_s
 
     double hoverscan;
     double voverscan;
-
-    int left_scanline_bias;
-    int right_scanline_bias;
 
     char config_filename[ 1024 ];
 };
@@ -466,12 +462,6 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->check_freq_present = atoi( tmp );
     }
 
-    if( (tmp = parser_get( pf, "LeftScanlineBias", 1 )) ) {
-        ct->left_scanline_bias = atoi( tmp );
-    }
-    if( (tmp = parser_get( pf, "RightScanlineBias", 1 )) ) {
-        ct->right_scanline_bias = atoi( tmp );
-    }
     if( (tmp = parser_get( pf, "Overscan", 1 )) ) {
         ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
         ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
@@ -576,8 +566,6 @@ config_t *config_new( int argc, char **argv )
     ct->start_channel = 1;
     ct->hoverscan = 0.0;
     ct->voverscan = 0.0;
-    ct->left_scanline_bias = 0;
-    ct->right_scanline_bias = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -956,15 +944,5 @@ void config_set_vertical_overscan( config_t *ct, double voverscan )
     } else {
         ct->voverscan = voverscan;
     }
-}
-
-int config_get_left_scanline_bias( config_t *ct )
-{
-    return ct->left_scanline_bias;
-}
-
-int config_get_right_scanline_bias( config_t *ct )
-{
-    return ct->right_scanline_bias;
 }
 
