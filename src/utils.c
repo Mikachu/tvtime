@@ -643,14 +643,12 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION);
 }
 
-static iconv_t cd = NULL;
+static iconv_t cd = 0;
 
 void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
-    char *codeset;
     char *mycodeset = nl_langinfo( CODESET );
-    char *errfmt;
 
 #ifdef LC_MESSAGES
     setlocale( LC_MESSAGES, "" );
@@ -666,19 +664,21 @@ void setup_i18n( void )
      * we can just leave cd as NULL and allow lprintf/lputs & co to short-
      * circuit.
      */
-    if( !strcmp ( mycodeset, "UTF-8" ) ) {
+    if( !strcmp( mycodeset, "UTF-8" ) ) {
+        char *codeset;
+        char *errfmt;
+
         cd = iconv_open( mycodeset, "UTF-8" );
-        if( cd == (iconv_t)(-1) ) {
+        if( cd == (iconv_t) (-1) ) {
             /**
              * This error message is displayed using fprintf, NOT LFPRINTF, 
              * since we have not yet called bind_textdomain_codeset, so
              * gettext is still returning in the user's locale charset.
              */
-            fprintf( stderr,
-                     _("Failed to initialize UTF-8 to %s converter: "
+            fprintf( stderr, _("Failed to initialize UTF-8 to %s converter: "
                      "iconv_open failed (%s).\n"),
                      mycodeset, strerror( errno ) );
-            cd = NULL; /* (iconv_t)(-1) is retarded. */
+            cd = 0; /* (iconv_t) (-1) is retarded. */
         }
 
         /**
@@ -721,8 +721,9 @@ int lfputs( const char *s, FILE *stream )
     int nonreversible = 0;
     
     /* conversion not neccecary. save our time. */
-    if( !cd )
+    if( !cd ) {
         return fputs( s, stream );
+    }
     
     while( inbytesleft > 0 ) {
         ret = iconv( cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft );
@@ -774,17 +775,19 @@ static int lvfprintf( FILE *stream, const char *format, va_list ap )
 {
 #ifdef ENABLE_NLS
     static char str[4096];
-    char *mycodeset = nl_langinfo( CODESET );
     int ret = -1;
     
     /* conversion not neccecary. save our time. */
-    if ( !cd )
+    if( !cd ) {
         return vfprintf( stream, format, ap );
+    }
     
     ret = vsnprintf( str, sizeof str, format, ap );
     
-    if( lfputs( str, stream ) == EOF)
+    if( lfputs( str, stream ) == EOF ) {
         ret = -1;
+    }
+
     /* else, ret remains as the return value from vsnprintf () */
     free( str );
     return ret;
