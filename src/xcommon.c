@@ -1005,10 +1005,10 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
             load_icon( data );
             XChangeProperty( display, wm_window, net_wm_icon, cardinal, 32,
                              PropModeReplace,
-                             (const unsigned char*) data, 1026 * 4 );
+                             (const unsigned char*) data, 1026 );
             XChangeProperty( display, fs_window, net_wm_icon, cardinal, 32,
                              PropModeReplace, (const unsigned char*) data,
-                             1026 * 4 );
+                             1026 );
             free( data );
         }
     }
