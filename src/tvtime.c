@@ -523,7 +523,13 @@ int main( int argc, char **argv )
                          "available, exiting.\n" );
         return 1;
     }
-    curmethodid = 0;
+    curmethodid = config_get_preferred_deinterlace_method( ct );
+	if( curmethodid >= get_num_deinterlace_methods() ||
+		curmethodid < 0) {
+		fprintf( stderr, "tvtime: Invalid preferred deinterlace method, "
+				 "exiting.\n" );
+		return 1;
+	}
     curmethod = get_deinterlace_method( curmethodid );
 
     /* Build colourbars. */
