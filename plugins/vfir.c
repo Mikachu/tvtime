@@ -31,11 +31,12 @@
 #include "deinterlace.h"
 
 /**
- * This is an implementation of the deinterlacer filter described in
- * the MPEG2 specification for two-field aperature.
+ * The MPEG2 spec uses a slightly harsher filter, they specify
+ * [-1 8 2 8 -1].  ffmpeg uses a similar filter but with more of
+ * a tendancy to blur than to use the local information.  The
+ * filter taps here are: [-1 4 2 4 -1].
  */
 
-/* filter parameters: [-1 4 2 4 -1] // 8 */
 static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
                               unsigned char *lum_m3, unsigned char *lum_m2,
                               unsigned char *lum_m1, unsigned char *lum, int size )
@@ -83,11 +84,11 @@ static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
         paddw_r2r(mm3,mm1);
         psllw_i2r(1,mm2);
         paddw_r2r(mm4,mm0);
-        psllw_i2r(2,mm1);
+        psllw_i2r(2,mm1);// 2
         paddw_r2r(mm6,mm2);
         paddw_r2r(mm2,mm1);
         psubusw_r2r(mm0,mm1);
-        psrlw_i2r(3,mm1);
+        psrlw_i2r(3,mm1); // 3
         packuswb_r2r(mm7,mm1);
         movd_r2m(mm1,dst[0]);
         lum_m4+=4;
@@ -112,9 +113,7 @@ static void deinterlace_scanline_vfir( unsigned char *output,
                                        int width )
 {
     deinterlace_line( output, data->tt1, data->t0, data->m1, data->b0, data->bb1, width*2 );
-/*
-    blit_packed422_scanline( output, data->m1, width );
-*/
+    // blit_packed422_scanline( output, data->m1, width );
 }
 
 static void copy_scanline( unsigned char *output,
@@ -122,20 +121,20 @@ static void copy_scanline( unsigned char *output,
                            int width )
 {
     blit_packed422_scanline( output, data->m0, width );
-/*
+    /*
     if( data->bottom_field ) {
         deinterlace_line( output, data->tt2, data->t1, data->m2, data->b1, data->bb2, width*2 );
     } else {
         deinterlace_line( output, data->tt0, data->t1, data->m0, data->b1, data->bb0, width*2 );
     }
-*/
+    */
 }
 
 
 static deinterlace_method_t vfirmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "MPEG2 Spacial Scalability Filter",
+    "Vertical deinterlace filter",
     "Vertical FIR",
     1,
     0,
