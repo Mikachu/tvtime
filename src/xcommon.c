@@ -66,6 +66,17 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
+/**
+ * Called after mapping a window - waits until the window is mapped.
+ */
+static void x11_wait_mapped( Display *dpy, Window win )
+{
+    XEvent event;
+    do {
+        XMaskEvent( dpy, StructureNotifyMask, &event );
+    } while ( (event.type != MapNotify) || (event.xmap.event != win) );
+}
+
 static int have_xtestextention( void )
 {  
 #ifdef HAVE_XTESTEXTENSION
@@ -424,6 +435,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
+    x11_wait_mapped( display, wm_window );
 
     /* Wait for map. */
     XMaskEvent( display, StructureNotifyMask, &xev );
@@ -518,17 +530,6 @@ void xcommon_clear_screen( void )
     XFillRectangle( display, output_window, gc, video_area.x, video_area.y,
                     video_area.width, video_area.height );
     XSync( display, False );
-}
-
-/**
- * Called after mapping a window - waits until the window is mapped.
- */
-static void x11_wait_mapped( Display *dpy, Window win )
-{
-    XEvent event;
-    do {
-        XMaskEvent( dpy, StructureNotifyMask, &event );
-    } while ( (event.type != MapNotify) || (event.xmap.event != win) );
 }
 
 /**
