@@ -263,6 +263,9 @@ AC_CONFIG_FILES([
 	src/Makefile
 	intl/Makefile
 	po/Makefile.in
-	m4/Makefile 
+	m4/Makefile
+	docs/man/Makefile
+	docs/man/de/Makefile
+	docs/man/en/Makefile
 ])
 AC_OUTPUT

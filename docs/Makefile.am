@@ -15,10 +15,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+SUBDIRS = man
+
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 
-man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5 \
-	tvtime-configure.1 tvtime-scanner.1
 docs_html = html/default.tvtime.xml html/help.html html/index.html \
 	html/lirc.html html/little-screenshot.jpg html/problems.html \
 	html/screenshot-small.jpg html/toshiba-16x9-screenshot.jpg \
@@ -27,7 +27,7 @@ docs_html = html/default.tvtime.xml html/help.html html/index.html \
 	html/remote-small.jpg html/remote-nomenu-small.jpg \
 	html/example.lircrc html/zoran-email.txt
 
-EXTRA_DIST = $(man_MANS) $(docs_html) tvtime.16x16.png \
+EXTRA_DIST = $(docs_html) tvtime.16x16.png \
 	tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
 
 # We use $(datadir)/applications from the freedesktop spec

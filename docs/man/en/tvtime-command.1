@@ -1,0 +1,549 @@
+.\" Man page for tvtime-command
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH tvtime-command 1 "July 2004" "tvtime 0.9.13"
+
+.SH NAME
+tvtime\-command \- control a running
+.B tvtime
+process
+
+.SH SYNOPSIS
+
+.B tvtime\-command
+.RI [\| COMMAND "\|] ..."
+
+.SH DESCRIPTION
+
+.B tvtime\-command
+allows a user to control a running
+.B tvtime
+process by sending it commands.  It communicates with
+.B tvtime
+through a FIFO, otherwise known as a named pipe.  Commands are 
+case\-insensitive, and are executed in order.
+
+.SH COMMANDS
+
+.TP
+.B AUTO_ADJUST_PICT
+Restores the picture settings (brightness, contrast, hue, colour) to
+their default values.
+
+.TP
+.B AUTO_ADJUST_WINDOW
+Automatically resize the window to match the content inside it.  This
+is for when you resize tvtime into, say, a long rectangle, and want it
+to jump back to being a perfect 4:3 box around the content.
+
+.TP
+.B BRIGHTNESS_DOWN
+Lowers the brightness setting on the input.
+
+.TP
+.B BRIGHTNESS_UP
+Increases the brightness setting on the input.
+
+.TP
+.B CHANNEL_[0\-9]
+Simulates a keypad number press.
+
+.TP
+.B CHANNEL_ACTIVATE_ALL
+Re-activates all channels in the list.  Use this to re-initialize the
+channel list before running the scanner if you believe some channels are
+missing, or if new channels have become available.
+
+.TP
+.B CHANNEL_DEC / CHANNEL_DOWN
+Move one channel down in the channel list.
+
+.TP
+.B CHANNEL_INC / CHANNEL_UP
+Move one channel up in the channel list.
+
+.TP
+.B CHANNEL_JUMP / CHANNEL_PREV
+Changes to the last channel you were at.  Useful for jumping back and
+forth between two programs on distant channels.
+
+.TP
+.B CHANNEL_RENUMBER
+Renumbers the current channel.  This will swap the current channel with
+the number you type in.  Use this to configure your station list to suit
+preference or locality.
+
+.TP
+.B CHANNEL_SAVE_TUNING
+Saves the current fine tuning settings as a custom channel in the
+station list.
+
+.TP
+.B CHANNEL_SCAN
+Walks from the current position through the channel list, disabling any
+channels for which no signal is detected.  This command is only
+available if signal checking is enabled.
+
+.TP
+.B CHANNEL_SKIP
+Toggles the current channel as being active or disabled in the station
+list.  You can use this to manually scan your channels and enable those
+with signal or disable duplicate stations.
+
+.TP
+.B COLOUR_DOWN / COLOR_DOWN
+Decreases the input colour picture setting.  This will make the image
+less colourful until it is black-and-white.
+
+.TP
+.B COLOUR_UP / COLOR_UP
+Increases the input colour picture setting.  This will give the image
+more colour.
+
+.TP
+.B CONTRAST_DOWN
+Decreases the contrast setting of the input.
+
+.TP
+.B CONTRAST_UP
+Increases the contrast setting of the input.
+
+.TP
+.B DISPLAY_INFO
+This will re-display the OSD for the current channel, showing the
+channel information, current deinterlacer and framerate, the time, and
+input settings.
+
+.TP
+.B DISPLAY_MESSAGE
+This will display a message along the bottom of the OSD.  Useful for
+cron jobs or other scripts to send notifications to a user running
+tvtime.
+
+.TP
+.B DOWN
+This command provides the dual functionality of channel down or menu arrow
+down, depending on whether the menu is currently active.  This command is
+to be used together with the LEFT, RIGHT and UP commands.
+
+.TP
+.B ENTER
+Sends a virtual enter command.  Use this when changing the channel:
+.br
+\h'4n'tvtime-command channel_1 channel_5 enter
+.br
+will change to channel 15.
+
+.TP
+.B FINETUNE_DOWN
+Decreases the fine tuning setting for the current channel.
+
+.TP
+.B FINETUNE_UP
+Increases the fine tuning for the current channel.
+
+.TP
+.B HUE_DOWN
+Decreases the hue setting of the input.
+
+.TP
+.B HUE_UP
+Increases the hue setting of the input.
+
+.TP
+.B KEY_EVENT
+Sends a fake keystroke event to tvtime.  This is useful for
+doing complex operations via a remote control, as you can
+indirect events to tvtime's internal key binding system.
+
+.TP
+.B LEFT
+This command provides the dual functionality of mixer volume down or
+menu back command, depending on whether the menu is currently active.
+This command is to be used together with the RIGHT, UP and DOWN commands.
+
+.TP
+.B LUMA_DOWN
+Decreases the luma correction value.
+
+.TP
+.B LUMA_UP
+Increases the luma correction value.
+
+.TP
+.B MENU_DOWN
+In menu mode, this command moves the cursor down one entry in the menu.
+
+.TP
+.B MENU_ENTER
+In menu mode, this command selects the current entry or moves forward
+one level in the menu.
+
+.TP
+.B MENU_EXIT
+In menu mode, this command shuts off the menu.
+
+.TP
+.B MENU_LEFT
+In menu mode, this command moves back one level in the menu.
+
+.TP
+.B MENU_RIGHT
+In menu mode, this command selects the current entry or moves forward
+one level in the menu.
+
+.TP
+.B MENU_UP
+In menu mode, this command moves the cursor up one entry in the menu.
+
+.TP
+.B MIXER_DOWN
+Decreases the volume setting for the Line In device from 
+.IR /dev/mixer .
+An optional parameter specifies the percentage to decrease by.
+
+.TP
+.B MIXER_TOGGLE_MUTE
+Toggles the mute status with the mixer, and not with the capture card
+like
+.B TOGGLE_MUTE
+does.
+
+.TP
+.B MIXER_UP
+Increases the volume setting for the Line In device from 
+.IR /dev/mixer .
+An optional parameter specifies the percentage to increase by.
+
+.TP
+.B NOOP
+The command to do nothing.  Useful for when you want to blank out one of
+the default key bindings in tvtime.
+
+.TP
+.B OVERSCAN_DOWN
+Decreases the overscan compensation amount.  This will show more of the
+captured input.
+
+.TP
+.B OVERSCAN_UP
+Increases the overscan compensation amount.  This will show less of the
+captured input.
+
+.TP
+.B PICTURE
+Selects which picture setting (brightness/contrast/colour/hue) to change
+using the
+.B PICTURE_UP
+and
+.B PICTURE_DOWN
+commands.
+
+.TP
+.B PICTURE_UP
+Increases the current picture setting value (brightness/contrast/colour/hue).
+
+.TP
+.B PICTURE_DOWN
+Decreases the current picture setting value (brightness/contrast/colour/hue).
+
+.TP
+.B RESTART
+Asks tvtime to restart itself.  This is used in the menu when we have changed
+a value that we can't yet change at runtime.
+
+.TP
+.B RIGHT
+This command provides the dual functionality of mixer volume up or
+menu enter command, depending on whether the menu is currently active.
+This command is to be used together with the LEFT, UP and DOWN commands.
+
+.TP
+.B RUN_COMMAND
+Instructs tvtime to spawn a command.  This can be used to start a program using
+a key in tvtime or lirc, such as to spawn mythepg or alevt.  Using
+tvtime-command run_command "xterm" will have tvtime call system( "xterm &" ).
+
+.TP
+.B SAVE_PICTURE_GLOBAL
+Saves the current picture settings as the global defaults.
+
+.TP
+.B SAVE_PICTURE_CHANNEL
+Saves the current picture settings as the defaults for the current channel
+on the tuner.
+
+.TP
+.B SCREENSHOT
+Asks
+.B tvtime
+to take a screenshot.  Screenshots are saved to the directory listed as
+the screenshot directory in the
+.I tvtime.xml
+configuration file.  The default is the
+running user's home directory.
+
+.TP
+.B SET_AUDIO_MODE
+This command takes a parameter and sets the current audio mode.  Valid
+options are "mono", "stereo", "sap", "lang1" or "lang2".
+
+.TP
+.B SET_DEINTERLACER
+This command takes a parameter and sets the current deinterlacer.  Valid
+options are the short name of any of the deinterlacers available in tvtime.
+
+.TP
+.B SET_FRAMERATE
+This command takes a parameter and sets the current framerate.  Valid
+options are "full", "top" and "bottom".
+
+.TP
+.B SET_FREQUENCY_TABLE
+This command takes a parameter and sets the current frequency table.
+
+.TP
+.B SET_FULLSCREEN_POSITION
+This command sets where widescreen output will be aligned when in fullscreen
+mode, either top for the top of the screen, center, or bottom.
+
+.TP
+.B SET_INPUT_WIDTH
+This command takes a parameter and sets the current input width in pixels.
+It will be used in tvtime after a restart.
+
+.TP
+.B SET_MATTE
+This command sets the matte to apply to the output.  This changes the
+size of the output window, and is useful for watching a 2.35:1 movie in
+a long, thin window, or for watching it at the top of the screen using
+the fullscreen position option.  Valid options here are 16:9, 1.85:1,
+2.35:1 or 4:3.
+
+.TP
+.B SET_NORM
+This command takes a parameter and sets the current television standard.
+It will be used in tvtime after a restart.
+
+.TP
+.B SET_STATION
+This command takes a station name or number as a parameter and changes
+the channel to the station given.
+
+.TP
+.B SET_XMLTV_LANGUAGE
+Set the preferred language code for XMLTV data. The argument can be
+either the two-letter language code according to ISO 639 or a number
+to select one of the known languages.
+
+.TP
+.B SHOW_DEINTERLACER_INFO
+Shows a help screen on the OSD describing the current deinterlacer setting.
+
+.TP
+.B SHOW_MENU
+This command is used to bring up the tvtime setup menu.
+
+.TP
+.B SHOW_STATS
+Shows a debug screen showing statistics about the running instance of tvtime.
+
+.TP
+.B SLEEP
+This command sets the sleep timer to tell tvtime to shut itself off after
+a certain amount of time.  Sending this command will first activate the feature,
+and sending it again will increase the timer up until a maximum value at which
+point it is shut off.
+
+.TP
+.B TOGGLE_ALWAYSONTOP
+If supported by your window manager, this command will ask to have the
+window be put into an "always on top" state, where no other window can
+be stacked above it.
+
+.TP
+.B TOGGLE_ASPECT
+Toggles the display between 4:3 and 16:9 mode.  Use 16:9 mode if you
+have configured an external DVD player or satellite receiver to output
+anamorphic 16:9 content.
+
+.TP
+.B TOGGLE_AUDIO_MODE
+Toggles between the available audio modes on this channel.  It can take
+some time before the driver discovers that modes are available.
+
+.TP
+.B TOGGLE_BARS
+Asks
+.B tvtime
+to display colourbars.  The colourbars are generated by
+.B tvtime
+and are not related to the capture card, but simply to help
+configure your video card and display device.  Once your settings are
+correct with these colourbars, try colourbars from an input source like
+an external DVD player and make sure they match up.
+
+.TP
+.B TOGGLE_CC
+Enables closed caption information to be displayed in the
+.B tvtime
+window.
+Closed captioning is only available if you have enabled VBI reading in
+your
+.I tvtime.xml
+configuration file.
+
+.TP
+.B TOGGLE_CHANNEL_PAL_DK
+For PAL users, toggles the audio mode of the current channel between
+the PAL-BG and PAL-DK audio norms.
+
+.TP
+.B TOGGLE_CHROMA_KILL
+Enables or disables the chroma killer filter, which makes the input
+black and white.  Useful when watching a black-and-white movie to avoid
+chrominance artifacts.
+
+.TP
+.B TOGGLE_COLOR_INVERT / TOGGLE_COLOUR_INVERT
+Turns on or off the colour invert filter.  This is (apparently) useful
+for users of the Australian cable company Optus who want to avoid using
+the decryption boxes and tune using their capture card directly.
+
+.TP
+.B TOGGLE_DEINTERLACER
+This toggles between the available deinterlacing methods.
+
+.TP
+.B TOGGLE_FULLSCREEN
+This toggles between fullscreen and windowed mode.
+
+.TP
+.B TOGGLE_FRAMERATE
+Toggles the framerate at which
+.B tvtime
+will output.  Options are full frame
+rate (every field deinterlaced to a frame), half frame rate TFF (every
+top field deinterlaced to a frame) and half frame rate BFF (every bottom
+field deinterlaced to a frame).
+
+.TP
+.B TOGGLE_INPUT
+Switches the capture card input used.  Among the Inputs are: the
+tuner, composite, or S-Video connectors on the capture card.
+
+.TP
+.B TOGGLE_LUMA_CORRECTION
+This command enables or disables the luma correction feature.
+When enabled, this will try to correct for the incorrect colour space
+provided by bt848 and bt878 based capture cards.
+
+.TP
+.B TOGGLE_MATTE
+Switches between the available mattes.  This cuts off the top and
+bottom of the input picture to help fit the window to the image
+content.
+
+.TP
+.B TOGGLE_MIRROR
+Turns on or off the mirror filter, which flips the input.  This is
+useful for using tvtime with mirroring projectors, although I don't
+think it will actually work as intended yet since we don't mirror
+the OSD output.  :)  Comments appreciated.
+
+.TP
+.B TOGGLE_MUTE
+Toggles the mute state in the capture card (and not in
+your soundcard).
+
+.TP
+.B TOGGLE_NTSC_CABLE_MODE
+Toggles the NTSC cable mode settings: 
+.IR Standard ,
+.IR IRC ", and "
+.I HRC
+are available.
+
+.TP
+.B TOGGLE_PAL_DK_AUDIO
+For PAL users, toggles the default audio mode of all channels between
+the PAL-BG and PAL-DK audio norms.
+
+.TP
+.B TOGGLE_PAL_SECAM
+Toggles between PAL and SECAM on the current channel.  This feature is
+useful for regions which receive both PAL and SECAM channels, such that
+tvtime can be configured on a per-channel basis for the correct norm.
+
+.TP
+.B TOGGLE_PAUSE
+Enters pause mode.  Pause mode is a debugging feature used to
+test deinterlacer filters by allowing to see the output of a single set
+of frames with various deinterlacers.
+
+.TP
+.B TOGGLE_PULLDOWN_DETECTION
+Enables or disables the 2\[en]3 pulldown detection feature for NTSC input.
+
+.TP
+.B TOGGLE_QUIET_SCREENSHOTS
+When this option is turned on, screenshots will not announce themselves
+on the OSD.  This is useful if you intend to take a lot of screenshots,
+and don't want the text to interrupt your TV watching or appear in other
+screenshots.
+
+.TP
+.B TOGGLE_SIGNAL_DETECTION
+Toggles on and off tvtime's signal detection code.  Signal detection enables
+features like channel scanning and increases responsiveness on channels with
+poor reception, but may make it impossible to watch stations where the
+reception is too bad for the card to detect it reliably.
+
+.TP
+.B TOGGLE_XDS
+Toggles on and off tvtime's XDS decoding code.  XDS is used to send information
+about the channel including the network name and call letters, and
+sometimes information about the current show.  This information is then shown
+on the OSD and saved to the stationlist.xml file.
+
+.TP
+.B TOGGLE_XMLTV_LANGUAGE
+Toggles which language to show by default from the XMLTV file from
+the ones available in the file.
+
+.TP
+.B UP
+This command provides the dual functionality of channel up or menu arrow up,
+depending on whether the menu is currently active.  This command is to be
+used together with the LEFT, RIGHT and DOWN commands.
+
+.TP
+.B QUIT
+Asks the running
+.B tvtime
+process to exit.
+
+.SH AUTHORS
+
+Billy Biggs,
+Stewart Allen.
+
+.SH "SEE ALSO"
+
+.BR tvtime (1),
+.IR tvtime.xml (5),
+.IR stationlist.xml (5).
