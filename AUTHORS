@@ -133,6 +133,9 @@ Translators
   Michael Kim <lavnrose@e.sarang.net>
     - Korean translation.
 
+  Helder Correia <helder.correia@netcabo.pt>
+    - Portuguese translation.
+
 Packagers
 
   Bart Dorsey <echo@thebucket.org>
@@ -212,13 +215,6 @@ Code we stole (well, used under the GPL)
   MMX code for the MPEG2-style vertical [-1 4 2 4 -1]/8 deinterlacer
   filter from ffmpeg by Fabrice Bellard:
     http://ffmpeg.org/
-
-  wine direcory for win32 DLL loading support from libw32 in xine.
-    http://xine.sf.net/
-  win32 codec support in xine is based on work from:
-    avifile http://avifile.sf.net
-    MPlayer http://www.mplayerhq.hu/
-    wine    http://www.winehq.com
 
   Taglines courtesy of
     James Dewar, Adam Letts, Andrew Lewycky, Håkan Hjort, Billy Biggs,
