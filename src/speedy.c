@@ -108,6 +108,39 @@ void (*quarter_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *one,
                                                   uint8_t *three, int width );
 void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
                                                  uint8_t *bot, int subpixpos, int width );
+void (*composite_bars_packed4444_scanline)( uint8_t *output,
+                                            uint8_t *background, int width,
+                                            int a, int luma, int cb, int cr,
+                                            int percentage );
+void (*packed444_to_nonpremultiplied_packed4444_scanline)( uint8_t *output, 
+                                                           uint8_t *input,
+                                                           int width, int alpha );
+void (*aspect_adjust_packed4444_scanline)( uint8_t *output,
+                                           uint8_t *input, 
+                                           int width,
+                                           double pixel_aspect );
+void (*packed444_to_packed422_scanline)( uint8_t *output,
+                                         uint8_t *input,
+                                         int width );
+void (*packed422_to_packed444_scanline)( uint8_t *output,
+                                         uint8_t *input,
+                                         int width );
+void (*packed422_to_packed444_rec601_scanline)( uint8_t *dest,
+                                                uint8_t *src,
+                                                int width );
+void (*packed444_to_rgb24_rec601_scanline)( uint8_t *output,
+                                            uint8_t *input,
+                                            int width );
+void (*rgb24_to_packed444_rec601_scanline)( uint8_t *output,
+                                            uint8_t *input,
+                                            int width );
+void (*rgba32_to_packed4444_rec601_scanline)( uint8_t *output,
+                                              uint8_t *input,
+                                              int width );
+void (*chroma_422_to_444_mpeg2_plane)( uint8_t *dst, uint8_t *src,
+                                       int width, int height );
+void (*chroma_420_to_422_mpeg2_plane)( uint8_t *dst, uint8_t *src,
+                                       int width, int height, int progressive );
 
 
 /**
@@ -136,8 +169,8 @@ static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
 
 unsigned long CombJaggieThreshold = 73;
 
-unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
-                                                 uint8_t *bot, int width )
+static unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
+                                                        uint8_t *bot, int width )
 {
 #ifdef ARCH_X86
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
@@ -222,7 +255,7 @@ unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
 
 static unsigned long BitShift = 6;
 
-unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int width )
+static unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
 
@@ -242,7 +275,7 @@ unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old, int w
     return ret;
 }
 
-unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, int width )
+static unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
 
@@ -262,8 +295,7 @@ unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, 
     return ret;
 }
 
-
-unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int width )
+static unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int width )
 {
 #ifdef ARCH_X86
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
@@ -306,8 +338,8 @@ unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int
 
 #define ABS(a) (((a) < 0)?-(a):(a))
 
-void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
-                                  uint8_t *new, int os, int ns )
+static void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
+                                         uint8_t *new, int os, int ns )
 {
 #ifdef ARCH_X86
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
@@ -451,8 +483,8 @@ void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
 #endif
 }
 
-void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
-                                uint8_t *new, int os, int ns )
+static void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
+                                       uint8_t *new, int os, int ns )
 {
     int x, y, e=0, o=0, s=0, p=0, t=0;
     uint8_t *oldp, *newp;
@@ -480,7 +512,7 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
     m->d = e+o;
 }
 
-void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int width )
+static void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     width /= 2;
     while( width-- ) {
@@ -493,7 +525,7 @@ void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int wid
     }
 }
 
-void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int width )
+static void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     width /= 2;
     while( width-- ) {
@@ -513,7 +545,7 @@ void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int wid
  *
  * [-1 3 -6 12 -24 80 80 -24 12 -6 3 -1]
  */
-void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int width )
+static void packed422_to_packed444_rec601_scanline_c( uint8_t *dest, uint8_t *src, int width )
 {
     int i;
 
@@ -547,9 +579,9 @@ void packed422_to_packed444_rec601_scanline( uint8_t *dest, uint8_t *src, int wi
     }
 }
 
-void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
-{
 #ifdef ARCH_X86
+static void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
+{
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     const mmx_t nullchroma = { 0x8000800080008000ULL };
 
@@ -568,10 +600,10 @@ void kill_chroma_packed422_inplace_scanline_mmx( uint8_t *data, int width )
         data[ 1 ] = 128;
         data += 2;
     }
-#endif
 }
+#endif
 
-void kill_chroma_packed422_inplace_scanline_c( uint8_t *data, int width )
+static void kill_chroma_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     while( width-- ) {
         data[ 1 ] = 128;
@@ -603,7 +635,7 @@ void testing_packed422_inplace_scanline_c( uint8_t *data, int width, int scanlin
 }
 */
 
-void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
+static void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x, tmp1, tmp2;
     int width2 = width*2;
@@ -618,7 +650,7 @@ void mirror_packed422_inplace_scanline_c( uint8_t *data, int width )
     }
 }
 
-void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
+static void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int x;
 
@@ -628,7 +660,7 @@ void halfmirror_packed422_inplace_scanline_c( uint8_t *data, int width )
     }
 }
 
-void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
+static void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int r1 = 0;
     int r2 = 0;
@@ -644,7 +676,7 @@ void filter_luma_121_packed422_inplace_scanline_c( uint8_t *data, int width )
     }
 }
 
-void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
+static void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
 {
     int r1 = 0;
     int r2 = 0;
@@ -664,8 +696,8 @@ void filter_luma_14641_packed422_inplace_scanline_c( uint8_t *data, int width )
     }
 }
 
-void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
-                                       uint8_t *bot, int width )
+static void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
+                                              uint8_t *bot, int width )
 {
     int i;
 
@@ -674,10 +706,10 @@ void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
     }
 }
 
-void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
-                                         uint8_t *bot, int width )
-{
 #ifdef ARCH_X86
+static void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
+                                                uint8_t *bot, int width )
+{
     const mmx_t shiftmask = { 0xfefffefffefffeffULL };  /* To avoid shifting chroma to luma. */
     int i;
 
@@ -741,13 +773,13 @@ void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
     }
 
     emms();
-#endif
 }
+#endif
 
-void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
-                                            uint8_t *bot, int width )
-{
 #ifdef ARCH_X86
+static void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
+                                                   uint8_t *bot, int width )
+{
     int i;
 
     for( i = width/16; i; --i ) {
@@ -791,10 +823,10 @@ void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
 
     sfence();
     emms();
-#endif
 }
+#endif
 
-void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
+static void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
 {
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     uint32_t *o = (uint32_t *) output;
@@ -804,9 +836,9 @@ void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb
     }
 }
 
-void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int cb, int cr )
-{
 #ifdef ARCH_X86
+static void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int cb, int cr )
+{
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
 
@@ -841,12 +873,12 @@ void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int 
     }
 
     emms();
-#endif
 }
+#endif
 
-void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, int cb, int cr )
-{
 #ifdef ARCH_X86
+static void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, int cb, int cr )
+{
     uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
 
@@ -882,11 +914,11 @@ void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, i
 
     sfence();
     emms();
-#endif
 }
+#endif
 
-void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
-                                        int alpha, int luma, int cb, int cr )
+static void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
+                                               int alpha, int luma, int cb, int cr )
 {
     int j;
 
@@ -898,11 +930,11 @@ void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
     }
 }
 
-void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
-                                          int alpha, int luma,
-                                          int cb, int cr )
-{
 #ifdef ARCH_X86
+static void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
+                                                 int alpha, int luma,
+                                                 int cb, int cr )
+{
     uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
@@ -932,14 +964,14 @@ void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
     }
 
     emms();
-#endif
 }
+#endif
 
-void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
-                                             int alpha, int luma,
-                                             int cb, int cr )
-{
 #ifdef ARCH_X86
+static void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
+                                                    int alpha, int luma,
+                                                    int cb, int cr )
+{
     uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
@@ -970,8 +1002,8 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
 
     sfence();
     emms();
-#endif
 }
+#endif
 
 
 /**
@@ -999,16 +1031,16 @@ static inline __attribute__ ((always_inline,const)) void small_memcpy( void *to,
 }
 #endif
 
-void speedy_memcpy_c( void *dest, const void *src, size_t n )
+static void speedy_memcpy_c( void *dest, const void *src, size_t n )
 {
     if( dest != src ) {
         memcpy( dest, src, n );
     }
 }
 
-void speedy_memcpy_mmx( void *d, const void *s, size_t n )
-{
 #ifdef ARCH_X86
+static void speedy_memcpy_mmx( void *d, const void *s, size_t n )
+{
     const uint8_t *src = s;
     uint8_t *dest = d;
 
@@ -1047,12 +1079,12 @@ void speedy_memcpy_mmx( void *d, const void *s, size_t n )
 
         emms();
     }
-#endif
 }
+#endif
 
-void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
-{
 #ifdef ARCH_X86
+static void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
+{
     const uint8_t *src = s;
     uint8_t *dest = d;
 
@@ -1092,26 +1124,30 @@ void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
         sfence();
         emms();
     }
-#endif
 }
+#endif
 
-void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
+static void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
 {
     speedy_memcpy_c( dest, src, width*2 );
 }
 
-void blit_packed422_scanline_mmx( uint8_t *dest, const uint8_t *src, int width )
+#ifdef ARCH_X86
+static void blit_packed422_scanline_mmx( uint8_t *dest, const uint8_t *src, int width )
 {
     speedy_memcpy_mmx( dest, src, width*2 );
 }
+#endif
 
-void blit_packed422_scanline_mmxext( uint8_t *dest, const uint8_t *src, int width )
+#ifdef ARCH_X86
+static void blit_packed422_scanline_mmxext( uint8_t *dest, const uint8_t *src, int width )
 {
     speedy_memcpy_mmxext( dest, src, width*2 );
 }
+#endif
 
-void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
-                                                         uint8_t *foreground, int width, int alpha )
+static void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
+                                                                uint8_t *foreground, int width, int alpha )
 {
     int i;
 
@@ -1168,12 +1204,12 @@ void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_
     }
 }
 
-void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
-                                                              uint8_t *input,
-                                                              uint8_t *foreground,
-                                                              int width, int alpha )
-{
 #ifdef ARCH_X86
+static void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
+                                                                     uint8_t *input,
+                                                                     uint8_t *foreground,
+                                                                     int width, int alpha )
+{
     const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
     const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
     const mmx_t round  = { 0x0080008000800080ULL };
@@ -1267,11 +1303,11 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
     }
     sfence();
     emms();
-#endif
 }
+#endif
 
-void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
-                                                   uint8_t *foreground, int width )
+static void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
+                                                          uint8_t *foreground, int width )
 {
     int i;
     for( i = 0; i < width; i++ ) {
@@ -1310,10 +1346,10 @@ void composite_packed4444_to_packed422_scanline_c( uint8_t *output, uint8_t *inp
 }
 
 
-void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t *input,
-                                                        uint8_t *foreground, int width )
-{
 #ifdef ARCH_X86
+static void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t *input,
+                                                               uint8_t *foreground, int width )
+{
     const mmx_t alpha2 = { 0x0000FFFF00000000ULL };
     const mmx_t alpha1 = { 0xFFFF0000FFFFFFFFULL };
     const mmx_t round  = { 0x0080008000800080ULL };
@@ -1402,8 +1438,8 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
     }
     sfence();
     emms();
-#endif
 }
+#endif
 
 /**
  * um... just need some scrap paper...
@@ -1413,12 +1449,12 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
  *     = B + a*(textluma - B)
  *   Da = (1 - a)*b + a
  */
-void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
-                                                   uint8_t *input,
-                                                   uint8_t *mask,
-                                                   int width,
-                                                   int textluma, int textcb,
-                                                   int textcr )
+static void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
+                                                          uint8_t *input,
+                                                          uint8_t *mask,
+                                                          int width,
+                                                          int textluma, int textcb,
+                                                          int textcr )
 {
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
@@ -1444,14 +1480,14 @@ void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
     }
 }
 
-void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
-                                                        uint8_t *input,
-                                                        uint8_t *mask,
-                                                        int width,
-                                                        int textluma, int textcb,
-                                                        int textcr )
-{
 #ifdef ARCH_X86
+static void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
+                                                               uint8_t *input,
+                                                               uint8_t *mask,
+                                                               int width,
+                                                               int textluma, int textcb,
+                                                               int textcr )
+{
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     const mmx_t round = { 0x0080008000800080ULL };
     const mmx_t fullalpha = { 0x00000000000000ffULL };
@@ -1540,14 +1576,14 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
     }
     sfence();
     emms();
-#endif
 }
+#endif
 
-void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
-                                                         uint8_t *input,
-                                                         uint8_t *mask, int width,
-                                                         int textluma, int textcb,
-                                                         int textcr, int alpha )
+static void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
+                                                                uint8_t *input,
+                                                                uint8_t *mask, int width,
+                                                                int textluma, int textcb,
+                                                                int textcr, int alpha )
 {
     uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
@@ -1577,7 +1613,7 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
     }
 }
 
-void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int width )
+static void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     while( width-- ) {
         unsigned int cur_a = input[ 0 ];
@@ -1592,9 +1628,9 @@ void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int wid
     }
 }
 
-void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, int width )
-{
 #ifdef ARCH_X86
+static void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, int width )
+{
     const mmx_t round  = { 0x0080008000800080ULL };
     const mmx_t alpha  = { 0x00000000000000ffULL };
     const mmx_t noalp  = { 0xffffffffffff0000ULL };
@@ -1628,11 +1664,11 @@ void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, in
     }
     sfence();
     emms();
-#endif
 }
+#endif
 
-void blend_packed422_scanline_c( uint8_t *output, uint8_t *src1,
-                                 uint8_t *src2, int width, int pos )
+static void blend_packed422_scanline_c( uint8_t *output, uint8_t *src1,
+                                        uint8_t *src2, int width, int pos )
 {
     if( pos == 0 ) {
         blit_packed422_scanline( output, src1, width );
@@ -1648,10 +1684,10 @@ void blend_packed422_scanline_c( uint8_t *output, uint8_t *src1,
     }
 }
 
-void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
-                                      uint8_t *src2, int width, int pos )
-{
 #ifdef ARCH_X86
+static void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
+                                             uint8_t *src2, int width, int pos )
+{
     if( pos <= 0 ) {
         blit_packed422_scanline( output, src1, width );
     } else if( pos >= 256 ) {
@@ -1690,13 +1726,13 @@ void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
         sfence();
         emms();
     }
-#endif
 }
+#endif
 
-void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *one,
-                                                      uint8_t *three, int width )
-{
 #ifdef ARCH_X86
+static void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *one,
+                                                             uint8_t *three, int width )
+{
     int i;
 
     for( i = width/16; i; --i ) {
@@ -1747,12 +1783,12 @@ void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *
 
     sfence();
     emms();
-#endif
 }
+#endif
 
 
-void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *one,
-                                                 uint8_t *three, int width )
+static void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *one,
+                                                        uint8_t *three, int width )
 {
     width *= 2;
     while( width-- ) {
@@ -1762,8 +1798,8 @@ void quarter_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *one,
     }
 }
 
-void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
-                                                uint8_t *bot, int subpixpos, int width )
+static void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
+                                                       uint8_t *bot, int subpixpos, int width )
 {
     if( subpixpos == 32768 ) {
         interpolate_packed422_scanline( output, top, bot, width );
@@ -1781,8 +1817,8 @@ void subpix_blit_vertical_packed422_scanline_c( uint8_t *output, uint8_t *top,
     }
 }
 
-void a8_subpix_blit_scanline_c( uint8_t *output, uint8_t *input,
-                                int lasta, int startpos, int width )
+static void a8_subpix_blit_scanline_c( uint8_t *output, uint8_t *input,
+                                       int lasta, int startpos, int width )
 {
     int pos = 0xffff - (startpos & 0xffff);
     int prev = lasta;
@@ -1930,7 +1966,7 @@ static void init_YCbCr_to_RGB_tables(void)
   conv_YR_inited = 1;
 }
 
-void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+static void rgb24_to_packed444_rec601_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
 
@@ -1947,7 +1983,7 @@ void rgb24_to_packed444_rec601_scanline( uint8_t *output, uint8_t *input, int wi
     }
 }
 
-void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+static void rgba32_to_packed4444_rec601_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
 
@@ -1966,7 +2002,7 @@ void rgba32_to_packed4444_rec601_scanline( uint8_t *output, uint8_t *input, int 
     }
 }
 
-void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int width )
+static void packed444_to_rgb24_rec601_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     if( !conv_YR_inited ) init_YCbCr_to_RGB_tables();
 
@@ -2002,7 +2038,7 @@ void packed444_to_rgb24_rec601_scanline( uint8_t *output, uint8_t *input, int wi
  * B-Y' = -0.299*R' - 0.587*G' + 0.886*B'
  * R-Y' =  0.701*R' - 0.587*G' - 0.114*B'
  */
-void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width )
+static void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width )
 {
     while( width-- ) {
         double yp = (((double) input[ 0 ]) - 16.0) / 255.0;
@@ -2027,9 +2063,9 @@ void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *inp
     }
 }
 
-void packed444_to_nonpremultiplied_packed4444_scanline( uint8_t *output, 
-                                                        uint8_t *input,
-                                                        int width, int alpha )
+static void packed444_to_nonpremultiplied_packed4444_scanline_c( uint8_t *output, 
+                                                                 uint8_t *input,
+                                                                 int width, int alpha )
 {
     int i;
 
@@ -2042,13 +2078,12 @@ void packed444_to_nonpremultiplied_packed4444_scanline( uint8_t *output,
         output += 4;
         input += 3;
     }
-
 }
 
-void aspect_adjust_packed4444_scanline( uint8_t *output,
-                                        uint8_t *input, 
-                                        int width,
-                                        double pixel_aspect )
+static void aspect_adjust_packed4444_scanline_c( uint8_t *output,
+                                                 uint8_t *input, 
+                                                 int width,
+                                                 double pixel_aspect )
 {
     double i;
     int prev_i = 0;
@@ -2094,10 +2129,10 @@ void aspect_adjust_packed4444_scanline( uint8_t *output,
 /**
  * Sub-pixel data bar renderer.  There are 128 bars.
  */
-void composite_bars_packed4444_scanline( uint8_t *output,
-                                         uint8_t *background, int width,
-                                         int a, int luma, int cb, int cr,
-                                         int percentage )
+static void composite_bars_packed4444_scanline_c( uint8_t *output,
+                                                  uint8_t *background, int width,
+                                                  int a, int luma, int cb, int cr,
+                                                  int percentage )
 {
     /**
      * This is the size of both the bar and the spacing in between in subpixel
@@ -2138,7 +2173,7 @@ void composite_bars_packed4444_scanline( uint8_t *output,
 }
 
 /* horizontal 1:2 interpolation filter */
-void mpeg2_422_to_444_plane_c( uint8_t *dst, uint8_t *src, int width, int height )
+static void chroma_422_to_444_mpeg2_plane_c( uint8_t *dst, uint8_t *src, int width, int height )
 {
     int i, i2, w, j, im2, im1, ip1, ip2, ip3;
 
@@ -2168,7 +2203,8 @@ void mpeg2_422_to_444_plane_c( uint8_t *dst, uint8_t *src, int width, int height
 }
 
 /* vertical 1:2 interpolation filter */
-void mpeg2_420_to_422_plane_c( uint8_t *dst, uint8_t *src, int width, int height, int progressive )
+static void chroma_420_to_422_mpeg2_plane_c( uint8_t *dst, uint8_t *src,
+                                             int width, int height, int progressive )
 {
     int w, h, i, j, j2;
     int jm6, jm5, jm4, jm3, jm2, jm1, jp1, jp2, jp3, jp4, jp5, jp6, jp7;
@@ -2298,6 +2334,17 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
     quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
     subpix_blit_vertical_packed422_scanline = subpix_blit_vertical_packed422_scanline_c;
+    composite_bars_packed4444_scanline = composite_bars_packed4444_scanline_c;
+    packed444_to_nonpremultiplied_packed4444_scanline = packed444_to_nonpremultiplied_packed4444_scanline_c;
+    aspect_adjust_packed4444_scanline = aspect_adjust_packed4444_scanline_c;
+    packed444_to_packed422_scanline = packed444_to_packed422_scanline_c;
+    packed422_to_packed444_scanline = packed422_to_packed444_scanline_c;
+    packed422_to_packed444_rec601_scanline = packed422_to_packed444_rec601_scanline_c;
+    packed444_to_rgb24_rec601_scanline = packed444_to_rgb24_rec601_scanline_c;
+    rgb24_to_packed444_rec601_scanline = rgb24_to_packed444_rec601_scanline_c;
+    rgba32_to_packed4444_rec601_scanline = rgba32_to_packed4444_rec601_scanline_c;
+    chroma_422_to_444_mpeg2_plane = chroma_422_to_444_mpeg2_plane_c;
+    chroma_420_to_422_mpeg2_plane = chroma_420_to_422_mpeg2_plane_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {

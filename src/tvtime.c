@@ -33,6 +33,9 @@
 #include <time.h>
 #include <stdint.h>
 #include <errno.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 #include "pngoutput.h"
 #include "pnginput.h"
 #include "videoinput.h"
@@ -62,11 +65,6 @@
 #include "pulldown.h"
 #include "utils.h"
 #include "cpuinfo.h"
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "mm_accel.h"
 
 /**
@@ -82,7 +80,7 @@
 enum {
     PULLDOWN_NONE = 0,
     PULLDOWN_VEKTOR = 1,
-    PULLDOWN_MAX = 2,
+    PULLDOWN_MAX = 2
 };
 static unsigned int pulldown_alg = 0;
 
@@ -123,7 +121,7 @@ static void build_colourbars( uint8_t *output, int width, int height )
     for( i = 0; i < height; i++ ) {
         uint8_t *curout = output + (i * width * 2);
         uint8_t *curin = cb444 + (i * width * 3);
-        packed444_to_packed422_scanline_c( curout, curin, width );
+        packed444_to_packed422_scanline( curout, curin, width );
     }
 
     free( cb444 );
