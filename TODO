@@ -17,3 +17,77 @@ Stuff to do
 10. Menu system like a real tv.
 11. Display of stereo/mono etc (maybe time/date) when changing
     channels or requested by keystroke.
+12. break apart main
+13. autotools stuff
+
+Longer term TODO stuff
+----------------------
+
+Menu stuff
+----------
+
+Picture
+    - brightness etc
+    - aspect ratio / window size
+
+Audio
+    - View info (stereo/mono etc)
+    - coolass audio graph thing overlayed on picture
+        - oscilloscope or bar graph
+
+Channel Scan
+    - scan channels and remember which ones have a signal
+    - auto skip signaless channels (a toggle)
+
+Parental Control
+    - different levels
+    - per channel
+    - one password per channel (md5 stored)
+
+PVR (eventually)
+    - pause/zoom doable now
+
+Setup
+    - Date/Time Display
+    - colours of OSD
+    - OSD font
+    - selection of info displayed at channel change
+
+TV Guide (keybinding to activate)
+    - use xmltv data
+    - display grid schedule
+    - use xmltv data when switching programs to display the program on 
+        the current channel
+    - use xmltv data to set channel text ("CNN")
+
+Language
+    - change osd language
+
+Input channel
+    - composite, tv, svideo etc. 
+    - dynamic base on cards capabilities
+    - bind 1..9 to an input
+
+Channel Preview (keybinding to activate)
+    - small shots of many channels
+    - allow channel selection
+
+Other Stuff
+-----------
+
+    - PIP for each card.
+    - Config file
+        - channels
+        - set all options menu has  
+        - all keybindings
+        - PAL/NTSC etc
+    - display time/date + channel text on channel change
+        - can use xmltv data to display more about programme
+    - render OSD stuff to overlay buffer rather than every object
+        every frame
+    - separate input when in menu mode
+    - ability to log tv watching habits
+        - all program info
+        - log on selectable events 
+            - (channel switch, input switch, start/quit etc)
+        - can do a lot with this
