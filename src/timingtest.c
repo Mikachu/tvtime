@@ -63,6 +63,7 @@ int main( int argc, char **argv )
 {
     unsigned char *source422packed;
     unsigned char *source422packed2;
+    unsigned char *source4444packed;
     unsigned char *dest422packed;
     uint64_t avg_sum = 0;
     uint64_t avg_count = 0;
@@ -105,9 +106,10 @@ int main( int argc, char **argv )
 
     source422packed = (unsigned char *) malloc( width * height * 2 );
     source422packed2 = (unsigned char *) malloc( width * height * 2 );
+    source4444packed = (unsigned char *) malloc( width * height * 4 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
 
-    if( !source422packed || !source422packed2 || !dest422packed ) {
+    if( !source422packed || !source422packed2 || !source4444packed || !dest422packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );
         return 1;
     }
@@ -115,6 +117,10 @@ int main( int argc, char **argv )
     for( i = 0; i < width*height*2; i++ ) {
         //source422packed[ i ] = i % 256;
         source422packed[ i ] = random() % 256;
+        source422packed2[ i ] = random() % 256;
+    }
+    for( i = 0; i < width*height*4; i++ ) {
+        source4444packed[ i ] = random() % 256;
     }
 
     /* Sleep to let the system cool off. */
