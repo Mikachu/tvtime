@@ -118,7 +118,7 @@ int main( int argc, char **argv )
     int volume;
     int debug = 0;
     osd_string_t *channel_number, *volume_bar, *muted_osd;
-    osd_shape_t *osd_rect;
+//    osd_shape_t *osd_rect;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
 
@@ -319,10 +319,17 @@ int main( int argc, char **argv )
             }
             if( commands & TVTIME_CHANNEL_UP || commands & TVTIME_CHANNEL_DOWN ) {
                 if( !videoinput_has_tuner( vidin ) ) {
-                    fprintf( stderr, "tvtime: Can't change channel, no tuner present!\n" );
+                    if( verbose )
+                        fprintf( stderr, "tvtime: Can't change channel, no tuner present!\n" );
                 } else {
-                    chanindex = (chanindex + ( (commands & TVTIME_CHANNEL_UP) ? 1 : -1) + chancount) % chancount;
-                    videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+                    int start_index = chanindex;
+                    do {
+                        chanindex = (chanindex + ( (commands & TVTIME_CHANNEL_UP) ? 1 : -1) + chancount) % chancount;
+
+                        if( chanindex == start_index ) break;
+
+                        videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+                    } while( !videoinput_freq_present( vidin ) );
                     if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
                     osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
                 }

@@ -430,6 +430,27 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
     }
 }
 
+int videoinput_freq_present( videoinput_t *vidin )
+{
+    if (vidin->tuner.tuner > -1) {
+
+        usleep( 100000 );
+
+        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+            perror( "ioctl VIDIOCGTUNER" );
+            return 0;
+        }
+
+#ifdef VERBOSE
+        fprintf( stderr, "videoinput: strength %d\n", vidin->tuner.signal );
+#endif
+
+        return( vidin->tuner.signal );
+    }
+
+    return 0;
+}
+
 void videoinput_delete( videoinput_t *vidin )
 {
 

@@ -114,6 +114,11 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz );
 int videoinput_get_tuner_freq( videoinput_t *vidin );
 
 /**
+ * Returns 1 if the frequency tuned to is a decent picture
+ */
+int videoinput_freq_present( videoinput_t *vidin );
+
+/**
  * Signal to the videoinput device that we're done reading the last frame, to
  * allow the hardware to use the buffer.
  */
