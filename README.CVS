@@ -1,0 +1,23 @@
+
+Notes about tvtime from CVS
+---------------------------
+
+1. Run the autogen.sh to generate everything.  This will
+   run configure.  It's all good.
+2. If autogen.sh fails, then you likely have an old
+   version of something.
+3. You will need automake more recent than 1.4, I think.
+   In debian I had to do 'apt-get install automake1.7' (or 1.6)
+   and I did update-alternatives --config automake at taaz'
+   suggestion to select automake 1.7.
+4. You cannot use autoconf2.13, I don't think.  Use 2.52
+   or better I think is the requirement.
+
+If you don't like any of that, well I don't feel all that
+inclined to revert back to old versions of autoconf or automake,
+since the only people this affects are those who run from CVS.
+When we start building regular betas it should be a bit better.
+
+Thoughts?  If something is wrong, please submit a bug report:
+http://www.sourceforge.net/projects/tvtime/
+
