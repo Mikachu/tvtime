@@ -50,6 +50,14 @@ void ft_font_delete( ft_font_t *font );
  */
 int ft_font_get_size( ft_font_t *font );
 
+/**
+ * Returns the max pixel height of the font.
+ */
+int ft_font_get_height( ft_font_t *font );
+
+/**
+ * Renders a given string with this font to the given buffer.
+ */
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
                      int subpix_pos, int *width, int *height, int outsize );
 

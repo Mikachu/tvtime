@@ -40,12 +40,14 @@ struct ft_font_s
     FT_Glyph bitmaps[ 256 ];
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
+    int max_height;
 };
 
 ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 {
     ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
     FT_Error error;
+    FT_BBox bbox;
     int xdpi, i;
 
     if( !font ) return 0;
@@ -81,11 +83,16 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     FT_Select_Charmap( font->face, ft_encoding_unicode );
 
+    bbox.yMin = INT_MAX;
+    bbox.yMax = -INT_MAX;
+
     for( i = 0; i < 256; i++ ) {
         FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
         font->glyphs[ i ] = 0;
 
         if( glyph_index ) {
+            FT_BBox glyph_bbox;
+
             error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
             if( error ) {
                 fprintf( stderr, "leetft: Can't load glyph %d\n", i );
@@ -108,9 +115,16 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
                 fprintf( stderr, "leetft: Can't render glyph %d\n", i );
                 FT_Done_Glyph( font->glyphs[ i ] );
                 font->glyphs[ i ] = 0;
+                continue;
             }
+
+            FT_Glyph_Get_CBox( font->glyphs[ i ], ft_glyph_bbox_subpixels, &glyph_bbox );
+            if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
+            if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
         }
     }
+
+    font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
 
     return font;
 }
@@ -138,6 +152,11 @@ void ft_font_delete( ft_font_t *font )
 int ft_font_get_size( ft_font_t *font )
 {
     return font->fontsize;
+}
+
+int ft_font_get_height( ft_font_t *font )
+{
+    return font->max_height;
 }
 
 static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos,
