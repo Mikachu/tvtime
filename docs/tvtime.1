@@ -1,46 +1,88 @@
+'\" t
+.\" Man page for tvtime
+.\" Copyright (c) 2003  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
 .TH tvtime 1 "April 2003" "tvtime 0.9.8"
+
 .SH NAME
 tvtime \- a high quality television application
+
 .SH SYNOPSIS
 
-\fBtvtime\fR [\fB\-ahkmMsSv\fR] [\fB\-F \fIconfig file\fB\fR] [\fB\-r \fIrvrfile\fB\fR]
-[\fB\-H \fIheight\fB\fR] [\fB\-I \fIsampling\fB\fR] [\fB\-d \fIdevice\fB\fR]
-[\fB\-b \fIdevice\fB\fR] [\fB\-i \fIinput\fB\fR] [\fB\-n \fInorm\fB\fR]
-[\fB\-f \fIfrequencies\fB\fR] [\fB\-c \fIchannel\fB\fR]
+.B tvtime
+.RB [\| \-ahkmMsSv \|]
+.RB [\| \-F
+.IR "config file" \|]
+.RB [\| \-r
+.IR rvrfile \|]
+.RB [\| \-H
+.IR height \|]
+.RB [\| \-I
+.IR sampling \|]
+.RB [\| -d
+.IR device \|]
+.RB [\| \-b
+.IR device \|]
+.RB [\| \-i
+.IR input \|]
+.RB [\| \-n
+.IR norm \|]
+.RB [\| \-f
+.IR frequencies \|]
+.RB [\| \-c
+.IR channel \|]
 
 .SH DESCRIPTION
-tvtime is a high quality television application for use with video
-capture cards.  tvtime processes the input from a capture card and
-displays it on a computer monitor or projector.
 
-  tvtime supports:
+.B tvtime
+is a high quality television application for use with video capture
+cards.
+.B tvtime
+processes the input from a capture card and displays it on a computer
+monitor or projector.
 
-.TP
-.B o
+.B tvtime
+supports:
+
+.IP \(bu 4
 Deinterlaced output at full interlaced rate of 59.94 frames per second
 for NTSC source, or 50 frames per second for PAL sources. This gives
 smoothness of motion and high visual quality.
 
-.TP
-.B o
+.IP \(bu
 Multiple deinterlacing algorithms for finding the optimal mode for the
 video content and available processor speed.
 
-.TP
-.B o
+.IP \(bu
 16:9 aspect ratio mode for the highest available resolution when
 processing input from an external DVD player or digital satellite
 receiver.
 
-.TP
-.B o
+.IP \(bu
 A super\-slick on\-screen\-display for the complete television
 experience.
 
-.SH "OPTIONS"
+.SH OPTIONS
+
 .TP
 .B \-a
-This option starts tvtime in 16:9 aspect ratio mode.
+This option starts
+.B tvtime
+in 16:9 aspect ratio mode.
 
 .TP
 .B \-h
@@ -48,19 +90,33 @@ Show usage information.
 
 .TP
 .B \-k
-Disables keyboard input in tvtime for slave mode.  Slave mode was added
-for integration with PVR applications like freevo or mythtv, so that
-freevo can handle keyboard input while tvtime is running.  In slave
-mode, keystrokes are ignored but they are printed to stdout, and
-commands are read from stdin in the same syntax as 'tvtime-command'.
+Disables keyboard input in
+.B tvtime
+for slave mode.  Slave mode was added
+for integration with PVR applications like
+.B freevo
+or
+.BR mythtv ,
+so that
+.B freevo
+can handle keyboard input while
+.B tvtime
+is running.  In slave mode, keystrokes are ignored but they are
+printed to standard output, and commands are read from standard input in
+the same syntax as
+.BR tvtime\-command .
 
 .TP
 .B \-m
-Start tvtime in fullscreen mode.
+Start
+.B tvtime
+in fullscreen mode.
 
 .TP
 .B \-M
-Start tvtime in windowed mode.
+Start
+.B tvtime
+in windowed mode.
 
 .TP
 .B \-s
@@ -75,8 +131,10 @@ setting, aspect ratio, verbose mode, and output window height.
 .TP
 .B \-v
 The verbose setting indicates that we should print full informational
-and warning messages to stderr while running tvtime.  Otherwise, only
-critical errors will be printed to the output.
+and warning messages to standard error while running
+.BR tvtime .
+Otherwise,
+only critical errors will be printed to the output.
 
 .TP
 .B \-F
@@ -85,66 +143,124 @@ Additional config file to load settings from.
 .TP
 .B \-H
 Sets the height of the output window to start up at in scanlines.  The
-default output window size is 576 scanlines.
+default output window size is
+.I 576
+scanlines.
 
 .TP
 .B -I
-V4L input scanline sampling, defaults to 720.
+V4L input scanline sampling (defaults to
+.IR 720 .
 This sets how many pixels per scanline to request from the capture card.
 A higher setting gives better quality, while a lower setting means we do
-less work, and so tvtime will run faster.  If you have a slower CPU
-(like, less than 500Mhz or so), maybe values of 480 or 400 might suit
-you best.  For best quality, choose a high value like 720 or 768.  Many
-capture cards cannot sample higher than 768 pixels per scanline.
+less work, and so
+.B tvtime
+will run faster.  If you have a slower CPU
+(like, less than 500Mhz or so), maybe values of
+.IR 480 \ or\  400
+might suit you best.  For best quality, choose a high value like
+.IR 720 \ or\  768 .
+Many capture cards cannot sample higher than
+.I 768
+pixels per scanline.
 
 .TP
 .B \-d
-video4linux device to use (defaults to /dev/video0).
+video4linux device to use (defaults to
+.IR /dev/video0 ).
 
 .TP
 .B \-b
-VBI device to use (defaults to /dev/vbi0).
+VBI device to use (defaults to
+.IR /dev/vbi0 ).
 
 .TP
 .B \-i
-video4linux input number (defaults to 0).  Cards commonly have a bunch
-of sources, for example, for my WinTV card source 0 is my tuner and
-source 1 is the composite input.
+video4linux input number (defaults to
+.IR 0 ).
+Cards commonly have a bunch
+of sources, for example, on my WinTV card,
+.I source 0
+is my tuner and
+.I source 1
+is the composite input.
 
 .TP
 .B \-c
-On startup, tvtime will tune to the given channel.  Otherwise, the
+On startup,
+.B tvtime
+will tune to the given channel.  Otherwise, the
 channels from the config file will be used.
 
 .TP
 .B \-n
-The mode to set the tuner to: PAL, NTSC, SECAM, PAL\-NC, PAL\-M, PAL\-N
-or NTSC\-JP (defaults to NTSC).
+The mode to set the tuner to (defaults to
+.IR NTSC ).
+Valid modes are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@PAL
+\(bu@SECAM
+\(bu@PAL\-NC
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@NTSC\-JP
+.TE
 
 .TP
 .B \-f
-The channels you are receiving with the tuner (defaults to us\-cable).
-
+The channels you are receiving with the tuner (defaults to
+.IR us\-cable ).
 Valid values are:
-        us\-cable
-        us\-broadcast
-        japan\-cable
-        japan\-broadcast
-        europe
-        australia
-        australia\-optus
-        newzealand
-        france
-        russia
+.TS
+nokeep tab (@);
+l l.
+\(bu@us\-cable
+\(bu@us\-broadcast
+\(bu@japan\-cable
+\(bu@japan\-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia\-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+.TE
+
+.SH FILES
+
+.I /tvtime/tvtime.xml
+.br
+.I $HOME/.tvtime/tvtime.xml
+.br
+.I $HOME/.tvtime/stationlist.xml
+.br
+.I /var/run/tvtime/TV-*/tvtimefifo
 
 .SH AUTHORS
-.LP 
-Billy Biggs, Doug Bell, Alexander S. Belov, Achim Schneider, David I.
-Lehn, Paul Jara, Robert Högberg, Craig Dooley, Bart Dorsey, Nicolas
-Boos, Simon Law, Mark Trolley, Joachim Koenig, Stewart Allen,
-Justin A, Brian Goines, Krister Lagerstrom
+
+Billy Biggs,
+Doug Bell,
+Alexander S. Belov,
+Achim Schneider,
+David I. Lehn,
+Paul Jara,
+Robert H\[:o]gberg,
+Craig Dooley,
+Bart Dorsey,
+Nicolas Boos,
+Simon Law,
+Mark Trolley,
+Joachim Koenig,
+Stewart Allen,
+Justin A,
+Brian Goines,
+Krister Lagerstrom.
 
 .SH "SEE ALSO"
-.BR tvtime-command (1)
-.BR tvtime.xml (5)
-.BR stationlist.xml (5)
+
+.BR tvtime-command (1),
+.IR tvtime.xml (5),
+.IR stationlist.xml (5).

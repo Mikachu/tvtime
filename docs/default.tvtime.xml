@@ -11,9 +11,9 @@
 
 
   <!--
-    The verbose setting indicates that we should print full informational
-    and warning messages to stderr while running tvtime.  Otherwise, only
-    fatal errors will be printed to the output.
+    The verbose setting indicates that we should print full
+    informational and warning messages to stderr while running tvtime.
+    Otherwise, only fatal errors will be printed to the output.
   -->
   <option name="Verbose" value="0"/>
 
@@ -25,13 +25,20 @@
     This sets the default capture card input to be opened by tvtime.
     For example, for my WinTV card has the tuner as source 0, and
     its composite input as source 1.  Sources can be changed at runtime
-    using the 'toggle_input' command, defaulting to a key command of 'i'.
+    using the "toggle_input" command, which is key command "i" by
+    default.
   -->
   <option name="V4LInput" value="0"/>
 
   <!--
-    This sets the default TV norm.  Valid options are "ntsc", "pal",
-    "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
+    This sets the default TV norm.  Valid options are:
+       ntsc
+       pal
+       secam
+       pal-nc
+       pal-m
+       pal-n
+       ntsc-jp
   -->
   <option name="Norm" value="NTSC"/>
 
@@ -60,28 +67,30 @@
   <option name="NTSCCableMode" value="Nominal"/>
 
   <!--
-    Toggle whether tvtime should check if there is a signal present when
-    changing channels etc.  If your card doesn't suck, you shouldn't need
-    to shut this off.  Disabling this feature will also disable the
-    channel scanner.
+    Toggle whether tvtime should check if there is a signal present
+    when changing channels etc.  If your card doesn't suck, you
+    shouldn't need to shut this off.  Disabling this feature will also
+    disable the channel scanner.
   -->
   <option name="CheckForSignal" value="1"/>
 
   <!--
-    This sets how many pixels per scanline to request from the capture card.
-    A higher setting gives better quality, while a lower setting means we do
-    less work, and so tvtime will run faster.  If you have a slower CPU (like,
-    less than 500Mhz or so), maybe values of 480 or 400 might suit you best.
-    For best quality, choose a high value like 720 or 768.  Most capture
-    cards cannot sample higher than 768 pixels per scanline.
+    This sets how many pixels per scanline to request from the capture
+    card.  A higher setting gives better quality, while a lower setting
+    means we do less work, and so tvtime will run faster.  If you have
+    a slower CPU (like, less than 500Mhz or so), maybe values of 480
+    or 400 might suit you best.  For best quality, choose a high value
+    like 720 or 768.  Most capture cards cannot sample higher than 768
+    pixels per scanline.
   -->
   <option name="InputWidth" value="720"/>
 
 
   <!--
-    Set this to 1 to enable VBI decoding.  tvtime supports decoding of closed
-    captions and XDS channel information data.  Both of these standards are
-    specific to NTSC regions, since that's what the tvtime authors use. :)
+    Set this to 1 to enable VBI decoding.  tvtime supports decoding of
+    closed captions and XDS channel information data.  Both of these
+    standards are specific to NTSC regions, since that's what the
+    tvtime authors use. :)
   -->
   <option name="UseVBI" value="0"/>
 
@@ -91,18 +100,22 @@
   <option name="VBIDevice" value="/dev/vbi0"/>
 
 
-  <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
+  <!--
+    This option enables 16:9 aspect ratio mode by default on startup.
+  -->
   <option name="Widescreen" value="0"/>
 
-  <!-- Default to a 768x576 window. -->
+  <!--
+    Default to a 768x576 window.
+  -->
   <option name="OutputHeight" value="576"/>
 
   <!--
-    This sets the percent of the sides to leave to the overscan, that is,
-    don't show them at all.  Safe action area on a television is 10% in
-    the overscan, but that's a bit restrictive.  If you want to look like
-    a TV, a good value would be about 6-8%.  The value is in percent,
-    so for 8% use 8.0.
+    This sets the percent of the sides to leave to the overscan, that
+    is, don't show them at all.  Safe action area on a television is 10%
+    in the overscan, but that's a bit restrictive.  If you want tvtime
+    to look like a TV, a good value would be about 6-8%.  The value is
+    in percent, so for 8%, use 8.0.
   -->
   <option name="Overscan" value="0.0"/>
 
@@ -133,16 +146,16 @@
   <!--
     This indicates whether the luma correction option should be enabled by
     default when starting the application.  Luma correction can be turned
-    on or off within the application using the 'c' key.
+    on or off within the application using the "c" key.
   -->
   <option name="ApplyLumaCorrection" value="0"/>
 
   <!--
-    This indicates the power for correction.  A value of 1.0 does nothing
-    except apply Bt8x8 correction, if you have a Bt8x8-based capture card.
-    Values less than one make the output darker, and values greater than
-    one make the output brighter.  The valid range is 0.1 to 10.0 in
-    increments of 0.1.
+    This indicates the power for correction.  A value of 1.0 does
+    nothing except apply Bt8x8 correction, if you have a Bt8x8-based
+    capture card.  Values less than one make the output darker, and
+    values greater than one make the output brighter.  The valid range
+    is 0.1 to 10.0 in increments of 0.1.
   -->
   <option name="LumaCorrection" value="1.0"/>
 
@@ -157,46 +170,45 @@
   <option name="ProcessPriority" value="-19"/>
 
   <!--
-    Sets the time format to be used in the tvtime OSD.  The format is a
-    string in the same format as strftime().  See 'man strftime' for
-    details on the format used.  The default is to use the time format
-    of your locale.
+    Sets the time format to be used in the tvtime on-screen display.
+    The format is a string in the same format as strftime(3).  The
+    default is to use the time format of your locale.
   -->
   <option name="TimeFormat" value="%X"/>
 
   <!--
     This is the default directory in which screenshots are placed.
-    The default is into user's home directory.
+    The default is to save them into the user's home directory.
   -->
   <option name="ScreenShotDir" value="~"/>
 
   <!--
-    These options set the ARGB colours used for the text in the OSD.
-    The default for the channel name is yellow, and the default for
-    the surrounding text is "wheat".  The colour format can be hex
-    or decimal.  If the alpha channel is not specified the default
-    is 255 (opaque).
+    These options set the ARGB colours used for the text in the
+    on-screen display.  The default for the channel name is "yellow"
+    (0xffffff00), and the default for the surrounding text is "wheat"
+    (0xfff5deb3).  The colour format can be hexadecimal or decimal.
+    If the alpha channel is not specified the default is "opaque" (255).
 
-    Examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215
+    Examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 
+              16777215.
   -->
   <option name="ChannelTextFG" value="0xFFFFFF00"/>
   <option name="OtherTextFG" value="0xFFF5DEB3"/>
 
   <!--
-    The following settings are saved at runtime to remember your current
-    channel, previous channel, and deinterlacer used.
+    This setting is saved at runtime to remember the current channel.
   -->
   <option name="PrevChannel" value="2"/>
-  <option name="Channel" value="2"/>
-  <option name="DeinterlaceMethod" value="GreedyH"/>
-
 
   <!--
-    Preset 'modes' for tvtime may be defined for convenience.  By
-    default, tvtime ships with two useful modes: LargeWindow and
-    SmallWindow.
+    This setting is saved at runtime to remember the previous channel.
+  -->
+  <option name="Channel" value="2"/>
 
-    Supported deinterlacers:
+  <!--
+    This setting is saved at runtime the deinterlacer used.
+
+    Supported deinterlacers are:
 
     LineDoubler    Line Doubler
     Greedy         Dscaler: Greedy - Low Motion
@@ -211,6 +223,13 @@
     OverlayBob     Overlay Bob
     Vertical       ffmpeg: Vertical Deinterlace Filter
     Weave          Weave Last Field
+  -->
+  <option name="DeinterlaceMethod" value="GreedyH"/>
+
+
+  <!--
+    Preset "modes" may be defined for convenience.  By default, tvtime 
+    ships with two useful modes: LargeWindow and SmallWindow.
   -->
 
   <mode name="LargeWindow">
@@ -233,36 +252,36 @@
 
     Commands known to tvtime:
 
-      AUTO_ADJUST_PICT           FINETUNE_UP              
-      BRIGHTNESS_DOWN            HUE_DOWN                 
-      BRIGHTNESS_UP              HUE_UP                   
-      CHANNEL_1                  LUMA_DOWN                
-      CHANNEL_2                  LUMA_UP                  
-      CHANNEL_3                  MIXER_DOWN               
-      CHANNEL_4                  MIXER_UP                 
-      CHANNEL_5                  OVERSCAN_DOWN            
-      CHANNEL_6                  OVERSCAN_UP              
-      CHANNEL_7                  SCREENSHOT               
-      CHANNEL_8                  SCROLL_CONSOLE_DOWN      
-      CHANNEL_9                  SCROLL_CONSOLE_UP        
-      CHANNEL_0                  SHOW_STATS               
-      CHANNEL_ACTIVATE_ALL       TOGGLE_ASPECT            
-      CHANNEL_DOWN               TOGGLE_AUDIO_MODE        
-      CHANNEL_PREV               TOGGLE_BARS              
-      CHANNEL_RENUMBER           TOGGLE_CC                
-      CHANNEL_SAVE_TUNING        TOGGLE_CONSOLE           
-      CHANNEL_SCAN               TOGGLE_DEINTERLACER      
-      CHANNEL_SKIP               TOGGLE_FULLSCREEN        
-      CHANNEL_UP                 TOGGLE_FRAMERATE         
-      COLOUR_DOWN                TOGGLE_INPUT             
-      COLOUR_UP                  TOGGLE_LUMA_CORRECTION   
-      COLOR_DOWN                 TOGGLE_MODE              
-      COLOR_UP                   TOGGLE_MUTE              
-      CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE   
-      CONTRAST_UP                TOGGLE_PAUSE             
+      AUTO_ADJUST_PICT           FINETUNE_UP
+      BRIGHTNESS_DOWN            HUE_DOWN
+      BRIGHTNESS_UP              HUE_UP
+      CHANNEL_1                  LUMA_DOWN
+      CHANNEL_2                  LUMA_UP
+      CHANNEL_3                  MIXER_DOWN
+      CHANNEL_4                  MIXER_UP
+      CHANNEL_5                  OVERSCAN_DOWN
+      CHANNEL_6                  OVERSCAN_UP
+      CHANNEL_7                  SCREENSHOT
+      CHANNEL_8                  SCROLL_CONSOLE_DOWN
+      CHANNEL_9                  SCROLL_CONSOLE_UP
+      CHANNEL_0                  SHOW_STATS
+      CHANNEL_ACTIVATE_ALL       TOGGLE_ASPECT
+      CHANNEL_DOWN               TOGGLE_AUDIO_MODE
+      CHANNEL_PREV               TOGGLE_BARS
+      CHANNEL_RENUMBER           TOGGLE_CC
+      CHANNEL_SAVE_TUNING        TOGGLE_CONSOLE
+      CHANNEL_SCAN               TOGGLE_DEINTERLACER
+      CHANNEL_SKIP               TOGGLE_FULLSCREEN
+      CHANNEL_UP                 TOGGLE_FRAMERATE
+      COLOUR_DOWN                TOGGLE_INPUT
+      COLOUR_UP                  TOGGLE_LUMA_CORRECTION
+      COLOR_DOWN                 TOGGLE_MODE
+      COLOR_UP                   TOGGLE_MUTE
+      CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE
+      CONTRAST_UP                TOGGLE_PAUSE
       DISPLAY_INFO               TOGGLE_PULLDOWN_DETECTION
-      ENTER                      QUIT                     
-      FINETUNE_DOWN                                       
+      ENTER                      QUIT
+      FINETUNE_DOWN
 
 
     Special keys known by tvtime:

@@ -1,21 +1,55 @@
+'\" t
+.\" Man page for tvtime
+.\" Copyright (c) 2003  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License ,
+.IR or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful ,
+.IR but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not ,
+.IR write to the Free Software
+.\" Foundation ,
+.IR Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
 .TH tvtime.xml 5 "April 2003" "tvtime 0.9.8"
+
 .SH NAME
-tvtime.xml -- tvtime configuration file
+
+tvtime.xml \- tvtime configuration file
 
 .SH SYNOPSIS
 
-.B ~/.tvtime/tvtime.xml
+.I ~/.tvtime/tvtime.xml
 .br
-.B $PREFIX/etc/tvtime/tvtime.xml
+.I /etc/tvtime/tvtime.xml
 .br
 
 .SH DESCRIPTION
-The tvtime.xml file is the main configuration file for tvtime.  It
-contains all of the default settings, key bindings, and preset mode
-definitions.  The tvtime.xml file is updated by tvtime at runtime, to
-store settings across sessions.  For this reason, you should not edit
-the tvtime.xml file while tvtime is running, as your changes may be
-overwritten.
+
+The
+.I tvtime.xml
+file is the main configuration file for
+.BR tvtime .
+It contains all of the default settings, key bindings, and preset mode
+definitions.  The
+.I tvtime.xml
+file is updated by
+.B tvtime
+at runtime, to store settings across sessions.  For this reason, you
+should not edit the
+.I tvtime.xml
+file while
+.B tvtime
+is running, as your changes may be overwritten.
 
 The global syntax is as follows:
 
@@ -25,255 +59,372 @@ The global syntax is as follows:
     <tvtime xmlns="http://tvtime.sourceforge.net/DTD/">
     </tvtime>
 
-You can find the DTD and other information at the namespace URL.
+You can find the DTD and other information about the XML configuration
+files at
+.nh
+.UR http://tvtime.sourceforge.net/DTD/
+http://tvtime.sourceforge.net/DTD/
+.UE
+.hy
 
 .SH OPTIONS
+
+.B tvtime
+supports a multitude of options.  The <option> tag should be contained
+within a <tvtime> tag, or within a <mode> tag.
 
 The following is a list of options and their default values, along with
 a description of what the option does.
 
-  <!--
-    The verbose setting indicates that we should print full informational
-    and warning messages to stderr while running tvtime.  Otherwise, only
-    fatal errors will be printed to the output.
-  -->
-  <option name="Verbose" value="0"/>
+.TP
+<option name="Verbose" value="0"/>
+The verbose setting indicates that we should print full informational
+and warning messages to stderr while running
+.BR tvtime .
+Otherwise, only fatal errors will be printed to the output.
 
+.TP
+<option name="V4LDevice" value="/dev/video0"/>
+This sets the default capture device to use.
 
-  <!-- This sets the default capture device to use. -->
-  <option name="V4LDevice" value="/dev/video0"/>
+.TP
+<option name="V4LInput" value="0"/>
+This sets the default capture card input to be opened by
+.BR tvtime .
+For example, for my WinTV card has the tuner as source
+.IR 0 ,
+and its composite input as source
+.IR 1 .
+Sources can be changed at runtime using the
+.B toggle_input
+command, which is key command \(lqi\(rq by default.
 
-  <!--
-    This sets the default capture card input to be opened by tvtime.
-    For example, for my WinTV card has the tuner as source 0, and
-    its composite input as source 1.  Sources can be changed at runtime
-    using the 'toggle_input' command, defaulting to a key command of 'i'.
-  -->
-  <option name="V4LInput" value="0"/>
+.TP
+<option name="Norm" value="NTSC"/>
+This sets the default TV norm.  Valid options are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@ntsc
+\(bu@pal
+\(bu@secam
+\(bu@pal\-nc
+\(bu@pal\-m
+\(bu@pal\-n
+\(bu@ntsc\-jp
+.TE
 
-  <!--
-    This sets the default TV norm.  Valid options are "ntsc", "pal",
-    "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
-  -->
-  <option name="Norm" value="NTSC"/>
+.TP
+<option name="Frequencies" value="US-Cable"/>
+This sets the default frequency table to use for any tuners found.
+Possibilities are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us-cable
+\(bu@us-broadcast
+\(bu@japan-cable
+\(bu@japan-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+.TE
 
-  <!--
-    This sets the default frequency table to use for any tuners found.
-    Possibilities are:
-       us-cable
-       us-broadcast
-       japan-cable
-       japan-broadcast
-       europe
-       australia
-       australia-optus
-       newzealand
-       france
-       russia
-  -->
-  <option name="Frequencies" value="US-Cable"/>
+.TP
+<option name="NTSCCableMode" value="Nominal"/>
+There are two special NTSC cable standards in the US: IRC and HRC.
+In IRC, channels 5 and 6 are on different frequencies, and HRC mode
+shifts all frequencies up by 1.25MHz (and is also weird on channels
+5 and 6).
 
-  <!--
-    There are two special NTSC cable standards in the US: IRC and HRC.
-    In IRC, channels 5 and 6 are on different frequencies, and HRC mode
-    shifts all frequencies up by 1.25MHz (and is also weird on channels
-    5 and 6).
-  -->
-  <option name="NTSCCableMode" value="Nominal"/>
+.TP
+<option name="CheckForSignal" value="1"/>
+Toggle whether
+.B tvtime
+should check if there is a signal present when changing channels etc.
+If your card doesn't suck, you shouldn't need to shut this off.
+Disabling this feature will also disable the channel scanner.
 
-  <!--
-    Toggle whether tvtime should check if there is a signal present when
-    changing channels etc.  If your card doesn't suck, you shouldn't need
-    to shut this off.  Disabling this feature will also disable the
-    channel scanner.
-  -->
-  <option name="CheckForSignal" value="1"/>
+.TP
+<option name="InputWidth" value="720"/>
+This sets how many pixels per scanline to request from the capture card.
+A higher setting gives better quality, while a lower setting means we do
+less work, and so
+.B tvtime
+will run faster.  If you have a slower CPU (like, less than 500Mhz or
+so), maybe values of
+.IR 480 " or " 400
+might suit you best.  For best quality, choose a high value like
+.IR 720 " or " 768 .
+Most capture cards cannot sample higher than
+.I 768
+pixels per scanline.
 
-  <!--
-    This sets how many pixels per scanline to request from the capture card.
-    A higher setting gives better quality, while a lower setting means we do
-    less work, and so tvtime will run faster.  If you have a slower CPU (like,
-    less than 500Mhz or so), maybe values of 480 or 400 might suit you best.
-    For best quality, choose a high value like 720 or 768.  Most capture
-    cards cannot sample higher than 768 pixels per scanline.
-  -->
-  <option name="InputWidth" value="720"/>
+.TP
+<option name="UseVBI" value="0"/>
+Set this to
+.I 1
+to enable VBI decoding.
+.B tvtime
+supports decoding of closed
+captions and XDS channel information data.  Both of these standards are
+specific to NTSC regions, since that's what the
+.B tvtime
+authors use. :)
 
+.TP
+<option name="VBIDevice" value="/dev/vbi0"/>
+This sets which device to use for VBI decoding.
 
-  <!--
-    Set this to 1 to enable VBI decoding.  tvtime supports decoding of closed
-    captions and XDS channel information data.  Both of these standards are
-    specific to NTSC regions, since that's what the tvtime authors use. :)
-  -->
-  <option name="UseVBI" value="0"/>
+.TP
+<option name="Widescreen" value="0"/>
+This option enables 16:9 aspect ratio mode by default on startup.
 
-  <!--
-    This sets which device to use for VBI decoding.
-  -->
-  <option name="VBIDevice" value="/dev/vbi0"/>
+.TP
+<option name="OutputHeight" value="576"/>
+Default to a
+.RI 768\[mu] 576
+window.
 
+.TP
+<option name="Overscan" value="0.0"/>
+This sets the percent of the sides to leave to the overscan, that is,
+don't show them at all.  Safe action area on a television is 10% in
+the overscan, but that's a bit restrictive.  If you want
+.B tvtime
+to look like a TV, a good value would be about 6\[en]8%.  The value is
+in percent, so for 8%, use
+.IR 8.0 .
 
-  <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
-  <option name="Widescreen" value="0"/>
+.TP
+<option name="Fullscreen" value="0"/>
+Set this to
+.I 1
+to have
+.B tvtime
+start in fullscreen mode.  This setting is set at runtime so that when 
+you quit
+.B tvtime
+in fullscreen, starting it again will start back in fullscreen mode.
 
-  <!-- Default to a 768x576 window. -->
-  <option name="OutputHeight" value="576"/>
+.TP
+<option name="FramerateMode" value="0"/>
+This sets the framerate of the output from
+.BR tvtime .
+.RS
+.TP 4
+.I 0
+Full framerate mode, every field is deinterlaced.
+59.94fps for NTSC, 50fps for PAL.
 
-  <!--
-    This sets the percent of the sides to leave to the overscan, that is,
-    don't show them at all.  Safe action area on a television is 10% in
-    the overscan, but that's a bit restrictive.  If you want to look like
-    a TV, a good value would be about 6-8%.  The value is in percent,
-    so for 8% use 8.0.
-  -->
-  <option name="Overscan" value="0.0"/>
+.TP
+.I 1
+Half framerate mode, deinterlace every top field to a frame (TFF).
+29.97fps for NTSC, 25fps for PAL.
 
-  <!--
-    Set this to 1 to have tvtime start in fullscreen mode.  This setting is
-    set at runtime so that when you quit tvtime in fullscreen, starting it
-    again will start back in fullscreen mode.
-  -->
-  <option name="Fullscreen" value="0"/>
+.TP
+.I 2
+Half framerate mode, deinterlace every bottom field to a frame (BFF).
+29.97fps for NTSC, 25fps for PAL.
+.RE
+.IP
+The two half framerate modes are useful for progressive content from
+video game consoles.  Use weave and select either TFF or BFF, whichever
+does not exhibit interlace effects.
 
-  <!--
-    This sets the framerate of the output from tvtime.
+.TP
+<option name="ApplyLumaCorrection" value="0"/>
+This indicates whether the luma correction option should be enabled by
+default when starting the application.  Luma correction can be turned
+on or off within the application using the \(lqc\(rq key.
 
-    0 = Full framerate mode, every field is deinterlaced.
-        59.94fps for NTSC, 50fps for PAL.
-    1 = Half framerate mode, deinterlace every top field to a frame (TFF).
-        29.97fps for NTSC, 25fps for PAL.
-    2 = Half framerate mode, deinterlace every bottom field to a frame (BFF).
-        29.97fps for NTSC, 25fps for PAL.
+.TP
+<option name="LumaCorrection" value="1.0"/>
+This indicates the power for correction.  A value of
+.I 1.0
+does nothing except apply Bt8x8 correction, if you have a Bt8x8-based
+capture card.  Values less than one make the output darker, and values
+greater than one make the output brighter.  The valid range is
+.IR 0.1 " to " 10.0
+in increments of 0.1.
 
-    The two half framerate modes are useful for progressive content from
-    video game consoles.  Use weave and select either TFF or BFF, whichever
-    does not exhibit interlace effects.
-  -->
-  <option name="FramerateMode" value="0"/>
+.TP
+<option name="ProcessPriority" value="-19"/>
+Sets the default process priority.  By default,
+.B tvtime
+tries to be a real hog and get
+.I \[en]19
+priority, which is insane, but hey, if a frame comes in we need to
+process it right away or it gets dropped, right? :)    Acceptable
+values are from
+.IR \[en]20 " to " 20 ,
+with lower values meaning higher priority (blame
+.SM UNIX
+for that).
 
+.TP
+<option name="TimeFormat" value="%X"/>
+Sets the time format to be used in the
+.B tvtime
+on\-screen display.  The format is a string in the same format as
+.BR strftime (3).
+The default is to use the time format of your locale.
 
-  <!--
-    This indicates whether the luma correction option should be enabled by
-    default when starting the application.  Luma correction can be turned
-    on or off within the application using the 'c' key.
-  -->
-  <option name="ApplyLumaCorrection" value="0"/>
+.TP
+<option name="ScreenShotDir" value="~"/>
+This is the default directory in which screenshots are placed.
+The default is to save them into the user's home directory.
 
-  <!--
-    This indicates the power for correction.  A value of 1.0 does nothing
-    except apply Bt8x8 correction, if you have a Bt8x8-based capture card.
-    Values less than one make the output darker, and values greater than
-    one make the output brighter.  The valid range is 0.1 to 10.0 in
-    increments of 0.1.
-  -->
-  <option name="LumaCorrection" value="1.0"/>
+.TP
+.PD 0
+<option name="ChannelTextFG" value="0xFFFFFF00"/>
+.TP
+.PD
+<option name="OtherTextFG" value="0xFFF5DEB3"/>
+These options set the ARGB colours used for the text in the on-screen
+display.  The default for the channel name is \(lqyellow\(rq
+.RI ( 0xffffff00 ),
+and the default for the surrounding text is \(lqwheat\(rq
+.RI ( 0xfff5deb3 ).
+The colour format can be hexadecimal or decimal.  If the alpha channel
+is not specified the default is \(lqopaque\(rq
+.RI ( 255 ).
 
+.RS
+.TP 10
+Examples:
+.IR 0xffaadd ,
+.IR 0xff0000ff ,
+.IR 0xff ,
+.IR 0xffff ,
+.IR "255 255 0" ,
+.IR 0 ,
+.IR 16777215 .
+.RE
 
-  <!--
-    Sets the default process priority.  By default, tvtime tries to be
-    a real hog and get -19 priority, which is insane, but hey, if a
-    frame comes in we need to process it right away or it gets dropped,
-    right? :)    Acceptable values are from -20 to 20, with lower values
-    meaning higher priority (blame UNIX for that).
-  -->
-  <option name="ProcessPriority" value="-19"/>
+.TP
+<option name="PrevChannel" value="2"/>
+This setting is saved at runtime to remember the current channel.
 
-  <!--
-    Sets the time format to be used in the tvtime OSD.  The format is a
-    string in the same format as strftime().  See 'man strftime' for
-    details on the format used.  The default is to use the time format
-    of your locale.
-  -->
-  <option name="TimeFormat" value="%X"/>
+.TP
+<option name="Channel" value="2"/>
+This setting is saved at runtime to remember the previous channel.
 
-  <!--
-    This is the default directory in which screenshots are placed.
-    The default is into user's home directory.
-  -->
-  <option name="ScreenShotDir" value="~"/>
+.TP
+<option name="DeinterlaceMethod" value="GreedyH"/>
+This setting is saved at runtime to remember the deinterlacer used.
 
-  <!--
-    These options set the ARGB colours used for the text in the OSD.
-    The default for the channel name is yellow, and the default for
-    the surrounding text is "wheat".  The colour format can be hex
-    or decimal.  If the alpha channel is not specified the default
-    is 255 (opaque).
+Supported deinterlacers are:
+.RS
+.TP 15
+.PD 0
+.I LineDoubler
+Line Doubler
+.TP
+.I Greedy
+Dscaler: Greedy \[em] Low Motion
+.TP
+.I Greedy2Frame
+DScaler: Greedy \[em] 2-frame
+.TP
+.I GreedyH
+DScaler: Greedy \[em] High Motion
+.TP
+.I TomsMoComp
+DScaler: TomsMoComp
+.TP
+.I TwoFrame
+DScaler: TwoFrame
+.TP
+.I VideoBob
+DScaler: Video Bob
+.TP
+.I VideoWeave
+DScaler: Video Weave
+.TP
+.I Linear
+Linear Interpolation
+.TP
+.I LinearBlend
+mplayer: Linear Blend
+.TP
+.I OverlayBob
+Overlay Bob
+.TP
+.I Vertical
+ffmpeg: Vertical Deinterlace Filter
+.TP
+.I Weave
+Weave Last Field
+.PD
+.RE
 
-    Examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215
-  -->
-  <option name="ChannelTextFG" value="0xFFFFFF00"/>
-  <option name="OtherTextFG" value="0xFFF5DEB3"/>
+.SH MODES
 
-  <!--
-    The following settings are saved at runtime to remember your current
-    channel, previous channel, and deinterlacer used.
-  -->
-  <option name="PrevChannel" value="2"/>
-  <option name="Channel" value="2"/>
-  <option name="DeinterlaceMethod" value="GreedyH"/>
+Modes are used to define a certain group of presets and exist within
+the <tvtime> tag.  Just like the global <tvtime> tag, a <mode> can
+contain any number of <option> tags.
 
+Preset \(lqmodes\(rq may be defined for convenience.  By default,
+.B tvtime
+ships with two useful modes:
+.I LargeWindow
+and
+.IR SmallWindow .
 
-  <!--
-    Preset 'modes' for tvtime may be defined for convenience.  By
-    default, tvtime ships with two useful modes: LargeWindow and
-    SmallWindow.
+    <mode name="LargeWindow">
+      <option name="DeinterlaceMethod" value="GreedyH"/>
+    </mode>
 
-    Supported deinterlacers:
-
-    LineDoubler    Line Doubler
-    Greedy         Dscaler: Greedy - Low Motion
-    Greedy2Frame   DScaler: Greedy - 2-frame
-    GreedyH        DScaler: Greedy - High Motion
-    TomsMoComp     DScaler: TomsMoComp
-    TwoFrame       DScaler: TwoFrame
-    VideoBob       DScaler: Video Bob
-    VideoWeave     DScaler: Video Weave
-    Linear         Linear Interpolation
-    LinearBlend    mplayer: Linear Blend
-    OverlayBob     Overlay Bob
-    Vertical       ffmpeg: Vertical Deinterlace Filter
-    Weave          Weave Last Field
-  -->
-
-  <mode name="LargeWindow">
-    <option name="DeinterlaceMethod" value="GreedyH"/>
-  </mode>
-
-  <mode name="SmallWindow">
-    <option name="DeinterlaceMethod" value="OverlayBob"/>
-    <option name="FramerateMode" value="1"/>
-    <option name="OutputHeight" value="288"/>
-  </mode>
+    <mode name="SmallWindow">
+      <option name="DeinterlaceMethod" value="OverlayBob"/>
+      <option name="FramerateMode" value="1"/>
+      <option name="OutputHeight" value="288"/>
+    </mode>
 
 .SH BINDINGS
-Key presses and mouse button presses can be mapped to tvtime commands.
-For a description of commands known to tvtime, see
-.B tvtime-command (1).
+
+Key presses and mouse button clicks can be mapped to
+.B tvtime
+commands.  For a description of each command, see
+.BR tvtime-command (1).
 
 Multiple keys and mouse buttons may be bound to the same command.  For
-convenience, tvtime supplies aliases for special keys.  The special keys
-known to tvtime are:
+convenience,
+.B tvtime
+supplies aliases for special keys.  The special keys known to
+.B tvtime
+are:
 
-.B Up, Down, Left, Right, Insert, Home, End, PageUp, PageDown, F1, F2, F3,
-.B F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, Backspace, Escape,
-.B Enter, Print, Menu
+.nh
+.IR Up ", " Down ", " Left ", " Right ", " Insert ", " Home ", " End ",R "
+.IR PageUp ", " PageDown ", " F1 ", " F2 ", " F3 ", " F4 ", " F5 ", "
+.IR F6 ", " F7 ", " F8 ", " F9 ", " F10 ", " F11 ", " F12 ", " F13 ", "
+.IR F14 ", " F15 ", " Backspace ", " Escape ", " Enter ", " Print ", " Menu
+.hy
 
 An example key binding would be for the command
-.B CHANNEL_UP.
-In this case, we have two keys bound to the command as well as a mouse
-button.
+.IR CHANNEL_UP .
+In this case, we have two keys 
+.RI ( Up " and " k )
+bound to the command as well as a mouse button
+.RI ( 4 ).
 
-  <bind command="channel_up">
-    <keyboard key="up"/>
-    <keyboard key="k"/>
-    <mouse button="4"/>
-  </bind>
+    <bind command="channel_up">
+      <keyboard key="up"/>
+      <keyboard key="k"/>
+      <mouse button="4"/>
+    </bind>
 
-.SH AUTHORS
-.LP 
-Billy Biggs
+.SH AUTHOR
+
+Billy Biggs.
 
 .SH "SEE ALSO"
-.BR tvtime (1)
-.BR tvtime-command (1)
-.BR stationlist.xml (5)
+
+.BR tvtime (1),
+.BR tvtime-command (1),
+.IR stationlist.xml (5).
