@@ -214,22 +214,23 @@ static void xv_get_output_aspect( int *px_widthratio, int *px_heightratio )
 {
     int metric_widthratio = output_aspect ? 16 : 4;
     int metric_heightratio = output_aspect ? 9 : 3;
-    int sar_frac_n, sar_frac_d;
+    int sar_frac_w, sar_frac_h;
 
     if( matte_height ) {
         metric_heightratio = matte_height;
         metric_widthratio = matte_width;
     }
 
-    xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
+    xfullscreen_get_pixel_aspect( xf, &sar_frac_w, &sar_frac_h );
 
     if( xcommon_verbose ) {
         fprintf( stderr, "xcommon: Pixel aspect ratio %d:%d.\n",
-                 sar_frac_n, sar_frac_d );
+                 sar_frac_w, sar_frac_h );
     }
 
-    *px_widthratio = sar_frac_n * metric_widthratio;
-    *px_heightratio = sar_frac_d * metric_heightratio;
+    /* PX_RATIO = METRIC_RATIO / SAR_FRAC = METRIC_RATIO * (1 / SAR_FRAC) */
+    *px_widthratio = metric_widthratio * sar_frac_h;
+    *px_heightratio = metric_heightratio * sar_frac_w;
     simplify_fraction( px_widthratio, px_heightratio );
 }
 

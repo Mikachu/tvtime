@@ -76,8 +76,8 @@ void xfullscreen_get_position( xfullscreen_t *xf, int window_x,
  * This returns the pixel aspect ratio of the X server at the time of
  * the last update call.
  */
-void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
-                                   int *aspect_d );
+void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_w,
+                                   int *aspect_h );
 
 /**
  * This returns the refresh rate of the primary X display at the time of

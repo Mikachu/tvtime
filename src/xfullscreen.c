@@ -39,6 +39,7 @@
 #include "xfullscreen.h"
 
 #define MAX_HEADS 64
+#define SIGN(x) ( (x) == 0 ? 0 : (x) > 0 ? 1 : -1 )
 
 typedef struct head_s {
     int x;
@@ -291,34 +292,51 @@ static void simplify_fraction( int *n, int *d )
     *d /= gcd;
 }
 
-void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
-                                   int *aspect_d )
+void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_w,
+                                   int *aspect_h )
 {
     if( xf->squarepixel ) {
-        *aspect_n = *aspect_d = 1;
+        *aspect_h = *aspect_w = 1;
     } else {
         int cd;
-        int error_n;
-        int error_d;
+        int error_h;
+        int error_w;
+        /*
+         * To simplify the code, we enter all snapratios as ratios with a
+         * common denominator.
+         *
+         * In this code, we're only using two cases. A ratio of 1:1, the
+         * common square pixel case, and 16:15, the short pixel case that
+         * arises when 1280x1024 is displayed on a 4:3 monitor.
+         *
+         * Putting these on a common denominator gets us 15:15 and 16:15.
+         */
+        int snapratio_w[] = { 15, 16 };
+        int snapratio_cd = 15;
+        int snapratio_count = sizeof( snapratio_w ) / sizeof ( *snapratio_w );
+        int *snapratio_w_end = snapratio_w + snapratio_count;
+        int *ratio_w;
 
-        /* Calculate the exact aspect ratio. */
-        *aspect_n = xf->heightmm * xf->hdisplay;
-        *aspect_d = xf->widthmm * xf->vdisplay;
-        simplify_fraction( aspect_n, aspect_d );
+        /* Calculate the aspect ratio from the X11 metrics. */
+        *aspect_w = xf->widthmm * xf->vdisplay;
+        *aspect_h = xf->heightmm * xf->hdisplay;
+        simplify_fraction( aspect_h, aspect_w );
 
         /**
          * Calculate the maximum error, assuming that the
          * maximum error in the sources is half a millimeter.
          */
-        error_n = 1 * xf->hdisplay;
-        error_d = 2 * (xf->widthmm - 1) * xf->vdisplay;
-        simplify_fraction( &error_n, &error_d );
+        error_w = 1 * xf->hdisplay;
+        error_h = 2 * (xf->heightmm - 1) * xf->vdisplay;
+        simplify_fraction( &error_h, &error_w );
 
-        /* Put the two on a common denominator. */
-        cd = *aspect_d * error_d;
-        error_n *= *aspect_d;
-        *aspect_n *= error_d;
-        *aspect_d = error_d = cd;
+        /* Put ERROR, ASPECT and SNAPRATIOs on a common denominator. */
+        cd = *aspect_h * error_h * snapratio_cd;
+        *aspect_w *= error_h * snapratio_cd;
+        error_w *= *aspect_h * snapratio_cd;
+        for( ratio_w = snapratio_w; ratio_w < snapratio_w_end; ratio_w++ )
+            *ratio_w *= *aspect_h * error_h;
+        *aspect_h = cd;
 
         /**
          * We want to see if the error means that we could end up either
@@ -335,35 +353,22 @@ void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
          * (ASPECT + ERROR - RATIO > 0 && ASPECT - ERROR - RATIO < 0) ||
          * (ASPECT + ERROR - RATIO < 0 && ASPECT - ERROR - RATIO > 0)
          *
-         * <==> By inspection we can see:
+         * <==> By inspection we can see that this is equivalent to:
          *
          * SIGN(ASPECT + ERROR - RATIO) != SIGN(ASPECT - ERROR - RATIO)
          *
-         * <==> And since multiplying two integers with different signs
-         *      returns a negative number:
-         *
-         * (ASPECT + ERROR - RATIO) * (ASPECT - ERROR - RATIO) < 0
-         *
-         * <==> Now, we multiply the test by the common denominator, cd:
-         *
-         * (aspect_n+error_n - RATIO_N) * (aspect_n-error_n - RATIO_N) < 0 * cd
-         *
-         * <==> In our case, we're just checking for RATIO == 1, but this can
-         *      be extended in the future to encompass other common aspect
-         *      ratios if neccecary. In our case, also, RATIO_N == cd, because
-         *      (RATIO * cd = RATIO_N) and (RATIO = 1). Also 0 * cd == 0.
-         *      So we get the final test:
-         */
-        if( ( *aspect_n + error_n - cd ) * ( *aspect_n - error_n - cd ) < 0 ) {
-            /*
-             * We can assume square pixels, since taking in account the error,
-             * the pixels could either be narrow or wide.
-             */
-            *aspect_n = *aspect_d = 1;
-        } else {
-            /* Simplify and return the aspect ratio. */
-            simplify_fraction( aspect_n, aspect_d );
+         * <==> Now, we multiply the test by the common denominator.
+         *      (if this has any effect on the signedness, it'll be mirrored),
+         *      and we get the final test:
+         */ 
+        for( ratio_w = snapratio_w; ratio_w < snapratio_w_end; ratio_w++ ) {
+            if( SIGN(*aspect_w + error_w - *ratio_w) !=
+                SIGN(*aspect_w - error_w - *ratio_w) ) {
+                *aspect_w = *ratio_w;
+                break;
+            }
         }
+        simplify_fraction( aspect_w, aspect_h );
     }
 }
 
