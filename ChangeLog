@@ -1,5 +1,6 @@
 
 0.9.11 -
+  * vektor: Save state of closed captions across sessions.
   * vektor: Save state of the colour invert filter across sessions.
   * vektor: Added a command to set the fullscreen position.
   * vektor: Fixed gettext to initialize properly.

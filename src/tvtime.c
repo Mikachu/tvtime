@@ -1664,7 +1664,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( !vbidata ) {
             fprintf( stderr, "tvtime: Could not create vbidata.\n" );
         } else {
-            vbidata_capture_mode( vbidata, CAPTURE_OFF );
+            vbidata_capture_mode( vbidata, config_get_cc( ct ) ? CAPTURE_CC1 : CAPTURE_OFF );
             vbidata_capture_xds( vbidata, config_get_usexds( ct ) );
         }
         commands_set_vbidata( commands, vbidata );

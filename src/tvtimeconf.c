@@ -75,6 +75,7 @@ struct config_s
     int colour;
     int hue;
     int invert;
+    int cc;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -269,6 +270,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "ColourInvert" ) ) {
             ct->invert = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
+            ct->cc = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
@@ -759,6 +764,7 @@ config_t *config_new( void )
     ct->colour = -1;
     ct->hue = -1;
     ct->invert = 0;
+    ct->cc = 0;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1691,4 +1697,10 @@ int config_get_invert( config_t *ct )
 {
     return ct->invert;
 }
+
+int config_get_cc( config_t *ct )
+{
+    return ct->cc;
+}
+
 

@@ -201,6 +201,13 @@
   <option name="AudioMode" value="stereo"/>
 
   <!--
+    This option saves the state of closed caption decoding.  Closed
+    captions are an NTSC-specific text version of the audio for the
+    hearing impaired.
+  -->
+  <option name="ShowCC" value="0"/>
+
+  <!--
     This value saves the on-off state of the colour invert filter across
     sessions.
   -->
