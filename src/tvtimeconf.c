@@ -92,6 +92,8 @@ struct config_s
     int debug;
     int finetune;
 
+    int ntsc_mode;
+
     int apply_luma_correction;
     double luma_correction;
 
@@ -162,6 +164,7 @@ config_t *config_new( int argc, char **argv )
     ct->verbose = 0;
     ct->aspect = 0;
     ct->debug = 0;
+    ct->ntsc_mode = 0;
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
     ct->inputnum = 0;
@@ -213,7 +216,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
     ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;
-    ct->keymap[ 'f' ] = TVTIME_FREQLIST_UP;
+    ct->keymap[ 'f' ] = TVTIME_FULLSCREEN;
     ct->keymap[ 'a' ] = TVTIME_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
@@ -356,6 +359,16 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
         ct->finetune = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "NTSCCableMode", 1 )) ) {
+        if( !strcasecmp( tmp, "IRC" ) ) {
+            ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
+        } else if( !strcasecmp( tmp, "HRC" ) ) {
+            ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
+        } else {
+            ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
+        }
     }
 
     config_init_keymap( ct );

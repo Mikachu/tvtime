@@ -21,6 +21,13 @@
 
 typedef struct config_s config_t;
 
+/** 
+ * NTSC cable modes.
+ */
+#define NTSC_CABLE_MODE_NOMINAL 0
+#define NTSC_CABLE_MODE_IRC     1
+#define NTSC_CABLE_MODE_HRC     2
+
 /**
  * Input commands for keymap
  */

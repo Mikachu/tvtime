@@ -36,6 +36,12 @@ Norm = ntsc
 #    argentina
 Frequencies = us-cable
 
+# There are two special NTSC cable standards in the US: IRC and HRC.
+# In IRC, channels 5 and 6 are on different frequencies, and HRC mode
+# shifts all frequencies up by 1.25MHz (and is also weird on channels
+# 5 and 6).
+NTSCCableMode = Nominal
+
 # This sets a constant offset for all tuner frequencies, in kHz.
 # This value is always added to the frequency passed to the tuner (and may
 # be negative).  Note that since we take values in kHz, I don't think this
@@ -122,6 +128,7 @@ DebugMode = 0
 # key_colour_down            = F7
 # key_colour_up              = F8
 # key_tv_video               = F9
+# key_toggle_ntsc_cable_mode = F10
 # key_show_bars              = F11
 # key_debug                  = d
 # key_fullscreen             = f
@@ -150,6 +157,7 @@ key_cont_up                = F6
 key_colour_down            = F7
 key_colour_up              = F8
 key_tv_video               = F9
+key_toggle_ntsc_cable_mode = F10
 key_show_bars              = F11
 key_show_credits           = F12
 key_debug                  = d

@@ -55,9 +55,6 @@ struct input_s {
 /**
  * Tuner settings.
  */
-#define NTSC_CABLE_MODE_NOMINAL 0
-#define NTSC_CABLE_MODE_IRC     1
-#define NTSC_CABLE_MODE_HRC     2
 static int cur_channel = 0;
 static int cur_freq_table = 1;
 static int ntsc_cable_mode = NTSC_CABLE_MODE_NOMINAL;
