@@ -357,6 +357,7 @@ int DpyInfoInit(Display *dpy, int screen_nr)
 
   dpyinfo.resolution_origin = DpyInfoOriginX11;
   dpyinfo.geometry_origin = DpyInfoOriginX11;
+  dpyinfo.ewmh_fullscreen = 1;
 
   return 1;
 }
