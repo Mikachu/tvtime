@@ -187,6 +187,14 @@
   <option name="DefaultHue" value="-1"/>
 
   <!--
+    This option saves the last used audio mode.  This will be used to
+    remember which audio mode to select when the application is next
+    started.  Valid options here are "mono", "stereo", "lang1", "lang2"
+    or "sap".
+  -->
+  <option name="AudioMode" value="stereo"/>
+
+  <!--
     This indicates whether the luma correction option should be enabled by
     default when starting the application.  Luma correction can be turned
     on or off within the application using the "c" key.

@@ -1,5 +1,6 @@
 
 0.9.9.1
+  * vektor: Save the last used audio mode to the config file.
   * vektor: Let commands fall back to their default bindings even
       if you are in the menu.  This makes a lot more sense.
   * vektor: Added Ville Syrjala's DirectFB output layer.

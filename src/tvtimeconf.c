@@ -79,6 +79,7 @@ struct config_s
     char *freq;
     char *ssdir;
     char *timeformat;
+    char *audiomode;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
 
@@ -130,6 +131,7 @@ static void copy_config( config_t *dest, config_t *src )
     dest->nummodes = 0;
     dest->doc = 0;
     dest->output_driver = 0;
+    dest->audiomode = 0;
 
     /* Useful strings must be copied. */
     dest->norm = strdup( src->norm );
@@ -247,6 +249,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "DFBSendFields" ) ) {
             ct->send_fields = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "AudioMode" ) ) {
+            if( ct->audiomode ) free( ct->audiomode );
+            ct->audiomode = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "OutputDriver" ) ) {
@@ -727,6 +734,7 @@ config_t *config_new( void )
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
     ct->ssdir = strdup( getenv( "HOME" ) );
+    ct->ssdir = strdup( "stereo" );
     ct->timeformat = strdup( "%X" );
     ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
     ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
@@ -1232,6 +1240,7 @@ void config_free_data( config_t *ct )
     if( ct->norm ) free( ct->norm );
     if( ct->freq ) free( ct->freq );
     if( ct->ssdir ) free( ct->ssdir );
+    if( ct->audiomode ) free( ct->audiomode );
     if( ct->timeformat ) free( ct->timeformat );
     if( ct->output_driver ) free( ct->output_driver );
     if( ct->rvr_filename ) free( ct->rvr_filename );
@@ -1574,5 +1583,10 @@ int config_get_global_colour( config_t *ct )
 int config_get_global_hue( config_t *ct )
 {
     return ct->hue;
+}
+
+const char *config_get_audio_mode( config_t *ct )
+{
+    return ct->audiomode;
 }
 

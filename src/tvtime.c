@@ -1356,7 +1356,20 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 error_string = 0;
             }
         } else {
+            const char *audiomode = config_get_audio_mode( ct );
             videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
+
+            if( audiomode ) {
+                if( !strcasecmp( audiomode, "mono" ) ) {
+                    videoinput_set_audio_mode( vidin, VIDEOINPUT_MONO );
+                } else if( !strcasecmp( audiomode, "stereo" ) ) {
+                    videoinput_set_audio_mode( vidin, VIDEOINPUT_STEREO );
+                } else if( !strcasecmp( audiomode, "sap" ) || !strcasecmp( audiomode, "lang1" ) ) {
+                    videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG1 );
+                } else {
+                    videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
+                }
+            }
             width = videoinput_get_width( vidin );
             height = videoinput_get_height( vidin );
             if( verbose ) {
@@ -2379,6 +2392,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
         config_save( ct, "V4LInput", number );
+
+        if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_MONO ) {
+            config_save( ct, "AudioMode", "mono" );
+        } else if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_LANG1 ) {
+            config_save( ct, "AudioMode", "lang1" );
+        } else if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_LANG2 ) {
+            config_save( ct, "AudioMode", "lang2" );
+        } else {
+            config_save( ct, "AudioMode", "stereo" );
+        }
     }
 
     output->shutdown();
@@ -2389,6 +2412,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( rvrreader ) {
         rvrreader_delete( rvrreader );
     }
+
     if( vidin ) {
         videoinput_delete( vidin );
     }
