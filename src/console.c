@@ -32,14 +32,13 @@
 /* stupid glibc bug i guess */
 int vfscanf(FILE *stream, const char *format, va_list ap);
 
-struct console_line_coords {
+struct console_line_coords
+{
     int x, y;
 };
 
-struct console_s {
-
-    config_t *cfg;
-
+struct console_s
+{
     char *text;
     osd_string_t **line;
     struct console_line_coords *coords;
@@ -80,9 +79,9 @@ struct console_s {
 
 };
 
-console_t *console_new( config_t *cfg, int x, int y, int width, int height,
+console_t *console_new( int x, int y, int width, int height,
                         int fontsize, int video_width, int video_height, 
-                        double video_aspect )
+                        double video_aspect, unsigned int fgcolour )
 {
     int i=0, rowheight;
     console_t *con = (console_t *)malloc(sizeof(struct console_s));
@@ -91,7 +90,6 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
         return NULL;
     }
 
-    con->cfg = cfg;
     con->x = x;
     con->y = y;
     con->frame_width = video_width;
@@ -100,7 +98,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
     con->curx = 0;
     con->cury = 0;
     con->timeout = 51;
-    con->fgcolour = config_get_other_text_rgb( cfg );
+    con->fgcolour = fgcolour;
     con->bgcolour = 0x000000; /* black */
     con->bg_luma = 16;
     con->bg_cb = 128;

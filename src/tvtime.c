@@ -797,9 +797,9 @@ int main( int argc, char **argv )
     }
 
     /* Setup the console */
-    con = console_new( ct, (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 10,
-                       width, height, 
-                       config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+    con = console_new( (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 10,
+                       width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0),
+                       config_get_other_text_rgb( ct ) );
     if( !con ) {
         fprintf( stderr, "tvtime: Could not setup console.\n" );
     } else {
