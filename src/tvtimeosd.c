@@ -181,7 +181,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     memset( osd->network_call, 0, sizeof( osd->network_call ) );
     memset( osd->show_info, 0, sizeof( osd->show_info ) );
 
-    fontfile = "FreeSansBold.ttf";
+    fontfile = "tvtimeSansBold.ttf";
     logofile = "tvtimelogo";
 
     osd->databar = osd_rect_new();

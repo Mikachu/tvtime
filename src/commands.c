@@ -350,6 +350,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           int fieldtime )
 {
     commands_t *cmd = malloc( sizeof( struct commands_s ) );
+    char string[ 128 ];
     menu_t *menu;
 
     if( !cmd ) {
@@ -531,19 +532,23 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "picture" );
     menu_set_text( menu, 0, "Setup - Picture" );
-    menu_set_text( menu, 1, "Brightness" );
+    sprintf( string, "%c%c%c  Brightness", 0xe2, 0x98, 0x80 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 2, "Contrast" );
+    sprintf( string, "%c%c%c  Contrast", 0xe2, 0x97, 0x90 );
+    menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 3, "Colour" );
+    sprintf( string, "%c%c%c  Colour", 0xe2, 0x98, 0xB0 );
+    menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    menu_set_text( menu, 4, "Hue" );
+    sprintf( string, "%c%c%c  Hue", 0xe2, 0x97, 0xaf );
+    menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
@@ -555,50 +560,62 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "brightness" );
     menu_set_text( menu, 0, "Setup - Picture - Brightness" );
-    menu_set_text( menu, 1, "< Adjust >" );
+    sprintf( string, "%c%c%c Adjust %c%c%c",
+             0xe2, 0x97, 0x80,
+             0xe2, 0x96, 0xb6 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_BRIGHTNESS_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_BRIGHTNESS_DOWN, "" );
     menu_set_text( menu, 2, "Back" );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "contrast" );
     menu_set_text( menu, 0, "Setup - Picture - Contrast" );
-    menu_set_text( menu, 1, "< Adjust >" );
+    sprintf( string, "%c%c%c Adjust %c%c%c",
+             0xe2, 0x97, 0x80,
+             0xe2, 0x96, 0xb6 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_CONTRAST_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_CONTRAST_DOWN, "" );
     menu_set_text( menu, 2, "Back" );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "colour" );
     menu_set_text( menu, 0, "Setup - Picture - Colour" );
-    menu_set_text( menu, 1, "< Adjust >" );
+    sprintf( string, "%c%c%c Adjust %c%c%c",
+             0xe2, 0x97, 0x80,
+             0xe2, 0x96, 0xb6 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_COLOUR_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_COLOUR_DOWN, "" );
     menu_set_text( menu, 2, "Back" );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "hue" );
     menu_set_text( menu, 0, "Setup - Picture - Hue" );
-    menu_set_text( menu, 1, "< Adjust >" );
+    sprintf( string, "%c%c%c Adjust %c%c%c",
+             0xe2, 0x97, 0x80,
+             0xe2, 0x96, 0xb6 );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_NOCOMMAND, "" );
     menu_set_right_command( menu, 1, TVTIME_HUE_UP, "" );
     menu_set_left_command( menu, 1, TVTIME_HUE_DOWN, "" );
     menu_set_text( menu, 2, "Back" );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
 
     reinit_tuner( cmd );
