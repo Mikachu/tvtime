@@ -1,221 +1,943 @@
-# Dutch translation iof tvtime.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Dutch translation of tvtime.
+# Copyright (C) 2003 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the tvtime package.
 # Vincent van Adrighem <adrighem@gnome.org>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tvtime cvs\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-04 23:11+0200\n"
-"PO-Revision-Date: 2003-10-04 23:10+0200\n"
+"Report-Msgid-Bugs-To: http://tvtime.net/\n"
+"POT-Creation-Date: 2003-09-27 10:57+0200\n"
+"PO-Revision-Date: 2003-10-05 03:49+0200\n"
 "Last-Translator: Vincent van Adrighem <adrighem@gnome.org>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
-#: src/tvtime.c:1817
-msgid "Fullscreen mode active."
-msgstr "Volledig scherm."
+#: src/tvtime.c:824 src/tvtime.c:842 src/tvtime.c:876 src/tvtime.c:940
+#: src/tvtime.c:968 src/tvtime.c:1094 src/commands.c:357 src/commands.c:522
+#: src/commands.c:542 src/commands.c:604 src/commands.c:650 src/commands.c:725
+#: src/commands.c:742 src/commands.c:769 src/commands.c:834
+#: src/commands.c:1092 src/commands.c:1139 src/commands.c:1175
+#: src/commands.c:1213 src/commands.c:1285 src/commands.c:1356
+#: src/commands.c:1366 src/commands.c:1414 src/commands.c:1426
+#: src/commands.c:1456 src/commands.c:1489 src/commands.c:1522
+#: src/commands.c:1554
+msgid "Back"
+msgstr "Terug"
 
-#: src/tvtime.c:1820
-msgid "Windowed mode active."
-msgstr "TV in een venster."
+#: src/tvtime.c:854 src/tvtime.c:980
+#, c-format
+msgid "Full rate: %.2ffps"
+msgstr "Volledige snelheid: %.2ffps"
 
-#: src/tvtime.c:1830
+#: src/tvtime.c:862 src/tvtime.c:984
+#, c-format
+msgid "Half rate, deinterlace top fields: %.2ffps"
+msgstr "Halve snelheid. bovenste veld deinterlacen: %.2ffps"
+
+#: src/tvtime.c:869 src/tvtime.c:988
+#, c-format
+msgid "Half rate, deinterlace bottom fields: %.2ffps"
+msgstr "Halve snelheid, onderste veld deinterlacen: %.2ffps"
+
+#: src/tvtime.c:892
+msgid "Overscan setting"
+msgstr "Overscan-instellingen"
+
+#: src/tvtime.c:899 src/commands.c:1245
+msgid "Apply matte"
+msgstr "'Matte' toepassen"
+
+#: src/tvtime.c:907
+msgid "16:9 output"
+msgstr "16:9 uitvoer"
+
+#: src/tvtime.c:916
+msgid "Fullscreen"
+msgstr "Volledig scherm"
+
+#: src/tvtime.c:923
+msgid "Set fullscreen position"
+msgstr "Positie volledig scherm instellen"
+
+#: src/tvtime.c:933
+msgid "Always-on-top"
+msgstr "Altijd bovenaan"
+
+#: src/tvtime.c:951
+msgid "Centre"
+msgstr "Centreren"
+
+#: src/tvtime.c:958
+msgid "Top"
+msgstr "Boven"
+
+#: src/tvtime.c:964
+msgid "Bottom"
+msgstr "Onder"
+
+#: src/tvtime.c:978
+msgid "Frame drop setting"
+msgstr "Framedrop-instellingen"
+
+#: src/tvtime.c:1005
+msgid "Performance estimates"
+msgstr "Geschatte prestaties"
+
+#: src/tvtime.c:1007
+msgid "Deinterlacer"
+msgstr "Deinterlacer"
+
+#: src/tvtime.c:1010
+#, c-format
+msgid "Input: %s at %dx%d"
+msgstr "Invoer: %s op %dx%d"
+
+#: src/tvtime.c:1014
+#, c-format
+msgid "Attempted framerate: %.2ffps"
+msgstr "Weergavesnelheid: %.2ffps"
+
+#: src/tvtime.c:1018
+#, c-format
+msgid "Average blit time: %.2fms (%.0fMB/sec)"
+msgstr "Gemiddelde blit-snelheid: %.2fms (%.0fMB/sec)"
+
+#: src/tvtime.c:1022
+#, c-format
+msgid "Average render time: %5.2fms"
+msgstr "Gemiddelde opbouw-tijd: %5.2fms"
+
+#: src/tvtime.c:1026
+#, c-format
+msgid "Dropped frames: %d"
+msgstr "Overgeslagen beeldjes: %d"
+
+#: src/tvtime.c:1032
+#, c-format
+msgid "Blit spacing: %4.1f/%4.1fms (want %4.1fms)"
+msgstr "Blit-ruimte: %4.1f/%4.1fms (gewenst %4.1fms)"
+
+#: src/tvtime.c:1051 src/tvtime.c:1104
+msgid "16:9 + Overscan"
+msgstr "16:9 + Overscan"
+
+#: src/tvtime.c:1056 src/tvtime.c:1083 src/tvtime.c:1105
+msgid "1.85:1"
+msgstr "1.85:1"
+
+#: src/tvtime.c:1061 src/tvtime.c:1088 src/tvtime.c:1106
+msgid "2.35:1"
+msgstr "2.35:1"
+
+#: src/tvtime.c:1066 src/tvtime.c:1107
+msgid "4:3 centre"
+msgstr "4:3 gecentreerd"
+
+#: src/tvtime.c:1072
+msgid "4:3 + Overscan"
+msgstr "4:3 + Overscan"
+
+#: src/tvtime.c:1078
+msgid "16:9"
+msgstr "16:9"
+
+#: src/tvtime.c:1103
+msgid "Matte setting (Anamorphic input)"
+msgstr "'Matte' instellingen (Anamorphische invoer)"
+
+#: src/tvtime.c:1186
+msgid "tvtime: Can't set configuration options, exiting.\n"
+msgstr "tvtime: Kan configuratie-opties niet instellen. Afgebroken.\n"
+
+#: src/tvtime.c:1204
+#, c-format
+msgid "tvtime: Can't renice to %d.\n"
+msgstr "tvtime: Kan prioriteit niet instellen op %d.\n"
+
+#: src/tvtime.c:1211
+msgid "tvtime: Sending fields to interlaced output devices.\n"
+msgstr "tvtime: Zenden van beeldvelden naar uitvoer-apparaten met interlace functionaliteit.\n"
+
+#: src/tvtime.c:1214
+msgid "tvtime: Sending frames to interlaced output devices.\n"
+msgstr "tvtime: Zenden van frames naar uitvoer-apparaten met interlace functionaliteit.\n"
+
+#: src/tvtime.c:1257
+msgid ""
+"tvtime: Output driver failed to initialize: no video output available.\n"
+msgstr ""
+"tvtime: Initialisatie mislukt van uitvoer-driver. Geen uitvoer beschikbaar.\n"
+
+#: src/tvtime.c:1273
+msgid "tvtime: Can't initialize input filters.\n"
+msgstr "tvtime: Kan invoer-filters niet initialiseren.\n"
+
+#: src/tvtime.c:1276
+msgid "tvtime: Can't initialize output filters.\n"
+msgstr "tvtime: Kan uitvoer-filters niet initialiseren.\n"
+
+#: src/tvtime.c:1318
+msgid "tvtime: Can't initialize performance monitor, exiting.\n"
+msgstr "tvtime: Kan prestatie-analyse niet starten. Afgebroken.\n"
+
+#: src/tvtime.c:1327
+msgid "tvtime: Can't create stationmanager (no memory?), exiting.\n"
+msgstr "tvtime: Kan kanaalbeheer niet starten (geen geheugen?). Afgebroken.\n"
+
+#: src/tvtime.c:1341 src/tvtime.c:1352
+#, c-format
+msgid "Can't open rvr file '%s'."
+msgstr "Kan rvr-bestand '%s' niet openen."
+
+#: src/tvtime.c:1359
+#, c-format
+msgid "tvtime: RVR frame sampling %d pixels per scanline.\n"
+msgstr "tvtime: RVR beeld, %d beeldpunten per scanline.\n"
+
+#: src/tvtime.c:1369
+#, c-format
+msgid "Can't open video4linux device '%s'."
+msgstr "Kan video4linux-apparaat '%s' niet openen."
+
+#: src/tvtime.c:1393
+#, c-format
+msgid "tvtime: V4L sampling %d pixels per scanline.\n"
+msgstr "tvtime: V4L beeld, %d beeldpunten per scanline.\n"
+
+#: src/tvtime.c:1401
+#, c-format
+msgid "tvtime: Can't display input size %dx%d.\n"
+msgstr "tvtime: Kan invoerafmetingen %dx%d niet weergeven.\n"
+
+#: src/tvtime.c:1421
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Not enough to continue.  "
+"Exiting.\n"
+msgstr ""
+"tvtime: Kan slechts %d frame-buffers van V4L krijgen.  Niet genoeg om door te gaan.  Afgebroken.\n"
+
+#: src/tvtime.c:1426
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
+"plugins\n"
+"tvtime: to those which only need 1 field.\n"
+msgstr ""
+"tvtime: Kan slechts %d frame-buffers van V4L krijgen.  Interlace-compensatie plugins\n"
+"vtime: beperkt tot degene die slechts 1 veld nodig hebben.\n"
+
+#: src/tvtime.c:1432
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
+"plugins\n"
+"tvtime: to those which only need 2 fields.\n"
+msgstr ""
+"tvtime: Kan slechts %d frame-buffers van V4L krijgen.  Interlace-compensatie plugins\n"
+"tvtime: beperkt tot degene die slechts 2 velden nodig hebben.\n"
+
+#: src/tvtime.c:1442
+#, c-format
+msgid ""
+"\n"
+"*** You are using the bttv driver, but without enough gbuffers available.\n"
+"*** See the support page at %s for information\n"
+"*** on how to increase your gbuffers setting.\n"
+"\n"
+msgstr ""
+"\n"
+"*** U gebruikt de bttv-driver, maar heeft niet genoeg gbuffers beschikbaar.\n"
+"*** Kijk op de hulppagina op %s voor meer informatie\n"
+"*** over het verhogen van het aantal gbuffers.\n"
+"\n"
+
+#: src/tvtime.c:1459
+msgid "tvtime: No deinterlacing methods available, exiting.\n"
+msgstr "tvtime: Geen interlace-compensatiemethodes beschikbaar. Afgebroken.\n"
+
+#: src/tvtime.c:1480
+msgid "tvtime: Can't allocate extra frame storage memory.\n"
+msgstr "tvtime: Kan geen extra geheugen reserveren voor frame-opslag.\n"
+
+#: src/tvtime.c:1498
+msgid "tvtime: OSD initialization failed, OSD disabled.\n"
+msgstr "tvtime: OSD-initialisatie mislukt. OSD uitgeschakeld.\n"
+
+#: src/tvtime.c:1514
+msgid "No video source"
+msgstr "Geen video-bron"
+
+#: src/tvtime.c:1531
+msgid "tvtime: Can't create command handler.\n"
+msgstr "tvtime: Kan geen opdrachtafhandeling aanmaken.\n"
+
+#: src/tvtime.c:1558
+msgid ""
+"tvtime: Card requires conversion from UYVY, but we failed to initialize our "
+"converter!\n"
+msgstr ""
+"tvtime: Kaart vereist omzetting van UYVY, maar de omzetter kan niet "
+"geïnitialiseerd worden!\n"
+
+#: src/tvtime.c:1566
+msgid "tvtime: Cannot find FIFO directory.  FIFO disabled.\n"
+msgstr "tvtime: Kan FIFO-map niet vinden. FIFO uitgeschakeld.\n"
+
+#: src/tvtime.c:1573
+#, c-format
+msgid "tvtime: Cannot create directory %s.  FIFO disabled.\n"
+msgstr "tvtime: Kan de map %s niet aanmaken. FIFO uitgeschakeld.\n"
+
+#: src/tvtime.c:1580
+#, c-format
+msgid "tvtime: %s is not a directory.  FIFO disabled.\n"
+msgstr "tvtime: %s is geen map. FIFO uitgeschakeld.\n"
+
+#: src/tvtime.c:1592
+#, c-format
+msgid "tvtime: You do not own %s.  FIFO disabled.\n"
+msgstr "tvtime: U bent niet de eigenaar van %s. FIFO uitgeschakeld.\n"
+
+#: src/tvtime.c:1598
+#, c-format
+msgid "tvtime: Cannot stat %s.  FIFO disabled.\n"
+msgstr "tvtime: Kan %s niet statten. FIFO uitgeschakeld.\n"
+
+#: src/tvtime.c:1611
+msgid "tvtime: Cannot find FIFO file.  Failed to create FIFO object.\n"
+msgstr "tvtime: Kan FIFO-bestand niet vinden. Kan FIFO-object niet aanmaken.\n"
+
+#: src/tvtime.c:1616
+msgid "tvtime: Not reading input from FIFO.  Failed to create FIFO object.\n"
+msgstr "tvtime: Kan niet lezen van FIFO. Kan FIFO-object niet aanmaken.\n"
+
+#: src/tvtime.c:1629
+msgid "tvtime: Could not setup console.\n"
+msgstr "tvtime: Kan terminal niet instellen.\n"
+
+#: src/tvtime.c:1643
+msgid "tvtime: Can't create input handler.\n"
+msgstr "tvtime: Kan invoerafhandeling niet aanmaken.\n"
+
+#: src/tvtime.c:1651
+msgid "tvtime: Could not create vbiscreen, closed captions unavailable.\n"
+msgstr "tvtime: Kan geen vbiscreen aanmaken. Ondertiteling uitgeschakeld.\n"
+
+#: src/tvtime.c:1657
+msgid "tvtime: Could not create vbidata.\n"
+msgstr "tvtime: Kan geen vbidata aanmaken.\n"
+
+#: src/tvtime.c:1906
 msgid "Window set as always-on-top."
 msgstr "Venster altijd bovenaan"
 
-#: src/tvtime.c:1832
+#: src/tvtime.c:1909
 msgid "Window set to normal stacking."
 msgstr "Venster instellen op normale volgorde"
 
-#: src/tvtime.c:1845
+#: src/tvtime.c:1926
 msgid "16:9 display mode active."
 msgstr "16:9 verhouding."
 
-#: src/tvtime.c:1850
+#: src/tvtime.c:1933
 msgid "4:3 display mode active."
 msgstr "4:3 verhouding."
 
-#: src/tvtime.c:1927
+#: src/tvtime.c:2039
 msgid "2-3 Pulldown detection disabled."
-msgstr "2-3 oprekdetectie uitgeschakeld."
+msgstr "2-3 pulldown-detectie uitgeschakeld."
 
-#: src/tvtime.c:1929
+#: src/tvtime.c:2042
 msgid "2-3 Pulldown detection enabled."
-msgstr "2-3 oprekdetectie ingeschakeld."
+msgstr "2-3 pulldown-detectie ingeschakeld."
 
-#: src/tvtime.c:1934
+#: src/tvtime.c:2047
 msgid "2-3 Pulldown detection is not valid with your TV norm."
-msgstr "2-3 oprekdetectie onnodig voor uw TV-standaard."
+msgstr "2-3 pulldown-detectie onnodig voor uw TV-standaard."
 
-#: src/tvtime.c:2248 src/tvtime.c:2365
+#: src/tvtime.c:2281
+#, c-format
+msgid "tvtime: Stats using '%s' at %dx%d.\n"
+msgstr "tvtime: Stats voor '%s' op %dx%d.\n"
+
+#: src/tvtime.c:2419 src/tvtime.c:2560
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Schermafdruk: %s"
 
-#: src/commands.c:1985
+#: src/tvtime.c:2648
+msgid "tvtime: Cleaning up.\n"
+msgstr "tvtime: Opruimen.\n"
+
+#: src/tvtime.c:2691
+msgid "tvtime: Restarting.\n"
+msgstr "tvtime: Herstarten.\n"
+
+#: src/tvtime.c:2695
+msgid "tvtime: Thank you for using tvtime.\n"
+msgstr "tvtime: Bedankt voor het gebruiken van tvtime.\n"
+
+#: src/tvtime.c:2711
+#, c-format
+msgid "tvtime: Running %s.\n"
+msgstr "tvtime: Uitvoeren van %s.\n"
+
+#: src/tvtime.c:2714
+msgid ""
+"\n"
+"*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
+"*** We often break stuff during development.  Please submit bug reports\n"
+"*** based on released versions only!!\n"
+"\n"
+msgstr ""
+"\n"
+"*** LET OP: U maakt gebruik vaneen ONTWIKKELINGSversie van tvtime.\n"
+"*** We maken tijdens de ontwikkeling vaak dingen kapot. Stuur alleen\n"
+"*** foutrapporten in over officiële versies!!\n"
+"\n"
+
+#: src/tvtime.c:2723
+msgid ""
+"tvtime: Can't get realtime priority for better performance, need root "
+"access.\n"
+msgstr "tvtime: Kan geen realtime prioriteit krijgen. Dat kan alleen met root-toegang.\n"
+
+#: src/tvtime.c:2730
+#, c-format
+msgid ""
+"\n"
+"*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+"*** that you load the 'rtc' kernel module before starting tvtime,\n"
+"*** and make sure that your user has access to the device file.\n"
+"*** See our support page at %s for more information\n"
+"\n"
+msgstr ""
+"\n"
+"*** /dev/rtc is nodig voor vloeiende weergave. We raden u sterk aan om de\n"
+"*** 'rtc'-kernelmodule te laden voordat u tvtime start.\n"
+"*** Controleer ook of u als gebruiker wel toegang heeft tot het apparaat.\n"
+"*** Kijk op de hulppagina op %s voor meer informatie\n"
+"\n"
+
+#: src/tvtime.c:2748
+#, c-format
+msgid ""
+"\n"
+"*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
+"*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
+"*** linux kernel version 2.4.19 or later, please run:\n"
+"***       sysctl -w dev.rtc.max-user-freq=1024\n"
+"*** See our support page at %s for more information\n"
+"\n"
+msgstr ""
+"\n"
+"*** Kan geen resolutie van 1024 Hz krijgen van /dev/rtc.\n"
+"*** Beeldweergave zal niet vloeiend zijn. Start tvtime als root, of ,met\n"
+"*** linuxkernel 2.4.19+, kunt u:\n"
+"***       sysctl -w dev.rtc.max-user-freq=1024\n"
+"*** starten.\n"
+"*** Kijk op de hulppagina op %s voor meer informatie\n"
+"\n"
+
+#: src/commands.c:185 src/commands.c:753 src/commands.c:1076
+#: src/commands.c:1440 src/commands.c:1473 src/commands.c:1506
+#: src/commands.c:1539
+msgid "Current"
+msgstr "Huidige"
+
+#: src/commands.c:284
+msgid "Renumber current channel"
+msgstr "Huidige kanaal hernummeren"
+
+#: src/commands.c:292 src/commands.c:295
+msgid "Current channel active in list"
+msgstr "Huidige kanaal actief"
+
+#: src/commands.c:305
+msgid "Stop channel scan"
+msgstr "Kanaalscan stoppen"
+
+#: src/commands.c:309
+msgid "Scan channels for signal"
+msgstr "Kanalen scannen op signalen"
+
+#: src/commands.c:317
+msgid "Reset all channels as active"
+msgstr "Alle kanalen activeren"
+
+#: src/commands.c:323
+msgid "Finetune current channel"
+msgstr "Huidige kanaal fijnafstemmen"
+
+#: src/commands.c:330
+msgid "Change NTSC cable mode"
+msgstr "NTSC kabelstand veranderen"
+
+#: src/commands.c:336
+msgid "Set current channel as SECAM"
+msgstr "Huidige kanaal instellen als SECAM"
+
+#: src/commands.c:337
+msgid "Set current channel as PAL"
+msgstr "Huidige kanaal instellen als PAL"
+
+#: src/commands.c:344
+msgid "Change frequency table"
+msgstr "Frequentietabel veranderen"
+
+#: src/commands.c:350
+msgid "Disable signal detection"
+msgstr "Signaaldetectie uitschakelen"
+
+#: src/commands.c:351
+msgid "Enable signal detection"
+msgstr "Signaaldetectie inschakelen"
+
+#: src/commands.c:502 src/commands.c:529
+msgid "Cable"
+msgstr "Kabel"
+
+#: src/commands.c:510 src/commands.c:537
+msgid "Broadcast"
+msgstr "Via de ether"
+
+#: src/commands.c:517
+msgid "Cable with channels 100+"
+msgstr "Kabel met 100+ kanelen"
+
+#: src/commands.c:549
+msgid "Europe"
+msgstr "Europa"
+
+#: src/commands.c:557
+msgid "Russia"
+msgstr "Rusland"
+
+#: src/commands.c:564
+msgid "France"
+msgstr "Frankrijk"
+
+#: src/commands.c:571
+msgid "Australia"
+msgstr "Australië"
+
+#: src/commands.c:578
+msgid "Australia (Optus)"
+msgstr "Australië (Optus)"
+
+#: src/commands.c:585
+msgid "New Zealand"
+msgstr "Nieuw Zeeland"
+
+#: src/commands.c:592
+msgid "China Broadcast"
+msgstr "China Ether"
+
+#: src/commands.c:599
+msgid "Custom (first run tvtime-scanner)"
+msgstr "Aangepast (start tvtime-scanner)"
+
+#: src/commands.c:615
+#, c-format
+msgid "%s  Current: %d pixels"
+msgstr "%s  Huidig: %d beeldpunten"
+
+#: src/commands.c:622
+msgid "Low (360 pixels)"
+msgstr "Laag (360 beeldpunten)"
+
+#: src/commands.c:628
+msgid "Moderate (576 pixels)"
+msgstr "Gemiddeld (576 beeldpunten)"
+
+#: src/commands.c:634
+msgid "Standard (720 pixels)"
+msgstr "Standaard (720 beeldpunten)"
+
+#: src/commands.c:640
+msgid "High (768 pixels)"
+msgstr "Hoog (768 beeldpunten)"
+
+#: src/commands.c:645 src/commands.c:1208
+msgid "Restart with new settings"
+msgstr "Herstarten met nieuwe instellingen"
+
+#: src/commands.c:706
+msgid "Mono"
+msgstr "Mono"
+
+#: src/commands.c:713
+msgid "Stereo"
+msgstr "Stereo"
+
+#: src/commands.c:721
+msgid "SAP"
+msgstr "SAP"
+
+#: src/commands.c:732
+msgid "Primary Language"
+msgstr "Primaire taal"
+
+#: src/commands.c:737
+msgid "Secondary Language"
+msgstr "Secundaire taal"
+
+#: src/commands.c:759 src/commands.c:1082 src/commands.c:1446
+#: src/commands.c:1479 src/commands.c:1512 src/commands.c:1544
+msgid "Increase"
+msgstr "Verhogen"
+
+#: src/commands.c:764 src/commands.c:1087 src/commands.c:1451
+#: src/commands.c:1484 src/commands.c:1517 src/commands.c:1549
+msgid "Decrease"
+msgstr "Verlagen"
+
+#: src/commands.c:789
+msgid "BT8x8 luma correction"
+msgstr "BT8x8 luma-correctie"
+
+#: src/commands.c:799
+msgid "2-3 pulldown inversion"
+msgstr "2-3 pulldown-inversie"
+
+#: src/commands.c:808 src/commands.c:816
+msgid "Colour invert"
+msgstr "Kleurinversie"
+
+#: src/commands.c:820
+msgid "Mirror"
+msgstr "Spiegelen"
+
+# Wat is chroma-kill in hemelsnaam?
+# Volgens dict heeft het met kleurhelderheid en verzadiging te maken.
+#: src/commands.c:828
+msgid "Chroma killer"
+msgstr "Chroma-killer"
+
+#: src/commands.c:976 src/commands.c:1011 src/commands.c:1043
+#: src/commands.c:1061 src/commands.c:1072 src/commands.c:1100
+#: src/commands.c:1147 src/commands.c:1183 src/commands.c:1191
+#: src/commands.c:1204 src/commands.c:1239 src/commands.c:1245
+#: src/commands.c:1251 src/commands.c:1258 src/commands.c:1264
+#: src/commands.c:1292 src/commands.c:1298 src/commands.c:1306
+#: src/commands.c:1312 src/commands.c:1324 src/commands.c:1373
+#: src/commands.c:1436 src/commands.c:1469 src/commands.c:1502
+#: src/commands.c:1535
+msgid "Setup"
+msgstr "Instellingen"
+
+#: src/commands.c:979 src/commands.c:1043 src/commands.c:1062
+#: src/commands.c:1073
+msgid "Station management"
+msgstr "Kanalenbeheer"
+
+#: src/commands.c:984 src/commands.c:1015 src/commands.c:1101
+#: src/commands.c:1147 src/commands.c:1183 src/commands.c:1191
+msgid "Input configuration"
+msgstr "Invoerconfiguratie"
+
+#: src/commands.c:989 src/commands.c:1020
+msgid "Picture settings"
+msgstr "Beeldinstellingen"
+
+#: src/commands.c:994 src/commands.c:1025 src/commands.c:1264
+#: src/commands.c:1293 src/commands.c:1299 src/commands.c:1307
+#: src/commands.c:1313
+msgid "Video processing"
+msgstr "Videobewerking"
+
+#: src/commands.c:999 src/commands.c:1030 src/commands.c:1239
+#: src/commands.c:1245 src/commands.c:1251 src/commands.c:1258
+msgid "Output configuration"
+msgstr "Uitvoerconfiguratie"
+
+#: src/commands.c:1004 src/commands.c:1035
+msgid "Exit menu"
+msgstr "Menu sluiten"
+
+#: src/commands.c:1062
+msgid "Frequency table"
+msgstr "Frequentietabel"
+
+#: src/commands.c:1073 src/commands.c:2577
+msgid "Finetune"
+msgstr "Fijnafstelling"
+
+#: src/commands.c:1105 src/commands.c:1108 src/commands.c:1151
+#: src/commands.c:1154 src/commands.c:2683
+msgid "Change video source"
+msgstr "Videobron veranderen"
+
+#: src/commands.c:1114 src/commands.c:1160 src/commands.c:1191
+msgid "Preferred audio mode"
+msgstr "Voorkeurs-audiostand"
+
+#: src/commands.c:1119 src/commands.c:1165 src/commands.c:1204
+msgid "Television standard"
+msgstr "Televisiestandaard"
+
+#: src/commands.c:1124 src/commands.c:1170 src/commands.c:1183
+msgid "Sharpness"
+msgstr "Scherpte"
+
+#: src/commands.c:1129
+msgid "Toggle closed captions"
+msgstr "Ondertiteling in-/uitschakelen"
+
+#: src/commands.c:1134
+msgid "Toggle XDS decoding"
+msgstr "XDS-decodering in-/uitschakelen"
+
+#: src/commands.c:1204
+msgid "Input Configuration"
+msgstr "Invoerconfiguratie"
+
+#: src/commands.c:1251
+msgid "Overscan"
+msgstr "Overscan"
+
+#: src/commands.c:1258
+msgid "Fullscreen position"
+msgstr "Volledig scherm positie"
+
+#: src/commands.c:1268 src/commands.c:1293
+msgid "Deinterlacer configuration"
+msgstr "Deinterlacer configuratie"
+
+#: src/commands.c:1273
+msgid "Current deinterlacer description"
+msgstr "Beschrijving huidige deinterlacer"
+
+#: src/commands.c:1277 src/commands.c:1307
+msgid "Attempted framerate"
+msgstr "Gewenste snelheid"
+
+#: src/commands.c:1281 src/commands.c:1313
+msgid "Input filters"
+msgstr "Invoerfilters"
+
+#: src/commands.c:1299
+msgid "Deinterlacer description"
+msgstr "Beschijving deinterlacer"
+
+#: src/commands.c:1324 src/commands.c:1373 src/commands.c:1436
+#: src/commands.c:1469 src/commands.c:1502 src/commands.c:1535
+msgid "Picture"
+msgstr "Beeld"
+
+#: src/commands.c:1328 src/commands.c:1378 src/commands.c:1436
+#: src/commands.c:2713 src/commands.c:2754
+msgid "Brightness"
+msgstr "Helderheid"
+
+#: src/commands.c:1333 src/commands.c:1383 src/commands.c:1469
+#: src/commands.c:2727 src/commands.c:2757
+msgid "Contrast"
+msgstr "Contrast"
+
+#: src/commands.c:1337 src/commands.c:1387 src/commands.c:1502
+#: src/commands.c:2741 src/commands.c:2760
+msgid "Colour"
+msgstr "Kleur"
+
+#: src/commands.c:1341 src/commands.c:1391 src/commands.c:1535
+#: src/commands.c:2699 src/commands.c:2763
+msgid "Hue"
+msgstr "Hue"
+
+#: src/commands.c:1348
+msgid "Save current settings as defaults"
+msgstr "Huidige instellingen als standaard opslaan"
+
+#: src/commands.c:1352 src/commands.c:1362 src/commands.c:1409
+#: src/commands.c:1421
+msgid "Reset to global defaults"
+msgstr "Algemene standaardinstellingen herstellen"
+
+#: src/commands.c:1398
+msgid "Save current settings as global defaults"
+msgstr "Huidige instellingen als algemene standaard opslaan"
+
+#: src/commands.c:1404
+msgid "Save current settings as channel defaults"
+msgstr "Huidige instellingen als kanaalstandaard opslaan"
+
+#: src/commands.c:1679
+msgid "Add current station"
+msgstr "Huidige station toevoegen"
+
+#: src/commands.c:1681
+msgid "Exit"
+msgstr "Afsluiten"
+
+#: src/commands.c:1924
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Slaapstand over %d minuten."
 
-#: src/commands.c:1988
+#: src/commands.c:1927
 msgid "Sleep off."
 msgstr "Slaapstand uit."
 
-#: src/commands.c:2039
+#: src/commands.c:1978
 msgid "Channel marked as active in the browse list."
 msgstr "Kanaal ingeschakeld als actief in de lijst"
 
-#: src/commands.c:2041
+#: src/commands.c:1980
 msgid "Channel disabled from the browse list."
 msgstr "Kanaal uitgeschakeld in de lijst."
 
-#: src/commands.c:2083
+#: src/commands.c:2022
 msgid "Processing every input field."
 msgstr "Verwerken van ieder invoerveld."
 
-#: src/commands.c:2085
+#: src/commands.c:2024
 msgid "Processing every top field."
 msgstr "Verwerken van ieder bovenste veld."
 
-#: src/commands.c:2087
+#: src/commands.c:2026
 msgid "Processing every bottom field."
 msgstr "Verwerken van ieder onderste veld."
 
-#: src/commands.c:2099
+#: src/commands.c:2039
 #, c-format
 msgid "Sharpness will be %d on restart."
 msgstr "Scherpte zal %d zijn na herstarten."
 
-#: src/commands.c:2137
+#: src/commands.c:2085
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "Televisiestandaard zal %s zijn na herstarten."
 
-#: src/commands.c:2165
+#: src/commands.c:2114
 msgid "All channels re-activated."
 msgstr "Alle kanalen geactiveerd."
 
-#: src/commands.c:2185
+#: src/commands.c:2134
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Verplaatsen van %d. Geef nieuw kanaalnummer."
 
-#: src/commands.c:2196
-msgid "Scanner unavailable: Signal checking disabled."
-msgstr "Zoeken niet beschikbaar. Signaalcontrole uitgeschakeld."
+#: src/commands.c:2145
+msgid "Scanner unavailable with signal checking disabled."
+msgstr "Zoeken niet beschikbaar wegens uigeschakelde signaalcontrole."
 
-#: src/commands.c:2222
-msgid "Scanning for active channels."
+#: src/commands.c:2171
+msgid "Scanning for channels being broadcast."
 msgstr "Zoeken naar actieve kanalen."
 
-#: src/commands.c:2238
+#: src/commands.c:2187
 msgid "Closed captions disabled."
 msgstr "Ondertiteling uitgeschakeld."
 
-#: src/commands.c:2241
+#: src/commands.c:2190
 msgid "Closed captions enabled."
 msgstr "Ondertiteling ingeschakeld."
 
-#: src/commands.c:2245
+#: src/commands.c:2199
 msgid "No VBI device configured for CC decoding."
 msgstr "Geen VBI-apparaat ingesteld voor CC-decodering."
 
-#: src/commands.c:2259
+#: src/commands.c:2214
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Kleurdecodering voor dit kanaal ingesteld op %s."
 
-#: src/commands.c:2288
+#: src/commands.c:2255
 #, c-format
 msgid "Running: %s"
 msgstr "Actief: %s"
 
-#: src/commands.c:2364
+#: src/commands.c:2331
 msgid "Signal detection enabled."
 msgstr "Signaaldetectie ingeschakeld."
 
-#: src/commands.c:2366
+#: src/commands.c:2333
 msgid "Signal detection disabled."
 msgstr "Signaaldetectie uitgeschakeld."
 
-#: src/commands.c:2378
+#: src/commands.c:2345
 msgid "XDS decoding enabled."
 msgstr "XDS-decodering ingeschakeld."
 
-#: src/commands.c:2380
+#: src/commands.c:2347
 msgid "XDS decoding disabled."
 msgstr "XDS-decodering uitgeschakeld."
 
-#: src/commands.c:2426
+#: src/commands.c:2393
 msgid "Colour invert enabled."
 msgstr "Kleurinversie ingeschakeld."
 
-#: src/commands.c:2428
+#: src/commands.c:2395
 msgid "Colour invert disabled."
 msgstr "Kleurinversie uitgeschakeld."
 
-#: src/commands.c:2445
+#: src/commands.c:2417
 msgid "Mirror enabled."
 msgstr "Spiegeling ingeschakeld."
 
-#: src/commands.c:2447
+#: src/commands.c:2419
 msgid "Mirror disabled."
 msgstr "Spiegeling uitgeschakeld."
 
 # Wat is chroma-kill in hemelsnaam?
 # Volgens dict heeft het met kleurhelderheid en verzadiging te maken.
-#: src/commands.c:2464
+#: src/commands.c:2441
 msgid "Chroma kill enabled."
 msgstr "Chroma-kill ingeschakeld."
 
-#: src/commands.c:2466
+#: src/commands.c:2443
 msgid "Chroma kill disabled."
 msgstr "Chroma-kill uitgeschakeld."
 
-#: src/commands.c:2483
+#: src/commands.c:2460
 msgid "Luma correction enabled."
 msgstr "Luma-correctie ingeschakeld."
 
-#: src/commands.c:2486
+#: src/commands.c:2462
 msgid "Luma correction disabled."
 msgstr "Luma-correctie uitgeschakeld."
 
-#: src/commands.c:2499
+#: src/commands.c:2479
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Overscan: %1.f%%"
 
-#: src/commands.c:2524
+#: src/commands.c:2501
 #, c-format
 msgid "Luma correction value: %.1f"
-msgstr "Luma correctiewaarde: %.1f"
+msgstr "Luma-correctiewaarde: %.1f"
 
-#: src/commands.c:2554
+#: src/commands.c:2531
 msgid "Picture settings reset to defaults."
-msgstr "Standaard beeldinstellingen hersteld"
+msgstr "Standaard beeldinstellingen hersteld."
 
-#: src/commands.c:2806
+#: src/commands.c:2636 src/commands.c:2650
+msgid "Volume"
+msgstr "Volume"
+
+#: src/commands.c:2799
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "Huidige beeldinstellingen als algemene standaard opgeslagen.\n"
 
-#: src/commands.c:2818
+#: src/commands.c:2812
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Huidige beeldinstellingen opgeslagen voor kaneel %d.\n"
 
-#: src/commands.c:2900
+#: src/commands.c:2894
 msgid "Paused."
 msgstr "Pauze."
 
-#: src/commands.c:2900
+#: src/commands.c:2894
 msgid "Resumed."
 msgstr "Actief."
 
-#: src/tvtimeconf.c:611
+#: src/tvtimeconf.c:626
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -262,7 +984,7 @@ msgid ""
 "                             centre (default).\n"
 "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
-"  -S, --saveoptions          Save command line options to the config file.\n"
+"  -S, --saveoptions          Save command line options to the configfile.\n"
 "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 "  -v, --verbose              Print debugging messages to stderr.\n"
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
@@ -311,19 +1033,19 @@ msgstr ""
 "  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
 "                             (standaard: 720).\n"
 "  -k, --slave                Schakelt invoercontrole uit (slaafstand).\n"
-"  -m, --fullscreen           Tvtime schermvullend starten.\n"
-"  -M, --window               Tvtime in een venster starten.\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
-"ondersteunt:\n"
+"  -m, --fullscreen           tvtime schermvullend starten.\n"
+"  -M, --window               tvtime in een venster starten.\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+"                             ondersteunt:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (standaard: NTSC).\n"
 "  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
 "                             centre (standaard).\n"
 "  -r, --rvr=BESTAND          Af te spelen RVR bestand (voor debuggen).\n"
-"  -s, --showdrops            Framedropstatistieken weergeven (voor "
+"  -s, --showdrops            Framedropstatistieken tonen (voor "
 "debuggen).\n"
-"  -S, --saveoptions          Opties van huidige opdracht opslaan in "
-"configuratie.\n"
+"  -S, --saveoptions          Opties van huidige opdracht opslaan in\n"
+"                             configuratie.\n"
 "  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
 "  -v, --verbose              Debug-info uitvoeren naar stderr.\n"
 "  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
@@ -338,7 +1060,7 @@ msgstr ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 
-#: src/tvtimeconf.c:665
+#: src/tvtimeconf.c:680
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -430,8 +1152,8 @@ msgstr ""
 "                             (standaard: 720).\n"
 "  -m, --fullscreen           Tvtime schermvullend starten.\n"
 "  -M, --window               Tvtime in een venster starten.\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
-"ondersteunt:\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+"                             ondersteunt:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (standaard: NTSC).\n"
 "  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
@@ -451,7 +1173,7 @@ msgstr ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 
-#: src/tvtimeconf.c:715
+#: src/tvtimeconf.c:730
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -472,7 +1194,10 @@ msgstr ""
 "laden.\n"
 "  -h, --help                 Deze hulptekst weergeven.\n"
 "  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
-"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
-"ondersteunt:\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime\n"
+"                             ondersteunt:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (standaard: NTSC).\n"
+
+#~ msgid "Windowed mode active."
+#~ msgstr "TV in een venster."
