@@ -1,5 +1,6 @@
 
 1.0RC1 -
+  * vektor: Relicensed deinterlacer code written by me under the LGPL.
   * vektor: Stop setting the window caption so often.  This should be
       a significant performance improvement for some users.
   * vektor: Fix a bug for cx88 users where it would report that the driver
