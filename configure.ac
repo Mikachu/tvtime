@@ -261,7 +261,6 @@ AC_CONFIG_FILES([
 	data/Makefile
 	plugins/Makefile
 	src/Makefile
-	src/wine/Makefile
 	intl/Makefile
 	po/Makefile.in
 	m4/Makefile 

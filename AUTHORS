@@ -13,6 +13,10 @@ Authors and contributors
     - Station list management code.
     - Frequency table conversion script from xawtv's file format.
 
+  Dirk Ziegelmeier <dirk@ziegelmeier.net>
+    - Ported the TomsMoComp and GreedyH deinterlacers from
+      DScaler to gcc.
+
   Joachim Koenig <Joachim.Koenig@tecnomen.fi>
     - Wrote the dscaler plugin loader using the wine code.
 
