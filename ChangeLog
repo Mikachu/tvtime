@@ -1,5 +1,10 @@
 
-0.9.8.6 -
+0.9.9 -
+  * vektor: Added conversion from UYVY to YUYV.  We convert
+      per scanline as we read it from the input.  This should
+      be faster than having drivers convert.  Still, this is
+      only a hack until we update our deinterlacer API to let
+      deinterlacers provide implementations for either format.
   * vektor: Added a special fullscreen window mode (use
       --height=full or hit '*' a few times from the default
       config).  This resizes the window the same as if it
