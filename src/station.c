@@ -163,7 +163,8 @@ static void station_readconfig( station_mgr_t *mgr )
 
     f = fopen( name, "r");
     if( !f ) { 
-        fprintf( stderr, "station: No saved station data found in %s, all channels active.\n", name );
+        fprintf( stderr, "station: No saved station data found in %s.\n"
+                         "station: Initially, all stations will be active.\n", name );
     } else {
         while ( EOF != fscanf( f, "%d\n", &pos ) ) {
             station_set( mgr, pos );
