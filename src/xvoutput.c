@@ -167,7 +167,11 @@ static int open_display( void )
 
     display = XOpenDisplay( 0 );
     if( !display ) {
-        fprintf( stderr, "xvoutput: Cannot open display '%s'.\n", getenv( "DISPLAY" ) );
+        if( getenv( "DISPLAY" ) ) {
+            fprintf( stderr, "xvoutput: Cannot open display '%s'.\n", getenv( "DISPLAY" ) );
+        } else {
+            fprintf( stderr, "xvoutput: No DISPLAY set, so no output possible!\n" );
+        }
         return 0;
     }
 
@@ -353,8 +357,10 @@ int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect )
     output_width = outputwidth;
     output_height = ( output_width * 3 ) / 4;
     calculate_video_area();
-    open_display();
-    xv_check_extension();
+
+    if( !open_display() ) return 0;
+    if( !xv_check_extension() ) return 0;
+
     xv_alloc_frame();
     xv_clear_screen();
     saver_off( display );
