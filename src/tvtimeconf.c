@@ -751,3 +751,9 @@ void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *c
     *cb = (unsigned char)128;
     *cr = (unsigned char)128;
 }
+
+
+parser_file_t *config_get_parsed_file( config_t *ct )
+{
+    return &(ct->pf);
+}

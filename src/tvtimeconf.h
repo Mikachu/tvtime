@@ -103,6 +103,9 @@ unsigned int config_get_menu_bg_rgb( config_t *ct );
 unsigned int config_get_channel_text_rgb( config_t *ct );
 unsigned int config_get_other_text_rgb( config_t *ct );
 
+#include "parser.h"
+parser_file_t *config_get_parsed_file( config_t *ct );
+
 void config_set_verbose( config_t *ct, int verbose );
 void config_set_debug( config_t *ct, int debug );
 void config_set_outputwidth( config_t *ct, int outputwidth );

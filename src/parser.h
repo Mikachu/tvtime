@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
 struct parser_file_s {
     FILE *fh;
     long file_length;
