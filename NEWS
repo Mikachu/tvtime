@@ -23,9 +23,10 @@ News for 0.9.8
        Greedy2Frame   DScaler: Greedy - 2-frame
        TwoFrame       DScaler: TwoFrame
        TomsMoComp     DScaler: TomsMoComp
+       VideoBob       DScaler: Video Bob
        VideoWeave     DScaler: Video Weave
-     We had our own ports of twoframe and greedy2frame, but they were
-     found to be buggy.  Our ports will be disabled until fixed.
+     We had our own ports of videobob, twoframe, and greedy2frame,
+     but they were found to be buggy.  Our ports are currently disabled.
   *  Support for multiple audio channels (stereo, mono, lang1, lang2).
   *  Included a bunch of fixes for PAL-M support.
   *  Various speedups, quality improvements, and bugfixes.
