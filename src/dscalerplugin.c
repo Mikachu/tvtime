@@ -12,7 +12,8 @@
 #include "DS_Filter.h"
 #include "DS_Deinterlace.h"
 
-long CpuFeatureFlags = 0xffffffff;
+#include "mm_accel.h"
+#include "speedy.h"
 
 FILTER_METHOD *load_dscaler_filter( char *filename )
 {
@@ -20,6 +21,7 @@ FILTER_METHOD *load_dscaler_filter( char *filename )
     GETFILTERPLUGININFO* pfnGetFilterPluginInfo;
     FILTER_METHOD* pMethod;
     HMODULE hPlugInMod;
+    long CpuFeatureFlags = 0;
 
     hPlugInMod = LoadLibraryA( filename );
     if( !hPlugInMod ) {
@@ -31,6 +33,16 @@ FILTER_METHOD *load_dscaler_filter( char *filename )
     if( !pfnGetFilterPluginInfo ) {
         fprintf( stderr, "GetPluginInfo failed\n" );
         return 0;
+    }
+
+    if( speedy_get_accel() & MM_ACCEL_X86_MMX ) {
+        CpuFeatureFlags |= FEATURE_MMX;
+    }
+    if( speedy_get_accel() & MM_ACCEL_X86_3DNOW ) {
+        CpuFeatureFlags |= FEATURE_3DNOW;
+    }
+    if( speedy_get_accel() & MM_ACCEL_X86_MMXEXT ) {
+        CpuFeatureFlags |= FEATURE_MMXEXT;
     }
 
     pMethod = pfnGetFilterPluginInfo( CpuFeatureFlags );
@@ -80,6 +92,7 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
     GETDEINTERLACEPLUGININFO *pfnGetDeinterlacePluginInfo;
     DEINTERLACE_METHOD *pMethod;
     HMODULE hPlugInMod;
+    long CpuFeatureFlags = 0;
     int i;
 
     hPlugInMod = LoadLibrary( filename );
@@ -90,6 +103,16 @@ DEINTERLACE_METHOD *load_dscaler_deinterlacer( char *filename )
     pfnGetDeinterlacePluginInfo = (GETDEINTERLACEPLUGININFO*) GetProcAddress( hPlugInMod, "GetDeinterlacePluginInfo" );
     if( !pfnGetDeinterlacePluginInfo ) {
         return 0;
+    }
+
+    if( speedy_get_accel() & MM_ACCEL_X86_MMX ) {
+        CpuFeatureFlags |= FEATURE_MMX;
+    }
+    if( speedy_get_accel() & MM_ACCEL_X86_3DNOW ) {
+        CpuFeatureFlags |= FEATURE_3DNOW;
+    }
+    if( speedy_get_accel() & MM_ACCEL_X86_MMXEXT ) {
+        CpuFeatureFlags |= FEATURE_MMXEXT;
     }
 
     pMethod = pfnGetDeinterlacePluginInfo( CpuFeatureFlags );

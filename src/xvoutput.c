@@ -226,7 +226,7 @@ static int open_display( void )
 
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
          (major < 1) || ((major == 1) && (minor < 1))) {
-        fprintf (stderr, "xvoutput: No xshm extension available.\n");
+        fprintf( stderr, "xvoutput: No xshm extension available.\n" );
         return 0;
     }
 
@@ -448,17 +448,8 @@ int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
     if( output_fullscreen ) {
         ChangeWindowState( display, window, WINDOW_STATE_FULLSCREEN );
-        /* Disabled for now: this hurts EWMH and multi-head displays.
-        XGrabPointer( display, window, True, 0, GrabModeAsync, GrabModeAsync,
-                      window, None, CurrentTime );
-        XGrabKeyboard( display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime );
-        */
     } else {
         ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
-        /*
-        XUngrabPointer( display, CurrentTime );
-        XUngrabKeyboard( display, CurrentTime );
-        */
     }
 
     XFlush( display );
