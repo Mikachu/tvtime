@@ -63,7 +63,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	xcommon.h xcommon.c
 
-bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
+bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner \
+	tvtime-startup
 EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) $(DSCALER_SRCS) $(OUTPUT_SRCS) tvtime.c
@@ -88,10 +89,15 @@ tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-configure.c
 tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.h tvtimeconf.c \
-	station.c tvtime-scanner.c mixer.h mixer.c
+tvtime_scanner_SOURCES = utils.h utils.c videoinput.h videoinput.c \
+	tvtimeconf.h tvtimeconf.c station.h station.c tvtime-scanner.c \
+	mixer.h mixer.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
+tvtime_startup_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
+	tvtime-startup.c
+tvtime_startup_CFLAGS = $(OPT_CFLAGS) $(GTK_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
+tvtime_startup_LDFLAGS  = $(ZLIB_LIBS) $(GTK_LIBS) $(XML2_LIBS)
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
