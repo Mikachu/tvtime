@@ -72,6 +72,7 @@
 #include "dfboutput.h"
 #include "mgaoutput.h"
 #include "rvrreader.h"
+#include "mpeg2input.h"
 #include "sdloutput.h"
 #include "pulldown.h"
 #include "utils.h"
@@ -1128,6 +1129,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     videoinput_t *vidin = 0;
     station_mgr_t *stationmgr = 0;
     rvrreader_t *rvrreader = 0;
+    mpeg2input_t *mpegin = 0;
     int width = 720;
     int height = 480;
     int norm = 0;
@@ -1326,7 +1328,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     /* Default to a width specified on the command line. */
     width = config_get_inputwidth( ct );
 
-    if( config_get_rvr_filename( ct ) ) {
+    if( config_get_mpeg_filename( ct ) ) {
+        mpegin = mpeg2input_new( config_get_mpeg_filename( ct ), 0, mm_accel() );
+        if( !mpegin ) {
+            if( asprintf( &error_string, _("Can't open MPEG file '%s'."),
+                          config_get_mpeg_filename( ct ) ) < 0 ) {
+                error_string = 0;
+            }
+        } else {
+            width = mpeg2input_get_width( mpegin );
+            height = mpeg2input_get_height( mpegin );
+        }
+    } else if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
             if( asprintf( &error_string, _("Can't open RVR file '%s'."),
@@ -1388,6 +1401,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
      *                                 ^^^^^^^^^^^^^^^
      */
     if( rvrreader ) {
+        fieldsavailable = 4;
+    } else if( mpegin ) {
         fieldsavailable = 4;
     } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
@@ -1477,6 +1492,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
         if( rvrreader ) {
             tvtime_osd_set_input( osd, "RVR" );
+            tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
+        } else if( mpegin ) {
+            tvtime_osd_set_input( osd, "MPEG2" );
             tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
         } else if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
@@ -2113,6 +2131,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
          */
         if( rvrreader ) {
             tuner_state = TUNER_STATE_HAS_SIGNAL;
+        } else if( mpegin ) {
+            tuner_state = TUNER_STATE_HAS_SIGNAL;
         } else if( vidin ) {
             tuner_state = videoinput_check_for_signal
                 ( vidin, commands_check_freq_present( commands ) );
@@ -2147,6 +2167,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 curframe = rvrreader_get_curframe( rvrreader );
                 lastframe = rvrreader_get_lastframe( rvrreader );
                 secondlastframe = rvrreader_get_secondlastframe( rvrreader );
+            } else if( mpegin ) {
+                if( !mpeg2input_next_frame( mpegin ) ) break;
+                curframe = mpeg2input_get_curframe( mpegin );
+                lastframe = mpeg2input_get_lastframe( mpegin );
+                secondlastframe = mpeg2input_get_secondlastframe( mpegin );
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
@@ -2627,10 +2652,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( verbose ) {
         fputs( _("tvtime: Cleaning up.\n"), stderr );
     }
+    if( mpegin ) {
+        mpeg2input_delete( mpegin );
+    }
     if( rvrreader ) {
         rvrreader_delete( rvrreader );
     }
-
     if( vidin ) {
         videoinput_delete( vidin );
     }

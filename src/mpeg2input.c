@@ -27,9 +27,13 @@
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
+#include "mpeg2input.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef HAVE_LIBMPEG2
 #include <mpeg2dec/mpeg2.h>
 #include <mpeg2dec/convert.h>
-#include "mpeg2input.h"
 
 typedef struct vo_instance_s vo_instance_t;
 
@@ -571,4 +575,19 @@ int mpeg2input_get_height( mpeg2input_t *mpegin )
 {
     return 480; // mpegin->height;
 }
+
+#else
+mpeg2input_t *mpeg2input_new( const char *filename, int track, int accel )
+{
+    fprintf( stderr, "mpeg2input: Support not compiled in.\n" );
+    return 0;
+}
+void mpeg2input_delete( mpeg2input_t *instance ) {}
+int mpeg2input_next_frame( mpeg2input_t *mpegin ) { return 0; }
+uint8_t *mpeg2input_get_curframe( mpeg2input_t *mpegin ) { return 0; }
+uint8_t *mpeg2input_get_lastframe( mpeg2input_t *mpegin ) { return 0; }
+uint8_t *mpeg2input_get_secondlastframe( mpeg2input_t *mpegin ) { return 0; }
+int mpeg2input_get_width( mpeg2input_t *mpegin ) { return 0; }
+int mpeg2input_get_height( mpeg2input_t *mpegin ) { return 0; }
+#endif
 

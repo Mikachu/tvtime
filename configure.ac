@@ -46,6 +46,18 @@ if test "$CHECK_SDL" = "yes" ; then
 fi
 
 dnl ---------------------------------------------
+dnl libmpeg2
+dnl ---------------------------------------------
+AC_ARG_WITH([libmpeg2],
+            AC_HELP_STRING([--with-libmpeg2],
+                [Use this to enable MPEG2 input (disabled by default)]),
+            [USE_MPEG2="$withval"], [USE_MPEG2="no"])
+if test "$USE_MPEG2" != "no" ; then
+    AC_DEFINE([HAVE_LIBMPEG2],,[Define this to enable MPEG2 input])
+fi
+AM_CONDITIONAL(HAVE_LIBMPEG2, [test x"USE_MPEG2" != "xno"])
+
+dnl ---------------------------------------------
 dnl dynamic linker
 dnl ---------------------------------------------
 AC_CHECK_LIB(c, dlopen,

@@ -42,6 +42,14 @@ DIRECTFB_CFLAGS =
 DIRECTFB_LIBS = 
 endif
 
+if HAVE_LIBMPEG2
+MPEG2_CFLAGS = 
+MPEG2_LIBS = -lmpeg2
+else
+MPEG2_CFLAGS = 
+MPEG2_LIBS = 
+endif
+
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
@@ -66,7 +74,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	rvrreader.h rvrreader.c ree.h ree.c pulldown.h pulldown.c \
 	hashtable.h hashtable.c cpuinfo.h cpuinfo.c videodev.h videodev2.h \
 	menu.c menu.h outputfilter.h outputfilter.c dfbmatroxtv.c xmltv.h \
-	xmltv.c gettext.h tvtimeglyphs.h
+	xmltv.c gettext.h tvtimeglyphs.h mpeg2input.h mpeg2input.c
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
@@ -78,10 +86,10 @@ EXTRA_PROGRAMS = expandpng timingtest rvr
 tvtime_SOURCES = $(COMMON_SRCS) $(DSCALER_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
-	$(FONT_CFLAGS) $(AM_CFLAGS)
+	$(FONT_CFLAGS) $(MPEG2_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) -lm
+	$(DYNAMIC_LD_LIBS) $(MPEG2_LIBS) -lm
 if ARCH_X86
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread
