@@ -182,6 +182,7 @@ static void print_usage( char **argv )
                      "\t  \t\tjapan-broadcast\n"
                      "\t  \t\teurope\n"
                      "\t  \t\taustralia\n"
+                     "\t  \t\tnewzealand\n"
                      "\t  \t\tfrance\n"
                      "\t  \t\trussia\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
@@ -311,8 +312,8 @@ config_t *config_new( int argc, char **argv )
     if( parser_new( &(ct->pf), configFile ) ) {
         config_init( ct );
     } else {
-        fprintf( stderr, "\n** Notice: tvtime user config file "
-                         "has changed to ~/.tvtime/tvtimerc **\n\n" );
+        fprintf( stderr, "\n*** Notice: tvtime user config file "
+                         "has changed from ~/.tvtimerc to ~/.tvtime/tvtimerc\n\n" );
 
         strncpy( base, CONFDIR, 245 );
         strcat( base, "/tvtimerc" );

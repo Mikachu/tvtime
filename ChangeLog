@@ -1,7 +1,8 @@
 
 0.9.7
+  * (vektor) Added back "newzealand" at least for 0.9.7 (fixes bug 690983)
   * (vektor) Removed the scanline bias feature until I determine if it's
-    actually a good idea.
+    actually a good idea
   * (vektor) We no longer grab mouse and keyboard on fullscreen, as this
     has problems with ewmh (no alt-tab away from a fullscreen app) and also
     with multi-head displays.  We still need to decide what to do when the

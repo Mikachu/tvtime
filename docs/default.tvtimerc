@@ -35,6 +35,7 @@ Norm = ntsc
 #    japan-broadcast
 #    europe
 #    australia
+#    newzealand
 #    france
 #    russia
 Frequencies = us-cable

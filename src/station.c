@@ -188,6 +188,14 @@ station_mgr_t *station_init( config_t *ct )
 
     frequencies = config_get_v4l_freq( ct );
 
+    if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
+        !strcasecmp( frequencies, "europe-cable" ) ) {
+        fprintf( stderr, "\n*** Frequency list %s has been changed to be called %s in tvtime 0.9.7.\n",
+                 frequencies, "europe" );
+        fprintf( stderr, "*** Please update your configuration.  Comments?  tvtime-devel@lists.sourceforge.net\n\n" );
+        frequencies = "europe";
+    }
+
     if( !strcasecmp( frequencies, "us-cable" ) ) {
         station_add_band( mgr, "us cable" );
     } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
@@ -215,6 +223,10 @@ station_mgr_t *station_init( config_t *ct )
         station_add_band( mgr, "uhf" );
     } else if( !strcasecmp( frequencies, "australia" ) ) {
         station_add_band( mgr, "vhf australia" );
+        station_add_band( mgr, "vhf e2-e12" );
+        station_add_band( mgr, "uhf" );
+    } else if( !strcasecmp( frequencies, "newzealand" ) ) {
+        /* Billy: It's unclear to me if we should keep this around. */
         station_add_band( mgr, "vhf e2-e12" );
         station_add_band( mgr, "uhf" );
     }
