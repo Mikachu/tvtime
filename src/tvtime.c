@@ -1145,6 +1145,8 @@ int main( int argc, char **argv )
     if( !fifodir ) {
         fprintf( stderr, "tvtime: Directory %s does not exist.  FIFO disabled.\n", FIFODIR );
     } else {
+        int success = 0;
+
         closedir( fifodir );
         /* Create the user's FIFO directory */
         if( mkdir( config_get_command_pipe_dir( ct ), S_IRWXU ) < 0 ) {
@@ -1158,13 +1160,19 @@ int main( int argc, char **argv )
                             config_get_command_pipe_dir( ct ) );
                 } else {
                     closedir( fifodir );
-                    /* Setup the FIFO */
-                    fifo = fifo_new( config_get_command_pipe( ct ) );
-                    if( !fifo && verbose ) {
-                        fprintf( stderr, "tvtime: Not reading input from FIFO. Creating "
-                                         "FIFO object failed.\n" );
-                    }
+                    success = 1;
                 }
+            }
+        } else {
+            success = 1;
+        }
+
+        if( success ) {
+            /* Setup the FIFO */
+            fifo = fifo_new( config_get_command_pipe( ct ) );
+            if( !fifo && verbose ) {
+                fprintf( stderr, "tvtime: Not reading input from FIFO. Creating "
+                                 "FIFO object failed.\n" );
             }
         }
     }
