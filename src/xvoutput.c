@@ -271,14 +271,11 @@ static int xv_show_frame( int x, int y, int width, int height )
 {
     area_t video_area = xcommon_get_video_area();
 
-    XLockDisplay( display );
     xcommon_ping_screensaver();
     XvShmPutImage( display, xv_port, output_window, xcommon_get_gc(), image,
                    x, y, width, height,
                    video_area.x, video_area.y,
                    video_area.width, video_area.height, False );
-    XFlush( display );
-    XUnlockDisplay( display );
     xcommon_frame_drawn();
     XSync( display, False );
     if( xvoutput_error ) return 0;
