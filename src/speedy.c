@@ -254,6 +254,7 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width )
 {
+    SPEEDY_START();
     width /= 2;
     while( width-- ) {
         output[ 0 ] = input[ 0 ];
@@ -263,11 +264,13 @@ void cheap_packed444_to_packed422_scanline( unsigned char *output,
         output += 4;
         input += 6;
     }
+    SPEEDY_END();
 }
 
 void cheap_packed422_to_packed444_scanline( unsigned char *output,
                                             unsigned char *input, int width )
 {
+    SPEEDY_START();
     width /= 2;
     while( width-- ) {
         output[ 0 ] = input[ 0 ];
@@ -279,6 +282,7 @@ void cheap_packed422_to_packed444_scanline( unsigned char *output,
         output += 6;
         input += 4;
     }
+    SPEEDY_END();
 }
 
 /**
@@ -290,6 +294,7 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
 {
     int i;
 
+    SPEEDY_START();
     /* Process two input pixels at a time.  Input is [Y'][Cb][Y'][Cr]. */
     for( i = 0; i < width / 2; i++ ) {
         dest[ (i*6) + 0 ] = src[ (i*4) + 0 ];
@@ -318,6 +323,7 @@ void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char 
             dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
     }
+    SPEEDY_END();
 }
 
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
