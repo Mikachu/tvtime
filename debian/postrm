@@ -25,8 +25,8 @@ case "$1" in
         if [ -d /etc/tvtime ]; then
             echo "removing directory \`/etc/tvtime'." >&2
             rm -rf /etc/tvtime
-            ucf -p /etc/tvtime/tvtime.xml
         fi
+        ucf -p /etc/tvtime/tvtime.xml
         ;;
 
     *)
