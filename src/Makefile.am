@@ -1,9 +1,10 @@
 
 SUBDIRS = wine
 
-tvtimedatadir = $(datadir)/tvtime
-tvtimesysconfdir = $(sysconfdir)/tvtime
-pkgsysconfdir = $(sysconfdir)/tvtime
+pkgsysconfdir = $(sysconfdir)/@PACKAGE@
+
+rundir = $(localstatedir)/run
+pkgrundir = $(rundir)/@PACKAGE@
 
 TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
 TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
@@ -20,7 +21,7 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins
 # DIRECTFB_LIBS = 
 # endif
 
-OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\"" -D_LARGEFILE64_SOURCE
+OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" -DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" -D_LARGEFILE64_SOURCE
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
