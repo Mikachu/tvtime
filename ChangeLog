@@ -1,5 +1,8 @@
 
 0.9.9 -
+  * vektor: Added a logo for film mode, visible when pulldown
+      detection is enabled, and animating when we have
+      succesfully detected pulldown.
   * vektor: Added a command to toggle always-on-top for WMs
       that support EWMH's ABOVE layer.
   * vektor: Add a command to change the matte mode.

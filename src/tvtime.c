@@ -377,6 +377,8 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
 {
     int i;
 
+    if( osd ) tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );
+
     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
         if( osd ) tvtime_osd_set_film_mode( osd, -1 );
     }
@@ -790,7 +792,7 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
                           const char *deinterlacer, int width,
                           int height, int framesize, int fieldtime,
-                          int frameratemode )
+                          int frameratemode, int norm )
 {
     double blit_time = performance_get_estimated_blit_time( perf );
     char text[ 200 ];
@@ -801,7 +803,7 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     sprintf( text, "Deinterlacer: %s", deinterlacer );
     tvtime_osd_list_set_text( osd, 1, text );
 
-    sprintf( text, "Input frame size:  %dx%d", width, height );
+    sprintf( text, "Input: %s at %dx%d", videoinput_get_norm_name( norm ), width, height );
     tvtime_osd_list_set_text( osd, 2, text );
 
     sprintf( text, "Attempted framerate: %.2ffps",
@@ -1794,7 +1796,8 @@ int main( int argc, char **argv )
             }
             performance_print_last_frame_stats( perf, framesize );
             osd_list_statistics( osd, perf, (curmethod) ? curmethod->name : "interlaced passthrough",
-                                 width, height, framesize, fieldtime, framerate_mode );
+                                 width, height, framesize, fieldtime, framerate_mode,
+                                 videoinput_get_norm( vidin ) );
         }
         if( config_get_debug( ct ) ) {
             if( curmethod )  {
