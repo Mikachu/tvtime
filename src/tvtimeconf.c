@@ -321,11 +321,9 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
             } else if( !xmlStrcasecmp( binding->name, BAD_CAST "mouse" ) ) {
                 xmlChar *button = xmlGetProp( binding, BAD_CAST "button" );
                 if( button ) {
-                    int id;
-                    if( sscanf( (const char *) button, "button_%d", &id ) ) {
-                        if( (id > 0) && (id < MAX_BUTTONS) ) {
-                            ct->buttonmap[ id ] = tvtime_string_to_command( (const char *) command );
-                        }
+                    int id = atoi( (const char *) button );
+                    if( (id > 0) && (id < MAX_BUTTONS) ) {
+                        ct->buttonmap[ id ] = tvtime_string_to_command( (const char *) command );
                     }
                     xmlFree( button );
                 }
