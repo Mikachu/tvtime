@@ -544,5 +544,7 @@
   <bind command="toggle_console">      <keyboard key="`"/>    </bind>
   <bind command="scroll_console_up">   <keyboard key="pgup"/> </bind>
   <bind command="scroll_console_down"> <keyboard key="pgdn"/> </bind>
+  <bind command="mixer_toggle_mute">   <keyboard key=","/>    </bind>
+  <bind command="auto_adjust_pict">    <keyboard key=" "/>    </bind>
 
 </tvtime>

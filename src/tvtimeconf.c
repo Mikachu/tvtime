@@ -759,6 +759,7 @@ config_t *config_new( void )
     ct->keymap[ 'm' ] = TVTIME_TOGGLE_MUTE;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
+    ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
     ct->keymap[ I_F1 ] = TVTIME_SHOW_MENU;
     ct->keymap[ 'h' ] = TVTIME_SHOW_MENU;
@@ -774,6 +775,7 @@ config_t *config_new( void )
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_TOGGLE_DEINTERLACER;
     ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
+    ct->keymap[ ',' ] = TVTIME_MIXER_TOGGLE_MUTE;
     ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;

@@ -11,9 +11,9 @@ we are curious to know your thoughts and opinions.
 
   1. Keybindings have changed, and we have a menu.
 
-     The default key bindings have changed significantly.  We recommend
-     that users start over by deleting their config files, and
-     reconfiguring tvtime from scratch.  Feedback on how easy tvtime is
+     Some of the default key bindings have changed.  We recommend
+     that users who have not changed their key bindings to start over
+     by deleting their config files.  Feedback on how easy tvtime is
      to configure with the new menu would be greatly appreciated.
 
   2. Some of the stationlist management policy has changed.
@@ -25,4 +25,106 @@ we are curious to know your thoughts and opinions.
      spent a long time editing your stationlist.xml file, make a backup
      and try tvtime in verbose mode first and make sure none of your
      channels are missing.
+
+What changed with the key bindings
+----------------------------------
+
+  1. Using the vi arrow keys h,j,k,l as directions is now disabled by
+     default.  This is so we can move to having 'h' be a help key.
+
+  2. The right mouse button now brings up the menu instead of changing
+     inputs.
+
+  3. All picture controls (F1-F8) are now controllable via three keys
+     using the new picture commands: F6, F7, F8.
+
+  4. New commands with new keys:
+
+         show_menu                  F1, Tab, b3
+         toggle_matte               Insert
+         picture                    f6
+         picture_up                 f7
+         picture_down               f8
+
+  5. Some obscure features which had key bindings are now disabled and
+     moved exclusively into the menu.  They are:
+
+         toggle_ntsc_cable_mode     o
+         toggle_compatible_norm     n (command renamed toggle_pal_secam)
+         luma_correction            c
+         luma_up                    x
+         luma_down                  z
+         channel_save_tuning        f9
+         channel_scan               f10
+         channel_activate_all       f11
+         channel_skip               f12
+         brightness_down            f1
+         brightness_up              f2
+         contrast_down              f3
+         contrast_up                f4
+         colour_down                f5
+         colour_up                  f6
+         hue_down                   f7
+         hue_up                     f8
+
+  6. Complete table of differences.
+
+                                    0.9.8.5        0.9.9
+         -------------------------+--------------+-------------
+         quit                     | escape, q    | escape, q
+         show_menu                |              | f1, tab, b3
+         channel_inc              | up, k, b4    | up, b4
+         channel_dec              | down, j, b5  | down, b5
+         channel_prev             | backspace      backspace
+         finetune_up              | right, l       right
+         finetune_down            | left, h        left
+         luma_correction          | c
+         luma_up                  | x
+         luma_down                  z
+         toggle_mute                m, b2          m, b2
+         mixer_up                   +              +
+         mixer_down                 -              -
+         enter                      enter          enter
+         brightness_down            f1
+         brightness_up              f2
+         contrast_down              f3
+         contrast_up                f4
+         colour_down                f5
+         colour_up                  f6
+         hue_down                   f7
+         hue_up                     f8
+         picture                                   f6
+         picture_up                                f7
+         picture_down                              f8
+         channel_save_tuning        f9
+         channel_scan               f10
+         channel_activate_all       f11
+         channel_skip               f12
+         channel_renumber           r              r
+         toggle_bars                b              b
+         show_stats                 d              d
+         toggle_fullscreen          f              f
+         toggle_input               i, b3          i
+         toggle_aspect              a              a
+         screenshot                 s              s
+         toggle_deinterlacer        t              t
+         toggle_pulldown_detection  p              p
+         auto_adjust_pict           ' '            ' '
+         toggle_console             `              `
+         scroll_console_up          pgup           pgup
+         scroll_console_down        pgdn           pgdn
+         toggle_cc                  w              c
+         toggle_framerate           =              =
+         toggle_pause               end            end
+         toggle_audio_mode          e              e
+         overscan_up                >              >
+         overscan_down              <              <
+         display_info               b1             b1
+         toggle_mode                *              *
+         auto_adjust_window         /              /
+         mixer_toggle_mute          ,              ,
+         toggle_compatible_norm     n
+         toggle_ntsc_cable_mode     o
+         toggle_matte                              ins
+
 
