@@ -1251,6 +1251,7 @@ void xcommon_poll_events( input_t *in )
     int reconfigure = 0;
     int reconfwidth = 0;
     int reconfheight = 0;
+    int getfocus = 0;
 
     while( XPending( display ) ) {
         KeySym mykey;
@@ -1279,7 +1280,7 @@ void xcommon_poll_events( input_t *in )
             motion_timeout = 30;
             break;
         case EnterNotify:
-            XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
+            getfocus = 1;
             break;
         case FocusIn:
             has_focus = 1;
@@ -1420,9 +1421,14 @@ void xcommon_poll_events( input_t *in )
             break;
         case ButtonPress:
             input_callback( in, I_BUTTONPRESS, event.xbutton.button );
+            getfocus = 1;
             break;
         default: break;
         }
+    }
+
+    if( getfocus ) {
+        XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
     }
 
     if( !has_ewmh_state_fullscreen && output_fullscreen ) {
