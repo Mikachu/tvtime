@@ -142,8 +142,8 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
 
 void osd_string_render_image4444( osd_string_t *osds )
 {
-    osds->image_textwidth = efs_get_width( osds->efs ) + 4;
-    osds->image_textheight = efs_get_height( osds->efs ) + 4;
+    osds->image_textwidth = efs_get_width( osds->efs ) + 2;
+    osds->image_textheight = efs_get_height( osds->efs ) + 3;
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
                             osds->image_textheight, osds->image_width * 4,
@@ -193,14 +193,14 @@ void osd_string_render_image4444( osd_string_t *osds )
                                                  efs_get_height( osds->efs ),
                                                  efs_get_stride( osds->efs ),
                                                  osds->border_luma, osds->border_cb,
-                                                 osds->border_cr, 80, 4, 4 );
+                                                 osds->border_cr, 128, 3, 2 );
     }
 
     composite_alphamask_packed4444( osds->image4444, osds->image_width,
                                     osds->image_height, osds->image_width * 4,
                                     efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
                                     efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
-                                    osds->text_luma, osds->text_cb, osds->text_cr, 2, 2 );
+                                    osds->text_luma, osds->text_cb, osds->text_cr, 0, 0 );
 }
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
