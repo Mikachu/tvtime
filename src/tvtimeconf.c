@@ -759,6 +759,17 @@ int config_key_to_command( config_t *ct, int key )
     return TVTIME_NOCOMMAND;
 }
 
+int config_command_to_key( config_t *ct, int command )
+{
+    int i;
+
+    for( i = 0; i < 8 * MAX_KEYSYMS; i++ ) {
+        if( ct->keymap[ i ] == command ) return i;
+    }
+
+    return 0;
+}
+
 int config_button_to_command( config_t *ct, int button )
 {
     if( !ct || !ct->buttonmap ) return 0;
