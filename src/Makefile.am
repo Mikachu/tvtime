@@ -64,9 +64,20 @@ rvr_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthrea
 
 CLEANFILES = expandpng timingtest rvr
 
+# Satisfy extra-directory dependencies.  Unfortunately, this causes
+# libtool to re-link each and every time.  (Recursive make is evil!)
 .PHONY: ../plugins/libtvtimeplugins.la wine/libwine.la
 ../plugins/libtvtimeplugins.la:
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
 wine/libwine.la:
-	( $(MAKE) $(AM_MAKEFLAGS) -C wine )
+	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
+
+# Hook into the installation and uninstallation to create the required
+# FIFO directories.
+.PHONY: install-data-local
+install-exec-hook:
+	$(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir)
+
+uninstall-hook:
+	rm -rf $(pkgrundir)
 

@@ -21,6 +21,7 @@
 #include <sys/resource.h>
 #include <sys/mman.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
@@ -1144,10 +1145,27 @@ int main( int argc, char **argv )
     fifodir = opendir( FIFODIR );
     if( !fifodir ) {
         fprintf( stderr, "tvtime: Not reading input from fifo.  "
-                         "Directory " FIFODIR " does not exist.\n" );
+                         "Directory %s does not exist.\n", FIFODIR );
     }
     else {
         closedir( fifodir );
+	/* Create the user's FIFO directory */
+        if( mkdir( config_get_command_pipe_dir( ct ), S_IRWXU ) < 0 ) {
+            if( errno != EEXIST ) {
+                fprintf( stderr, "tvtime: Cannot create FIFO directory %s.\n", 
+                        config_get_command_pipe_dir( ct ) );
+                return 1;
+            }
+            else {
+                fifodir = opendir( config_get_command_pipe_dir( ct ) );
+                if( !fifodir ) {
+                    fprintf( stderr, "tvtime: %s is not a directory.\n", 
+                            config_get_command_pipe_dir( ct ) );
+                    return 0;
+                }
+                closedir( fifodir );
+            }
+        }
         /* Setup the FIFO */
         fifo = fifo_new( config_get_command_pipe( ct ) );
         if( !fifo ) {

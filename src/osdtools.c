@@ -74,15 +74,16 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         return 0;
     }
 
-    if( asprintf( &fontfilename, "%s%s", DATADIR "/", fontfile ) < 0 ) {
+    if( asprintf( &fontfilename, "%s/%s", DATADIR , fontfile ) < 0 ) {
         fontfilename = 0;
     } else if( !file_is_openable_for_read( fontfilename ) ) {
         free( fontfilename );
 
-        if( asprintf( &fontfilename, "%s%s", "../data/", fontfile ) < 0 ) {
+        if( asprintf( &fontfilename, "../data/%s", fontfile ) < 0 ) {
             fontfilename = 0;
         } else if( !file_is_openable_for_read( fontfilename ) ) {
-            fprintf( stderr, "osd_string: Can't find font '%s' in path '%s' or path '%s'.\n",
+            fprintf( stderr, "osd_string: Can't find font '%s' in path '%s' "
+			     "or path '../data/'.\n",
                      fontfile, DATADIR, "../data/" );
             free( fontfilename );
             fontfilename = 0;

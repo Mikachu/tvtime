@@ -16,6 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -124,7 +125,8 @@ struct config_s
     unsigned int other_text_rgb;
 
     uid_t uid;
-    char command_pipe[ 256 ];
+    char *command_pipe_dir;
+    char *command_pipe;
 
     char *rvr_filename;
 
@@ -551,8 +553,18 @@ config_t *config_new( int argc, char **argv )
         free( ct );
         return 0;
     }
-    snprintf( ct->command_pipe, sizeof( ct->command_pipe ), 
-              FIFODIR "/TV-%s", pwuid->pw_name );
+    if( asprintf( &(ct->command_pipe_dir), 
+                  "%s/TV-%s", FIFODIR, pwuid->pw_name ) < 0 ) {
+        fprintf( stderr, "config: Out of memory.\n" );
+        free( ct );
+        return 0;
+    }
+    if( asprintf( &(ct->command_pipe), 
+                  "%s/TV-%s/tvtimefifo", FIFODIR, pwuid->pw_name ) < 0 ) {
+        fprintf( stderr, "config: Out of memory.\n" );
+        free( ct );
+        return 0;
+    }
 
     if( strlen( nl_langinfo( T_FMT ) ) ) {
         ct->timeformat = strdup( nl_langinfo( T_FMT ) );
@@ -652,7 +664,7 @@ config_t *config_new( int argc, char **argv )
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
     snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
-    if( mkdir( temp_dirname, S_IRWXU ) < 0) {
+    if( mkdir( temp_dirname, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
             fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
             free( ct );
@@ -666,9 +678,7 @@ config_t *config_new( int argc, char **argv )
                 free( ct );
                 return 0;
             }
-            else {
-                closedir( temp_dir );
-            }
+	    closedir( temp_dir );
         }
         /* If the directory already exists, we didn't need to create it. */
     }
@@ -893,6 +903,11 @@ const char *config_get_config_filename( config_t *ct )
 uid_t config_get_uid( config_t *ct )
 {
     return ct->uid;
+}
+
+const char *config_get_command_pipe_dir( config_t *ct )
+{
+    return ct->command_pipe_dir;
 }
 
 const char *config_get_command_pipe( config_t *ct )
