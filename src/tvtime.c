@@ -2565,12 +2565,17 @@ int main( int argc, char **argv )
 
     /* Run tvtime. */
     for(;;) {
-        char *new_argv[ 2 ];
+        if( result == 2 ) {
+            char *new_argv[ 2 ];
 
-        new_argv[ 0 ] = "tvtime";
-        new_argv[ 1 ] = 0;
+            new_argv[ 0 ] = "tvtime";
+            new_argv[ 1 ] = 0;
 
-        result = tvtime_main( rtctimer, read_stdin, result == 2 ? 1 : argc, result == 2 ? new_argv : argv );
+            result = tvtime_main( rtctimer, read_stdin, 0, new_argv );
+        } else {
+            result = tvtime_main( rtctimer, read_stdin, argc, argv );
+        }
+
         if( result != 2 ) break;
     }
 

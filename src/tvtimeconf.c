@@ -936,52 +936,54 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:",
-            long_options, &option_index )) != -1 ) {
-        switch( c ) {
-        case 'a': ct->aspect = 1; break;
-        case 'k': ct->slave_mode = 1; break;
-        case 'm': ct->fullscreen = 1; break;
-        case 'M': ct->fullscreen = 0; break;
-        case 's': ct->debug = 1; break;
-        case 'S': saveoptions = 1; break;
-        case 'v': ct->verbose = 1; break;
-        case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
-                  ct->xmltvfile = expand_user_path( optarg ); break;
-        case 'F': if( configFile ) { free( configFile ); }
-                  configFile = strdup( optarg ); break;
-        case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
-                  ct->rvr_filename = strdup( optarg ); break;
-        case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
-                  ct->mixerdev = strdup( optarg ); break;
-        case 'X': setenv( "DISPLAY", optarg, 1 ); break;
-        case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
-                      ct->outputheight = -1;
-                  } else {
-                      ct->outputheight = atoi( optarg );
-                  }
-                  break;
-        case 'I': ct->inputwidth = atoi( optarg ); break;
-        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
-        case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
-        case 'i': ct->inputnum = atoi( optarg ); break;
-        case 'c': ct->prev_channel = ct->start_channel;
-                  ct->start_channel = atoi( optarg ); break;
-        case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
-        case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
-                  ct->output_driver = strdup( optarg ); break;
-        case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
-                      ct->fspos = 1;
-                  } else if( tolower( optarg[ 0 ] ) == 'b' ) {
-                      ct->fspos = 2;
-                  } else {
-                      ct->fspos = 0;
-                  }
-                  break;
-        case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
-        default:
-            print_usage( argv );
-            return 0;
+    if( argc ) {
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:",
+                long_options, &option_index )) != -1 ) {
+            switch( c ) {
+            case 'a': ct->aspect = 1; break;
+            case 'k': ct->slave_mode = 1; break;
+            case 'm': ct->fullscreen = 1; break;
+            case 'M': ct->fullscreen = 0; break;
+            case 's': ct->debug = 1; break;
+            case 'S': saveoptions = 1; break;
+            case 'v': ct->verbose = 1; break;
+            case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
+                      ct->xmltvfile = expand_user_path( optarg ); break;
+            case 'F': if( configFile ) { free( configFile ); }
+                      configFile = strdup( optarg ); break;
+            case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
+                      ct->rvr_filename = strdup( optarg ); break;
+            case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
+                      ct->mixerdev = strdup( optarg ); break;
+            case 'X': setenv( "DISPLAY", optarg, 1 ); break;
+            case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
+                          ct->outputheight = -1;
+                      } else {
+                          ct->outputheight = atoi( optarg );
+                      }
+                      break;
+            case 'I': ct->inputwidth = atoi( optarg ); break;
+            case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+            case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+            case 'i': ct->inputnum = atoi( optarg ); break;
+            case 'c': ct->prev_channel = ct->start_channel;
+                      ct->start_channel = atoi( optarg ); break;
+            case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+            case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
+                      ct->output_driver = strdup( optarg ); break;
+            case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
+                          ct->fspos = 1;
+                      } else if( tolower( optarg[ 0 ] ) == 'b' ) {
+                          ct->fspos = 2;
+                      } else {
+                          ct->fspos = 0;
+                      }
+                      break;
+            case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
+            default:
+                print_usage( argv );
+                return 0;
+            }
         }
     }
 
