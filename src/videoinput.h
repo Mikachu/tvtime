@@ -48,6 +48,14 @@ typedef struct videoinput_s videoinput_t;
 #define VIDEOINPUT_PAL_N   5
 #define VIDEOINPUT_NTSC_JP 6
 
+/** 
+ * Possible tuner signal states.
+ */
+#define TUNER_STATE_HAS_SIGNAL      0
+#define TUNER_STATE_SIGNAL_DETECTED 1
+#define TUNER_STATE_SIGNAL_LOST     2
+#define TUNER_STATE_NO_SIGNAL       3
+
 /**
  * Returns a text version of the norm.
  */
@@ -166,9 +174,19 @@ const char *videoinput_get_input_name( videoinput_t *vidin );
 void videoinput_mute( videoinput_t *vidin, int mute );
 
 /**
+ * Returns whether the volume is muted.
+ */
+int videoinput_get_muted( videoinput_t *vidin );
+
+/**
  * Sets the current input.
  */
 void videoinput_set_input_num( videoinput_t *vidin, int inputnum );
+
+/**
+ * Returns the current tuner state.
+ */
+int videoinput_check_for_signal( videoinput_t *vidin );
 
 #ifdef __cplusplus
 };

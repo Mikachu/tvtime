@@ -64,6 +64,12 @@
 #define DEFAULT_SAT_V_PAL 219
 
 
+/**
+ * How long to wait when we lose a signal, or aquire a signal.
+ */
+#define SIGNAL_RECOVER_DELAY 2
+#define SIGNAL_AQUIRE_DELAY  2
+
 struct videoinput_s
 {
     int grab_fd;
@@ -92,6 +98,13 @@ struct videoinput_s
     struct video_mbuf gb_buffers;
 
     int verbose;
+
+    int cur_tuner_state;
+    int signal_recover_wait;
+    int signal_aquire_wait;
+
+    int muted;
+    int user_muted;
 };
 
 
@@ -331,6 +344,11 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->verbose = verbose;
     vidin->norm = norm;
     vidin->height = ( vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP ) ? 480 : 576;
+    vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
+    vidin->signal_recover_wait = 0;
+    vidin->signal_aquire_wait = 0;
+    vidin->muted = 0;
+    vidin->user_muted = 0;
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -610,7 +628,7 @@ int videoinput_has_tuner( videoinput_t *vidin )
     return (vidin->tuner_number > -1);
 }
 
-void videoinput_mute( videoinput_t *vidin, int mute )
+void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
     if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
@@ -636,7 +654,17 @@ void videoinput_mute( videoinput_t *vidin, int mute )
             fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
         }
     }
+}
 
+void videoinput_mute( videoinput_t *vidin, int mute )
+{
+    vidin->user_muted = mute;
+    videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+}
+
+int videoinput_get_muted( videoinput_t *vidin )
+{
+    return vidin->user_muted;
 }
 
 /* freqKHz is in KHz (duh) */
@@ -653,7 +681,8 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
             frequency /= 1000; /* switch to MHz */
         }
 
-        videoinput_mute( vidin, 1 );
+        vidin->muted = 1;
+        videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
 
         if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
             perror( "ioctl VIDIOCSFREQ" );
@@ -827,5 +856,46 @@ void videoinput_delete( videoinput_t *vidin )
 
     free( vidin->grab_buf );
     free( vidin );
+}
+
+int videoinput_check_for_signal( videoinput_t *vidin )
+{
+    if( videoinput_freq_present( vidin ) ) {
+        switch( vidin->cur_tuner_state ) {
+        case TUNER_STATE_NO_SIGNAL:
+        case TUNER_STATE_SIGNAL_LOST:
+            vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
+            vidin->signal_aquire_wait = SIGNAL_AQUIRE_DELAY;
+            vidin->signal_recover_wait = 0;
+        case TUNER_STATE_SIGNAL_DETECTED:
+            if( vidin->signal_aquire_wait ) {
+                vidin->signal_aquire_wait--;
+            } else {
+                vidin->cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
+                vidin->muted = 0;
+                videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+            }
+        default: break;
+        }
+    } else {
+        switch( vidin->cur_tuner_state ) {
+        case TUNER_STATE_HAS_SIGNAL:
+        case TUNER_STATE_SIGNAL_DETECTED:
+            vidin->cur_tuner_state = TUNER_STATE_SIGNAL_LOST;
+            vidin->signal_recover_wait = SIGNAL_RECOVER_DELAY;
+            vidin->muted = 1;
+            videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+        case TUNER_STATE_SIGNAL_LOST:
+            if( vidin->signal_recover_wait ) {
+                vidin->signal_recover_wait--;
+                break;
+            } else {
+                vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
+            }
+        default: break;
+        }
+    }
+
+    return vidin->cur_tuner_state;
 }
 

@@ -75,13 +75,6 @@ LumaCorrection = 1.0
 # by the capture card, we will print frame drop information to stderr.
 DebugMode = 0
 
-# This option will mute the tv card instead of the master volume of the mixer.
-# The caveat with this is that some cards unmute themselves when changing
-# channels. You probably only want to set this to 1 if you don't use a
-# soundcard for your tv audio.  The volume controls will appear to have no
-# effect if you do not have (or use) a soundcard for the tv audio.
-MuteTVCard = 0
-
 ########################################
 #
 #  Keybindings

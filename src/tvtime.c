@@ -58,17 +58,6 @@ static int curmethodid;
 static int fadepos = 0;
 static double fadespeed = 65.0;
 
-#define SIGNAL_RECOVER_DELAY 2
-#define SIGNAL_AQUIRE_DELAY  2
-
-#define TUNER_STATE_HAS_SIGNAL      0
-#define TUNER_STATE_SIGNAL_DETECTED 1
-#define TUNER_STATE_SIGNAL_LOST     2
-#define TUNER_STATE_NO_SIGNAL       3
-static int cur_tuner_state = TUNER_STATE_NO_SIGNAL;
-static int signal_recover_wait = 0;
-static int signal_aquire_wait = 0;
-
 static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
@@ -407,6 +396,7 @@ int main( int argc, char **argv )
     menu_t *menu;
     output_api_t *output;
     performance_t *perf;
+    int has_signal = 0;
 
     setup_speedy_calls();
 
@@ -648,6 +638,7 @@ int main( int argc, char **argv )
         int printdebug = 0;
         int showbars, screenshot;
         int aquired = 0;
+        int tuner_state;
 
         output->poll_events( in );
 
@@ -677,54 +668,32 @@ int main( int argc, char **argv )
 
 
         /* Aquire the next frame. */
-        if( videoinput_freq_present( vidin ) ) {
-            switch( cur_tuner_state ) {
-            case TUNER_STATE_NO_SIGNAL:
-            case TUNER_STATE_SIGNAL_LOST:
-                cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
-                signal_aquire_wait = SIGNAL_AQUIRE_DELAY;
-                signal_recover_wait = 0;
-            case TUNER_STATE_SIGNAL_DETECTED:
-                if( signal_aquire_wait ) {
-                    signal_aquire_wait--;
-                } else {
-                    cur_tuner_state = TUNER_STATE_HAS_SIGNAL;
-                    videoinput_mute( vidin, input_get_muted( in ) );
-                    tvtime_osd_signal_present( osd, 1 );
-                }
-            default: break;
-            }
-        } else {
-            switch( cur_tuner_state ) {
-            case TUNER_STATE_HAS_SIGNAL:
-                save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
-                fadepos = 0;
-            case TUNER_STATE_SIGNAL_DETECTED:
-                cur_tuner_state = TUNER_STATE_SIGNAL_LOST;
-                signal_recover_wait = SIGNAL_RECOVER_DELAY;
-            case TUNER_STATE_SIGNAL_LOST:
-                if( signal_recover_wait ) {
-                    signal_recover_wait--;
-                    break;
-                } else {
-                    cur_tuner_state = TUNER_STATE_NO_SIGNAL;
-                    tvtime_osd_signal_present( osd, 0 );
-                }
-            default:
-                if( fadepos < 256 ) {
-                    crossfade_frame( fadeframe, saveframe, blueframe, width,
-                                     height, width*2, width*2, width*2, fadepos );
-                    fadepos += fadespeed;
-                }
+        tuner_state = videoinput_check_for_signal( vidin );
+
+        if( has_signal && tuner_state != TUNER_STATE_HAS_SIGNAL ) {
+            has_signal = 0;
+            save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
+            fadepos = 0;
+        }
+
+        if( tuner_state == TUNER_STATE_HAS_SIGNAL ) {
+            has_signal = 1;
+            tvtime_osd_signal_present( osd, 1 );
+        } else if( tuner_state == TUNER_STATE_NO_SIGNAL ) {
+            tvtime_osd_signal_present( osd, 0 );
+            if( fadepos < 256 ) {
+                crossfade_frame( fadeframe, saveframe, blueframe, width,
+                                 height, width*2, width*2, width*2, fadepos );
+                fadepos += fadespeed;
             }
         }
 
-        if( cur_tuner_state == TUNER_STATE_HAS_SIGNAL || cur_tuner_state == TUNER_STATE_SIGNAL_DETECTED ) {
+        if( tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED ) {
             curframe = videoinput_next_frame( vidin, &curframeid );
             aquired = 1;
         }
 
-        if( cur_tuner_state != TUNER_STATE_HAS_SIGNAL ) {
+        if( tuner_state != TUNER_STATE_HAS_SIGNAL ) {
             if( fadepos == 0 ) {
                 secondlastframe = lastframe = curframe = saveframe;
             } else if( fadepos >= 256 ) {

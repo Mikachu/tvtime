@@ -40,7 +40,6 @@ struct input_s {
     int digit_counter;
     int quit;
     int inputnum;
-    int muted;
 
     int screenshot;
     int printdebug;
@@ -225,7 +224,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
-    in->muted = 0;
 
     /**
      * Set the current channel list.
@@ -451,17 +449,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
             break;
 
         case TVTIME_MIXER_MUTE:
-            /*
-            if( !config_get_mutetvcard( in->cfg ) ) {
-                mixer_toggle_mute();
-            } else {
-                videoinput_mute( in->vidin, !in->muted );
-                in->muted = !in->muted;
-            }
-            */
-            in->muted = !in->muted;
-            tvtime_osd_volume_muted( in->osd, in->muted );
-            videoinput_mute( in->vidin, in->muted );
+            videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
+            tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
             break;
 
         case TVTIME_TV_VIDEO:
@@ -562,11 +551,6 @@ int input_quit( input_t *in )
 int input_print_debug( input_t *in )
 {
     return in->printdebug;
-}
-
-int input_get_muted( input_t *in )
-{
-    return in->muted;
 }
 
 int input_show_bars( input_t *in )
