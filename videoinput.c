@@ -26,6 +26,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <linux/videodev.h>
 #include "videoinput.h"
 #include "frequencies.h"
 #include "mixer.h"
@@ -476,16 +477,23 @@ void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode )
             return;
         }
 
-        if ( (mode == VIDEO_MODE_PAL && !(vidin->tuner.flags & VIDEO_TUNER_PAL)) ||
-             (mode == VIDEO_MODE_NTSC && !(vidin->tuner.flags & VIDEO_TUNER_NTSC)) ||
-             (mode == VIDEO_MODE_SECAM && !(vidin->tuner.flags & VIDEO_TUNER_SECAM))
-            ) {
+        if( (mode == VIDEOINPUT_NTSC  && !(vidin->tuner.flags & VIDEO_TUNER_NTSC )) ||
+            (mode == VIDEOINPUT_PAL   && !(vidin->tuner.flags & VIDEO_TUNER_PAL  )) ||
+            (mode == VIDEOINPUT_SECAM && !(vidin->tuner.flags & VIDEO_TUNER_SECAM)) ) {
+
             fprintf( stderr, "Invalid tuner mode specified.\n" );
             return;
         }
 
         vidin->tuner.tuner = tuner_number;
-        vidin->tuner.mode = mode;
+        if( mode == VIDEOINPUT_PAL ) {
+            vidin->tuner.mode = VIDEO_MODE_PAL;
+        } else if( mode == VIDEOINPUT_SECAM ) {
+            vidin->tuner.mode = VIDEO_MODE_SECAM;
+        } else {
+            vidin->tuner.mode = VIDEO_MODE_NTSC;
+        }
+
         if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
             perror( "ioctl VIDIOCSTUNER" );
             return;

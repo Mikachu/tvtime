@@ -236,12 +236,12 @@ int main( int argc, char **argv )
     if( videoinput_has_tuner( vidin ) ) {
         if( palmode ) {
             if( secam ) {
-                videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_SECAM );
+                videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_SECAM );
             } else {
-                videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_PAL );
+                videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_PAL );
             }
         } else {
-            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_NTSC );
+            videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_NTSC );
         }
         /* Set to the current channel, or the first channel in our frequency list. */
         if( !frequencies_set_chanlist( freq ? freq : "us-cable" ) ) {

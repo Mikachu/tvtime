@@ -19,8 +19,6 @@
 #ifndef VIDEOINPUT_H_INCLUDED
 #define VIDEOINPUT_H_INCLUDED
 
-#include <linux/videodev.h>  /* Include this for the VIDEO_MODE defines */
-
 typedef struct videoinput_s videoinput_t;
 
 /**
@@ -79,10 +77,14 @@ void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
 int videoinput_get_colour( videoinput_t *vidin );
 void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
 
+#define VIDEOINPUT_NTSC   0
+#define VIDEOINPUT_PAL    1
+#define VIDEOINPUT_SECAM  2
+
 /**
  * Sets the tuner to tuner_number for the current channel. Also sets the tuners
- * mode to mode. Valid modes are VIDEO_MODE_PAL, VIDEO_MODE_NTSC, 
- * VIDEO_MODE_SECAM, VIDEO_MODE_AUTO (not sure if AUTO would have any effect)
+ * mode to mode. Valid modes are VIDEOINPUT_NTSC, VIDEOINPUT_PAL
+ * and VIDEOINPUT_SECAM.
  */
 void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode );
 
