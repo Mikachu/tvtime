@@ -41,7 +41,7 @@ static int timediff( struct timeval *large, struct timeval *small )
 }
 
 /* What font to test text rendering with. */
-static const char *leeft_font = "../data/FreeSansBold.ttf";
+static const char *leeft_font = "../data/tvtimeSansBold.ttf";
 const unsigned int leeft_size = 30;
 const double leetft_aspect = 1.125;
 

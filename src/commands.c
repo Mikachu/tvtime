@@ -2178,7 +2178,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     if( cmd->scan_channels ) {
                         tvtime_osd_set_hold_message( cmd->osd, "Scanning for active channels." );
                     } else {
-                        tvtime_osd_set_hold_message( cmd->osd, " " );
+                        /* Nuke the hold message, and make sure we show nothing (hack). */
+                        tvtime_osd_set_hold_message( cmd->osd, "" );
+                        tvtime_osd_show_message( cmd->osd, " " );
                     }
                     tvtime_osd_show_info( cmd->osd );
                 }
