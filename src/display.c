@@ -416,8 +416,8 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
       NOTE("%s", "Xinerama extension not found/active\n");
     }
 #endif
-#ifdef HAVE_XF86VIDMODE
   case DpyInfoOriginXF86VidMode:
+#ifdef HAVE_XF86VIDMODE
     if(XF86VidModeQueryExtension(dpy, &event_base, &error_base)) {
       if(update_resolution_xf86vidmode(&dpyinfo, dpy, screen_nr)) {
 	dpyinfo.resolution_origin = DpyInfoOriginXF86VidMode;
