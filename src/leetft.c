@@ -37,7 +37,7 @@ struct ft_font_s
     int fontsize;
     FT_Face face;
     FT_Glyph glyphs[ 256 ];
-    FT_Vector glyphpos[ MAX_STRING_LENGTH ];
+    FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
 };
 
@@ -68,6 +68,12 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         return 0;
     }
 
+    /*
+    if( FT_Attach_File( font->face, "../data/cmss17.afm" ) ) {
+        fprintf( stderr, "attach failed.\n" );
+    }
+    */
+
     xdpi = (int) ( ( 72.0 * pixel_aspect ) + 0.5 );
     FT_Set_Char_Size( font->face, 0, font->fontsize * 64, xdpi, 72 );
 
@@ -86,7 +92,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
     for( i = 0; i < 256; i++ ) {
         FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
 
-        error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_DEFAULT );
+        error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
         if( error ) {
             font->glyphs[ i ] = 0;
         } else {
@@ -116,19 +122,19 @@ void ft_font_delete( ft_font_t *font )
     }
 }
 
-static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_Vector *glyphpos,
+static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos,
                                FT_UInt *glyphindex, const char *text, int len )
 {
     FT_Bool use_kerning;
     FT_UInt previous;
     FT_BBox bbox;
-    int pen_x, pen_y, i;
+    int pen_x, i;
+    int prev = 0;
 
-    bbox.xMin = bbox.yMin = 32767;
-    bbox.xMax = bbox.yMax = -32767;
+    bbox.xMin = bbox.yMin = 32767*64; // 32767;
+    bbox.xMax = bbox.yMax = -32767*64;
 
     pen_x = 0;
-    pen_y = 0;
 
     use_kerning = FT_HAS_KERNING( face );
     previous = 0;
@@ -143,23 +149,29 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_Vector *glyphp
 
             if( use_kerning && previous && glyphindex[ i ] ) {
                 FT_Vector  delta;
-                FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_default, &delta );
-                pen_x += delta.x >> 6;
+                FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_unfitted, &delta );
+                pen_x += ( delta.x * 1024 );
+
+                /* fprintf( stderr, "%c-%c: delta.x %.4f, pos %d, adv %d\n",
+                   prev, text[ i ], ( (double) delta.x ) / 64.0, pen_x, glyphs[ cur ]->advance.x ); */
             }
+            prev = text[ i ];
 
             // store current pen position
-            glyphpos[ i ].x = pen_x;
-            glyphpos[ i ].y = pen_y;
+            glyphpos[ i ] = pen_x;
 
-            pen_x += glyphs[ cur ]->advance.x >> 16;
+            // pen_x += glyphs[ cur ]->advance.x >> 16;
+            pen_x += glyphs[ cur ]->advance.x;
             previous = glyphindex[ i ];
 
-            FT_Glyph_Get_CBox( glyphs[ cur ], ft_glyph_bbox_pixels, &glyph_bbox );
 
-            glyph_bbox.xMin += glyphpos[ i ].x;
-            glyph_bbox.xMax += glyphpos[ i ].x;
-            glyph_bbox.yMin += glyphpos[ i ].y;
-            glyph_bbox.yMax += glyphpos[ i ].y;
+            FT_Glyph_Get_CBox( glyphs[ cur ], ft_glyph_bbox_subpixels, &glyph_bbox );
+
+            glyph_bbox.xMin *= 1024;
+            glyph_bbox.xMax *= 1024;
+
+            glyph_bbox.xMin += glyphpos[ i ];
+            glyph_bbox.xMax += glyphpos[ i ];
 
             if( glyph_bbox.xMin < bbox.xMin ) bbox.xMin = glyph_bbox.xMin;
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
@@ -176,6 +188,7 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_Vector *glyphp
     return bbox;
 }
 
+/*
 static void blit_stuff( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
                         unsigned char *src, int src_width, int src_height, int src_stride,
                         int dst_xpos, int dst_ypos, int src_xpos, int src_ypos )
@@ -205,6 +218,43 @@ static void blit_stuff( unsigned char *dst, int dst_width, int dst_height, int d
         }
     }
 }
+*/
+
+static void blit_stuff_subpix( unsigned char *dst, int dst_width, int dst_height, int dst_stride,
+                               unsigned char *src, int src_width, int src_height, int src_stride,
+                               int dst_xpos_subpix, int dst_ypos )
+{
+    int blit_width = src_width; // (dst_width - dst_xpos);
+    int blit_height = (dst_height - dst_ypos);
+
+    if( blit_width > src_width ) blit_width = src_width;
+    if( blit_height > src_height ) blit_height = src_height;
+
+    if( blit_width >= 0 && blit_height >= 0 ) {
+        int y;
+
+        for( y = 0; y < blit_height; y++ ) {
+            unsigned char *curdst = dst + ((dst_ypos + y)*dst_stride) + ( dst_xpos_subpix >> 16 );
+            unsigned char *cursrc = src + (y*src_stride);
+            int prev = 0;
+            int pos = dst_xpos_subpix & 0xffff;
+            int x;
+            int tmp;
+
+            for( x = 0; x < blit_width; x++ ) {
+                tmp = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
+                tmp += curdst[ x ];
+                curdst[ x ] = (tmp > 255) ? 255 : tmp;
+                // curdst[ x ] = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
+                prev = cursrc[ x ];
+            }
+            tmp = ( prev * pos ) / 65535;
+            tmp += curdst[ blit_width ];
+            curdst[ x ] = (tmp > 255) ? 255 : tmp;
+            // curdst[ blit_width ] = ( prev * pos ) / 65535;
+        }
+    }
+}
 
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
                      int *width, int *height, int outsize )
@@ -229,12 +279,19 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
     push_x = 0;
     *width = string_bbox.xMax;
     if( string_bbox.xMin < 0 ) {
+        fprintf( stderr, "leetft: Negative xmin?  Sigh..\n" );
         *width += -string_bbox.xMin;
         push_x = -string_bbox.xMin;
     }
+    *width = (*width + 32768) >> 16;
+
+    /* Hack, why are we not wide enough? */
+    *width += 32;
 
     /* The numbers I get for a height all seem to make sense. */
-    *height = font->fontsize - string_bbox.yMin;
+    *height = font->fontsize - ((string_bbox.yMin + 32) >> 6);
+
+    // fprintf( stderr, "text %dx%d\n", *width, *height );
     if( *width * *height > outsize ) {
         *width = *height = 0;
         return;
@@ -254,9 +311,9 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
             if( !error ) {
                 FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
 
-                blit_stuff( output, *width, *height, *width,
-                            bit->bitmap.buffer, bit->bitmap.width, bit->bitmap.rows, bit->bitmap.pitch,
-                            push_x + font->glyphpos[ i ].x, font->fontsize - bit->top, 0, 0 );
+                blit_stuff_subpix( output, *width, *height, *width,
+                                   bit->bitmap.buffer, bit->bitmap.width, bit->bitmap.rows, bit->bitmap.pitch,
+                            (push_x*0xffff) + font->glyphpos[ i ] + (bit->left*65536), font->fontsize - bit->top );
 
                 FT_Done_Glyph( image );
             }
