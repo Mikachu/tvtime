@@ -19,7 +19,7 @@
 #include "config.h"
 #include "dfboutput.h"
 
-#ifdef HAVE_DIRECTFB
+#ifdef HAVE_DIRECTFB && direcffb_major_version >= 9
 
 #include <stdio.h>
 #include <directfb.h>
