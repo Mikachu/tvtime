@@ -802,7 +802,7 @@ osd_list_t *osd_list_new( osd_font_t *font, double pixel_aspect )
         osd_string_show_text( osdl->lines[ i ], "Blank", 100 );
         if( !i ) {
             /* white */
-            osd_string_set_colour( osdl->lines[ i ], 255, 128, 128 );
+            osd_string_set_colour( osdl->lines[ i ], 235, 128, 128 );
         } else {
             /* wheat */
             osd_string_set_colour_rgb( osdl->lines[ i ], 0xf5, 0xde, 0xb3 );
@@ -948,25 +948,25 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
         if( scanline < osdl->height ) {
             int bgwidth = osdl->width - xpos;
-            int alpha240, alpha200;
+            int alpha255, alpha200;
 
             if( bgwidth > width ) bgwidth = width;
 
-            alpha240 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 240.0) + 0.5);
+            alpha255 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 255.0) + 0.5);
             alpha200 = (int) (((((double) osdl->frames_left) / ((double) OSD_FADEOUT_TIME)) * 200.0) + 0.5);
 
-            if( alpha240 > 240 ) alpha240 = 240;
+            if( alpha255 > 255 ) alpha255 = 255;
             if( alpha200 > 200 ) alpha200 = 200;
 
             if( !i ) {
                 /* tvtime blue */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, alpha240 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 123, 150, 124, bgwidth, alpha255 );
             } else if( i == osdl->hilight ) {
                 /* white */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 255, 128, 128, bgwidth, alpha200 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 235, 128, 128, bgwidth, alpha200 );
             } else {
                 /* gray */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 128, 128, 128, bgwidth, alpha200 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255,  90, 128, 128, bgwidth, alpha200 );
             }
 
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
