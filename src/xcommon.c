@@ -64,25 +64,25 @@ static Window fs_window;
 static Window output_window;
 static Window windowed_output_window;
 static GC gc;
-static int have_xtest = 0;
+static int have_xtest;
 static int output_width, output_height;
-static int output_aspect = 0;
-static int output_on_root = 0;
-static int has_ewmh_state_fullscreen = 0;
-static int has_ewmh_state_above = 0;
-static int has_ewmh_state_below = 0;
+static int output_aspect;
+static int output_on_root;
+static int has_ewmh_state_fullscreen;
+static int has_ewmh_state_above;
+static int has_ewmh_state_below;
 static Cursor nocursor;
-static int output_fullscreen = 0;
-static int xcommon_verbose = 0;
-static int xcommon_exposed = 0;
-static int xcommon_colourkey = 0;
-static int motion_timeout = 0;
-static int fullscreen_position = 0;
-static int matte_width = 0;
-static int matte_height = 0;
-
-static int alwaysontop = 0;
-static int has_focus = 0;
+static int output_fullscreen;
+static int xcommon_verbose;
+static int xcommon_exposed;
+static int xcommon_colourkey;
+static int motion_timeout;
+static int fullscreen_position;
+static int matte_width;
+static int matte_height;
+static int alwaysontop;
+static int has_focus;
+static int wm_is_metacity;
 
 static Atom net_supporting_wm_check;
 static Atom net_supported;
@@ -95,8 +95,6 @@ static Atom utf8_string;
 static Atom kwm_keep_on_top;
 static Atom wm_protocols;
 static Atom wm_delete_window;
-
-static int wm_is_metacity = 0;
 
 #ifdef HAVE_XTESTEXTENSION
 static KeyCode kc_shift_l; /* Fake key to send. */
@@ -752,6 +750,23 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
         output_height = 576;
     }
     xcommon_verbose = verbose;
+
+    have_xtest = 0;
+    output_on_root = 0;
+    has_ewmh_state_fullscreen = 0;
+    has_ewmh_state_above = 0;
+    has_ewmh_state_below = 0;
+    output_fullscreen = 0;
+    xcommon_verbose = 0;
+    xcommon_exposed = 0;
+    xcommon_colourkey = 0;
+    motion_timeout = 0;
+    fullscreen_position = 0;
+    matte_width = 0;
+    matte_height = 0;
+    alwaysontop = 0;
+    has_focus = 0;
+    wm_is_metacity = 0;
 
     display = XOpenDisplay( 0 );
     if( !display ) {
