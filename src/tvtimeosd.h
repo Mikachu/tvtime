@@ -74,7 +74,6 @@ void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode );
 void tvtime_osd_set_pulldown( tvtime_osd_t *osd, int mode );
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal );
-void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode );
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 

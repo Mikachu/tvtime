@@ -840,6 +840,51 @@ static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
     menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
 }
 
+static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
+{
+    char string[ 128 ];
+    char text[ 128 ];
+
+    sprintf( text, "Full rate: %.2ffps", maxrate );
+    if( mode == 0 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SET_FRAMERATE, "full" );
+    menu_set_right_command( menu, 1, TVTIME_SET_FRAMERATE, "full" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "processing" );
+
+    sprintf( text, "Half rate, deinterlace top fields: %.2ffps", maxrate / 2 );
+    if( mode == 1 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SET_FRAMERATE, "top" );
+    menu_set_right_command( menu, 2, TVTIME_SET_FRAMERATE, "top" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "processing" );
+
+    sprintf( text, "Half rate, deinterlace bottom fields: %.2ffps", maxrate / 2 );
+    if( mode == 2 ) {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
+    }
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SET_FRAMERATE, "bottom" );
+    menu_set_right_command( menu, 3, TVTIME_SET_FRAMERATE, "bottom" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+}
+
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1626,16 +1671,16 @@ int main( int argc, char **argv )
             }
         }
         if( framerate_mode < 0 || framerate_mode != commands_get_framerate( commands ) ) {
-            int showlist = !(framerate_mode < 0 );
+            int showlist = !(framerate_mode < 0 ) && !commands_menu_active( commands );
             framerate_mode = commands_get_framerate( commands );
+
             if( osd ) {
-                if( showlist ) osd_list_framerates( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
-                if( framerate_mode ) {
-                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) (fieldtime*2)), framerate_mode );
-                } else {
-                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
+                build_framerate_menu( commands_get_menu( commands, "framerate" ),
+                                      1000000.0 / ((double) fieldtime), framerate_mode );
+                commands_refresh_menu( commands );
+                if( showlist ) {
+                    osd_list_framerates( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
                 }
-                tvtime_osd_show_info( osd );
             }
         }
         if( commands_toggle_fullscreen( commands ) ) {

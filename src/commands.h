@@ -81,6 +81,7 @@ enum tvtime_commands
 
     TVTIME_SET_NORM,
     TVTIME_SET_DEINTERLACER,
+    TVTIME_SET_FRAMERATE,
 
     TVTIME_MENUMODE,
     TVTIME_DISPLAY_INFO,
@@ -157,6 +158,7 @@ int tvtime_num_commands( void );
 const char *tvtime_get_command( int pos );
 int tvtime_get_command_id( int pos );
 int tvtime_is_menu_command( int command );
+int tvtime_command_takes_arguments( int command );
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
                           station_mgr_t *mgr, tvtime_osd_t *osd,
@@ -168,6 +170,7 @@ void commands_handle( commands_t *cmd, int command, const char *arg );
 void commands_add_menu( commands_t *cmd, menu_t *menu );
 menu_t *commands_get_menu( commands_t *cmd, const char *menuname );
 void commands_refresh_menu( commands_t *cmd );
+int commands_menu_active( commands_t *cmd );
 
 double commands_get_luma_power( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );

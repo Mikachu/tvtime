@@ -110,8 +110,6 @@ struct tvtime_osd_s
 
     char hold_message[ 255 ];
 
-    double framerate;
-    int framerate_mode;
     int film_mode;
     int pulldown_mode;
     int mutestate;
@@ -154,8 +152,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     }
 
     strcpy( osd->hold_message, "" );
-    osd->framerate = 0.0;
-    osd->framerate_mode = FRAMERATE_FULL;
     osd->film_mode = -1;
     osd->pulldown_mode = 0;
     osd->mutestate = 0;
@@ -565,12 +561,6 @@ void tvtime_osd_set_pulldown( tvtime_osd_t *osd, int mode )
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
 {
     snprintf( osd->timeformat, sizeof( osd->timeformat ), "%s", format );
-}
-
-void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode )
-{
-    osd->framerate = framerate;
-    osd->framerate_mode = mode;
 }
 
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )

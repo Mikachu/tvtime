@@ -115,6 +115,7 @@ static command_names_t command_table[] = {
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
     { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
+    { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
     { "SET_NORM", TVTIME_SET_NORM },
 
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
@@ -230,6 +231,13 @@ const char *tvtime_command_to_string( int command )
 int tvtime_is_menu_command( int command )
 {
     return (command >= TVTIME_MENU_UP);
+}
+
+int tvtime_command_takes_arguments( int command )
+{
+    return (command == TVTIME_DISPLAY_MESSAGE || command == TVTIME_SCREENSHOT ||
+            command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
+            command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE);
 }
 
 struct commands_s {
@@ -715,6 +723,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "deintdescription" );
     menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer description" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "framerate" );
+    menu_set_text( menu, 0, "Setup - Video processing - Attempted framerate" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "filters" );
@@ -1229,6 +1241,23 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_SET_DEINTERLACER:
         cmd->setdeinterlacer = 1;
         snprintf( cmd->deinterlacer, sizeof( cmd->deinterlacer ), "%s", arg );
+        break;
+
+    case TVTIME_SET_FRAMERATE:
+        if( !strcasecmp( arg, "full" ) ) {
+            cmd->framerate = FRAMERATE_FULL;
+        } else if( !strcasecmp( arg, "top" ) ) {
+            cmd->framerate = FRAMERATE_HALF_TFF;
+        } else {
+            cmd->framerate = FRAMERATE_HALF_BFF;
+        }
+        if( cmd->osd ) {
+            char message[ 128 ];
+            sprintf( message, "Framerate set at %s.",
+                     cmd->framerate == FRAMERATE_FULL ? "full" :
+                     (cmd->framerate == FRAMERATE_HALF_TFF ? "half (top fields processed)" : "half (bottom fields processed)") );
+            tvtime_osd_show_message( cmd->osd, message );
+        }
         break;
 
     case TVTIME_SET_NORM:
@@ -2064,5 +2093,10 @@ int commands_set_deinterlacer( commands_t *cmd )
 const char *commands_get_new_deinterlacer( commands_t *cmd )
 {
     return cmd->deinterlacer;
+}
+
+int commands_menu_active( commands_t *cmd )
+{
+    return cmd->menuactive;
 }
 
