@@ -763,7 +763,7 @@ int station_writeconfig( station_mgr_t *mgr )
             fprintf( stderr, "station: No station file found, creating a new one.\n" );
             doc = xmlNewDoc( BAD_CAST "1.0" );
             if( !doc ) {
-                fprintf( stderr, "configsave: Could not create new config file.\n" );
+                fprintf( stderr, "station: Could not create new config file.\n" );
                 return 0;
             }
         }
