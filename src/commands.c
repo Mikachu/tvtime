@@ -409,7 +409,10 @@ static void reset_xmltv_languages_menu( menu_t *menu, xmltv_t *xmltv )
 
     menu_reset_num_lines( menu );
     menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
-    menu_set_text( menu, 1, _("Default language") );
+    snprintf( string, sizeof( string ), "%s  %s",
+              cur? TVTIME_ICON_RADIOOFF : TVTIME_ICON_RADIOON,
+              _("Default language") );
+    menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SET_XMLTV_LANGUAGE, "none" );
 
     for( i = 1; i <= num; i++ ) {
