@@ -250,23 +250,30 @@ static void update_xmltv_display( commands_t *cmd )
         char subtitle[ 1024 ];
 
         timestamp = xmltv_get_start_time( cmd->xmltv );
-        if( timestamp == 0 ) return;
-        strftime( start_time, 50, "%k:%M", localtime( &timestamp ) );
-        timestamp = xmltv_get_end_time( cmd->xmltv );
-        strftime( end_time, 50, "%k:%M", localtime( &timestamp ) );
-
-        desc = xmltv_get_description( cmd->xmltv );
-
-        if( xmltv_get_sub_title( cmd->xmltv ) ) {
-           snprintf( subtitle, sizeof( subtitle ), "%s - %s - %s",
-                     start_time, end_time,
-                     xmltv_get_sub_title( cmd->xmltv ) );
+        if( timestamp == 0 ) {
+            /* No information available */
+            start_time[0] = '\0';
+            end_time[0] = '\0';
+            subtitle[0] = '\0';
+            title = 0;
+            desc = 0;
         } else {
-           snprintf( subtitle, sizeof( subtitle ), "%s - %s",
-                     start_time, end_time );
-        }
+            strftime( start_time, 50, "%H:%M", localtime( &timestamp ) );
+            timestamp = xmltv_get_end_time( cmd->xmltv );
+            strftime( end_time, 50, "%H:%M", localtime( &timestamp ) );
 
-        title = xmltv_get_title( cmd->xmltv );
+            if( xmltv_get_sub_title( cmd->xmltv ) ) {
+               snprintf( subtitle, sizeof( subtitle ), "%s - %s - %s",
+                         start_time, end_time,
+                         xmltv_get_sub_title( cmd->xmltv ) );
+            } else {
+               snprintf( subtitle, sizeof( subtitle ), "%s - %s",
+                         start_time, end_time );
+            }
+
+            title = xmltv_get_title( cmd->xmltv );
+            desc = xmltv_get_description( cmd->xmltv );
+        }
 
         if( xmltv_get_next_title( cmd->xmltv ) ) {
             snprintf( next_title, sizeof( next_title ),
