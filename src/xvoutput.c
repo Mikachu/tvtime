@@ -175,6 +175,45 @@ static int open_display( void )
         return 0;
     }
 
+    fprintf( stderr, "xvoutput: Display %s, vendor %s, ", DisplayString( display ), ServerVendor( display ) );
+
+    if( strstr( ServerVendor( display ), "XFree86" ) ) {
+        int vendrel = VendorRelease( display );
+
+	fprintf( stderr, "XFree86 " );
+        if( vendrel < 336 ) {
+	    /*
+	     * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
+	     * those cases here.
+	     */
+	    fprintf( stderr, "%d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
+	} else if( vendrel < 3900 ) {
+	    /* 3.3.x versions, other than the exceptions handled above */
+	    fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 100) % 10);
+	    if (((vendrel / 10) % 10) || (vendrel % 10)) {
+		fprintf( stderr, ".%d", (vendrel / 10) % 10);
+		if (vendrel % 10) {
+		    fprintf( stderr, ".%d", vendrel % 10);
+		}
+	    }
+	} else if( vendrel < 40000000 ) {
+	    /* 4.0.x versions */
+	    fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 10) % 10);
+	    if( vendrel % 10 ) {
+		fprintf( stderr, ".%d", vendrel % 10 );
+	    }
+	} else {
+	    /* post-4.0.x */
+	    fprintf( stderr, "%d.%d.%d", vendrel / 10000000, (vendrel / 100000) % 100, (vendrel / 1000) % 100);
+	    if( vendrel % 1000 ) {
+		fprintf( stderr, ".%d", vendrel % 1000);
+	    }
+	}
+	fprintf( stderr, "\n" );
+    } else {
+        fprintf( stderr, "vendor release %d\n", VendorRelease( display ) );
+    }
+
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
          (major < 1) || ((major == 1) && (minor < 1))) {
         fprintf (stderr, "xvoutput: No xshm extension available.\n");
@@ -209,7 +248,6 @@ static int open_display( void )
     XSelectInput( display, window, ButtonPressMask | StructureNotifyMask |
                                    KeyPressMask | ExposureMask | PropertyChangeMask );
 
-    XSetWindowBackgroundPixmap( display, window, None );
     XMapWindow( display, window );
 
     /* Wait for map. */
