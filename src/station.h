@@ -44,14 +44,13 @@ int station_hasChanged( void );
 
 station_info_t *station_getInfo();
 
-int station_adds(char *pos, char *band, char *channel, char *name);
-int station_add(int pos, const char *band, const char *channel, char* name);
+int station_add( int pos, char *band, char *channel, char* name );
 
 int station_add_band( char *band, int us_cable );
 
-int station_scan(int band);
+int station_scan( char *band, int us_cable );
 
-int station_writeConfig(FILE config);
+int station_writeConfig( config_t *ct );
 
 #ifdef __cplusplus
 };

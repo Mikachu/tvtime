@@ -60,22 +60,7 @@ int freq_byName( const char **band, const char **channel, int us_cable )
 }
 
 
-int freq_byPos( const char *band, int channel )
-{
-    const band_t *b;
-
-    b = getBand( band );
-    if( !b ) return 0;
-
-    if( b->count >= channel || channel < 0 ) {
-        return 0;
-    }
-
-    return b->channels[ channel ].freq;
-}
-
-
-int freq_for_band( const char *band, int us_cable, freq_callback_t f )
+int freq_for_band( char *band, int us_cable, freq_callback_t f )
 {
     const band_t *b;
     const band_entry_t *rp;
@@ -85,14 +70,19 @@ int freq_for_band( const char *band, int us_cable, freq_callback_t f )
 
     for( rp = b->channels; rp < &b->channels[ b->count ]; ++rp ) {
         int freq = rp->freq;
+	const char *nband= b->name;
 
         if ( us_cable != US_CABLE_NOMINAL && !strcmp( b->name, "US Cable") ) {
-            freq=  us_cable == US_CABLE_HRC
-                ? NTSC_CABLE_HRC(rp->freq)
-                : NTSC_CABLE_IRC(rp->freq);
+            if ( us_cable == US_CABLE_HRC ){
+		freq= NTSC_CABLE_HRC(rp->freq);
+		nband= "US Cable [HRC]";
+	    } else {
+                freq= NTSC_CABLE_IRC(rp->freq);
+	    	nband= "US Cable [IRC]";
+	    }
         }
         
-        (*f) ((char *)b->name, (char *)rp->name, freq);
+        if (! (*f) (nband, rp->name, freq) ) return 0;
     }
 
     return 1;

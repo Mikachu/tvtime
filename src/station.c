@@ -47,7 +47,7 @@ node newNode(node next, node prev, station_info_t *info) {
 	return 0;
 }
 
-station_info_t *newInfo( int pos, const char *name, const char *band, const char *channel, int freq) {
+station_info_t *newInfo( int pos, char *name, const char *band, const char *channel, int freq) {
 	station_info_t *i;
 
 	if ( NULL != ( i= malloc(sizeof *i) ) ) {
@@ -159,12 +159,14 @@ station_info_t *station_getInfo( void )
 
 
 
-int station_adds(char *pos, char *band, char *channel, char *name);
-int station_add(int pos, const char *band, const char *channel, char *name) {
+int station_add(int pos, char *band, char *channel, char *name) {
 	int freq;
 	station_info_t *i;
-
-	if ( 0 == ( freq= freq_byName(&band,&channel,US_CABLE_NOMINAL) ) ) {
+	const char *bandc= band;
+	const char *channelc= channel;
+	
+	// band and channel get consted by freq_byName
+	if ( 0 == ( freq= freq_byName(&bandc,&channelc,US_CABLE_NOMINAL) ) ) {
 		fprintf(stderr, "station: No frequency known for %s %s\n", band, channel);
 		return 0;
 	}
@@ -195,7 +197,7 @@ int getNextPos() {
 }
 
 
-void freq_callback( const char *band, const char *channel, unsigned int freq ) {
+int add_band_callback( const char *band, const char *channel, unsigned int freq ) {
 	int pos;
 	station_info_t *i;
 
@@ -206,31 +208,35 @@ void freq_callback( const char *band, const char *channel, unsigned int freq ) {
 	} else
 		pos= getNextPos();
 	
-	if ( 0 == ( i= newInfo( pos, channel, band, channel, freq ) ) ) {
+	if ( 0 == ( i= newInfo( pos, (char *)channel, band, channel, freq ) ) ) {
 		fprintf(stderr, "station: Out of Memory");
-		return;
+		return 0;
 	}
 
 
 	if ( insert(i) ) 
-		return;
+		return 1;
 
 	free(i);
-	return;
+	return 0;
 
 	
 }
 
-
-int station_add_band( char* band, int us_cable ) {
-	freq_for_band( band, us_cable, freq_callback );
-	return 1;
-}
-
-int station_scan(int band) {
+int scan_callback( const char *band, const char *channel, unsigned int freq ) {
 	return 0;
 }
 
-int station_writeConfig(FILE config) {
+
+
+int station_add_band( char* band, int us_cable ) {
+	return freq_for_band( band, us_cable, add_band_callback );
+}
+
+int station_scan( char *band, int us_cable ) {
+	return freq_for_band( band, us_cable, scan_callback );
+}
+
+int station_writeConfig( config_t *ct ) {
 	return 0;
 }
