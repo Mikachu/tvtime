@@ -52,7 +52,7 @@ osd_font_t *osd_font_new( const char *fontfile, int fontsize,
 
     fontfilename = get_tvtime_file( fontfile );
     if( !fontfilename ) {
-        fprintf( stderr, "osd_font: Can't find font '%s'.  Checked: %s\n",
+        fprintf( stderr, "osd_font: Can't find font '%s'.\nosd_font: Looked in %s\n",
                  fontfile, get_tvtime_paths() );
         free( font );
         return 0;
