@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "pngoutput.h"
 #include "frequencies.h"
 #include "videoinput.h"
 #include "rtctimer.h"
@@ -127,6 +128,28 @@ void build_colourbars( unsigned char *output, int width, int height )
     free( cb444 );
 }
 
+static void pngscreenshot( unsigned char *filename, unsigned char *frame422,
+                           int width, int height, int stride )
+{
+    pngoutput_t *pngout = pngoutput_new( filename, width, height, 0.45 );
+    unsigned char *tempscanline = (unsigned char *) malloc( width * 3 );
+    int i;
+
+    if( !tempscanline ) {
+        pngoutput_delete( pngout );
+        return;
+    }
+
+    for( i = 0; i < height; i++ ) {
+        unsigned char *input422 = frame422 + (i * stride);
+        chroma422_to_chroma444_rec601_scanline( tempscanline, input422, width );
+        packed444_to_rgb24_rec601_scanline( tempscanline, tempscanline, width );
+        pngoutput_scanline( pngout, tempscanline );
+    }
+
+    pngoutput_delete( pngout );
+}
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -156,7 +179,6 @@ int main( int argc, char **argv )
     int debug = 0;
     int videohold = CHANNEL_HOLD;
     osd_string_t *channel_number, *volume_bar, *muted_osd;
-    // osd_shape_t *osd_rect;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
     unsigned char *testframe_odd;
@@ -239,14 +261,10 @@ int main( int argc, char **argv )
     channel_number = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
     volume_bar = osd_string_new( "helr.ttf", 15, width, height, 4.0 / 3.0 );
     muted_osd = osd_string_new( "helr.ttf", 15, width, height, 4.0 / 3.0 );
-    // osd_rect = osd_shape_new( OSD_Circle, 50, 50 );
-    // osd_shape_set_colour( osd_rect, 200, 128, 128 );
-    //osd_string_set_colour( channel_number, 226, 12, 155 );
     osd_string_set_colour( channel_number, 220, 12, 155 );
     osd_string_set_colour( volume_bar, 200, 128, 128 );
     osd_string_set_colour( muted_osd, 200, 128, 128 );
     osd_string_show_border( channel_number, 1 );
-
 
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( vidin ) ) {
@@ -554,7 +572,8 @@ int main( int argc, char **argv )
             memcpy( sdl_get_output(), colourbars, width*height*2 );
         } else {
             if( apply_luma_correction ) {
-                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(), width*2, curframe,
+                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(),
+                                                               width*2, curframe,
                                                                width, height/2, width*4 );
             } else {
                 packed422_field_to_frame_top( sdl_get_output(), width*2, curframe,
@@ -665,7 +684,6 @@ int main( int argc, char **argv )
         osd_string_advance_frame( channel_number );
         osd_string_advance_frame( muted_osd );
         osd_string_advance_frame( volume_bar );
-        // osd_shape_advance_frame( osd_rect );
 
         if( videohold ) videohold--;
     }

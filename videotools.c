@@ -635,7 +635,8 @@ void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth,
 const int filterkernel[] = { -1, 3, -6, 12, -24, 80, 80, -24, 12, -6, 3, -1 };
 const int kernelsize = sizeof( filterkernel ) / sizeof( int );
 
-void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src, int srcwidth )
+void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src,
+                                             int srcwidth )
 {
     if( srcwidth ) {
         int halfksize = kernelsize / 2;
@@ -852,9 +853,8 @@ static void init_YCbCr_to_RGB_tables(void)
 }
 
 
-void rgb24_to_packed444_601_scanline( unsigned char *output,
-                                      unsigned char *input,
-                                      int width )
+void rgb24_to_packed444_rec601_scanline( unsigned char *output,
+                                         unsigned char *input, int width )
 {
     if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
 
@@ -871,9 +871,8 @@ void rgb24_to_packed444_601_scanline( unsigned char *output,
     }
 }
 
-void packed444_to_rgb24_601_scanline( unsigned char *output,
-                                      unsigned char *input,
-                                      int width )
+void packed444_to_rgb24_rec601_scanline( unsigned char *output,
+                                         unsigned char *input, int width )
 {
     if( !conv_YR_inited ) init_YCbCr_to_RGB_tables();
 
@@ -951,8 +950,8 @@ void create_colourbars_packed444( unsigned char *output,
     int stripe_width;
     int pl_width;
 
-    rgb24_to_packed444_601_scanline( rainbowYCbCr, rainbowRGB, 7 );
-    rgb24_to_packed444_601_scanline( wobnairYCbCr, wobnairRGB, 7 );
+    rgb24_to_packed444_rec601_scanline( rainbowYCbCr, rainbowRGB, 7 );
+    rgb24_to_packed444_rec601_scanline( wobnairYCbCr, wobnairRGB, 7 );
 
     bnb_start = height * 2 / 3;
     pluge_start = height * 3 / 4;

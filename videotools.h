@@ -122,12 +122,10 @@ void cheap_packed444_to_packed422_scanline( unsigned char *output,
 void chroma422_to_chroma444_rec601_scanline( unsigned char *dest,
                                              unsigned char *src,
                                              int srcwidth );
-void packed444_to_rgb24_601_scanline( unsigned char *output,
-                                      unsigned char *input,
-                                      int width );
-void rgb24_to_packed444_601_scanline( unsigned char *output,
-                                      unsigned char *input,
-                                      int width );
+void packed444_to_rgb24_rec601_scanline( unsigned char *output,
+                                         unsigned char *input, int width );
+void rgb24_to_packed444_rec601_scanline( unsigned char *output,
+                                         unsigned char *input, int width );
 
 /**
  * Frame functions.

@@ -108,25 +108,42 @@ void osd_string_render_image4444( osd_string_t *osds )
                             0, 16, 128, 128 );
 
     if( osds->show_border ) {
-        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
-                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
-                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
-                                        osds->border_luma, osds->border_cb, osds->border_cr, 0, 0 );
-        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
-                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
-                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
-                                        osds->border_luma, osds->border_cb, osds->border_cr, 4, 0 );
-        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
-                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
-                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
-                                        osds->border_luma, osds->border_cb, osds->border_cr, 0, 4 );
-        composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
-                                        efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
-                                        efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
-                                        osds->border_luma, osds->border_cb, osds->border_cr, 4, 4 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width,
+                                        osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ),
+                                        efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ),
+                                        efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb,
+                                        osds->border_cr, 0, 0 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width,
+                                        osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ),
+                                        efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ),
+                                        efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb,
+                                        osds->border_cr, 4, 0 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width,
+                                        osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ),
+                                        efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ),
+                                        efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb,
+                                        osds->border_cr, 0, 4 );
+        composite_alphamask_packed4444( osds->image4444, osds->image_width,
+                                        osds->image_height, osds->image_width * 4,
+                                        efs_get_buffer( osds->efs ),
+                                        efs_get_width( osds->efs ),
+                                        efs_get_height( osds->efs ),
+                                        efs_get_stride( osds->efs ),
+                                        osds->border_luma, osds->border_cb,
+                                        osds->border_cr, 4, 4 );
     }
 
-    composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
+    composite_alphamask_packed4444( osds->image4444, osds->image_width,
+                                    osds->image_height, osds->image_width * 4,
                                     efs_get_buffer( osds->efs ), efs_get_width( osds->efs ),
                                     efs_get_height( osds->efs ), efs_get_stride( osds->efs ),
                                     osds->text_luma, osds->text_cb, osds->text_cr, 2, 2 );
@@ -165,11 +182,13 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
     if( osds->frames_left < 50 ) {
         int alpha = (int) ( ( ( ( (double) osds->frames_left ) / 50.0 ) * 256.0 ) + 0.5 );
         composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                                 osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width*4,
+                                                 osds->image4444, osds->image_textwidth,
+                                                 osds->image_textheight, osds->image_width*4,
                                                  xpos, ypos, alpha );
     } else {
         composite_packed4444_to_packed422( output, width, height, stride,
-                                           osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width*4,
+                                           osds->image4444, osds->image_textwidth,
+                                           osds->image_textheight, osds->image_width*4,
                                            xpos, ypos );
     }
 }
