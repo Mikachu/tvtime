@@ -1521,6 +1521,7 @@ int main( int argc, char **argv )
         }
 
         if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
+            acquired = 1;
             if( rvrreader ) {
                 if( !rvrreader_next_frame( rvrreader ) ) break;
                 curframe = rvrreader_get_curframe( rvrreader );
@@ -1530,10 +1531,10 @@ int main( int argc, char **argv )
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
                     fprintf( stderr, "tvtime: Can't capture next frame, exiting.\n" );
-                    break;
+                    tuner_state = TUNER_STATE_NO_SIGNAL;
+                    acquired = 0;
                 }
             }
-            acquired = 1;
             tvtime->filtered_curframe = 0;
         } else {
             /**
@@ -1734,10 +1735,10 @@ int main( int argc, char **argv )
          */
         if( vidin && acquired ) {
             if( fieldsavailable == 4 ) {
-                videoinput_free_frame( vidin, secondlastframeid );
+                if( secondlastframeid >= 0 ) videoinput_free_frame( vidin, secondlastframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             } else if( fieldsavailable == 2 ) {
-                videoinput_free_frame( vidin, lastframeid );
+                if( lastframeid >= 0 ) videoinput_free_frame( vidin, lastframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
         }
@@ -1859,7 +1860,7 @@ int main( int argc, char **argv )
                 lastframeid = curframeid;
                 lastframe = curframe;
             } else {
-                videoinput_free_frame( vidin, curframeid );
+                if( curframeid >= 0 ) videoinput_free_frame( vidin, curframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
         }
