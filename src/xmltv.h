@@ -98,6 +98,44 @@ const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name );
 */
 const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id );
 
+/**
+ * Sets the preferred language for xmltv data, add it to
+ * language list if not yet known.
+ */
+void xmltv_set_language( xmltv_t *xmltv, const char *locale );
+
+/**
+ * Get the currently selected language code.
+ */
+const char *xmltv_get_language( xmltv_t *xmltv );
+
+/**
+ * Number of known languages.
+ */
+int xmltv_get_num_languages( xmltv_t *xmltv );
+
+/**
+ * Select one of the known languages.
+ * n = 0..xmltv_get_num_languages()
+ * 0: default language
+ */
+void xmltv_select_language( xmltv_t *xmltv, int n );
+
+/**
+ * Get the current language number.
+ */
+int xmltv_get_langnum( xmltv_t *xmltv );
+
+/**
+ * Get the code for language n.
+ */
+const char *xmltv_get_language_code( xmltv_t *xmltv, int n );
+
+/**
+ * Get the name of language n.
+ */
+const char *xmltv_get_language_name( xmltv_t *xmltv, int n );
+
 #ifdef __cplusplus
 };
 #endif

@@ -1960,6 +1960,30 @@ int commands_in_menu( commands_t *cmd )
     return cmd->menuactive;
 }
 
+static void osd_list_xmltv_languages( tvtime_osd_t *osd, commands_t *cmd )
+{
+    int num = xmltv_get_num_languages( cmd->xmltv );
+    const char *cur = xmltv_get_language( cmd->xmltv );
+    char string[ 128 ];
+    int i;
+
+    tvtime_osd_list_set_hilight( osd, 1 );
+    tvtime_osd_list_set_lines( osd, num + 2);
+    tvtime_osd_list_set_text( osd, 0, _("Preferred XMLTV language") );
+    tvtime_osd_list_set_text( osd, 1, _("Default language") );
+    for( i = 1; i <= num; i++ ) {
+        const char *code = xmltv_get_language_code( cmd->xmltv, i );
+        const char *name = xmltv_get_language_name( cmd->xmltv, i );
+        snprintf( string, sizeof( string ), "%s (%s)",
+                  code, name? name : _("Unknown language") );
+        tvtime_osd_list_set_text( osd, i + 1, string );
+        if( cur && code && !strncasecmp( cur, code, 2 ) ) {
+            tvtime_osd_list_set_hilight( osd, i + 1 );
+        }
+    }
+    tvtime_osd_show_list( osd, 1, 0 );
+}
+
 void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 {
     time_t now;
@@ -3202,6 +3226,21 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_TOGGLE_QUIET_SCREENSHOTS:
         cmd->togglequiet = 1;
+        break;
+
+    case TVTIME_TOGGLE_XMLTV_LANGUAGE:
+        if( cmd->xmltv ) {
+            const char *lang;
+            int i = xmltv_get_langnum( cmd->xmltv ) + 1;
+            if( i > xmltv_get_num_languages( cmd->xmltv ) ) i = 0;
+            xmltv_select_language( cmd->xmltv, i );
+            xmltv_refresh( cmd->xmltv );
+            if( cmd->osd && !cmd->menuactive ) {
+                osd_list_xmltv_languages( cmd->osd, cmd );
+            }
+            lang = xmltv_get_language( cmd->xmltv );
+            config_save( cmd->cfg, "XMLTVLanguage", lang? lang : "none" );
+        }
         break;
     }
 }

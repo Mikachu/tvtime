@@ -19,16 +19,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <libxml/tree.h>
 #include "xmltv.h"
 
+#define MAX_LANGUAGES 3
+
+typedef struct language_s language_t;
 typedef struct program_s program_t;
 
 struct xmltv_s
 {
     xmlDocPtr doc;
     xmlNodePtr root;
-    xmlChar *locale;
+    int num_languages;
+    language_t *languages;
+    language_t *locale;
     char curchannel[ 256 ];
     int refresh;
     xmlChar *curchan;
@@ -36,6 +42,15 @@ struct xmltv_s
     program_t *pro;
     program_t *next_pro;
     int is_tv_grab_na;
+};
+
+/**
+ * Struct to store language info.
+ */
+struct language_s {
+    xmlChar code[3];
+    const char *name;
+    language_t *next;
 };
 
 /**
@@ -96,6 +111,64 @@ tz_map_t date_manip_timezones[] = {
     { "NZT",      1200, }, { "NZDT",     1300, } };
 
 const int num_timezones = sizeof( date_manip_timezones ) / sizeof( tz_map_t );
+
+/**
+ * ISO 639 language codes
+ */
+typedef struct {
+    const char *code;
+    const char *name;
+} locale_t;
+
+static locale_t locale_table[] = {
+    {"AA", "Afar"},           {"AB", "Abkhazian"},      {"AF", "Afrikaans"},
+    {"AM", "Amharic"},        {"AR", "Arabic"},         {"AS", "Assamese"},
+    {"AY", "Aymara"},         {"AZ", "Azerbaijani"},    {"BA", "Bashkir"},
+    {"BE", "Byelorussian"},   {"BG", "Bulgarian"},      {"BH", "Bihari"},
+    {"BI", "Bislama"},        {"BN", "Bengali"},        {"BO", "Tibetan"},
+    {"BR", "Breton"},         {"CA", "Catalan"},        {"CO", "Corsican"},
+    {"CS", "Czech"},          {"CY", "Welsh"},          {"DA", "Danish"},
+    {"DE", "German"},         {"DZ", "Bhutani"},        {"EL", "Greek"},
+    {"EN", "English"},        {"EO", "Esperanto"},      {"ES", "Spanish"},
+    {"ET", "Estonian"},       {"EU", "Basque"},         {"FA", "Persian"},
+    {"FI", "Finnish"},        {"FJ", "Fiji"},           {"FO", "Faeroese"},
+    {"FR", "French"},         {"FY", "Frisian"},        {"GA", "Irish"},
+    {"GD", "Gaelic"},         {"GL", "Galician"},       {"GN", "Guarani"},
+    {"GU", "Gujarati"},       {"HA", "Hausa"},          {"HI", "Hindi"},
+    {"HR", "Croatian"},       {"HU", "Hungarian"},      {"HY", "Armenian"},
+    {"IA", "Interlingua"},    {"IE", "Interlingue"},    {"IK", "Inupiak"},
+    {"IN", "Indonesian"},     {"IS", "Icelandic"},      {"IT", "Italian"},
+    {"IW", "Hebrew"},         {"JA", "Japanese"},       {"JI", "Yiddish"},
+    {"JW", "Javanese"},       {"KA", "Georgian"},       {"KK", "Kazakh"},
+    {"KL", "Greenlandic"},    {"KM", "Cambodian"},      {"KN", "Kannada"},
+    {"KO", "Korean"},         {"KS", "Kashmiri"},       {"KU", "Kurdish"},
+    {"KY", "Kirghiz"},        {"LA", "Latin"},          {"LN", "Lingala"},
+    {"LO", "Laothian"},       {"LT", "Lithuanian"},     {"LV", "Latvian"},
+    {"MG", "Malagasy"},       {"MI", "Maori"},          {"MK", "Macedonian"},
+    {"ML", "Malayalam"},      {"MN", "Mongolian"},      {"MO", "Moldavian"},
+    {"MR", "Marathi"},        {"MS", "Malay"},          {"MT", "Maltese"},
+    {"MY", "Burmese"},        {"NA", "Nauru"},          {"NE", "Nepali"},
+    {"NL", "Dutch"},          {"NO", "Norwegian"},      {"OC", "Occitan"},
+    {"OM", "Oromo"},          {"OR", "Oriya"},          {"PA", "Punjabi"},
+    {"PL", "Polish"},         {"PS", "Pashto"},         {"PT", "Portuguese"},
+    {"QU", "Quechua"},        {"RM", "Rhaeto-Romance"}, {"RN", "Kirundi"},
+    {"RO", "Romanian"},       {"RU", "Russian"},        {"RW", "Kinyarwanda"},
+    {"SA", "Sanskrit"},       {"SD", "Sindhi"},         {"SG", "Sangro"},
+    {"SH", "Serbo-Croatian"}, {"SI", "Singhalese"},     {"SK", "Slovak"},
+    {"SL", "Slovenian"},      {"SM", "Samoan"},         {"SN", "Shona"},
+    {"SO", "Somali"},         {"SQ", "Albanian"},       {"SR", "Serbian"},
+    {"SS", "Siswati"},        {"ST", "Sesotho"},        {"SU", "Sudanese"},
+    {"SV", "Swedish"},        {"SW", "Swahili"},        {"TA", "Tamil"},
+    {"TE", "Tegulu"},         {"TG", "Tajik"},          {"TH", "Thai"},
+    {"TI", "Tigrinya"},       {"TK", "Turkmen"},        {"TL", "Tagalog"},
+    {"TN", "Setswana"},       {"TO", "Tonga"},          {"TR", "Turkish"},
+    {"TS", "Tsonga"},         {"TT", "Tatar"},          {"TW", "Twi"},
+    {"UK", "Ukrainian"},      {"UR", "Urdu"},           {"UZ", "Uzbek"},
+    {"VI", "Vietnamese"},     {"VO", "Volapuk"},        {"WO", "Wolof"},
+    {"XH", "Xhosa"},          {"YO", "Yoruba"},         {"ZH", "Chinese"},
+    {"ZU", "Zulu"} };
+
+const int num_locales = sizeof( locale_table ) / sizeof( locale_t );
 
 /**
  * Timezone parsing code based loosely on the algorithm in
@@ -359,6 +432,63 @@ static int xmltv_is_tv_grab_na( xmltv_t *xmltv )
     return 0;
 }
 
+static language_t *xmltv_add_language( xmltv_t *xmltv, const xmlChar *lang )
+{
+    language_t *last = 0;
+    language_t *l = xmltv->languages;
+    int i;
+
+    if( xmltv->num_languages >= MAX_LANGUAGES ) return 0;
+
+    while( l ) {
+        i = xmlStrncasecmp( l->code, lang, 2 );
+        if( i == 0 ) {
+            return l;
+        } else if( i < 0 ) {
+            last = l;
+            l = l->next;
+        } else {
+            break;
+        }
+    }
+
+    xmltv->num_languages++;
+    l = malloc( sizeof( language_t ) );
+    if( !l ) return 0;
+    if( last ) {
+        l->next = last->next;
+        last->next = l;
+    } else {
+        l->next = xmltv->languages;
+        xmltv->languages = l;
+    }
+    for( i=0; i<2 && isalpha(lang[i]); i++ ) {
+        l->code[i] = tolower( lang[i] );
+    }
+    l->code[i] = '\0';
+
+    for( i=0; i<num_locales; i++ ) {
+        if( !xmlStrncasecmp( lang, BAD_CAST locale_table[i].code, 2 ) ) {
+            l->name = locale_table[i].name;
+            return l;
+        }
+    }
+    l->name = 0;
+    return l;
+}
+
+static int xmltv_find_languages( xmlNodePtr node, xmltv_t *xmltv )
+{
+    xmlNodePtr cur = node->xmlChildrenNode;
+    while( cur ) {
+        xmlChar *c = xmlGetProp( cur, BAD_CAST "lang" );
+        if( c ) xmltv_add_language( xmltv, c );
+        xmltv_find_languages( cur, xmltv );
+        cur = cur->next;
+    }
+    return 0;
+}
+
 xmltv_t *xmltv_new( const char *filename, const char *locale )
 {
     xmltv_t *xmltv = malloc( sizeof( xmltv_t ) );
@@ -366,8 +496,6 @@ xmltv_t *xmltv_new( const char *filename, const char *locale )
     if( !xmltv ) {
         return 0;
     }
-
-    xmltv->locale = locale ? BAD_CAST strdup( locale ) : 0;
 
     xmltv->doc = xmlParseFile( filename );
     if( !xmltv->doc ) {
@@ -402,6 +530,15 @@ xmltv_t *xmltv_new( const char *filename, const char *locale )
     xmltv->refresh = 1;
     xmltv->is_tv_grab_na = xmltv_is_tv_grab_na( xmltv );
 
+    xmltv->num_languages = 0;
+    xmltv->languages = 0;
+    if( locale ) {
+        xmltv->locale = xmltv_add_language( xmltv, BAD_CAST locale );
+    } else {
+        xmltv->locale = 0;
+    }
+    xmltv_find_languages( xmltv->root, xmltv );
+
     return xmltv;
 }
 
@@ -414,6 +551,17 @@ static void program_delete( program_t *pro )
     free( pro );
 }
 
+static void languages_delete( language_t *languages )
+{
+    language_t *cur, *next;
+    cur = languages;
+    while( cur ) {
+        next = cur->next;
+        free( cur );
+        cur = next;
+    }
+}
+
 void xmltv_delete( xmltv_t *xmltv )
 {
     program_delete( xmltv->pro );
@@ -422,6 +570,7 @@ void xmltv_delete( xmltv_t *xmltv )
     if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
     if( xmltv->locale ) xmlFree( xmltv->locale );
     xmlFreeDoc( xmltv->doc );
+    languages_delete( xmltv->languages );
     free( xmltv );
 }
 
@@ -434,16 +583,6 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
         *xmltv->curchannel = '\0';
     }
     xmltv->refresh = 1;
-}
-
-void xmltv_set_language( xmltv_t *xmltv, const char *locale )
-{
-    if( xmltv->locale ) free( xmltv->locale );
-    if( locale ) {
-        xmltv->locale = BAD_CAST strdup( locale );
-    } else {
-        xmltv->locale = 0;
-    }
 }
 
 void xmltv_refresh( xmltv_t *xmltv )
@@ -463,13 +602,13 @@ void xmltv_refresh( xmltv_t *xmltv )
     if( *xmltv->curchannel ) {
         xmlNodePtr program_node = 0;
         program_node = get_program( xmltv->root, xmltv->curchannel, curtime );
-        reinit_program( xmltv->pro, program_node, xmltv->locale );
+        reinit_program( xmltv->pro, program_node, xmltv->locale->code );
 
         if( program_node ) {
             /* If we found a program, lookup what's on next. */
             program_node = get_program( xmltv->root, xmltv->curchannel,
                                         xmltv->pro->end_time );
-            reinit_program( xmltv->next_pro, program_node, xmltv->locale );
+            reinit_program( xmltv->next_pro, program_node, xmltv->locale->code );
         } else {
             /* We found no program, schedule a check in a half hour. */
             xmltv->pro->end_time = curtime + 1800;
@@ -605,5 +744,70 @@ const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
     }
 
     return 0;
+}
+
+void xmltv_set_language( xmltv_t *xmltv, const char *locale )
+{
+    language_t *l;
+    if( !locale ) {
+        xmltv->locale = 0;
+        return;
+    }
+    l = xmltv_add_language( xmltv, BAD_CAST locale );
+    if( l ) xmltv->locale = l;
+}
+
+const char *xmltv_get_language( xmltv_t *xmltv )
+{
+    if( xmltv->locale ) return (char *) xmltv->locale->code;
+    return 0;
+}
+
+int xmltv_get_num_languages( xmltv_t *xmltv )
+{
+    return xmltv->num_languages;
+}
+
+void xmltv_select_language( xmltv_t *xmltv, int n )
+{
+    int i;
+    if( n > xmltv->num_languages ) return;
+    if( n == 0 ) {
+        xmltv->locale = 0;
+        return;
+    }
+    xmltv->locale = xmltv->languages;
+    for( i=1; i<n; i++ ) xmltv->locale = xmltv->locale->next;
+}
+
+int xmltv_get_langnum( xmltv_t *xmltv )
+{
+    language_t *l = xmltv->languages;
+    int i = 1;
+    if( !xmltv->locale ) return 0;
+    while( l ) {
+        if( l == xmltv->locale ) return i;
+        l = l->next;
+        i++;
+    }
+    return 0; /* should never happen */
+}
+
+const char *xmltv_get_language_code( xmltv_t *xmltv, int n )
+{
+    language_t *l = xmltv->languages;
+    int i;
+    if( n==0 || n>xmltv->num_languages ) return 0;
+    for( i=1; i<n; i++ ) l = l->next;
+    return (char *) l->code;
+}
+
+const char *xmltv_get_language_name( xmltv_t *xmltv, int n )
+{
+    language_t *l = xmltv->languages;
+    int i;
+    if( n==0 || n>xmltv->num_languages ) return 0;
+    for( i=1; i<n; i++ ) l = l->next;
+    return (char *) l->name;
 }
 

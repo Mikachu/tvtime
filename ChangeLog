@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Added code for toggling the XMLTV language using the command
+      TOGGLE_XMLTV_LANGUAGE.  Thanks to Ingo van Lil for the patch.
   * vektor: Support toggling PAL-DK/PAL-BG audio mode as a global
       setting, and added per-channel support for overriding this
       setting.  This should solve problems for cx88 users where the
