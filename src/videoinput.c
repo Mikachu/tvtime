@@ -820,7 +820,7 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
 
         vidin->tuner.tuner = vidin->tuner_number;
 
-        if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_M || vidin->norm == VIDEOINPUT_PAL_N ) {
+        if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N ) {
             if( vidin->tuner.mode != VIDEO_MODE_PAL ) {
                 mustchange = 1;
                 vidin->tuner.mode = VIDEO_MODE_PAL;
