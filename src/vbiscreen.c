@@ -625,7 +625,7 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 
                     if( startx < width ) {
 
-                        if( 0 && vs->captions )
+                        if( vs->captions )
                             blit_colour_packed422_scanline( 
                                 output + (startx*2), 
                                 osd_string_get_width( vs->line[ row ] ),
