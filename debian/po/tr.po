@@ -1,0 +1,156 @@
+# Turkish translation of tvtime.
+# This file is distributed under the same license as the tvtime package.
+# Recai Oktaş, 2004. 
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
+"PO-Revision-Date: 2004-05-15 11:13+0300\n"
+"Last-Translator: Recai Oktaş <roktas@omu.edu.tr>\n"
+"Language-Team: Turkish <debian-l10n-turkish@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=1; plural=0;\n"
+
+#. Type: select
+#. Choices
+#: ../templates:3
+msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid "Select the default television standard for your location"
+msgstr "Bulunduğunuz konuma ilişkin öntanımlı televizyon standartını seçin"
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid ""
+"North American users should select NTSC.  Most areas in the world use PAL."
+msgstr ""
+"Dünyanın bir çok bölgesinde PAL kullanılır.  Kuzey Amerika'da yaşayan "
+"kullanıcılar NTSC standartını seçmelidir."
+
+#. Type: select
+#. Choices
+#: ../templates:9
+msgid "Cable, Broadcast, Cable including channels 100+"
+msgstr "Kablo, Yayın, 100'ün üzerinde kanal içeren Kablo"
+
+#. Type: select
+#. Choices
+#: ../templates:17
+msgid "Cable, Broadcast"
+msgstr "Kablo, Yayın"
+
+#. Type: select
+#. Description
+#: ../templates:18
+msgid ""
+"The frequency table specifies which frequencies correspond to the familiar "
+"channel numbers.  Select broadcast if you use an antenna for over-the-air "
+"signals."
+msgstr ""
+"Frekans tablosu, alışkın olduğunuz kanallara karşı düşen frekansları "
+"tanımlar.  Eğer TV yayınını antenle alıyorsanız, \"yayın\"ı seçin."
+
+#. Type: select
+#. Choices
+#: ../templates:25
+msgid ""
+"Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
+"Optus, Custom (must run tvtime-scanner first)"
+msgstr ""
+"Avrupa, Fransa, Rusya, Avustralya, Yeni Zelanda, Çin, Avustralya Optus, Özel "
+"(önce tvtime-scanner çalıştırılmalı)"
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid "Select the default frequency table"
+msgstr "Öntanımlı frekans tablosunu seçin"
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid ""
+"Users of the Optus cable company in Australia should select Australia "
+"Optus.  If you are a user of a cable company that does not use standard "
+"frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
+"the tvtime-scanner application before using tvtime."
+msgstr ""
+"Avustralya Optus kablo-tv firmasını kullananlar Avustralya Optus'u "
+"seçmelidir.  Şayet Casema, UPC veya Mixtics gibi, standart frekanslar "
+"kullanmayan herhangi bir kablo-tv firmasına abone değilseniz, Özel'i seçin "
+"ve tvtime'ı kullanmadan önce tvtime-scanner programını çalıştırın."
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid "Specify your default television capture device"
+msgstr "Öntanımlı görüntü yakalama aygıtını girin"
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid ""
+"This should be the video4linux device which corresponds to your capture card."
+msgstr "Bu aygıt, görüntü yakalama kartınıza ait video4linux aygıtı olmalıdır."
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid "Specify a device to use for VBI decoding"
+msgstr "VBI kod çözümü için kullanılan aygıtı girin"
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid ""
+"This will only be used in NTSC areas for decoding closed captions and XDS "
+"channel information."
+msgstr ""
+"Bu aygıt, sadece NTSC bölgelerinde, yakalanan görüntülerin ve XDS kanal "
+"bilgisinin çözülmesinde kullanılacaktır."
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
+msgstr "`/usr/bin/tvtime'ın root haklarıyla çalıştırılmasını ister misiniz?"
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid ""
+"This allows tvtime to run at a high priority to ensure smooth video and "
+"should be used for high quality video output even during high CPU load."
+msgstr ""
+"Bu ayar, görüntü kalitesini arttırmak için tvtime'ın yüksek bir öncelikte "
+"çalışmasına müsaade eder.  Yüksek işlemci (CPU) yükleri altında dahi "
+"kaliteli bir görüntü elde etmek istiyorsanız bu ayarı kullanmalısınız."
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid "Specify the process priority for the tvtime binary"
+msgstr "\"tvtime\" programının süreç önceliğini girin"
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid ""
+"This setting controls the priority of the tvtime process relative to other "
+"processes on the system.  The allowed range is from -19 to 19. Lower values "
+"indicate higher priority, and a value of 0 would give tvtime the same "
+"priority as a normal process."
+msgstr ""
+"Bu ayar, sistemdeki diğer süreçlerle göreceli olarak tvtime'a ait süreç "
+"önceliğini belirler.  İzin verilen değerler -19 ilâ 19 aralığındadır.  Küçük "
+"değerler düşük öncelik belirtir.  0 değeri ise tvtime'a normal bir süreç ile "
+"aynı önceliği verecektir."
