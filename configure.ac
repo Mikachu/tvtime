@@ -56,6 +56,16 @@ AM_CONDITIONAL(HAVE_LIBPNG, [test x"$have_libpng" = "xyes"])
 AC_SUBST(PNG_LIBS)
 
 
+dnl ---------------------------------------------
+dnl freetype
+dnl ---------------------------------------------
+dnl Test for freetype
+AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
+if test "$FREETYPE_CONFIG" = "no" ; then
+  AC_MSG_ERROR(freetype2 needed and freetype-config not found)
+fi
+
+
 
 AC_ARG_ENABLE([warnings],
     [  --disable-warnings      do not treat warnings as errors])

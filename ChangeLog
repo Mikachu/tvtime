@@ -6,4 +6,6 @@
     more correct times.  Added a performance tracker object.
   * (vektor) Removed the force-DScaler-defaults on startup for V4L settings.
   * (vektor) Improved OSD display to show more information more consistently.
+  * (vektor) Added a poor configure check for freetype2, this should
+    be improved in the future.
 
