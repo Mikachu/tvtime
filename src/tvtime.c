@@ -2008,7 +2008,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
                 build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
                 commands_refresh_menu( commands );
-                osd_list_deinterlacers( osd, curmethodid );
+                if( !commands_menu_active( commands ) ) osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
