@@ -170,7 +170,7 @@ void mixer_set_device( const char *devname )
         channame = mixer_device + i + 1;
     }
     if( !file_is_openable_for_read( mixer_device ) ) {
-        fprintf( stderr, "mixer: Can't open device %s, volume controls unavailable.\n", mixer_device );
+        fprintf( stderr, "mixer: Can't open device %s, mixer volume and mute unavailable.\n", mixer_device );
     }
 
     mixer_channel = SOUND_MIXER_LINE;
