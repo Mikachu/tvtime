@@ -2139,9 +2139,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 framesize = width * height;
             }
             performance_print_last_frame_stats( perf, framesize );
-            osd_list_statistics( osd, perf, (curmethod) ? curmethod->name : "interlaced passthrough",
-                                 width, height, framesize, fieldtime, framerate_mode,
-                                 videoinput_get_norm( vidin ) );
+            if( osd ) {
+                osd_list_statistics( osd, perf, (curmethod) ? curmethod->name : "interlaced passthrough",
+                                     width, height, framesize, fieldtime, framerate_mode,
+                                     videoinput_get_norm( vidin ) );
+            }
         }
         if( config_get_debug( ct ) && commands_check_freq_present( commands ) ) {
             if( curmethod )  {
