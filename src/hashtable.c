@@ -24,6 +24,11 @@ struct hashtable_s {
 	struct hashtable_object *table;
 };
 
+struct hashtable_iterator_s {
+	hashtable_t *ht;
+	int index;
+};
+
 struct hashtable_object {
 	enum { NEVER_USED, CLEARED, IN_USE } status;
 	int index;
@@ -178,3 +183,48 @@ void hashtable_destroy( hashtable_t *ht )
 	free (ht);
 }
 
+hashtable_iterator_t *hashtable_iterator_init (hashtable_t *ht)
+{
+	hashtable_iterator_t *iter = malloc (sizeof *iter);
+
+	if (iter == NULL)
+		return NULL;
+	iter->ht = ht;
+	iter->index = 0;
+	return iter;
+}
+
+void *hashtable_iterator_go (hashtable_iterator_t *iter,
+			     int preinc, int postinc, int *index)
+{
+	// TODO: Support decrementation
+	int i;
+	void *ret = NULL;
+
+	*index = -1;
+	// First, check if the iterator is on an object in the hash table
+	if (iter->ht->table[iter->index].status != IN_USE)
+		preinc++;
+	for (i = 0; i < preinc; i++) {	
+		while (iter->ht->table[iter->index].status != IN_USE) {
+			iter->index++;
+			if (iter->index >= iter->ht->size)
+				return NULL;
+		}
+	}
+	*index = iter->ht->table[iter->index].index;
+	ret = iter->ht->table[iter->index++].data;
+	for (i = 0; i < postinc; i++) {
+		while (iter->ht->table[iter->index].status != IN_USE) {
+			iter->index++;
+			if (iter->index >= iter->ht->size)
+				return ret;
+		}
+	}
+	return ret;
+}
+
+void hashtable_iterator_destroy (hashtable_iterator_t *iter)
+{
+	free (iter);
+}

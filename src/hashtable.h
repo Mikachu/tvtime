@@ -59,6 +59,33 @@ int hashtable_insert( hashtable_t *ht, int index, void *data );
  */
 int hashtable_delete( hashtable_t *ht, int index );
 
+/**
+ * Class providing an iterator for hashtable_t
+ */
+
+typedef struct hashtable_iterator_s hashtable_iterator_t;
+
+/**
+ * Constructs an interator.
+ */
+
+hashtable_iterator_t *hashtable_iterator_init (hashtable_t *ht);
+
+/**
+ * Iterates through the hash table preinc steps, returns what it finds,
+ * and then increments postinc steps.
+ * It will put the hashtable index in *index.
+ */
+
+void *hashtable_iterator_go (hashtable_iterator_t *iter,
+			     int preinc, int postinc, int *index);
+
+/**
+ * Destroys an iterator.
+ */
+
+void hashtable_iterator_destroy (hashtable_iterator_t *iter);
+
 #ifdef __cplusplus
 };
 #endif
