@@ -68,8 +68,6 @@ int ree_is_audio_packet( ree_packet_t *pkt );
 /**
  * Decodes the given video packet into the given buffers.
  */
-void ree_decode_video_packet( ree_packet_t *pkt, unsigned char *luma,
-                              unsigned char *cb, unsigned char *cr,
-                              int width, int height );
+void ree_decode_video_packet( ree_packet_t *pkt, unsigned char *data, int width, int height );
 
 #endif /* REE_H_INCLUDED */
