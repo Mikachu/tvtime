@@ -205,13 +205,13 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  * currently set to about 1 second, that is, we won't go into film mode
  * until we've seen a pulldown sequence successfully for 1 second.
  */
-#define PULLDOWN_ERROR_WAIT     24
+#define PULLDOWN_ERROR_WAIT     60
 
 /**
  * This is how many predictions have to be incorrect before we fall back to
  * video mode.  Right now, if we mess up, we jump to video mode immediately.
  */
-#define PULLDOWN_ERROR_THRESHOLD 4
+#define PULLDOWN_ERROR_THRESHOLD 2
 
 
 /**
@@ -314,7 +314,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
          */
 
-        pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
+        pdoffset = determine_pulldown_offset_short_history_new( last_topdiff, last_botdiff, 1, predicted );
 
         /* 3:2 pulldown state machine. */
         if( !pdoffset ) {
