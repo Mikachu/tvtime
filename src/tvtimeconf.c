@@ -877,6 +877,16 @@ config_t *config_new( void )
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
     ct->keymap[ 'o' ] = TVTIME_TOGGLE_COLOUR_INVERT;
+    ct->keymap[ '0' ] = TVTIME_CHANNEL_0;
+    ct->keymap[ '1' ] = TVTIME_CHANNEL_1;
+    ct->keymap[ '2' ] = TVTIME_CHANNEL_2;
+    ct->keymap[ '3' ] = TVTIME_CHANNEL_3;
+    ct->keymap[ '4' ] = TVTIME_CHANNEL_4;
+    ct->keymap[ '5' ] = TVTIME_CHANNEL_5;
+    ct->keymap[ '6' ] = TVTIME_CHANNEL_6;
+    ct->keymap[ '7' ] = TVTIME_CHANNEL_7;
+    ct->keymap[ '8' ] = TVTIME_CHANNEL_8;
+    ct->keymap[ '9' ] = TVTIME_CHANNEL_9;
 
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
