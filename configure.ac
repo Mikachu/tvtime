@@ -108,6 +108,12 @@ if test x"$no_x" != x"yes"; then
 	    X11_LIBS="$X11_LIBS -lXv"],,
 	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
 
+	dnl check for Xinerama
+	AC_CHECK_LIB([Xinerama],[XineramaQueryScreens],
+	    [AC_DEFINE([HAVE_XINERAMA],,[Xinerama support])
+	    X11_LIBS="$X11_LIBS -lXinerama"],,
+	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
+
 	dnl check for Xvmode
 	AC_CHECK_LIB([Xxf86vm],[XF86VidModeGetModeLine],
 	    [AC_DEFINE([HAVE_XF86VIDMODE],,[XF86VidModeExtension support])
