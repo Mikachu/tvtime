@@ -163,6 +163,14 @@ static void deinterlace_greedy_packed422_scanline_mmxext( uint8_t *output,
 #endif
 }
 
+/**
+ * The greedy deinterlacer introduces a one-field delay on the input.
+ * From the diagrams in deinterlace.h, the field being deinterlaced is
+ * always t-1.  For this reason, our copy_scanline method is used for
+ * deinterlace_method_t's interpolate_scanline function, and the real
+ * work is done in deinterlace_method_t's copy_scanline function.
+ */
+
 static deinterlace_method_t greedymethod =
 {
     "Motion Adaptive: Simple Detection",
