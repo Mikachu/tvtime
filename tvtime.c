@@ -167,7 +167,11 @@ int main( int argc, char **argv )
 
         return 1;
     } else {
-        videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+        if( frequencies_find_current_index() == -1 ) {
+            videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+        }
+        fprintf( stderr, "tvtime: Changing to channel %s\n", 
+                 chanlist[ chanindex ].name );
     }
 
     if( setpriority( 0, 0, -19 ) < 0 ) {

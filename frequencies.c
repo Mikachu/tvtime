@@ -1,8 +1,10 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define IN_FREQUENCIES_C
 #include "frequencies.h"
+#include "videoinput.h"
 
 /* --------------------------------------------------------------------- */
 
@@ -1321,4 +1323,21 @@ int frequencies_set_chanlist( char *str )
     chantab = chanlist_names[i].index;
     chancount = chanlists[chanlist_names[i].index].count;
     return 1;
+}
+
+int frequencies_find_current_index()
+{
+    int curfreq = videoinput_get_tuner_freq();
+    int i;
+    fprintf( stderr, "frequencies: current frequency %d\n", curfreq);
+
+    for( i=0; i < chancount; i++ ) {
+        if( curfreq < chanlist[i].freq+500 && 
+            curfreq > chanlist[i].freq-500 ) 
+            break;
+    }
+
+    if( i == chancount ) return -1;
+    chanindex = i;
+    return i;
 }

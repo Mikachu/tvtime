@@ -115,6 +115,7 @@ extern struct STRTAB chanlist_names[];
 extern int                chantab;
 extern struct CHANLIST   *chanlist;
 extern int                chancount;
-int                frequencies_set_chanlist( char *str );
+int                       frequencies_set_chanlist( char *str );
+int                       frequencies_find_current_index();
 extern int                chanindex;
 #endif

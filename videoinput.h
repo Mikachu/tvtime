@@ -75,6 +75,11 @@ void videoinput_set_tuner( int tuner_number, int mode );
  */
 void videoinput_set_tuner_freq( int freqKHz );
 
+/**
+ * Returns the currently tuned frequency in KHz
+ */
+int videoinput_get_tuner_freq();
+
 /** 
  * Mutes the mixer, saving the current volume, if mute is true
  */

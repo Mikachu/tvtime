@@ -358,7 +358,6 @@ void videoinput_set_tuner_freq( int freqKHz )
 
     if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
         perror( "ioctl VIDIOCSFREQ" );
-        videoinput_mute(0);
         return;
     }
 }
@@ -370,6 +369,21 @@ void videoinput_mute( int mute )
     } else {
         mixer_set_volume( 100 );
     }
+}
+
+int videoinput_get_tuner_freq() 
+{
+    unsigned long frequency;
+    if( ioctl( grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
+        perror( "ioctl VIDIOCSFREQ" );
+        return 0;
+    }
+
+    if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
+        frequency *= 1000; // switch from MHz to KHz
+    }
+
+    return frequency/16;
 }
 
 void videoinput_delete( videoinput_t *vidin )
