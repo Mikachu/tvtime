@@ -159,6 +159,11 @@ void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
     osds->frames_left = timeout;
 }
 
+void osd_string_set_timeout( osd_string_t *osds, int timeout )
+{
+    osds->frames_left = timeout;
+}
+
 int osd_string_visible( osd_string_t *osds )
 {
     return ( osds->efs && (osds->frames_left != 0) );

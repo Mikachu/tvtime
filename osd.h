@@ -42,6 +42,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 void osd_string_delete( osd_string_t *osds );
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );
+void osd_string_set_timeout( osd_string_t *osds, int timeout );
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr );
 void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr );
