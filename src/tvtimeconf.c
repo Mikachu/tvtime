@@ -658,7 +658,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         case 'H': ct->outputheight = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
-        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'c': ct->prev_channel = ct->start_channel;
                   ct->start_channel = atoi( optarg ); break;
@@ -706,6 +706,9 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         configsave( ct->configsave, "InputWidth", tempstring );
 
         configsave( ct->configsave, "V4LDevice", ct->v4ldev );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->use_vbi );
+        configsave( ct->configsave, "UseVBI", tempstring );
         configsave( ct->configsave, "VBIDevice", ct->vbidev );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
