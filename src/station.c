@@ -47,7 +47,7 @@ node newNode(node next, node prev, station_info_t *info) {
 	return 0;
 }
 
-station_info_t *newInfo( int pos, char *name, char *band, char *channel, int freq) {
+station_info_t *newInfo( int pos, const char *name, const char *band, const char *channel, int freq) {
 	station_info_t *i;
 
 	if ( NULL != ( i= malloc(sizeof *i) ) ) {
@@ -160,7 +160,7 @@ station_info_t *station_getInfo( void )
 
 
 int station_adds(char *pos, char *band, char *channel, char *name);
-int station_add(int pos, char* band, char *channel, char *name) {
+int station_add(int pos, const char *band, const char *channel, char *name) {
 	int freq;
 	station_info_t *i;
 

@@ -23,11 +23,11 @@
 #define US_CABLE_HRC		1
 #define US_CABLE_IRC		2
 
-int freq_byName(char** band, char **channel, int us_cable);
-int freq_byPos(char* band, int channel);
+int freq_byName( const char **band, const char **channel, int us_cable );
+int freq_byPos( char *band, int channel );
 
-typedef void (*freq_callback_t) (char *band, char *channel, unsigned int freq);
-int freq_for_band(char *band, int us_cable, freq_callback_t f);
+typedef void (*freq_callback_t)( char *band, char *channel, unsigned int freq );
+int freq_for_band( char *band, int us_cable, freq_callback_t f );
 
 // tab-seperated
 //char *freq_getBands();

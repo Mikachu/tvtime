@@ -20,36 +20,42 @@
 #include "freq.h"
 #include "bands.h"
 
-band_t *getBand( char *band ) {
-	band_t *rp;
-	
-	for ( rp= (band_t *)bands; rp < &bands[numbands]; ++rp )
-		if ( !strcasecmp( rp->name, band ) )
-			return rp;
+const band_t *getBand( const char *band )
+{
+    const band_t *rp;
+    
+    for( rp = bands; rp < &bands[ numbands ]; ++rp ) {
+        if( !strcasecmp( rp->name, band ) ) {
+            return rp;
+        }
+    }
 
-	return NULL;
+    return 0;
 }
 
-int freq_byName( char **band, char **channel, int us_cable) {
-	band_t *b;
-	band_entry_t *rp;
-	
-	if ( NULL == ( b= getBand(*band) ) )
-		return 0;
-	for ( rp= (band_entry_t *)b->channels; rp < &(b->channels[b->count]); ++rp ) {
-		if ( !strcasecmp( rp->name, *channel ) ) {
-			if ( us_cable != US_CABLE_NOMINAL && !strcmp( b->name, "US Cable") ) {
-				return  us_cable == US_CABLE_HRC
-					? NTSC_CABLE_HRC(rp->freq)
-					: NTSC_CABLE_IRC(rp->freq);
-			}
-			*band= (char *)b->name;
-			*channel= (char *)rp->name;
-			return rp->freq;
-		}
-	}
+int freq_byName( const char **band, const char **channel, int us_cable )
+{
+    const band_t *b;
+    const band_entry_t *rp;
 
-	return 1;
+    b = getBand( *band ); 
+    if( !b ) {
+        return 0;
+    }
+
+    for( rp = b->channels; rp < &(b->channels[ b->count ]); ++rp ) {
+        if( !strcasecmp( rp->name, *channel ) ) {
+            if( us_cable != US_CABLE_NOMINAL && !strcmp( b->name, "US Cable" ) ) {
+                return (us_cable == US_CABLE_HRC) ? NTSC_CABLE_HRC( rp->freq )
+                                                  : NTSC_CABLE_IRC( rp->freq );
+            }
+            *band = b->name;
+            *channel = rp->name;
+            return rp->freq;
+        }
+    }
+
+    return 1;
 }
 
 

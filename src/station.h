@@ -26,8 +26,8 @@
 typedef struct station_info {
     int pos;
     char name[32];
-    char *band;
-    char *channel;
+    const char *band;
+    const char *channel;
     int freq;
 } station_info_t;
 
@@ -43,7 +43,7 @@ int station_hasChanged( void );
 station_info_t *station_getInfo();
 
 int station_adds(char *pos, char *band, char *channel, char *name);
-int station_add(int pos, char* band, char *channel, char* name);
+int station_add(int pos, const char *band, const char *channel, char* name);
 
 int station_add_band( char *band, int us_cable );
 
