@@ -1,5 +1,8 @@
 
 0.9.9 -
+  * vektor: Lots of fixes and features made it into this release
+      that aren't in this changelog.  We should try to improve
+      that in the future.
   * vektor: Added support for runtime frequency table switching.
   * vektor: Added save/restore for per-channel and global picture
       settings.

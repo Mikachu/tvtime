@@ -494,7 +494,6 @@
   </bind>
 
   <bind command="display_info">
-    <keyboard key="?"/>
     <mouse button="1"/>
   </bind>
 
