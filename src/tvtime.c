@@ -1041,7 +1041,7 @@ int main( int argc, char **argv )
     osd = tvtime_osd_new( width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0),
                           config_get_channel_text_rgb( ct ), config_get_other_text_rgb( ct ) );
     if( !osd ) {
-        fprintf( stderr, "Can't initialize OSD object, OSD disabled.\n" );
+        fprintf( stderr, "tvtime: OSD initialization failed, OSD disabled.\n" );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         tvtime_osd_set_deinterlace_method( osd, curmethod->name );
