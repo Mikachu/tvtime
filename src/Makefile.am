@@ -22,9 +22,6 @@ localedir = $(datadir)/locale
 TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
 TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 
-PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
-PLUGINS_LIBS = -L$(top_builddir)/plugins
-
 # Set the following if you want to specify an additional font directory
 # FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
@@ -45,20 +42,40 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	cpuinfo.h cpuinfo.c videodev.h videodev2.h menu.c menu.h \
 	outputfilter.h outputfilter.c xmltv.h xmltv.c gettext.h tvtimeglyphs.h
 
+if ARCH_X86
+DSCALER_SRCS = $(top_builddir)/plugins/dscalerapi.h \
+	$(top_builddir)/plugins/greedyhmacros.h \
+	$(top_builddir)/plugins/kdetv_greedyh.c \
+	$(top_builddir)/plugins/kdetv_tomsmocomp.c \
+	$(top_builddir)/plugins/greedyh.h \
+	$(top_builddir)/plugins/greedyh.cpp \
+	$(top_builddir)/plugins/tomsmocomp.h \
+	$(top_builddir)/plugins/tomsmocomp.cpp
+else
+DSCALER_SRCS = 
+endif
+
+PLUGIN_SRCS =  $(top_builddir)/plugins/plugins.h \
+	$(top_builddir)/plugins/linear.c \
+	$(top_builddir)/plugins/scalerbob.c \
+	$(top_builddir)/plugins/linearblend.c \
+	$(top_builddir)/plugins/vfir.c \
+	$(top_builddir)/plugins/greedy.c \
+	$(top_builddir)/plugins/weave.c \
+	$(top_builddir)/plugins/weavetff.c \
+	$(top_builddir)/plugins/weavebff.c \
+	$(DSCALER_SRCS)
+
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	xcommon.h xcommon.c
 
 bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
-EXTRA_PROGRAMS = expandpng timingtest
 
-tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
+tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) $(PLUGIN_SRCS) tvtime.c
 tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
-	$(FONT_CFLAGS) $(AM_CFLAGS)
+	$(X11_CFLAGS) $(XML2_FLAG) $(FONT_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) -lm -lstdc++
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
+	$(X11_LIBS) $(XML2_LIBS) -lm -lstdc++
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-command.c
@@ -73,26 +90,4 @@ tvtime_scanner_SOURCES = utils.h utils.c videoinput.h videoinput.c \
 	mixer.h mixer.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-
-expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
-timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
-timingtest_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
-	$(FONT_CFLAGS) $(AM_CFLAGS)
-timingtest_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) -lm
-
-CLEANFILES = expandpng timingtest
-
-# Satisfy extra-directory dependencies.  Unfortunately, this causes
-# libtool to re-link each and every time.  (Recursive make is evil!)
-if ARCH_386
-external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
-else
-external_dependencies = ../plugins/libtvtimeplugins.la
-endif
-.PHONY: $(external_dependencies)
-$(external_dependencies):
-	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
 
