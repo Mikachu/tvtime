@@ -195,6 +195,10 @@ static int mga_can_read_from_buffer( void )
     return 0;
 }
 
+static void mga_set_fullscreen_position( int pos )
+{
+}
+
 static void mga_shutdown( void )
 {
     ioctl( mga_fd, MGA_VID_OFF, 0 );
@@ -229,6 +233,7 @@ static output_api_t mgaoutput =
 
     mga_set_window_position,
     mga_set_window_height,
+    mga_set_fullscreen_position,
 
     mga_poll_events,
     mga_shutdown

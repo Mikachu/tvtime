@@ -469,6 +469,10 @@ int dfb_can_read_from_buffer( void )
     return 0;
 }
 
+void dfb_set_fullscreen_position( int pos )
+{
+}
+
 output_api_t dfboutput =
 {
     dfb_init,
@@ -497,6 +501,7 @@ output_api_t dfboutput =
 
     dfb_set_window_position,
     dfb_set_window_height,
+    dfb_set_fullscreen_position,
 
     dfb_poll_events,
     dfb_shutdown

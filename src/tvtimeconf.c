@@ -58,6 +58,7 @@ struct config_s
     int apply_luma_correction;
     double luma_correction;
     int useposition;
+    int fspos;
     int x;
     int y;
 
@@ -190,7 +191,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         char *curval = (char *) value;
 
         if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
-            if( curval[ 0 ] == 'f' || curval[ 0 ] == 'F' ) {
+            if( tolower( curval[ 0 ] ) == 'f' ) {
                 ct->outputheight = -1;
             } else {
                 ct->outputheight = atoi( curval );
@@ -224,6 +225,16 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "OutputDriver" ) ) {
             if( ct->output_driver ) free( ct->output_driver );
             ct->output_driver = strdup( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "FullscreenPosition" ) ) {
+            if( tolower( curval[ 0 ] ) == 't' ) {
+                ct->fspos = 1;
+            } else if( tolower( curval[ 0 ] ) == 'b' ) {
+                ct->fspos = 2;
+            } else {
+                ct->fspos = 0;
+            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
@@ -560,6 +571,8 @@ static void print_usage( char **argv )
              "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
              "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
              "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+             "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+             "                             centre (default).\n"
              "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
              "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
              "  -S, --saveoptions          Save command line options to the config file.\n"
@@ -591,6 +604,7 @@ config_t *config_new( void )
     ct->verbose = 0;
     ct->send_fields = 0;
     ct->output_driver = strdup( "xv" );
+    ct->fspos = 0;
     ct->aspect = 0;
     ct->debug = 0;
     ct->ntsc_mode = 0;
@@ -764,6 +778,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "slave", 0, 0, 'k' },
         { "widescreen", 0, 0, 'a' },
         { "rvr", 1, 0, 'r' },
+        { "fspos", 1, 0, 'p' },
         { 0, 0, 0, 0 }
     };
     int option_index = 0;
@@ -771,7 +786,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:",
+    while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -787,7 +802,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                   ct->rvr_filename = strdup( optarg ); break;
         case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                   ct->mixerdev = strdup( optarg ); break;
-        case 'H': if( optarg[ 0 ] == 'f' || optarg[ 0 ] == 'F' ) {
+        case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
                       ct->outputheight = -1;
                   } else {
                       ct->outputheight = atoi( optarg );
@@ -802,6 +817,14 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
         case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
                   ct->output_driver = strdup( optarg ); break;
+        case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
+                      ct->fspos = 1;
+                  } else if( tolower( optarg[ 0 ] ) == 'b' ) {
+                      ct->fspos = 2;
+                  } else {
+                      ct->fspos = 0;
+                  }
+                  break;
         case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
         default:
             print_usage( argv );
@@ -846,6 +869,14 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         config_save( ct, "Verbose", tempstring );
 
         config_save( ct, "OutputDriver", ct->output_driver );
+
+        if( ct->fspos == 0 ) {
+            config_save( ct, "FullscreenPosition", "Centre" );
+        } else if( ct->fspos == 1 ) {
+            config_save( ct, "FullscreenPosition", "Top" );
+        } else if( ct->fspos == 2 ) {
+            config_save( ct, "FullscreenPosition", "Bottom" );
+        }
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
         config_save( ct, "OutputHeight", tempstring );
@@ -1154,5 +1185,10 @@ int config_get_slave_mode( config_t *ct )
 const char *config_get_mixer_device( config_t *ct )
 {
     return ct->mixerdev;
+}
+
+int config_get_fullscreen_position( config_t *ct )
+{
+    return ct->fspos;
 }
 

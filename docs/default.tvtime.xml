@@ -147,6 +147,14 @@
   <option name="Fullscreen" value="0"/>
 
   <!--
+    Sets the position of the output when in fullscreen mode: top, bottom
+    or centre.  When set to top, tvtime in fullscreen will place its output
+    at the top of the screen.  Use this if you have a projector to help
+    tvtime fit properly onto your screen.
+  -->
+  <option name="FullscreenPosition" value="Centre"/>
+
+  <!--
     This sets the framerate of the output from tvtime.
 
     0 = Full framerate mode, every field is deinterlaced.

@@ -210,6 +210,7 @@ static output_api_t mgaoutput =
 
     xcommon_set_window_position,
     xcommon_set_window_height,
+    xcommon_set_fullscreen_position,
 
     xcommon_poll_events,
     mga_shutdown

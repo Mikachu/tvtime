@@ -58,6 +58,7 @@ void xcommon_resize_window_fullscreen( void );
 int xcommon_is_exposed( void );
 void xcommon_set_colourkey( int colourkey );
 void xcommon_frame_drawn( void );
+void xcommon_set_fullscreen_position( int pos );
 
 #ifdef __cplusplus
 };

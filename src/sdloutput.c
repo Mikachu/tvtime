@@ -343,6 +343,10 @@ static void sdl_set_window_height( int window_height )
     sdl_reset_display();
 }
 
+static void sdl_set_fullscreen_position( int pos )
+{
+}
+
 static output_api_t sdloutput =
 {
     sdl_init,
@@ -372,6 +376,7 @@ static output_api_t sdloutput =
     sdl_set_window_caption,
     sdl_set_window_position,
     sdl_set_window_height,
+    sdl_set_fullscreen_position,
 
     sdl_poll_events,
     sdl_quit

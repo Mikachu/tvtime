@@ -77,6 +77,7 @@ static int xcommon_verbose = 0;
 static int xcommon_exposed = 0;
 static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
+static int fullscreen_position = 0;
 
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
@@ -710,6 +711,13 @@ static void calculate_video_area( void )
 
     video_area.x = ( output_width - curwidth ) / 2;
     video_area.y = ( output_height - curheight ) / 2;
+    if( output_fullscreen ) {
+        if( fullscreen_position == 1 ) {
+            video_area.y = 0;
+        } else if( fullscreen_position == 2 ) {
+            video_area.y = output_height - curheight;
+        }
+    }
     video_area.width = curwidth;
     video_area.height = curheight;
 
@@ -1452,5 +1460,10 @@ int xcommon_get_visible_height( void )
 area_t xcommon_get_window_area( void )
 {
     return window_area;
+}
+
+void xcommon_set_fullscreen_position( int pos )
+{
+    fullscreen_position = pos;
 }
 

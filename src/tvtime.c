@@ -1273,14 +1273,19 @@ int main( int argc, char **argv )
     tagline = taglines[ rand() % numtaglines ];
     output->set_window_caption( tagline );
 
+    /* Set the fullscreen position. */
+    output->set_fullscreen_position( config_get_fullscreen_position( ct ) );
+
     /* If we start fullscreen, go into fullscreen mode now. */
     if( config_get_fullscreen( ct ) ) {
         commands_handle( commands, TVTIME_TOGGLE_FULLSCREEN, 0 );
     }
+
     /* If we start half-framerate, toggle that now. */
     for( i = 0; i < config_get_framerate_mode( ct ); i++ ) {
         commands_handle( commands, TVTIME_TOGGLE_FRAMERATE, 0 );
     }
+
     /* If we are a new install, start scanning channels. */
     if( station_is_new_install( stationmgr ) ) {
         commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
