@@ -1,5 +1,6 @@
 
-0.9.14 - Thu Oct 28 14:10:03 EDT 2004
+0.9.14 - Thu Oct 28 22:20:47 EDT 2004
+  * vektor: Don't show the hue control for non-NTSC-like norms.
   * vektor: Improve usability of the menu system when using a mouse.
   * inguin: Xinerama: Go to fullscreen on the head that contains the largest
       part of the tvtime window.

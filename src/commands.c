@@ -1032,6 +1032,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     char string[ 128 ];
     menu_t *menu;
     int maxwidth;
+    int curpos = 0;
 
     if( !cmd ) {
         return 0;
@@ -1517,34 +1518,46 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "saturation" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    curpos = 4;
+    if( cmd->vidin && videoinput_get_height( cmd->vidin ) == 480 &&
+        videoinput_get_norm( cmd->vidin ) != VIDEOINPUT_PAL_60 ) {
+        /* Hue only applies to NTSC norms. */
+        snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "hue" );
+        curpos++;
+    }
 
     if (config_get_save_restore_picture (cfg)) {
         snprintf( string, sizeof( string ),
                   TVTIME_ICON_SAVEPICTUREGLOBAL "  %s",
                   _("Save current settings as defaults") );
-        menu_set_text( menu, 5, string );
-        menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        curpos++;
+
         snprintf( string, sizeof( string ), TVTIME_ICON_RESETTODEFAULTS "  %s",
                   _("Reset to global defaults") );
-        menu_set_text( menu, 6, string );
-        menu_set_enter_command( menu, 6, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_AUTO_ADJUST_PICT, "" );
+        curpos++;
+
         snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
                   _("Back") );
-        menu_set_text( menu, 7, string );
-        menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "root" );
         commands_add_menu( cmd, menu );
     } else {
         snprintf( string, sizeof( string ), TVTIME_ICON_RESETTODEFAULTS "  %s",
                   _("Reset to global defaults") );
-        menu_set_text( menu, 5, string );
-        menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_AUTO_ADJUST_PICT, "" );
+        curpos++;
+
         snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
                   _("Back") );
-        menu_set_text( menu, 6, string );
-        menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "root" );
         commands_add_menu( cmd, menu );
     }
 
@@ -1567,44 +1580,54 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "saturation" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    curpos = 4;
+    if( cmd->vidin && videoinput_get_height( cmd->vidin ) == 480 &&
+        videoinput_get_norm( cmd->vidin ) != VIDEOINPUT_PAL_60 ) {
+        snprintf( string, sizeof( string ), TVTIME_ICON_HUE "  %s", _("Hue") );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "hue" );
+        curpos++;
+    }
 
     if( config_get_save_restore_picture( cfg ) ) {
         snprintf( string, sizeof( string ),
                   TVTIME_ICON_SAVEPICTUREGLOBAL "  %s",
                   _("Save current settings as global defaults") );
-        menu_set_text( menu, 5, string );
-        menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SAVE_PICTURE_GLOBAL, "" );
+        curpos++;
 
         snprintf( string, sizeof( string ),
                   TVTIME_ICON_SAVEPICTURECHANNEL "  %s",
                   _("Save current settings as channel defaults") );
-        menu_set_text( menu, 6, string );
-        menu_set_enter_command( menu, 6, TVTIME_SAVE_PICTURE_CHANNEL, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SAVE_PICTURE_CHANNEL, "" );
+        curpos++;
 
         snprintf( string, sizeof( string ), TVTIME_ICON_RESETTODEFAULTS " %s",
                   _("Reset to global defaults") );
-        menu_set_text( menu, 7, string );
-        menu_set_enter_command( menu, 7, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_AUTO_ADJUST_PICT, "" );
+        curpos++;
 
         snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
                   _("Back") );
-        menu_set_text( menu, 8, string );
-        menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "root" );
 
         commands_add_menu( cmd, menu );
     } else {
         snprintf( string, sizeof( string ), TVTIME_ICON_RESETTODEFAULTS "  %s",
                   _("Reset to global defaults") );
-        menu_set_text( menu, 5, string );
-        menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_AUTO_ADJUST_PICT, "" );
+        curpos++;
 
         snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
                   _("Back") );
-        menu_set_text( menu, 6, string );
-        menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+        menu_set_text( menu, curpos, string );
+        menu_set_enter_command( menu, curpos, TVTIME_SHOW_MENU, "root" );
+        curpos++;
 
         commands_add_menu( cmd, menu );
     }
