@@ -373,6 +373,11 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         tvtime_osd_set_film_mode( osd, -1 );
     }
 
+    if( pulldown_alg != PULLDOWN_VEKTOR ) {
+        /* If we leave vektor pulldown mode, lose our state. */
+        filmmode = 0;
+    }
+
     /* Make pulldown decisions every top field. */
     if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field ) {
         int predicted;
