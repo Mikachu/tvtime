@@ -494,6 +494,11 @@ int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     } else {
         ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
     }
+    /* When we go fullscreen or windowed, the wm_state code explicitly
+     * waits for a map event, so we have no choice at this point but
+     * to assume that we are mapped.
+     */
+    xvoutput_exposed = 1;
 
     XFlush( display );
     XSync( display, False );
