@@ -40,7 +40,7 @@ static void copy_scanline( unsigned char *output,
 static deinterlace_method_t weavemethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Weave last field",
+    "Weave Last Field",
     "Weave",
     2,
     0,

@@ -134,8 +134,8 @@ static void copy_scanline( unsigned char *output,
 static deinterlace_method_t vfirmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Vertical deinterlace filter",
-    "Vertical FIR",
+    "ffmpeg: Vertical Deinterlace Filter",
+    "Vertical",
     1,
     0,
     0,

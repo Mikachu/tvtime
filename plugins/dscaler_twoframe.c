@@ -98,7 +98,7 @@ static deinterlace_method_t greedymethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
     "DScaler: TwoFrame",
-    "2-Frame",
+    "TwoFrame",
     4,
     MM_ACCEL_X86_MMXEXT,
     0,

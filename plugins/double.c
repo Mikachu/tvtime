@@ -40,8 +40,8 @@ static void copy_scanline( unsigned char *output,
 static deinterlace_method_t doublemethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Line doubler",
-    "Double",
+    "Line Doubler",
+    "LineDoubler",
     1,
     0,
     0,

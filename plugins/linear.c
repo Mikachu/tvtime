@@ -38,7 +38,7 @@ static void copy_scanline( unsigned char *output,
 static deinterlace_method_t linearmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Linear interpolation",
+    "Linear Interpolation",
     "Linear",
     1,
     0,

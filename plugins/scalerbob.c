@@ -25,8 +25,8 @@
 static deinterlace_method_t scalerbobmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "XVideo Bob",
-    "XVideo Bob",
+    "Overlay Bob",
+    "OverlayBob",
     1,
     0,
     1,
