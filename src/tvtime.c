@@ -483,6 +483,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
         }
     } else {
+        int loop_size;
         int scanline = 0;
 
         if( bottom_field ) {
@@ -513,7 +514,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         output += outstride;
         scanline++;
 
-        for( i = ((frame_height - 2) / 2); i; --i ) {
+        loop_size = ((frame_height - 2) / 2);
+        for( i = loop_size; i; --i ) {
             deinterlace_scanline_data_t data;
 
             data.t0 = curframe;
@@ -524,13 +526,13 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             }
 
             if( bottom_field ) {
-                data.tt1 = 0;
+                data.tt1 = (i < loop_size) ? (curframe - instride) : (curframe + instride);
                 data.m1  = curframe + instride;
-                data.bb1 = 0;
+                data.bb1 = i ? (curframe + (instride*3)) : (curframe + instride);
             } else {
-                data.tt1 = 0;
+                data.tt1 = (i < loop_size) ? (lastframe - instride) : (lastframe + instride);
                 data.m1  = lastframe + instride;
-                data.bb1 = 0;
+                data.bb1 = i ? (lastframe + (instride*3)) : (lastframe + instride);
             }
 
             data.t2 = lastframe;
@@ -554,9 +556,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             output += outstride;
             scanline++;
 
-            data.tt0 = 0;
+            data.tt0 = curframe;
             data.m0  = curframe + (instride*2);
-            data.bb0 = 0;
+            data.bb0 = i ? (curframe + (instride*4)) : (curframe + (instride*2));
 
             if( bottom_field ) {
                 data.t1 = curframe + instride;
@@ -802,7 +804,7 @@ int main( int argc, char **argv )
     linear_plugin_init();
     weave_plugin_init();
     double_plugin_init();
-    gamedither_plugin_init();
+    vfir_plugin_init();
 
     scalerbob_plugin_init();
 
