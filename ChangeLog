@@ -1,5 +1,10 @@
 
 0.9.7
+  * (vektor) We no longer grab mouse and keyboard on fullscreen, as this
+    has problems with ewmh (no alt-tab away from a fullscreen app) and also
+    with multi-head displays.  We still need to decide what to do when the
+    virtual res is smaller than the display (fixes bug 691707)
+  * (vektor) We now show the cursor on motion, hide it on inactivity.
   * (vektor) Limit to 4 buffers from the card, even if they provide more.
     This fixes a/v sync issues (fixes bug 691629)
   * (vektor) Europe-east is now just part of the 'europe' frequency map.
