@@ -85,7 +85,9 @@ static const char *taglines[] = {
 "tvtime: viewer discretion is advised",
 "tvtime: tvtime should not be taken more than twice daily. People switching from an oral steroid, like prednisone, to tvtime, which contains an inhaled steroid, need to be especially careful. While adjusting to the switch, your body may not be as able to heal after surgery, infection, or serious injury. Tell your healthcare professional if you have a heart condition or high blood pressure. Some people may experience increased blood pressure, heart rate, or changes in heart rhythm. See your healthcare professional if your condition does not improve. tvtime is a long-term maintenance treatment for bad tv apps in patients 12 and older.",
 "tvtime: oh hungry?",
-"tvtime: an army of one" };
+"tvtime: an army of one",
+"tvtime: recommended by Dr. Mom",
+"tvtime: sometimes you need a little tvtime, sometimes you need alot" };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 
