@@ -17,8 +17,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef HAVE_VBISCREEN_H
-#define HAVE_VBISCREEN_H
+#ifndef VBISCREEN_H_INCLUDED
+#define VBISCREEN_H_INCLUDED
 
 typedef struct vbiscreen_s vbiscreen_t;
 
@@ -43,4 +43,4 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 void vbiscreen_dump_screen_text( vbiscreen_t *vs );
 void vbiscreen_reset( vbiscreen_t *vs );
 
-#endif
+#endif /* VBISCREEN_H_INCLUDED */
