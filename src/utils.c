@@ -648,7 +648,7 @@ static iconv_t cd = 0;
 void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
-    char *mycodeset = nl_langinfo( CODESET );
+    char *mycodeset;
 
 #ifdef LC_MESSAGES
     setlocale( LC_MESSAGES, "" );
@@ -656,6 +656,7 @@ void setup_i18n( void )
 #else
     setlocale( LC_ALL, "" );
 #endif
+    mycodeset = nl_langinfo( CODESET );
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
 
@@ -664,7 +665,7 @@ void setup_i18n( void )
      * we can just leave cd as NULL and allow lprintf/lputs & co to short-
      * circuit.
      */
-    if( !strcmp( mycodeset, "UTF-8" ) ) {
+    if( strcmp( mycodeset, "UTF-8" ) ) {
         char *codeset;
         char *errfmt;
 
@@ -687,7 +688,7 @@ void setup_i18n( void )
          * undefined state.
          */
         errfmt = _("\n"
-                   "*** Call to bind_textdomain_codeset() failed to set UTF-8 mode.\n"
+                   "*** Call to bind_textdomain_codeset() failed to set UTF-8 mode. (Returned %s.)\n"
                    "*** This may cause GUI messages to be displayed incorrectly!\n"
                    "*** Please report this as a bug at %s.\n\n");
 
@@ -702,7 +703,7 @@ void setup_i18n( void )
              * Also, we're using fprintf() here and not lfprintf() since we
              * called gettext() prior to bind_textdomain_codeset().
              */
-            fprintf( stderr, errfmt, PACKAGE_BUGREPORT );
+            fprintf( stderr, errfmt, codeset, PACKAGE_BUGREPORT );
         }
     }
 #endif
