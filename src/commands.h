@@ -108,9 +108,7 @@ enum tvtime_commands
     TVTIME_CHANNEL_7,
     TVTIME_CHANNEL_8,
     TVTIME_CHANNEL_9,
-    TVTIME_CHANNEL_0,
-
-    TVTIME_LAST
+    TVTIME_CHANNEL_0
 };
 
 int tvtime_string_to_command( const char *str );

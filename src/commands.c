@@ -30,6 +30,9 @@
 #include "console.h"
 #include "configsave.h"
 
+/* Number of frames to wait for next channel digit. */
+#define CHANNEL_DELAY 100
+
 typedef struct {
     char name[MAX_CMD_NAMELEN];
     int command;
@@ -96,11 +99,10 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_9", TVTIME_CHANNEL_9 },
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
 };
-#define NUM_CMDS (sizeof(cmd_table)/sizeof(Cmd_Names))
 
 int tvtime_num_commands( void )
 {
-    return NUM_CMDS;
+    return ( sizeof( cmd_table ) / sizeof( Cmd_Names ) );
 }
 
 const char *tvtime_get_command( int pos )
@@ -115,25 +117,18 @@ int tvtime_get_command_id( int pos )
 
 int tvtime_string_to_command( const char *str )
 {
-    int i=0;
+    int i;
 
     if( !str ) return TVTIME_NOCOMMAND;
 
-    while( i < NUM_CMDS ) {
-        if( !strcasecmp( cmd_table[i].name, str ) ) {
-            return cmd_table[i].command;
+    for( i = 0; i < tvtime_num_commands(); i++ ) {
+        if( !strcasecmp( cmd_table[ i ].name, str ) ) {
+            return cmd_table[ i ].command;
         }
-        i++;
     }
+
     return -1;
 }
-
-
-
-/* Number of frames to wait for next channel digit. */
-#define CHANNEL_DELAY 100
-
-
 
 struct commands_s {
     config_t *cfg;

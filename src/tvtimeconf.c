@@ -30,7 +30,6 @@
 #include "tvtimeconf.h"
 #include "input.h"
 
-
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
 
@@ -225,7 +224,6 @@ static unsigned int parse_colour( const char *str )
 
     return 0;
 }
-
 
 static void config_init_keymap( config_t *ct, parser_file_t *pf )
 {
