@@ -126,7 +126,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
         fprintf( stderr, "vbiscreen: Could not find my font: %s\n", 
                  vs->fontfile );
         vbiscreen_delete( vs );
-        return NULL;
+        return 0;
     }
 
     osd_string_show_border( vs->line[ 0 ], 1 );
@@ -140,7 +140,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
         if( !vs->line[ i ] ) {
             fprintf( stderr, "vbiscreen: Could not allocate a line.\n" );
             vbiscreen_delete( vs );
-            return NULL;
+            return 0;
         }
         osd_string_set_colour_rgb( vs->line[ i ], 
                                    (vs->fgcolour & 0xff0000) >> 16,
