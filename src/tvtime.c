@@ -71,7 +71,6 @@
 #include "station.h"
 #include "dfboutput.h"
 #include "mgaoutput.h"
-#include "xmgaoutput.h"
 #include "rvrreader.h"
 #include "sdloutput.h"
 #include "pulldown.h"
@@ -120,7 +119,6 @@ enum {
     OUTPUT_DIRECTFB,
     OUTPUT_DIRECTFB_MATROXTV,
     OUTPUT_MGA,
-    OUTPUT_XMGA,
     OUTPUT_SDL
 };
 
@@ -1219,8 +1217,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             output_driver = OUTPUT_DIRECTFB_MATROXTV;
         } else if( !strcasecmp( config_get_output_driver( ct ), "mga" ) ) {
             output_driver = OUTPUT_MGA;
-        } else if( !strcasecmp( config_get_output_driver( ct ), "xmga" ) ) {
-            output_driver = OUTPUT_XMGA;
         } else if( !strcasecmp( config_get_output_driver( ct ), "sdl" ) ) {
             output_driver = OUTPUT_SDL;
         } else {
@@ -1237,8 +1233,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         output = get_dfb_matroxtv_output();
     } else if( output_driver == OUTPUT_MGA ) {
         output = get_mga_output();
-    } else if( output_driver == OUTPUT_XMGA ) {
-        output = get_xmga_output();
     } else if( output_driver == OUTPUT_SDL ) {
         output = get_sdl_output();
     } else {

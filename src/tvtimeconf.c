@@ -649,7 +649,7 @@ static void print_usage( char **argv )
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
     lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-              "                             xmga, matroxtv or SDL (defaults to Xv).\n"), stderr );
+              "                             matroxtv or SDL (defaults to Xv).\n"), stderr );
     lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
               "                             (defaults to us-cable).\n\n"
               "                             Valid values are:\n"
@@ -702,7 +702,7 @@ static void print_config_usage( char **argv )
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
     lfputs( _("  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
-              "                             xmga, matroxtv or SDL (defaults to Xv).\n"), stderr );
+              "                             matroxtv or SDL (defaults to Xv).\n"), stderr );
     lfputs( _("  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
               "                             (defaults to us-cable).\n\n"
               "                             Valid values are:\n"
