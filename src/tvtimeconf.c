@@ -100,9 +100,6 @@ struct config_s
 
     uid_t uid;
 
-    char *rvr_filename;
-    char *mpeg_filename;
-
     char *mixerdev;
 
     char *deinterlace_method;
@@ -610,7 +607,6 @@ static void print_usage( char **argv )
               "                             PAL-N or PAL-60 (defaults to NTSC).\n"), stderr );
     lfputs( _("  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
               "                             centre (default).\n"), stderr );
-    lfputs( _("  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"), stderr );
     lfputs( _("  -s, --showdrops            Print stats on frame drops (for debugging).\n"), stderr );
     lfputs( _("  -S, --saveoptions          Save command line options to the config file.\n"), stderr );
     lfputs( _("  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"), stderr );
@@ -753,8 +749,6 @@ config_t *config_new( void )
 
     ct->uid = getuid();
 
-    ct->rvr_filename = 0;
-    ct->mpeg_filename = 0;
     ct->mixerdev = strdup( "/dev/mixer:line" );
 
     ct->deinterlace_method = strdup( "GreedyH" );
@@ -898,8 +892,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "window", 0, 0, 'M' },
         { "slave", 0, 0, 'k' },
         { "widescreen", 0, 0, 'a' },
-        { "rvr", 1, 0, 'r' },
-        { "mpeg", 1, 0, 'g' },
         { "fspos", 1, 0, 'p' },
         { "xmltv", 1, 0, 't' },
         { "xmltvlanguage", 1, 0, 'l' },
@@ -936,10 +928,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                           conf_xml_parse( ct, ct->config_filename );
                       }
                       break;
-            case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
-                      ct->rvr_filename = strdup( optarg ); break;
-            case 'g': if( ct->mpeg_filename ) { free( ct->mpeg_filename ); }
-                      ct->mpeg_filename = strdup( optarg ); break;
             case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                       ct->mixerdev = strdup( optarg ); break;
             case 'X': setenv( "DISPLAY", optarg, 1 ); break;
@@ -1265,8 +1253,6 @@ void config_free_data( config_t *ct )
     if( ct->xmltvfile ) free( ct->xmltvfile );
     if( ct->xmltvlanguage ) free( ct->xmltvlanguage );
     if( ct->timeformat ) free( ct->timeformat );
-    if( ct->rvr_filename ) free( ct->rvr_filename );
-    if( ct->mpeg_filename ) free( ct->mpeg_filename );
     if( ct->mixerdev ) free( ct->mixerdev );
     if( ct->vbidev ) free( ct->vbidev );
     if( ct->config_filename ) free( ct->config_filename );
@@ -1579,16 +1565,6 @@ int config_get_ntsc_cable_mode( config_t *ct )
 const char *config_get_screenshot_dir( config_t *ct )
 {
     return ct->ssdir;
-}
-
-const char *config_get_rvr_filename( config_t *ct )
-{
-    return ct->rvr_filename;
-}
-
-const char *config_get_mpeg_filename( config_t *ct )
-{
-    return ct->mpeg_filename;
 }
 
 int config_get_framerate_mode( config_t *ct )
