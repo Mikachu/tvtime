@@ -263,25 +263,6 @@ static int xv_get_height_for_width( int window_width )
     return rounded_int_division( window_width * n, d );
 }
 
-static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int aspect_height )
-{
-    /* These hints don't work with current versions of metacity.
-     * We'll re-enable this code for metacity when newer versions
-     * become more popular.
-     */
-    if( !wm_is_metacity ) {
-        XSizeHints hints;
-
-        hints.flags = PAspect;
-        hints.min_aspect.x = aspect_width;
-        hints.min_aspect.y = aspect_height;
-        hints.max_aspect.x = aspect_width;
-        hints.max_aspect.y = aspect_height;
-
-        XSetWMNormalHints( dpy, win, &hints );
-    }
-}
-
 static void x11_static_gravity( Display *dpy, Window win )
 {
     XSizeHints hints;
@@ -1004,7 +985,6 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XSetWMProtocols( display, wm_window, &wm_delete_window, 1 );
 
     calculate_video_area();
-    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
 
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
@@ -1279,7 +1259,6 @@ int xcommon_toggle_aspect( void )
 {
     output_aspect = !output_aspect;
     calculate_video_area();
-    x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
     xcommon_clear_screen();
     return output_aspect;
 }
@@ -1678,11 +1657,6 @@ void xcommon_set_fullscreen_position( int pos )
 
 void xcommon_set_matte( int width, int height )
 {
-    if( width ) {
-        x11_aspect_hint( display, wm_window, width, height );
-    } else {
-        x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
-    }
     matte_width = width;
     matte_height = height;
     calculate_video_area();

@@ -913,6 +913,13 @@ static void build_output_menu( menu_t *menu, int widescreen,
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
     cur++;
 
+    snprintf( string, sizeof( string ), 
+              TVTIME_ICON_TELEVISIONSTANDARD "  %s",
+              _("Resize window to match contents") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_AUTO_ADJUST_WINDOW, "" );
+    cur++;
+
     if( fullscreen_supported ) {
         snprintf( string, sizeof( string ), fullscreen ?
                   TVTIME_ICON_GENERALTOGGLEON "  %s" :
