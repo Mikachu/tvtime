@@ -115,7 +115,7 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
     }
 
     osds->font = font;
-    osds->image4444 = (unsigned char *) malloc( video_width * (fontsize + 10) * 4 );
+    osds->image4444 = (unsigned char *) malloc( video_width * (fontsize*2) * 4 );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
@@ -141,7 +141,7 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
     osds->border_cr = 128;
 
     osds->image_width = video_width;
-    osds->image_height = fontsize + 10;
+    osds->image_height = fontsize*2;
     osds->image_textwidth = 0;
     osds->image_textheight = 0;
 
