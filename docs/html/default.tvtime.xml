@@ -95,7 +95,7 @@
   <option name="XMLTVFile" value="none"/>
 
   <!--
-    Set this to a two-letter country code to set the language to use
+    Set this to a two-letter language code to set the language to use
     for entries in the XMLTV file (for example, use "de" for German).
     Set to "none" if you wish to use the default language of the file.
   -->
