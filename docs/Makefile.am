@@ -1,3 +1,3 @@
-EXTRA_DIST = DESIGN TODO default.tvtimerc quotes.txt \
-	tvtime-icon-white.png tvtime-icon-black.png \
-	tvtime.1 tvtimerc.5
+EXTRA_DIST = DESIGN default.tvtimerc quotes.txt
+
+tvtime_MANS = tvtime.1 tvtimerc.5
