@@ -25,7 +25,7 @@ TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 # Set the following if you want to specify an additional font directory
 # FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
-OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
+OPT_CFLAGS = -Wall -pedantic -I. -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
@@ -55,6 +55,7 @@ else
 DSCALER_SRCS = 
 endif
 
+PLUGIN_CFLAGS = -I$(top_builddir)/plugins
 PLUGIN_SRCS =  $(top_builddir)/plugins/plugins.h \
 	$(top_builddir)/plugins/linear.c \
 	$(top_builddir)/plugins/scalerbob.c \
@@ -73,7 +74,8 @@ bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
 
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) $(PLUGIN_SRCS) tvtime.c
 tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(X11_CFLAGS) $(XML2_FLAG) $(FONT_CFLAGS) $(AM_CFLAGS)
+	$(PLUGIN_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+	$(FONT_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(X11_LIBS) $(XML2_LIBS) -lm -lstdc++
 
