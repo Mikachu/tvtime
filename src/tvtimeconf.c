@@ -116,6 +116,8 @@ struct config_s
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
     char *command_pipe;
+
+	int preferred_deinterlace_method;
 };
 
 void config_init( config_t *ct );
@@ -127,7 +129,8 @@ static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
-                     "[-f <frequencies>] [-t <tuner>]\n", argv[ 0 ] );
+                     "[-f <frequencies>] [-t <tuner>] "
+			         "[-D <deinterlace method>]\n", argv[ 0 ] );
     fprintf( stderr, "\t-v\tShow verbose messages.\n" );
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
@@ -160,6 +163,8 @@ static void print_usage( char **argv )
                      "\t  \t\titaly\n"
                      "\t  \t\tfrance\n"
                      "\t  \t\targentina\n\n" );
+    fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
+			         "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
 }
 
 
@@ -193,6 +198,7 @@ config_t *config_new( int argc, char **argv )
     ct->channel_text_rgb = 4294967040U; /* opaque yellow */
     ct->other_text_rgb = 4294303411U; /* opaque wheat */
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
+	ct->preferred_deinterlace_method = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -270,7 +276,7 @@ config_t *config_new( int argc, char **argv )
         config_init( ct );
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:I" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
@@ -286,6 +292,7 @@ config_t *config_new( int argc, char **argv )
         case 'f': ct->freq = strdup( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
         case 'm': ct->fullscreen = 1; break;
+		case 'D': ct->preferred_deinterlace_method = atoi( optarg ); break;	
         default:
             print_usage( argv );
             return 0;
@@ -420,6 +427,10 @@ void config_init( config_t *ct )
         } else {
             ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
         }
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "PreferredDeinterlaceMethod", 1 )) ) {
+        ct->preferred_deinterlace_method = atoi( tmp );
     }
 
     config_init_keymap( ct );
@@ -669,6 +680,16 @@ int config_get_inputnum( config_t *ct )
 int config_get_apply_luma_correction( config_t *ct )
 {
     return ct->apply_luma_correction;
+}
+
+int config_get_preferred_deinterlace_method( config_t *ct )
+{
+	return ct->preferred_deinterlace_method;
+}
+
+void config_set_preferred_deinterlace_method( config_t *ct, int preferred_deinterlace_method )
+{
+	ct->preferred_deinterlace_method = preferred_deinterlace_method;
 }
 
 void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction )

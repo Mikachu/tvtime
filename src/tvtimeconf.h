@@ -109,6 +109,7 @@ unsigned int config_get_other_text_rgb( config_t *ct );
 int config_get_fullscreen( config_t *ct );
 int config_get_priority( config_t *ct );
 char *config_get_command_pipe( config_t *ct );
+int config_get_preferred_deinterlace_method( config_t *ct );
 
 #include "parser.h"
 parser_file_t *config_get_parsed_file( config_t *ct );
@@ -125,6 +126,7 @@ void config_set_v4l_device( config_t *ct, const char *v4ldev );
 void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
 void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
 void config_set_timeformat( config_t *ct, const char *format );
+void config_set_preferred_deinterlace_method( config_t *ct, int preferred_deinterlace_method );
 
 void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr );
 
