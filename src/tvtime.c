@@ -90,12 +90,6 @@ enum {
 static unsigned int pulldown_alg = 0;
 
 /**
- * This is ridiculous, but apparently I need to give my own
- * prototype for this function because of a glibc bug. -Billy
- */
-int setresuid( uid_t ruid, uid_t euid, uid_t suid );
-
-/**
  * Current deinterlacing method.
  */
 static deinterlace_method_t *curmethod;
@@ -952,8 +946,14 @@ int main( int argc, char **argv )
     }
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
-    if( setresuid( getuid(), getuid(), getuid() ) == -1 ) {
-        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", strerror( errno ) );
+#ifdef _POSIX_SAVED_IDS
+    if( seteuid( getuid() ) == -1 ) {
+#else
+    if( setreuid( -1, getuid() ) == -1 ) {
+#endif
+        fprintf( stderr, 
+                 "tvtime: Unknown problems dropping root access: %s\n", 
+                 strerror( errno ) );
         return 1;
     }
 

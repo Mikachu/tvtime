@@ -24,8 +24,11 @@
 #include <unistd.h>
 
 #include <errno.h>
+#include <string.h>
 #include <signal.h>
 #include <assert.h>
+
+#include <sys/resource.h>
 
 #include <X11/Xmd.h>
 #include <X11/Xlib.h>
@@ -171,7 +174,29 @@ void saver_off(Display *mDisplay) {
         close( STDOUT_FILENO );
         close( STDERR_FILENO );
 
-        /* Ping xscreensaver once ever ping_xscreensaver_sleep 
+        /* We need to drop privileges to the normal user, in case we are
+         * still setuid. */
+#ifdef _POSIX_SAVED_IDS
+        if( seteuid( getuid() ) == -1 ) {
+#else
+        if( setreuid( -1, getuid() ) == -1 ) {
+#endif
+          fprintf( stderr, 
+                   "x11tools: Unknown problems dropping root access: %s\n",
+                   strerror( errno ) );
+        }
+
+        /* Now we should re-nice ourselves so we don't get scheduled too
+         * often. */
+        errno = 0;
+        result = getpriority( PRIO_PROCESS, 0 );
+        assert( errno != 0 );
+        if( result < 0 ) {
+          /* Ensure that we are at least 0 nice. */
+          setpriority( PRIO_PROCESS, 0, 0 );
+        }
+
+        /* Ping xscreensaver once every ping_xscreensaver_sleep 
          * seconds. */
         for( ;; ) {
           errno = 0;

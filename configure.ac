@@ -31,7 +31,7 @@ AC_HEADER_TIME
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_MMAP
-AC_CHECK_FUNCS([asprintf atexit fork execlp gettimeofday memset signal sigemptyset sigaction strerror vsscanf wordexp wordfree])
+AC_CHECK_FUNCS([asprintf atexit fork execlp getpriority gettimeofday seteuid memset setreuid setpriority signal sigemptyset sigaction strerror vsscanf wordexp wordfree])
 
 # Let's set the group of the $(localstatedir)/run/tvtime directory
 # On most GNU/Linux systems, this should be `video', but most GNU/Linux
