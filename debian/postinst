@@ -23,7 +23,7 @@ set -e
 #     installation fails and the `postinst' is called with `abort-upgrade',
 #     `abort-remove' or `abort-deconfigure'.
 
-function setuid () {
+setuid () {
     db_get tvtime/setuid
     if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
 	if [ ! -x /usr/sbin/dpkg-statoverride ] ||\
@@ -41,11 +41,11 @@ function setuid () {
 }
 
 # Parse the option requested from tvtime-configure
-function get_option () {
+get_option () {
     OPTION=`tvtime-configure --$1 2>/dev/null | awk -F: '{ print \$2 }'`
 }
 
-function suck_tvtime_xml () {
+suck_tvtime_xml () {
     # If tvtime-configure was not there at Debconf, but
     # /etc/tvtime/tvtime.xml was, then we presume that the
     # administrator knew what he was doing.  We will therefore suck
