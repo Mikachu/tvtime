@@ -1,47 +1,95 @@
-Wed Feb  5 00:45:42 AST 2003
- This is the first draft of a survey i think we should run.
+Mon Feb 10 19:43:16 AST 2003
+ This is the second draft of a survey i think we should run.
  Please comment on it (or answer it!) and send to vektor@dumbterm.net
  for now.  We should decide on what questions we should ask and run
  this when we release 0.9.7.
     -vektor
 
 
-What capture card do you have (name on the box)?
+                tvtime user survey for 0.9.7
 
-What driver do you use?
+Introduction
+============
 
-Did you compile the driver separately or was it in your kernel already?
+This survey represents some questions for our users which we believe can
+help us better understand what features we should focus on, and also how
+we can better tune the finer details of the application towards how it
+will be used.
 
-What tvtime versions have you tried?
+Please answer as many questions as you like, and email them to
+tvtime-survey@dumbterm.net.  Your help is greatly appreciated.
 
-What distribution do you use?
+ Thanks,
+ -The tvtime development team
 
-What kernel is currently running on your machine?
 
-What is your output device
+Background
+----------
+1. What tvtime feature do you find most attractive?
+
+2. Have you ever heard of the 'DScaler' application for Windows?
+
+3. Have you ever used 'DScaler' under Windows?
+
+
+Setup
+-----
+1. What distribution do you use?
+
+2. What kernel is currently running on your machine?
+
+3. What capture card do you have (name on the box)?
+
+4. What driver do you use?
+
+5. Did you compile the driver separately or was it in your kernel already?
+
+
+Tvtime
+------
+1. What tvtime versions have you tried (if any)?
+
+
+Input
+-----
+1. What input do you use for tvtime?  Cable?  Satellite?  DVD player?
+
+2. If cable/satellite, who is your cable provider?
+
+3. If you use a tuner, how many channels do you get?
+
+
+Output
+------
+1. Do you mostly watch TV
+  a) in a little window
+  b) in a large window
+  c) fullscreen
+
+2. What is your output device
   a) A standard CRT monitor
   b) An LCD panel
   c) A data projector
   d) A television
 
-What is the size of your output device in inches?
+3. What is the size of your output device in inches?
 
-Have you ever heard of the 'DScaler' application for Windows?
+4. What refresh rate is it set to?
 
-Have you ever used 'DScaler' under Windows?
 
-Which of the following features is most important to you:
+Features
+--------
+1. Which of the following features is most important to you:
   1) Film-mode detection for higher quality deinterlacing for movies
   2) Motion-adaptive deinterlacing for higher quality TV broadcasts
   3) Less CPU-intensive deinterlacing methods
 
-Do you mostly watch TV
-  a) in a little window
-  b) in a large window
-  c) fullscreen
+2. Would you consider using tvtime as a component in a home theatre system?
 
-Would you consider using tvtime as a component in a home theatre system?
 
-If we have any follow-up questions and you would be willing to answer them,
-please write your email here.
+Thanks!!
+========
+
+Thanks alot for participating in our survey!  If you have any further
+comments or suggestions, please feel free to send them along as well.
 
