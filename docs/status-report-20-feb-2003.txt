@@ -1,0 +1,66 @@
+
+  Hi all, here's the tvtime status report in four sections:
+    1. What's going on right now
+    2. What we need to finish to release 0.9.7
+    3. What we will postpone until a soon release
+    4. Outstanding long-term issues
+
+
+Current goal
+  - A month ago I said we should release 0.9.7 for the bugfixes ASAP.
+    This has gone on too long now, I think we should just release what
+    we have by Monday.
+  - Simon is around enough that if I do a release, a debian package
+    should follow quickly after.  Let's forget about his issues for now
+    and if necessary do a 0.9.8.1 for debian.
+
+
+1. What's going on currently
+  - Both Alex and Achim are hot on getting libxml2 code in there. 
+  - The whole frequency code got rewritten by Achim, and we now have
+    config file saving too.
+  - I did a bunch of bugfixing with the V4L code to support the SAA7134
+    better, and provide more intelligent error messages.
+  - I was playing with a new deinterlacer filter, but I'm going to
+    disable it for the release since it isn't yet worth using.
+  - Doug has still been too busy to do any hacking.
+  - I disabled the VBI code in CVS for the release.
+
+2. To do for 0.9.7
+  - Make sure the new FAQ page is very detailed about problems relating
+    to incorrect tuner (bug 646494).
+  - Make sure EWMH support is enabled (bug 646494).
+  - Write documentation on the low cpu deinterlacing methods (no bug).
+  - Edit the gentoo ebuild to install all documentation (bug 683494).
+  - Ensure we're sync'ed with the ogle fullscreen code (no bug).
+
+3. Postpone until the future
+  - We're going to wait on autoscan (bug 633024).
+  - We're still going to have to wait on some of the smaller UI issues
+    and missing options:
+      - bug 633235 on 'no on-frame indication of dropped frames'
+      - bug 635005 on 'no way to specify deinterlacing algorithm'
+      - bug 664637 on 'tvtime should install its own default config'
+      - bug 650218 on 'no way to disable deinterlacing algorithms'
+      - bug 650218 on 'no support for 16:9 geometry'
+      - bug 628943 on 'font aspect not updated with output'
+      - bug 690428 on 'No detection of non-square-pixel displays'
+  - I'm not going to finish 3:2 pulldown support for the next release
+    (bug 633606).
+  - I'm not going to enable the DScaler dll loader, there are some
+    annoying issues to solve (no bug).
+  - We need to make sure our gentoo ebuild is more explicit with the
+    required compiler options to avoid problems (no bug).
+
+4. Outstanding long-term issues
+  - We badly need to get a usable menu, and the issue is mostly just
+    fighting with making sure whatever we choose is simple to extend,
+    maintain, and most importantly, simple to use.  Run-time
+    configuration with a menu is essential to solving many of our
+    current problems with frequency tables, auto-detection, and
+    usability.
+  - We still need to decide how closely our deinterlacing API should try
+    and follow DScaler's, and at what point it will be necessary to add
+    4:2:0 support to the API.
+
+

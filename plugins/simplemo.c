@@ -62,27 +62,27 @@ const int weight[] = {
  0, 0, 0, 0, 0, 0, 0, 0,
  0, 0, 0, 0, 0, 0, 0, 0,
 
- 4, 4, 4, 4, 4, 4, 4, 4, // 64
- 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 4, 4, 4, 4, 4, 4, 4,
+ 0, 0, 0, 0, 0, 0, 0, 0, // 64
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
 
- 4, 4, 4, 4, 4, 4, 4, 4, // 32
- 8, 8, 8, 8, 8, 8, 8, 8,
- 8, 8, 8, 8, 8, 8, 8, 8,
- 8, 8, 8, 8, 8, 8, 8, 8,
+ 0, 0, 0, 0, 0, 0, 0, 0, // 32
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 4, 4,
 
 // ---------------------
 
- 8, 8, 8, 8, 8, 8, 8, 8,
- 8, 8, 8, 8, 8, 8, 8, 8,
- 8, 8, 8, 8, 8, 8, 8, 8,
- 4, 4, 4, 4, 4, 4, 4, 4, // 32
+ 4, 4, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, // 32
 
- 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 4, 4, 4, 4, 4, 4, 4,
- 4, 4, 4, 4, 4, 4, 4, 4, // 64
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, // 64
 
  0, 0, 0, 0, 0, 0, 0, 0,
  0, 0, 0, 0, 0, 0, 0, 0,
@@ -126,30 +126,46 @@ static void deinterlace_scanline_slow( unsigned char *output,
 
     t1 += (drop - 2)*2;
     b1 += (drop - 2)*2;
+    t0 += (drop - 2)*2;
+    b0 += (drop - 2)*2;
     m1 += (drop - 2)*2;
     output += (drop - 2)*2;
 
-    PREFETCH_2048( weight );
-    PREFETCH_2048( t1 );
-    PREFETCH_2048( b1 );
-    PREFETCH_2048( m1 );
-
     for( i = drop; i < width - drop; i++ ) {
 
-        /* todo: rounding */
-
+/* Best ?
         unsigned int curfield = t1[ 0 ] + b1[ 0 ] + t1[ 8 ] + b1[ 8 ] +
                                 ((t1[ 2 ] + t1[ 6 ] + b1[ 2 ] + b1[ 6 ])<<2) +
                                 ((t1[ 4 ] + b1[ 4 ])*6);
         unsigned int both = (curfield + ((m1[ 0 ] + m1[ 8 ] +
                                          ((m1[ 2 ] + m1[ 6 ])<<2) +
                                          (m1[ 4 ]*6))<<1))>>6;
+*/
+/*
+        unsigned int curfield = t1[ 4 ] + b1[ 4 ];
+        unsigned int both = (curfield + (m1[ 4 ]<<1))>>2;
+*/
+
+/* Medium?
+*/
+/*
+        unsigned int curfield = t1[ 2 ] + t1[ 4 ] + b1[ 2 ] + b1[ 4 ];
+        unsigned int both = (curfield + ((m1[ 2 ] + m1[ 4 ])<<1))>>3;
+*/
+        unsigned int curfield = (t1[ 0 ] + t1[ 2 ] + t1[ 4 ] + t1[ 8 ] + b1[ 0 ] + b1[ 4 ] + b1[ 2 ] + b1[ 8 ])>>3;
+        unsigned int both = (t0[ 0 ] + t0[ 2 ] + t0[ 4 ] + t0[ 8 ] + b0[ 0 ] + b0[ 2 ] + b0[ 4 ] + b0[ 8 ])>>3;
         unsigned int w;
         int diff;
 
-        curfield = (curfield)>>5;
+        //curfield = (curfield)>>5;
+        //curfield = curfield>>2;
+
         diff = both - curfield + 256;
         w = weight[ diff ];
+
+        curfield = (t1[ 4 ] + b1[ 4 ])>>1;
+
+        //if( i % 500 == 499 ) fprintf( stderr, "%d: %d\n", diff, w );
 
         if( w ) {
             output[ 4 ] = ((8 - w)*curfield + (w*m1[ 4 ])) >> 3;
@@ -162,6 +178,8 @@ static void deinterlace_scanline_slow( unsigned char *output,
         output += 2;
         t1 += 2;
         b1 += 2;
+        t0 += 2;
+        b0 += 2;
         m1 += 2;
     }
     sfence();

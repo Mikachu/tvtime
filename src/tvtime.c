@@ -567,7 +567,6 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't initialize performance monitor.\n" );
         return 1;
     }
-
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputwidth( ct ), 
                             norm, verbose );
