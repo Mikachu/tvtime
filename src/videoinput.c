@@ -211,6 +211,7 @@ typedef struct capture_buffer_s
     struct v4l2_buffer vidbuf;
     uint8_t *data;
     int length;
+    int free;
 } capture_buffer_t;
 
 struct videoinput_s
@@ -289,6 +290,7 @@ static void free_frame( videoinput_t *vidin, int frameid )
             fprintf( stderr, "videoinput: Can't free frame %d: %s\n",
                      frameid, strerror( errno ) );
         }
+        vidin->capbuffers[ frameid ].free = 1;
     } else {
         if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frameid ) < 0 ) {
             fprintf( stderr, "videoinput: Can't free frame %d: %s\n",
@@ -342,6 +344,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
                      strerror( errno ) );
             return 0;
         }
+        vidin->capbuffers[ cur_buf.index ].free = 0;
         *frameid = cur_buf.index;
         return vidin->capbuffers[ cur_buf.index ].data;
     } else {
@@ -380,6 +383,31 @@ static void videoinput_free_all_frames( videoinput_t *vidin )
         free_frame( vidin, i );
     }
     vidin->curframe = 0;
+}
+
+int videoinput_buffer_invalid( videoinput_t *vidin, int frameid )
+{
+    if( !vidin->isv4l2 ) {
+        return 0;
+    } else {
+        return vidin->capbuffers[ frameid ].free;
+    }
+}
+
+static void videoinput_start_capture_v4l2( videoinput_t *vidin )
+{
+    if( ioctl( vidin->grab_fd, VIDIOC_STREAMON, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+        fprintf( stderr, "videoinput: Driver refuses to begin streaming: %s.\n",
+                 strerror( errno ) );
+    }
+}
+
+static void videoinput_stop_capture_v4l2( videoinput_t *vidin )
+{
+    if( ioctl( vidin->grab_fd, VIDIOC_STREAMOFF, &vidin->capbuffers[ 0 ].vidbuf.type ) < 0 ) {
+        fprintf( stderr, "videoinput: Driver refuses to halt streaming: %s.\n",
+                 strerror( errno ) );
+    }
 }
 
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,

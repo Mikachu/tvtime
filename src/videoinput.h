@@ -140,6 +140,8 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid );
  */
 void videoinput_free_frame( videoinput_t *vidin, int frameid );
 
+int videoinput_buffer_invalid( videoinput_t *vidin, int frameid );
+
 int videoinput_get_numframes( videoinput_t *vidin );
 
 /**
