@@ -98,6 +98,8 @@ struct videoinput_s
     struct video_channel grab_chan;
     int curframe;
 
+    int has_audio;
+
     int tuner_number;
     struct video_tuner tuner;
 
@@ -258,6 +260,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->signal_aquire_wait = 0;
     vidin->muted = 1;
     vidin->user_muted = 0;
+    vidin->has_audio = 1;
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -279,8 +282,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
 
     if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Using video4linux driver '%s', type is %x.\n",
-                 grab_cap.name, grab_cap.type );
+        fprintf( stderr, "videoinput: Using video4linux driver '%s', type is %x, audio %d.\n",
+                 grab_cap.name, grab_cap.type, grab_cap.audios );
     }
 
     /* The capabilities should tell us how many inputs this card has. */
@@ -298,7 +301,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* dirty hack time / v4l design flaw -- works with bttv only
      * this adds support for a few less common PAL versions */
     vidin->isbttv = 0;
-    if( -1 != ioctl( vidin->grab_fd, BTTV_VERSION, &i ) ) {
+    if( ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0 ) {
         vidin->isbttv = 1;
     } else if( norm > VIDEOINPUT_SECAM ) {
         fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
@@ -311,6 +314,14 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     /* On initialization, set to input 0.  This is just to start things up. */
     videoinput_set_input_num( vidin, 0 );
+
+
+    /* Test for audio support. */
+    if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
+        vidin->has_audio = 0;
+        fprintf( stderr, "videoinput: No audio detected (asked for audio, got '%s').\n",
+                 strerror( errno ) );
+    }
 
     /**
      * Once we've done that, we've set the hardware norm.  Now confirm that
@@ -592,6 +603,8 @@ int videoinput_has_tuner( videoinput_t *vidin )
 
 void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
+    if( !vidin->has_audio ) return;
+
     if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
         fprintf( stderr, "videoinput: Please post a bug report on "
@@ -909,16 +922,18 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
 
 void videoinput_delete( videoinput_t *vidin )
 {
-    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
-                 strerror( errno ) );
-        fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-    } else {
-        vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
+    if( vidin->has_audio ) {
+        if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
                      strerror( errno ) );
             fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+        } else {
+            vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+                fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
+                         strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+            }
         }
     }
 
