@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2004-09-18 23:43-0400\n"
-"PO-Revision-Date: 2004-07-10 02:27+0200\n"
+"PO-Revision-Date: 2004-09-19 19:56+0200\n"
 "Last-Translator: Ingo van Lil <inguin@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -777,7 +777,7 @@ msgstr "Aus Liste aktiver Kanäle entfernt."
 #: src/commands.c:2296
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
-msgstr "Lautstärke der TV-Karte wird nicht durch tvtime eingestellt."
+msgstr "Lautstärke der TV-Karte wird nicht durch tvtime gesetzt."
 
 #: src/commands.c:2299
 #, c-format
@@ -848,7 +848,7 @@ msgstr "Untertitel aktiviert."
 
 #: src/commands.c:2577
 msgid "No VBI device configured for CC decoding."
-msgstr "Kein passendes Gerät für Untertitel-Dekodierung konfiguriert."
+msgstr "Kein VBI-Gerät für Untertitel-Dekodierung konfiguriert."
 
 #: src/commands.c:2593
 #, c-format
@@ -1202,6 +1202,8 @@ msgstr "Lese Konfiguration aus %s\n"
 #: src/tvtimeconf.c:962
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
 msgstr ""
+"Es ist nicht möglich, zwei tvtime-Instanzen mit gleicher Konfiguration\n"
+"zu starten.\n"
 
 #: src/tvtimeconf.c:973
 msgid "Saving command line options.\n"
