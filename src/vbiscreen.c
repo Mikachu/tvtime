@@ -57,7 +57,7 @@ struct vbiscreen_s
     int frame_height;
     int frame_aspect;
 
-    int x, y; /* where to draw console */
+    int x, y; /* where to draw the CC screen. */
     int width, height;  /* the size box we have to draw in */
     int rowheight, charwidth;
     
@@ -131,7 +131,8 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
         return NULL;
     }
 
-    osd_string_show_text( vs->line[ 0 ], "W", 0 );
+    osd_string_show_border( vs->line[ 0 ], 1 );
+    osd_string_show_text( vs->line[ 0 ], "gW", 0 );
     vs->rowheight = osd_string_get_height( vs->line[ 0 ] );
     vs->charwidth = osd_string_get_width( vs->line[ 0 ] );
     osd_string_delete( vs->line[ 0 ] );
@@ -147,6 +148,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
                                    (vs->fgcolour & 0xff0000) >> 16,
                                    (vs->fgcolour & 0xff00) >> 8,
                                    (vs->fgcolour & 0xff) );
+        osd_string_show_border( vs->line[ i ], 1 );
         osd_string_show_text( vs->line[ i ], " ", 0 );
     }
     memset( vs->text, 0, 2 * ROWS * COLS );
@@ -239,10 +241,11 @@ int update_row_x( vbiscreen_t *vs, int row )
                                ( vs->fgcolour & 0xff0000 ) >> 16,
                                ( vs->fgcolour & 0xff00 ) >> 8,
                                ( vs->fgcolour & 0xff ) );
-    if( !haschars ) 
+    if( !haschars )  {
         osd_string_show_text( vs->line[ row ], " ", 0 );
-    else
+    } else {
         osd_string_show_text( vs->line[ row ], text, 51 );
+    }
 
     return haschars;
 }
@@ -307,7 +310,9 @@ void scroll_screen( vbiscreen_t *vs )
 void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital, 
                             unsigned int colour, int row )
 {
-    if( vs->verbose ) fprintf( stderr, "indent: %d, ital: %d, colour: 0x%x, row: %d\n", indent, ital, colour, row );
+    if( vs->verbose ) {
+        fprintf( stderr, "indent: %d, ital: %d, colour: 0x%x, row: %d\n", indent, ital, colour, row );
+    }
 
     if( 0 && vs->captions && vs->style <= ROLL_4 && vs->style ) {
         if( row != vs->cury+1 ) {
@@ -329,8 +334,9 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
 
 void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
 {
-    if( vs->verbose )
+    if( vs->verbose ) {
         fprintf( stderr, "in set mode\n");
+    }
 
     if( vs->verbose ) {
         fprintf( stderr, "Caption: %d ", caption );
@@ -587,22 +593,16 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                                              int width, int xpos, 
                                              int scanline )
 {
-    int x=0, y=0, row=0, index=0;
+    int x = 0, y = 0, row = 0, index = 0;
 
     if( scanline >= vs->y && scanline < vs->y + vs->height ) {
-
-        if( 0 && !vs->captions )
-            blit_colour_packed422_scanline( output + (vs->x*2), vs->width,
-                                            vs->bg_luma, vs->bg_cb, 
-                                            vs->bg_cr );
 
         index = vs->top_of_screen * COLS;
         x = ( vs->x + vs->charwidth) & ~1;
         for( row = 0; row < ROWS; row++ ) {
             y = vs->y + row * vs->rowheight + vs->rowheight;
             if( osd_string_visible( vs->line[ row ] ) ) {
-                if( scanline >= y &&
-                    scanline < y + vs->rowheight ) {
+                if( scanline >= y && scanline < y + vs->rowheight ) {
 
                     int startx;
                     int strx;
@@ -617,15 +617,6 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
 
 
                     if( startx < width ) {
-
-                        if( vs->captions )
-                            blit_colour_packed422_scanline( 
-                                output + (startx*2), 
-                                osd_string_get_width( vs->line[ row ] ),
-                                vs->bg_luma, 
-                                vs->bg_cb, 
-                                vs->bg_cr );
-
                         osd_string_composite_packed422_scanline( 
                             vs->line[ row ],
                             output + (startx*2),
