@@ -1199,6 +1199,8 @@ int main( int argc, char **argv )
 
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
     configsave( "StartChannel", number, 1 );
+    snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
+    configsave( "CaptureSource", number, 1 );
     output->shutdown();
 
     if( verbose ) {
