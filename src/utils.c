@@ -63,6 +63,7 @@ ings in this Software without prior written authorization from him.
 #ifdef ENABLE_NLS
 # define _(string) gettext (string)
 # include "gettext.h"
+# include <langinfo.h>
 #endif
 #include "tvtimeconf.h"
 #include "utils.h"
@@ -643,6 +644,8 @@ int tvtime_command_takes_arguments( int command )
 void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
+    char *codeset;
+
 #ifdef LC_MESSAGES
     setlocale( LC_MESSAGES, "" );
     setlocale( LC_CTYPE, "" );
@@ -651,6 +654,34 @@ void setup_i18n( void )
 #endif
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
+
+    codeset = nl_langinfo (CODESET);
+
+    if( strcmp( codeset, "UTF-8" ) != 0 ) {
+        /* Note that we're displaying this message BEFORE we switch the user
+           over to UTF-8. This insures that, for example, Russian users, will
+           receive at least the one message explaining the problem in a
+           character set they can read. */
+        fprintf( stderr,
+                 _("\n*** Since your console is set for the %s codeset, rather than UTF-8,"
+                   "\n*** console messages may be partially or completely illegible on your terminal."
+                   "\n*** This is a known bug, and will probably be fixed for the next release of"
+                   "\n*** tvtime. You can work around this problem by launching tvtime using a UTF-8"
+                   "\n*** aware terminal. See %s for more information.\n\n"),
+                 codeset, PACKAGE_BUGREPORT );
+        codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
+        if( strcmp( codeset, "UTF-8" ) != 0 ) {
+          /* This string is not translated, since gettext may now be in an
+             undefined state! However, we do not die here, since if the
+             user has an improperly set up locale but still wants to
+             display messages in English, this will allow the program
+             to function. */
+          fprintf( stderr,
+                   "%s:%d: Failed to force UTF-8 for gettext output! Some GUI messages may not be\n"
+                   "properly displayed! Please report this bug at %s.\n"
+                   __FILE__, __LINE__, PACKAGE_BUGREPORT );
+        }
+    }
 #endif
 }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-09-27 10:57+0200\n"
+"POT-Creation-Date: 2003-10-05 20:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/tvtime.c:824 src/tvtime.c:842 src/tvtime.c:876 src/tvtime.c:940
-#: src/tvtime.c:968 src/tvtime.c:1094 src/commands.c:357 src/commands.c:522
-#: src/commands.c:542 src/commands.c:604 src/commands.c:650 src/commands.c:725
-#: src/commands.c:742 src/commands.c:769 src/commands.c:834
-#: src/commands.c:1092 src/commands.c:1139 src/commands.c:1175
-#: src/commands.c:1213 src/commands.c:1285 src/commands.c:1356
-#: src/commands.c:1366 src/commands.c:1414 src/commands.c:1426
-#: src/commands.c:1456 src/commands.c:1489 src/commands.c:1522
-#: src/commands.c:1554
+#: src/tvtime.c:968 src/tvtime.c:1094 src/commands.c:370 src/commands.c:544
+#: src/commands.c:564 src/commands.c:626 src/commands.c:672 src/commands.c:747
+#: src/commands.c:764 src/commands.c:791 src/commands.c:856
+#: src/commands.c:1114 src/commands.c:1161 src/commands.c:1197
+#: src/commands.c:1235 src/commands.c:1307 src/commands.c:1378
+#: src/commands.c:1388 src/commands.c:1436 src/commands.c:1448
+#: src/commands.c:1478 src/commands.c:1511 src/commands.c:1544
+#: src/commands.c:1576
 msgid "Back"
 msgstr ""
 
@@ -47,7 +47,7 @@ msgstr ""
 msgid "Overscan setting"
 msgstr ""
 
-#: src/tvtime.c:899 src/commands.c:1245
+#: src/tvtime.c:899 src/commands.c:1267
 msgid "Apply matte"
 msgstr ""
 
@@ -125,11 +125,11 @@ msgstr ""
 msgid "16:9 + Overscan"
 msgstr ""
 
-#: src/tvtime.c:1056 src/tvtime.c:1083 src/tvtime.c:1105
+#: src/tvtime.c:1056 src/tvtime.c:1083
 msgid "1.85:1"
 msgstr ""
 
-#: src/tvtime.c:1061 src/tvtime.c:1088 src/tvtime.c:1106
+#: src/tvtime.c:1061 src/tvtime.c:1088
 msgid "2.35:1"
 msgstr ""
 
@@ -137,7 +137,7 @@ msgstr ""
 msgid "4:3 centre"
 msgstr ""
 
-#: src/tvtime.c:1072
+#: src/tvtime.c:1072 src/tvtime.c:1110
 msgid "4:3 + Overscan"
 msgstr ""
 
@@ -147,6 +147,10 @@ msgstr ""
 
 #: src/tvtime.c:1103
 msgid "Matte setting (Anamorphic input)"
+msgstr ""
+
+#: src/tvtime.c:1109
+msgid "Matte setting (4:3 input)"
 msgstr ""
 
 #: src/tvtime.c:1186
@@ -404,501 +408,501 @@ msgstr ""
 #, c-format
 msgid ""
 "\n"
-"*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
-"*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
-"*** linux kernel version 2.4.19 or later, please run:\n"
+"*** Failed to get 1024hz resolution from /dev/rtc.  This will cause\n"
+"*** video to not be smooth.  Please run tvtime as root, or change\n"
+"*** the maximum resolution by running this command as root:\n"
 "***       sysctl -w dev.rtc.max-user-freq=1024\n"
 "*** See our support page at %s for more information\n"
 "\n"
 msgstr ""
 
-#: src/commands.c:185 src/commands.c:753 src/commands.c:1076
-#: src/commands.c:1440 src/commands.c:1473 src/commands.c:1506
-#: src/commands.c:1539
+#: src/commands.c:185 src/commands.c:775 src/commands.c:1098
+#: src/commands.c:1462 src/commands.c:1495 src/commands.c:1528
+#: src/commands.c:1561
 msgid "Current"
 msgstr ""
 
-#: src/commands.c:284
+#: src/commands.c:297
 msgid "Renumber current channel"
 msgstr ""
 
-#: src/commands.c:292 src/commands.c:295
+#: src/commands.c:305 src/commands.c:308
 msgid "Current channel active in list"
 msgstr ""
 
-#: src/commands.c:305
+#: src/commands.c:318
 msgid "Stop channel scan"
 msgstr ""
 
-#: src/commands.c:309
+#: src/commands.c:322
 msgid "Scan channels for signal"
 msgstr ""
 
-#: src/commands.c:317
+#: src/commands.c:330
 msgid "Reset all channels as active"
 msgstr ""
 
-#: src/commands.c:323
+#: src/commands.c:336
 msgid "Finetune current channel"
 msgstr ""
 
-#: src/commands.c:330
+#: src/commands.c:343
 msgid "Change NTSC cable mode"
 msgstr ""
 
-#: src/commands.c:336
+#: src/commands.c:349
 msgid "Set current channel as SECAM"
 msgstr ""
 
-#: src/commands.c:337
+#: src/commands.c:350
 msgid "Set current channel as PAL"
 msgstr ""
 
-#: src/commands.c:344
+#: src/commands.c:357
 msgid "Change frequency table"
 msgstr ""
 
-#: src/commands.c:350
+#: src/commands.c:363
 msgid "Disable signal detection"
 msgstr ""
 
-#: src/commands.c:351
+#: src/commands.c:364
 msgid "Enable signal detection"
 msgstr ""
 
-#: src/commands.c:502 src/commands.c:529
+#: src/commands.c:524 src/commands.c:551
 msgid "Cable"
 msgstr ""
 
-#: src/commands.c:510 src/commands.c:537
+#: src/commands.c:532 src/commands.c:559
 msgid "Broadcast"
 msgstr ""
 
-#: src/commands.c:517
+#: src/commands.c:539
 msgid "Cable with channels 100+"
 msgstr ""
 
-#: src/commands.c:549
+#: src/commands.c:571
 msgid "Europe"
 msgstr ""
 
-#: src/commands.c:557
+#: src/commands.c:579
 msgid "Russia"
 msgstr ""
 
-#: src/commands.c:564
+#: src/commands.c:586
 msgid "France"
 msgstr ""
 
-#: src/commands.c:571
+#: src/commands.c:593
 msgid "Australia"
 msgstr ""
 
-#: src/commands.c:578
+#: src/commands.c:600
 msgid "Australia (Optus)"
 msgstr ""
 
-#: src/commands.c:585
+#: src/commands.c:607
 msgid "New Zealand"
 msgstr ""
 
-#: src/commands.c:592
+#: src/commands.c:614
 msgid "China Broadcast"
 msgstr ""
 
-#: src/commands.c:599
+#: src/commands.c:621
 msgid "Custom (first run tvtime-scanner)"
 msgstr ""
 
-#: src/commands.c:615
+#: src/commands.c:637
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr ""
 
-#: src/commands.c:622
+#: src/commands.c:644
 msgid "Low (360 pixels)"
 msgstr ""
 
-#: src/commands.c:628
+#: src/commands.c:650
 msgid "Moderate (576 pixels)"
 msgstr ""
 
-#: src/commands.c:634
+#: src/commands.c:656
 msgid "Standard (720 pixels)"
 msgstr ""
 
-#: src/commands.c:640
+#: src/commands.c:662
 msgid "High (768 pixels)"
 msgstr ""
 
-#: src/commands.c:645 src/commands.c:1208
+#: src/commands.c:667 src/commands.c:1230
 msgid "Restart with new settings"
 msgstr ""
 
-#: src/commands.c:706
+#: src/commands.c:728
 msgid "Mono"
 msgstr ""
 
-#: src/commands.c:713
+#: src/commands.c:735
 msgid "Stereo"
 msgstr ""
 
-#: src/commands.c:721
+#: src/commands.c:743
 msgid "SAP"
 msgstr ""
 
-#: src/commands.c:732
+#: src/commands.c:754
 msgid "Primary Language"
 msgstr ""
 
-#: src/commands.c:737
+#: src/commands.c:759
 msgid "Secondary Language"
 msgstr ""
 
-#: src/commands.c:759 src/commands.c:1082 src/commands.c:1446
-#: src/commands.c:1479 src/commands.c:1512 src/commands.c:1544
+#: src/commands.c:781 src/commands.c:1104 src/commands.c:1468
+#: src/commands.c:1501 src/commands.c:1534 src/commands.c:1566
 msgid "Increase"
 msgstr ""
 
-#: src/commands.c:764 src/commands.c:1087 src/commands.c:1451
-#: src/commands.c:1484 src/commands.c:1517 src/commands.c:1549
+#: src/commands.c:786 src/commands.c:1109 src/commands.c:1473
+#: src/commands.c:1506 src/commands.c:1539 src/commands.c:1571
 msgid "Decrease"
 msgstr ""
 
-#: src/commands.c:789
+#: src/commands.c:811
 msgid "BT8x8 luma correction"
 msgstr ""
 
-#: src/commands.c:799
+#: src/commands.c:821
 msgid "2-3 pulldown inversion"
 msgstr ""
 
-#: src/commands.c:808 src/commands.c:816
+#: src/commands.c:830 src/commands.c:838
 msgid "Colour invert"
 msgstr ""
 
-#: src/commands.c:820
+#: src/commands.c:842
 msgid "Mirror"
 msgstr ""
 
-#: src/commands.c:828
+#: src/commands.c:850
 msgid "Chroma killer"
 msgstr ""
 
-#: src/commands.c:976 src/commands.c:1011 src/commands.c:1043
-#: src/commands.c:1061 src/commands.c:1072 src/commands.c:1100
-#: src/commands.c:1147 src/commands.c:1183 src/commands.c:1191
-#: src/commands.c:1204 src/commands.c:1239 src/commands.c:1245
-#: src/commands.c:1251 src/commands.c:1258 src/commands.c:1264
-#: src/commands.c:1292 src/commands.c:1298 src/commands.c:1306
-#: src/commands.c:1312 src/commands.c:1324 src/commands.c:1373
-#: src/commands.c:1436 src/commands.c:1469 src/commands.c:1502
-#: src/commands.c:1535
+#: src/commands.c:998 src/commands.c:1033 src/commands.c:1065
+#: src/commands.c:1083 src/commands.c:1094 src/commands.c:1122
+#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
+#: src/commands.c:1226 src/commands.c:1261 src/commands.c:1267
+#: src/commands.c:1273 src/commands.c:1280 src/commands.c:1286
+#: src/commands.c:1314 src/commands.c:1320 src/commands.c:1328
+#: src/commands.c:1334 src/commands.c:1346 src/commands.c:1395
+#: src/commands.c:1458 src/commands.c:1491 src/commands.c:1524
+#: src/commands.c:1557
 msgid "Setup"
 msgstr ""
 
-#: src/commands.c:979 src/commands.c:1043 src/commands.c:1062
-#: src/commands.c:1073
+#: src/commands.c:1001 src/commands.c:1065 src/commands.c:1084
+#: src/commands.c:1095
 msgid "Station management"
 msgstr ""
 
-#: src/commands.c:984 src/commands.c:1015 src/commands.c:1101
-#: src/commands.c:1147 src/commands.c:1183 src/commands.c:1191
+#: src/commands.c:1006 src/commands.c:1037 src/commands.c:1123
+#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
 msgid "Input configuration"
 msgstr ""
 
-#: src/commands.c:989 src/commands.c:1020
+#: src/commands.c:1011 src/commands.c:1042
 msgid "Picture settings"
 msgstr ""
 
-#: src/commands.c:994 src/commands.c:1025 src/commands.c:1264
-#: src/commands.c:1293 src/commands.c:1299 src/commands.c:1307
-#: src/commands.c:1313
+#: src/commands.c:1016 src/commands.c:1047 src/commands.c:1286
+#: src/commands.c:1315 src/commands.c:1321 src/commands.c:1329
+#: src/commands.c:1335
 msgid "Video processing"
 msgstr ""
 
-#: src/commands.c:999 src/commands.c:1030 src/commands.c:1239
-#: src/commands.c:1245 src/commands.c:1251 src/commands.c:1258
+#: src/commands.c:1021 src/commands.c:1052 src/commands.c:1261
+#: src/commands.c:1267 src/commands.c:1273 src/commands.c:1280
 msgid "Output configuration"
 msgstr ""
 
-#: src/commands.c:1004 src/commands.c:1035
+#: src/commands.c:1026 src/commands.c:1057
 msgid "Exit menu"
 msgstr ""
 
-#: src/commands.c:1062
+#: src/commands.c:1084
 msgid "Frequency table"
 msgstr ""
 
-#: src/commands.c:1073 src/commands.c:2577
+#: src/commands.c:1095 src/commands.c:2601
 msgid "Finetune"
 msgstr ""
 
-#: src/commands.c:1105 src/commands.c:1108 src/commands.c:1151
-#: src/commands.c:1154 src/commands.c:2683
+#: src/commands.c:1127 src/commands.c:1130 src/commands.c:1173
+#: src/commands.c:1176 src/commands.c:2707
 msgid "Change video source"
 msgstr ""
 
-#: src/commands.c:1114 src/commands.c:1160 src/commands.c:1191
+#: src/commands.c:1136 src/commands.c:1182 src/commands.c:1213
 msgid "Preferred audio mode"
 msgstr ""
 
-#: src/commands.c:1119 src/commands.c:1165 src/commands.c:1204
+#: src/commands.c:1141 src/commands.c:1187 src/commands.c:1226
 msgid "Television standard"
 msgstr ""
 
-#: src/commands.c:1124 src/commands.c:1170 src/commands.c:1183
+#: src/commands.c:1146 src/commands.c:1192 src/commands.c:1205
 msgid "Sharpness"
 msgstr ""
 
-#: src/commands.c:1129
+#: src/commands.c:1151
 msgid "Toggle closed captions"
 msgstr ""
 
-#: src/commands.c:1134
+#: src/commands.c:1156
 msgid "Toggle XDS decoding"
 msgstr ""
 
-#: src/commands.c:1204
+#: src/commands.c:1226
 msgid "Input Configuration"
 msgstr ""
 
-#: src/commands.c:1251
+#: src/commands.c:1273
 msgid "Overscan"
 msgstr ""
 
-#: src/commands.c:1258
+#: src/commands.c:1280
 msgid "Fullscreen position"
 msgstr ""
 
-#: src/commands.c:1268 src/commands.c:1293
+#: src/commands.c:1290 src/commands.c:1315
 msgid "Deinterlacer configuration"
 msgstr ""
 
-#: src/commands.c:1273
+#: src/commands.c:1295
 msgid "Current deinterlacer description"
 msgstr ""
 
-#: src/commands.c:1277 src/commands.c:1307
+#: src/commands.c:1299 src/commands.c:1329
 msgid "Attempted framerate"
 msgstr ""
 
-#: src/commands.c:1281 src/commands.c:1313
+#: src/commands.c:1303 src/commands.c:1335
 msgid "Input filters"
 msgstr ""
 
-#: src/commands.c:1299
+#: src/commands.c:1321
 msgid "Deinterlacer description"
 msgstr ""
 
-#: src/commands.c:1324 src/commands.c:1373 src/commands.c:1436
-#: src/commands.c:1469 src/commands.c:1502 src/commands.c:1535
+#: src/commands.c:1346 src/commands.c:1395 src/commands.c:1458
+#: src/commands.c:1491 src/commands.c:1524 src/commands.c:1557
 msgid "Picture"
 msgstr ""
 
-#: src/commands.c:1328 src/commands.c:1378 src/commands.c:1436
-#: src/commands.c:2713 src/commands.c:2754
+#: src/commands.c:1350 src/commands.c:1400 src/commands.c:1458
+#: src/commands.c:2737 src/commands.c:2778
 msgid "Brightness"
 msgstr ""
 
-#: src/commands.c:1333 src/commands.c:1383 src/commands.c:1469
-#: src/commands.c:2727 src/commands.c:2757
+#: src/commands.c:1355 src/commands.c:1405 src/commands.c:1491
+#: src/commands.c:2751 src/commands.c:2781
 msgid "Contrast"
 msgstr ""
 
-#: src/commands.c:1337 src/commands.c:1387 src/commands.c:1502
-#: src/commands.c:2741 src/commands.c:2760
+#: src/commands.c:1359 src/commands.c:1409 src/commands.c:1524
+#: src/commands.c:2765 src/commands.c:2784
 msgid "Colour"
 msgstr ""
 
-#: src/commands.c:1341 src/commands.c:1391 src/commands.c:1535
-#: src/commands.c:2699 src/commands.c:2763
+#: src/commands.c:1363 src/commands.c:1413 src/commands.c:1557
+#: src/commands.c:2723 src/commands.c:2787
 msgid "Hue"
 msgstr ""
 
-#: src/commands.c:1348
+#: src/commands.c:1370
 msgid "Save current settings as defaults"
 msgstr ""
 
-#: src/commands.c:1352 src/commands.c:1362 src/commands.c:1409
-#: src/commands.c:1421
+#: src/commands.c:1374 src/commands.c:1384 src/commands.c:1431
+#: src/commands.c:1443
 msgid "Reset to global defaults"
 msgstr ""
 
-#: src/commands.c:1398
+#: src/commands.c:1420
 msgid "Save current settings as global defaults"
 msgstr ""
 
-#: src/commands.c:1404
+#: src/commands.c:1426
 msgid "Save current settings as channel defaults"
 msgstr ""
 
-#: src/commands.c:1679
+#: src/commands.c:1703
 msgid "Add current station"
 msgstr ""
 
-#: src/commands.c:1681
+#: src/commands.c:1705
 msgid "Exit"
 msgstr ""
 
-#: src/commands.c:1924
+#: src/commands.c:1948
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr ""
 
-#: src/commands.c:1927
+#: src/commands.c:1951
 msgid "Sleep off."
 msgstr ""
 
-#: src/commands.c:1978
+#: src/commands.c:2002
 msgid "Channel marked as active in the browse list."
 msgstr ""
 
-#: src/commands.c:1980
+#: src/commands.c:2004
 msgid "Channel disabled from the browse list."
 msgstr ""
 
-#: src/commands.c:2022
+#: src/commands.c:2046
 msgid "Processing every input field."
 msgstr ""
 
-#: src/commands.c:2024
+#: src/commands.c:2048
 msgid "Processing every top field."
 msgstr ""
 
-#: src/commands.c:2026
+#: src/commands.c:2050
 msgid "Processing every bottom field."
 msgstr ""
 
-#: src/commands.c:2039
+#: src/commands.c:2063
 #, c-format
 msgid "Sharpness will be %d on restart."
 msgstr ""
 
-#: src/commands.c:2085
+#: src/commands.c:2109
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr ""
 
-#: src/commands.c:2114
+#: src/commands.c:2138
 msgid "All channels re-activated."
 msgstr ""
 
-#: src/commands.c:2134
+#: src/commands.c:2158
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr ""
 
-#: src/commands.c:2145
+#: src/commands.c:2169
 msgid "Scanner unavailable with signal checking disabled."
 msgstr ""
 
-#: src/commands.c:2171
+#: src/commands.c:2195
 msgid "Scanning for channels being broadcast."
 msgstr ""
 
-#: src/commands.c:2187
+#: src/commands.c:2211
 msgid "Closed captions disabled."
 msgstr ""
 
-#: src/commands.c:2190
+#: src/commands.c:2214
 msgid "Closed captions enabled."
 msgstr ""
 
-#: src/commands.c:2199
+#: src/commands.c:2223
 msgid "No VBI device configured for CC decoding."
 msgstr ""
 
-#: src/commands.c:2214
+#: src/commands.c:2238
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr ""
 
-#: src/commands.c:2255
+#: src/commands.c:2279
 #, c-format
 msgid "Running: %s"
 msgstr ""
 
-#: src/commands.c:2331
+#: src/commands.c:2355
 msgid "Signal detection enabled."
 msgstr ""
 
-#: src/commands.c:2333
+#: src/commands.c:2357
 msgid "Signal detection disabled."
 msgstr ""
 
-#: src/commands.c:2345
+#: src/commands.c:2369
 msgid "XDS decoding enabled."
 msgstr ""
 
-#: src/commands.c:2347
+#: src/commands.c:2371
 msgid "XDS decoding disabled."
 msgstr ""
 
-#: src/commands.c:2393
+#: src/commands.c:2417
 msgid "Colour invert enabled."
 msgstr ""
 
-#: src/commands.c:2395
+#: src/commands.c:2419
 msgid "Colour invert disabled."
 msgstr ""
 
-#: src/commands.c:2417
+#: src/commands.c:2441
 msgid "Mirror enabled."
 msgstr ""
 
-#: src/commands.c:2419
+#: src/commands.c:2443
 msgid "Mirror disabled."
 msgstr ""
 
-#: src/commands.c:2441
+#: src/commands.c:2465
 msgid "Chroma kill enabled."
 msgstr ""
 
-#: src/commands.c:2443
+#: src/commands.c:2467
 msgid "Chroma kill disabled."
 msgstr ""
 
-#: src/commands.c:2460
+#: src/commands.c:2484
 msgid "Luma correction enabled."
 msgstr ""
 
-#: src/commands.c:2462
+#: src/commands.c:2486
 msgid "Luma correction disabled."
 msgstr ""
 
-#: src/commands.c:2479
+#: src/commands.c:2503
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr ""
 
-#: src/commands.c:2501
+#: src/commands.c:2525
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr ""
 
-#: src/commands.c:2531
+#: src/commands.c:2555
 msgid "Picture settings reset to defaults."
 msgstr ""
 
-#: src/commands.c:2636 src/commands.c:2650
+#: src/commands.c:2660 src/commands.c:2674
 msgid "Volume"
 msgstr ""
 
-#: src/commands.c:2799
+#: src/commands.c:2823
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 
-#: src/commands.c:2812
+#: src/commands.c:2836
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr ""
 
-#: src/commands.c:2894
+#: src/commands.c:2918
 msgid "Paused."
 msgstr ""
 
-#: src/commands.c:2894
+#: src/commands.c:2918
 msgid "Resumed."
 msgstr ""
 
@@ -1036,4 +1040,18 @@ msgid ""
 "supports:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
+msgstr ""
+
+#: src/utils.c:666
+#, c-format
+msgid ""
+"\n"
+"*** Since your console is set for the %s codeset, rather than UTF-8,\n"
+"*** console messages may be partially or completely illegible on your "
+"terminal.\n"
+"*** This is a known bug, and will probably be fixed for the next release of\n"
+"*** tvtime. You can work around this problem by launching tvtime using a UTF-"
+"8\n"
+"*** aware terminal. See %s for more information.\n"
+"\n"
 msgstr ""

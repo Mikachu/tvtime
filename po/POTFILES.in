@@ -4,3 +4,4 @@
 src/tvtime.c
 src/commands.c
 src/tvtimeconf.c
+src/utils.c
