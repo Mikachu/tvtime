@@ -443,7 +443,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
 
     if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: V4LWIN set to (%d,%d/%dx%d), chromakey %d, flags %d, clips %d.\n",
+        fprintf( stderr, "videoinput: Window set to (%d,%d/%dx%d), chromakey %d, flags %d, clips %d.\n",
              vidin->grab_win.x, vidin->grab_win.y, vidin->grab_win.width,
              vidin->grab_win.height, vidin->grab_win.chromakey,
              vidin->grab_win.flags, vidin->grab_win.clipcount );
