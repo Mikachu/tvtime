@@ -4,7 +4,6 @@
 #include "config.h"
 #include "attributes.h"
 #include "mmx.h"
-#include "sse.h"
 #include "mm_accel.h"
 #include "speedy.h"
 
