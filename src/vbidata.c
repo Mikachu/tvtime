@@ -315,7 +315,8 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         int day = packet[4];
         int hour = packet[3];
         int min = packet[2];
-        char str[33];
+        char str[32];
+
         if( vbi->verbose ) fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
                  day & 31, months[month & 15], hour & 31, min & 63 );
         vbi->start_month = month & 15;
@@ -349,7 +350,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             free( vbi->program_desc[ packet[1] & 0xf ] );
         vbi->program_desc[ packet[1] & 0xf ] = strdup( packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x02 ) {
-        char str[ 33 ];
+        char str[ 32 ];
         str[0] = 0;
         if( vbi->verbose ) fprintf( stderr, "Program Length: %02d:%02d", 
                  packet[ 3 ] & 63, packet[ 2 ] & 63 ); 
@@ -358,13 +359,15 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         snprintf( str, 32, "%02d:%02d", 
                  packet[ 3 ] & 63, packet[ 2 ] & 63 );
         if( length > 4 ) {
-            if( vbi->verbose ) fprintf( stderr, " Elapsed: %02d:%02d", packet[ 5 ] & 63, 
-                     packet[ 4 ] & 63 );
-        vbi->length_elapsed_hour = packet[ 5 ] & 63;
-        vbi->length_elapsed_min = packet[ 4 ] & 63;
-        snprintf( str, 32, "%02d:%02d/%02d:%02d", 
-                  packet[ 5 ] & 63, packet[ 4 ] & 63,
-                  packet[ 3 ] & 63, packet[ 2 ] & 63 );
+            if( vbi->verbose ) {
+                fprintf( stderr, " Elapsed: %02d:%02d", packet[ 5 ] & 63, 
+                         packet[ 4 ] & 63 );
+            }
+            vbi->length_elapsed_hour = packet[ 5 ] & 63;
+            vbi->length_elapsed_min = packet[ 4 ] & 63;
+            snprintf( str, 32, "%02d:%02d/%02d:%02d", 
+                      packet[ 5 ] & 63, packet[ 4 ] & 63,
+                      packet[ 3 ] & 63, packet[ 2 ] & 63 );
         } else {
             vbi->length_elapsed_hour = 0;
             vbi->length_elapsed_min = 0;
