@@ -39,6 +39,7 @@ static int mga_width;
 static int mga_height;
 static int mga_stride;
 static int mga_frame_size;
+static int mga_outheight;
 static int curframe;
 
 static int mga_init( int outputheight, int aspect, int verbose )
@@ -49,6 +50,7 @@ static int mga_init( int outputheight, int aspect, int verbose )
     }
 
     mga_config.version = MGA_VID_VERSION;
+    mga_outheight = outputheight;
 
     return 1;
 }
@@ -57,13 +59,14 @@ static void mga_reconfigure( void )
 {
     mga_config.src_width = mga_input_width;
     mga_config.src_height = mga_height;
-    mga_config.dest_width = 640;
-    mga_config.dest_height = 480;
     mga_config.x_org = 0;
     mga_config.y_org = 0;
 
-    mga_config.colkey_on = 0;
+    /* Assume square pixels. */
+    mga_config.dest_height = mga_outheight;
+    mga_config.dest_width = (mga_outheight * 4) / 3;
 
+    mga_config.colkey_on = 0;
     mga_config.format = MGA_VID_FORMAT_YUY2;
     mga_config.frame_size = mga_frame_size;
     mga_config.num_frames = 2;
