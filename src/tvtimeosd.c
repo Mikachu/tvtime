@@ -371,6 +371,7 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     }
     if( osd->channel_logo ) osd_animation_delete( osd->channel_logo );
     if( osd->film_logo ) osd_animation_delete( osd->film_logo );
+    osd_list_delete( osd->list );
     osd_rect_delete( osd->databarbg );
     osd_rect_delete( osd->databar );
     osd_font_delete( osd->smallfont );

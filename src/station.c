@@ -389,6 +389,13 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
 
 void station_delete( station_mgr_t *mgr )
 {
+    station_info_t *cur = mgr->first;
+    while( cur ) {
+        station_info_t *next = cur->next;
+        if( next == mgr->first ) next = 0;
+        free( cur );
+        cur = next;
+    }
     free( mgr->table );
     free( mgr->norm );
     free( mgr );

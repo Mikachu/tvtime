@@ -36,6 +36,7 @@
 #include <math.h>
 #include <time.h>
 #include <errno.h>
+#include <libxml/parser.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -145,13 +146,13 @@ typedef struct tvtime_s
     int filmmode;
 } tvtime_t;
 
-tvtime_t *tvtime_new( videofilter_t *filter )
+tvtime_t *tvtime_new( void )
 {
     tvtime_t *tvtime = malloc( sizeof( tvtime_t ) );
     if( !tvtime ) return 0;
 
     tvtime->curmethod = 0;
-    tvtime->filter = filter;
+    tvtime->filter = videofilter_new();
     tvtime->filtered_curframe = 0;
     tvtime->last_topdiff = 0;
     tvtime->last_botdiff = 0;
@@ -163,6 +164,14 @@ tvtime_t *tvtime_new( videofilter_t *filter )
     tvtime->filmmode = 0;
 
     return tvtime;
+}
+
+void tvtime_delete( tvtime_t *tvtime )
+{
+    if( tvtime->filter ) {
+        videofilter_delete( tvtime->filter );
+    }
+    free( tvtime );
 }
 
 void tvtime_set_deinterlacer( tvtime_t *tvtime, deinterlace_method_t *method )
@@ -755,7 +764,7 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     tvtime->filtered_curframe = 1;
 }
 
-void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
+static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
 {
     int nummethods = get_num_deinterlace_methods();
     int i;
@@ -769,7 +778,7 @@ void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
     tvtime_osd_show_list( osd, 1 );
 }
 
-void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
+static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
 
@@ -789,10 +798,10 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     tvtime_osd_show_list( osd, 1 );
 }
 
-void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
-                          const char *deinterlacer, int width,
-                          int height, int framesize, int fieldtime,
-                          int frameratemode, int norm )
+static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
+                                 const char *deinterlacer, int width,
+                                 int height, int framesize, int fieldtime,
+                                 int frameratemode, int norm )
 {
     double blit_time = performance_get_estimated_blit_time( perf );
     char text[ 200 ];
@@ -834,7 +843,7 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     tvtime_osd_show_list( osd, 1 );
 }
 
-void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
+static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
 {
     tvtime_osd_list_set_lines( osd, 5 );
     if( sixteennine ) {
@@ -1051,7 +1060,7 @@ int main( int argc, char **argv )
     setup_speedy_calls( mm_accel(), verbose );
 
     /* Setup the tvtime object. */
-    tvtime = tvtime_new( videofilter_new() );
+    tvtime = tvtime_new();
     if( !tvtime->filter ) {
         fprintf( stderr, "tvtime: Can't initialize filters.\n" );
     }
@@ -2125,6 +2134,11 @@ int main( int argc, char **argv )
     free( saveframe );
     free( fadeframe );
     free( blueframe );
+
+    /* Free state. */
+    tvtime_delete( tvtime );
+
+    xmlCleanupParser();
 
     fprintf( stderr, "tvtime: Thank you for using tvtime.\n" );
     return 0;
