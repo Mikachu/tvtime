@@ -1844,19 +1844,26 @@ int main( int argc, char **argv )
                 if( screenshot ) {
                     const char *basename;
                     const char *outfile;
-                    char filename[ 256 ];
-                    char message[ 512 ];
-                    char pathfilename[ 256 ];
-                    char timestamp[ 50 ];
+                    char *filename;
+                    char *pathfilename;
+                    char *message;
+                    char timestamp[ 256 ];
                     time_t tm = time( 0 );
 
                     if( fifo_args && strlen( fifo_args ) ) {
                         basename = outfile = fifo_args;
                     } else {
-                        strftime( timestamp, sizeof( timestamp ),
-                                  config_get_timeformat( ct ), localtime( &tm ) );
-                        snprintf( filename, sizeof( filename ), "tvtime-output-%s.png", timestamp );
-                        snprintf( pathfilename, sizeof( pathfilename ), "%s/%s", config_get_screenshot_dir( ct ), filename );
+                        strftime( timestamp, 
+                                  sizeof( timestamp ),
+                                  config_get_timeformat( ct ),
+                                  localtime( &tm ) );
+                        asprintf( &filename,
+                                  "tvtime-output-%s.png",
+                                  timestamp );
+                        asprintf( &pathfilename,
+                                  "%s/%s",
+                                  config_get_screenshot_dir( ct ),
+                                  filename );
                         outfile = pathfilename;
                         basename = filename;
                     }
@@ -1867,7 +1874,9 @@ int main( int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
-                    snprintf( message, sizeof( message ), "Screenshot saved: %s", basename );
+                    asprintf( &message,
+                              "Screenshot saved: %s",
+                              basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
                 }
