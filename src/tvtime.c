@@ -115,7 +115,7 @@ enum {
 /**
  * Speed at which to fade to blue on channel changes.
  */
-const double fadespeed = 65.0;
+const int fadespeed = 65;
 
 /**
  * Number of frames to wait before detecting a signal.
@@ -703,13 +703,12 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
         curframe += instride;
     }
 
-    /* Copy a scanline. */
+    /* Interpolate the top scanline as a special case. */
     if( tvtime->filter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->filter, scanline + bottom_field ) ) {
         videofilter_packed422_scanline( tvtime->filter, curframe, width, 0, 0 );
         videofilter_packed422_scanline( tvtime->filter, curframe + instride, width, 0, 1 );
         videofilter_packed422_scanline( tvtime->filter, curframe + (instride*2), width, 0, 2 );
     }
-    // blit_packed422_scanline( output, curframe, width );
     quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
 
     if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
@@ -731,12 +730,10 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
             }
         }
 
-        /* Copy/interpolate a scanline. */
+        /* Interpolate scanline. */
         if( bottom_field ) {
-            // interpolate_packed422_scanline( output, curframe, curframe - (instride*2), width );
             quarter_blit_vertical_packed422_scanline( output, curframe - (instride*2), curframe, width );
         } else {
-            // blit_packed422_scanline( output, curframe, width );
             if( i > 1 ) {
                 quarter_blit_vertical_packed422_scanline( output, curframe + (instride*2), curframe, width );
             } else {
