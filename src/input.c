@@ -72,6 +72,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->vc = vc;
     in->frame_counter = 0;
     in->digit_counter = 0;
+    in->menu = 0;
 
     in->videohold = 0;
     in->quit = 0;

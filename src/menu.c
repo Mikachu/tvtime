@@ -71,7 +71,7 @@ menu_t *menu_new( input_t *in, config_t *cfg, int width,
     m->frame_width = width;
     m->frame_height = height;
     m->frame_aspect = aspect;
-    m->bg = osd_graphic_new( "menubg.png" , width, height, aspect, 255 );
+    m->bg = osd_graphic_new( DATADIR "/menubg.png" , width, height, aspect, 255 );
     if( !m->bg ) {
         free( m );
         return NULL;

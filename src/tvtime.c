@@ -537,8 +537,8 @@ int main( int argc, char **argv )
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
     }
-
     if( menu ) input_set_menu( in, menu );
+
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
