@@ -11,13 +11,19 @@ bug tracker on our sourceforge webpage:
   Known bugs
   ----------
 
-725162 tvtime.xml needs a man page
-725145 No man page for tvtime-command
-725163 stationlist.xml needs a man page
-716843 GPL exception needed to ship DScaler DLLs
-710430 RPMs don't depend on lirc package
-669826 debian packaging issues
-633042 No man page
+727990 kscreensaver shutdown too slow
+  * We have disabled our code to shut down kscreensaver when running
+    tvtime, as it makes tvtime's startup way too slow in many
+    situations.
+726635 Don't create a new entry if freq already exists
+  * If you accidentally hit F9, even when turned to a valid channel, it
+    will create a new custom frequency entry anyway.
+727947 tvtime needs a -geometry environment variable
+727946 tvtime needs a -display command line flag.
+726637 Duplicate frequencies should automatically be disabled
+  * The europe channel list has many duplicate frequencies (same
+    channel, different name).  We should start with disabling them.
+726822 Filter not hitting all scanlines when using dalias' pulldown
 694544 linux-dvb driver broken and CVS version needs V4L2 support
 725830 BadAtom errors from something
 723926 icons should be installed by the source distribution
@@ -88,11 +94,11 @@ understood by the authors.
 
 711966 Mute/Unmute while in Comp/S-Video switches sound to tuner
 711428 Tuner type=2 almost always misdetected
-694870 Capture timed out after deinterlace mode change on saa7134
 630585 blits are still taking waaay too long
  * We've had bad problems with crappy AGP chipsets causing absolutely
    terrible performance.
 694144 Overscan feature vs nvidia driver: corrupted borders
+ * If you experience this, upgrade to the latest nv or NVIDIA driver.
 672810 g400 marvel
 636338 SiS XVideo driver unusably slow in XFree86 4.2.1 and earlier
  * This is fixed in the drivers included in X 4.3.  The latest drivers
