@@ -90,11 +90,11 @@ static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
     }
 
     if( mm_accel() & MM_ACCEL_X86_MMXEXT ) {
-        tomsmocomp_filter_mmx( &Info );
+        tomsmocomp_filter_sse( &Info );
     } else if( mm_accel() & MM_ACCEL_X86_3DNOW ) {
         tomsmocomp_filter_3dnow( &Info );
     } else {
-        tomsmocomp_filter_sse( &Info );
+        tomsmocomp_filter_mmx( &Info );
     }
 }
 

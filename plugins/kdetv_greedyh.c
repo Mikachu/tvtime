@@ -91,11 +91,11 @@ static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
     }
 
     if( mm_accel() & MM_ACCEL_X86_MMXEXT ) {
-        greedyh_filter_mmx( &Info );
+        greedyh_filter_sse( &Info );
     } else if( mm_accel() & MM_ACCEL_X86_3DNOW ) {
         greedyh_filter_3dnow( &Info );
     } else {
-        greedyh_filter_sse( &Info );
+        greedyh_filter_mmx( &Info );
     }
 }
 
