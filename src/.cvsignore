@@ -5,6 +5,7 @@ Makefile.in
 *.o
 tvtime
 tvtime-command
+rvr
 expandpng
 timingtest
 *.swp
