@@ -416,10 +416,10 @@ static void reinit_tuner( commands_t *cmd )
             tvtime_osd_show_info( cmd->osd );
 
             if( station_get_current_active( cmd->stationmgr ) ) {
-                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb7 );
                 menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
             } else {
-                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa4 );
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
                 menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
             }
             commands_refresh_menu( cmd );
@@ -970,7 +970,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0xb9 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
@@ -999,7 +999,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0xb9 );
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
@@ -1025,7 +1025,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     */
-    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
     menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
@@ -1035,7 +1035,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
@@ -1050,7 +1050,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0xba );
     menu_set_text( menu, 7, string );
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
@@ -1076,7 +1076,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     */
-    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
     menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
@@ -1086,17 +1086,17 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_right_command( menu, 3, TVTIME_CHANNEL_SCAN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0xb0 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0xba );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "frequencies" );
@@ -1122,7 +1122,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     */
-    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+    sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
     menu_set_right_command( menu, 2, TVTIME_CHANNEL_SKIP, "" );
@@ -1137,17 +1137,17 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_TOGGLE_PAL_SECAM, "" );
     menu_set_right_command( menu, 4, TVTIME_TOGGLE_PAL_SECAM, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa3 );
+    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0xb0 );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0xba );
     menu_set_text( menu, 7, string );
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
     menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "frequencies" );
@@ -1984,10 +1984,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 }
             }
             if( station_get_current_active( cmd->stationmgr ) ) {
-                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa5 );
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb7 );
                 menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
             } else {
-                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xa4 );
+                sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
                 menu_set_text( commands_get_menu( cmd, "stations" ), 2, string );
             }
             commands_refresh_menu( cmd );
