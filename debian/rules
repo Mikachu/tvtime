@@ -47,6 +47,8 @@ config.status: configure
 		    --prefix=/usr                     \
 		    --mandir=\$${prefix}/share/man    \
 		    --infodir=\$${prefix}/share/info  \
+		    --sysconfdir=/etc                 \
+		    --localstatedir=/var              \
 		    --with-fifogroup=video
 
 build: build-stamp
