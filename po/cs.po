@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-08-19 20:39-0400\n"
+"POT-Creation-Date: 2004-08-27 08:53-0400\n"
 "PO-Revision-Date: 2003-11-02 20:08+0100\n"
 "Last-Translator: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "Language-Team: Lukáš Slánský <lukas@schnauzer.cz>\n"
@@ -15,33 +15,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:794 src/commands.c:1376 src/commands.c:1401
+#: src/tvtime.c:794 src/commands.c:1399 src/commands.c:1424
 msgid "Deinterlacer configuration"
 msgstr "Nastavení prokládače"
 
-#: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:952
-#: src/tvtime.c:980 src/tvtime.c:1106 src/commands.c:379 src/commands.c:569
-#: src/commands.c:603 src/commands.c:623 src/commands.c:685 src/commands.c:720
-#: src/commands.c:765 src/commands.c:840 src/commands.c:857 src/commands.c:884
-#: src/commands.c:944 src/commands.c:1204 src/commands.c:1256
-#: src/commands.c:1321 src/commands.c:1393 src/commands.c:1464
-#: src/commands.c:1474 src/commands.c:1522 src/commands.c:1534
-#: src/commands.c:1564 src/commands.c:1597 src/commands.c:1630
-#: src/commands.c:1662
+#: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:959
+#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:591
+#: src/commands.c:625 src/commands.c:645 src/commands.c:707 src/commands.c:742
+#: src/commands.c:787 src/commands.c:862 src/commands.c:879 src/commands.c:906
+#: src/commands.c:966 src/commands.c:1227 src/commands.c:1279
+#: src/commands.c:1344 src/commands.c:1416 src/commands.c:1487
+#: src/commands.c:1497 src/commands.c:1545 src/commands.c:1557
+#: src/commands.c:1587 src/commands.c:1620 src/commands.c:1653
+#: src/commands.c:1685
 msgid "Back"
 msgstr "Zpět"
 
-#: src/tvtime.c:856 src/tvtime.c:992
+#: src/tvtime.c:856 src/tvtime.c:999
 #, c-format
 msgid "Full rate: %.2f fps"
 msgstr "Plná rychlost: %.2f fps"
 
-#: src/tvtime.c:864 src/tvtime.c:996
+#: src/tvtime.c:864 src/tvtime.c:1003
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
 msgstr "Poloviční rychlost, prokládat horní půlsnímky: %.2f fps"
 
-#: src/tvtime.c:871 src/tvtime.c:1000
+#: src/tvtime.c:871 src/tvtime.c:1007
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
 msgstr "Poloviční rychlost, prokládat spodní půlsnímky: %.2f fps"
@@ -50,7 +50,7 @@ msgstr "Poloviční rychlost, prokládat spodní půlsnímky: %.2f fps"
 msgid "Overscan setting"
 msgstr "Nastavení overscanu"
 
-#: src/tvtime.c:903 src/commands.c:1353
+#: src/tvtime.c:903 src/commands.c:1376
 msgid "Apply matte"
 msgstr "Používat ořezání"
 
@@ -58,123 +58,128 @@ msgstr "Používat ořezání"
 msgid "16:9 output"
 msgstr "Výstup 16:9"
 
-#: src/tvtime.c:920
+#: src/tvtime.c:918
+msgid "Resize window to match contents"
+msgstr ""
+
+#: src/tvtime.c:927
 msgid "Fullscreen"
 msgstr "Celoobrazovkový mód"
 
-#: src/tvtime.c:927
+#: src/tvtime.c:934
 msgid "Set fullscreen position"
 msgstr "Nastavení pozice celoobrazovkového módu"
 
-#: src/tvtime.c:937
+#: src/tvtime.c:944
 msgid "Always-on-top"
 msgstr "Vždy navrchu"
 
-#: src/tvtime.c:946
+#: src/tvtime.c:953
 #, fuzzy
 msgid "Quiet screenshots"
 msgstr "Snímek obrazovky: %s"
 
-#: src/tvtime.c:963
+#: src/tvtime.c:970
 msgid "Centre"
 msgstr "Střed"
 
-#: src/tvtime.c:970
+#: src/tvtime.c:977
 msgid "Top"
 msgstr "Nahoře"
 
-#: src/tvtime.c:976
+#: src/tvtime.c:983
 msgid "Bottom"
 msgstr "Dole"
 
-#: src/tvtime.c:990 src/commands.c:1385 src/commands.c:1415
+#: src/tvtime.c:997 src/commands.c:1408 src/commands.c:1438
 msgid "Attempted framerate"
 msgstr "Zkoušená obnovovací frekvence"
 
-#: src/tvtime.c:1017
+#: src/tvtime.c:1024
 msgid "Performance estimates"
 msgstr "Odhady výkonosti"
 
-#: src/tvtime.c:1019
+#: src/tvtime.c:1026
 msgid "Deinterlacer"
 msgstr "Prokladač"
 
-#: src/tvtime.c:1022
+#: src/tvtime.c:1029
 #, c-format
 msgid "Input: %s at %dx%d pixels"
 msgstr "Vstup: %s na %dx%d bodů"
 
-#: src/tvtime.c:1026
+#: src/tvtime.c:1033
 #, c-format
 msgid "Attempted framerate: %.2f fps"
 msgstr "Zkoušená obnovovací frekvence: %.2f fps"
 
-#: src/tvtime.c:1030
+#: src/tvtime.c:1037
 #, c-format
 msgid "Average blit time: %.2f ms (%.0f MB/sec)"
 msgstr "Průměrná rychlost překreslení: %.2f ms (%.0f MB/sec)"
 
-#: src/tvtime.c:1034
+#: src/tvtime.c:1041
 #, c-format
 msgid "Average render time: %5.2f ms"
 msgstr "Průměrná rychlost rendrování: %5.2f ms"
 
-#: src/tvtime.c:1038
+#: src/tvtime.c:1045
 #, c-format
 msgid "Dropped frames: %d"
 msgstr "Zahozené snímky: %d"
 
-#: src/tvtime.c:1044
+#: src/tvtime.c:1051
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
 msgstr "Interval překreslení:  %4.1f/%4.1f ms (potřebujeme %4.1f ms)"
 
-#: src/tvtime.c:1063 src/tvtime.c:1116
+#: src/tvtime.c:1070 src/tvtime.c:1123
 msgid "16:9 + Overscan"
 msgstr "16:9 + Overscan"
 
-#: src/tvtime.c:1068 src/tvtime.c:1095
+#: src/tvtime.c:1075 src/tvtime.c:1102
 msgid "1.85:1"
 msgstr "1,85:1"
 
-#: src/tvtime.c:1073 src/tvtime.c:1100
+#: src/tvtime.c:1080 src/tvtime.c:1107
 msgid "2.35:1"
 msgstr "2,35:1"
 
-#: src/tvtime.c:1078 src/tvtime.c:1119
+#: src/tvtime.c:1085 src/tvtime.c:1126
 msgid "4:3 centre"
 msgstr "4:3 centrování"
 
-#: src/tvtime.c:1084 src/tvtime.c:1122
+#: src/tvtime.c:1091 src/tvtime.c:1129
 msgid "4:3 + Overscan"
 msgstr "4:3 + Overscan"
 
-#: src/tvtime.c:1090
+#: src/tvtime.c:1097
 msgid "16:9"
 msgstr "16:9"
 
-#: src/tvtime.c:1115
+#: src/tvtime.c:1122
 msgid "Matte setting (Anamorphic input)"
 msgstr "Nastavení ořezání (Anamorfický vstup)"
 
-#: src/tvtime.c:1121
+#: src/tvtime.c:1128
 msgid "Matte setting (4:3 input)"
 msgstr "Nastavení ořezání (vstup 4:3)"
 
-#: src/tvtime.c:1198 src/tvtime.c:1239 src/tvtime.c:1284 src/tvtime.c:1292
-#: src/tvtime.c:1420 src/tvtime.c:1468 src/tvtime.c:1493 src/tvtime.c:1507
-#: src/tvtime.c:1521 src/tvtime-command.c:56 src/tvtime-command.c:71
-#: src/tvtime-configure.c:48 src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
+#: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
+#: src/tvtime.c:1422 src/tvtime.c:1470 src/tvtime.c:1495 src/tvtime.c:1509
+#: src/tvtime.c:1523 src/tvtimeconf.c:1110 src/tvtime-command.c:56
+#: src/tvtime-command.c:71 src/tvtime-configure.c:48 src/tvtime-scanner.c:61
+#: src/tvtime-scanner.c:97
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
 msgstr "%s: Nelze naalokovat paměť.\n"
 
-#: src/tvtime.c:1308
+#: src/tvtime.c:1315
 #, c-format
 msgid "Cannot open capture device %s."
 msgstr "Nelze otevřít zachytávací zařízení %s."
 
-#: src/tvtime.c:1313
+#: src/tvtime.c:1320
 #, c-format
 msgid ""
 "\n"
@@ -191,7 +196,7 @@ msgstr ""
 "    zařízení (%s).\n"
 "\n"
 
-#: src/tvtime.c:1378
+#: src/tvtime.c:1380
 #, c-format
 msgid ""
 "\n"
@@ -210,7 +215,7 @@ msgstr ""
 "    najdete na našich stránkách podpory %s\n"
 "\n"
 
-#: src/tvtime.c:1385
+#: src/tvtime.c:1387
 #, c-format
 msgid ""
 "\n"
@@ -228,77 +233,77 @@ msgstr ""
 "    sdělte nám to do tvtime bug trackeru na %s\n"
 "\n"
 
-#: src/tvtime.c:1437
+#: src/tvtime.c:1439
 msgid "On screen display failed to initialize, disabled.\n"
 msgstr "Displej na obrazovce nelze inicializovat. Vypnut.\n"
 
-#: src/tvtime.c:1450
+#: src/tvtime.c:1452
 msgid "No video source"
 msgstr "Bez zdroje videa"
 
-#: src/tvtime.c:1497
+#: src/tvtime.c:1499
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
 msgstr "Nemohu vytvořit FIFO. Dálkové ovládán tvtime vypnuto.\n"
 
-#: src/tvtime.c:1515
+#: src/tvtime.c:1517
 msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr "Zobrazování titulků nejde inicializovat. vypnuto.\n"
 
-#: src/tvtime.c:1740
+#: src/tvtime.c:1745
 msgid "Always-on-top enabled."
 msgstr "Mód Vždy navrchu zapnut."
 
-#: src/tvtime.c:1745
+#: src/tvtime.c:1750
 msgid "Always-on-top disabled."
 msgstr "Mód Vždy navrchu vypnut."
 
-#: src/tvtime.c:1765
+#: src/tvtime.c:1770
 msgid "16:9 display mode active."
 msgstr "Obrazový mód 16:9 zapnut."
 
-#: src/tvtime.c:1774
+#: src/tvtime.c:1779
 msgid "4:3 display mode active."
 msgstr "Obrazový mód 4:3 zapnut."
 
-#: src/tvtime.c:1824
+#: src/tvtime.c:1829
 msgid "Screenshot messages disabled."
 msgstr ""
 
-#: src/tvtime.c:1826
+#: src/tvtime.c:1831
 msgid "Screenshot messages enabled."
 msgstr ""
 
-#: src/tvtime.c:1901
+#: src/tvtime.c:1906
 msgid "2-3 pulldown inversion disabled."
 msgstr "2-3 pulldown inverze vypnuta."
 
-#: src/tvtime.c:1904
+#: src/tvtime.c:1909
 msgid "2-3 pulldown inversion enabled."
 msgstr "2-3 pulldown inverze zapnuta."
 
-#: src/tvtime.c:1910
+#: src/tvtime.c:1915
 msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr "2-3 pulldown inverze s vaší TV normou nefunguje."
 
-#: src/tvtime.c:2307 src/tvtime.c:2452
+#: src/tvtime.c:2312 src/tvtime.c:2457
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Snímek obrazovky: %s"
 
-#: src/tvtime.c:2591
+#: src/tvtime.c:2606
 msgid "Restarting tvtime.\n"
 msgstr "tvtime se restartuje.\n"
 
-#: src/tvtime.c:2595
+#: src/tvtime.c:2610
 msgid "Thank you for using tvtime.\n"
 msgstr "Děkujeme za používání tvtime.\n"
 
-#: src/tvtime.c:2617
+#: src/tvtime.c:2632
 #, c-format
 msgid "Running %s.\n"
 msgstr "Spouští se %s.\n"
 
-#: src/tvtime.c:2635
+#: src/tvtime.c:2650
 #, c-format
 msgid ""
 "\n"
@@ -317,7 +322,7 @@ msgstr ""
 "    stránkách podpory %s.\n"
 "\n"
 
-#: src/tvtime.c:2650
+#: src/tvtime.c:2665
 #, c-format
 msgid ""
 "\n"
@@ -339,7 +344,7 @@ msgstr ""
 "    Více informací najdete na našich stránkách podpory %s.\n"
 "\n"
 
-#: src/tvtime.c:2670
+#: src/tvtime.c:2685
 #, c-format
 msgid ""
 "\n"
@@ -352,9 +357,9 @@ msgstr ""
 "    tvtime se nyní ukončí, aby předešel bezpečnostním problémům.\n"
 "\n"
 
-#: src/commands.c:186 src/commands.c:868 src/commands.c:1188
-#: src/commands.c:1548 src/commands.c:1581 src/commands.c:1614
-#: src/commands.c:1647
+#: src/commands.c:186 src/commands.c:890 src/commands.c:1211
+#: src/commands.c:1571 src/commands.c:1604 src/commands.c:1637
+#: src/commands.c:1670
 msgid "Current"
 msgstr "Současný"
 
@@ -368,576 +373,607 @@ msgstr "Nejsou dostupné informace o programu"
 msgid "Next: %s"
 msgstr "Další: %s"
 
-#: src/commands.c:306
+#: src/commands.c:307
 msgid "Renumber current channel"
 msgstr "Přečíslování současného kanálu"
 
-#: src/commands.c:314 src/commands.c:317
+#: src/commands.c:315 src/commands.c:318
 msgid "Current channel active in list"
 msgstr "Současný kanál je aktivní v seznamu"
 
-#: src/commands.c:327
+#: src/commands.c:328
 msgid "Stop channel scan"
 msgstr "Vypnutí hledání kanálů"
 
-#: src/commands.c:331
+#: src/commands.c:332
 msgid "Scan channels for signal"
 msgstr "Hledání signálu v kanálech"
 
-#: src/commands.c:339
+#: src/commands.c:340
 msgid "Reset all channels as active"
 msgstr "Aktivování všech kanálů"
 
-#: src/commands.c:345
+#: src/commands.c:346
 msgid "Finetune current channel"
 msgstr "Jemné ladění současného kanálu"
 
-#: src/commands.c:352
+#: src/commands.c:353
 msgid "Change NTSC cable mode"
 msgstr "Změna kabelového módu NTSC"
 
-#: src/commands.c:358
+#: src/commands.c:359
 msgid "Set current channel as SECAM"
 msgstr "Nastavení kanálu na SECAM"
 
-#: src/commands.c:359
+#: src/commands.c:360
 msgid "Set current channel as PAL"
 msgstr "Nastavení kanálu na PAL"
 
-#: src/commands.c:366
-msgid "Change frequency table"
-msgstr "Změna frekvenční tabulky"
+#: src/commands.c:371
+msgid "Use PAL-BG audio decoding"
+msgstr ""
 
-#: src/commands.c:372
-msgid "Disable signal detection"
-msgstr "Vypnou detekci signálu"
-
-#: src/commands.c:373
-msgid "Enable signal detection"
-msgstr "Zapnout detekci signálu"
-
-#: src/commands.c:535 src/commands.c:1226 src/commands.c:1290
-#: src/commands.c:1709
-msgid "Preferred audio mode"
-msgstr "Preferovaný mód audia"
-
-#: src/commands.c:544
+#: src/commands.c:376
 msgid "Use PAL-DK audio decoding"
 msgstr ""
 
-#: src/commands.c:551 src/commands.c:1231 src/commands.c:1303
+#: src/commands.c:384
+msgid "Change frequency table"
+msgstr "Změna frekvenční tabulky"
+
+#: src/commands.c:390
+msgid "Disable signal detection"
+msgstr "Vypnou detekci signálu"
+
+#: src/commands.c:391
+msgid "Enable signal detection"
+msgstr "Zapnout detekci signálu"
+
+#: src/commands.c:556 src/commands.c:1249 src/commands.c:1313
+#: src/commands.c:1732
+msgid "Preferred audio mode"
+msgstr "Preferovaný mód audia"
+
+#: src/commands.c:566
+msgid "Default to PAL-DK audio decoding"
+msgstr ""
+
+#: src/commands.c:573 src/commands.c:1254 src/commands.c:1326
 msgid "Audio volume boost"
 msgstr ""
 
-#: src/commands.c:557 src/commands.c:1236 src/commands.c:1312
+#: src/commands.c:579 src/commands.c:1259 src/commands.c:1335
 msgid "Television standard"
 msgstr "Televizní standard"
 
-#: src/commands.c:563 src/commands.c:1241 src/commands.c:1281
+#: src/commands.c:585 src/commands.c:1264 src/commands.c:1304
 msgid "Horizontal resolution"
 msgstr "Horizontální rozlišení"
 
-#: src/commands.c:583 src/commands.c:610
+#: src/commands.c:605 src/commands.c:632
 msgid "Cable"
 msgstr "Kabel"
 
-#: src/commands.c:591 src/commands.c:618
+#: src/commands.c:613 src/commands.c:640
 msgid "Broadcast"
 msgstr "Vysílání"
 
-#: src/commands.c:598
+#: src/commands.c:620
 msgid "Cable with channels 100+"
 msgstr "Kabel s kanály nad 100"
 
-#: src/commands.c:630
+#: src/commands.c:652
 msgid "Europe"
 msgstr "Evropa"
 
-#: src/commands.c:638
+#: src/commands.c:660
 msgid "Russia"
 msgstr "Rusko"
 
-#: src/commands.c:645
+#: src/commands.c:667
 msgid "France"
 msgstr "Francie"
 
-#: src/commands.c:652
+#: src/commands.c:674
 msgid "Australia"
 msgstr "Austrálie"
 
-#: src/commands.c:659
+#: src/commands.c:681
 msgid "Australia (Optus)"
 msgstr "Austrálie (Optus)"
 
-#: src/commands.c:666
+#: src/commands.c:688
 msgid "New Zealand"
 msgstr "Nový Zealand"
 
-#: src/commands.c:673
+#: src/commands.c:695
 msgid "China Broadcast"
 msgstr "Čínské vysílání"
 
-#: src/commands.c:680
+#: src/commands.c:702
 msgid "Custom (first run tvtime-scanner)"
 msgstr "Vlastní (nejprve spuťte tvtime-scanner)"
 
-#: src/commands.c:697
+#: src/commands.c:719
 #, fuzzy
 msgid "Disabled"
 msgstr "Kabel"
 
-#: src/commands.c:703
+#: src/commands.c:725
 msgid "Quiet"
 msgstr ""
 
-#: src/commands.c:709
+#: src/commands.c:731
 msgid "Medium"
 msgstr ""
 
-#: src/commands.c:715
+#: src/commands.c:737
 msgid "Full"
 msgstr ""
 
-#: src/commands.c:730
+#: src/commands.c:752
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr "%s  Současně: %d bodů"
 
-#: src/commands.c:737
+#: src/commands.c:759
 msgid "Low (360 pixels)"
 msgstr "Nízké (360 bodů)"
 
-#: src/commands.c:743
+#: src/commands.c:765
 msgid "Moderate (576 pixels)"
 msgstr "Střední (576 bodů)"
 
-#: src/commands.c:749
+#: src/commands.c:771
 msgid "Standard (720 pixels)"
 msgstr "Normální (720 bodů)"
 
-#: src/commands.c:755
+#: src/commands.c:777
 msgid "High (768 pixels)"
 msgstr "Vysoké (768 bodů)"
 
-#: src/commands.c:760 src/commands.c:1316
+#: src/commands.c:782 src/commands.c:1339
 msgid "Restart with new settings"
 msgstr "Přestartovat s novým nastavením"
 
-#: src/commands.c:821 src/commands.c:1710
+#: src/commands.c:843 src/commands.c:1733
 msgid "Mono"
 msgstr "Mono"
 
-#: src/commands.c:828 src/commands.c:1711
+#: src/commands.c:850 src/commands.c:1734
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/commands.c:836 src/commands.c:1713
+#: src/commands.c:858 src/commands.c:1736
 msgid "SAP"
 msgstr "SAP"
 
-#: src/commands.c:847 src/commands.c:1713
+#: src/commands.c:869 src/commands.c:1736
 msgid "Primary Language"
 msgstr "Primární jazyk"
 
-#: src/commands.c:852 src/commands.c:1714
+#: src/commands.c:874 src/commands.c:1737
 msgid "Secondary Language"
 msgstr "Sekundární jazyk"
 
-#: src/commands.c:874 src/commands.c:1194 src/commands.c:1554
-#: src/commands.c:1587 src/commands.c:1620 src/commands.c:1652
+#: src/commands.c:896 src/commands.c:1217 src/commands.c:1577
+#: src/commands.c:1610 src/commands.c:1643 src/commands.c:1675
 msgid "Increase"
 msgstr "Zvětšit"
 
-#: src/commands.c:879 src/commands.c:1199 src/commands.c:1559
-#: src/commands.c:1592 src/commands.c:1625 src/commands.c:1657
+#: src/commands.c:901 src/commands.c:1222 src/commands.c:1582
+#: src/commands.c:1615 src/commands.c:1648 src/commands.c:1680
 msgid "Decrease"
 msgstr "Zmenšit"
 
-#: src/commands.c:903
+#: src/commands.c:925
 msgid "BT8x8 luma correction"
 msgstr "Korekce barev BT8x8"
 
-#: src/commands.c:913
+#: src/commands.c:935
 msgid "2-3 pulldown inversion"
 msgstr "2-3 pulldown inverze"
 
-#: src/commands.c:922
+#: src/commands.c:944
 msgid "Colour invert"
 msgstr "Inverze barev"
 
-#: src/commands.c:930
+#: src/commands.c:952
 msgid "Mirror"
 msgstr "Zrcadleni"
 
-#: src/commands.c:938
+#: src/commands.c:960
 msgid "Chroma killer"
 msgstr "Odstranění barev"
 
-#: src/commands.c:1088 src/commands.c:1123 src/commands.c:1155
-#: src/commands.c:1172 src/commands.c:1184 src/commands.c:1212
-#: src/commands.c:1265 src/commands.c:1281 src/commands.c:1290
-#: src/commands.c:1303 src/commands.c:1312 src/commands.c:1347
-#: src/commands.c:1353 src/commands.c:1359 src/commands.c:1366
-#: src/commands.c:1372 src/commands.c:1400 src/commands.c:1406
-#: src/commands.c:1414 src/commands.c:1420 src/commands.c:1432
-#: src/commands.c:1481 src/commands.c:1544 src/commands.c:1577
-#: src/commands.c:1610 src/commands.c:1643
+#: src/commands.c:1110 src/commands.c:1145 src/commands.c:1177
+#: src/commands.c:1195 src/commands.c:1207 src/commands.c:1235
+#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
+#: src/commands.c:1326 src/commands.c:1335 src/commands.c:1370
+#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
+#: src/commands.c:1395 src/commands.c:1423 src/commands.c:1429
+#: src/commands.c:1437 src/commands.c:1443 src/commands.c:1455
+#: src/commands.c:1504 src/commands.c:1567 src/commands.c:1600
+#: src/commands.c:1633 src/commands.c:1666
 msgid "Setup"
 msgstr "Nastavení"
 
-#: src/commands.c:1091 src/commands.c:1155 src/commands.c:1173
-#: src/commands.c:1185
+#: src/commands.c:1113 src/commands.c:1177 src/commands.c:1196
+#: src/commands.c:1208
 msgid "Channel management"
 msgstr "Správa kanálů"
 
-#: src/commands.c:1096 src/commands.c:1127 src/commands.c:1213
-#: src/commands.c:1265 src/commands.c:1281 src/commands.c:1290
-#: src/commands.c:1303 src/commands.c:1312
+#: src/commands.c:1118 src/commands.c:1149 src/commands.c:1236
+#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
+#: src/commands.c:1326 src/commands.c:1335
 msgid "Input configuration"
 msgstr "Konfigurace vstupu"
 
-#: src/commands.c:1101 src/commands.c:1132
+#: src/commands.c:1123 src/commands.c:1154
 msgid "Picture settings"
 msgstr "Nastavení obrazu"
 
-#: src/commands.c:1106 src/commands.c:1137 src/commands.c:1372
-#: src/commands.c:1401 src/commands.c:1407 src/commands.c:1415
-#: src/commands.c:1421
+#: src/commands.c:1128 src/commands.c:1159 src/commands.c:1395
+#: src/commands.c:1424 src/commands.c:1430 src/commands.c:1438
+#: src/commands.c:1444
 msgid "Video processing"
 msgstr "Zpracování videa"
 
-#: src/commands.c:1111 src/commands.c:1142 src/commands.c:1347
-#: src/commands.c:1353 src/commands.c:1359 src/commands.c:1366
+#: src/commands.c:1133 src/commands.c:1164 src/commands.c:1370
+#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
 msgid "Output configuration"
 msgstr "Konfigurace výstupu"
 
-#: src/commands.c:1116 src/commands.c:1147
+#: src/commands.c:1138 src/commands.c:1169
 msgid "Exit menu"
 msgstr "Vypnutí nabídky"
 
-#: src/commands.c:1173
+#: src/commands.c:1196
 msgid "Frequency table"
 msgstr "Frekvenční tabulka"
 
-#: src/commands.c:1185 src/commands.c:2797
+#: src/commands.c:1208 src/commands.c:2893
 msgid "Finetune"
 msgstr "Jemné doladění"
 
-#: src/commands.c:1217 src/commands.c:1220 src/commands.c:1269
-#: src/commands.c:1272 src/commands.c:2909
+#: src/commands.c:1240 src/commands.c:1243 src/commands.c:1292
+#: src/commands.c:1295 src/commands.c:3005
 msgid "Change video source"
 msgstr "Změna zdroje videa"
 
-#: src/commands.c:1246
+#: src/commands.c:1269
 msgid "Toggle closed captions"
 msgstr "Zapnout/vypnout titulky"
 
-#: src/commands.c:1251
+#: src/commands.c:1274
 msgid "Toggle XDS decoding"
 msgstr "Zapnout/vypnout dekódování XDS"
 
-#: src/commands.c:1359
+#: src/commands.c:1382
 msgid "Overscan"
 msgstr "Overscan"
 
-#: src/commands.c:1366
+#: src/commands.c:1389
 msgid "Fullscreen position"
 msgstr "Pozice celoobrazovkového módu"
 
-#: src/commands.c:1381
+#: src/commands.c:1404
 msgid "Current deinterlacer description"
 msgstr "Popis současného prokládače"
 
-#: src/commands.c:1389 src/commands.c:1421
+#: src/commands.c:1412 src/commands.c:1444
 msgid "Input filters"
 msgstr "Vstupní filtry"
 
-#: src/commands.c:1407
+#: src/commands.c:1430
 msgid "Deinterlacer description"
 msgstr "Popis prokládače"
 
-#: src/commands.c:1432 src/commands.c:1481 src/commands.c:1544
-#: src/commands.c:1577 src/commands.c:1610 src/commands.c:1643
+#: src/commands.c:1455 src/commands.c:1504 src/commands.c:1567
+#: src/commands.c:1600 src/commands.c:1633 src/commands.c:1666
 msgid "Picture"
 msgstr "Obraz"
 
-#: src/commands.c:1436 src/commands.c:1486 src/commands.c:1544
-#: src/commands.c:2939 src/commands.c:2980
+#: src/commands.c:1459 src/commands.c:1509 src/commands.c:1567
+#: src/commands.c:3035 src/commands.c:3076
 msgid "Brightness"
 msgstr "Jas"
 
-#: src/commands.c:1441 src/commands.c:1491 src/commands.c:1577
-#: src/commands.c:2953 src/commands.c:2983
+#: src/commands.c:1464 src/commands.c:1514 src/commands.c:1600
+#: src/commands.c:3049 src/commands.c:3079
 msgid "Contrast"
 msgstr "Kontrast"
 
-#: src/commands.c:1445 src/commands.c:1495 src/commands.c:1610
-#: src/commands.c:2967 src/commands.c:2986
+#: src/commands.c:1468 src/commands.c:1518 src/commands.c:1633
+#: src/commands.c:3063 src/commands.c:3082
 msgid "Colour"
 msgstr "Barevný kontrast"
 
-#: src/commands.c:1449 src/commands.c:1499 src/commands.c:1643
-#: src/commands.c:2925 src/commands.c:2989
+#: src/commands.c:1472 src/commands.c:1522 src/commands.c:1666
+#: src/commands.c:3021 src/commands.c:3085
 msgid "Hue"
 msgstr "Odstín"
 
-#: src/commands.c:1456
+#: src/commands.c:1479
 msgid "Save current settings as defaults"
 msgstr "Uložení současného nastavení jako předdefinované hodnoty"
 
-#: src/commands.c:1460 src/commands.c:1470 src/commands.c:1517
-#: src/commands.c:1529
+#: src/commands.c:1483 src/commands.c:1493 src/commands.c:1540
+#: src/commands.c:1552
 msgid "Reset to global defaults"
 msgstr "Nastavení ne globální předdefinované hodnoty"
 
-#: src/commands.c:1506
+#: src/commands.c:1529
 msgid "Save current settings as global defaults"
 msgstr "Uložení současného nastavení jako globální předdefinované hodnoty"
 
-#: src/commands.c:1512
+#: src/commands.c:1535
 msgid "Save current settings as channel defaults"
 msgstr "Uložení současného nastavení jako předdefinované hodnoty pro kanál"
 
-#: src/commands.c:1783
+#: src/commands.c:1806
 msgid "Favorites"
 msgstr "Oblíbené"
 
-#: src/commands.c:1790
+#: src/commands.c:1813
 msgid "Add current channel"
 msgstr "Přidej současný kanál"
 
-#: src/commands.c:1792
+#: src/commands.c:1815
 msgid "Exit"
 msgstr "Konec"
 
-#: src/commands.c:2060
+#: src/commands.c:1972
+#, fuzzy
+msgid "Preferred XMLTV language"
+msgstr "Primární jazyk"
+
+#: src/commands.c:1973
+msgid "Default language"
+msgstr ""
+
+#: src/commands.c:1978
+msgid "Unknown language"
+msgstr ""
+
+#: src/commands.c:2107
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Usnout za %d minut."
 
-#: src/commands.c:2063
+#: src/commands.c:2110
 #, c-format
 msgid "Sleep off."
 msgstr "Usínání vypnuto."
 
-#: src/commands.c:2100
+#: src/commands.c:2149
+#, fuzzy, c-format
+msgid "Using PAL-BG audio decoding for this channel."
+msgstr "Dekódování barev tohoto kanálu bylo nastaveno na %s."
+
+#: src/commands.c:2152
+#, fuzzy, c-format
+msgid "Using PAL-DK audio decoding for this channel."
+msgstr "Dekódování barev tohoto kanálu bylo nastaveno na %s."
+
+#: src/commands.c:2181
 #, c-format
-msgid "Using PAL-DK audio decoding."
+msgid "Defaulting to PAL-DK audio decoding."
 msgstr ""
 
-#: src/commands.c:2103
+#: src/commands.c:2184
 #, c-format
-msgid "Using PAL-BG audio decoding."
+msgid "Defaulting to PAL-BG audio decoding."
 msgstr ""
 
-#: src/commands.c:2131
+#: src/commands.c:2212
 msgid "Channel marked as active in the browse list."
 msgstr "V seznamu byl kanál označen jako aktivní"
 
-#: src/commands.c:2134
+#: src/commands.c:2215
 msgid "Channel disabled from the browse list."
 msgstr "V seznamu byl kanál deaktivován."
 
-#: src/commands.c:2163
+#: src/commands.c:2245
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr ""
 
-#: src/commands.c:2166
+#: src/commands.c:2248
 #, c-format
 msgid "Setting capture card volume to %d%%."
 msgstr ""
 
-#: src/commands.c:2199
+#: src/commands.c:2281
 msgid "Processing every input field."
 msgstr "Zpracování každého snímku."
 
-#: src/commands.c:2202
+#: src/commands.c:2284
 msgid "Processing every top field."
 msgstr "Zpracování každého horního půlsnímku."
 
-#: src/commands.c:2205
+#: src/commands.c:2287
 msgid "Processing every bottom field."
 msgstr "Zpracování každého spodního půlsnímku."
 
-#: src/commands.c:2220
+#: src/commands.c:2302
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "Po restartu bude horizontální rozlišení %d bodů."
 
-#: src/commands.c:2266
+#: src/commands.c:2359
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "Po restartu bude televizní standard %s."
 
-#: src/commands.c:2297
+#: src/commands.c:2390
 msgid "All channels re-activated."
 msgstr "Všechny kanály byly aktivovány."
 
-#: src/commands.c:2318
+#: src/commands.c:2411
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Přemapování %d. Vložte nové číslo kanálu."
 
-#: src/commands.c:2330
+#: src/commands.c:2423
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Skener kanálu není dostupný při vypnuté kontrole signálu."
 
-#: src/commands.c:2357
+#: src/commands.c:2451
 msgid "Scanning for channels being broadcast."
 msgstr "Hledání kanálu, které jsou vysílány."
 
-#: src/commands.c:2375
+#: src/commands.c:2469
 msgid "Closed captions disabled."
 msgstr "Titulky byly vypnuty."
 
-#: src/commands.c:2381
+#: src/commands.c:2475
 msgid "Closed captions enabled."
 msgstr "Titulky byly zapnuty."
 
-#: src/commands.c:2393
+#: src/commands.c:2487
 msgid "No VBI device configured for CC decoding."
 msgstr "Nebylo konfigurováno zařízení pro dekódování titulků."
 
-#: src/commands.c:2409
+#: src/commands.c:2503
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Dekódování barev tohoto kanálu bylo nastaveno na %s."
 
-#: src/commands.c:2451
+#: src/commands.c:2546
 #, c-format
 msgid "Running: %s"
 msgstr "Spouštění: %s"
 
-#: src/commands.c:2528
+#: src/commands.c:2624
 msgid "Signal detection enabled."
 msgstr "Detekce signálu zapnuta."
 
-#: src/commands.c:2531
+#: src/commands.c:2627
 msgid "Signal detection disabled."
 msgstr "Detekce signálu vypnuta."
 
-#: src/commands.c:2544
+#: src/commands.c:2640
 msgid "XDS decoding enabled."
 msgstr "Dekódování XDS zapnuto."
 
-#: src/commands.c:2547
+#: src/commands.c:2643
 msgid "XDS decoding disabled."
 msgstr "Dekódování XDS vypnuto."
 
-#: src/commands.c:2593
+#: src/commands.c:2689
 msgid "Colour invert enabled."
 msgstr "Inverze barev zapnuta."
 
-#: src/commands.c:2595
+#: src/commands.c:2691
 msgid "Colour invert disabled."
 msgstr "Inverze barev vypnuta."
 
-#: src/commands.c:2617
+#: src/commands.c:2713
 msgid "Mirror enabled."
 msgstr "Zrcadleni zapnuto."
 
-#: src/commands.c:2619
+#: src/commands.c:2715
 msgid "Mirror disabled."
 msgstr "Zrcadleni vypnuto."
 
-#: src/commands.c:2641
+#: src/commands.c:2737
 msgid "Chroma kill enabled."
 msgstr "Odstranění barev zapnuto."
 
-#: src/commands.c:2643
+#: src/commands.c:2739
 msgid "Chroma kill disabled."
 msgstr "Odstranění barev vypnuto."
 
-#: src/commands.c:2660
+#: src/commands.c:2756
 msgid "Luma correction enabled."
 msgstr "Korekce barev zapnuta."
 
-#: src/commands.c:2662
+#: src/commands.c:2758
 msgid "Luma correction disabled."
 msgstr "Korekce barev vypnuta."
 
-#: src/commands.c:2679
+#: src/commands.c:2775
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Overscan: %.1f%%"
 
-#: src/commands.c:2702
+#: src/commands.c:2798
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr "Hodnota korekce barev: %.1f"
 
-#: src/commands.c:2732
+#: src/commands.c:2828
 msgid "Picture settings reset to defaults."
 msgstr "Nastavení obrazu nastaveno na předdefinované hodnoty."
 
-#: src/commands.c:2760
+#: src/commands.c:2856
 msgid "Using nominal NTSC cable frequencies."
 msgstr "Používat nominální frekvence NTSC cable."
 
-#: src/commands.c:2766
+#: src/commands.c:2862
 msgid "Using IRC cable frequencies."
 msgstr "Používat frekvence IRC cable."
 
-#: src/commands.c:2772
+#: src/commands.c:2868
 msgid "Using HRC cable frequencies."
 msgstr "Používat frekvence HRC cable."
 
-#: src/commands.c:2856 src/commands.c:2876
+#: src/commands.c:2952 src/commands.c:2972
 msgid "Volume"
 msgstr "Hlasitost"
 
-#: src/commands.c:3026
+#: src/commands.c:3122
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 "Nastavení obrazu bylo uloženo jako globální předdefinované nastavení.\n"
 
-#: src/commands.c:3039
+#: src/commands.c:3135
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Nastavení obrazu pro kanál %d bylo uloženo.\n"
 
-#: src/commands.c:3123
+#: src/commands.c:3219
 msgid "Paused."
 msgstr "Pauza."
 
-#: src/commands.c:3123
+#: src/commands.c:3219
 msgid "Resumed."
 msgstr "Obnoveno."
 
-#: src/tvtimeconf.c:446
+#: src/tvtimeconf.c:455
 #, c-format
 msgid "Error parsing configuration file %s.\n"
 msgstr "Chyba zpracování konfiguračního souboru %s.\n"
 
-#: src/tvtimeconf.c:453
+#: src/tvtimeconf.c:462
 #, c-format
 msgid "No XML root element found in %s.\n"
 msgstr "V souboru %s nebyl nalezen kořenový XML element.\n"
 
-#: src/tvtimeconf.c:461 src/tvtimeconf.c:535
+#: src/tvtimeconf.c:470 src/tvtimeconf.c:544
 #, c-format
 msgid "%s is not a tvtime configuration file.\n"
 msgstr "%s není konfigurační souboru tvtime.\n"
 
-#: src/tvtimeconf.c:493
+#: src/tvtimeconf.c:502
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr "Konfigurační soubor nelze zpracovat. Nastavení nebude uloženo.\n"
 
-#: src/tvtimeconf.c:500
+#: src/tvtimeconf.c:509
 msgid "Could not create new config file.\n"
 msgstr "Nelze vytvořit nový konfigurační soubor..\n"
 
-#: src/tvtimeconf.c:524
+#: src/tvtimeconf.c:533
 msgid "Error creating configuration file.\n"
 msgstr "Chyba při vytváření konfiguračního souboru.\n"
 
-#: src/tvtimeconf.c:545 src/utils.c:134
+#: src/tvtimeconf.c:554 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr "Nelze změnit vlastníka %s: %s.\n"
 
-#: src/tvtimeconf.c:554
+#: src/tvtimeconf.c:563
 msgid ""
 "\n"
 "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
@@ -955,7 +991,7 @@ msgstr ""
 "tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov, and Achim Schneider.\n"
 
-#: src/tvtimeconf.c:565 src/tvtimeconf.c:615 src/tvtimeconf.c:661
+#: src/tvtimeconf.c:574 src/tvtimeconf.c:623 src/tvtimeconf.c:669
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -964,26 +1000,26 @@ msgstr ""
 "použití: %s [VOLBA]...\n"
 "\n"
 
-#: src/tvtimeconf.c:566 src/tvtimeconf.c:616
+#: src/tvtimeconf.c:575 src/tvtimeconf.c:624
 msgid "  -a, --widescreen           16:9 mode.\n"
 msgstr "  -a, --widescreen           mód 16:9.\n"
 
-#: src/tvtimeconf.c:567 src/tvtimeconf.c:617
+#: src/tvtimeconf.c:576 src/tvtimeconf.c:625
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr "  -b, --vbidevice=DEVICE     zařízení VBI (standardně /dev/vbi0).\n"
 
-#: src/tvtimeconf.c:568 src/tvtimeconf.c:618
+#: src/tvtimeconf.c:577 src/tvtimeconf.c:626
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr "  -c, --channel=KANÁL        Naladit určený kanál při zapnutí.\n"
 
-#: src/tvtimeconf.c:569 src/tvtimeconf.c:619 src/tvtimeconf.c:662
+#: src/tvtimeconf.c:578 src/tvtimeconf.c:627 src/tvtimeconf.c:670
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
 "  -d, --device=ZAŘÍZENÍ      zařízení video4linux (standardně /dev/video0).\n"
 
-#: src/tvtimeconf.c:570 src/tvtimeconf.c:620
+#: src/tvtimeconf.c:579 src/tvtimeconf.c:628
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1023,27 +1059,27 @@ msgstr ""
 "                                 custom (nejprve spuťte tvtime-scanner)\n"
 "\n"
 
-#: src/tvtimeconf.c:586 src/tvtimeconf.c:636 src/tvtimeconf.c:663
+#: src/tvtimeconf.c:595 src/tvtimeconf.c:644 src/tvtimeconf.c:671
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
 "  -F, --configfile=SOUBOR    Další konfigurační soubor pro čtení nastavení.\n"
 
-#: src/tvtimeconf.c:587 src/tvtimeconf.c:637 src/tvtimeconf.c:664
+#: src/tvtimeconf.c:596 src/tvtimeconf.c:645 src/tvtimeconf.c:672
 msgid "  -h, --help                 Show this help message.\n"
 msgstr "  -h, --help                 Zobrazit tuto nápovědu.\n"
 
-#: src/tvtimeconf.c:588 src/tvtimeconf.c:638
+#: src/tvtimeconf.c:597 src/tvtimeconf.c:646
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:589 src/tvtimeconf.c:639 src/tvtimeconf.c:665
+#: src/tvtimeconf.c:598 src/tvtimeconf.c:647 src/tvtimeconf.c:673
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
 "  -i, --input=ČÍSLOVSTUPU    číslo vstupu video4linux (standardně 0).\n"
 
-#: src/tvtimeconf.c:590 src/tvtimeconf.c:640
+#: src/tvtimeconf.c:599 src/tvtimeconf.c:648
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
@@ -1051,7 +1087,7 @@ msgstr ""
 "  -I, --inputwidth=ŠÍŘKA     Horizontální rozlišení vstupu\n"
 "                             (standardně 720 bodů).\n"
 
-#: src/tvtimeconf.c:592
+#: src/tvtimeconf.c:601
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
@@ -1059,15 +1095,15 @@ msgstr ""
 "  -k, --slave                Vypnout zpracování vstupu v tvtime (podřízený "
 "mód).\n"
 
-#: src/tvtimeconf.c:593 src/tvtimeconf.c:642
+#: src/tvtimeconf.c:602 src/tvtimeconf.c:650
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
 msgstr "  -m, --fullscreen           Zapnout tvtime v celoobrazovkovém módu.\n"
 
-#: src/tvtimeconf.c:594 src/tvtimeconf.c:643
+#: src/tvtimeconf.c:603 src/tvtimeconf.c:651
 msgid "  -M, --window               Start tvtime in window mode.\n"
 msgstr "  -M, --window               Zapnout tvtime v okenním módu.\n"
 
-#: src/tvtimeconf.c:595 src/tvtimeconf.c:644 src/tvtimeconf.c:666
+#: src/tvtimeconf.c:604 src/tvtimeconf.c:652 src/tvtimeconf.c:674
 msgid ""
 "  -n, --norm=NORM            The norm to use for the input.  tvtime "
 "supports:\n"
@@ -1078,39 +1114,32 @@ msgstr ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N nebo PAL-60 (standardně NTSC).\n"
 
-#: src/tvtimeconf.c:598
+#: src/tvtimeconf.c:607
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
 "  -s, --showdrops            Zobrazovat statistiky zahozených snímků (pro "
 "ladění).\n"
 
-#: src/tvtimeconf.c:599
-msgid ""
-"  -S, --saveoptions          Save command line options to the config file.\n"
-msgstr ""
-"  -S, --saveoptions          Uložit volby z příkazové řádky do "
-"konfiguračního souboru.\n"
-
-#: src/tvtimeconf.c:600 src/tvtimeconf.c:648
+#: src/tvtimeconf.c:608 src/tvtimeconf.c:656
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 msgstr "  -t, --xmltv=SOUBOR         Přečte seznamy XMLTV z daného souboru.\n"
 
-#: src/tvtimeconf.c:601 src/tvtimeconf.c:649
+#: src/tvtimeconf.c:609 src/tvtimeconf.c:657
 msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:602
+#: src/tvtimeconf.c:610
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
 msgstr "  -v, --verbose              Tisknout ladící zprávy na stderr.\n"
 
-#: src/tvtimeconf.c:603
+#: src/tvtimeconf.c:611
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
 msgstr "  -X, --display=DISPLAY      Používat daný X display.\n"
 
-#: src/tvtimeconf.c:604 src/tvtimeconf.c:650
+#: src/tvtimeconf.c:612 src/tvtimeconf.c:658
 msgid ""
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
 "                             (defaults to /dev/mixer:line)\n"
@@ -1136,21 +1165,26 @@ msgstr ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 
-#: src/tvtimeconf.c:647
+#: src/tvtimeconf.c:655
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
 "  -R, --priority=PRIORITA    Nastavit prioritu, pod kterou má tvtime běžet.\n"
 
-#: src/tvtimeconf.c:835 src/tvtimeconf.c:844 src/tvtimeconf.c:904
-#: src/tvtimeconf.c:1014 src/tvtimeconf.c:1161
+#: src/tvtimeconf.c:845 src/tvtimeconf.c:854 src/tvtimeconf.c:914
+#: src/tvtimeconf.c:1026 src/tvtimeconf.c:1191
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr "Čtení konfigurece z %s\n"
 
-#: src/tvtimeconf.c:934
+#: src/tvtimeconf.c:944
 msgid "Saving command line options.\n"
 msgstr "Ukládání voleb z příkazové řádky.\n"
+
+#: src/tvtimeconf.c:1117
+#, fuzzy
+msgid "Cannot update configuration while tvtime running.\n"
+msgstr "%s není konfigurační souboru tvtime.\n"
 
 #: src/tvtimeosd.c:355 src/tvtime-scanner.c:144
 msgid "No signal"
@@ -1170,13 +1204,13 @@ msgstr "Nelze vytvořit %s: %s\n"
 msgid "Cannot open %s: %s\n"
 msgstr "Nelze otevřít %s: %s\n"
 
-#: src/utils.c:650
+#: src/utils.c:653
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 "Nelze inicializovat konvertor z UTF-8 do %s: iconv_open zklamal (%s).\n"
 
-#: src/utils.c:661
+#: src/utils.c:664
 #, c-format
 msgid ""
 "\n"
@@ -1266,6 +1300,13 @@ msgid ""
 msgstr ""
 "Nalezen kanál na %6.2f MHz (%.2f - %.2f MHz). Přidávám ho do seznamu "
 "kanálů.\n"
+
+#~ msgid ""
+#~ "  -S, --saveoptions          Save command line options to the config "
+#~ "file.\n"
+#~ msgstr ""
+#~ "  -S, --saveoptions          Uložit volby z příkazové řádky do "
+#~ "konfiguračního souboru.\n"
 
 #~ msgid ""
 #~ "  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"

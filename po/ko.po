@@ -6,175 +6,180 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-11-13 23:54-0400\n"
+"POT-Creation-Date: 2004-08-27 08:53-0400\n"
 "PO-Revision-Date: 2004-08-22 04:21 +0900\n"
 "Last-Translator: Michael Kim <lavnrose@e.sarang.net>\n"
-"Language-Team: Korean Translation Team <translation-team-ko@lists.sourceforge.net>\n"
+"Language-Team: Korean Translation Team <translation-team-ko@lists."
+"sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:830 src/tvtime.c:849 src/tvtime.c:884 src/tvtime.c:948
-#: src/tvtime.c:976 src/tvtime.c:1102 src/commands.c:379 src/commands.c:555
-#: src/commands.c:575 src/commands.c:637 src/commands.c:683 src/commands.c:758
-#: src/commands.c:775 src/commands.c:802 src/commands.c:863
-#: src/commands.c:1118 src/commands.c:1165 src/commands.c:1202
-#: src/commands.c:1241 src/commands.c:1313 src/commands.c:1384
-#: src/commands.c:1394 src/commands.c:1442 src/commands.c:1454
-#: src/commands.c:1484 src/commands.c:1517 src/commands.c:1550
-#: src/commands.c:1582
+#: src/tvtime.c:794 src/commands.c:1399 src/commands.c:1424
+msgid "Deinterlacer configuration"
+msgstr "Deinterlacer 설정"
+
+#: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:959
+#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:591
+#: src/commands.c:625 src/commands.c:645 src/commands.c:707 src/commands.c:742
+#: src/commands.c:787 src/commands.c:862 src/commands.c:879 src/commands.c:906
+#: src/commands.c:966 src/commands.c:1227 src/commands.c:1279
+#: src/commands.c:1344 src/commands.c:1416 src/commands.c:1487
+#: src/commands.c:1497 src/commands.c:1545 src/commands.c:1557
+#: src/commands.c:1587 src/commands.c:1620 src/commands.c:1653
+#: src/commands.c:1685
 msgid "Back"
 msgstr "뒤로"
 
-#: src/tvtime.c:862 src/tvtime.c:988
+#: src/tvtime.c:856 src/tvtime.c:999
 #, c-format
 msgid "Full rate: %.2f fps"
 msgstr "최대 속도: %.2f fps"
 
-#: src/tvtime.c:870 src/tvtime.c:992
+#: src/tvtime.c:864 src/tvtime.c:1003
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
 msgstr "절반 속도, deinterlace top fields: %.2f fps"
 
-#: src/tvtime.c:877 src/tvtime.c:996
+#: src/tvtime.c:871 src/tvtime.c:1007
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
 msgstr "절반 속도, deinterlace bottom fields: %.2f fps"
 
-#: src/tvtime.c:900
+#: src/tvtime.c:896
 msgid "Overscan setting"
 msgstr "주사율 초과 설정"
 
-#: src/tvtime.c:907 src/commands.c:1273
+#: src/tvtime.c:903 src/commands.c:1376
 msgid "Apply matte"
 msgstr "화면 비율"
 
-#: src/tvtime.c:915
+#: src/tvtime.c:911
 msgid "16:9 output"
 msgstr "16:9 출력"
 
-#: src/tvtime.c:924
+#: src/tvtime.c:918
+msgid "Resize window to match contents"
+msgstr ""
+
+#: src/tvtime.c:927
 msgid "Fullscreen"
 msgstr "전체화면"
 
-#: src/tvtime.c:931
+#: src/tvtime.c:934
 msgid "Set fullscreen position"
 msgstr "전체화면 위치 설정"
 
-#: src/tvtime.c:941
+#: src/tvtime.c:944
 msgid "Always-on-top"
 msgstr "항상 맨 위에"
 
-#: src/tvtime.c:959
+# Missing String.
+#: src/tvtime.c:953
+msgid "Quiet screenshots"
+msgstr "화면잡기 메세지 설정"
+
+#: src/tvtime.c:970
 msgid "Centre"
 msgstr "가운데"
 
-#: src/tvtime.c:966
+#: src/tvtime.c:977
 msgid "Top"
 msgstr "위"
 
-#: src/tvtime.c:972
+#: src/tvtime.c:983
 msgid "Bottom"
 msgstr "아래"
 
-#: src/tvtime.c:986 src/commands.c:1305 src/commands.c:1335
+#: src/tvtime.c:997 src/commands.c:1408 src/commands.c:1438
 msgid "Attempted framerate"
 msgstr "시도할 프레임 속도"
 
-#: src/tvtime.c:1013
+#: src/tvtime.c:1024
 msgid "Performance estimates"
 msgstr "성능 평가"
 
-#: src/tvtime.c:1015
+#: src/tvtime.c:1026
 msgid "Deinterlacer"
 msgstr ""
 
-#: src/tvtime.c:1018
+#: src/tvtime.c:1029
 #, c-format
 msgid "Input: %s at %dx%d pixels"
 msgstr "입력: %s %dx%d 픽셀"
 
-#: src/tvtime.c:1022
+#: src/tvtime.c:1033
 #, c-format
 msgid "Attempted framerate: %.2f fps"
 msgstr "적용할 프레임 속도: %.2f fps"
 
-#: src/tvtime.c:1026
+#: src/tvtime.c:1037
 #, c-format
 msgid "Average blit time: %.2f ms (%.0f MB/sec)"
 msgstr "평균 blit 시간: %.2f ms (%.0f MB/sec)"
 
-#: src/tvtime.c:1030
+#: src/tvtime.c:1041
 #, c-format
 msgid "Average render time: %5.2f ms"
 msgstr "평균 렌더링 시간: %5.2f ms"
 
-#: src/tvtime.c:1034
+#: src/tvtime.c:1045
 #, c-format
 msgid "Dropped frames: %d"
 msgstr "무시한 프레임: %d"
 
-#: src/tvtime.c:1040
+#: src/tvtime.c:1051
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
 msgstr "Blit 공간:  %4.1f/%4.1f ms (want %4.1f ms)"
 
-#: src/tvtime.c:1059 src/tvtime.c:1112
+#: src/tvtime.c:1070 src/tvtime.c:1123
 msgid "16:9 + Overscan"
 msgstr "16:9 + 초과주사"
 
-#: src/tvtime.c:1064 src/tvtime.c:1091
+#: src/tvtime.c:1075 src/tvtime.c:1102
 msgid "1.85:1"
 msgstr ""
 
-#: src/tvtime.c:1069 src/tvtime.c:1096
+#: src/tvtime.c:1080 src/tvtime.c:1107
 msgid "2.35:1"
 msgstr ""
 
-#: src/tvtime.c:1074 src/tvtime.c:1115
+#: src/tvtime.c:1085 src/tvtime.c:1126
 msgid "4:3 centre"
 msgstr "4:3 가운데"
 
-#: src/tvtime.c:1080 src/tvtime.c:1118
+#: src/tvtime.c:1091 src/tvtime.c:1129
 msgid "4:3 + Overscan"
 msgstr "4:3 + 초과주사"
 
-#: src/tvtime.c:1086
+#: src/tvtime.c:1097
 msgid "16:9"
 msgstr ""
 
-#: src/tvtime.c:1111
+#: src/tvtime.c:1122
 msgid "Matte setting (Anamorphic input)"
 msgstr "비율 설정 (일그러진 입력)"
 
-#: src/tvtime.c:1117
+#: src/tvtime.c:1128
 msgid "Matte setting (4:3 input)"
 msgstr "비율 설정 (4:3 입력)"
 
-#: src/tvtime.c:1196 src/tvtime.c:1268 src/tvtime.c:1312 src/tvtime.c:1320
-#: src/tvtime.c:1469 src/tvtime.c:1522 src/tvtime.c:1547 src/tvtime.c:1581
-#: src/tvtime.c:1595 src/tvtime-command.c:56 src/tvtime-command.c:71
-#: src/tvtime-configure.c:48 src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
+#: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
+#: src/tvtime.c:1422 src/tvtime.c:1470 src/tvtime.c:1495 src/tvtime.c:1509
+#: src/tvtime.c:1523 src/tvtimeconf.c:1110 src/tvtime-command.c:56
+#: src/tvtime-command.c:71 src/tvtime-configure.c:48 src/tvtime-scanner.c:61
+#: src/tvtime-scanner.c:97
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
 msgstr "%s: 메모리를 할당 할 수 없음.\n"
 
-#: src/tvtime.c:1333
-#, c-format
-msgid "Cannot open MPEG file %s."
-msgstr "%s MPEG 화일을 열 수 없음."
-
-#: src/tvtime.c:1344
-#, c-format
-msgid "Cannot open RVR file %s."
-msgstr "%s RVR화일을 열 수 없음."
-
-#: src/tvtime.c:1358
+#: src/tvtime.c:1315
 #, c-format
 msgid "Cannot open capture device %s."
 msgstr "%s 장치를 열 수 없음."
 
-#: src/tvtime.c:1363
+#: src/tvtime.c:1320
 #, c-format
 msgid ""
 "\n"
@@ -191,7 +196,7 @@ msgstr ""
 "    현재 설정된 장치는 %s 입니다.\n"
 "\n"
 
-#: src/tvtime.c:1427
+#: src/tvtime.c:1380
 #, c-format
 msgid ""
 "\n"
@@ -210,7 +215,7 @@ msgstr ""
 "    우리의 지원 페이지를(%s) 잠초 하십시오.\n"
 "\n"
 
-#: src/tvtime.c:1434
+#: src/tvtime.c:1387
 #, c-format
 msgid ""
 "\n"
@@ -229,69 +234,78 @@ msgstr ""
 "\n"
 "\n"
 
-#: src/tvtime.c:1486
+#: src/tvtime.c:1439
 msgid "On screen display failed to initialize, disabled.\n"
 msgstr "OSD 초기화 실패, 사용하지 않습니다.\n"
 
-#: src/tvtime.c:1505
+#: src/tvtime.c:1452
 msgid "No video source"
 msgstr "비디오 입력이 없습니다."
 
-#: src/tvtime.c:1551
+#: src/tvtime.c:1499
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
-msgstr "입출력을 생성할 수 없으므로, tvtime의 원격 조정은 비활성화되었습니다.\n"
+msgstr ""
+"입출력을 생성할 수 없으므로, tvtime의 원격 조정은 비활성화되었습니다.\n"
 
-#: src/tvtime.c:1589
+#: src/tvtime.c:1517
 msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr ""
 
-#: src/tvtime.c:1845
+#: src/tvtime.c:1745
 msgid "Always-on-top enabled."
 msgstr "항상 제일 위에 위치합니다."
 
-#: src/tvtime.c:1850
+#: src/tvtime.c:1750
 msgid "Always-on-top disabled."
 msgstr "최상위 위치를 해제 합니다."
 
-#: src/tvtime.c:1869
+#: src/tvtime.c:1770
 msgid "16:9 display mode active."
 msgstr "16:9 출력이 활성화 되었습니다."
 
-#: src/tvtime.c:1878
+#: src/tvtime.c:1779
 msgid "4:3 display mode active."
 msgstr "4:3 출력이 활성화 되었습니다."
 
-#: src/tvtime.c:1985
+#: src/tvtime.c:1829
+msgid "Screenshot messages disabled."
+msgstr "화면잡게 메세지 표시안함."
+
+#: src/tvtime.c:1831
+msgid "Screenshot messages enabled."
+msgstr "화면잡게 메세지 표시."
+
+#: src/tvtime.c:1906
 msgid "2-3 pulldown inversion disabled."
 msgstr ""
 
-#: src/tvtime.c:1988
+#: src/tvtime.c:1909
 msgid "2-3 pulldown inversion enabled."
 msgstr ""
 
-#: src/tvtime.c:1994
+#: src/tvtime.c:1915
 msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr ""
 
-#: src/tvtime.c:2379 src/tvtime.c:2520
+#: src/tvtime.c:2312 src/tvtime.c:2457
 #, c-format
 msgid "Screenshot: %s"
 msgstr "화면저장: %s"
 
-#: src/tvtime.c:2653
+#: src/tvtime.c:2606
 msgid "Restarting tvtime.\n"
 msgstr "tvtime을 재시작 합니다.\n"
 
-#: src/tvtime.c:2657
+#: src/tvtime.c:2610
 msgid "Thank you for using tvtime.\n"
 msgstr "tvtime을 이용해 주셔서 감사합니다.\n"
 
-#: src/tvtime.c:2679
+#: src/tvtime.c:2632
 #, c-format
 msgid "Running %s.\n"
 msgstr "%s(을)를 실행합니다.\n"
 
-#: src/tvtime.c:2697
+#: src/tvtime.c:2650
 #, c-format
 msgid ""
 "\n"
@@ -304,13 +318,15 @@ msgid ""
 msgstr ""
 "\n"
 "    부드러운 화상출력을 위한 향상된 Real Time Clock 기능을 당신의 커널에서\n"
-"    지원하지 않습니다.  우리는 당신이 tvtime을 실행하기전에 'rtc' 커널 모듈을\n"
+"    지원하지 않습니다.  우리는 당신이 tvtime을 실행하기전에 'rtc' 커널 모듈"
+"을\n"
 "    읽어서, 당신의 사용자가 장치화일(/dev/rtc 혹은 /dev/misc/rtc)에\n"
-"    접근할 수 있도록 할것을 강력히 권장합니다.  자세한 내용은 우리의 지원 페이지\n"
+"    접근할 수 있도록 할것을 강력히 권장합니다.  자세한 내용은 우리의 지원 페"
+"이지\n"
 "   %s 를 보십시오.\n"
 "\n"
 
-#: src/tvtime.c:2712
+#: src/tvtime.c:2665
 #, c-format
 msgid ""
 "\n"
@@ -324,7 +340,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/tvtime.c:2732
+#: src/tvtime.c:2685
 #, c-format
 msgid ""
 "\n"
@@ -336,549 +352,622 @@ msgstr ""
 "    root 권한에서 전환 실패: %s.\n"
 "    tvtime은 보안문제로 인해 지금 종료될 것입니다.\n"
 "\n"
-#: src/commands.c:187 src/commands.c:786 src/commands.c:1102
-#: src/commands.c:1468 src/commands.c:1501 src/commands.c:1534
-#: src/commands.c:1567
+
+#: src/commands.c:186 src/commands.c:890 src/commands.c:1211
+#: src/commands.c:1571 src/commands.c:1604 src/commands.c:1637
+#: src/commands.c:1670
 msgid "Current"
 msgstr "현재"
 
 #. TRANSLATORS: This refers to a TV program, not a computer program.
-#: src/commands.c:219 src/commands.c:226
+#: src/commands.c:218 src/commands.c:225
 msgid "No program information available"
 msgstr "사용가능한 프로그램 정보가 없습니다."
 
-#: src/commands.c:265
+#: src/commands.c:264
 #, c-format
 msgid "Next: %s"
 msgstr "다음: %s"
 
-#: src/commands.c:306
+#: src/commands.c:307
 msgid "Renumber current channel"
 msgstr "현재 채널을 다시 지정"
 
-#: src/commands.c:314 src/commands.c:317
+#: src/commands.c:315 src/commands.c:318
 msgid "Current channel active in list"
 msgstr "현재 채널을 활성목록에 추가"
 
-#: src/commands.c:327
+#: src/commands.c:328
 msgid "Stop channel scan"
 msgstr "채널 검색을 중지"
 
-#: src/commands.c:331
+#: src/commands.c:332
 msgid "Scan channels for signal"
 msgstr "신호로서 채널 검색"
 
-#: src/commands.c:339
+#: src/commands.c:340
 msgid "Reset all channels as active"
 msgstr "모든 활성화된 채널을 지움"
 
-#: src/commands.c:345
+#: src/commands.c:346
 msgid "Finetune current channel"
 msgstr "현재 채널 미세 조정"
 
-#: src/commands.c:352
+#: src/commands.c:353
 msgid "Change NTSC cable mode"
 msgstr "NTSC 케이블로 전환"
 
-#: src/commands.c:358
+#: src/commands.c:359
 msgid "Set current channel as SECAM"
 msgstr "현재 체널을 SECAM으로 전환"
 
-#: src/commands.c:359
+#: src/commands.c:360
 msgid "Set current channel as PAL"
 msgstr "현재 채널을 PAL로 전환"
 
-#: src/commands.c:366
+#: src/commands.c:371
+msgid "Use PAL-BG audio decoding"
+msgstr ""
+
+#: src/commands.c:376
+msgid "Use PAL-DK audio decoding"
+msgstr ""
+
+#: src/commands.c:384
 msgid "Change frequency table"
 msgstr "주파수 테이블 변경"
 
-#: src/commands.c:372
+#: src/commands.c:390
 msgid "Disable signal detection"
 msgstr "신호 검출을 비활성"
 
-#: src/commands.c:373
+#: src/commands.c:391
 msgid "Enable signal detection"
 msgstr "신호 검출 활성"
 
-#: src/commands.c:535 src/commands.c:562
+#: src/commands.c:556 src/commands.c:1249 src/commands.c:1313
+#: src/commands.c:1732
+msgid "Preferred audio mode"
+msgstr "음향 설정"
+
+#: src/commands.c:566
+msgid "Default to PAL-DK audio decoding"
+msgstr ""
+
+#: src/commands.c:573 src/commands.c:1254 src/commands.c:1326
+msgid "Audio volume boost"
+msgstr "소리 증폭"
+
+#: src/commands.c:579 src/commands.c:1259 src/commands.c:1335
+msgid "Television standard"
+msgstr "TV  표준"
+
+#: src/commands.c:585 src/commands.c:1264 src/commands.c:1304
+msgid "Horizontal resolution"
+msgstr "수평 해상도"
+
+#: src/commands.c:605 src/commands.c:632
 msgid "Cable"
 msgstr "케이블"
 
-#: src/commands.c:543 src/commands.c:570
+#: src/commands.c:613 src/commands.c:640
 msgid "Broadcast"
 msgstr "공중파"
 
-#: src/commands.c:550
+#: src/commands.c:620
 msgid "Cable with channels 100+"
 msgstr "100개 이상의 채널을 가진 케이블"
 
-#: src/commands.c:582
+#: src/commands.c:652
 msgid "Europe"
 msgstr "유럽"
 
-#: src/commands.c:590
+#: src/commands.c:660
 msgid "Russia"
 msgstr "러시아"
 
-#: src/commands.c:597
+#: src/commands.c:667
 msgid "France"
 msgstr "프랑스"
 
-#: src/commands.c:604
+#: src/commands.c:674
 msgid "Australia"
 msgstr "호주"
 
-#: src/commands.c:611
+#: src/commands.c:681
 msgid "Australia (Optus)"
 msgstr "호주 (Optus)"
 
-#: src/commands.c:618
+#: src/commands.c:688
 msgid "New Zealand"
 msgstr "뉴질랜드"
 
-#: src/commands.c:625
+#: src/commands.c:695
 msgid "China Broadcast"
 msgstr "중국 공중파"
 
-#: src/commands.c:632
+#: src/commands.c:702
 msgid "Custom (first run tvtime-scanner)"
 msgstr "사용자 (먼저 tvtime-scaner를 실행)"
 
-#: src/commands.c:648
+#: src/commands.c:719
+msgid "Disabled"
+msgstr "사용안함"
+
+#: src/commands.c:725
+msgid "Quiet"
+msgstr "조용히"
+
+#: src/commands.c:731
+msgid "Medium"
+msgstr "보통"
+
+#: src/commands.c:737
+msgid "Full"
+msgstr "최대"
+
+#: src/commands.c:752
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr "%s 현재: %d 픽셀"
 
-#: src/commands.c:655
+#: src/commands.c:759
 msgid "Low (360 pixels)"
 msgstr "저화질 (360 픽셀)"
 
-#: src/commands.c:661
+#: src/commands.c:765
 msgid "Moderate (576 pixels)"
 msgstr "중간화질 (576 픽셀)"
 
-#: src/commands.c:667
+#: src/commands.c:771
 msgid "Standard (720 pixels)"
 msgstr "표준화질 (720 픽셀)"
 
-#: src/commands.c:673
+#: src/commands.c:777
 msgid "High (768 pixels)"
 msgstr "고화질 (768 픽셀)"
 
-#: src/commands.c:678 src/commands.c:1236
+#: src/commands.c:782 src/commands.c:1339
 msgid "Restart with new settings"
 msgstr "새로운 설정으로 재 시작"
 
-#: src/commands.c:739 src/commands.c:1630
+#: src/commands.c:843 src/commands.c:1733
 msgid "Mono"
 msgstr ""
 
-#: src/commands.c:746 src/commands.c:1631
+#: src/commands.c:850 src/commands.c:1734
 msgid "Stereo"
 msgstr ""
 
-#: src/commands.c:754 src/commands.c:1633
+#: src/commands.c:858 src/commands.c:1736
 msgid "SAP"
 msgstr ""
 
-#: src/commands.c:765 src/commands.c:1633
+#: src/commands.c:869 src/commands.c:1736
 msgid "Primary Language"
 msgstr "기본 언어"
 
-#: src/commands.c:770 src/commands.c:1634
+#: src/commands.c:874 src/commands.c:1737
 msgid "Secondary Language"
 msgstr "추가 선택 언어"
 
-#: src/commands.c:792 src/commands.c:1108 src/commands.c:1474
-#: src/commands.c:1507 src/commands.c:1540 src/commands.c:1572
+#: src/commands.c:896 src/commands.c:1217 src/commands.c:1577
+#: src/commands.c:1610 src/commands.c:1643 src/commands.c:1675
 msgid "Increase"
 msgstr "증가"
 
-#: src/commands.c:797 src/commands.c:1113 src/commands.c:1479
-#: src/commands.c:1512 src/commands.c:1545 src/commands.c:1577
+#: src/commands.c:901 src/commands.c:1222 src/commands.c:1582
+#: src/commands.c:1615 src/commands.c:1648 src/commands.c:1680
 msgid "Decrease"
 msgstr "감소"
 
-#: src/commands.c:822
+#: src/commands.c:925
 msgid "BT8x8 luma correction"
 msgstr ""
 
-#: src/commands.c:832
+#: src/commands.c:935
 msgid "2-3 pulldown inversion"
 msgstr ""
 
-#: src/commands.c:841
+#: src/commands.c:944
 msgid "Colour invert"
 msgstr "음영"
 
-#: src/commands.c:849
+#: src/commands.c:952
 msgid "Mirror"
 msgstr "거울효과"
 
-#: src/commands.c:857
+#: src/commands.c:960
 msgid "Chroma killer"
 msgstr "흑백"
 
-#: src/commands.c:1002 src/commands.c:1037 src/commands.c:1069
-#: src/commands.c:1086 src/commands.c:1098 src/commands.c:1126
-#: src/commands.c:1174 src/commands.c:1210 src/commands.c:1219
-#: src/commands.c:1232 src/commands.c:1267 src/commands.c:1273
-#: src/commands.c:1279 src/commands.c:1286 src/commands.c:1292
-#: src/commands.c:1320 src/commands.c:1326 src/commands.c:1334
-#: src/commands.c:1340 src/commands.c:1352 src/commands.c:1401
-#: src/commands.c:1464 src/commands.c:1497 src/commands.c:1530
-#: src/commands.c:1563
+#: src/commands.c:1110 src/commands.c:1145 src/commands.c:1177
+#: src/commands.c:1195 src/commands.c:1207 src/commands.c:1235
+#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
+#: src/commands.c:1326 src/commands.c:1335 src/commands.c:1370
+#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
+#: src/commands.c:1395 src/commands.c:1423 src/commands.c:1429
+#: src/commands.c:1437 src/commands.c:1443 src/commands.c:1455
+#: src/commands.c:1504 src/commands.c:1567 src/commands.c:1600
+#: src/commands.c:1633 src/commands.c:1666
 msgid "Setup"
 msgstr "설정"
 
-#: src/commands.c:1005 src/commands.c:1069 src/commands.c:1087
-#: src/commands.c:1099
+#: src/commands.c:1113 src/commands.c:1177 src/commands.c:1196
+#: src/commands.c:1208
 msgid "Channel management"
 msgstr "채널 관리"
 
-#: src/commands.c:1010 src/commands.c:1041 src/commands.c:1127
-#: src/commands.c:1174 src/commands.c:1210 src/commands.c:1219
-#: src/commands.c:1232
+#: src/commands.c:1118 src/commands.c:1149 src/commands.c:1236
+#: src/commands.c:1288 src/commands.c:1304 src/commands.c:1313
+#: src/commands.c:1326 src/commands.c:1335
 msgid "Input configuration"
 msgstr "입력 설정"
 
-#: src/commands.c:1015 src/commands.c:1046
+#: src/commands.c:1123 src/commands.c:1154
 msgid "Picture settings"
 msgstr "화면 설정"
 
-#: src/commands.c:1020 src/commands.c:1051 src/commands.c:1292
-#: src/commands.c:1321 src/commands.c:1327 src/commands.c:1335
-#: src/commands.c:1341
+#: src/commands.c:1128 src/commands.c:1159 src/commands.c:1395
+#: src/commands.c:1424 src/commands.c:1430 src/commands.c:1438
+#: src/commands.c:1444
 msgid "Video processing"
 msgstr "화면 처리"
 
-#: src/commands.c:1025 src/commands.c:1056 src/commands.c:1267
-#: src/commands.c:1273 src/commands.c:1279 src/commands.c:1286
+#: src/commands.c:1133 src/commands.c:1164 src/commands.c:1370
+#: src/commands.c:1376 src/commands.c:1382 src/commands.c:1389
 msgid "Output configuration"
 msgstr "출력 설정"
 
-#: src/commands.c:1030 src/commands.c:1061
+#: src/commands.c:1138 src/commands.c:1169
 msgid "Exit menu"
 msgstr "메뉴 나가기"
 
-#: src/commands.c:1087
+#: src/commands.c:1196
 msgid "Frequency table"
 msgstr "주파수 테이블"
 
-#: src/commands.c:1099 src/commands.c:2685
+#: src/commands.c:1208 src/commands.c:2893
 msgid "Finetune"
 msgstr "미세조정"
 
-#: src/commands.c:1131 src/commands.c:1134 src/commands.c:1178
-#: src/commands.c:1181 src/commands.c:2791
+#: src/commands.c:1240 src/commands.c:1243 src/commands.c:1292
+#: src/commands.c:1295 src/commands.c:3005
 msgid "Change video source"
 msgstr "비디오 소스 변경"
 
-#: src/commands.c:1140 src/commands.c:1187 src/commands.c:1219
-#: src/commands.c:1629
-msgid "Preferred audio mode"
-msgstr "음향 설정"
-
-#: src/commands.c:1145 src/commands.c:1192 src/commands.c:1232
-msgid "Television standard"
-msgstr "TV  표준"
-
-#: src/commands.c:1150 src/commands.c:1197 src/commands.c:1210
-msgid "Horizontal resolution"
-msgstr "수평 해상도"
-
-#: src/commands.c:1155
+#: src/commands.c:1269
 msgid "Toggle closed captions"
 msgstr "자막 설정"
 
-#: src/commands.c:1160
+#: src/commands.c:1274
 msgid "Toggle XDS decoding"
 msgstr "XDS 디코딩 설정"
 
-#: src/commands.c:1279
+#: src/commands.c:1382
 msgid "Overscan"
 msgstr "초과주사율"
 
-#: src/commands.c:1286
+#: src/commands.c:1389
 msgid "Fullscreen position"
 msgstr "전체화면 위치"
 
-#: src/commands.c:1296 src/commands.c:1321
-msgid "Deinterlacer configuration"
-msgstr "Deinterlacer 설정"
-
-#: src/commands.c:1301
+#: src/commands.c:1404
 msgid "Current deinterlacer description"
 msgstr "현재 deinterlacer 정보"
 
-#: src/commands.c:1309 src/commands.c:1341
+#: src/commands.c:1412 src/commands.c:1444
 msgid "Input filters"
 msgstr "입력 여과기"
 
-#: src/commands.c:1327
+#: src/commands.c:1430
 msgid "Deinterlacer description"
 msgstr "Deinterlacer 정보"
 
-#: src/commands.c:1352 src/commands.c:1401 src/commands.c:1464
-#: src/commands.c:1497 src/commands.c:1530 src/commands.c:1563
+#: src/commands.c:1455 src/commands.c:1504 src/commands.c:1567
+#: src/commands.c:1600 src/commands.c:1633 src/commands.c:1666
 msgid "Picture"
 msgstr "화면"
 
-#: src/commands.c:1356 src/commands.c:1406 src/commands.c:1464
-#: src/commands.c:2821 src/commands.c:2862
+#: src/commands.c:1459 src/commands.c:1509 src/commands.c:1567
+#: src/commands.c:3035 src/commands.c:3076
 msgid "Brightness"
 msgstr "밝기"
 
-#: src/commands.c:1361 src/commands.c:1411 src/commands.c:1497
-#: src/commands.c:2835 src/commands.c:2865
+#: src/commands.c:1464 src/commands.c:1514 src/commands.c:1600
+#: src/commands.c:3049 src/commands.c:3079
 msgid "Contrast"
 msgstr "명암"
 
-#: src/commands.c:1365 src/commands.c:1415 src/commands.c:1530
-#: src/commands.c:2849 src/commands.c:2868
+#: src/commands.c:1468 src/commands.c:1518 src/commands.c:1633
+#: src/commands.c:3063 src/commands.c:3082
 msgid "Colour"
 msgstr "색상"
 
-#: src/commands.c:1369 src/commands.c:1419 src/commands.c:1563
-#: src/commands.c:2807 src/commands.c:2871
+#: src/commands.c:1472 src/commands.c:1522 src/commands.c:1666
+#: src/commands.c:3021 src/commands.c:3085
 msgid "Hue"
 msgstr ""
 
-#: src/commands.c:1376
+#: src/commands.c:1479
 msgid "Save current settings as defaults"
 msgstr "현재 설정을 기본값으로"
 
-#: src/commands.c:1380 src/commands.c:1390 src/commands.c:1437
-#: src/commands.c:1449
+#: src/commands.c:1483 src/commands.c:1493 src/commands.c:1540
+#: src/commands.c:1552
 msgid "Reset to global defaults"
 msgstr "기본 설정으로 되돌림"
 
-#: src/commands.c:1426
+#: src/commands.c:1529
 msgid "Save current settings as global defaults"
 msgstr "현재 설정을 기본 설정값으로 저장"
 
-#: src/commands.c:1432
+#: src/commands.c:1535
 msgid "Save current settings as channel defaults"
 msgstr "현재 설정값을 채널 기본값으로 저장"
 
-#: src/commands.c:1703
+#: src/commands.c:1806
 msgid "Favorites"
 msgstr "즐겨보기"
 
-#: src/commands.c:1710
+#: src/commands.c:1813
 msgid "Add current channel"
 msgstr "현재 채널 추가"
 
-#: src/commands.c:1712
+#: src/commands.c:1815
 msgid "Exit"
 msgstr "종료"
 
-#: src/commands.c:1980
+#: src/commands.c:1972
+#, fuzzy
+msgid "Preferred XMLTV language"
+msgstr "기본 언어"
+
+#: src/commands.c:1973
+msgid "Default language"
+msgstr ""
+
+#: src/commands.c:1978
+msgid "Unknown language"
+msgstr ""
+
+#: src/commands.c:2107
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "%d분 뒤에 자동 종료."
 
-#: src/commands.c:1983
+#: src/commands.c:2110
+#, c-format
 msgid "Sleep off."
 msgstr "자동 종료기능 사용안함."
 
-#: src/commands.c:2041
+#: src/commands.c:2149
+#, c-format
+msgid "Using PAL-BG audio decoding for this channel."
+msgstr ""
+
+#: src/commands.c:2152
+#, c-format
+msgid "Using PAL-DK audio decoding for this channel."
+msgstr ""
+
+#: src/commands.c:2181
+#, c-format
+msgid "Defaulting to PAL-DK audio decoding."
+msgstr ""
+
+#: src/commands.c:2184
+#, c-format
+msgid "Defaulting to PAL-BG audio decoding."
+msgstr ""
+
+#: src/commands.c:2212
 msgid "Channel marked as active in the browse list."
 msgstr "탐색목록에서 채널표시."
 
-#: src/commands.c:2044
+#: src/commands.c:2215
 msgid "Channel disabled from the browse list."
 msgstr "탐색목록에서 채널 표시안함."
 
-#: src/commands.c:2087
+#: src/commands.c:2245
+#, c-format
+msgid "Capture card volume will not be set by tvtime."
+msgstr ""
+
+#: src/commands.c:2248
+#, c-format
+msgid "Setting capture card volume to %d%%."
+msgstr ""
+
+#: src/commands.c:2281
 msgid "Processing every input field."
 msgstr "모든 입력 필드를 처리."
 
-#: src/commands.c:2090
+#: src/commands.c:2284
 msgid "Processing every top field."
 msgstr "모든 윗쪽 필드를 처리."
 
-#: src/commands.c:2093
+#: src/commands.c:2287
 msgid "Processing every bottom field."
 msgstr "모든 아래 필드를 처리."
 
-#: src/commands.c:2108
+#: src/commands.c:2302
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "수평해상도는 재시작시 %d 픽셀로 적용됩니다."
 
-#: src/commands.c:2154
+#: src/commands.c:2359
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "TV 표준은 재시작시에 %s 로 적용 됩니다."
 
-#: src/commands.c:2185
+#: src/commands.c:2390
 msgid "All channels re-activated."
 msgstr "모든 채널을 다시 활성화함."
 
-#: src/commands.c:2206
+#: src/commands.c:2411
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr ""
 
-#: src/commands.c:2218
+#: src/commands.c:2423
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "신호 검출을 사용안한 상태에서 검색할 수 없습니다."
 
-#: src/commands.c:2245
+#: src/commands.c:2451
 msgid "Scanning for channels being broadcast."
 msgstr "공중파 채널 검출."
 
-#: src/commands.c:2263
+#: src/commands.c:2469
 msgid "Closed captions disabled."
 msgstr "자막 사용안함."
 
-#: src/commands.c:2269
+#: src/commands.c:2475
 msgid "Closed captions enabled."
 msgstr "자막 사용."
 
-#: src/commands.c:2281
+#: src/commands.c:2487
 msgid "No VBI device configured for CC decoding."
 msgstr ""
 
-#: src/commands.c:2297
+#: src/commands.c:2503
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr ""
 
-#: src/commands.c:2339
+#: src/commands.c:2546
 #, c-format
 msgid "Running: %s"
 msgstr "실행: %s"
 
-#: src/commands.c:2416
+#: src/commands.c:2624
 msgid "Signal detection enabled."
 msgstr "신호 검출 사용."
 
-#: src/commands.c:2419
+#: src/commands.c:2627
 msgid "Signal detection disabled."
 msgstr "신호 검출 사용안함."
 
-#: src/commands.c:2432
+#: src/commands.c:2640
 msgid "XDS decoding enabled."
 msgstr "XDS 디코딩 사용."
 
-#: src/commands.c:2435
+#: src/commands.c:2643
 msgid "XDS decoding disabled."
 msgstr "XDS 디코딩 사용안함."
 
-#: src/commands.c:2481
+#: src/commands.c:2689
 msgid "Colour invert enabled."
 msgstr "색상 뒤집기 사용."
 
-#: src/commands.c:2483
+#: src/commands.c:2691
 msgid "Colour invert disabled."
 msgstr "색상 뒤집기 사용안함."
 
-#: src/commands.c:2505
+#: src/commands.c:2713
 msgid "Mirror enabled."
 msgstr "거울효과 사용."
 
-#: src/commands.c:2507
+#: src/commands.c:2715
 msgid "Mirror disabled."
 msgstr "거울효과 사용안함."
 
-#: src/commands.c:2529
+#: src/commands.c:2737
 msgid "Chroma kill enabled."
 msgstr "흑백기능 사용."
 
-#: src/commands.c:2531
+#: src/commands.c:2739
 msgid "Chroma kill disabled."
 msgstr "흑백기능 사용 안함."
 
-#: src/commands.c:2548
+#: src/commands.c:2756
 msgid "Luma correction enabled."
 msgstr ""
 
-#: src/commands.c:2550
+#: src/commands.c:2758
 msgid "Luma correction disabled."
 msgstr ""
 
-#: src/commands.c:2567
+#: src/commands.c:2775
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "초과주사: %.1f%%"
 
-#: src/commands.c:2590
+#: src/commands.c:2798
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr ""
 
-#: src/commands.c:2620
+#: src/commands.c:2828
 msgid "Picture settings reset to defaults."
 msgstr "화면 설정을 기본값으로 초기화."
 
-#: src/commands.c:2648
+#: src/commands.c:2856
 msgid "Using nominal NTSC cable frequencies."
 msgstr "일반적인 NTSC 케이블 주파수 사용."
 
-#: src/commands.c:2654
+#: src/commands.c:2862
 msgid "Using IRC cable frequencies."
 msgstr "IRC 케이블 주파수 사용."
 
-#: src/commands.c:2660
+#: src/commands.c:2868
 msgid "Using HRC cable frequencies."
 msgstr "HRC 케이블 주사푸 사용."
 
-#: src/commands.c:2744 src/commands.c:2758
+#: src/commands.c:2952 src/commands.c:2972
 msgid "Volume"
 msgstr "소리"
 
-#: src/commands.c:2908
+#: src/commands.c:3122
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "현재 화면설정을 기본값으로 저장.\n"
 
-#: src/commands.c:2921
+#: src/commands.c:3135
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "현재 화면 설정을 채널 %d에 저장.\n"
 
-#: src/commands.c:3005
+#: src/commands.c:3219
 msgid "Paused."
 msgstr "일시중지"
 
-#: src/commands.c:3005
+#: src/commands.c:3219
 msgid "Resumed."
 msgstr "시작됨."
 
-#: src/tvtimeconf.c:521
+#: src/tvtimeconf.c:455
 #, c-format
 msgid "Error parsing configuration file %s.\n"
 msgstr "설정화일 %s 변환 오류\n"
 
-#: src/tvtimeconf.c:528
+#: src/tvtimeconf.c:462
 #, c-format
 msgid "No XML root element found in %s.\n"
 msgstr "%s 에서 XML root가 없습니다.\n"
 
-#: src/tvtimeconf.c:536 src/tvtimeconf.c:612
+#: src/tvtimeconf.c:470 src/tvtimeconf.c:544
 #, c-format
 msgid "%s is not a tvtime configuration file.\n"
 msgstr "%s 는 tvtime 설정화일이 아닙니다.\n"
 
-#: src/tvtimeconf.c:570
+#: src/tvtimeconf.c:502
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr "설정 화일을 만들지 못했습니다. 설정이 저장되지 않았습니다.\n"
 
-#: src/tvtimeconf.c:577
+#: src/tvtimeconf.c:509
 msgid "Could not create new config file.\n"
 msgstr "새 설정화일을 생성 할 수 없습니다.\n"
 
-#: src/tvtimeconf.c:601
+#: src/tvtimeconf.c:533
 msgid "Error creating configuration file.\n"
 msgstr "설정화일을 생성 할 수 없습니다.\n"
 
-#: src/tvtimeconf.c:622 src/utils.c:133
+#: src/tvtimeconf.c:554 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr "%s의 소유자를 변경할 수 없음: %s.\n"
 
-#: src/tvtimeconf.c:631
+#: src/tvtimeconf.c:563
 msgid ""
 "\n"
 "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
@@ -889,14 +978,16 @@ msgid ""
 "Alexander S. Belov, and Achim Schneider.\n"
 msgstr ""
 "\n"
-"tvtime 은 자유 소프트웨어 이며, Billy Biggs 와 Doug Bell 그리고 많은 개발자들에\n"
-"의해 작성되었습니다.  저작권에 대한 자세한 내용을 보시려면, 우리의 웹사이트 인\n"
+"tvtime 은 자유 소프트웨어 이며, Billy Biggs 와 Doug Bell 그리고 많은 개발자들"
+"에\n"
+"의해 작성되었습니다.  저작권에 대한 자세한 내용을 보시려면, 우리의 웹사이트 "
+"인\n"
 "http://tvtime.net/ 에서 볼 수 있습니다.\n"
 "\n"
 "tvtime 의 저작권 Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov, and Achim Schneider.\n"
 
-#: src/tvtimeconf.c:642 src/tvtimeconf.c:695 src/tvtimeconf.c:745
+#: src/tvtimeconf.c:574 src/tvtimeconf.c:623 src/tvtimeconf.c:669
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
@@ -905,36 +996,30 @@ msgstr ""
 "사용법: %s [OPTION]...\n"
 "\n"
 
-#: src/tvtimeconf.c:643 src/tvtimeconf.c:696
-msgid "  -a, --widescreen           16:9 화면.\n"
+#: src/tvtimeconf.c:575 src/tvtimeconf.c:624
+msgid "  -a, --widescreen           16:9 mode.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:644 src/tvtimeconf.c:697
-msgid "  -b, --vbidevice=장치     VBI 장치 (기본값은 /dev/vbi0).\n"
+#: src/tvtimeconf.c:576 src/tvtimeconf.c:625
+msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:645 src/tvtimeconf.c:698
+#: src/tvtimeconf.c:577 src/tvtimeconf.c:626
 msgid ""
-"  -c, --channel=채널      지정된 채널로 시작합니다.\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:646 src/tvtimeconf.c:699 src/tvtimeconf.c:746
+#: src/tvtimeconf.c:578 src/tvtimeconf.c:627 src/tvtimeconf.c:670
 msgid ""
-"  -d, --device=장치        video4linux 장치 (기본값은 /dev/video0).\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:647 src/tvtimeconf.c:700
+#: src/tvtimeconf.c:579 src/tvtimeconf.c:628
 msgid ""
-"  -D, --driver=이름          사용할 출력 드라이버: Xv, DirectFB, mga,\n"
-"                             matroxtv or SDL (기본값은 Xv).\n"
-msgstr ""
-
-#: src/tvtimeconf.c:649 src/tvtimeconf.c:702
-msgid ""
-"  -f, --frequencies=이름     튜너에서 사용할 신호테이블.\n"
-"                             (기본값은 us-cable).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
 "\n"
-"                             사용 가능한 값:\n"
+"                             Valid values are:\n"
 "                                 us-cable\n"
 "                                 us-cable100\n"
 "                                 us-broadcast\n"
@@ -947,50 +1032,49 @@ msgid ""
 "                                 newzealand\n"
 "                                 france\n"
 "                                 russia\n"
-"                                 custom (먼저 tvtime-scanner를 실행)\n"
+"                                 custom (first run tvtime-scanner)\n"
 "\n"
 msgstr ""
 
-#: src/tvtimeconf.c:665 src/tvtimeconf.c:718 src/tvtimeconf.c:747
+#: src/tvtimeconf.c:595 src/tvtimeconf.c:644 src/tvtimeconf.c:671
 msgid ""
-"  -F, --configfile=화일      설정을 지정한 설정화일로부터 지정합니다.\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:666 src/tvtimeconf.c:719 src/tvtimeconf.c:748
-msgid "  -h, --help                 이 도움말을 출력합니다.\n"
+#: src/tvtimeconf.c:596 src/tvtimeconf.c:645 src/tvtimeconf.c:672
+msgid "  -h, --help                 Show this help message.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:667 src/tvtimeconf.c:720
+#: src/tvtimeconf.c:597 src/tvtimeconf.c:646
+msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:598 src/tvtimeconf.c:647 src/tvtimeconf.c:673
 msgid ""
-"  -H, --height=높이        출력 창의 높이 (기본값은 576 pixels).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:668 src/tvtimeconf.c:721 src/tvtimeconf.c:749
-msgid ""
-"  -i, --input=번호       video4linux 입력 번호 (기본값은 0).\n"
-msgstr ""
-
-#: src/tvtimeconf.c:669 src/tvtimeconf.c:722
+#: src/tvtimeconf.c:599 src/tvtimeconf.c:648
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:671
+#: src/tvtimeconf.c:601
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:672 src/tvtimeconf.c:724
+#: src/tvtimeconf.c:602 src/tvtimeconf.c:650
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:673 src/tvtimeconf.c:725
+#: src/tvtimeconf.c:603 src/tvtimeconf.c:651
 msgid "  -M, --window               Start tvtime in window mode.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:674 src/tvtimeconf.c:726 src/tvtimeconf.c:750
+#: src/tvtimeconf.c:604 src/tvtimeconf.c:652 src/tvtimeconf.c:674
 msgid ""
 "  -n, --norm=NORM            The norm to use for the input.  tvtime "
 "supports:\n"
@@ -998,36 +1082,30 @@ msgid ""
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:677 src/tvtimeconf.c:729
-msgid ""
-"  -p, --fspos=위치            전체화면 위치: top, bottom,\n"
-"                             centre (기본값).\n"
-msgstr ""
-
-#: src/tvtimeconf.c:679
-msgid ""
-"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
-msgstr ""
-
-#: src/tvtimeconf.c:680
+#: src/tvtimeconf.c:607
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
 
-#: src/tvtimeconf.c:681
-msgid ""
-"  -S, --saveoptions          Save command line options to the config file.\n"
-msgstr ""
-
-#: src/tvtimeconf.c:682 src/tvtimeconf.c:732
+#: src/tvtimeconf.c:608 src/tvtimeconf.c:656
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:683
+#: src/tvtimeconf.c:609 src/tvtimeconf.c:657
+msgid ""
+"  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
+"available.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:610
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:684 src/tvtimeconf.c:734
+#: src/tvtimeconf.c:611
+msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+msgstr ""
+
+#: src/tvtimeconf.c:612 src/tvtimeconf.c:658
 msgid ""
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
 "                             (defaults to /dev/mixer:line)\n"
@@ -1042,26 +1120,27 @@ msgid ""
 "                                 video, radio, monitor\n"
 msgstr ""
 
-#: src/tvtimeconf.c:731
+#: src/tvtimeconf.c:655
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:733
-msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
-msgstr ""
-
-#: src/tvtimeconf.c:928 src/tvtimeconf.c:937 src/tvtimeconf.c:997
-#: src/tvtimeconf.c:1135 src/tvtimeconf.c:1298
+#: src/tvtimeconf.c:845 src/tvtimeconf.c:854 src/tvtimeconf.c:914
+#: src/tvtimeconf.c:1026 src/tvtimeconf.c:1191
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr "%s로 부터 설정 읽음\n"
 
-#: src/tvtimeconf.c:1045
+#: src/tvtimeconf.c:944
 msgid "Saving command line options.\n"
 msgstr "명령줄 설정 저장.\n"
 
-#: src/tvtimeosd.c:355 src/tvtime-scanner.c:143
+#: src/tvtimeconf.c:1117
+#, fuzzy
+msgid "Cannot update configuration while tvtime running.\n"
+msgstr "%s 는 tvtime 설정화일이 아닙니다.\n"
+
+#: src/tvtimeosd.c:355 src/tvtime-scanner.c:144
 msgid "No signal"
 msgstr "신호 없음"
 
@@ -1069,22 +1148,22 @@ msgstr "신호 없음"
 msgid "Mute"
 msgstr "음소거"
 
-#: src/utils.c:117
+#: src/utils.c:118
 #, c-format
 msgid "Cannot create %s: %s\n"
 msgstr "%s(을)를 생성할 수 없음: %s\n"
 
-#: src/utils.c:123
+#: src/utils.c:124
 #, c-format
 msgid "Cannot open %s: %s\n"
 msgstr "%s(을)를 열 수 없음: %s\n"
 
-#: src/utils.c:612
+#: src/utils.c:653
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr "UTF-8 애서 %s 로 변환 초기화 실패: iconv_open 실패 (%s).\n"
 
-#: src/utils.c:623
+#: src/utils.c:664
 #, c-format
 msgid ""
 "\n"
@@ -1102,6 +1181,7 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
+#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1110,6 +1190,7 @@ msgstr ""
 "사용 가능한 명령:\n"
 
 #: src/tvtime-command.c:80
+#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime이 실행되고 있지 않습니다.\n"
 
@@ -1138,7 +1219,7 @@ msgstr "%s: 명령 %s 보냄.\n"
 msgid "Scanning using TV standard %s.\n"
 msgstr "TV 표준 %s 으로 검색.\n"
 
-#: src/tvtime-scanner.c:114
+#: src/tvtime-scanner.c:115
 #, c-format
 msgid ""
 "\n"
@@ -1151,70 +1232,47 @@ msgstr ""
 "    --input=<번호> 를 사용하여 다른 입력장치를 선택하십시오.\n"
 "\n"
 
-#: src/tvtime-scanner.c:125
+#: src/tvtime-scanner.c:126
 #, c-format
 msgid "Scanning from %6.2f MHz to %6.2f MHz.\n"
 msgstr "%6.2f MHz 에서 %6.2f MHz 까지 검색.\n"
 
-#: src/tvtime-scanner.c:136
+#: src/tvtime-scanner.c:137
 #, c-format
 msgid "Checking %6.2f MHz:"
 msgstr "%6.2f Mhz 검색:"
 
-#: src/tvtime-scanner.c:147 src/tvtime-scanner.c:154
+#: src/tvtime-scanner.c:148 src/tvtime-scanner.c:155
 msgid "Signal detected"
 msgstr "신호 검출"
 
-#: src/tvtime-scanner.c:166
+#: src/tvtime-scanner.c:167
 #, c-format
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
 "주파수 %6.2f MHz 에서 채널 찾음(%.2f - %.2f MHz), 채널 목록에 추가합니다.\n"
 
+#~ msgid "Cannot open MPEG file %s."
+#~ msgstr "%s MPEG 화일을 열 수 없음."
 
-# Missing String.
-msgid "Quiet screenshots"
-msgstr "화면잡기 메세지 설정"
+#~ msgid "Cannot open RVR file %s."
+#~ msgstr "%s RVR화일을 열 수 없음."
 
-msgid "Screenshot messages enabled."
-msgstr "화면잡게 메세지 표시."
+#~ msgid "Television"
+#~ msgstr "텔레비전"
 
-msgid "Screenshot messages disabled."
-msgstr "화면잡게 메세지 표시안함."
+#~ msgid "Composite1"
+#~ msgstr "외부입력1"
 
-msgid "Audio volume boost"
-msgstr "소리 증폭"
+#~ msgid "Composite2"
+#~ msgstr "외부입력2"
 
-msgid "Disabled"
-msgstr "사용안함"
+#~ msgid "Composite3"
+#~ msgstr "외부입력3"
 
-msgid "Quiet"
-msgstr "조용히"
+#~ msgid "Television: Full resolution"
+#~ msgstr "텔레비전: 최대 해상도"
 
-msgid "Medium"
-msgstr "보통"
-
-msgid "Full"
-msgstr "최대"
-
-msgid "Television"
-msgstr "텔레비전"
-
-msgid "Composite1"
-msgstr "외부입력1"
-
-msgid "Composite2"
-msgstr "외부입력2"
-
-msgid "Composite3"
-msgstr "외부입력3"
-
-msgid "Television: Full resolution"
-msgstr "텔레비전: 최대 해상도"
-
-msgid "Television: Half resolution"
-msgstr "텔레비전: 중간 해상도"
-
-
-
+#~ msgid "Television: Half resolution"
+#~ msgstr "텔레비전: 중간 해상도"
