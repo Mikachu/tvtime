@@ -559,6 +559,7 @@ int input_menu_callback( input_t *in, InputEvent command, int arg )
             default:
                 break;
             }
+            return 1;
             break;
 
         default:

@@ -270,6 +270,7 @@ int main( int argc, char **argv )
                       localtime(&tm) );
             tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
             tvtime_osd_show_channel_info( osd, timestamp );
+            tvtime_osd_show_channel_logo( osd );
         }
     }
 
