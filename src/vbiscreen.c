@@ -55,7 +55,6 @@ struct vbiscreen_s
 
     int frame_width;  
     int frame_height;
-    int frame_aspect;
 
     int x, y; /* where to draw the CC screen. */
     int width, height;  /* the size box we have to draw in */
@@ -77,7 +76,7 @@ struct vbiscreen_s
 };
 
 vbiscreen_t *vbiscreen_new( int video_width, int video_height, 
-                            double video_aspect, int verbose )
+                            double pixel_aspect, int verbose )
 {
     int i=0, fontsize = FONT_SIZE;
     vbiscreen_t *vs = (vbiscreen_t *)malloc(sizeof(struct vbiscreen_s));
@@ -91,7 +90,6 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->y = 0;
     vs->frame_width = video_width;
     vs->frame_height = video_height;
-    vs->frame_aspect = video_aspect;
     vs->curx = 0;
     vs->cury = 0;
     vs->fgcolour = 0xFFFFFFFFU; /* white */
@@ -117,13 +115,13 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->scroll = 0;
     vs->font = 0;
 
-    vs->font = osd_font_new( vs->fontfile, fontsize, video_width, video_height, video_aspect );
+    vs->font = osd_font_new( vs->fontfile, fontsize, pixel_aspect );
     if( !vs->font ) {
         vbiscreen_delete( vs );
         return 0;
     }
 
-    vs->line[0] = osd_string_new( vs->font, video_width );
+    vs->line[0] = osd_string_new( vs->font );
     if( !vs->line[0] ) {
         fprintf( stderr, "vbiscreen: Could not find my font (%s)!\n", 
                  vs->fontfile );
@@ -138,7 +136,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     osd_string_delete( vs->line[ 0 ] );
 
     for( i = 0; i < ROWS; i++ ) {
-        vs->line[ i ] = osd_string_new( vs->font, video_width );
+        vs->line[ i ] = osd_string_new( vs->font );
         if( !vs->line[ i ] ) {
             fprintf( stderr, "vbiscreen: Could not allocate a line.\n" );
             vbiscreen_delete( vs );

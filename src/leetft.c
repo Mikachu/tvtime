@@ -34,7 +34,6 @@ static int ft_lib_refcount = 0;
 static FT_Library ft_lib = 0;
 
 #define MAX_STRING_LENGTH 1024
-#define NUM_GLYPHS 256
 #define HASHTABLE_SIZE 303 /* is a prime number. */
 
 struct ft_font_s
@@ -45,7 +44,6 @@ struct ft_font_s
     hashtable_t *glyphdata; // These contain glyph_data_s
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
-    int max_height;
     iconv_t cd;
 };
 
@@ -126,7 +124,6 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
 ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 {
     ft_font_t *font = (ft_font_t *) malloc( sizeof( ft_font_t ) );
-    FT_BBox bbox;
     int i;
 
     if( !font ) return 0;
@@ -179,39 +176,28 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     FT_Select_Charmap( font->face, ft_encoding_unicode );
 
-    bbox.yMin = INT_MAX;
-    bbox.yMax = -INT_MAX;
+    /* Precache printable ASCII chars for better performance */
 
-    for( i = 0; i < NUM_GLYPHS; i++ ) {
-        FT_BBox glyph_bbox;
+    for (i = 32; i < 128; i++)
+        ft_cache_glyph (font, i, NULL);
 
-        if( ft_cache_glyph( font, i, &glyph_bbox ) ) {
-            if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
-            if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
-        }
-    }
-
-    font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
-    
     return font;
 }
 
 void ft_font_delete( ft_font_t *font )
 {
-    int i;
+    hashtable_iterator_t *iter = hashtable_iterator_init (font->glyphdata);
+    ft_glyph_data_t *cur;
+    int index;
 
-    for( i = 0; i < NUM_GLYPHS; i++ ) {
-        ft_glyph_data_t *cur;
-
-        cur = hashtable_lookup( font->glyphdata, i );
-        if( cur ) {
-            FT_Done_Glyph( cur->glyph );
-            FT_Done_Glyph( cur->bitmap );
-            hashtable_delete( font->glyphdata, i );
-        }
+    while ((cur = hashtable_iterator_go (iter, 0, 1, &index)) != NULL) {
+        FT_Done_Glyph( cur->glyph );
+        FT_Done_Glyph( cur->bitmap );
+        hashtable_delete( font->glyphdata, index );
     }
 
     FT_Done_Face( font->face );
+    hashtable_iterator_destroy (iter);
     hashtable_destroy( font->glyphdata );
     iconv_close( font->cd );
     free( font );
@@ -228,19 +214,12 @@ int ft_font_get_size( ft_font_t *font )
     return font->fontsize;
 }
 
-int ft_font_get_height( ft_font_t *font )
-{
-    return font->max_height;
-}
-
 int ft_font_points_to_subpix_width( ft_font_t *font, int points )
 {
     return ( font->xdpi * points * 65536 ) / 72;
 }
 
-static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata,
-                               FT_UInt *glyphpos, FT_UInt *glyphindex,
-                               const wchar_t *wtext, int len )
+static FT_BBox prerender_text( ft_font_t *font, const wchar_t *wtext, int len )
 {
     FT_Bool use_kerning;
     FT_UInt previous;
@@ -251,24 +230,27 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata,
     bbox.xMin = bbox.yMin = INT_MAX;
     bbox.xMax = bbox.yMax = -INT_MAX;
 
-    use_kerning = FT_HAS_KERNING( face );
+    use_kerning = FT_HAS_KERNING( font->face );
     previous = 0;
     pen_x = 0;
 
     for( i = 0; i < len; i++ ) {
         wchar_t cur = wtext[ i ];
         ft_glyph_data_t *curdata;
+	int ret;
 
-        curdata = hashtable_lookup( glyphdata, cur );
-        if( curdata ) {
+	ret = ft_cache_glyph( font, wtext[i], NULL );
+        curdata = hashtable_lookup( font->glyphdata, cur );
+
+        if( ret && curdata ) {
             FT_Glyph curglyph = curdata->glyph;
             FT_BBox glyph_bbox;
 
-            glyphindex[ i ] = FT_Get_Char_Index( face, cur );
+            font->glyphindex[ i ] = FT_Get_Char_Index( font->face, cur );
 
-            if( use_kerning && previous && glyphindex[ i ] ) {
+            if( use_kerning && previous && font->glyphindex[ i ] ) {
                 FT_Vector  delta;
-                FT_Get_Kerning( face, previous, glyphindex[ i ],
+                FT_Get_Kerning( font->face, previous, font->glyphindex[ i ],
                                 ft_kerning_unfitted, &delta );
 
                 /* Ignore kerning on numbers for now. */
@@ -278,10 +260,10 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata,
                 }
             }
             prevchar = wtext[ i ];
-            previous = glyphindex[ i ];
+            previous = font->glyphindex[ i ];
 
             /* Save the current pen position. */
-            glyphpos[ i ] = pen_x;
+            font->glyphpos[ i ] = pen_x;
 
             /* Advance is in 16.16 format. */
             pen_x += curglyph->advance.x;
@@ -293,8 +275,8 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata,
             glyph_bbox.xMin *= 1024;
             glyph_bbox.xMax *= 1024;
 
-            glyph_bbox.xMin += glyphpos[ i ];
-            glyph_bbox.xMax += glyphpos[ i ];
+            glyph_bbox.xMin += font->glyphpos[ i ];
+            glyph_bbox.xMax += font->glyphpos[ i ];
 
             if( glyph_bbox.xMin < bbox.xMin ) bbox.xMin = glyph_bbox.xMin;
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
@@ -380,8 +362,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
     /* Calculate length of the string generated by iconv. */
     len = outbuf - wtext;
 
-    string_bbox = prerender_text( font->face, font->glyphdata, font->glyphpos,
-                                  font->glyphindex, wtext, len );
+    string_bbox = prerender_text( font, wtext, len );
 
     /**
      * Temporary hack.  I'm worried about strings where the bounding box

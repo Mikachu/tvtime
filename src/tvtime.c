@@ -872,6 +872,7 @@ int main( int argc, char **argv )
     int kbd_available;
     char *error_string = 0;
     int read_stdin = 1;
+    double pixel_aspect;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1187,7 +1188,8 @@ int main( int argc, char **argv )
 
 
     /* Setup OSD stuff. */
-    osd = tvtime_osd_new( width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0),
+    pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) ) );
+    osd = tvtime_osd_new( width, height, pixel_aspect,
                           config_get_channel_text_rgb( ct ), config_get_other_text_rgb( ct ) );
     if( !osd ) {
         fprintf( stderr, "tvtime: OSD initialization failed, OSD disabled.\n" );
@@ -1292,8 +1294,7 @@ int main( int argc, char **argv )
 
     /* Setup the console */
     con = console_new( (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 16,
-                       width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0),
-                       config_get_other_text_rgb( ct ) );
+                        width, height, pixel_aspect, config_get_other_text_rgb( ct ) );
     if( !con ) {
         fprintf( stderr, "tvtime: Could not setup console.\n" );
     } else {
@@ -1319,9 +1320,7 @@ int main( int argc, char **argv )
 
     usevbi = config_get_usevbi( ct );
     if( usevbi ) {
-        vs = vbiscreen_new( width, height, 
-                            config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
-                            verbose );
+        vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
             fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
         }

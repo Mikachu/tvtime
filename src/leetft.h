@@ -57,11 +57,6 @@ void ft_font_delete( ft_font_t *font );
 int ft_font_get_size( ft_font_t *font );
 
 /**
- * Returns the max pixel height of the font.
- */
-int ft_font_get_height( ft_font_t *font );
-
-/**
  * Returns subpixel width for points.
  */
 int ft_font_points_to_subpix_width( ft_font_t *font, int points );

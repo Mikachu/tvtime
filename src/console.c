@@ -54,7 +54,6 @@ struct console_s
 
     int frame_width;  
     int frame_height;
-    double frame_aspect;
 
     int x, y; /* where to draw console */
     int width, height;  /* the size box we have to draw in */
@@ -82,7 +81,7 @@ struct console_s
 
 console_t *console_new( int x, int y, int width, int height,
                         int fontsize, int video_width, int video_height, 
-                        double video_aspect, unsigned int fgcolour )
+                        double pixel_aspect, unsigned int fgcolour )
 {
     int i=0, rowheight;
     console_t *con = (console_t *)malloc(sizeof(struct console_s));
@@ -95,7 +94,6 @@ console_t *console_new( int x, int y, int width, int height,
     con->y = y;
     con->frame_width = video_width;
     con->frame_height = video_height;
-    con->frame_aspect = video_aspect;
     con->curx = 0;
     con->cury = 0;
     con->timeout = 51;
@@ -137,7 +135,7 @@ console_t *console_new( int x, int y, int width, int height,
     con->fontfile = "FreeMonoBold.ttf";
     con->fontsize = fontsize;
 
-    con->font = osd_font_new( con->fontfile, fontsize, video_width, video_height, video_aspect );
+    con->font = osd_font_new( con->fontfile, fontsize, pixel_aspect );
     if( !con->font ) {
         console_delete( con );
         return 0;
@@ -150,7 +148,7 @@ console_t *console_new( int x, int y, int width, int height,
     con->width = width;
     con->height = height;
 
-    con->line[0] = osd_string_new( con->font, video_width );
+    con->line[0] = osd_string_new( con->font );
     if( !con->line[0] ) {
         fprintf( stderr, "console: Could not create string.\n" );
         console_delete( con );
@@ -195,7 +193,7 @@ console_t *console_new( int x, int y, int width, int height,
             console_delete( con );
             return NULL;
         }
-        con->line[0] = osd_string_new( con->font, con->frame_width );
+        con->line[0] = osd_string_new( con->font );
         if( !con->line[ 0 ] ) {
             fprintf( stderr, 
                      "console: Could not create new string.\n" );
@@ -262,7 +260,7 @@ void update_osd_strings( console_t *con )
 
             return;
         }
-        con->line[0] = osd_string_new( con->font, con->frame_width );
+        con->line[0] = osd_string_new( con->font );
         if( !con->line[ 0 ] ) {
             fprintf( stderr, "console: Could not create new string.\n" );
             return;
@@ -358,7 +356,7 @@ void update_osd_strings( console_t *con )
             con->cury++;
             tmpstr[0] = '\0';
 
-            con->line[ con->cury ] = osd_string_new( con->font, con->frame_width );
+            con->line[ con->cury ] = osd_string_new( con->font );
             if( !con->line[ con->cury ] ) {
                 fprintf( stderr, "console: Could not create new string.\n" );
                 con->cury--;

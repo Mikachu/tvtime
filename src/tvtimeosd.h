@@ -47,7 +47,7 @@ extern "C" {
 
 typedef struct tvtime_osd_s tvtime_osd_t;
 
-tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
+tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                               unsigned int channel_rgb, unsigned int other_rgb );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 

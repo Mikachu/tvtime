@@ -29,6 +29,8 @@
 
 #define OSD_FADEOUT_TIME 15
 
+#define MEMORY_PER_STRING (256*1024)
+
 int aspect_adjust_packed4444_scanline( uint8_t *output,
                                        uint8_t *input, 
                                        int width,
@@ -39,12 +41,9 @@ struct osd_font_s
     ft_font_t *font;
 };
 
-osd_font_t *osd_font_new( const char *fontfile, int fontsize,
-                          int video_width, int video_height,
-                          double video_aspect )
+osd_font_t *osd_font_new( const char *fontfile, int fontsize, double pixel_aspect )
 {
     osd_font_t *font = (osd_font_t *) malloc( sizeof( osd_font_t ) );
-    double pixel_aspect;
     char *fontfilename;
 
     if( !font ) {
@@ -59,7 +58,6 @@ osd_font_t *osd_font_new( const char *fontfile, int fontsize,
         return 0;
     }
 
-    pixel_aspect = ( (double) video_width ) / ( ( (double) video_height ) * video_aspect );
     font->font = ft_font_new( fontfilename, fontsize, pixel_aspect );
     free( fontfilename );
 
@@ -101,23 +99,21 @@ struct osd_string_s
     int border_cr;
 
     uint8_t *image4444;
-    int image_width;
-    int image_height;
+    int image_size;
     int image_textwidth;
     int image_textheight;
 };
 
-osd_string_t *osd_string_new( osd_font_t *font, int video_width )
+osd_string_t *osd_string_new( osd_font_t *font )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
-    int max_height = ft_font_get_height( osd_font_get_font( font ) ) + 4;
 
     if( !osds ) {
         return 0;
     }
 
     osds->font = font;
-    osds->image4444 = (uint8_t *) malloc( video_width * max_height * 4 );
+    osds->image4444 = (uint8_t *) malloc( MEMORY_PER_STRING );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
@@ -144,8 +140,7 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
     osds->border_cb = 128;
     osds->border_cr = 128;
 
-    osds->image_width = video_width;
-    osds->image_height = max_height;
+    osds->image_size = MEMORY_PER_STRING;
     osds->image_textwidth = 0;
     osds->image_textheight = 0;
 
@@ -210,15 +205,16 @@ static void osd_string_render_dropshadow_image4444( osd_string_t *osds, const ch
     osds->image_textwidth = stringwidth + ( ( pushsize_x + 32768 ) / 65536 );
     osds->image_textheight = stringheight + pushsize_y;
 
-    if( osds->image_textwidth > osds->image_width ) osds->image_textwidth = osds->image_width;
-    if( osds->image_textheight > osds->image_height ) osds->image_textheight = osds->image_height;
+    if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
+        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+    }
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
-                            osds->image_textheight, osds->image_width * 4,
+                            osds->image_textheight, osds->image_textwidth * 4,
                             0, 0, 0, 0 );
 
-    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
-                                             osds->image_height, osds->image_width * 4,
+    composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_textwidth,
+                                             osds->image_textheight, osds->image_textwidth * 4,
                                              ft_string_get_buffer( osds->fts ),
                                              stringwidth, stringheight,
                                              ft_string_get_stride( osds->fts ),
@@ -229,8 +225,8 @@ static void osd_string_render_dropshadow_image4444( osd_string_t *osds, const ch
     stringwidth = ft_string_get_width( osds->fts );
     stringheight = ft_string_get_height( osds->fts );
 
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
@@ -258,24 +254,24 @@ static void osd_string_render_bordered_image4444( osd_string_t *osds, const char
     osds->image_textwidth = ft_string_get_width( osds->fts ) + ( (right_x + 32768) / 65536 );
     osds->image_textheight = ft_string_get_height( osds->fts ) + bottom_y;
 
-    if( osds->image_textwidth > osds->image_width ) osds->image_textwidth = osds->image_width;
-    if( osds->image_textheight > osds->image_height ) osds->image_textheight = osds->image_height;
-
+    if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
+        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+    }
 
     /* TODO: Only blit size of data if < full text size. */
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
-                            osds->image_textheight, osds->image_width * 4,
+                            osds->image_textheight, osds->image_textwidth * 4,
                             0, 0, 0, 0 );
 
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
                                        osds->border_luma, osds->border_cb,
                                        osds->border_cr, 0, 0 );
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
@@ -284,15 +280,15 @@ static void osd_string_render_bordered_image4444( osd_string_t *osds, const char
     ft_string_set_text( osds->fts, text, right_x );
     stringwidth = ft_string_get_width( osds->fts );
     stringheight = ft_string_get_height( osds->fts );
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
                                        osds->border_luma, osds->border_cb,
                                        osds->border_cr, 0, 0 );
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
@@ -303,8 +299,8 @@ static void osd_string_render_bordered_image4444( osd_string_t *osds, const char
     stringwidth = ft_string_get_width( osds->fts );
     stringheight = ft_string_get_height( osds->fts );
 
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
@@ -322,15 +318,16 @@ static void osd_string_render_plain_image4444( osd_string_t *osds, const char *t
     osds->image_textwidth = ft_string_get_width( osds->fts );
     osds->image_textheight = ft_string_get_height( osds->fts );
 
-    if( osds->image_textwidth > osds->image_width ) osds->image_textwidth = osds->image_width;
-    if( osds->image_textheight > osds->image_height ) osds->image_textheight = osds->image_height;
+    if( osds->image_textwidth * osds->image_textheight * 4 > osds->image_size ) {
+        osds->image_textwidth = ((osds->image_size / osds->image_textheight) | 0xf) - 0xf;
+    }
 
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
-                            osds->image_textheight, osds->image_width * 4,
+                            osds->image_textheight, osds->image_textwidth * 4,
                             0, 0, 0, 0 );
 
-    composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
-                                       osds->image_height, osds->image_width * 4,
+    composite_alphamask_to_packed4444( osds->image4444, osds->image_textwidth,
+                                       osds->image_textheight, osds->image_textwidth * 4,
                                        ft_string_get_buffer( osds->fts ),
                                        stringwidth, stringheight,
                                        ft_string_get_stride( osds->fts ),
@@ -400,11 +397,11 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
             int alpha;
             alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
             composite_packed4444_alpha_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
                 width, alpha );
         } else {
             composite_packed4444_to_packed422_scanline( output, background,
-                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                osds->image4444 + (osds->image_textwidth*4*scanline) + (xpos*4),
                 width );
         }
     }

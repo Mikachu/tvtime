@@ -29,7 +29,7 @@ typedef struct console_s console_t;
 
 console_t *console_new( int x, int y, int cols, int rows,
                         int fontsize, int video_width, int video_height,
-                        double video_aspect, unsigned int fgcolour );
+                        double pixel_aspect, unsigned int fgcolour );
 void console_delete( console_t *con );
 void console_printf( console_t *con, char *format, ... );
 void console_gotoxy( console_t *con, int x, int y );

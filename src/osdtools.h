@@ -47,16 +47,14 @@ typedef enum OSD_Shapes_e {
  * Eventually I'll just take one parameter: pixel aspect, which would
  * make more sense.
  */
-osd_font_t *osd_font_new( const char *fontfile, int fontsize,
-                          int video_width, int video_height,
-                          double video_aspect );
+osd_font_t *osd_font_new( const char *fontfile, int fontsize, double pixel_aspect );
 void osd_font_delete( osd_font_t *font );
 
 /**
  * Creates a new string for a given font, with a given maximum width
  * that it will be asked to render to (for its back buffer).
  */
-osd_string_t *osd_string_new( osd_font_t *font, int video_width );
+osd_string_t *osd_string_new( osd_font_t *font );
 void osd_string_delete( osd_string_t *osds );
 
 /**
