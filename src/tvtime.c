@@ -403,15 +403,15 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
 int main( int argc, char **argv )
 {
     video_correction_t *vc = 0;
-    videoinput_t *vidin = NULL;
-    rtctimer_t *rtctimer = NULL;
+    videoinput_t *vidin = 0;
+    rtctimer_t *rtctimer = 0;
     int width, height;
     int norm = 0;
     int fieldtime;
     int safetytime;
     int fieldsavailable = 0;
     int verbose;
-    tvtime_osd_t *osd = NULL;
+    tvtime_osd_t *osd = 0;
     unsigned char *colourbars;
     unsigned char *lastframe = 0;
     unsigned char *secondlastframe = 0;
@@ -421,17 +421,17 @@ int main( int argc, char **argv )
     const char *tagline;
     int lastframeid;
     int secondlastframeid;
-    config_t *ct = NULL;
-    input_t *in = NULL;
-    menu_t *menu = NULL;
-    output_api_t *output = NULL;
-    performance_t *perf = NULL;
-    console_t *con = NULL;
+    config_t *ct = 0;
+    input_t *in = 0;
+    menu_t *menu = 0;
+    output_api_t *output = 0;
+    performance_t *perf = 0;
+    console_t *con = 0;
     int has_signal = 0;
-    vbidata_t *vbidata = NULL;
-    vbiscreen_t *vs = NULL;
-    fifo_t *fifo = NULL;
-    commands_t *commands = NULL;
+    vbidata_t *vbidata = 0;
+    vbiscreen_t *vs = 0;
+    fifo_t *fifo = 0;
+    commands_t *commands = 0;
     int usevbi = 1;
 
     setup_speedy_calls();
@@ -621,11 +621,13 @@ int main( int argc, char **argv )
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
         fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
     }
+
 /* This is bad now. --Doug
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) && verbose ) {
         fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
     }
 */
+
     if( !set_realtime_priority( 0 ) && verbose ) {
         fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
