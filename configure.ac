@@ -265,5 +265,6 @@ AC_CONFIG_FILES([
 	data/Makefile
 	plugins/Makefile
 	src/Makefile
+	src/wine/Makefile
 ])
 AC_OUTPUT

@@ -1,22 +1,17 @@
-EXTRA_DIST = stubs.s wrapper.S
 
-noinst_LTLIBRARIES = $(wine_lib)
+EXTRA_DIST = stubs.s wrapper.S
 
 # WARNING: DO NOT USE AM_CFLAGS HERE UNLESS YOU UNDERSTAND THE PROBLEM WITH
 # DEFAULT XINE FLAGS AND KNOW HOW TO FIX IT.
-CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer \
-	-Wmissing-prototypes -Wimplicit-function-declaration \
-	-DWIN32_PATH=\"@w32_path@\" -I$(srcdir)/.. -D__WINE__ \
-	-Ddbg_printf=__vprintf -DTRACE=__vprintf
+# CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer
 
-DEBUG_CFLAGS = @DEBUG_CFLAGS@ $(X_CFLAGS) -fno-omit-frame-pointer \
+CFLAGS = -fno-omit-frame-pointer \
 	-Wmissing-prototypes -Wimplicit-function-declaration \
-	-DWIN32_PATH=\\\"@w32_path@\\\" -I$(srcdir)/.. -D__WINE__ \
-	-Ddbg_printf=__vprintf -DTRACE=__vprintf
-	
-if HAVE_W32DLL
+	-D__WINE__ -Ddbg_printf=__vprintf -DTRACE=__vprintf
+
 wine_lib = libwine.la
-endif
+
+noinst_LTLIBRARIES = $(wine_lib)
 
 libwine_la_SOURCES = \
 	afl.c \
@@ -77,15 +72,4 @@ stubs.lo: stubs.s
 
 wrapper.lo: wrapper.S
 	$(CC) -c $(srcdir)/wrapper.S -o wrapper.lo
-
-debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in
 
