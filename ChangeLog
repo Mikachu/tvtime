@@ -1,5 +1,6 @@
 
 0.9.7
+  * (vektor) Added the SECAM-DK frequencies ("russia").
   * (vektor) Officially re-enabled the EWMH code from the ogle
     fullscreen handler wm_state.c.
   * (vektor) Reverted to previous frequencies.h format.
