@@ -18,7 +18,7 @@
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 
 man_MANS = tvtime.1
-EXTRA_DIST = README.channels default.tvtime.xml quotes.txt $(man_MANS)
+EXTRA_DIST = default.tvtime.xml quotes.txt $(man_MANS)
 
 .PHONY: install-exec-hook
 install-exec-hook:
