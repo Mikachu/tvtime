@@ -1277,8 +1277,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         linearblend_plugin_init();
         vfir_plugin_init();
 
-        // dscaler_tomsmocomp_plugin_init();
-        // dscaler_greedyh_plugin_init();
+        dscaler_tomsmocomp_plugin_init();
+        dscaler_greedyh_plugin_init();
         greedy_plugin_init();
 
         weavetff_plugin_init();

@@ -1042,7 +1042,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Change NTSC cable mode", 0xee, 0x80, 0x80 );
+    sprintf( string, "%c%c%c  Change NTSC cable mode", 0xee, 0x80, 0xbf );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
