@@ -21,9 +21,11 @@
 #define TVTIME_ICON_LEFTARROW          "\xe2\x97\x80" /* Left Arrow          */
 #define TVTIME_ICON_RIGHTARROW         "\xe2\x96\xb6" /* Right Arrow         */
 #define TVTIME_ICON_BACKARROW          "\xe2\x97\x84" /* Back Arrow          */
+#define TVTIME_ICON_PLAINLEFTARROW     "\xe2\x86\x90" /* Plain Left Arrow    */
 #define TVTIME_ICON_CONTRAST           "\xe2\x97\x90" /* Contrast            */
 #define TVTIME_ICON_HUE                "\xe2\x97\xaf" /* Hue                 */
 #define TVTIME_ICON_COLOUR             "\xe2\x98\xb0" /* Colour              */
+#define TVTIME_ICON_BRIGHTNESS         "\xe2\x98\x80" /* Brightness          */
 #define TVTIME_ICON_TVLOGO             "\xee\x80\x80" /* TV Logo             */
 #define TVTIME_ICON_TIMELOGO01         "\xee\x80\x81" /* Time Logo 01        */
 #define TVTIME_ICON_TIMELOGO02         "\xee\x80\x82" /* Time Logo 02        */
