@@ -981,6 +981,11 @@ void osd_rect_set_timeout( osd_rect_t *osdr, int timeout )
     osdr->frames_left = timeout;
 }
 
+int osd_rect_visible( osd_rect_t *osdr )
+{
+    return (osdr->frames_left > 0);
+}
+
 void osd_rect_advance_frame( osd_rect_t *osdr )
 {
     if( osdr->frames_left > 0 ) {
@@ -1000,8 +1005,9 @@ void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
 {
     if( scanline < osdr->height && xpos < osdr->width ) {
         int alpha = (int) (((((double) osdr->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
+        if( alpha > 256 ) alpha = 256;
         composite_colour4444_alpha_to_packed422_scanline( output, output, osdr->a, osdr->l,
-                                                          osdr->cb, osdr->cr, width - xpos, alpha );
+                                                          osdr->cb, osdr->cr, osdr->width - xpos, alpha );
     }
 }
 

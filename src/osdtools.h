@@ -98,6 +98,7 @@ void osd_rect_set_colour( osd_rect_t *osdr, int alpha, int luma, int cb, int cr 
 void osd_rect_set_colour_rgb( osd_rect_t *osdr, int alpha, int r, int g, int b );
 void osd_rect_set_timeout( osd_rect_t *osdr, int timeout );
 void osd_rect_advance_frame( osd_rect_t *osdr );
+int osd_rect_visible( osd_rect_t *osdr );
 void osd_rect_set_size( osd_rect_t *osdr, int width, int height );
 void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
                                             uint8_t *background, int width, int xpos,

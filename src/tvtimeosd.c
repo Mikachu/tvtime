@@ -65,6 +65,12 @@ struct tvtime_osd_s
     osd_font_t *bigfont;
     string_object_t strings[ OSD_MAX_STRING_OBJECTS ];
 
+    osd_rect_t *databarbg;
+    osd_rect_t *databar;
+    int databar_ypos;
+    int databar_xend;
+    int databar_xstart;
+
     osd_list_t *list;
     int listpos_x;
     int listpos_y;
@@ -121,6 +127,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->hold = 0;
     osd->listpos_x = width / 2;
     osd->listpos_y = (height * 30) / 100;
+    osd->databar_xend = (width * 90) / 100;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -134,19 +141,37 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     fontfile = "FreeSansBold.ttf";
     logofile = "tvtimelogo";
 
+    osd->databar = osd_rect_new();
+    if( !osd->databar ) {
+        free( osd );
+        return 0;
+    }
+    osd->databarbg = osd_rect_new();
+    if( !osd->databarbg ) {
+        osd_rect_delete( osd->databar );
+        free( osd );
+        return 0;
+    }
+
     osd->smallfont = osd_font_new( fontfile, 18, pixel_aspect );
     if( !osd->smallfont ) {
+        osd_rect_delete( osd->databarbg );
+        osd_rect_delete( osd->databar );
         free( osd );
         return 0;
     }
     osd->medfont = osd_font_new( fontfile, 30, pixel_aspect );
     if( !osd->medfont ) {
+        osd_rect_delete( osd->databarbg );
+        osd_rect_delete( osd->databar );
         osd_font_delete( osd->smallfont );
         free( osd );
         return 0;
     }
     osd->bigfont = osd_font_new( fontfile, 80, pixel_aspect );
     if( !osd->bigfont ) {
+        osd_rect_delete( osd->databarbg );
+        osd_rect_delete( osd->databar );
         osd_font_delete( osd->smallfont );
         osd_font_delete( osd->medfont );
         free( osd );
@@ -155,6 +180,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     osd->list = osd_list_new( pixel_aspect );
     if( !osd->list ) {
+        osd_rect_delete( osd->databarbg );
+        osd_rect_delete( osd->databar );
         osd_font_delete( osd->smallfont );
         osd_font_delete( osd->medfont );
         osd_font_delete( osd->bigfont );
@@ -331,6 +358,8 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
         }
     }
     if( osd->channel_logo ) osd_animation_delete( osd->channel_logo );
+    osd_rect_delete( osd->databarbg );
+    osd_rect_delete( osd->databar );
     osd_font_delete( osd->smallfont );
     osd_font_delete( osd->medfont );
     osd_font_delete( osd->bigfont );
@@ -514,6 +543,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    osd_rect_set_timeout( osd->databar, 0 );
+    osd_rect_set_timeout( osd->databarbg, 0 );
 
     /* Billy: What's up?  Are we ditching the logo for XDS? */
     if( osd->channel_logo ) {
@@ -536,11 +567,21 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
 {
     if( !*(osd->hold_message ) ) {
         char bar[ 108 ];
-        memset( bar, 0, 108 );
-        strcpy( bar, barname );
-        memset( bar + 7, '|', percentage );
+        int maxwidth;
+
+        sprintf( bar, "%s (%d) ", barname, percentage );
         osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, bar, OSD_FADE_DELAY );
         osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+
+        maxwidth = osd->databar_xend - (osd->strings[ OSD_DATA_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_DATA_BAR ].string ));
+        osd->databar_xstart = osd->strings[ OSD_DATA_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_DATA_BAR ].string );
+        osd->databar_ypos = osd->strings[ OSD_DATA_BAR ].ypos + 4;
+        osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
+        osd_rect_set_size( osd->databar, (maxwidth * percentage) / 100, 18 );
+        osd_rect_set_timeout( osd->databar, OSD_FADE_DELAY );
+        osd_rect_set_colour( osd->databarbg, 80, 80, 40, 40 );
+        osd_rect_set_size( osd->databarbg, maxwidth, 18 );
+        osd_rect_set_timeout( osd->databarbg, OSD_FADE_DELAY );
     }
 }
 
@@ -549,6 +590,8 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
     if( !*(osd->hold_message) ) {
         osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, message, OSD_FADE_DELAY );
         osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+        osd_rect_set_timeout( osd->databar, 0 );
+        osd_rect_set_timeout( osd->databarbg, 0 );
     }
 }
 
@@ -563,11 +606,21 @@ void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
 {
     if( !*(osd->hold_message ) ) {
         char bar[ 108 ];
-        memset( bar, 0, sizeof( bar ) );
-        strcpy( bar, "Volume " );
-        memset( bar + 7, '|', percentage );
+        int maxwidth;
+
+        sprintf( bar, "Volume (%d) ", percentage );
         osd_string_show_text( osd->strings[ OSD_VOLUME_BAR ].string, bar, OSD_FADE_DELAY );
         osd_string_set_timeout( osd->strings[ OSD_DATA_BAR ].string, 0 );
+
+        maxwidth = osd->databar_xend - (osd->strings[ OSD_VOLUME_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_VOLUME_BAR ].string ));
+        osd->databar_xstart = osd->strings[ OSD_VOLUME_BAR ].xpos + osd_string_get_width( osd->strings[ OSD_VOLUME_BAR ].string );
+        osd->databar_ypos = osd->strings[ OSD_VOLUME_BAR ].ypos + 4;
+        osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
+        osd_rect_set_size( osd->databar, (maxwidth * percentage) / 100, 18 );
+        osd_rect_set_timeout( osd->databar, OSD_FADE_DELAY );
+        osd_rect_set_colour( osd->databarbg, 80, 80, 40, 40 );
+        osd_rect_set_size( osd->databarbg, maxwidth, 18 );
+        osd_rect_set_timeout( osd->databarbg, OSD_FADE_DELAY );
     }
 }
 
@@ -632,6 +685,8 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     }
 
     osd_list_advance_frame( osd->list );
+    osd_rect_advance_frame( osd->databar );
+    osd_rect_advance_frame( osd->databarbg );
 }
 
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
@@ -674,6 +729,28 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                 }
             }
         }
+    }
+
+    if( osd_rect_visible( osd->databar ) && ( scanline >= osd->databar_ypos ) ) {
+        int startx;
+        int strx = 0;
+
+        startx = osd->databar_xstart - xpos;
+
+        if( startx < 0 ) {
+            strx = -startx;
+            startx = 0;
+        }
+
+        /* Make sure we start somewhere even. */
+        startx = startx & ~1;
+
+        osd_rect_composite_packed422_scanline( osd->databarbg, output + (startx*2),
+                                               output + (startx*2), width - startx,
+                                               strx, scanline - osd->strings[ OSD_VOLUME_BAR ].ypos );
+        osd_rect_composite_packed422_scanline( osd->databar, output + (startx*2),
+                                               output + (startx*2), width - startx,
+                                               strx, scanline - osd->strings[ OSD_VOLUME_BAR ].ypos );
     }
 
     if( osd->channel_logo ) {
