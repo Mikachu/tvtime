@@ -41,7 +41,7 @@ int main( int argc, char **argv )
         fprintf( stdout, "tvtime-command: Available commands:\n" );
         for( i = 0; i < (nc+1)/2; i++ ) {
             fprintf( stdout, "    %-25s  %-25s\n", tvtime_get_command( i ),
-                (nc/2+i+1 < nc ? tvtime_get_command(nc/2+i+1) : ""));
+                ((nc+1)/2+i < nc ? tvtime_get_command((nc+1)/2+i) : ""));
         }
     }
 
