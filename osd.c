@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <math.h>
 #include "ttfont.h"
 #include "videotools.h"
 #include "osd.h"
@@ -63,6 +64,18 @@ struct osd_string_s
     int text_luma;
     int text_cb;
     int text_cr;
+};
+
+struct osd_shape_s
+{
+    int type;
+    int frames_left;
+    int shape_luma;
+    int shape_cb;
+    int shape_cr;
+    int shape_height;
+    int shape_width;
+    unsigned char *shape_mask;
 };
 
 osd_string_t *osd_string_new( const char *fontfile, int fontsize,
@@ -160,6 +173,156 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                                    efs_get_scanline( osds->efs, src_y + i ),
                                                    blit_w, osds->text_luma, osds->text_cb,
                                                    osds->text_cr, ((double) osds->frames_left) / 50.0 );
+            output += stride;
+        }
+    }
+}
+
+
+/* Shape functions */
+
+osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_height )
+{
+
+    int x,y;
+    double radius_sqrd,x0;
+
+    osd_shape_t *osds = (osd_shape_t *) malloc( sizeof( osd_shape_t ) );
+    osds->frames_left = 0;
+    osds->shape_luma = 16;
+    osds->shape_cb = 128;
+    osds->shape_cr = 128;
+    osds->shape_width = shape_width;
+    osds->shape_height = shape_height;
+    osds->type = shape_type;
+
+    switch( shape_type ) {
+    case OSD_Rect:
+        osds->shape_mask = (unsigned char*)malloc( osds->shape_width );
+        memset( osds->shape_mask, 5, osds->shape_width );
+        break;
+
+    case OSD_Circle:
+        osds->shape_mask = (unsigned char*)malloc( shape_width * shape_width );
+        memset( osds->shape_mask, 0, shape_width * shape_width );
+
+        x0 = (double)(((double)shape_width)/2.0);
+        radius_sqrd = pow((double)x0,(double)2);
+        for( x = 0; x < shape_width; x++ ) {
+            for( y = 0; y < shape_width; y++ ) {
+                if( (pow((x-x0),(double)2) + pow((double)(y-x0),(double)2)) <= radius_sqrd ) {
+                    osds->shape_mask[y*shape_width+x] = (char)5;
+                }
+            }
+        }
+
+        break;
+
+    default:
+        osds->shape_mask = NULL;
+        break;
+    }
+
+    return osds;
+}
+
+void osd_shape_delete( osd_shape_t *osds )
+{
+    if( osds->shape_mask ) free( osds->shape_mask );
+    free( osds );
+}
+
+void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
+{
+    osds->shape_luma = luma;
+    osds->shape_cb = cb;
+    osds->shape_cr = cr;
+}
+
+void osd_shape_show_shape( osd_shape_t *osds, int timeout )
+{
+    osds->frames_left = timeout;
+}
+
+int osd_shape_visible( osd_shape_t *osds )
+{
+    return ( osds->frames_left != 0 );
+}
+
+void osd_shape_advance_frame( osd_shape_t *osds )
+{
+    if( osds->frames_left > 0 ) {
+        osds->frames_left--;
+    }
+}
+
+
+unsigned char *osd_shape_get_scanline( osd_shape_t *osds, int line )
+{
+    unsigned char *scanline;
+
+    switch( osds->type ) {
+    case OSD_Rect:
+        scanline = osds->shape_mask;
+        break;
+    case OSD_Circle:
+        scanline = (unsigned char*)(osds->shape_mask + osds->shape_width*line);
+        break;
+    default:
+        scanline = NULL;
+        break;
+    }
+
+    return scanline;
+}
+
+void osd_shape_composite_packed422( osd_shape_t *osds, unsigned char *output,
+                                    int width, int height, int stride,
+                                    int xpos, int ypos )
+{
+    int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
+    unsigned char *scanline;
+
+
+    src_x = 0;
+    src_y = 0;
+    dest_x = xpos;
+    dest_y = ypos;
+    blit_w = osds->shape_width;
+    blit_h = osds->shape_height;
+
+    if( dest_x < 0 ) {
+        src_x = -dest_x;
+        blit_w += dest_x;
+        dest_x = 0;
+    }
+    if( dest_y < 0 ) {
+        src_y = -dest_y;
+        blit_h += dest_y;
+        dest_y = 0;
+    }
+    if( dest_x + blit_w > width ) {
+        blit_w = width - dest_x;
+    }
+    if( dest_y + blit_h > height ) {
+        blit_h = height - dest_y;
+    }
+
+    if( blit_w > 0 && blit_h > 0 ) {
+        int i;
+
+        output += dest_y * stride;
+        for( i = 0; i < blit_h; i++ ) {
+            scanline = osd_shape_get_scanline( osds, i );
+
+            if( scanline )
+            composite_textmask_packed422_scanline( output + ((dest_x) * 2),
+                                                   output + ((dest_x) * 2),
+                                                   scanline,
+                                                   blit_w, osds->shape_luma, 
+                                                   osds->shape_cb, 
+                                                   osds->shape_cr, 
+                                                   ((double) osds->frames_left) / 50.0 );
             output += stride;
         }
     }

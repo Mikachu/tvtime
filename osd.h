@@ -21,6 +21,12 @@
 
 typedef struct osd_string_s osd_string_t;
 
+typedef enum OSD_Shapes_e {
+    OSD_Rect        = (1<<0),
+    OSD_Circle      = (1<<1)
+} OSD_Shape;
+typedef struct osd_shape_s osd_shape_t;
+
 /**
  * Creates a new string with the given truetype font at the given point size.
  * I don't understand point size vs pixel size, so, uh, whatever.  Maybe it's
@@ -39,5 +45,16 @@ void osd_string_advance_frame( osd_string_t *osds );
 void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                      int width, int height, int stride,
                                      int xpos, int ypos, int rightjustified );
+
+osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_height );
+void osd_shape_delete( osd_shape_t *osds );
+void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr );
+void osd_shape_show_shape( osd_shape_t *osds, int timeout );
+int osd_shape_visible( osd_shape_t *osds );
+void osd_shape_advance_frame( osd_shape_t *osds );
+void osd_shape_composite_packed422( osd_shape_t *osds, unsigned char *output,
+                                    int width, int height, int stride, 
+                                    int xpos, int ypos );
+
 
 #endif /* OSD_H_INCLUDED */

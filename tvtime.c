@@ -118,6 +118,7 @@ int main( int argc, char **argv )
     int volume;
     int debug = 0;
     osd_string_t *channel_number, *volume_bar, *muted_osd;
+    osd_shape_t *osd_rect;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
 
@@ -183,6 +184,8 @@ int main( int argc, char **argv )
     channel_number = osd_string_new( "helr.ttf", 80, width, height );
     volume_bar = osd_string_new( "helr.ttf", 15, width, height );
     muted_osd = osd_string_new( "helr.ttf", 15, width, height );
+//    osd_rect = osd_shape_new( OSD_Circle, 50, 50 );
+//    osd_shape_set_colour( osd_rect, 200, 128, 128 );
     osd_string_set_colour( channel_number, 200, 128, 128 );
     osd_string_set_colour( volume_bar, 200, 128, 128 );
     osd_string_set_colour( muted_osd, 200, 128, 128 );
@@ -402,6 +405,8 @@ int main( int argc, char **argv )
                                   input_text, CHANNEL_DELAY );
         }
 
+//        osd_shape_show_shape( osd_rect, 51 );
+
         /* CHECKPOINT1 : Blit the second field */
         gettimeofday( &(checkpoint[ 0 ]), 0 );
 
@@ -457,6 +462,7 @@ int main( int argc, char **argv )
                                                     width, width, height );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+//            osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
             if( mixer_ismute() ) {
                 osd_string_show_text( muted_osd, "Mute", 100 );
                 osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
@@ -516,6 +522,8 @@ int main( int argc, char **argv )
                                                     1, width * 2, width, width, height );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+//            osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
+
             if( mixer_ismute() ) {
                 osd_string_show_text( muted_osd, "Mute", 51 );
                 osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
@@ -562,6 +570,7 @@ int main( int argc, char **argv )
         osd_string_advance_frame( channel_number );
         osd_string_advance_frame( muted_osd );
         osd_string_advance_frame( volume_bar );
+//        osd_shape_advance_frame( osd_rect );
     }
 
     if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );
