@@ -360,6 +360,7 @@ static output_api_t xvoutput =
     xcommon_get_visible_width,
     xcommon_get_visible_height,
     xcommon_is_fullscreen,
+    xcommon_is_alwaysontop,
 
     xv_is_interlaced,
     xv_wait_for_sync,

@@ -198,6 +198,7 @@ static output_api_t mgaoutput =
     xcommon_get_visible_width, 
     xcommon_get_visible_height, 
     xcommon_is_fullscreen,
+    xcommon_is_alwaysontop,
 
     mga_is_interlaced,
     mga_wait_for_sync,

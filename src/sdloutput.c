@@ -272,6 +272,11 @@ static int sdl_is_fullscreen( void )
     return fs;
 }
 
+static int sdl_is_alwaysontop( void )
+{
+    return 0;
+}
+
 static void sdl_wait_for_sync( int field )
 {
 }
@@ -372,6 +377,7 @@ static output_api_t sdloutput =
     sdl_get_visible_width,
     sdl_get_visible_height,
     sdl_is_fullscreen,
+    sdl_is_alwaysontop,
 
     sdl_is_interlaced,
     sdl_wait_for_sync,

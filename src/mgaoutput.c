@@ -140,6 +140,11 @@ static int mga_is_fullscreen( void )
     return 1;
 }
 
+static int mga_is_alwaysontop( void )
+{
+    return 0;
+}
+
 static int mga_is_interlaced( void )
 {
     return 0;
@@ -230,6 +235,7 @@ static output_api_t mgaoutput =
     mga_get_visible_width, 
     mga_get_visible_height, 
     mga_is_fullscreen,
+    mga_is_alwaysontop,
 
     mga_is_interlaced,
     mga_wait_for_sync,

@@ -40,6 +40,7 @@ Display *xcommon_get_display( void );
 Window xcommon_get_output_window( void );
 GC xcommon_get_gc( void );
 int xcommon_is_fullscreen( void );
+int xcommon_is_alwaysontop( void );
 int xcommon_get_visible_width( void );
 int xcommon_get_visible_height( void );
 

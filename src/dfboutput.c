@@ -449,6 +449,11 @@ static int dfb_is_fullscreen( void )
     return 1;
 }
 
+static int dfb_is_alwaysontop( void )
+{
+    return 0;
+}
+
 static void dfb_resize_window_fullscreen( void )
 {
     /* Tv-out is always full screen */
@@ -498,6 +503,7 @@ static output_api_t dfboutput =
     dfb_get_visible_width, 
     dfb_get_visible_height, 
     dfb_is_fullscreen,
+    dfb_is_alwaysontop,
 
     dfb_is_interlaced,
     dfb_wait_for_sync,

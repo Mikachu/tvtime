@@ -896,9 +896,9 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
 
     if( widescreen ) {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb5 );
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb7 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb4 );
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb8 );
     }
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_TOGGLE_ASPECT, "" );
@@ -906,16 +906,20 @@ static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
 
     if( fullscreen ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb3 );
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb7 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb2 );
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb8 );
     }
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_TOGGLE_FULLSCREEN, "" );
     menu_set_right_command( menu, 3, TVTIME_TOGGLE_FULLSCREEN, "" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
 
-    snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0x80 );
+    if( alwaysontop ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0xb7 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0xb8 );
+    }
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_TOGGLE_ALWAYSONTOP, "" );
     menu_set_right_command( menu, 4, TVTIME_TOGGLE_ALWAYSONTOP, "" );
@@ -1697,7 +1701,7 @@ int main( int argc, char **argv )
         }
     }
 
-    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), output->is_alwaysontop() );
     if( height == 480 ) {
         build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
     }
@@ -1811,7 +1815,7 @@ int main( int argc, char **argv )
 
                 if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
                     output->toggle_fullscreen( 0, 0 );
-                    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+                    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), output->is_alwaysontop() );
                 } else {
                     if( config_get_outputheight( cur ) < 0 ) {
                         output->resize_window_fullscreen();
@@ -1850,7 +1854,7 @@ int main( int argc, char **argv )
                 config_save( ct, "FullScreen", "0" );
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), output->is_alwaysontop() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_alwaysontop( commands ) ) {
@@ -1859,7 +1863,7 @@ int main( int argc, char **argv )
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "Window not set always-on-top." );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), output->is_alwaysontop() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_aspect( commands ) ) {
@@ -1880,7 +1884,7 @@ int main( int argc, char **argv )
                 tvtime_osd_show_list( osd, 0 );
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), output->is_alwaysontop() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_matte( commands ) ) {

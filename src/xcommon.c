@@ -1508,6 +1508,11 @@ int xcommon_is_fullscreen( void )
     return output_fullscreen;
 }
 
+int xcommon_is_alwaysontop( void )
+{
+    return alwaysontop;
+}
+
 area_t xcommon_get_video_area( void )
 {
     return video_area;
