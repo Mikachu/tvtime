@@ -1648,3 +1648,8 @@ const char *videoinput_get_input_name( videoinput_t *vidin )
     return vidin->inputname;
 }
 
+const char *videoinput_get_driver_name( videoinput_t *vidin )
+{
+    return vidin->drivername;
+}
+

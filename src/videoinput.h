@@ -244,6 +244,11 @@ void videoinput_toggle_pal_secam( videoinput_t *vidin );
  */
 void videoinput_switch_pal_secam( videoinput_t *vidin, int norm );
 
+/**
+ * Returns the name of the capture card driver.
+ */
+const char *videoinput_get_driver_name( videoinput_t *vidin );
+
 #ifdef __cplusplus
 };
 #endif
