@@ -40,7 +40,6 @@ struct config_s
     int verbose;
     int aspect;
     int debug;
-    int finetune;
     int fullscreen;
     int priority;
 
@@ -377,10 +376,6 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->start_channel = atoi( tmp );
     }
 
-    if( (tmp = parser_get( pf, "FinetuneOffset", 1 )) ) {
-        ct->finetune = atoi( tmp );
-    }
-
     if( (tmp = parser_get( pf, "NTSCCableMode", 1 )) ) {
         if( !strcasecmp( tmp, "IRC" ) ) {
             ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
@@ -498,7 +493,6 @@ config_t *config_new( int argc, char **argv )
         ct->timeformat = strdup( "%r" );
     }
     ct->ssdir = strdup( getenv( "HOME" ) );
-    ct->finetune = 0;
     ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
     ct->channel_text_rgb = 4294967040U; /* opaque yellow */
@@ -800,11 +794,6 @@ const char *config_get_v4l_freq( config_t *ct )
 const char *config_get_timeformat( config_t *ct )
 {
     return ct->timeformat;
-}
-
-int config_get_finetune( config_t *ct )
-{
-    return ct->finetune;
 }
 
 unsigned int config_get_menu_bg_rgb( config_t *ct )
