@@ -95,6 +95,7 @@ struct config_s
     int debug;
     int finetune;
     int fullscreen;
+    int priority;
 
     int ntsc_mode;
 
@@ -174,6 +175,7 @@ config_t *config_new( int argc, char **argv )
     ct->aspect = 0;
     ct->debug = 0;
     ct->ntsc_mode = 0;
+    ct->priority = -19;
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
     ct->inputnum = 0;
@@ -357,6 +359,10 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "CaptureSource", 1 )) ) {
         ct->inputnum = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "ProcessPriority", 1 )) ) {
+        ct->priority = atoi( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "FullScreen", 1 )) ) {
@@ -682,6 +688,11 @@ const char *config_get_v4l_norm( config_t *ct )
 int config_get_fullscreen( config_t *ct )
 {
     return ct->fullscreen;
+}
+
+int config_get_priority( config_t *ct )
+{
+    return ct->priority;
 }
 
 const char *config_get_v4l_freq( config_t *ct )

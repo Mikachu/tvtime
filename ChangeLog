@@ -1,4 +1,8 @@
 
+0.9.7
+  * (vektor) You can now change the default process priority in the .tvtimerc
+    using the ProcessPriority value.
+
 0.9.6 - Thu Nov 14 16:37:25 AST 2002
   * (bitstream) Added the -m switch to start fullscreen (bug 636044)
   * (bitstream) Added configurable OSD colours to the tvtimerc.

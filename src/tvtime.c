@@ -596,8 +596,8 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Attempting to aquire "
                          "performance-enhancing features.\n" );
     }
-    if( setpriority( 0, 0, -19 ) < 0 && verbose ) {
-        fprintf( stderr, "tvtime: Can't renice to -19.\n" );
+    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
+        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
     }
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) && verbose ) {
         fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );

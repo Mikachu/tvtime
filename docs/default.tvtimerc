@@ -76,6 +76,13 @@ ApplyLumaCorrection = 0
 # increments of 0.1.
 LumaCorrection = 1.0
 
+# Sets the default process priority.  By default, tvtime tries to be
+# a real hog and get -19 priority, which is insane, but hey, if a
+# frame comes in we need to process it right away or it gets dropped,
+# right? :)    Acceptable values are from -20 to 20, with lower values
+# meaning higher priority (blame UNIX for that).
+ProcessPriority = -19
+
 # This option enables a special debug mode.  In debug mode, if we are
 # running behind and cannot keep up with the number of frames being provided
 # by the capture card, we will print frame drop information to stderr.
