@@ -271,7 +271,7 @@ static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
     char *code;
     char *string;
     int cmd;
-    
+
     if( lirc_nextcode( &code ) != 0 ) {
         /* Can not connect to lircd. */
         return;
@@ -282,22 +282,15 @@ static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
         return;
     }
 
-    lirc_code2char( lirc_conf, code, &string );
+    while( !lirc_code2char( lirc_conf, code, &string ) && string ) {
+        cmd = tvtime_string_to_command( string );                                                               
 
-    if( !string ) {
-        /* No tvtime action for this code. */
-        free( code );
-        return;
+        if( cmd != -1 ) {
+            input_callback( in, I_REMOTE, cmd );
+        } else {
+            fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
+        }
     }
-
-    cmd = tvtime_string_to_command( string );
-
-    if( cmd != -1 ) {
-        input_callback( in, I_REMOTE, cmd );
-    } else {
-        fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
-    }
-
     free( code );
 }
 #endif
