@@ -260,7 +260,47 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
  * frame, and in case 2, we only need the previous frame, since the
  * current frame contains both Field 3 and Field 4.
  */
-static int pdoffset = PULLDOWN_OFFSET_1;
+static videofilter_t *filter = 0;
+static int filtered_cur = 0;
+
+static void do_pulldown_action( uint8_t *output,
+                                uint8_t *prevfield,
+                                uint8_t *curfield,
+                                uint8_t *nextfield,
+                                tvtime_osd_t *osd,
+                                console_t *con,
+                                vbiscreen_t *vs,
+                                int bottom_field,
+                                int width,
+                                int frame_height,
+                                int fieldstride,
+                                int outstride,
+                                int action )
+{
+    int i;
+
+    for( i = 0; i < frame_height; i++ ) {
+        uint8_t *curoutput = output + (i * outstride);
+
+        if( bottom_field == (i & 1) ) {
+            blit_packed422_scanline( curoutput, curfield + ((i / 2) * fieldstride), width );
+        } else {
+            if( pulldown_source( action, bottom_field ) ) {
+                blit_packed422_scanline( curoutput, prevfield + ((i / 2) * fieldstride), width );
+            } else {
+                blit_packed422_scanline( curoutput, nextfield + ((i / 2) * fieldstride), width );
+            }
+        }
+
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+        if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+    }
+
+    filtered_cur = 1;
+}
+
+static int pdoffset = PULLDOWN_SEQ_AA;
 static int pderror = PULLDOWN_ERROR_WAIT;
 static int pdlastbusted = 0;
 static int filmmode = 0;
@@ -268,63 +308,31 @@ static int filmmode = 0;
 static int last_topdiff = 0;
 static int last_botdiff = 0;
 
-static videofilter_t *filter = 0;
-static int filtered_cur = 0;
-
 static int pulldown_merge = 0;
 static int pulldown_copy = 0;
 static int did_copy_top = 0;
 static int last_fieldcount = 0;
 
-static void tvtime_do_pulldown_action( uint8_t *output,
-                                       uint8_t *curframe,
-                                       uint8_t *lastframe,
-                                       tvtime_osd_t *osd,
-                                       console_t *con,
-                                       vbiscreen_t *vs,
-                                       int bottom_field,
-                                       int width,
-                                       int frame_height,
-                                       int instride,
-                                       int outstride,
-                                       int action )
+static void calculate_pulldown_score_vektor( uint8_t *curframe,
+                                             uint8_t *lastframe,
+                                             int instride,
+                                             int frame_height,
+                                             int width )
 {
-    unsigned int topdiff = 0;
-    unsigned int botdiff = 0;
     int i;
 
+    last_topdiff = 0;
+    last_botdiff = 0;
+
     for( i = 0; i < frame_height; i++ ) {
-        uint8_t *curoutput = output + (i * outstride);
-
-        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, i ) ) {
-            videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
-        }
-
-        if( pulldown_alg == PULLDOWN_VEKTOR ) {
-            if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
-                                                           lastframe + (i*instride), width );
-                botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
-                                                           lastframe + (i*instride) + instride,
-                                                           width );
-            }
-        }
-
-        if( action != PULLDOWN_ACTION_DROP2 ) {
-            if( action == PULLDOWN_ACTION_MRGE3 && (i & 1) ) {
-                blit_packed422_scanline( curoutput, lastframe + (i*instride), width );
-            } else {
-                blit_packed422_scanline( curoutput, curframe + (i*instride), width );
-            }
-            if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-            if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-            if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+        if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+            last_topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
+                                                            lastframe + (i*instride), width );
+            last_botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
+                                                            lastframe + (i*instride) + instride,
+                                                            width );
         }
     }
-
-    last_topdiff = topdiff;
-    last_botdiff = botdiff;
-    filtered_cur = 1;
 }
 
 static void tvtime_build_deinterlaced_frame( uint8_t *output,
@@ -340,8 +348,6 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
                                              int instride,
                                              int outstride )
 {
-    unsigned int topdiff = 0;
-    unsigned int botdiff = 0;
     int i;
 
     if( pulldown_alg == PULLDOWN_NONE ) {
@@ -353,103 +359,86 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         filmmode = 0;
     }
 
-    /* Make pulldown decisions every top field. */
-    if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field ) {
-        int predicted;
+    if( pulldown_alg == PULLDOWN_VEKTOR ) {
+        /* Make pulldown phase decisions every top field. */
+        if( !bottom_field ) {
+            int predicted;
 
-        predicted = pdoffset << 1;
-        if( predicted > PULLDOWN_OFFSET_5 ) predicted = PULLDOWN_OFFSET_1;
+            predicted = pdoffset << 1;
+            if( predicted > PULLDOWN_SEQ_DD ) predicted = PULLDOWN_SEQ_AA;
 
-        /**
-         * Old algorithm:
-        pdoffset = determine_pulldown_offset_history( last_topdiff, last_botdiff, 1, &realbest );
-        if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
-         */
+            /**
+             * Old algorithm:
+            pdoffset = determine_pulldown_offset_history( last_topdiff, last_botdiff, 1, &realbest );
+            if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
+             */
 
-        pdoffset = determine_pulldown_offset_short_history_new( last_topdiff, last_botdiff, 1, predicted );
-        //pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
+            pdoffset = determine_pulldown_offset_short_history_new( last_topdiff, last_botdiff, 1, predicted );
+            //pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
 
-        /* 3:2 pulldown state machine. */
-        if( !pdoffset ) {
-            /* No pulldown offset applies, drop out of pulldown immediately. */
-            pdlastbusted = 0;
-            pderror = PULLDOWN_ERROR_WAIT;
-        } else if( pdoffset != predicted ) {
-            if( pdlastbusted ) {
-                pdlastbusted--;
-                pdoffset = predicted;
-            } else {
+            calculate_pulldown_score_vektor( curframe, lastframe, instride, frame_height, width );
+
+            /* 3:2 pulldown state machine. */
+            if( !pdoffset ) {
+                /* No pulldown offset applies, drop out of pulldown immediately. */
+                pdlastbusted = 0;
                 pderror = PULLDOWN_ERROR_WAIT;
+            } else if( pdoffset != predicted ) {
+                if( pdlastbusted ) {
+                    pdlastbusted--;
+                    pdoffset = predicted;
+                } else {
+                    pderror = PULLDOWN_ERROR_WAIT;
+                }
+            } else {
+                if( pderror ) {
+                    pderror--;
+                }
+
+                if( !pderror ) {
+                    pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
+                }
             }
-        } else {
-            if( pderror ) {
-                pderror--;
-            }
+
 
             if( !pderror ) {
-                pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
+                int curoffset = pdoffset << 1;
+                if( curoffset > PULLDOWN_SEQ_DD ) curoffset = PULLDOWN_SEQ_AA;
+
+                // We're in pulldown, reverse it.
+                if( !filmmode ) {
+                    fprintf( stderr, "Film mode enabled.\n" );
+                    if( osd ) tvtime_osd_set_film_mode( osd, curoffset );
+                    filmmode = 1;
+                }
+
+                do_pulldown_action( output, lastframe, lastframe + instride, curframe,
+                                    osd, con, vs, !bottom_field, width,
+                                    frame_height, instride*2, outstride, curoffset );
+
+                return;
+            } else {
+                if( filmmode ) {
+                    fprintf( stderr, "Film mode disabled.\n" );
+                    if( osd ) tvtime_osd_set_film_mode( osd, -1 );
+                    filmmode = 0;
+                }
             }
-        }
-
-
-        if( !pderror ) {
+        } else if( !pderror ) {
             int curoffset = pdoffset << 1;
-            if( curoffset > PULLDOWN_OFFSET_5 ) curoffset = PULLDOWN_OFFSET_1;
+            if( curoffset > PULLDOWN_SEQ_DD ) curoffset = PULLDOWN_SEQ_AA;
 
-            // We're in pulldown, reverse it.
-            if( !filmmode ) {
-                fprintf( stderr, "Film mode enabled.\n" );
-                if( osd ) tvtime_osd_set_film_mode( osd, curoffset );
-                filmmode = 1;
-            }
-            if( curoffset == PULLDOWN_OFFSET_2 ) {
-                // Drop.
-                tvtime_do_pulldown_action( output, curframe, lastframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_DROP2 );
-            } else if( curoffset == PULLDOWN_OFFSET_3 ) {
-                // Merge.
-                tvtime_do_pulldown_action( output, curframe, lastframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_MRGE3 );
-            } else if( curoffset == PULLDOWN_OFFSET_4 ) {
-                // Copy.
-                tvtime_do_pulldown_action( output, curframe, lastframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_COPY4 );
-            }
+            do_pulldown_action( output, lastframe + instride, curframe, curframe + instride,
+                                osd, con, vs, !bottom_field, width,
+                                frame_height, instride*2, outstride, curoffset );
+
             return;
-        } else {
-            if( filmmode ) {
-                fprintf( stderr, "Film mode disabled.\n" );
-                if( osd ) tvtime_osd_set_film_mode( osd, -1 );
-                filmmode = 0;
-            }
         }
-    } else if( (pulldown_alg == PULLDOWN_VEKTOR) && !pderror ) {
-        int curoffset = pdoffset << 1;
-        if( curoffset > PULLDOWN_OFFSET_5 ) curoffset = PULLDOWN_OFFSET_1;
-
-        if( curoffset == PULLDOWN_OFFSET_1 || curoffset == PULLDOWN_OFFSET_5 ) {
-            // Copy.
-            tvtime_do_pulldown_action( output, curframe, lastframe,
-                                       osd, con, vs, bottom_field, width,
-                                       frame_height, instride, outstride,
-                                       PULLDOWN_ACTION_COPY1 );
-        } else if( curoffset == PULLDOWN_OFFSET_5 ) {
-            // Copy.
-            tvtime_do_pulldown_action( output, curframe, lastframe,
-                                       osd, con, vs, bottom_field, width,
-                                       frame_height, instride, outstride,
-                                       PULLDOWN_ACTION_COPY5 );
-        }
-        return;
     }
 
     if( pulldown_alg == PULLDOWN_DALIAS ) {
+#if 0
+        // rewrite this
         if( osd ) tvtime_osd_set_film_mode( osd, 0 );
 
         last_fieldcount++;
@@ -470,20 +459,17 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             */
 
             if( drop_next ) {
-                tvtime_do_pulldown_action( output, curframe, lastframe,
-                                           osd, con, vs, bottom_field, width,
-                                           frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_DROP2 );
+                do_pulldown_action( output, lastframe, lastframe + instride, curframe,
+                                    osd, con, vs, !bottom_field, width,
+                                    frame_height, instride*2, outstride, PULLDOWN_ACTION_PREV_NEXT );
                 drop_next = 0;
                 drop_cur = 1;
                 pulldown_copy = 2;
             } else {
-                switch(determine_pulldown_offset_dalias( &old_peak, &old_rel, &old_mean,
-                                                         &new_peak, &new_rel, &new_mean )) {
-                    case PULLDOWN_ACTION_MRGE3: drop_next = 1; pulldown_merge = 1; break;
-                    default:
-                    case PULLDOWN_ACTION_COPY1: break;
-                    case PULLDOWN_ACTION_DROP2: break;
+                switch( determine_pulldown_offset_dalias( &old_peak, &old_rel, &old_mean,
+                                                          &new_peak, &new_rel, &new_mean ) ) {
+                    case PULLDOWN_ACTION_PREV_NEXT: drop_next = 1; pulldown_merge = 1; break;
+                    default: break;
                 }
             }
             old_peak = new_peak;
@@ -494,7 +480,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
                 tvtime_do_pulldown_action( output, lastframe, curframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
-                                           PULLDOWN_ACTION_COPY1 );
+                                           PULLDOWN_ACTION_NEXT_PREV );
                 pulldown_copy--;
                 did_copy_top = 1;
                 // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
@@ -520,27 +506,20 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             }
         }
         return;
+#endif
     }
 
 
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( ((pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field) || (filter && !filtered_cur) ) {
+        if( filter && !filtered_cur ) {
             for( i = 0; i < frame_height; i++ ) {
-                if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                    topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
-                                                               lastframe + (i*instride), width );
-                    botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
-                                                               lastframe + (i*instride) + instride, width );
-                }
                 if( videofilter_active_on_scanline( filter, i ) ) {
                     videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
                 }
             }
         }
-        last_topdiff = topdiff;
-        last_botdiff = botdiff;
 
         data.f0 = curframe;
         data.f1 = lastframe;
@@ -657,10 +636,6 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             }
 
             /* Copy a scanline. */
-            if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field && scanline > 40 && (scanline & 3) == 0 && scanline < frame_height - 40 ) {
-                topdiff += diff_factor_packed422_scanline( curframe, lastframe, width );
-                botdiff += diff_factor_packed422_scanline( curframe + instride, lastframe + instride, width );
-            }
             curmethod->copy_scanline( output, &data, width );
             curframe += instride * 2;
             lastframe += instride * 2;
@@ -675,9 +650,6 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         }
 
         if( !bottom_field ) {
-            last_topdiff = topdiff;
-            last_botdiff = botdiff;
-
             /* Double the bottom scanline. */
             blit_packed422_scanline( output, curframe, width );
 

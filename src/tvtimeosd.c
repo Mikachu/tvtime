@@ -486,11 +486,11 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
         }
         switch( osd->film_mode ) {
             case 0: film_mode = ", DFilm"; break;
-            case PULLDOWN_OFFSET_1: film_mode = ", Film1"; break;
-            case PULLDOWN_OFFSET_2: film_mode = ", Film2"; break;
-            case PULLDOWN_OFFSET_3: film_mode = ", Film3"; break;
-            case PULLDOWN_OFFSET_4: film_mode = ", Film4"; break;
-            case PULLDOWN_OFFSET_5: film_mode = ", Film5"; break;
+            case PULLDOWN_SEQ_AA: film_mode = ", Film1"; break;
+            case PULLDOWN_SEQ_AB: film_mode = ", Film2"; break;
+            case PULLDOWN_SEQ_BC: film_mode = ", Film3"; break;
+            case PULLDOWN_SEQ_CC: film_mode = ", Film4"; break;
+            case PULLDOWN_SEQ_DD: film_mode = ", Film5"; break;
             default: film_mode = ""; break;
         }
         snprintf( text, sizeof( text ), "%s - %s [%.2ffps%s%s]", osd->input_text,

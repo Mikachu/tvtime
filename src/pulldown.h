@@ -26,24 +26,20 @@
 extern "C" {
 #endif
 
-/**
- * Possible pulldown offsets.
- */
-#define PULLDOWN_OFFSET_1 (1<<0)
-#define PULLDOWN_OFFSET_2 (1<<1)
-#define PULLDOWN_OFFSET_3 (1<<2)
-#define PULLDOWN_OFFSET_4 (1<<3)
-#define PULLDOWN_OFFSET_5 (1<<4)
+#define PULLDOWN_SEQ_AA (1<<0) /* next - prev */
+#define PULLDOWN_SEQ_AB (1<<1) /* prev - next */
+#define PULLDOWN_SEQ_BC (1<<2) /* prev - next */
+#define PULLDOWN_SEQ_CC (1<<3) /* next - prev */
+#define PULLDOWN_SEQ_DD (1<<4) /* next - prev */
+
+#define PULLDOWN_ACTION_NEXT_PREV (1<<0) /* next - prev */
+#define PULLDOWN_ACTION_PREV_NEXT (1<<1) /* prev - next */
 
 /**
- * Actions that we can return.
+ * Returns 1 if the source is the previous field, 0 if it is
+ * the next field, for the given action.
  */
-#define PULLDOWN_ACTION_COPY1 (1<<0)
-#define PULLDOWN_ACTION_DROP2 (1<<1)
-#define PULLDOWN_ACTION_MRGE3 (1<<2)
-#define PULLDOWN_ACTION_COPY4 (1<<3)
-#define PULLDOWN_ACTION_COPY5 (1<<4)
-#define PULLDOWN_ACTION_INTRP (1<<5)
+int pulldown_source( int action, int bottom_field );
 
 int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff, int last_offset );
 int determine_pulldown_offset_history( int top_repeat, int bot_repeat, int tff, int *realbest );

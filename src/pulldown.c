@@ -42,15 +42,6 @@
  * Bot 5 : Show
  */
 
-/**
- * Possible pulldown offsets.
- */
-#define PULLDOWN_OFFSET_1 (1<<0)
-#define PULLDOWN_OFFSET_2 (1<<1)
-#define PULLDOWN_OFFSET_3 (1<<2)
-#define PULLDOWN_OFFSET_4 (1<<3)
-#define PULLDOWN_OFFSET_5 (1<<4)
-
 /* Offset                  1     2     3      4      5   */
 /* Field Pattern          [T B  T][B  T][B   T B]  [T B] */
 /* Action                 Copy  Save  Merge  Copy  Copy  */
@@ -89,7 +80,7 @@ int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff,
     int i;
 
     predicted_offset = last_offset << 1;
-    if( predicted_offset > PULLDOWN_OFFSET_5 ) predicted_offset = PULLDOWN_OFFSET_1;
+    if( predicted_offset > PULLDOWN_SEQ_DD ) predicted_offset = PULLDOWN_SEQ_AA;
 
     /**
      * Detect our pattern.
@@ -492,14 +483,14 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak,
         if ((2*new_relative->t < new_relative->p) && (new_relative->p > 600))
             laced=1;
     }
-    if (!laced) return PULLDOWN_ACTION_COPY1;
+    if( !laced ) return PULLDOWN_ACTION_NEXT_PREV;
 
     if (new_relative->t < 2*new_relative->p) {
         if ((3*old_relative->e < old_relative->o) || (2*new_relative->t < new_relative->p)) {
-            return PULLDOWN_ACTION_MRGE3;
+            return PULLDOWN_ACTION_PREV_NEXT;
         }
     }
-    return PULLDOWN_ACTION_DROP2;
+    return PULLDOWN_ACTION_PREV_NEXT;
 }
 
 #define MAXUP(a,b) ((a) = ((a)>(b)) ? (a) : (b))
@@ -542,5 +533,14 @@ void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *
     mean->s /= x;
     mean->p /= x;
     mean->t /= x;
+}
+
+int pulldown_source( int action, int bottom_field )
+{
+    if( action == PULLDOWN_SEQ_AB || action == PULLDOWN_SEQ_BC ) {
+        return bottom_field;
+    } else {
+        return !bottom_field;
+    }
 }
 
