@@ -28,10 +28,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <termio.h>
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 #include <math.h>
 #include <time.h>
-#include <stdint.h>
 #include <errno.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"

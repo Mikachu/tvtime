@@ -19,7 +19,11 @@
 #ifndef SPEEDY_H_INCLUDED
 #define SPEEDY_H_INCLUDED
 
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -153,6 +157,17 @@ extern unsigned int (*diff_factor_packed422_scanline)( uint8_t *cur, uint8_t *ol
 extern unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
                                                        uint8_t *bot, int width );
 
+/**
+ * Vertical [1 2 1] chroma filter.
+ */
+extern void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
+                                                      uint8_t *m, uint8_t *t, uint8_t *b );
+
+/**
+ * Vertical [3 3 2] chroma filter.
+ */
+extern void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
+                                                      uint8_t *m, uint8_t *t, uint8_t *b );
 
 /**
  * In-place [1 2 1] filter.

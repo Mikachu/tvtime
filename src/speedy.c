@@ -142,6 +142,10 @@ void (*chroma_422_to_444_mpeg2_plane)( uint8_t *dst, uint8_t *src,
 void (*chroma_420_to_422_mpeg2_plane)( uint8_t *dst, uint8_t *src,
                                        int width, int height, int progressive );
 void (*invert_colour_packed422_inplace_scanline)( uint8_t *data, int width );
+void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
+                                               uint8_t *m, uint8_t *t, uint8_t *b );
+void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
+                                               uint8_t *m, uint8_t *t, uint8_t *b );
 
 
 /**
@@ -575,6 +579,146 @@ static void packed422_to_packed444_rec601_scanline_c( uint8_t *dest, uint8_t *sr
             dest[ (i*6) + 4 ] = src[ (i*4) + 1 ];
             dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
+    }
+}
+
+#ifdef ARCH_X86
+static void vfilter_chroma_121_packed422_scanline_mmx( uint8_t *output, int width,
+                                                       uint8_t *m, uint8_t *t, uint8_t *b )
+{
+    int i;
+    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
+    const mmx_t cmask = { 0xff00ff00ff00ff00ULL };
+
+    // Get width in bytes.
+    width *= 2;
+    i = width / 8;
+    width -= i * 8;
+
+    movq_m2r( ymask, mm7 );
+    movq_m2r( cmask, mm6 );
+
+    while( i-- ) {
+        movq_m2r( *t, mm0 );
+        movq_m2r( *b, mm1 );
+        movq_m2r( *m, mm2 );
+
+        movq_r2r ( mm2, mm3 );
+        pand_r2r ( mm7, mm3 );
+
+        pand_r2r ( mm6, mm0 );
+        pand_r2r ( mm6, mm1 );
+        pand_r2r ( mm6, mm2 );
+
+        psrlq_i2r( 8, mm0 );
+        psrlq_i2r( 8, mm1 );
+        psrlq_i2r( 7, mm2 );
+
+        paddw_r2r( mm0, mm2 );
+        paddw_r2r( mm1, mm2 );
+
+        psllw_i2r( 6, mm2 );
+        pand_r2r( mm6, mm2 ); 
+
+        por_r2r ( mm3, mm2 );
+
+        movq_r2m( mm2, *output );
+        output += 8;
+        t += 8;
+        b += 8;
+        m += 8;
+    }
+    output++; t++; b++; m++;
+    while( width-- ) {
+        *output = (*t + *b + (*m << 1)) >> 2;
+        output+=2; t+=2; b+=2; m+=2;
+    }
+    
+    emms();
+}
+#endif
+
+static void vfilter_chroma_121_packed422_scanline_c( uint8_t *output, int width,
+                                                     uint8_t *m, uint8_t *t, uint8_t *b )
+{
+    output++; t++; b++; m++;
+    while( width-- ) {
+        *output = (*t + *b + (*m << 1)) >> 2;
+        output +=2; t+=2; b+=2; m+=2;
+    }
+}
+
+#ifdef ARCH_X86
+static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
+                                                       uint8_t *m, uint8_t *t, uint8_t *b )
+{
+    int i;
+    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
+    const mmx_t cmask = { 0xff00ff00ff00ff00ULL };
+
+    // Get width in bytes.
+    width *= 2; 
+    i = width / 8;
+    width -= i * 8;
+
+    movq_m2r( ymask, mm7 );
+    movq_m2r( cmask, mm6 );
+
+    while( i-- ) {
+        movq_m2r( *t, mm0 );
+        movq_m2r( *b, mm1 );
+        movq_m2r( *m, mm2 );
+
+        movq_r2r ( mm2, mm3 );
+        pand_r2r ( mm7, mm3 );
+
+        pand_r2r ( mm6, mm0 );
+        pand_r2r ( mm6, mm1 );
+        pand_r2r ( mm6, mm2 );
+
+        psrlq_i2r( 8, mm0 );
+        psrlq_i2r( 7, mm1 );
+        psrlq_i2r( 8, mm2 );
+
+        movq_r2r ( mm0, mm4 );
+        psllw_i2r( 1, mm4 );
+        paddw_r2r( mm4, mm0 );
+
+        movq_r2r ( mm2, mm4 );
+        psllw_i2r( 1, mm4 );
+        paddw_r2r( mm4, mm2 );
+
+        paddw_r2r( mm0, mm2 );
+        paddw_r2r( mm1, mm2 );
+
+        psllw_i2r( 5, mm2 );
+        pand_r2r( mm6, mm2 );
+
+        por_r2r ( mm3, mm2 );
+
+        movq_r2m( mm2, *output );
+        output += 8;
+        t += 8;
+        b += 8;
+        m += 8;
+    }
+    output++; t++; b++; m++;
+    while( width-- ) {
+        *output = (3 * *t + 3 * *m + 2 * *b) >> 3;
+        output +=2; t+=2; b+=2; m+=2;
+    }
+
+    emms();
+}
+#endif
+
+static void vfilter_chroma_332_packed422_scanline_c( uint8_t *output, int width,
+                                                     uint8_t *m, uint8_t *t, uint8_t *b )
+{
+    output++; t++; b++; m++;
+    while( width-- ) {
+        *output = (3 * *t + 3 * *m + 2 * *b) >> 3;
+        output +=2; t+=2; b+=2; m+=2;
     }
 }
 
@@ -2379,6 +2523,8 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     chroma_422_to_444_mpeg2_plane = chroma_422_to_444_mpeg2_plane_c;
     chroma_420_to_422_mpeg2_plane = chroma_420_to_422_mpeg2_plane_c;
     invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_c;
+    vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_c;
+    vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
@@ -2400,6 +2546,8 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_mmxext;
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
+        vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
+        vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
@@ -2414,6 +2562,8 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
+        vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
+        vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmx;
     } else {
         if( verbose ) {
