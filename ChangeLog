@@ -1,5 +1,7 @@
 
 0.9.8
+  * krister: Support for commands to be read from stdin for better
+      integration with freevo.
   * vektor: Support added for channel renumbering (fixes 711431)
   * vektor: tvtime now frees its shared memory segments (fixes 711470)
   * vektor: Fixed some annoying issues with non-square pixel outputs
