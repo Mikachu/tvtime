@@ -75,7 +75,6 @@ int config_get_outputwidth( config_t *ct );
 int config_get_inputwidth( config_t *ct );
 int config_get_aspect( config_t *ct );
 int config_get_inputnum( config_t *ct );
-int config_get_tuner_number( config_t *ct );
 int config_get_apply_luma_correction( config_t *ct );
 int config_get_bt8x8_correction( config_t *ct );
 double config_get_luma_correction( config_t *ct );
@@ -95,7 +94,6 @@ void config_set_luma_correction( config_t *ct, double luma_correction );
 void config_set_v4l_device( config_t *ct, const char *v4ldev );
 void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
 void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
-void config_set_tuner_number( config_t *ct, int tuner_number );
 void config_set_timeformat( config_t *ct, const char *format );
 
 #endif /* TVTIMECONF_H_INCLUDED */

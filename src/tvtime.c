@@ -333,8 +333,7 @@ int main( int argc, char **argv )
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
     int width, height;
-    int palmode = 0;
-    int secam = 0;
+    int norm = 0;
     int fieldtime;
     int blittime = 0;
     int skipped = 0;
@@ -368,17 +367,16 @@ int main( int argc, char **argv )
     verbose = config_get_verbose( ct );
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
-        palmode = 1;
+        norm = VIDEOINPUT_PAL;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {
-        palmode = 1;
-        secam = 1;
+        norm = VIDEOINPUT_SECAM;
     } else {
         /* Only allow NTSC otherwise. */
-        palmode = 0;
+        norm = VIDEOINPUT_NTSC;
     }
 
     /* Field display in microseconds. */
-    if( palmode ) {
+    if( norm != VIDEOINPUT_NTSC ) {
         fieldtime = 20000;
     } else {
         fieldtime = 16683;
@@ -389,15 +387,15 @@ int main( int argc, char **argv )
                  config_get_inputwidth( ct ) );
     }
     vidin = videoinput_new( config_get_v4l_device( ct ), 
-                            config_get_inputnum( ct ), 
                             config_get_inputwidth( ct ), 
-                            palmode, verbose );
+                            norm, verbose );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
         return 1;
     }
 
+    videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
 
@@ -457,53 +455,44 @@ int main( int argc, char **argv )
         fprintf( stderr, "Can't initialize OSD object.\n" );
     }
 
+    /**
+     * Set to the current channel, or the first channel in our
+     * frequency list.
+     */
+    if( !frequencies_set_chanlist( (char*)config_get_v4l_freq( ct ) ) ) {
+        fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", 
+                 config_get_v4l_freq( ct ) );
+        /* XXX: Print valid frequency regions here. */
+        return 1;
+    }
+
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( vidin ) ) {
-        if( palmode ) {
-            if( secam ) {
-                videoinput_set_tuner( vidin, config_get_tuner_number( ct ), 
-                                      VIDEOINPUT_SECAM );
-            } else {
-                videoinput_set_tuner( vidin, config_get_tuner_number( ct ),
-                                      VIDEOINPUT_PAL );
-            }
-        } else {
-            videoinput_set_tuner( vidin, config_get_tuner_number( ct ),
-                                  VIDEOINPUT_NTSC );
-        }
-
         /**
          * Set to the current channel, or the first channel in our
          * frequency list.
          */
-        if( !frequencies_set_chanlist( (char*)config_get_v4l_freq( ct ) ) ) {
-            fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", 
-                     config_get_v4l_freq( ct ) );
-            /* XXX: Print valid frequency regions here. */
-            return 1;
-        } else {
-            char timestamp[50];
-            time_t tm = time(NULL);
-            int rc = frequencies_find_current_index( vidin );
-            if( rc == -1 ) {
-                /* set to a known frequency */
-                videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+        char timestamp[50];
+        time_t tm = time(NULL);
+        int rc = frequencies_find_current_index( vidin );
+        if( rc == -1 ) {
+            /* set to a known frequency */
+            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
-                if( verbose ) fprintf( stderr, 
-                                       "tvtime: Changing to channel %s.\n", 
-                                       chanlist[ chanindex ].name );
-            } else if( rc > 0 ) {
-                if( verbose ) fprintf( stderr, 
-                                       "tvtime: Changing to channel %s.\n",
-                                       chanlist[ chanindex ].name );
-            }
-            strftime( timestamp, 50, config_get_timeformat( ct ), 
-                      localtime(&tm) );
-            if( osd ) {
-                tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
-                tvtime_osd_show_channel_info( osd, timestamp );
-                tvtime_osd_show_channel_logo( osd );
-            }
+            if( verbose ) fprintf( stderr, 
+                                   "tvtime: Changing to channel %s.\n", 
+                                   chanlist[ chanindex ].name );
+        } else if( rc > 0 ) {
+            if( verbose ) fprintf( stderr, 
+                                   "tvtime: Changing to channel %s.\n",
+                                   chanlist[ chanindex ].name );
+        }
+        strftime( timestamp, 50, config_get_timeformat( ct ), 
+                  localtime(&tm) );
+        if( osd ) {
+            tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
+            tvtime_osd_show_channel_info( osd, timestamp );
+            tvtime_osd_show_channel_logo( osd );
         }
     }
 
@@ -599,8 +588,6 @@ int main( int argc, char **argv )
     mixer_set_volume( mixer_get_volume() );
 
     /* Begin capturing frames. */
-    videoinput_free_all_frames( vidin );
-
     if( fieldsavailable == 3 ) {
         lastframe = videoinput_next_frame( vidin, &lastframeid );
     } else if( fieldsavailable == 5 ) {

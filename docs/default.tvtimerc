@@ -41,11 +41,6 @@ Norm = ntsc
 #    argentina
 Frequencies = us-cable
 
-# This sets the default tuner number to use.  I have no idea what
-# this really means.  If you can explain this one, let me know:
-# vektor@dumbterm.net
-TunerNumber = 0
-
 # This sets the initial width of the output window.
 OutputWidth = 800
 

@@ -270,6 +270,35 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_TV_VIDEO:
              videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
+             /* Setup the tuner if available. */
+             if( videoinput_has_tuner( in->vidin ) ) {
+                 /**
+                  * Set to the current channel, or the first channel in our
+                  * frequency list.
+                  */
+                 char timestamp[50];
+                 time_t tm = time(NULL);
+                 int rc = frequencies_find_current_index( in->vidin );
+                 if( rc == -1 ) {
+                     /* set to a known frequency */
+                     videoinput_set_tuner_freq( in->vidin, chanlist[ chanindex ].freq );
+
+                     if( verbose ) fprintf( stderr, 
+                                            "tvtime: Changing to channel %s.\n", 
+                                            chanlist[ chanindex ].name );
+                 } else if( rc > 0 ) {
+                     if( verbose ) fprintf( stderr, 
+                                            "tvtime: Changing to channel %s.\n",
+                                            chanlist[ chanindex ].name );
+                 }
+                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
+                           localtime(&tm) );
+                 if( in->osd ) {
+                     tvtime_osd_show_channel_number( in->osd, chanlist[ chanindex ].name );
+                     tvtime_osd_show_channel_info( in->osd, timestamp );
+                     tvtime_osd_show_channel_logo( in->osd );
+                 }
+             }
              if( in->osd ) {
                  tvtime_osd_show_message( in->osd, videoinput_get_input_name( in->vidin ) );
              }

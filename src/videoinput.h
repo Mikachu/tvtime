@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,12 @@ extern "C" {
  */
 typedef struct videoinput_s videoinput_t;
 
+/**
+ * Possible TV norms we support.
+ */
+#define VIDEOINPUT_NTSC   0
+#define VIDEOINPUT_PAL    1
+#define VIDEOINPUT_SECAM  2
 
 /**
  * Create a new input device from the given device name and which input
@@ -48,8 +54,8 @@ typedef struct videoinput_s videoinput_t;
  * The verbose flag indicates we should print to stderr when things go
  * bad, and maybe for some helpful information messages.
  */
-videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
-                              int capwidth, int palmode, int verbose );
+videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
+                              int norm, int verbose );
 
 /**
  * Shut down the capture device.
@@ -67,6 +73,11 @@ int videoinput_get_width( videoinput_t *vidin );
 int videoinput_get_height( videoinput_t *vidin );
 
 /**
+ * Returns true if this input is a BT8x8-based card.
+ */
+int videoinput_is_bt8x8( videoinput_t *vidin );
+
+/**
  * Returns a pointer to the next image buffer.  Also returns the last field
  * number captured.
  */
@@ -77,7 +88,6 @@ unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid );
  * allow the hardware to use the buffer.
  */
 void videoinput_free_frame( videoinput_t *vidin, int frameid );
-void videoinput_free_all_frames( videoinput_t *vidin );
 
 int videoinput_get_numframes( videoinput_t *vidin );
 
@@ -97,17 +107,6 @@ int videoinput_get_contrast( videoinput_t *vidin );
 void videoinput_set_contrast_relative( videoinput_t *vidin, int offset );
 int videoinput_get_colour( videoinput_t *vidin );
 void videoinput_set_colour_relative( videoinput_t *vidin, int offset );
-
-#define VIDEOINPUT_NTSC   0
-#define VIDEOINPUT_PAL    1
-#define VIDEOINPUT_SECAM  2
-
-/**
- * Sets the tuner to tuner_number for the current channel. Also sets the tuners
- * mode to mode. Valid modes are VIDEOINPUT_NTSC, VIDEOINPUT_PAL
- * and VIDEOINPUT_SECAM.
- */
-void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode );
 
 /**
  * Sets the frequency to tune in to. (ie. the station to watch)

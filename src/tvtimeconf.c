@@ -43,7 +43,6 @@ struct config_s
     char *v4ldev;
     char *norm;
     char *freq;
-    int tuner_number;
     int *keymap;
     char *timeformat;
 };
@@ -90,7 +89,6 @@ static void print_usage( char **argv )
                      "\t  \t\targentina\n"
                      "\t  \t\tcanada-cable\n"
                      "\t  \t\taustralia-optus\n"
-                     "\t-t\tThe tuner number for this input (defaults to 0).\n"
                      "\n\tSee the README for more details.\n",
                      argv[ 0 ] );
 }
@@ -114,7 +112,6 @@ config_t *config_new( int argc, char **argv )
     ct->luma_correction = 1.0;
     ct->bt8x8_correction = 0;
     ct->inputnum = 0;
-    ct->tuner_number = 0;
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
@@ -182,7 +179,6 @@ config_t *config_new( int argc, char **argv )
                   ct->apply_luma_correction = 1; break;
         case 'n': ct->norm = strdup( optarg ); break;
         case 'f': ct->freq = strdup( optarg ); break;
-        case 't': ct->tuner_number = atoi( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
         default:
             print_usage( argv );
@@ -208,24 +204,6 @@ config_t *config_new( int argc, char **argv )
         ct->inputwidth -= 1;
         fprintf( stderr, "config: Odd values for input width not allowed, "
                          "using %d instead.\n", ct->inputwidth );
-    }
-
-    if( ct->inputwidth < 100 ) {
-        fprintf( stderr, "config: Width %d too low, using value 100 instead.  "
-                 "If your card supports\n\tsuch low input resolutions, and you "
-                 "have a reason for wanting to use\n\tthem, please submit a "
-                 "bug report at http://www.sourceforge.net/projects/tvtime/.\n",
-                 ct->inputwidth );
-        ct->inputwidth = 100;
-    }
-
-    if( ct->inputwidth > 768 ) {
-        fprintf( stderr, "config: Width %d too large.  We have no way of verifying from\n\t"
-                 "video4linux our max capture width, so we have capped it at 768 for\n\t"
-                 "now.  If you know your card supports higher sampling rates, please\n\t"
-                 "submit a bug report at http://www.sourceforge.net/projects/tvtime/.\n",
-                 ct->inputwidth );
-        ct->inputwidth = 768;
     }
 
     return ct;
@@ -299,10 +277,6 @@ void config_init( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "TimeFormat")) ) {
         free( ct->timeformat );
         ct->timeformat = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( &(ct->pf), "TunerNumber")) ) {
-        ct->tuner_number = atoi( tmp );
     }
 
     config_init_keymap( ct );
@@ -622,11 +596,6 @@ int config_get_aspect( config_t *ct )
 int config_get_inputnum( config_t *ct )
 {
     return ct->inputnum;
-}
-
-int config_get_tuner_number( config_t *ct )
-{
-    return ct->tuner_number;
 }
 
 int config_get_apply_luma_correction( config_t *ct )
