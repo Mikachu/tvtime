@@ -26,13 +26,55 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <langinfo.h>
-#include "parser.h"
+#include <libxml/parser.h>
 #include "tvtimeconf.h"
 #include "input.h"
 #include "station.h"
+#include "commands.h"
 
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
+
+/* Key names. */
+typedef struct key_name_s key_name_t;
+
+struct key_name_s {
+    char *name;
+    int key;
+};
+
+key_name_t key_names[] = {
+    { "up", I_UP },
+    { "down", I_DOWN },
+    { "left", I_LEFT },
+    { "right", I_RIGHT },
+    { "insert", I_INSERT },
+    { "home", I_HOME },
+    { "end", I_END },
+    { "pgup", I_PGUP },
+    { "pgdn", I_PGDN },
+    { "f1", I_F1 },
+    { "f2", I_F2 },
+    { "f3", I_F3 },
+    { "f4", I_F4 },
+    { "f5", I_F5 },
+    { "f6", I_F6 },
+    { "f7", I_F7 },
+    { "f8", I_F8 },
+    { "f9", I_F9 },
+    { "f10", I_F10 },
+    { "f11", I_F11 },
+    { "f12", I_F12 },
+    { "f13", I_F13 },
+    { "f14", I_F14 },
+    { "f15", I_F15 },
+    { "backspace", I_BACKSPACE },
+    { "escape", I_ESCAPE },
+    { "enter", I_ENTER },
+    { "print", I_PRINT },
+    { "menu", I_MENU },
+    { 0, 0 }
+};
 
 struct config_s
 {
@@ -80,125 +122,9 @@ struct config_s
     char config_filename[ 1024 ];
 };
 
-static int string_to_key( const char *str )
-{
-    int key = 0;
-    const char *ptr;
-
-    if( !str ) return 0;
-
-    if( strlen( str ) == 1) return (int)(*str);
-
-    ptr = str;
-    while( *ptr ) {
-        unsigned int onumber;
-        int number, digits;
-
-        /* skip spaces */
-        while( *ptr == ' ' ) ptr++;
-
-        switch( *ptr ) {
-        case 'c':
-        case 'C':
-            if( *++ptr && *ptr == '+') {
-                key |= I_CTRL;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 'm':
-        case 'M':
-            if( *++ptr && *ptr == '+') {
-                key |= I_META;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 's':
-        case 'S':
-            if( *++ptr && *ptr == '+') {
-                key |= I_SHIFT;
-            } else {
-                key |= *ptr;
-            }
-            ptr++;
-            break;
-
-        case 'f':
-        case 'F':
-            ptr++;
-            if( *ptr && sscanf( ptr, "%d%n", &number, &digits ) ) {
-                if( number > 0 && number < 16 ) {
-                    key |= 281 + number;
-                    ptr += digits;
-                } else {
-                    fprintf( stderr, "config: Error parsing keybinding.\n" );
-                    return 0;
-                }
-            } else {
-                key |= *ptr;
-                ptr++;
-            }
-            break;
-
-        case '\\':
-            ptr++;
-            switch( *ptr ) {
-
-            case 'b':
-                key |= '\b';
-                ptr++;
-                break;
-                
-            case 't':
-                key |= '\t';
-                ptr++;
-                break;
-
-            case 's':
-                key |= ' ';
-                ptr++;
-                break;
-
-            case '0':
-                ptr++;
-                if( *ptr && sscanf( ptr, "%o%n", &onumber, &digits) ) {
-                    if( digits == 3 && onumber < 512 ) {
-                        key |= onumber;
-                        ptr += digits;
-                    } else {
-                        fprintf( stderr, "config: Invalid octal keycode.\n" );
-                        return 0;
-                    }
-                } else {
-                    fprintf( stderr, "config: Invalid escape sequence.\n" );
-                    return 0;
-                }
-                break;
-
-            default:
-                key |= *ptr;
-                ptr++;
-                break;
-            }
-            break;
-
-        default:
-            key |= *ptr;
-            ptr++;
-            break;
-        }
-    }
-    return key;
-}
-
 static unsigned int parse_colour( const char *str )
 {
-    unsigned int a,r,g,b;
+    unsigned int a, r, g, b;
     int ret;
     
     if( !str || !*str ) return 0;
@@ -206,213 +132,184 @@ static unsigned int parse_colour( const char *str )
     if( strlen( str ) == 1 ) return (unsigned int)atoi( str );
 
     if( str[0] == '0' && str[1] == 'x' ) {
-        ret = sscanf( str, "0x%2x%2x%2x%2x", &a, &r, &g, &b );
+        ret = sscanf( str, "0x%x", &a );
     } else {
         ret = sscanf( str, "%u %u %u %u", &a, &r, &g, &b );
     }
-    switch( ret ) {
-    case 0:
-        return 0;
-        break;
-    case 1:
+
+    if( ret == 1 ) {
         return a;
-        break;
-    case 2:
-        return 0xff000000 | ( (a & 0xff) << 8 ) | (r & 0xff);
-        break;
-    case 3:
+    } else if( ret == 3 ) {
         return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
-        break;
-    case 4:
+    } else if( ret == 4 ) {
         return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
     }
 
     return 0;
 }
 
-static void config_init_keymap( config_t *ct, parser_file_t *pf )
+int match_special_key(const char *str)
 {
-    const char *tmp;
-    int key, cmd=0, i=1;
-    
-    if( !ct->keymap ) {
-        fprintf( stderr, "config: No keymap. No keybindings.\n" );
-        return;
+    int count;
+
+    for( count = 0; key_names[ count ].name; count++ ) {
+        if( !xmlStrcasecmp( BAD_CAST str, BAD_CAST key_names[ count ].name ) ) {
+            return key_names[ count ].key;
+        }
     }
 
-    for( cmd=0; cmd < tvtime_num_commands(); cmd++ ) {
-        char keystr[ 5+MAX_CMD_NAMELEN ];
-        sprintf( keystr, "key_%s", tvtime_get_command( cmd ) );
-
-        for(i=1;;i++)
-            if( (tmp = parser_get( pf, keystr, i )) ) {
-                key = string_to_key( tmp );
-                ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] = tvtime_get_command_id( cmd );
-            } else { break; }
-    }   
+    return 0;
 }
 
-static void config_init_buttonmap( config_t *ct, parser_file_t *pf )
+int parse_global( config_t *ct, xmlDocPtr doc, xmlNodePtr node)
 {
-    int button=0, cmd=0;
-    const char *tmp;
+    xmlChar *buf;
 
-    for( button=0; button < MAX_BUTTONS; button++ ) {
-        char butstr[ 14+MAX_CMD_NAMELEN ];
-        sprintf( butstr, "mouse_button_%d", button );
+    while( node ) {
+        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
 
-        if( (tmp = parser_get( pf, butstr, 1 )) ) {
-            cmd = tvtime_string_to_command( tmp );
-            if( cmd == -1 ) {
-                fprintf( stderr, 
-                         "config_init_buttonmap: %s is not a valid command.\n", 
-                         tmp );
-                continue;
+            if( !xmlStrcasecmp( node->name, BAD_CAST "outputwidth" ) ) {
+                ct->outputwidth = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "inputwidth" ) ) {
+                ct->inputwidth = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "verbose")) {
+                ct->verbose = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "widescreen")) {
+                ct->aspect = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "debugmode")) {
+                ct->debug = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "applylumacorrection")) {
+                ct->apply_luma_correction = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "lumacorrection")) {
+                ct->luma_correction = atof((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "v4ldevice")) {
+                free(ct->v4ldev);
+                ct->v4ldev = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "vbidevice")) {
+                free(ct->vbidev);
+                ct->vbidev = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "capturesource")) {
+                ct->inputnum = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "usevbi")) {
+                ct->use_vbi = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "processpriority")) {
+                ct->priority = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "fullscreen")) {
+                ct->fullscreen = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "norm")) {
+                free(ct->norm);
+                ct->norm = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "frequencies")) {
+                free(ct->freq);
+                ct->freq = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "commandpipe")) {
+                if(buf[0] == '~' && getenv("HOME") ) {
+                    snprintf(ct->command_pipe, sizeof(ct->command_pipe), "%s%s", getenv("HOME"), buf+1);
+                } else {
+                    strncpy(ct->command_pipe, buf, 255);
+                }
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "timeformat")) {
+                free(ct->timeformat);
+                ct->timeformat = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "screenshotdir")) {
+                free(ct->ssdir);
+                ct->ssdir = strdup(buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "menubg")) {
+                ct->menu_bg_rgb = parse_colour((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "channeltextfg")) {
+                ct->channel_text_rgb = parse_colour((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "othertextfg")) {
+                ct->other_text_rgb = parse_colour((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "startchannel")) {
+                ct->start_channel = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "ntsccablemode")) {
+                if( !strcasecmp((const char *)buf, "irc") ) {
+                    ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
+                } else if ( !strcasecmp((const char *)buf, "hrc") ) {
+                    ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
+                } else {
+                    ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
+                }
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "preferreddeinterlacemethod")) {
+                ct->preferred_deinterlace_method = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "checkforsignal")) {
+                ct->check_freq_present = atoi((const char *)buf);
+            } else if( !xmlStrcasecmp(node->name, BAD_CAST "overscan")) {
+                ct->hoverscan = (atof((const char *)buf) / 2.0) / 100.0;
+                ct->voverscan = (atof((const char *)buf) / 2.0) / 100.0;
             }
-
-            ct->buttonmap[ button ] = cmd;
         }
+        node = node->next;
     }
-
+    return 1;
 }
 
-static void config_init( config_t *ct, parser_file_t *pf )
+int parse_keys(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
 {
-    const char *tmp;
-
-    if( (tmp = parser_get( pf, "OutputWidth", 1 )) ) {
-        ct->outputwidth = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "InputWidth", 1 )) ) {
-        ct->inputwidth = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Verbose", 1 )) ) {
-        ct->verbose = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Widescreen", 1 )) ) {
-        ct->aspect = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "DebugMode", 1 )) ) {
-        ct->debug = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "ApplyLumaCorrection", 1 )) ) {
-        ct->apply_luma_correction = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "LumaCorrection", 1 )) ) {
-        ct->luma_correction = atof( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "V4LDevice", 1 )) ) {
-        free( ct->v4ldev );
-        ct->v4ldev = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "VBIDevice", 1 )) ) {
-        free( ct->vbidev );
-        ct->vbidev = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "CaptureSource", 1 )) ) {
-        ct->inputnum = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "UseVBI", 1 )) ) {
-        ct->use_vbi = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "ProcessPriority", 1 )) ) {
-        ct->priority = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Fullscreen", 1 )) ) {
-        ct->fullscreen = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "FramerateMode", 1 )) ) {
-        ct->framerate = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Norm", 1 )) ) {
-        free( ct->norm );
-        ct->norm = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Frequencies", 1 )) ) {
-        free( ct->freq );
-        ct->freq = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "CommandPipe", 1 )) ) {
-        if( tmp[ 0 ] == '~' && getenv( "HOME" ) ) {
-            snprintf( ct->command_pipe, sizeof( ct->command_pipe ), "%s%s", getenv( "HOME" ), tmp + 1 );
-        } else {
-            strncpy( ct->command_pipe, tmp, 255 );
+    xmlChar *buf;
+    int key;
+    while(node != NULL) {
+        if(!xmlIsBlankNode(node) && ((buf=xmlGetProp(node, BAD_CAST"value")) != NULL)) {
+            if( (key=match_special_key((const char *)buf)) )
+                ct->keymap[key]=tvtime_string_to_command((const char *)node->name);
+            else
+                ct->keymap[*buf]=tvtime_string_to_command((const char *)node->name);
         }
+       node=node->next;
     }
-
-    if( (tmp = parser_get( pf, "TimeFormat", 1 )) ) {
-        free( ct->timeformat );
-        ct->timeformat = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "ScreenShotDir", 1 )) ) {
-        free( ct->ssdir );
-        ct->ssdir = strdup( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "MenuBG", 1 )) ) {
-        ct->menu_bg_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "ChannelTextFG", 1 )) ) {
-        ct->channel_text_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "OtherTextFG", 1 )) ) {
-        ct->other_text_rgb = parse_colour( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "PrevChannel", 1 )) ) {
-        ct->prev_channel = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "StartChannel", 1 )) ) {
-        ct->start_channel = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "NTSCCableMode", 1 )) ) {
-        if( !strcasecmp( tmp, "IRC" ) ) {
-            ct->ntsc_mode = NTSC_CABLE_MODE_IRC;
-        } else if( !strcasecmp( tmp, "HRC" ) ) {
-            ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
-        } else {
-            ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
-        }
-    }
-
-    if( (tmp = parser_get( pf, "PreferredDeinterlaceMethod", 1 )) ) {
-        ct->preferred_deinterlace_method = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "CheckForSignal", 1 )) ) {
-        ct->check_freq_present = atoi( tmp );
-    }
-
-    if( (tmp = parser_get( pf, "Overscan", 1 )) ) {
-        ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
-        ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
-    }
-
-    config_init_keymap( ct, pf );
-    config_init_buttonmap( ct, pf );
+    return 1;
 }
 
+int parse_mouse(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
+{
+    xmlChar *buf;
+    int button;
+    while(node != NULL) {
+        if(!xmlIsBlankNode(node) && ((buf=xmlGetProp(node, BAD_CAST"value")) != NULL)) {
+            if( sscanf((const char *)buf, "button_%d", &button))
+                if( (button > 0) && (button < MAX_BUTTONS))
+                    ct->buttonmap[button] = tvtime_string_to_command((const char *)node->name);
+        }
+        node=node->next;
+    }
+    return 1;
+}
+
+int conf_xml_parse( config_t *ct, char *configFile)
+{
+    xmlDocPtr doc;
+    xmlNodePtr top, node;
+
+    if( (doc=xmlParseFile(configFile)) == NULL) {
+        fprintf(stderr, "config: Error parsing configuration file %s.\n", configFile);
+        return 0;
+    }
+    if( (top=xmlDocGetRootElement(doc)) == NULL) {
+        fprintf(stderr, "config: No XML root element found in %s.\n",configFile);
+        xmlFreeDoc(doc);
+        return 0;
+    }
+    if( xmlStrcasecmp(top->name, BAD_CAST "Conf")) {
+        fprintf(stderr, "config: Root node in configuration file %s should be 'Conf'.\n", configFile);
+        xmlFreeDoc(doc);
+        return 0;
+    }
+
+    node=top->xmlChildrenNode;
+    while(node != NULL) {
+        if(xmlIsBlankNode(top));
+        else if(!xmlStrcasecmp(node->name, BAD_CAST "global"))
+            parse_global(ct, doc, node->xmlChildrenNode);
+        else if(!xmlStrcasecmp(node->name, BAD_CAST "keybindings"))
+            parse_keys(ct, doc, node->xmlChildrenNode);
+        else if(!xmlStrcasecmp(node->name, BAD_CAST "mousebindings"))
+            parse_mouse(ct, doc,node->xmlChildrenNode);
+        node=node->next;
+    }
+
+    return 1;
+}
+ 
 static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
@@ -470,7 +367,6 @@ static int file_is_openable_for_read( const char *filename )
 
 config_t *config_new( int argc, char **argv )
 {
-    parser_file_t pf;
     char temp_dirname[ 1024 ];
     char base[ 256 ];
     char *configFile = 0;
@@ -598,39 +494,23 @@ config_t *config_new( int argc, char **argv )
     snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
     mkdir( temp_dirname, 0777 );
 
-    /* Warning for 0.9.7. */
-    strncpy( base, getenv( "HOME" ), 235 );
-    strcat( base, "/.tvtimerc" );
-    if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, "\n*** Notice: tvtime user config file has changed!\n"
-                           "*** Old ~/.tvtimerc now belongs at ~/.tvtime/tvtimerc\n"
-                           "*** Many of the options have also changed, so please check\n"
-                           "*** out the new default config file!  Old config file ignored.\n\n" );
-    }
-
     /* First read in global settings. */
     strncpy( base, CONFDIR, 245 );
-    strcat( base, "/tvtimerc" );
+    strcat( base, "/tvtime.xml" );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         configFile = base;
-        if( parser_new( &pf, configFile ) ) {
-            config_init( ct, &pf );
-            parser_delete( &pf );
-        }
+        conf_xml_parse(ct, configFile);
     }
 
     /* Then read in local settings. */
     strncpy( base, getenv( "HOME" ), 235 );
-    strcat( base, "/.tvtime/tvtimerc" );
+    strcat( base, "/.tvtime/tvtime.xml" );
     sprintf( ct->config_filename, "%s", base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
         configFile = base;
-        if( parser_new( &pf, configFile ) ) {
-            config_init( ct, &pf );
-            parser_delete( &pf );
-        }
+        conf_xml_parse(ct, configFile);
     }
 
     while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:Ib:r:" )) != -1 ) {
@@ -664,12 +544,7 @@ config_t *config_new( int argc, char **argv )
         sprintf( ct->config_filename, "%s", configFile );
         fprintf( stderr, "config: Reading configuration from %s\n", configFile );
 
-        if( !parser_new( &pf, configFile ) ) {
-            fprintf( stderr, "config: Could not read configuration from %s\n", configFile );
-        } else {
-            config_init( ct, &pf );
-            parser_delete( &pf );
-        }
+        conf_xml_parse(ct, configFile);
         free( configFile );
     }
 
