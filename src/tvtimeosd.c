@@ -399,7 +399,7 @@ void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
 
 void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
 {
-    sprintf( osd->hold_message, "%s", str );
+    snprintf( osd->hold_message, sizeof( osd->hold_message ), "%s", str );
 }
 
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
@@ -464,14 +464,15 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
 
     if( strlen( osd->freqtable_text ) ) {
-        sprintf( text, "%s [%s]: %s", osd->tv_norm_text, osd->audiomode_text, osd->freqtable_text );
+        snprintf( text, sizeof( text ), "%s [%s]: %s",
+                  osd->tv_norm_text, osd->audiomode_text, osd->freqtable_text );
     } else {
-        sprintf( text, "%s", osd->tv_norm_text );
+        snprintf( text, sizeof( text ), "%s", osd->tv_norm_text );
     }
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
 
     if( *(osd->hold_message) ) {
-        sprintf( text, "%s", osd->hold_message );
+        snprintf( text, sizeof( text ), "%s", osd->hold_message );
     } else {
         const char *rate_mode = "";
         const char *film_mode = "";
@@ -489,8 +490,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
             case PULLDOWN_OFFSET_5: film_mode = ", Film5"; break;
             default: film_mode = ""; break;
         }
-        sprintf( text, "%s - %s [%.2ffps%s%s]", osd->input_text,
-                 osd->deinterlace_text, osd->framerate, rate_mode, film_mode );
+        snprintf( text, sizeof( text ), "%s - %s [%.2ffps%s%s]", osd->input_text,
+                  osd->deinterlace_text, osd->framerate, rate_mode, film_mode );
     }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );

@@ -1727,8 +1727,8 @@ int main( int argc, char **argv )
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
                                   config_get_timeformat( ct ), localtime( &tm ) );
-                        sprintf( filename, "tvtime-output-%s.png", timestamp );
-                        sprintf( pathfilename, "%s/%s", config_get_screenshot_dir( ct ), filename );
+                        snprintf( filename, sizeof( filename ), "tvtime-output-%s.png", timestamp );
+                        snprintf( pathfilename, sizeof( pathfilename ), "%s/%s", config_get_screenshot_dir( ct ), filename );
                         outfile = pathfilename;
                         basename = filename;
                     }
@@ -1739,7 +1739,7 @@ int main( int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
-                    sprintf( message, "Screenshot saved: %s", basename );
+                    snprintf( message, sizeof( message ), "Screenshot saved: %s", basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
                 }
@@ -1821,8 +1821,8 @@ int main( int argc, char **argv )
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
                                   config_get_timeformat( ct ), localtime( &tm ) );
-                        sprintf( filename, "tvtime-output-%s.png", timestamp );
-                        sprintf( pathfilename, "%s/%s", config_get_screenshot_dir( ct ), filename );
+                        snprintf( filename, sizeof( filename ), "tvtime-output-%s.png", timestamp );
+                        snprintf( pathfilename, sizeof( pathfilename ), "%s/%s", config_get_screenshot_dir( ct ), filename );
                         outfile = pathfilename;
                         basename = filename;
                     }
@@ -1833,7 +1833,7 @@ int main( int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
-                    sprintf( message, "Screenshot saved: %s", basename );
+                    snprintf( message, sizeof( message ), "Screenshot saved: %s", basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
                 }

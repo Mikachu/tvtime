@@ -237,7 +237,8 @@ static void reinit_tuner( commands_t *in )
 
         if( in->osd ) {
             char channel_display[ 20 ];
-            sprintf( channel_display, "%d", station_get_current_id( in->stationmgr ) );
+            snprintf( channel_display, sizeof( channel_display ), "%d",
+                      station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_set_channel_number( in->osd, channel_display );
@@ -439,8 +440,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             in->renumbering = 1;
             if( in->osd ) {
                 char message[ 256 ];
-                sprintf( message, "Remapping %d.  Enter new channel number.",
-                         station_get_current_id( in->stationmgr ) );
+                snprintf( message, sizeof( message ),
+                          "Remapping %d.  Enter new channel number.",
+                          station_get_current_id( in->stationmgr ) );
                 tvtime_osd_set_hold_message( in->osd, message );
             }
         }
@@ -578,7 +580,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
         if( in->osd ) {
             char message[ 200 ];
-            sprintf( message, "Overscan: %.1f%%", in->overscan * 2.0 * 100.0 );
+            snprintf( message, sizeof( message ), "Overscan: %.1f%%",
+                      in->overscan * 2.0 * 100.0 );
             tvtime_osd_show_message( in->osd, message );
         }
         break;
@@ -601,12 +604,13 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 fprintf( stderr, "tvtime: Luma correction value: %.1f\n", in->luma_power );
             }
 
-            sprintf( message, "%.1f", in->luma_power );
+            snprintf( message, sizeof( message ), "%.1f", in->luma_power );
             if( config_get_configsave( in->cfg ) ) {
                 configsave( config_get_configsave( in->cfg ), "LumaCorrection", message );
             }
             if( in->osd ) {
-                sprintf( message, "Luma correction value: %.1f", in->luma_power );
+                snprintf( message, sizeof( message ), "Luma correction value: %.1f",
+                          in->luma_power );
                 tvtime_osd_show_message( in->osd, message );
             }
         }
@@ -645,7 +649,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
                 if( in->osd ) {
                     char message[ 200 ];
-                    sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+                    snprintf( message, sizeof( message ), "Tuning: %4.2fMhz.",
+                              ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
                     tvtime_osd_show_message( in->osd, message );
                 }
             }
@@ -790,7 +795,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             if( station_set( in->stationmgr, atoi( in->next_chan_buffer ) ) ) {
                 in->change_channel = 1;
             } else {
-                sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
+                snprintf( in->next_chan_buffer, sizeof( in->next_chan_buffer ),
+                          "%d", station_get_current_id( in->stationmgr ) );
                 if( in->osd ) {
                     tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
                     tvtime_osd_show_info( in->osd );
@@ -801,7 +807,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 in->renumbering = 0;
                 if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
             }
-            sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
+            snprintf( in->next_chan_buffer, sizeof( in->next_chan_buffer ),
+                      "%d", station_get_current_id( in->stationmgr ) );
             if( in->osd ) {
                 tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
                 tvtime_osd_show_info( in->osd );

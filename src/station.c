@@ -16,6 +16,7 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -483,13 +484,13 @@ const char *station_get_current_band( station_mgr_t *mgr )
         return "No Band";
     } else {
         if( !strcasecmp( mgr->current->band->name, "US Cable" ) && mgr->us_cable_mode ) {
-            sprintf( mgr->band_and_frequency, "%s [%s]: %s",
-                     mgr->current->band->name,
-                     mgr->us_cable_mode == NTSC_CABLE_MODE_HRC ? "HRC" : "IRC",
-                     mgr->current->channel->name );
+            snprintf( mgr->band_and_frequency, sizeof( mgr->band_and_frequency ),
+                      "%s [%s]: %s", mgr->current->band->name,
+                      mgr->us_cable_mode == NTSC_CABLE_MODE_HRC ? "HRC" : "IRC",
+                      mgr->current->channel->name );
         } else {
-            sprintf( mgr->band_and_frequency, "%s: %s",
-                     mgr->current->band->name, mgr->current->channel->name );
+            snprintf( mgr->band_and_frequency, sizeof( mgr->band_and_frequency ),
+                      "%s: %s", mgr->current->band->name, mgr->current->channel->name );
         }
         return mgr->band_and_frequency;
     }
@@ -527,7 +528,7 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
     if( !isFreePos( mgr, pos ) ) pos = getNextPos( mgr );
 
     if( !name ) {
-        sprintf( tempname, "%d", pos );
+        snprintf( tempname, sizeof( tempname ), "%d", pos );
         name = tempname;
     }
 
@@ -535,10 +536,8 @@ int station_add( station_mgr_t *mgr, int pos, const char *bandname, const char *
         int freq = (int) ((atof( channel ) * 1000.0) + 0.5);
         band_entry_t *newentry = malloc( sizeof( band_entry_t ) );
         if( newentry ) {
-            char *entryname = (char *) malloc( 32 );
-            if( entryname ) {
-                sprintf( entryname, "%.2fMHz", ((double) freq) / 1000.0 );
-            } else {
+            char *entryname;
+            if( asprintf( &entryname, "%.2fMHz", ((double) freq) / 1000.0 ) < 0 ) {
                 entryname = "Error";
             }
             newentry->name = entryname;
@@ -807,16 +806,16 @@ int station_writeconfig( station_mgr_t *mgr )
 
     do {
         xmlNodePtr node = find_station( list->xmlChildrenNode, rp->name );
-        char buf[ 255 ];
+        char buf[ 256 ];
 
-        sprintf( buf, "%d", rp->pos );
+        snprintf( buf, sizeof( buf ), "%d", rp->pos );
         if( !node ) {
             node = xmlNewTextChild( list, 0, BAD_CAST "station", 0 );
         }
         xmlSetProp( node, BAD_CAST "name", BAD_CAST rp->name );
         xmlSetProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );
 
-        sprintf( buf, "%d", rp->pos );
+        snprintf( buf, sizeof( buf ), "%d", rp->pos );
         xmlSetProp( node, BAD_CAST "position", BAD_CAST buf );
         xmlSetProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
         xmlSetProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
