@@ -95,6 +95,13 @@
   <option name="XMLTVFile" value="none"/>
 
   <!--
+    Set this to a two-letter country code to set the language to use
+    for entries in the XMLTV file (for example, use "de" for German).
+    Set to "none" if you wish to use the default language of the file.
+  -->
+  <option name="XMLTVLanguage" value="none"/>
+
+  <!--
     Set this to 1 to enable XDS channel information decoding.  This
     option is specific to NTSC regions.  XDS is used to send information
     about the channel including the network name and call letters, and

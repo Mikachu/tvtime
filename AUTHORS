@@ -94,13 +94,17 @@ Authors and contributors
     - Extended XMLTV info to list the upcoming show.
 
   Kevin Ko <kevko@users.sourceforge.net>
-    - Improved CC decoding by adding better VBI clock-signal locking
+    - Improved CC decoding by adding better VBI clock-signal locking.
 
   Corey Quilliam <tourettes@users.sourceforge.net>
     - Fixed the mixer commands to allow changing by percentages.
 
   Than Ngo <than@redhat.com>
-    - Fixed for compiling with gcc-3.4 and -fPIC
+    - Fixed for compiling with gcc-3.4 and -fPIC.
+
+  Ingo van Lil <inguin@gmx.de>
+    - Added support for reading the localized program descriptions
+      from the XMLTV file.
 
 Translators
 

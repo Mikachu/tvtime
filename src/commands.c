@@ -970,7 +970,12 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->sleeptimer_start = 0;
 
     if( config_get_xmltv_file( cfg ) && strcasecmp( config_get_xmltv_file( cfg ), "none" ) ) {
-        cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ) );
+        if( config_get_xmltv_language( cfg ) && strcasecmp( config_get_xmltv_language( cfg ), "none" ) ) {
+            cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ),
+                                    config_get_xmltv_language( cfg ) );
+        } else {
+            cmd->xmltv = xmltv_new( config_get_xmltv_file( cfg ), 0 );
+        }
     } else {
         cmd->xmltv = 0;
     }

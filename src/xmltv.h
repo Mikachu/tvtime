@@ -30,7 +30,7 @@ typedef struct xmltv_s xmltv_t;
 /**
  * Creates a new XMLTV parser object.
  */
-xmltv_t *xmltv_new( const char *filename );
+xmltv_t *xmltv_new( const char *filename, const char *locale );
 
 /**
  * Cleans up and deletes an XMLTV parser object.

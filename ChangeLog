@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Added code for reading localized descriptions from the XMLTV
+      file.  Thanks to Ingo van Lil for the patch.
   * vektor: Fixed an insanely bad race condition in the not-using-RTC
       code.  This should solve some weird, inexplicable hangs.  Thanks
       to Roman Glebov for his help debugging this.

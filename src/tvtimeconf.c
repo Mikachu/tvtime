@@ -97,6 +97,7 @@ struct config_s
     char *timeformat;
     char *audiomode;
     char *xmltvfile;
+    char *xmltvlanguage;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
 
@@ -151,6 +152,7 @@ static void copy_config( config_t *dest, config_t *src )
     dest->doc = 0;
     dest->audiomode = 0;
     dest->xmltvfile = 0;
+    dest->xmltvlanguage = 0;
     dest->dkmode = 0;
 
     /* Useful strings must be copied. */
@@ -300,6 +302,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "XMLTVFile" ) ) {
             if( ct->xmltvfile ) free( ct->xmltvfile );
             ct->xmltvfile = expand_user_path( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "XMLTVLanguage" ) ) {
+            if( ct->xmltvlanguage ) free( ct->xmltvlanguage );
+            ct->xmltvlanguage = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "FullscreenPosition" ) ) {
@@ -815,6 +822,7 @@ config_t *config_new( void )
     }
     ct->audiomode = strdup( "stereo" );
     ct->xmltvfile = strdup( "none" );
+    ct->xmltvlanguage = strdup( "none" );
     ct->timeformat = strdup( "%X" );
     ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
     ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
@@ -1088,6 +1096,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         config_save( ct, "MixerDevice", ct->mixerdev );
 
         config_save( ct, "XMLTVFile", ct->xmltvfile );
+        config_save( ct, "XMLTVLanguage", ct->xmltvlanguage );
     }
 
     return 1;
@@ -1263,6 +1272,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         config_save( ct, "MixerDevice", ct->mixerdev );
 
         config_save( ct, "XMLTVFile", ct->xmltvfile );
+        config_save( ct, "XMLTVLanguage", ct->xmltvlanguage );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->priority );
         config_save( ct, "ProcessPriority", tempstring );
@@ -1321,6 +1331,7 @@ void config_free_data( config_t *ct )
     if( ct->ssdir ) free( ct->ssdir );
     if( ct->audiomode ) free( ct->audiomode );
     if( ct->xmltvfile ) free( ct->xmltvfile );
+    if( ct->xmltvlanguage ) free( ct->xmltvlanguage );
     if( ct->timeformat ) free( ct->timeformat );
     if( ct->rvr_filename ) free( ct->rvr_filename );
     if( ct->mpeg_filename ) free( ct->mpeg_filename );
@@ -1731,6 +1742,11 @@ const char *config_get_audio_mode( config_t *ct )
 const char *config_get_xmltv_file( config_t *ct )
 {
     return ct->xmltvfile;
+}
+
+const char *config_get_xmltv_language( config_t *ct )
+{
+    return ct->xmltvlanguage;
 }
 
 int config_get_invert( config_t *ct )

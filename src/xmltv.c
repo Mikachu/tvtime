@@ -28,6 +28,7 @@ struct xmltv_s
 {
     xmlDocPtr doc;
     xmlNodePtr root;
+    xmlChar *locale;
     char curchannel[ 256 ];
     int refresh;
     xmlChar *curchan;
@@ -42,8 +43,11 @@ struct xmltv_s
  */
 struct program_s {
     xmlChar *title;
+    xmlChar *title_local;
     xmlChar *subtitle;
+    xmlChar *subtitle_local;
     xmlChar *description;
+    xmlChar *description_local;
     char times[ 256 ];
     time_t end_time;
 };
@@ -204,11 +208,12 @@ static time_t parse_xmltv_date( const char *date )
     return mktime( &tm_obj );
 }
 
-static void reinit_program( program_t *pro, xmlNodePtr cur )
+static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
 {
     if( cur ) {
         xmlChar *start = xmlGetProp( cur, BAD_CAST "start" );
         xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
+        xmlChar *lang;
         time_t start_time = 0;
         time_t end_time = 0;
         struct tm start_tm;
@@ -242,17 +247,46 @@ static void reinit_program( program_t *pro, xmlNodePtr cur )
 
         cur = cur->xmlChildrenNode;
         while( cur ) {
+            lang = xmlGetProp( cur, BAD_CAST "lang");
             if( !xmlStrcasecmp( cur->name, BAD_CAST "title" ) ) {
-                pro->title = xmlNodeGetContent( cur );
+                if( !lang || !locale ) {
+                    if ( pro->title ) xmlFree ( pro->title );
+                    pro->title = xmlNodeGetContent( cur );
+                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                    if ( pro->title_local ) xmlFree ( pro->title_local );
+                    pro->title_local = xmlNodeGetContent( cur );
+                } else if( !pro->title ) {
+                    pro->title = xmlNodeGetContent( cur );
+                }
             } else if( !xmlStrcasecmp( cur->name, BAD_CAST "sub-title" ) ) {
-                pro->subtitle = xmlNodeGetContent( cur );
+                if( !lang || !locale ) {
+                    if ( pro->subtitle ) xmlFree ( pro->subtitle );
+                    pro->subtitle = xmlNodeGetContent( cur );
+                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                    if ( pro->subtitle_local )
+                        xmlFree ( pro->subtitle_local );
+                    pro->subtitle_local = xmlNodeGetContent( cur );
+                } else if( !pro->subtitle ) {
+                    pro->subtitle = xmlNodeGetContent( cur );
+                }
             } else if( !xmlStrcasecmp( cur->name, BAD_CAST "desc" ) ) {
-                pro->description = xmlNodeGetContent( cur );
+                if( !lang || !locale ) {
+                    if ( pro->description ) xmlFree ( pro->description );
+                    pro->description = xmlNodeGetContent( cur );
+                } else if( !xmlStrcasecmp( lang, locale ) ) {
+                    if ( pro->description_local )
+                        xmlFree ( pro->description_local );
+                    pro->description_local = xmlNodeGetContent( cur );
+                } else if( !pro->description ) {
+                    pro->description = xmlNodeGetContent( cur );
+                }
             }
+            if( lang ) xmlFree( lang );
             cur = cur->next;
         }
     } else {
          pro->title = pro->subtitle = pro->description = 0;
+         pro->title_local = pro->subtitle_local = pro->description_local = 0;
          pro->end_time = 0;
          *pro->times = 0;
     }
@@ -261,7 +295,7 @@ static void reinit_program( program_t *pro, xmlNodePtr cur )
 static program_t *program_new( void )
 {
     program_t *pro = malloc( sizeof( program_t ) );
-    reinit_program( pro, 0 );
+    reinit_program( pro, 0, 0 );
     return pro;
 }
 
@@ -325,13 +359,15 @@ static int xmltv_is_tv_grab_na( xmltv_t *xmltv )
     return 0;
 }
 
-xmltv_t *xmltv_new( const char *filename )
+xmltv_t *xmltv_new( const char *filename, const char *locale )
 {
     xmltv_t *xmltv = malloc( sizeof( xmltv_t ) );
 
     if( !xmltv ) {
         return 0;
     }
+
+    xmltv->locale = BAD_CAST strdup( locale );
 
     xmltv->doc = xmlParseFile( filename );
     if( !xmltv->doc ) {
@@ -374,7 +410,7 @@ static void program_delete( program_t *pro )
     if( pro->title ) xmlFree( pro->title );
     if( pro->subtitle ) xmlFree( pro->subtitle );
     if( pro->description ) xmlFree( pro->description );
-    reinit_program( pro, 0 );
+    reinit_program( pro, 0, 0 );
     free( pro );
 }
 
@@ -384,6 +420,7 @@ void xmltv_delete( xmltv_t *xmltv )
     program_delete( xmltv->next_pro );
     if( xmltv->curchan ) xmlFree( xmltv->curchan );
     if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
+    if( xmltv->locale) xmlFree( xmltv->locale );
     xmlFreeDoc( xmltv->doc );
     free( xmltv );
 }
@@ -406,23 +443,23 @@ void xmltv_refresh( xmltv_t *xmltv )
     if( xmltv->pro->title ) xmlFree( xmltv->pro->title );
     if( xmltv->pro->subtitle ) xmlFree( xmltv->pro->subtitle );
     if( xmltv->pro->description ) xmlFree( xmltv->pro->description );
-    reinit_program( xmltv->pro, 0 );
+    reinit_program( xmltv->pro, 0, 0 );
 
     if( xmltv->next_pro->title ) xmlFree( xmltv->next_pro->title );
     if( xmltv->next_pro->subtitle ) xmlFree( xmltv->next_pro->subtitle );
     if( xmltv->next_pro->description ) xmlFree( xmltv->next_pro->description );
-    reinit_program( xmltv->next_pro, 0 );
+    reinit_program( xmltv->next_pro, 0, 0 );
 
     if( *xmltv->curchannel ) {
         xmlNodePtr program_node = 0;
         program_node = get_program( xmltv->root, xmltv->curchannel, curtime );
-        reinit_program( xmltv->pro, program_node );
+        reinit_program( xmltv->pro, program_node, xmltv->locale );
 
         if( program_node ) {
             /* If we found a program, lookup what's on next. */
             program_node = get_program( xmltv->root, xmltv->curchannel,
                                         xmltv->pro->end_time );
-            reinit_program( xmltv->next_pro, program_node );
+            reinit_program( xmltv->next_pro, program_node, xmltv->locale );
         } else {
             /* We found no program, schedule a check in a half hour. */
             xmltv->pro->end_time = curtime + 1800;
@@ -433,16 +470,25 @@ void xmltv_refresh( xmltv_t *xmltv )
 
 const char *xmltv_get_title( xmltv_t *xmltv )
 {
+    if ( xmltv->pro->title_local ) {
+        return (char *) xmltv->pro->title_local;
+    }
     return (char *) xmltv->pro->title;
 }
 
 const char *xmltv_get_sub_title( xmltv_t *xmltv )
 {
+    if ( xmltv->pro->subtitle_local ) {
+        return (char *) xmltv->pro->subtitle_local;
+    }
     return (char *) xmltv->pro->subtitle;
 }
 
 const char *xmltv_get_description( xmltv_t *xmltv )
 {
+    if ( xmltv->pro->description_local ) {
+        return (char *) xmltv->pro->description_local;
+    }
     return (char *) xmltv->pro->description;
 }
 
@@ -453,6 +499,9 @@ const char *xmltv_get_times( xmltv_t *xmltv )
 
 const char *xmltv_get_next_title( xmltv_t *xmltv )
 {
+    if ( xmltv->next_pro->title_local ) {
+        return (char *) xmltv->next_pro->title_local;
+    }
     return (char *) xmltv->next_pro->title;
 }
 
