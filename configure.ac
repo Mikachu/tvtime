@@ -50,7 +50,7 @@ dnl Test for libpng
 AC_CHECK_LIB(png, png_read_png,
         [ AC_CHECK_HEADER(png.h,
           have_libpng=yes
-          PNG_LIBS="-lpng",)], AC_MSG_ERROR(libpng needed), "$ZLIB_LIBS")
+          PNG_LIBS="-lpng $ZLIB_LIBS -lm",)], AC_MSG_ERROR(libpng needed), "$ZLIB_LIBS" -lm)
 
 AM_CONDITIONAL(HAVE_LIBPNG, [test x"$have_libpng" = "xyes"])
 AC_SUBST(PNG_LIBS)
