@@ -1,0 +1,518 @@
+.\" Man page for tvtime.xml
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\" German translation (c) 2004  Ingo van Lil
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH tvtime.xml 5 "September 2004" "tvtime 0.9.13"
+
+.SH NAME
+tvtime.xml \- tvtime\-Konfigurationsdatei
+
+.SH ÜBERSICHT
+
+.I ~/.tvtime/tvtime.xml
+.br
+.I /etc/tvtime/tvtime.xml
+.br
+
+.SH BESCHREIBUNG
+
+Die Datei
+.I tvtime.xml
+ist die zentrale Konfigurationsdatei für
+.BR tvtime .
+Sie enthält alle Standardeinstellungen und Tastenbindungen.  Die Datei wird
+zur Laufzeit durch
+.B tvtime
+aktualisiert, um Einstellungen für den nächsten Programmstart zu erhalten.
+Daher sollten Sie die Datei nicht bearbeiten, während
+.B tvtime
+läuft, da Ihre Änderungen sonst überschrieben werden könnten.
+
+Die globale Syntax sieht folgendermaßen aus:
+
+    <?xml version="1.0"?>
+    <!DOCTYPE tvtime PUBLIC "-//tvtime//DTD tvtime 1.0//EN"
+      "http://tvtime.sourceforge.net/DTD/tvtime1.dtd">
+    <tvtime xmlns="http://tvtime.sourceforge.net/DTD/">
+    </tvtime>
+
+Den DTD und weitere Informationen über die XML\-Konfigurationsdateien finden
+Sie unter
+.nh
+.UR http://tvtime.sourceforge.net/DTD/
+http://tvtime.sourceforge.net/DTD/
+.UE
+.hy
+
+.SH OPTIONEN
+
+.B tvtime
+bietet eine große Menge an Optionen.  Die <option>\-Tags sollten im
+<tvtime>\-Tag eingeschlossen sein.
+
+Die folgende Liste enthält alle Optionen, deren Standardwerte und eine
+Beschreibung ihrer Wirkung:
+
+.TP
+<option name="Verbose" value="0"/>
+Wenn diese Option auf
+.IR 1
+gesetzt wird, startet
+.B tvtime
+im wortreichen Modus, in dem Informations\- und Warnmeldungen auf dem
+Standardfehlerkanal ausgegeben werden.  Andernfalls werden nur kritische
+Fehlermeldungen angezeigt.
+
+.TP
+<option name="V4LDevice" value="/dev/video0"/>
+Legt das zu verwendende video4linux\-Gerät fest.  Standardmäßig wird
+.IR /dev/video0
+verwendet.
+
+.TP
+<option name="V4LInput" value="0"/>
+Legt die video4linux\-Quellennummer fest.  Standardwert ist
+.IR 0 .
+Die meisten Karten besitzen eine ganze Reihe von Quellen, so ist z. B. bei
+einer WinTV\-Karte
+.I Quelle 0
+der TV\-Empfänger und
+.I Quelle 1
+der Composite Video\-Eingang.
+
+Die Videoquelle kann auch zur Laufzeit mit dem Kommando
+.B toggle_input
+geändert werden, das im Normalfall mit der Taste \(lqi\(rq ausgelöst wird.
+
+.TP
+<option name="Norm" value="NTSC"/>
+Stellt den TV\-Empfänger auf die angegebene Fernsehnorm ein (Standardwert ist
+.IR NTSC ).
+Gültige Werte sind:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@NTSC\-JP
+\(bu@SECAM
+\(bu@PAL
+\(bu@PAL\-Nc
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@PAL\-60
+.TE
+
+.TP
+<option name="SaveAndRestorePictureSettings" value="1"/>
+Diese Option legt fest, ob
+.B tvtime
+die Bildeinstellungen automatisch beim Kanalwechsel oder beim Beenden des
+Programms speichern soll.
+
+.TP
+<option name="AudioMode" value="stereo"/>
+Diese Option speichert den zuletzt verwendeten Audio\-Modus, um diesen beim
+nächsten Programmstart wiederherzustellen.  Mögliche Werte sind "mono",
+"stereo", "lang1", "lang2" oder "sap".
+
+.TP
+<option name="AudioBoost" value="-1"/>
+Diese Option speichert die Lautstärke der TV\-Karte in Prozent.  Im Normalfall
+ändert
+.B tvtime
+die Audio\-Lautstärke der TV\-Karte überhaupt nicht, aber in manchen Fällen
+ist die Werkseinstellung nicht brauchbar oder wird von anderen Anwendungen
+verändert und kann mit dieser Option auf einen sinnvollen Wert konfiguriert
+werden.
+Verwenden Sie
+.IR -1 ,
+um die Lautstärke nicht durch
+.B tvtime
+setzen zu lassen.
+
+.TP
+<option name="ShowCC" value="0"/>
+Diese Option aktiviert oder deaktiviert die Dekodierung von Closed
+Caption\-Untertiteln für Hörgeschädigte in NTSC\-Regionen.
+
+.TP
+<option name="ColourInvert" value="0"/>
+Diese Option speichert den Status des Farbinvertierungsfilters bis zum
+nächsten Programmstart.
+
+.TP
+<option name="MirrorInput" value="0"/>
+Diese Option speichert den Status des Spiegelfilters bis zum nächsten
+Programmstart.
+
+.TP
+<option name="Frequencies" value="US-Cable"/>
+Wählt die zu verwendende Frequenztabelle. Mögliche Werte:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us-cable
+\(bu@us-broadcast
+\(bu@japan-cable
+\(bu@japan-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+.TE
+
+.TP
+<option name="NTSCCableMode" value="Standard"/>
+Es gibt in den USA zwei vom Normalfall abweichende NTSC\-Kabelstandards: IRC
+und HRC. Bei IRC liegen die Kanäle 5 und 6 auf anderen Frequenzen als sonst,
+bei HRC sind zusätzlich noch alle Frequenzen um 1,25 MHz nach oben verschoben.
+Mögliche Werte:
+.IR Standard ,
+.IR IRC " oder "
+.IR HRC .
+IRC und HRC werden nur sehr selten verwendet.
+
+
+.TP
+<option name="CheckForSignal" value="1"/>
+Aktiviert oder deaktiviert die Signalprüfung.  Wenn Sie nicht gerade eine ganz
+furchtbar schlechte TV\-Karte haben, sollte es keinen Grund geben, diese
+Funktion abzuschalten.  Die Signalprüfung ist eine notwendige Voraussetzung
+für den Sendersuchlauf.
+
+.TP
+<option name="InputWidth" value="720"/>
+Legt die horizontale Auflösung des V4L\-Eingangssignals fest.  Ein höherer
+Wert liefert ein besseres Bild, ein niedrigerer Wert verringert die benötigte
+Rechenzeit.  Wenn Sie eine langsame CPU besitzen (etwa 500 MHz oder weniger),
+sollten Sie einen Wert von
+.IR 480 " oder " 400
+verwenden.  Für höchste Bildqualität verwenden Sie
+.IR 720 " oder " 768
+Pixel.  Die meisten TV\-Karten können das Eingangssignal nicht mit mehr als
+.I 768
+Pixeln pro Bildzeile abtasten.
+
+.TP
+<option name="XMLTVFile" value="none"/>
+Tragen Sie hier den Namen der Datei ein, aus der Programminformationen im
+XMLTV\-Format zur Anzeige im OSD gelesen werden sollen.  Verwenden Sie "none",
+wenn Sie XMLTV nicht verwenden möchten.
+
+.TP
+<option name="XMLTVLanguage" value="none"/>
+Wählt die bevorzugte Sprache für XMLTV\-Daten.  Setzen Sie dies auf den
+zweibuchstabigen Sprachcode gemäß ISO 639 (z. B. "de" für Deutsch), um
+XMLTV\-Daten in der gewählten Sprache anzuzeigen, wenn vorhanden.
+
+.TP
+<option name="UseXDS" value="0"/>
+Setzen Sie diese Option auf
+.IR 1 ,
+um die Dekodierung von XDS\-Programminformationen zu aktivieren.  Diese
+Funktion ist nur in NTSC\-Gebieten verfügbar.  XDS wird verwendet, um
+Informationen über das aktuelle Programm (Name des Senders und des
+Netzwerkes, dem er angehört, Senderkürzel und manchmal Informationen über die
+laufende Sendung) zu übertragen.
+
+.TP
+<option name="VBIDevice" value="/dev/vbi0"/>
+Legt das zu verwendende VBI\-Gerät fest.
+
+.TP
+<option name="MixerDevice" value="/dev/mixer:line"/>
+Legt Mixergerät und \-kanal fest.  Das Format dieser Einstellung ist
+name:kanal.  Gültige Kanäle:
+
+.nh
+.IR vol ", " bass ", " treble ", " synth ", " pcm ", " speaker ", "
+.IR line ", "  mic ", "  cd ", "  mix ", "  pcm2 ", " rec ", " 
+.IR igain ", "  ogain ", "  line1 ", "  line2 ", "  line3 ", "
+.IR dig1 ", "  dig2 ", "  dig3 ", "  phin ", " phout ", " video ", "
+.IR radio ", "  monitor
+.hy
+
+.TP
+<option name="Widescreen" value="0"/>
+Setzen Sie diese Option, um
+.B tvtime
+im 16:9\-Breitbildmodus zu starten.
+
+.TP
+<option name="WindowGeometry" value="0x576"/>
+Legt die Größe des Ausgabefensters fest.  Wenn die Breite mit 0 angegeben
+wird, wird die passende Breite zur Fensterhöhe berechnet.  Bei einem
+4:3\-Bildformat und quadratischen Pixeln wird standardmäßig eine Fenstergröße
+von
+.I 768\[mu]576
+Pixeln verwendet.
+
+.TP
+<option name="Overscan" value="0.0"/>
+Gibt die Größe des überstehenden Bildbereiches in Prozent an.  Analoge
+Fernseher verwenden normalerweise etwa 10%, dadurch ist allerdings ein großer
+Teil des Bildes nicht zu sehen.  Wenn Sie möchten, daß
+.B tvtime
+wie ein normaler Fernseher aussieht, sollten Sie einen Wert zwischen 6% und
+8% wählen.  Um 8% zu verwenden, setzen Sie diese Option auf 
+.IR 8.0 .
+
+.TP
+<option name="Fullscreen" value="0"/>
+Setzen Sie diese Option auf
+.IR 1 ,
+um
+.B tvtime
+im Vollbildmodus starten zu lassen.  Diese Einstellung wird beim Beenden
+gespeichert und beim nächsten Programmstart wiederhergestellt.
+
+.TP
+<option name="AlwaysOnTop" value="0"/>
+Setzen Sie diese Option auf
+.IR 1 ,
+um
+.B tvtime
+im "Immer im Vordergrund"\-Modus zu starten, vorausgesetzt, der verwendete
+Fenstermanager unterstützt diese Funktion.  Diese Einstellung wird beim
+Beenden gespeichert und beim nächsten Programmstart wiederhergestellt.
+
+.TP
+<option name="FullscreenPosition" value="Centre"/>
+Setzt die Position des Bildes im Vollbildmodus. Mögliche Werte:
+.IR "top (oberer Bildrand)" ,
+.I bottom (unterer Bildrand)
+oder
+.I centre (mittig).
+
+.TP
+<option name="FramerateMode" value="0"/>
+Setzt die Bildrate, in der
+.B tvtime
+startet. Mögliche Werte:
+.RS
+.TP 4
+.I 0
+Volle Bildrate, beide Halbbilder werden verarbeitet.  Die Bildrate beträgt
+59.94 Bilder/s bei NTSC und 50 Bilder/s bei PAL.
+
+.TP
+.I 1
+Halbe Bildrate, nur das obere Halbbild wird verarbeitet (TFF, Top Field
+First). 29,97 Bilder/s bei NTSC, 25 Bilder/s bei PAL.
+
+.TP
+.I 2
+Halbe Bildrate, nur das untere Halbbild wird verarbeitet (BFF, Bottom Field
+First). 29,97 Bilder/s bei NTSC, 25 Bilder/s bei PAL.
+.RE
+.IP
+Die beiden Modi mit halber Bildrate sind nützlich, wenn Sie
+.B tvtime
+mit einer Spielkonsole betreiben wollen.  Benutzen Sie den
+"Weave"\-De\-Interlacer und wählen Sie TFF oder BFF, je nachdem, bei welcher
+Einstellung keine Interlace\-Effekte auftreten.
+
+.TP
+<option name="ApplyLumaCorrection" value="0"/>
+Legt fest, ob der Farbkorrekturfilter bei Programmstart aktiviert oder
+deaktiviert sein soll.  Diese Einstellung können Sie zur Laufzeit mit der
+Taste \(lqc\(rq ändern.
+
+.TP
+<option name="LumaCorrection" value="1.0"/>
+Legt die Stärke der Farbkorrektur fest.  Bei einem Wert von
+.I 1.0
+wird nur die bt8x8\-Korrektur aktiviert, falls Sie eine bt8x8\-basierte Karte
+besitzen.  Bei niedrigeren Werten wird das Bild dunkler, bei höheren Werten
+heller.  Der zulässige Wertebereich ist
+.IR 0.1 " bis " 10.0
+bei einer Schrittweite von 0.1.
+
+.TP
+<option name="QuietScreenshots" value="0"/>
+Schaltet die optische Rückmeldung beim Bildschirmfotos ein oder aus.
+Normalerweise wird bei Erzeugen eines Bildschirmfotos eine Nachricht im OSD
+ausgegeben.  Wenn Sie mehrere Bildschirmfotos kurz hintereinander machen
+möchten, ohne daß die jeweils vorangegangene Benachrichtigung in selbigen zu
+sehen ist, können Sie die Benachrichtigung mit dieser Funktion abschalten.
+
+.TP
+<option name="ProcessPriority" value="-19"/>
+Setzt die Priorität, mit der der
+.BR tvtime \-Prozeß
+laufen soll.  Im Normalfall versucht
+.BR tvtime ,
+die höchstmögliche Priorität
+.RI ( \[en]19 )
+zu bekommen, was zwar nicht unbedingt fair gegenüber anderen Prozessen ist,
+aber sicherstellt, daß ein Bild bearbeitet wird, sobald es ankommt.  Zulässige
+Werte sind
+.IR \[en]20 " bis " 20 ,
+wobei niedrigere Werte eine höhere Priorität bedeuten (beschweren Sie sich
+darüber bei den UNIX\-Entwicklern).
+
+.TP
+<option name="TimeFormat" value="%X"/>
+Legt das Zeitformat im OSD fest.  Die Angabe ist eine Zeichenkette im selben
+Format, wie bei 
+.BR strftime (3).
+Die Standardeinstellung verwendet das Zeitformat Ihrer Locale\-Einstellungen.
+
+.TP
+<option name="ScreenShotDir" value="~"/>
+Legt das Verzeichnis fest, in dem Ihre Bildschirmfotos abgelegt werden.
+Standardmäßig wird das Homeverzeichnis des
+.BR tvtime \-Benutzers
+verwendet.
+
+.TP
+.PD 0
+<option name="ChannelTextFG" value="0xFFFFFF00"/>
+.TP
+.PD
+<option name="OtherTextFG" value="0xFFF5DEB3"/>
+Diese Optionen setzen die Farben des OSD im ARGB\-Format (Alpha, Rot, Grün,
+Blau).  Die Standardwerte bedeuten, daß Kanalnummer und \-name gelb angezeigt
+werden, während der restliche Text beige ist.
+Die Farbe kann sowohl im Hexadezimal\- als auch im Dezimalformat angegeben
+werden.  Fehlt der Wert für den Alphakanal, wird der Text vollständig
+undurchsichtig
+.RI ( 255 )
+dargestellt.
+
+.RS
+.TP 10
+Beispiele:
+.IR 0xffaadd ,
+.IR 0xff0000ff ,
+.IR 0xff ,
+.IR 0xffff ,
+.IR "255 255 0" ,
+.IR 0 ,
+.IR 16777215 .
+.RE
+
+.TP
+<option name="UnmuteVolume" value="-1"/>
+Diese Einstellung speichert die Mixerlautstärke vor Stummschaltung bis zum
+nächsten Programmstart.  Sie sollten diesen Wert nicht von Hand verändern.
+
+.TP
+<option name="Muted" value="0"/>
+Diese Einstellung speichert den Status der Stummschaltung bis zum nächsten
+Programmstart.
+
+.TP
+<option name="MuteOnExit" value="1"/>
+Legt fest, ob
+.B tvtime
+die Mixerlautstärke beim Beenden stummschalten soll.  Normalerweise wird die
+Mixerlautstärke auf 0 gesetzt, da der Ton mancher TV\-Karten nicht
+abgeschaltet werden kann.  Deaktivieren Sie diese Einstellung, wenn dies zu
+Problemen mit anderen TV\-Anwendungen führt.
+
+.TP
+<option name="PrevChannel" value="2"/>
+Diese Option wird zur Laufzeit gesetzt, um den vorherigen Kanal zu speichern.
+
+.TP
+<option name="Channel" value="2"/>
+Diese Option wird zur Laufzeit gesetzt, um den aktuellen Kanal zu speichern.
+
+.TP
+<option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
+Legt den zu verwendenden De\-Interlacer\-Algorithmus fest.  Zulässige Werte:
+
+.RS
+.TP 15
+.PD 0
+.I TelevisionFull
+Television: Volle Auflösung
+.TP
+.I TelevisionHalf
+Television: Halbe Auflösung
+.TP
+.I BlurVertical
+Vertikal verwischen
+.TP
+.I BlurTemporal
+Zeitlich verwischen
+.TP
+.I AdaptiveSearch
+Adaptive Bewegungssuche
+.TP
+.I AdaptiveAdvanced
+Erweiterte adaptive Bewegungssuche
+.TP
+.I AdaptiveSimple
+Einfache adaptive Bewegungssuche
+.TP
+.I ProgressiveTFF
+Progressiv: Oberes Halbbild zuerst
+.TP
+.I ProgressiveBFF
+Progressiv: Unteres Halbbild zuerst
+.PD
+.RE
+
+.SH BINDUNGEN
+
+Tastendrücke und Mausklicks können 
+.BR tvtime \-Kommandos
+zugeordnet werden.  Eine vollständige Beschreibung aller Kommandos finden Sie
+in
+.BR tvtime-command (1).
+
+Es können mehrere Tasten oder Mausknöpfe ein und dem selben Kommando
+zugeordnet werden.
+.B tvtime
+stellt folgende Alias\-Bezeichnungen für spezielle Tasten zur Verfügung:
+
+.nh
+.IR Up ", " Down ", " Left ", " Right ", " Insert ", " Home ", " End ", "
+.IR PageUp ", " PageDown ", " F1 ", " F2 ", " F3 ", " F4 ", " F5 ", "
+.IR F6 ", " F7 ", " F8 ", " F9 ", " F10 ", " F11 ", " F12 ", " F13 ", "
+.IR F14 ", " F15 ", " Backspace ", " Escape ", " Enter ", " Print ", " Menu
+.hy
+
+In diesem Beispiel werden dem Kommando
+.I CHANNEL_INC
+die Tasten
+.IR Up " und " k
+sowie der Mausknopf
+.I 4
+zugeordnet:
+
+    <bind command="channel_inc">
+      <keyboard key="up"/>
+      <keyboard key="k"/>
+      <mouse button="4"/>
+    </bind>
+
+.SH AUTOR
+
+Billy Biggs.
+
+.SH "SIEHE AUCH"
+
+.BR tvtime (1),
+.BR tvtime-configure (1),
+.BR tvtime-command (1),
+.BR tvtime-scanner (1),
+.IR stationlist.xml (5).

@@ -1,0 +1,393 @@
+.\" Man page for tvtime
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\" German translation (c) 2004  Ingo van Lil
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH tvtime 1 "September 2004" "tvtime 0.9.13"
+
+.SH NAME
+tvtime \- Hochwertige Fernsehsoftware
+
+.SH SYNTAX
+
+.B tvtime
+[
+.IR OPTION
+] ...
+
+.SH BESCHREIBUNG
+
+.B tvtime
+ist eine hochwertige Fernsehsoftware zum Einsatz in Verbindung mit einer
+TV-Karte.
+.B tvtime
+verarbeitet die Bilddaten der TV-Karte und stellt sie auf dem Monitor oder
+einem Projektor dar.
+
+.B tvtime
+bietet:
+
+.IP \(bu 4
+De\-interlacing bei voller Bildrate (59.94 Bilder/s für NTSC\-Quellen, 50
+Bilder/s für PAL\-Quellen).  Dies ermöglicht ruckelfreie Bewegungen und hohe
+Bildqualität.
+
+.IP \(bu
+Mehrere De\-Interlacer-Algorithmen.  Dies ermöglicht, den jeweils optimalen
+Modus für den aktuellen Bildinhalt und die verfügbare Prozessorleistung
+auszuwählen.
+
+.IP \(bu
+16:9\-Modus, um die höchstmögliche Auflösung bei der Darstellung von
+Videosignalen von externen DVD\-Playern oder digitalen Satellitenreceivern zu
+bieten.
+
+.IP \(bu
+Ein ansprechendes On\-Screen\-Display für ein komplettes TV\-Erlebnis sowie
+ein leistungsfähiges Menü\-System.
+
+.SH BENUTZUNG
+
+Dies sind die wichtigsten Tastenkommandos, die sie für die Benutzung von
+tvtime lernen sollten:
+
+.RS
+.TP 20
+.I Escape oder q
+Beenden
+.TP
+.I F1 oder Tab
+Menü anzeigen
+.TP
+.I hoch/runter
+Sender wählen
+.TP
+.I 0-9 und Eingabe
+Sender wählen
+.TP
+.I Backspace
+Zurück zum letzten Sender
+.TP
+.I i
+Videoquelle wählen
+.TP
+.I m
+Stumm
+.TP
+.I +/- oder links/rechts
+Lautstärke einstellen
+.TP
+.I f
+Vollbild
+.TP
+.I s
+Bildschirmfoto machen
+.TP
+.I ?
+Informationen anzeigen
+.TP
+.I d
+Statistiken zu Debug\-Zwecken anzeigen
+.RE
+
+Die folgenden Tastenkommandos steuern erweiterte Funktionen von
+.BR tvtime .
+Alle diese Funktionen sind auch über das Menüsystem einstellbar, bei
+häufiger Verwendung können diese Abkürzungen jedoch hilfreich sein:
+
+.RS
+.TP 20
+.I < / >
+Overscan\-Einstellung.
+.TP
+.I e
+Audio\-Modus wechseln (Stereo/Mono/SAP)
+.TP
+.I a
+Seitenverhältnis wechseln.
+.TP
+.I r
+Aktuellen Sender auf anderen Speicherplatz verschieben.
+.TP
+.I v
+Immer im Vordergrund ein\-/ausschalten (bei kompatiblen Fenstermanagern).
+.TP
+.I p
+Pulldown\-Detektion ein\-/ausschalten (nur für NTSC)
+.TP
+.I t
+De\-Interlacer wechseln.
+.TP
+.I =
+Darstellungs\-Bildrate ändern.
+.TP
+.I F5/F6/F7
+Bildeinstellungen.
+.TP
+.I c
+Dekodierung von "Closed Caption"\-Untertiteln ein\-/ausschalten (nur NTSC).
+.TP
+.I ins
+Bildränder abblenden.
+.RE
+
+.SH OPTIONEN
+
+.TP
+.B \-a, \-\-widescreen
+Diese Option startet
+.B tvtime
+im 16:9\-Modus.
+
+.TP
+.B \-h, \-\-help
+Informationen zum Programmaufruf.
+
+.TP
+.B \-k, \-\-slave
+Tastatursteuerung deaktivieren, um
+.B tvtime
+im sog. Slave\-Modus zu betreiben. Dieser Modus wurde zur Integration mit
+PVR\-Software, wie z.B.
+.B freevo
+oder
+.BR mythtv
+hinzugefügt, so daß
+.B freevo
+Tastatureingaben verarbeiten kann, während
+.B tvtime
+läuft. Im Slave\-Modus werden Tastendrücke ignoriert, aber sie werden auf der
+Standardausgabe angezeigt und von der Standardeingabe werden Kommandos in der
+Syntax von
+.BR tvtime\-command
+akzeptiert.
+
+.TP
+.B \-m, \-\-fullscreen
+.B tvtime
+im Vollbildmodus starten.
+
+.TP
+.B \-M, \-\-window
+.B tvtime
+im Fenstermodus starten.
+
+.TP
+.B \-s, \-\-showdrops
+Informationen über übersprungene Bilder anzeigen.
+
+.TP
+.B \-S, \-\-saveoptions
+Kommandozeilenoptionen in Konfigurationsdatei speichern.  Diese Option
+speichert Informationen über die V4L\-Gerätedatei, VBI\-Gerätedatei,
+Quellennummer, Fernsehnorm, Frequenzen, Vollbildeinstellung, Seitenverhältnis,
+wortreichen Modus und die Höhe des Ausgabefensters.
+
+.TP
+.B \-v, \-\-verbose
+Startet
+.B tvtime
+im wortreichen Modus.  In diesem Modus werden Informationen und Warnmeldungen
+auf dem Standardfehlerkanal ausgegeben.  Andernfalls werden nur kritische
+Fehler angezeigt.
+
+.TP
+.B \-F, \-\-configfile=FILE
+Zusätzliche Konfigurationsdatei einlesen.
+
+.TP
+.B \-g, \-\-geometry=GEOMETRY
+Legt die Größe des Ausgabefensters fest, z. B. 400x300 für ein Fenster, das
+400 Pixel breit und 300 Pixel hoch ist.  Wird die Breite mit 0 angegeben, wird
+die passende Breite aus der Fensterhöhe errechnet.  Bei einem Seitenverhältnis
+von 4:3 und quadratischen Bildpunkten wird standardmäßig eine Fenstergröße von
+.I 768 \[mu] 576
+Punkten verwendet.
+
+.TP
+.B -I, \-\-inputwidth=SAMPLING
+Horizontale Auflösung des V4L\-Eingangssignals. Der Standardwert beträgt
+.IR 720 .
+Diese Einstellung legt fest, wie viele Pixel pro Bildzeile von der TV\-Karte
+ausgelesen werden sollen.  Ein höherer Wert liefert ein besseres Bild, ein
+niedriger Wert verringert die benötigte Rechenzeit.  Wenn Sie eine langsame
+CPU besitzen (etwa 500 MHz oder weniger), sollten Sie einen Wert von
+.IR 480 \ oder\  400
+verwenden.  Für höchste Bildqualität verwenden Sie
+.IR 720 \ oder\  768
+Pixel.  Viele TV\-Karten können das Eingangssignal nicht mit mehr als
+.I 768
+Pixeln pro Bildzeile abtasten.
+
+.TP
+.B \-d, \-\-device=NAME
+Legt das zu verwendende video4linux\-Gerät fest.  Standardmäßig wird
+.IR /dev/video0
+verwendet.
+
+.TP
+.B \-b, \-\-vbidevice=DEVICE
+Legt das zu verwendende VBI\-Gerät fest.  Standardmäßig wird
+.IR /dev/vbi0
+verwendet.
+
+.TP
+.B \-i, \-\-input=INPUTNUM
+Legt die video4linux\-Quellennummer fest.  Standardwert ist
+.IR 0 .
+Die meisten Karten besitzen eine ganze Reihe von Quellen, so ist z. B. bei
+einer WinTV\-Karte
+.I Quelle 0
+der TV\-Empfänger und
+.I Quelle 1
+der Composite Video\-Eingang.
+
+.TP
+.B \-c, \-\-channel=CHANNEL
+Startet
+.B tvtime
+auf dem angegebenen Sender.  Andernfalls wird die Einstellung aus der
+Konfigurationsdatei verwendet.
+
+.TP
+.B \-n, \-\-norm=NORM
+Stellt den TV\-Empfänger auf die angegebene Fernsehnorm ein (Standardwert ist
+.IR NTSC ).
+Gültige Werte sind:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@PAL
+\(bu@SECAM
+\(bu@PAL\-NC
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@NTSC\-JP
+.TE
+
+.TP
+.B \-f, \-\-frequencies=NAME
+Wählt die zu verwendende Frequenztabelle (Standardwert ist
+.IR us\-cable ).
+Gültige Werte sind:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us\-cable
+\(bu@us\-broadcast
+\(bu@japan\-cable
+\(bu@japan\-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia\-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+\(bu@custom (erst tvtime\-scanner starten)
+.TE
+
+.TP
+.B \-t, \-\-xmltv=FILE
+Liest die XMLTV\-Daten zur Anzeige im OSD aus der angegebenen Datei.  Die
+Zuordnung der Sender erfolgt aufgrund ihrer Namen.
+.B tvtime
+zeigt dann Titel, Untertitel und Beschreibung zur aktuellen Sendung im OSD an.
+
+.TP
+.B \-l, \-\-xmltvlanguage=LANG
+XMLTV\-Daten in der angegebenen Sprache anzeigen, wenn vorhanden.  Sprachen
+werden durch ihren zweibuchstabigen Code (z. B. "de" für Deutsch) angegeben.
+Fehlt diese Angabe oder ist sie auf "none" gesetzt, wird die Standardsprache
+verwendet.
+
+.TP
+.B \-X, \-\-display=DISPLAY
+Das angegebene X\-Display zur Darstellung des Fernsehbildes verwenden.
+
+.TP
+.B \-x, \-\-mixer=DEVICE[:CH]
+Legt Mixergerät und \-kanal fest. Der Standardwert ist
+.IR /dev/mixer:line ).
+Gültige Kanäle sind:
+.TS
+nokeep tab (@);
+l l.
+\(bu@vol
+\(bu@bass
+\(bu@treble
+\(bu@synth
+\(bu@pcm
+\(bu@speaker
+\(bu@line
+\(bu@mic
+\(bu@cd
+\(bu@mix
+\(bu@pcm2
+\(bu@rec
+\(bu@igain
+\(bu@ogain
+\(bu@line1
+\(bu@line2
+\(bu@line3
+\(bu@dig1
+\(bu@dig2
+\(bu@dig3
+\(bu@phin
+\(bu@phout
+\(bu@video
+\(bu@radio
+\(bu@monitor
+.TE
+
+
+.SH DATEIEN
+
+.I /tvtime/tvtime.xml
+.br
+.I $HOME/.tvtime/tvtime.xml
+.br
+.I $HOME/.tvtime/stationlist.xml
+.br
+.I /var/run/tvtime/TV-*/tvtimefifo
+
+.SH AUTOREN
+
+Billy Biggs,
+Doug Bell,
+Alexander S. Belov,
+Achim Schneider,
+David I. Lehn,
+Paul Jara,
+Robert H\[:o]gberg,
+Craig Dooley,
+Bart Dorsey,
+Nicolas Boos,
+Simon Law,
+Mark Trolley,
+Joachim Koenig,
+Stewart Allen,
+Justin A,
+Brian Goines,
+Krister Lagerstrom.
+
+.SH "SIEHE AUCH"
+
+.BR tvtime-command (1),
+.BR tvtime-configure (1),
+.BR tvtime-scanner (1),
+.IR tvtime.xml (5),
+.IR stationlist.xml (5).

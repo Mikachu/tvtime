@@ -1,0 +1,577 @@
+.\" Man page for tvtime-command
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\" German translation (c) 2004  Ingo van Lil
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.TH tvtime-command 1 "September 2004" "tvtime 0.9.13"
+
+.SH NAME
+tvtime\-command \- Steuerung einen laufenden
+.BR tvtime \-Prozesses.
+
+.SH SYNTAX
+
+.B tvtime\-command
+.RI [\| KOMMANDO "\|] ..."
+
+.SH BESCHREIBUNG
+
+.B tvtime\-command
+ermöglicht dem Benutzer, einem laufenden
+.BR tvtime \-Prozeß
+Kommandos zu schicken, um diesen zu steuern.  Es kommuniziert durch einen
+FIFO (eine "benannte Pipe") mit
+.BR tvtime .
+Kommandos werden nicht nach Groß\-/Kleinschreibung unterschieden und in der
+Reihenfolge ihrer Angabe ausgeführt.
+
+.SH KOMMANDOS
+
+.TP
+.B AUTO_ADJUST_PICT
+Setzt die Bildeinstellungen (Helligkeit, Kontrast, Farbton und Sättigung) auf
+die ihre Standardwerte zurück.
+
+.TP
+.B AUTO_ADJUST_WINDOW
+Paßt die Fenstergröße dem Inhalt an.  Setzen Sie diese Funktion ein, wenn sie
+die Fenstergröße von
+.B tvtime
+verstellt haben und sie wieder ein dem Bild angepaßtes Fenster mit dem
+Seitenverhältnis 4:3 haben möchten.
+
+.TP
+.B BRIGHTNESS_DOWN
+Verringert die Helligkeit der Bildquelle.
+
+.TP
+.B BRIGHTNESS_UP
+Erhöht die Helligkeit der Bildquelle.
+
+.TP
+.B CHANNEL_[0\-9]
+Simuliert einen Tastendruck auf dem Ziffernblock.
+
+.TP
+.B CHANNEL_ACTIVATE_ALL
+Reaktiviert alle Kanäle der Senderliste.  Benutzen Sie diese Funktion, um die
+Senderliste zu reinitialisieren, bevor sie den Kanalscanner starten, wenn
+Ihnen Sender fehlen oder oder wenn neue Sender hinzugekommen sind.
+
+.TP
+.B CHANNEL_DEC / CHANNEL_DOWN
+Wechselt zum nächstniedrigeren Kanal in der Senderliste.
+
+.TP
+.B CHANNEL_INC / CHANNEL_UP
+Wechselt zum nächsthöheren Kanal in der Senderliste.
+
+.TP
+.B CHANNEL_JUMP / CHANNEL_PREV
+Springt zum zuletzt eingestellten Sender zurück.  Dies ist sinnvoll um
+zwischen zwei Sendern hin\- und herzuspringen, die in der Senderliste weit
+auseinanderliegen.
+
+.TP
+.B CHANNEL_RENUMBER
+Verschiebt den aktuellen Kanal auf einen anderen Senderspeicher.  Diese
+Funktion tauscht den Speicherplatz des gerade aktiven Kanals mit dem, dessen
+Nummer sie eingeben.  Auf diese Weise können Sie die Senderliste ihren
+persönlichen Vorlieben anpassen.
+
+.TP
+.B CHANNEL_SAVE_TUNING
+Schreibt die momentane Feineinstellung als benutzerdefinierten Kanal in die
+Senderliste.
+
+.TP
+.B CHANNEL_SCAN
+Durchläuft die Senderliste ab der momentanen Position und deaktiviert alle
+Kanäle, auf denen kein Signal empfangen wird.  Dieses Kommando ist nur
+verfügbar, wenn die Signalprüfung aktiviert ist.
+
+.TP
+.B CHANNEL_SKIP
+Markiert den aktuellen Kanal als aktiviert oder deaktiviert.  Auf diese Weise
+können Sie ihre Senderliste manuell durchsuchen und solche mit vorhandenem
+Signal aktivieren oder doppelt vorhandene Sender deaktivieren.
+
+.TP
+.B COLOUR_DOWN / COLOR_DOWN / SATURATION_DOWN
+Verringert die Farbsättigung des Bildsignals.  Dadurch wird das Bild weniger
+farbintensiv, bis es komplett schwarzweiß ist.
+
+.TP
+.B COLOUR_UP / COLOR_UP / SATURATION_UP
+Erhöht die Farbsättigung des Bildsignals.  Dadurch wird das Bild
+farbintensiver.
+
+.TP
+.B CONTRAST_DOWN
+Verringert die Kontrasteinstellung des Bildsignals.
+
+.TP
+.B CONTRAST_UP
+Erhöht die Kontrasteinstellung des Bildsignals.
+
+.TP
+.B DISPLAY_INFO
+Blendet das OSD mit Information zum aktuellen Sender und der Uhrzeit ein.
+
+.TP
+.B DISPLAY_MESSAGE
+Zeigt eine Nachricht am unteren Bildrand an.  Dies ist nützlich für Cronjobs
+oder andere Skripte, um Benachrichtigungen an einen tvtime-Nutzer zu
+schicken.
+
+.TP
+.B DOWN
+Dieses Kommando wechselt entweder zum nächstniedrigeren Sender oder bewegt den
+Cursor eine Menüzeile nach unten, je nachdem, ob das Menü aktiv ist oder
+nicht.  Es sollte in Verbindung mit den Kommandos LEFT, RIGHT und UP verwendet
+werden.
+
+.TP
+.B ENTER
+Simuliert einen ENTER\-Tastendruck.  Verwenden Sie dies, um den Sender zu
+wechseln:
+.br
+\h'4n'tvtime-command channel_1 channel_5 enter
+.br
+wechselt auf Sender 15.
+
+.TP
+.B FINETUNE_DOWN
+Verringert die Feineinstellung für den aktuellen Sender.
+
+.TP
+.B FINETUNE_UP
+Erhöht die Feineinstellung für den aktuellen Sender.
+
+.TP
+.B HUE_DOWN
+Verringert die Farbton\-Einstellung für den aktuellen Sender.
+
+.TP
+.B HUE_UP
+Erhöht die Farbton\-Einstellung für den aktuellen Sender.
+
+.TP
+.B KEY_EVENT
+Simuliert einen Tastendruck in
+.BR tvtime .
+Auf diese Weise können komplexe Operationen mit der Fernbedienung
+durchgeführt werden, indem Sie
+.BR tvtime s
+Tastenbindungssystem verwenden.
+
+.TP
+.B LEFT
+Dieses Kommando verringert entweder die Lautstärke oder geht eine Menüebene
+zurück, je nachdem, ob das Menü aktiv ist oder nicht.  Es sollte in Verbindung
+mit den Kommandos RIGHT, UP und DOWN genutzt werden.
+
+.TP
+.B LUMA_DOWN
+Verringert den Farbkorrekturwert.
+
+.TP
+.B LUMA_UP
+Erhöht den Farbkorrekturwert.
+
+.TP
+.B MENU_DOWN
+Bewegt den Cursor um einen Menüzeile nach unten.
+
+.TP
+.B MENU_ENTER
+Wählt den markierten Menüeintrag oder wechselt zur nächsten Menüebene.
+
+.TP
+.B MENU_EXIT
+Verläßt das Menü.
+
+.TP
+.B MENU_LEFT
+Geht eine Menüebene zurück.
+
+.TP
+.B MENU_RIGHT
+Wählt den markierten Menüeintrag oder wechselt zur nächsten Menüebene.
+
+.TP
+.B MENU_UP
+Bewegt den Cursor um einen Menüzeile nach oben.
+
+.TP
+.B MIXER_DOWN
+Verringert die Mixerlautstärke.  Durch einen optionalen Parameter kann die
+Anzahl der Prozentpunkte, um die die Lautstärke verringert werden soll,
+angegeben werden.
+
+.TP
+.B MIXER_TOGGLE_MUTE
+Aktiviert oder deaktiviert die Stummschaltung des Mixers, im Gegensatz zu
+.B TOGGLE_MUTE,
+das die TV\-Karte stummschaltet.
+
+.TP
+.B MIXER_UP
+Erhöht die Mixerlautstärke.  Durch einen optionalen Parameter kann die
+Anzahl der Prozentpunkte, um die die Lautstärke erhöht werden soll,
+angegeben werden.
+
+.TP
+.B NOOP
+Dieses Kommando hat keine Wirkung.  Es ist sinnvoll, um eine vordefinierte
+Tastenbindung zu deaktivieren.
+
+.TP
+.B OVERSCAN_DOWN
+Verringert den überstehenden Bildbereich, es ist also ein größerer Teil des
+Fernsehbildes zu sehen.
+
+.TP
+.B OVERSCAN_UP
+Erhöht den überstehenden Bildbereich, es ist also ein kleinerer Teil des
+Fernsehbildes zu sehen.
+
+.TP
+.B PICTURE
+Wechselt die mit den Kommandos
+.B PICTURE_UP
+und
+.B PICTURE_DOWN
+zu ändernde Bildeinstellung.
+
+.TP
+.B PICTURE_UP
+Erhöht die momentan gewählte Bildeinstellung (Helligkeit, Kontrast, Farbton
+oder Sättigung).
+
+.TP
+.B PICTURE_DOWN
+Verringert die momentan gewählte Bildeinstellung (Helligkeit, Kontrast,
+Farbton oder Sättigung).
+
+.TP
+.B RESTART
+Startet
+.B tvtime
+neu.  Dieses Kommando wird aus dem Menü verwendet, wenn eine Einstellung
+geändert wurde, die (noch) nicht zur Laufzeit konfigurierbar ist.
+
+.TP
+.B RIGHT
+Dieses Kommando erhöht entweder die Lautstärke oder wählt den markierten
+Menüpunkt, je nachdem, ob das Menü aktiv ist oder nicht.  Es sollte in
+Verbindung mit den Kommandos LEFT, UP und DOWN genutzt werden.
+
+.TP
+.B RUN_COMMAND
+Weist
+.B tvtime
+an, ein Kommando zu starten.  Auf diese Weise können externe Programme, z. B.
+mythepg oder alevt, durch einen Tastendruck in
+.B tvtime
+oder lirc gestartet werden.
+.br
+\h'4n'tvtime-command run_command "xterm"
+.br
+würde
+.B tvtime
+veranlassen, system( "xterm &" ) aufzurufen.
+
+.TP
+.B SAVE_PICTURE_GLOBAL
+Speichert die momentanten Bildeinstellungen als globale Standardwerte.
+
+.TP
+.B SAVE_PICTURE_CHANNEL
+Speichert die momentanen Bildeinstellungen als Standardwerte für den aktuellen
+Sender.
+
+.TP
+.B SCREENSHOT
+Erzeugt ein Bildschirmfoto vom aktuellen Fernsehbild.  Bildschirmfotos werden
+in dem Ordner gespeichert, der in der Datei
+.I tvtime.xml
+als Zielpfad für Bildschirmfotos angegeben ist.  Standardmäßig wird das
+Heimatverzeichnis des Nutzers verwendet.
+
+.TP
+.B SET_AUDIO_MODE
+Dieses Kommando benötigt einen Parameter und setzt den Audio\-Modus.
+Zulässige Werte für diese Option sind "mono", "stereo", "sap", "lang1" oder
+"lang2".
+
+.TP
+.B SET_DEINTERLACER
+Dieses Kommando benötigt einen Parameter und setzt den De\-Interlacer.
+Zulässige Werte sind die Kurzbezeichnungen der in
+.B tvtime
+verfügbaren De\-Interlacer\-Algorithmen.
+
+.TP
+.B SET_FRAMERATE
+Dieses Kommando benötigt einen Parameter und setzt die momentane Bildrate.
+Gültige Werte sind "full" (volle Bildrate), "top" (halbe Bildrate, oberes
+Halbbild) oder "bottom" (halbe Bildrate, unteres Halbbild).
+
+.TP
+.B SET_FREQUENCY_TABLE
+Dieses Kommando benötigt einen Parameter und setzt die zu verwendende
+Frequenztabelle.
+
+.TP
+.B SET_FULLSCREEN_POSITION
+Dieses Kommando benötigt einen Parameter und legt fest, wie ein zu breites
+Fernsehbild im Vollbild\-Modus plaziert wird. Zulässige Werte sind "top"
+(oberer Rand), "center" (mittig) oder "bottom" (unterer Bildrand).
+
+.TP
+.B SET_INPUT_WIDTH
+Dieses Kommando benötigt einen Parameter und legt die horizontale Auflösung
+des Eingangssignals in Pixeln fest.  Diese Einstellung zeigt erst nach einem
+Neustart von
+.B tvtime
+Wirkung.
+
+.TP
+.B SET_MATTE
+Dieses Kommando benötigt einen Parameter und legt die Breite der schwarzen
+Balken am oberen und unteren Bildrand fest.  Auf diese Weise kann das
+Seitenverhältnis des Ausgabefenster festgelegt werden.  Gültige Werte sind
+16:9, 1.85:1, 2.35:1 oder 4:3.
+
+.TP
+.B SET_NORM
+Dieses Kommando benötigt einen Parameter und setzt die zu verwendende
+Fernsehnorm.  Diese Einstellung zeigt erst nach einem Neustart von
+.B tvtime
+Wirkung.
+
+.TP
+.B SET_STATION
+Dieses Kommando interpretiert seinen Parameter als Sendername oder als Nummer
+und wechselt zum angegebenen Kanal.
+
+.TP
+.B SET_XMLTV_LANGUAGE
+Dieses Kommando setzt die bevorzugte Sprache für XMLTV\-Daten.  Das Argument
+kann entweder ein zweibuchstabiges Sprachkürzel gemäß ISO 639 (z. B. "de"
+für deutsch) sein oder eine Nummer, um eine der bereits bekannten Sprachen
+zu verwenden.
+
+.TP
+.B SHOW_DEINTERLACER_INFO
+Zeigt einen Hilfetext mit einer Beschreibung des aktiven De\-Interlacers auf
+dem OSD an.
+
+.TP
+.B SHOW_MENU
+Zeigt das
+.BR tvtime \-Hauptmenü.
+
+.TP
+.B SHOW_STATS
+Zeigt eine Reihe von statistischen Daten zu Debug\-Zwecken im OSD an.
+
+.TP
+.B SLEEP
+Dieses Kommando setzt die Schlaffunktion von
+.BR tvtime .
+Wenn es zum ersten Mal gesendet wird, wird dieses Funktion aktiviert,
+wiederholtes Senden erhöht die Zeit, nach Ablauf derer
+.B tvtime
+sich selbsttätig beenden wird.  Wird das Kommando nach Erreichen des
+Maximalwertes erneut gesendet, wird die Funktion wieder deaktiviert.
+
+
+.TP
+.B TOGGLE_ALWAYSONTOP
+Wechselt den "Immer im Vordergrund"\-Status von
+.BR tvtime ,
+vorausgesetzt, der verwendete Fenstermanager unterstützt diese Funktion.
+
+.TP
+.B TOGGLE_ASPECT
+Wechselt das Seitenverhältnis zwischen 4:3 und 16:9.  Verwenden Sie den
+16:9\-Modus, wenn Sie einen externen DVD\-Player oder Satellitenreceiver
+anschließen möchten, der ein anamorphes 16:9\-Signal erzeugt.
+
+.TP
+.B TOGGLE_AUDIO_MODE
+Wechselt den Audio\-Modus zwischen den beim aktuellen Kanal verfügbaren
+Einstellungen.  Es kann einige Zeit dauern, bis der Treiber die verfügbaren
+Modi erkennt.
+
+.TP
+.B TOGGLE_BARS
+Zeigt ein Testbild mit Farbbalken in
+.BR tvtime .
+Diese Balken werden von
+.B tvtime
+generiert, nicht vom Treiber der TV\-Karte.  Sie sind dazu gedacht, um Sie
+beim Konfigurieren der Bildschirm\- oder Projektoreinstellungen zu
+unterstützen.  Wenn diese Farbbalken korrekt dargestellt werden, vergleichen
+Sie sie mit einem Testbild aus einer externen Quelle.
+
+.TP
+.B TOGGLE_CC
+Schaltet die Dekodierung von Closed Caption\-Untertiteln ein oder aus.  Diese
+Funktion ist nur in NTSC\-Gebieten und bei aktivierter VBI\-Dekodierung in der
+Konfigurationsdatei
+.I tvtime.xml
+verfügbar.
+
+.TP
+.B TOGGLE_CHANNEL_PAL_DK
+Wechselt den Audiomodus des aktuellen Senders zwischen PAL\-BG und PAL\-DK.
+
+.TP
+.B TOGGLE_CHROMA_KILL
+Aktiviert oder deaktiviert den Farbsignalfilter.  Dieser Filter macht das
+Eingangssignal schwarzweiß und ist nützlich, um Schwarzweiß\-Filme ohne
+Crominanz\-Artifakte zu betrachten.
+
+.TP
+.B TOGGLE_COLOR_INVERT / TOGGLE_COLOUR_INVERT
+Schaltet den Farbinvertierungsfilter ein oder aus.  Dies ist (scheinbar)
+hilfreich für Kunden der australischen Kabelfirma Optus, die den Kanal über
+die TV\-Karte einstellen möchten, anstatt die Dekoderbox zu verwenden.
+
+.TP
+.B TOGGLE_DEINTERLACER
+Wechselt zwischen den verfügbaren De\-Interlacer\-Algorithmen.
+
+.TP
+.B TOGGLE_FULLSCREEN
+Wechselt zwischen Vollbild\- und Fenstermodus.
+
+.TP
+.B TOGGLE_FRAMERATE
+Wechselt die Einstellung der verwendeten Bildrate. Mögliche Werte sind "volle
+Bildrate", "halbe Bildrate, oberes Halbbild" und "halbe Bildrate, unteres
+Halbbild".
+
+.TP
+.B TOGGLE_INPUT
+Wechselt die Signalquelle der TV\-Karte.  Mögliche Signalquellen sind u. a.
+das Empfangsteil, der Composite Video\-Eingang oder ein S\-Video\-Anschluß.
+
+.TP
+.B TOGGLE_LUMA_CORRECTION
+Dieses Kommando aktiviert oder deaktiviert den Farbkorrekturfilter, der
+versucht, falsche Farbraumwerte von bt848\- oder bt878\-basierten TV\-Karten
+auszugleichen.
+
+.TP
+.B TOGGLE_MATTE
+Wechselt zwischen den verschieden breiten Bildblenden, um die oberen und
+unteren Bildränder abzudecken.
+
+.TP
+.B TOGGLE_MIRROR
+Schaltet den Bildspiegelfilter ein oder aus, der für den Einsatz von
+.B tvtime
+in Verbindung mit Rückprojektionsprojektoren gedacht ist.  Diese Funktion
+ist leider noch nicht wirklich brauchbar, da die OSD\-Anzeige nicht
+mitgespiegelt wird.
+
+.TP
+.B TOGGLE_MUTE
+Aktiviert oder deaktiviert die Stummschaltung der TV\-Karte (nicht der
+Soundkarte).
+
+.TP
+.B TOGGLE_NTSC_CABLE_MODE
+Wechselt den NTSC\-Kabelmodus zwischen
+.IR Standard ,
+.IR IRC ", und "
+.IR HRC "."
+
+.TP
+.B TOGGLE_PAL_DK_AUDIO
+Wechselt die Audionorm zwischen PAL\-BG und PAL\-DK.
+
+.TP
+.B TOGGLE_PAL_SECAM
+Wechselt die TV\-Norm für den aktuellen Sender zwischen PAL und SECAM.  Diese
+Funktion ermöglicht es, in Gebieten, in denen Sender beider Normen empfangen
+werden können, für jeden Sender die richtige Norm zu konfigurieren.
+
+.TP
+.B TOGGLE_PAUSE
+Schaltet
+.B tvtime
+in den Pause\-Modus.  Dieser Modus wird bei der Entwicklung von
+De\-Interlacer\-Algorithmen eingesetzt, um ein und dieselben Bilder mit
+verschiedenen De\-Interlacer\-Einstellungen zu betrachten.
+
+.TP
+.B TOGGLE_PULLDOWN_DETECTION
+Aktiviert oder deaktiviert den 2\[en]3\-Pulldown im NTSC\-Modus.
+
+.TP
+.B TOGGLE_QUIET_SCREENSHOTS
+Schaltet die optische Rückmeldung beim Bildschirmfotos ein oder aus.
+Normalerweise wird bei Erzeugen eines Bildschirmfotos eine Nachricht im OSD
+ausgegeben.  Wenn Sie mehrere Bildschirmfotos kurz hintereinander machen
+möchten, ohne daß die jeweils vorangegangene Benachrichtigung in selbigen zu
+sehen ist, können Sie die Benachrichtigung mit dieser Funktion abschalten.
+
+.TP
+.B TOGGLE_SIGNAL_DETECTION
+Schaltet die Signalerkennung ein oder aus.  Signalerkennung ist Voraussetzung
+für Funktionen wie den Sendersuchlauf und erhöht die Ansprechbarkeit bei
+Sendern mit schwachem Empfang, aber sie macht es unmöglich, Sender
+anzuschauen, deren Signal zu schwach für eine zuverlässige Detektion ist.
+
+.TP
+.B TOGGLE_XDS
+Schaltet die XDS\-Dekodierung ein oder aus, die in NTSC\-Gebieten verwendet
+wird, um Senderinformationen wie den Sender\- und Netzwerknamen und das
+aktuelle Fernsehprogramm zu übertragen.  Diese Informationen werden, wenn
+verfügbar, im OSD angezeigt.
+
+.TP
+.B TOGGLE_XMLTV_LANGUAGE
+Wechselt die bevorzugte Sprache für XMLTV\-Daten zwischen den in der
+XMLTV\-Datei verfügbaren Sprachcodes.
+
+.TP
+.B UP
+Dieses Kommando wechselt entweder zum nächsthöheren Sender oder bewegt den
+Cursor um eine Menüzeile nach oben, je nachdem, ob das Menü aktiv ist oder
+nicht.  Es sollte in Verbindung mit den Kommandos LEFT, RIGHT und DOWN
+verwendet werden.
+
+.TP
+.B QUIT
+Beendet den laufenden
+.BR tvtime \-Prozeß.
+
+.SH AUTOREN
+
+Billy Biggs,
+Stewart Allen.
+
+.SH "SIEHE AUCH"
+
+.BR tvtime (1),
+.IR tvtime.xml (5),
+.IR stationlist.xml (5).
