@@ -60,29 +60,26 @@ int parser_openfile( parser_file_t *pf, const char *filename )
     return 1;
 }
 
-int parser_get( parser_file_t *pf, const char *name, const char *def, char **value )
+const char *parser_get( parser_file_t *pf, const char *name, const char *def )
 {
     int i;
 
     if( !pf ) {
         fprintf( stderr, "parser: No parser_file_t* given.\n" );
-        return 0;
+        return NULL;
     }
 
     for( i=0; i < pf->num_pairs && pf->nv_pairs[i].name; i++ ) {
         if( !strcasecmp( name, pf->nv_pairs[i].name ) ) {
-            *value = strdup( pf->nv_pairs[i].value );
-            if( !*value ) return 0;
-            return 1;
+            return pf->nv_pairs[i].value;
         }
     }
 
     if( i >= pf->num_pairs || !pf->nv_pairs[i].name ) {
-        *value = strdup( def );
-        if( !*value ) return 0;
+        return def;
     }
 
-    return 1;
+    return NULL;
 }
 
 int parser_readfile( parser_file_t *pf )

@@ -83,64 +83,52 @@ void config_init( config_t *ct )
         return;
     }
 
-    if( parser_get( &(ct->pf), "OutputWidth", "800", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "OutputWidth", "800")) ) {
         ct->outputwidth = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "InputWidth", "720", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "InputWidth", "720")) ) {
         ct->inputwidth = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "Verbose", "0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "Verbose", "0")) ) {
         ct->verbose = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "Widescreen", "0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "Widescreen", "0")) ) {
         ct->aspect = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "DebugMode", "0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "DebugMode", "0")) ) {
         ct->debug = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "ApplyLumaCorrection", "1", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "ApplyLumaCorrection", "1")) ) {
         ct->apply_luma_correction = atoi( tmp );
-        free( tmp );
     }
 
-    if( parser_get( &(ct->pf), "LumaCorrection", "1.0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "LumaCorrection", "1.0")) ) {
         ct->luma_correction = atof( tmp );
-        free( tmp );
     }
 
-    if( !parser_get( &(ct->pf), "V4LDevice", "/dev/video0", &(ct->v4ldev)) ) {
-        ct->v4ldev = strdup("/dev/video0");
-        if( !ct->v4ldev ) fprintf( stderr, "config: Error setting v4ldev.\n" );
+    if( (tmp = parser_get( &(ct->pf), "V4LDevice", "/dev/video0")) ) {
+        ct->v4ldev = tmp;
     }
 
-    if( parser_get( &(ct->pf), "CaptureSource", "0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "CaptureSource", "0")) ) {
         ct->inputnum = atoi( tmp );
-        free( tmp );
     }
 
-    if( !parser_get( &(ct->pf), "Norm", "ntsc", &(ct->norm)) ) {
-        ct->norm = strdup("ntsc");
-        if( !ct->norm ) fprintf( stderr, "config: Error setting norm.\n" );
+    if( (tmp = parser_get( &(ct->pf), "Norm", "ntsc")) ) {
+        ct->norm = tmp;
     }
 
-    if( !parser_get( &(ct->pf), "Frequencies", "us-cable", &(ct->freq)) ) {
-        ct->freq = strdup("us-cable");
-        if( !ct->freq ) fprintf( stderr, "config: Error setting freq.\n" );
+    if( (tmp = parser_get( &(ct->pf), "Frequencies", "us-cable")) ) {
+        ct->freq = tmp;
     }
 
-    if( parser_get( &(ct->pf), "TunerNumber", "0", &tmp) ) {
+    if( (tmp = parser_get( &(ct->pf), "TunerNumber", "0")) ) {
         ct->tuner_number = atoi( tmp );
-        free( tmp );
     }
 
     config_dump( ct );
