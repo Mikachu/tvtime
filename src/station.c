@@ -51,6 +51,7 @@ struct station_mgr_s
     station_info_t *first;
     station_info_t *current;
     int num_stations;
+    int max_position;
     int verbose;
     int us_cable_mode;
     int last_channel;
@@ -125,6 +126,10 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
 static int insert( station_mgr_t *mgr, station_info_t *i )
 {
     mgr->num_stations++;
+
+    if( i->pos > mgr->max_position ) {
+        mgr->max_position = i->pos;
+    }
 
     if( !mgr->first ) {
         mgr->first = i;
@@ -303,6 +308,7 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
     mgr->last_channel = 0;
     mgr->new_install = 0;
     mgr->num_stations = 0;
+    mgr->max_position = 0;
     mgr->norm = strdup( norm );
     if( !mgr->norm ) {
         free( mgr );
@@ -396,6 +402,11 @@ int station_is_new_install( station_mgr_t *mgr )
 int station_get_num_stations( station_mgr_t *mgr )
 {
     return mgr->num_stations;
+}
+
+int station_get_max_position( station_mgr_t *mgr )
+{
+    return mgr->max_position;
 }
 
 int station_set( station_mgr_t *mgr, int pos )

@@ -150,6 +150,11 @@ int station_get_prev_id( station_mgr_t *mgr );
 int station_get_num_stations( station_mgr_t *mgr );
 
 /**
+ * Returns the maximum position in the station list.
+ */
+int station_get_max_position( station_mgr_t *mgr );
+
+/**
  * Add or update the channel list.
  */
 int station_add( station_mgr_t *mgr, int pos, const char *band, const char *channel, const char *name );

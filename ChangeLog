@@ -1,5 +1,8 @@
 
 0.9.9 -
+  * vektor: Change channel if we type more digits than
+      possible for the current number of channels in the
+      station list.
   * vektor: Added a command line and config file option to
       set the fullscreen output position.
   * vektor: Made the tvtime logo animate.

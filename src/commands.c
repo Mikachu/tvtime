@@ -558,15 +558,19 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
             in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
             in->digit_counter++;
-            in->digit_counter %= 4;
-            if( !in->digit_counter ) {
-                int i;
-                for( i = 0; i < 4; i++ ) {
-                    in->next_chan_buffer[ i ] = in->next_chan_buffer[ i + 1 ];
-                }
-                in->digit_counter = 3;
-            }
             in->frame_counter = CHANNEL_DELAY;
+
+            /**
+             * Send an enter command if we type more
+             * digits than there are channels.
+             */
+            if( in->digit_counter > 0 && (station_get_max_position( in->stationmgr ) < 10) ) {
+                commands_handle( in, TVTIME_ENTER, 0 );
+            } else if( in->digit_counter > 1 && (station_get_max_position( in->stationmgr ) < 100) ) {
+                commands_handle( in, TVTIME_ENTER, 0 );
+            } else if( in->digit_counter > 2 ) {
+                commands_handle( in, TVTIME_ENTER, 0 );
+            }
         }
         break;
 
