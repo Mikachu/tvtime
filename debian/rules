@@ -49,7 +49,10 @@ config.status: configure
 		    --infodir=\$${prefix}/share/info  \
 		    --sysconfdir=/etc                 \
 		    --localstatedir=/var              \
-		    --with-fifogroup=video
+		    --with-fifogroup=video            \
+	            --without-directfb                \
+	            --without-sdl
+
 
 build: build-stamp
 
@@ -58,7 +61,6 @@ build-stamp:  config.status
 
 	# Add here commands to compile the package.
 	$(MAKE) FONT_CFLAGS='-DFONTDIR="\"/usr/share/fonts/truetype/freefont\""'
-	#/usr/bin/docbook-to-man debian/tvtime.sgml > tvtime.1
 
 	touch build-stamp
 
@@ -86,12 +88,15 @@ install: build
 	$(MAKE) install prefix=$(CURDIR)/debian/tvtime/usr       \
 	                sysconfdir=$(CURDIR)/debian/tvtime/etc   \
 			localstatedir=$(CURDIR)/debian/tvtime/var
-	# Remove the extra TTFs.
-	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/*.ttf
+	# Remove the freefont TTFs.
+	-rm -f $(CURDIR)/debian/tvtime/usr/share/tvtime/Free*.ttf
 	# Remove the configuration file.
 	-rm -f $(CURDIR)/debian/tvtime/etc/tvtime/tvtime.xml
 	# Copy HTML documentation.
-	-cp -f $(CURDIR)/docs/html/* $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
+	-cp -f $(CURDIR)/docs/html/*.html $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
+	-cp -f $(CURDIR)/docs/html/*.png $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
+	-cp -f $(CURDIR)/docs/html/*.jpg $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
+	-cp -f $(CURDIR)/docs/html/*.css $(CURDIR)/debian/tvtime/usr/share/doc/tvtime/html/
 
 
 # Build architecture-independent files here.
@@ -102,7 +107,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installdebconf	
+	dh_installdebconf
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu
