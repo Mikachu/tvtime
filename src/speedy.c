@@ -828,8 +828,8 @@ void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
 
 void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb, int cr )
 {
-    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
-    unsigned int *o = (unsigned int *) output;
+    uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
+    uint32_t *o = (uint32_t *) output;
 
     SPEEDY_START();
 
@@ -842,7 +842,7 @@ void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb
 
 void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int cb, int cr )
 {
-    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
+    uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
 
     SPEEDY_START();
@@ -868,7 +868,7 @@ void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int 
     width = (width & 0x7);
 
     for( i = width / 2; i; --i ) {
-        *((unsigned int *) output) = colour;
+        *((uint32_t *) output) = colour;
         output += 4;
     }
 
@@ -884,7 +884,7 @@ void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int 
 
 void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, int cb, int cr )
 {
-    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
+    uint32_t colour = cr << 24 | y << 16 | cb << 8 | y;
     int i;
 
     SPEEDY_START();
@@ -910,7 +910,7 @@ void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, i
     width = (width & 0x7);
 
     for( i = width / 2; i; --i ) {
-        *((unsigned int *) output) = colour;
+        *((uint32_t *) output) = colour;
         output += 4;
     }
 
@@ -946,7 +946,7 @@ void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
                                           int alpha, int luma,
                                           int cb, int cr )
 {
-    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
     SPEEDY_START();
@@ -972,7 +972,7 @@ void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
     width = (width & 0x1);
 
     if( width ) {
-        *((unsigned int *) output) = colour;
+        *((uint32_t *) output) = colour;
         output += 4;
     }
 
@@ -985,7 +985,7 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
                                              int alpha, int luma,
                                              int cb, int cr )
 {
-    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    uint32_t colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
     int i;
 
     SPEEDY_START();
@@ -1011,7 +1011,7 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
     width = (width & 0x1);
 
     if( width ) {
-        *((unsigned int *) output) = colour;
+        *((uint32_t *) output) = colour;
         output += 4;
     }
 
@@ -1253,8 +1253,8 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
     pxor_r2r( mm7, mm7 );
 
     for( i = width/2; i; i-- ) {
-        int fg1 = *((unsigned int *) foreground);
-        int fg2 = *(((unsigned int *) foreground)+1);
+        int fg1 = *((uint32_t *) foreground);
+        int fg2 = *(((uint32_t *) foreground)+1);
 
         if( fg1 || fg2 ) {
             /* mm1 = [ cr ][ y ][ cb ][ y ] */
@@ -1383,8 +1383,8 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
 
     pxor_r2r( mm7, mm7 );
     for( i = width/2; i; i-- ) {
-        int fg1 = *((unsigned int *) foreground);
-        int fg2 = *(((unsigned int *) foreground)+1);
+        int fg1 = *((uint32_t *) foreground);
+        int fg2 = *(((uint32_t *) foreground)+1);
 
         if( (fg1 & 0xff) == 0xff && (fg2 & 0xff) == 0xff ) {
             movq_m2r( *foreground, mm3 );
@@ -1480,7 +1480,7 @@ void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
                                                    int textluma, int textcb,
                                                    int textcr )
 {
-    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
 
     SPEEDY_START();
@@ -1489,13 +1489,13 @@ void composite_alphamask_to_packed4444_scanline_c( uint8_t *output,
         int a = *mask;
 
         if( a == 0xff ) {
-            *((unsigned int *) output) = opaque;
+            *((uint32_t *) output) = opaque;
         } else if( (input[ 0 ] == 0x00) ) {
-            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+            *((uint32_t *) output) = (multiply_alpha( a, textcr ) << 24)
                                        | (multiply_alpha( a, textcb ) << 16)
                                        | (multiply_alpha( a, textluma ) << 8) | a;
         } else if( a ) {
-            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+            *((uint32_t *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
                                        | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
                                        | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
                                        |  (input[ 0 ] + multiply_alpha( a, 0xff - input[ 0 ] ));
@@ -1514,7 +1514,7 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
                                                         int textluma, int textcb,
                                                         int textcr )
 {
-    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     const mmx_t round = { 0x0080008000800080ULL };
     const mmx_t fullalpha = { 0x00000000000000ffULL };
     mmx_t colour;
@@ -1542,7 +1542,7 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
         int a = *mask;
 
         if( a == 0xff ) {
-            *((unsigned int *) output) = opaque;
+            *((uint32_t *) output) = opaque;
         } else if( (input[ 0 ] == 0x00) ) {
             /* We just need to multiply our colour by the alpha value. */
 
@@ -1613,7 +1613,7 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha )
 {
-    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    uint32_t opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
     int i;
 
     SPEEDY_START();
@@ -1625,13 +1625,13 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( uint8_t *output,
            int a = ((af * alpha) + 0x80) >> 8;
 
            if( a == 0xff ) {
-               *((unsigned int *) output) = opaque;
+               *((uint32_t *) output) = opaque;
            } else if( input[ 0 ] == 0x00 ) {
-               *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+               *((uint32_t *) output) = (multiply_alpha( a, textcr ) << 24)
                                           | (multiply_alpha( a, textcb ) << 16)
                                           | (multiply_alpha( a, textluma ) << 8) | a;
            } else if( a ) {
-               *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+               *((uint32_t *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
                                          | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
                                          | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
                                          | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
@@ -1652,10 +1652,10 @@ void premultiply_packed4444_scanline_c( uint8_t *output, uint8_t *input, int wid
     while( width-- ) {
         unsigned int cur_a = input[ 0 ];
 
-        *((unsigned int *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
-                                   | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
-                                   | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
-                                   | cur_a;
+        *((uint32_t *) output) = (multiply_alpha( cur_a, input[ 3 ] ) << 24)
+                               | (multiply_alpha( cur_a, input[ 2 ] ) << 16)
+                               | (multiply_alpha( cur_a, input[ 1 ] ) << 8)
+                               | cur_a;
 
         output += 4;
         input += 4;
