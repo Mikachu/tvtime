@@ -525,6 +525,10 @@ int main( int argc, char **argv )
     }
 
     stationmgr = station_init( ct );
+    if( !stationmgr ) {
+        fprintf( stderr, "tvtime: Can't create station manager.\n" );
+        return 0;
+    }
     station_set( stationmgr, config_get_start_channel( ct ) );
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {

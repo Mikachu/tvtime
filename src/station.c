@@ -203,7 +203,6 @@ station_mgr_t *station_init( config_t *ct )
         f= fopen( name, "r");
         if( !f ) { 
             fprintf( stderr, "station: Couldn't open %s for reading\n", name );
-            return 0;
         }
     
         if( f ) {
