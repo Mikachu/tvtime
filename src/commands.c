@@ -246,14 +246,15 @@ struct commands_s {
 static void reinit_tuner( commands_t *in )
 {
     /* Setup the tuner if available. */
+    if( in->vbi ) {
+        vbidata_reset( in->vbi );
+        vbidata_capture_mode( in->vbi, in->capturemode );
+    }
+
     if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
         int norm;
 
         videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
-        if( in->vbi ) {
-            vbidata_reset( in->vbi );
-            vbidata_capture_mode( in->vbi, in->capturemode );
-        }
 
         norm = videoinput_get_norm_number( station_get_current_norm( in->stationmgr ) );
         if( norm >= 0 ) {
