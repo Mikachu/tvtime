@@ -13,12 +13,12 @@ TTFLIBS = -lfreetype
 PNGFLAGS =
 PNGLIBS = -lpng
 
-CFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS)
+CFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS) $(PNGFLAGS)
 CXXFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS) -I/usr/include/freetype2
-LDFLAGS = $(SDLLIBS) $(TTFLIBS)
+LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS)
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
-	videotools.o ttfont.o efs.o osd.o parser.o
+	videotools.o ttfont.o efs.o osd.o parser.o pngoutput.o
 
 all: tvtime
 
