@@ -43,6 +43,7 @@ struct station_mgr_s
     int debug;
     int us_cable_mode;
     int last_channel;
+    char band_and_frequency[ 1024 ];
 };
 
 static const band_t *get_band( const char *band )
@@ -303,7 +304,9 @@ const char *station_get_current_band( station_mgr_t *mgr )
     if( !mgr->current ) {
         return "No Band";
     } else {
-        return mgr->current->band->name;
+        sprintf( mgr->band_and_frequency, "%s: %s",
+                 mgr->current->band->name, mgr->current->channel->name );
+        return mgr->band_and_frequency;
     }
 }
 
