@@ -5,7 +5,7 @@ TTF_CFLAGS = `freetype-config --cflags`
 TTF_LIBS = `freetype-config --libs`
 
 PNG_CFLAGS =
-PNG_LIBS = -lpng
+PNG_LIBS = -lpng -lz
 
 PLUGINS_CFLAGS = -I../plugins
 PLUGINS_LIBS = -L../plugins -ltvtimeplugins
