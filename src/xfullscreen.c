@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2003 Billy Biggs <vektor@dumbterm.net>
+ * Copyright (c) 2003 Billy Biggs <vektor@dumbterm.net> and
+ *                    Per von Zweigbergk <pvz@e.kth.se>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -300,12 +301,12 @@ void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
         int error_n;
         int error_d;
 
-        /* Calculate the aspect ratio. */
+        /* Calculate the exact aspect ratio. */
         *aspect_n = xf->heightmm * xf->hdisplay;
         *aspect_d = xf->widthmm * xf->vdisplay;
         simplify_fraction( aspect_n, aspect_d );
 
-        /*
+        /**
          * Calculate the maximum error, assuming that the
          * maximum error in the sources is half a millimeter.
          */
@@ -319,7 +320,7 @@ void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
         *aspect_n *= error_d;
         *aspect_d = error_d = cd;
 
-        /*
+        /**
          * We want to see if the error means that we could end up either
          * above or below a set aspect ratio. (Capital letters represent
          * pseudo-variables.)
@@ -353,7 +354,6 @@ void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
          *      (RATIO * cd = RATIO_N) and (RATIO = 1). Also 0 * cd == 0.
          *      So we get the final test:
          */
-
         if( ( *aspect_n + error_n - cd ) * ( *aspect_n - error_n - cd ) < 0 ) {
             /*
              * We can assume square pixels, since taking in account the error,
