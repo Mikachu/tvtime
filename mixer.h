@@ -1,6 +1,7 @@
-
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ *
+ * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

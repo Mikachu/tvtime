@@ -93,3 +93,9 @@ like -l 1.3 or -l 0.8 or similar.  This applies a gamma correction curve
 to the luminance channel, and will distort your colour, but maybe in a
 way that you find improves your mood. :)
 
+Authors and contributors
+
+  Billy Biggs <vektor@dumbterm.net>
+  Doug Bell <drbell@users.sourceforge.net>
+  Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
+
