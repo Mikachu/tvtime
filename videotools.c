@@ -121,36 +121,6 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
     }
 }
 
-/**
- * The kernel for this filter comes from ffmpeg, http://ffmpeg.sf.net/
- * [-1 4 2 4 -1]
- * The whole codebase for using better filters needs to be improved though.
- */
-void interpolate_packed422_scanline_filter( unsigned char *output,
-                                            unsigned char *top2,
-                                            unsigned char *top1,
-                                            unsigned char *mid,
-                                            unsigned char *bot1,
-                                            unsigned char *bot2, int width )
-{
-    int i;
-
-    for( i = width; i; --i ) {
-        int temp;
-        temp = ( ((*mid)<<1)
-                      + (((*top1) + (*bot1))<<2)
-                      - (*top2) - (*bot2) ) >>3;
-        if( temp < 0 ) temp = 0;
-        if( temp > 255 ) temp = 255;
-
-        *output++ = temp;
-        top2++; top1++; mid++; bot1++; bot2++;
-
-        *output++ = *top1;
-        top2++; top1++; mid++; bot1++; bot2++;
-    }
-}
-
 void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
                                                     unsigned char *output,
                                                     int outstride,
@@ -264,85 +234,6 @@ void packed422_field_to_frame_top( unsigned char *output, int outstride,
         /* Interpolate a scanline. */
         interpolate_packed422_scanline( output, output - outstride,
                                         output + outstride, fieldwidth );
-
-        output += outstride * 2;
-        field += fieldstride;
-    }
-
-    /* Clear a scanline. */
-    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
-}
-
-void packed422_field_to_frame_bot_filter( unsigned char *output, int outstride,
-                                          unsigned char *field, int fieldwidth,
-                                          int fieldheight, int fieldstride )
-{
-    int i;
-
-    /* Clear a scanline. */
-    blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
-    output += outstride;
-
-    /* Copy a scanline. */
-    memcpy( output, field, fieldwidth*2 );
-    field += fieldstride;
-    output += outstride;
-
-    for( i = 0; i < fieldheight - 1; i++ ) {
-        unsigned char *top2, *top1, *mid, *bot1, *bot2;
-
-        /* Copy a scanline. */
-        memcpy( output + outstride, field, fieldwidth*2 );
-
-        if( i > 2 && i < fieldheight - 3 ) {
-            top2 = field - fieldstride - (fieldstride/2);
-            top1 = field - fieldstride;
-            mid  = field - (fieldstride/2);
-            bot1 = field;
-            bot2 = field + (fieldstride/2);
-        } else {
-            top2 = top1 = mid = bot1 = bot2 = field;
-        }
-
-        /* Interpolate a scanline. */
-        interpolate_packed422_scanline_filter( output, top2, top1, mid,
-                                               bot1, bot2, fieldwidth );
-
-        output += outstride * 2;
-        field += fieldstride;
-    }
-}
-
-void packed422_field_to_frame_top_filter( unsigned char *output, int outstride,
-                                          unsigned char *field, int fieldwidth,
-                                          int fieldheight, int fieldstride )
-{
-    int i;
-
-    /* Copy a scanline. */
-    memcpy( output, field, fieldwidth*2 );
-    field += fieldstride;
-    output += outstride;
-
-    for( i = 0; i < fieldheight - 1; i++ ) {
-        unsigned char *top2, *top1, *mid, *bot1, *bot2;
-
-        /* Copy a scanline. */
-        memcpy( output + outstride, field, fieldwidth*2 );
-
-        if( i > 2 && i < fieldheight - 3 ) {
-            top2 = field - (fieldstride) - (fieldstride/2);
-            top1 = field - (fieldstride);
-            mid  = field - (fieldstride/2);
-            bot1 = field;
-            bot2 = field + (fieldstride/2);
-        } else {
-            top2 = top1 = mid = bot1 = bot2 = field;
-        }
-
-        /* Interpolate a scanline. */
-        interpolate_packed422_scanline_filter( output, top2, top1, mid,
-                                               bot1, bot2, fieldwidth );
 
         output += outstride * 2;
         field += fieldstride;

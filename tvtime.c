@@ -358,7 +358,7 @@ int main( int argc, char **argv )
 
         if( screenshot ) {
             char filename[ 256 ];
-            sprintf( filename, "tvtime-shot-%d-%d.png",
+            sprintf( filename, "tvtime-shot-input-%d-%d.png",
                      (int) checkpoint[ 0 ].tv_sec,
                      (int) checkpoint[ 0 ].tv_usec );
             pngscreenshot( filename, curframe, width, height, width * 2 );
@@ -416,6 +416,14 @@ int main( int argc, char **argv )
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
                                             height, width*2 );
         }
+        if( screenshot ) {
+            char filename[ 256 ];
+            sprintf( filename, "tvtime-shot-top-%d-%d.png",
+                     (int) checkpoint[ 0 ].tv_sec,
+                     (int) checkpoint[ 0 ].tv_usec );
+            pngscreenshot( filename, sdl_get_output(), width, height, width * 2 );
+        }
+
 
 
         /* CHECKPOINT3 : Constructed the top field. */
@@ -473,6 +481,13 @@ int main( int argc, char **argv )
             tvtime_osd_volume_muted( osd, mixer_ismute() );
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
                                             height, width*2 );
+        }
+        if( screenshot ) {
+            char filename[ 256 ];
+            sprintf( filename, "tvtime-shot-bot-%d-%d.png",
+                     (int) checkpoint[ 0 ].tv_sec,
+                     (int) checkpoint[ 0 ].tv_usec );
+            pngscreenshot( filename, sdl_get_output(), width, height, width * 2 );
         }
 
 
