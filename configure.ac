@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.52)
-AC_INIT(tvtime, 0.9.8.1, http://www.sourceforge.net/projects/tvtime)
+AC_INIT(tvtime, 0.9.8.2, http://www.sourceforge.net/projects/tvtime)
 AC_CONFIG_SRCDIR([src/tvtime.c])
-AM_INIT_AUTOMAKE(tvtime,0.9.8.1)
+AM_INIT_AUTOMAKE(tvtime,0.9.8.2)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST

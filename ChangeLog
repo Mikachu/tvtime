@@ -1,5 +1,7 @@
 
-0.9.8.1 -
+0.9.8.2 -
+
+0.9.8.1 - Sat May  3 10:07:26 ADT 2003
   * vektor: Removed some of the fonts we don't use from the dist
   * vektor: Redid the screensaver shutdown code to just use XTest
       and send fake key events (but in a safe way - fixes 731691)
