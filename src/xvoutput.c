@@ -380,6 +380,8 @@ int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 int xv_toggle_aspect( void )
 {
     output_aspect = !output_aspect;
+    calculate_video_area();
+    xv_clear_screen();
     return output_aspect;
 }
 
@@ -412,7 +414,6 @@ void xv_poll_events( input_t *in )
             if( event.xconfigure.width != output_width || event.xconfigure.height != output_height ) {
                 output_width = event.xconfigure.width;
                 output_height = event.xconfigure.height;
-                // XClearWindow( display, window );
                 calculate_video_area();
                 xv_clear_screen();
             }
