@@ -728,6 +728,7 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter == 0 ) {
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
+        tvtime_osd_set_channel_number( in->osd, tvtuner[ cur_channel ].name );
     }
 
     if( in->frame_counter > 0 && !(in->frame_counter % 5)) {
