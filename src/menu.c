@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "videoinput.h"
 #include "speedy.h"
 #include "osdtools.h"
 #include "input.h"
@@ -61,17 +62,17 @@ struct menu_s {
 
     input_t *in;
     config_t *cfg;
+    videoinput_t *vidin;
 };
 
 
-menu_t *menu_new( input_t *in, config_t *cfg, int width, 
+menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width, 
                   int height, double aspect )
 {
     menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
     int i;
     const char *rgb;
-    unsigned int r, g, b;
-    unsigned char iconv[3], oconv[3];
+    unsigned char oconv[3];
 
     if( !m ) {
         return 0;
@@ -79,6 +80,7 @@ menu_t *menu_new( input_t *in, config_t *cfg, int width,
 
     m->in = in;
     m->cfg = cfg;
+    m->vidin = vidin;
     m->frame_width = width;
     m->frame_height = height;
     m->frame_aspect = aspect;
@@ -91,19 +93,16 @@ menu_t *menu_new( input_t *in, config_t *cfg, int width,
     m->bg_cb = 128;
     m->bg_cr = 128;
 
-    if( !cfg ) return;
-    rgb = config_get_menu_bg_rgb( cfg );
-    if( strlen( rgb ) == 6 ) {
-        if( sscanf( rgb, "%2x%2x%2x", &r, &g, &b ) == 3 ) {
-            iconv[0] = (unsigned char)(r & 0xff);
-            iconv[1] = (unsigned char)(g & 0xff);
-            iconv[2] = (unsigned char)(b & 0xff);
-            rgb24_to_packed444_rec601_scanline(oconv, iconv, 1);
-            m->bg_luma = oconv[0];
-            m->bg_cb = oconv[1];
-            m->bg_cr = oconv[2];
-        }
+    if( !cfg ) {
+        menu_delete( m );
+        return 0;
     }
+    rgb = config_get_menu_bg_rgb( cfg );
+    config_rgb_to_ycbcr( rgb, &oconv[0], &oconv[1], &oconv[2] );
+    m->bg_luma = (int)oconv[0];
+    m->bg_cb = (int)oconv[1];
+    m->bg_cr = (int)oconv[2];
+    
 
     for( i = 0; i < MENU_LINES; i++ ) {
         m->menu_line[ i ].line = osd_string_new( DATADIR "/FreeSansBold.ttf", 
@@ -178,6 +177,7 @@ void menu_main( menu_t *m, int key )
 
     case I_ENTER:
         m->menu_screen = m->menu_state + 1;
+        m->menu_state = 0;
         break;
 
     default:
@@ -242,6 +242,110 @@ void menu_main( menu_t *m, int key )
 
 void menu_pict( menu_t *m, int key )
 {
+    int i, start=0;
+    int NUM_ITEMS = 4;
+
+    if( !m ) return;
+
+    switch( key ) {
+    case I_UP:
+    case I_DOWN:
+        m->menu_state += ( key == I_UP ? -1 : 1 ) + NUM_ITEMS;
+        m->menu_state %= NUM_ITEMS ;
+
+        break;
+
+    case I_PGUP:
+    case I_PGDN:
+        m->menu_state += ( key == I_PGUP ? -2 : 2 ) + NUM_ITEMS;
+        m->menu_state %= NUM_ITEMS ;
+
+        break;
+
+    case I_LEFT:
+    case I_RIGHT:
+        switch( m->menu_state ) {
+        case 0:
+            videoinput_set_brightness_relative( 
+                m->vidin, 
+                (key == I_RIGHT) ? 1 : -1 );
+            break;
+
+        case 1:
+            videoinput_set_colour_relative( 
+                m->vidin, 
+                (key == I_RIGHT) ? 1 : -1 );
+            break;
+
+        case 2:
+            videoinput_set_contrast_relative( 
+                m->vidin, 
+                (key == I_RIGHT) ? 1 : -1 );
+            videoinput_get_contrast( m->vidin );
+            break;
+
+        case 3:
+            videoinput_set_hue_relative( 
+                m->vidin, 
+                (key == I_RIGHT) ? 1 : -1 );
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case I_ENTER:
+        m->menu_screen = m->menu_state + 1;
+        m->menu_state = 0;
+        break;
+
+    default:
+        break;
+    }
+
+    /* draw osd reflecting current state */
+    for( i=0; i < MENU_LINES/2; i++ ) {
+        char tmpstr[50];
+        if( m->menu_state == i ) {
+            osd_string_set_colour( m->menu_line[i*2].line, 220, 12, 155 );
+            osd_string_set_colour( m->menu_line[i*2+1].line, 220, 12, 155 );
+        } else {
+            osd_string_set_colour( m->menu_line[i*2].line, 200, 128, 128 );
+            osd_string_set_colour( m->menu_line[i*2+1].line, 200, 128, 128 );
+        }
+        switch( i ) {
+        case 0:
+            osd_string_show_text( m->menu_line[i*2].line, "Brightness", 51);
+            snprintf( tmpstr, 49, "%d%%", videoinput_get_brightness( m->vidin ));
+            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            break;
+
+        case 1:
+            osd_string_show_text( m->menu_line[i*2].line, "Colour", 51);
+            snprintf( tmpstr, 49, "%d%%", videoinput_get_colour( m->vidin ));
+            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            break;
+
+        case 2:
+            osd_string_show_text( m->menu_line[i*2].line, "Contrast", 51);
+            snprintf( tmpstr, 49, "%d%%", videoinput_get_contrast( m->vidin ));
+            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            break;
+
+        case 3:
+            osd_string_show_text( m->menu_line[i*2].line, "Hue", 51);
+            snprintf( tmpstr, 49, "%d%%", videoinput_get_hue( m->vidin ));
+            osd_string_show_text( m->menu_line[i*2+1].line, tmpstr, 51);
+            break;
+
+        default:
+            osd_string_show_text( m->menu_line[i*2].line, "", 0);
+            osd_string_show_text( m->menu_line[i*2+1].line, "", 0);
+            break;
+        }
+    }
+
 }
 
 void menu_audio( menu_t *m, int key )
@@ -274,6 +378,54 @@ void menu_input( menu_t *m, int key )
 
 void menu_preview( menu_t *m, int key )
 {
+}
+
+void menu_refresh( menu_t *m ) {
+    switch( m->menu_screen ) {
+    case MENU_MAIN:
+        menu_main( m, 0 );
+        break;
+
+    case MENU_PICT:
+        menu_pict( m, 0 );
+        break;
+
+    case MENU_AUDIO:
+        menu_audio( m, 0 );
+        break;
+
+    case MENU_CHANNELS:
+        menu_channels( m, 0 );
+        break;
+
+    case MENU_PARENTAL:
+        menu_parental( m, 0 );
+        break;
+
+    case MENU_PVR:
+        menu_pvr( m, 0 );
+        break;
+
+    case MENU_SETUP:
+        menu_setup( m, 0 );
+        break;
+
+    case MENU_TVGUIDE:
+        menu_tvguide( m, 0 );
+        break;
+
+    case MENU_INPUT:
+        menu_input( m, 0 );
+        break;
+
+    case MENU_PREVIEW:
+        menu_preview( m, 0 );
+        break;
+
+    default:
+        break;
+    }
+
 }
 
 int menu_callback( menu_t *m, InputEvent command, int arg )
@@ -350,6 +502,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
             default:
                 break;
             }
+            menu_refresh( m );
             return 1;
             break;
 

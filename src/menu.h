@@ -28,7 +28,7 @@ extern "C" {
 
 typedef struct menu_s menu_t;
 
-menu_t *menu_new( input_t *in, config_t *cfg, int width, 
+menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin, int width, 
                   int height, double aspect );
 void menu_delete( menu_t *m );
 

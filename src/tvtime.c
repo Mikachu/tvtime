@@ -537,7 +537,7 @@ int main( int argc, char **argv )
     }
 
 /* Billy - menu code disabled for now. */
-    menu = menu_new( in, ct, width, height, 
+    menu = menu_new( in, ct, vidin, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );

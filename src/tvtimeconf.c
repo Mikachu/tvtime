@@ -21,6 +21,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <ctype.h>
+#include "videotools.h"
 #include "parser.h"
 #include "tvtimeconf.h"
 #include "input.h"
@@ -656,14 +657,24 @@ const char *config_get_menu_bg_rgb( config_t *ct )
     return ct->menu_bg_rgb;
 }
 
-#ifdef TESTHARNESS
+void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr )
+{
+    unsigned int r, g, b;
+    unsigned char iconv[3], oconv[3];
 
-int main() {
-    config_t *ct;
-
-    ct = config_new( "/home/drbell/.tvtimerc" );
-    config_init( ct );
- 
+    if( strlen( rgbhex ) == 6 ) {
+        if( sscanf( rgbhex, "%2x%2x%2x", &r, &g, &b ) == 3 ) {
+            iconv[0] = (unsigned char)(r & 0xff);
+            iconv[1] = (unsigned char)(g & 0xff);
+            iconv[2] = (unsigned char)(b & 0xff);
+            rgb24_to_packed444_rec601_scanline(oconv, iconv, 1);
+            *y = oconv[0];
+            *cb = oconv[1];
+            *cr = oconv[2];
+            return;
+        }
+    }
+    *y = (unsigned char)16;
+    *cb = (unsigned char)128;
+    *cr = (unsigned char)128;
 }
-
-#endif

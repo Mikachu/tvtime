@@ -101,4 +101,6 @@ void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
 void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
 void config_set_timeformat( config_t *ct, const char *format );
 
+void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr );
+
 #endif /* TVTIMECONF_H_INCLUDED */
