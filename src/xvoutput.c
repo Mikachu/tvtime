@@ -53,6 +53,7 @@
 #endif
 
 #include "display.h"
+#include "speedy.h"
 
 #define FOURCC_YUY2 0x32595559
 
@@ -612,6 +613,7 @@ static void xv_alloc_frame( void )
     size = input_width * input_height * 2;
     alloc = (uint8_t *) create_shm( size);
     if( alloc ) {
+        blit_colour_packed422_scanline( alloc, input_width * input_height, 0, 128, 128 );
         image = XvShmCreateImage( display, xv_port, FOURCC_YUY2, (char *) alloc,
                                   input_width, input_height, &shminfo );
         image_data = alloc;
@@ -726,15 +728,6 @@ static int xv_init( int outputheight, int aspect, int verbose )
     calculate_video_area();
     x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
     return 1;
-}
-
-static void xv_set_input_size( int inputwidth, int inputheight )
-{
-    input_width = inputwidth;
-    input_height = inputheight;
-
-    xv_alloc_frame();
-    xv_clear_screen();
 }
 
 /**
@@ -939,6 +932,16 @@ static int xv_show_frame( int x, int y, int width, int height )
     }
     if( xvoutput_error ) return 0;
     return 1;
+}
+
+static void xv_set_input_size( int inputwidth, int inputheight )
+{
+    input_width = inputwidth;
+    input_height = inputheight;
+
+    xv_alloc_frame();
+    xv_show_frame( 0, 0, input_width, input_height );
+    xv_clear_screen();
 }
 
 static void xv_poll_events( input_t *in )
