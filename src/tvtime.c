@@ -865,7 +865,6 @@ int main( int argc, char **argv )
     int scanning = 0;
     int firstscan = 0;
     int use_vgasync = 0;
-    int was_paused = 0;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -1297,7 +1296,6 @@ int main( int argc, char **argv )
         }
 
         if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
-            if( was_paused ) videoinput_free_frame( vidin, curframeid );
             curframe = videoinput_next_frame( vidin, &curframeid );
             aquired = 1;
             filtered_cur = 0;
@@ -1535,7 +1533,6 @@ int main( int argc, char **argv )
         if( osd ) {
             tvtime_osd_advance_frame( osd );
         }
-        was_paused = paused;
         filtered_cur = 1;
     }
 
