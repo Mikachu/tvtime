@@ -1670,6 +1670,11 @@ int videoinput_is_uyvy( videoinput_t *vidin )
     return vidin->isuyvy;
 }
 
+int videoinput_is_v4l2( videoinput_t *vidin )
+{
+    return vidin->isv4l2;
+}
+
 int videoinput_get_input_num( videoinput_t *vidin )
 {
     return vidin->curinput;

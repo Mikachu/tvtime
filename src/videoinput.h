@@ -136,6 +136,11 @@ int videoinput_is_bttv( videoinput_t *vidin );
 int videoinput_is_uyvy( videoinput_t *vidin );
 
 /**
+ * Returns true if this input is a V4l2 device.
+ */
+int videoinput_is_v4l2( videoinput_t *vidin );
+
+/**
  * Returns a pointer to the next image buffer.  Also returns the last field
  * number captured.
  */
