@@ -1,5 +1,5 @@
 
-0.9.11 -
+0.9.11 - Thu Nov 13 09:39:14 AST 2003
   * vektor: Added a NOOP command for helping to kill our default key
       bindings.
   * vektor: Renamed 'sharpness' to 'horizontal resolution' to avoid some
