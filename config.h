@@ -1,0 +1,7 @@
+
+#ifndef CONFIG_H_INCLUDED
+#define CONFIG_H_INCLUDED
+
+#define ARCH_X86
+
+#endif /* CONFIG_H_INCLUDED */
