@@ -48,6 +48,7 @@ struct input_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
+    int toggleconsole;
     
     int togglemenumode;
     menu_t *menu;
@@ -173,7 +174,6 @@ void frequencies_list_disabled_freqs( )
             fprintf( stderr, "channel = %s %s 0\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ i ].name );
         }
     }
-    fprintf( stderr, "\n" );
 }
 
 void frequencies_disable_all( )
@@ -306,6 +306,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
+    in->toggleconsole = 0;
 
     /**
      * Set the current channel list.
@@ -412,6 +413,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
         case TVTIME_FULLSCREEN:
             in->togglefullscreen = 1;
+            break;
+
+        case TVTIME_TOGGLE_CONSOLE:
+            in->toggleconsole = 1;
             break;
 
         case TVTIME_SKIP_CHANNEL:
@@ -676,6 +681,11 @@ int input_toggle_deinterlacing_mode( input_t *in )
     return in->toggledeinterlacingmode;
 }
 
+int input_toggle_console( input_t *in )
+{
+    return in->toggleconsole;
+}
+
 int input_toggle_menu( input_t *in )
 {
     in->togglemenumode = !in->togglemenumode;
@@ -709,6 +719,7 @@ void input_next_frame( input_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->toggleconsole = 0;
     
     if( in->togglemenumode ) menu_refresh( in->menu );
 }

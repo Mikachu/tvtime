@@ -354,7 +354,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->image_width = video_width;
     osds->image_height = video_height;
     osds->alpha = alpha;
-    osds->aspect_ratio = aspect / (double)(((double)video_width)/((double)video_height));;
+    osds->aspect_ratio = aspect / (double)(((double)video_width)/((double)video_height));
     osds->shape_width = shape_width;
     osds->shape_height = shape_height;
     osds->shape_adjusted_width = shape_width;

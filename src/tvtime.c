@@ -45,6 +45,7 @@
 #include "performance.h"
 #include "taglines.h"
 #include "xvoutput.h"
+#include "console.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -219,6 +220,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              video_correction_t *vc,
                                              tvtime_osd_t *osd,
                                              menu_t *menu,
+                                             console_t *con,
                                              int bottom_field,
                                              int correct_input,
                                              int width,
@@ -239,6 +241,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         blit_packed422_scanline( output, curframe, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
         scanline++;
@@ -253,6 +256,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+    if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
     output += outstride;
     scanline++;
@@ -286,6 +290,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
 
         output += outstride;
         scanline++;
@@ -301,6 +307,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
         scanline++;
@@ -315,6 +322,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
 
         output += outstride;
         scanline++;
@@ -327,6 +336,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            video_correction_t *vc,
                                            tvtime_osd_t *osd,
                                            menu_t *menu,
+                                           console_t *con,
                                            int bottom_field,
                                            int correct_input,
                                            int width,
@@ -406,6 +416,7 @@ int main( int argc, char **argv )
     menu_t *menu;
     output_api_t *output;
     performance_t *perf;
+    console_t *con;
     int has_signal = 0;
 
     setup_speedy_calls();
@@ -621,6 +632,34 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    /* Setup the console */
+    con = console_new( ct, 10,10, 20, 10, 15,
+                       width, height, 
+                       config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+    if( !con ) {
+        fprintf( stderr, "tvtime: Could not setup console.\n" );
+        return 1;
+    }
+
+
+    console_printf( con, "
+You should also get your employer (if you work as a programmer) or your
+school, if any, to sign a copyright disclaimer for the program, if
+necessary.  Here is a sample; alter the names:
+
+  Yoyodyne, Inc., hereby disclaims all copyright interest in the program
+  `Gnomovision' (which makes passes at compilers) written by James Hacker.
+
+  <signature of Ty Coon>, 1 April 1989
+  Ty Coon, President of Vice
+
+This General Public License does not permit incorporating your program into
+proprietary programs.  If your program is a subroutine library, you may
+consider it more useful to permit linking proprietary applications with the
+library.  If this is what you want to do, use the GNU Library General
+Public License instead of this License.
+" );
+
 
     /* Setup the output. */
     output = get_xv_output();
@@ -683,6 +722,9 @@ int main( int argc, char **argv )
                 tvtime_osd_show_info( osd );
             }
         }
+        if( input_toggle_console( in ) ) {
+            console_toggle_console( con );
+        }
         input_next_frame( in );
 
 
@@ -737,7 +779,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, 0,
+                       curframe, vc, osd, menu, con, 0,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -750,7 +792,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                    curframe, lastframe, secondlastframe,
-                                   vc, osd, menu, 0,
+                                   vc, osd, menu, con, 0,
                                    vc && config_get_apply_luma_correction( ct ),
                                    width, height, width * 2, output->get_output_stride() );
             }
@@ -793,7 +835,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, 1,
+                       curframe, vc, osd, menu, con, 1,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -806,7 +848,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                   curframe, lastframe,
-                                  secondlastframe, vc, osd, menu, 1,
+                                  secondlastframe, vc, osd, menu, con, 1,
                                   vc && config_get_apply_luma_correction( ct ),
                                   width, height, width * 2, output->get_output_stride() );
             }
@@ -872,6 +914,9 @@ int main( int argc, char **argv )
     }
     if( menu ) {
         menu_delete( menu );
+    }
+    if( con ) {
+        console_delete( con );
     }
     return 0;
 }

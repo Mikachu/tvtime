@@ -77,6 +77,7 @@ static Cmd_Names cmd_table[] = {
 
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
     { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
+    { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
     { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL }
 };
 
@@ -242,6 +243,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
     ct->keymap[ 'r' ] = TVTIME_SKIP_CHANNEL;
+    ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

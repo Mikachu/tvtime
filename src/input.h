@@ -91,6 +91,7 @@ int input_toggle_fullscreen( input_t *in );
 int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );
 int input_toggle_menu( input_t *in );
+int input_toggle_console( input_t *in );
 
 void input_set_menu( input_t *in, menu_t *m );
 
