@@ -4,6 +4,7 @@
 
 typedef struct band_entry_s band_entry_t;
 typedef struct band_s band_t;
+typedef struct freqtable_s freqtable_t;
 
 struct band_entry_s {
     const char *name;
@@ -12,56 +13,58 @@ struct band_entry_s {
 
 struct band_s {
     const char *name;
-    band_entry_t *channels;
+    const band_entry_t *channels;
     int count;
+    int active;
 };
 
+struct freqtable_s
+{
+    const band_t **bands;
+    int numbands;
+};
 
 /**
  * Country specific VHF bands.
  */
-band_entry_t band_data_italy_vhf[] = {
+const band_entry_t band_data_italy_vhf[] = {
     { "A",   53750 }, { "B",  62250 }, { "C",   82250 },
     { "D",  175250 }, { "E", 183750 }, { "F",  192250 },
     { "G",  201250 }, { "H", 210250 }, { "H1", 217250 },
     { "H2", 224250 }
 };
-band_entry_t band_data_newzealand_vhf[] = {
+const band_entry_t band_data_newzealand_vhf[] = {
     { "1",   45250 }, { "2",   55250 }, { "3",  62250 },
     { "4",  175250 }, { "5",  182250 }, { "6", 189250 },
     { "7",  196250 }, { "8",  203250 }, { "9", 210250 },
     { "10", 217250 }, { "11", 224250 }
 };
-band_entry_t band_data_australia_vhf[] =
-{
+const band_entry_t band_data_australia_vhf[] = {
     { "AS1",  57250 }, { "AS2",   64250 }, { "AS3",   86250 },
     { "AS4",  95250 }, { "AS5",  102250 }, { "AS5A", 138250 },
     { "AS6", 175250 }, { "AS7",  182250 }, { "AS8",  189250 },
     { "AS9", 196250 }, { "AS10", 209250 }, { "AS11", 216250 }
 };
-band_t band_australia_vhf = { "Australia VHF", band_data_australia_vhf, 12 };
-band_t band_newzealand_vhf  = { "New Zealand VHF", band_data_newzealand_vhf, 11 };
-band_t band_italy_vhf = { "Italy VHF", band_data_italy_vhf, 10 };
+const band_t band_australia_vhf = { "Australia VHF", band_data_australia_vhf, 12 };
+const band_t band_newzealand_vhf  = { "New Zealand VHF", band_data_newzealand_vhf, 11 };
+const band_t band_italy_vhf = { "Italy VHF", band_data_italy_vhf, 10 };
 
 
+/**
+ * General PAL/SECAM VHF bands.
+ */
 
-band_entry_t band_data_pal_e2_e12[] =
-{
+const band_entry_t band_data_pal_e2_e12[] = {
     { "E2",   48250 }, { "E3",   55250 }, { "E4",   62250 },
     { "E5",  175250 }, { "E6",  182250 }, { "E7",  189250 },
     { "E8",  196250 }, { "E9",  203250 }, { "E10", 210250 },
     { "E11", 217250 }, { "E12", 224250 }
 };
-band_t band_pal_e2_e12 = { "PAL VHF E2-E12", band_data_pal_e2_e12, 11 };
-
-band_entry_t band_data_pal_misc_vhf[] =
-{
+const band_entry_t band_data_pal_misc_vhf[] = {
     { "E1", 45250 }, { "X",   69250 }, { "Y",   76250 },
     { "Z",  83250 }, { "Z+1", 90250 }, { "Z+2", 97250 }
 };
-
-band_entry_t band_data_pal_vhf_s1_s41[] =
-{
+const band_entry_t band_data_pal_vhf_s1_s41[] = {
     { "S1",  105250 }, { "S2",  112250 }, { "S3",  119250 },
     { "S4",  126250 }, { "S5",  133250 }, { "S6",  140250 },
     { "S7",  147250 }, { "S8",  154250 }, { "S9",  161250 },
@@ -77,9 +80,9 @@ band_entry_t band_data_pal_vhf_s1_s41[] =
     { "S37", 431250 }, { "S38", 439250 }, { "S39", 447250 },
     { "S40", 455250 }, { "S41", 463250 }
 };
+const band_t band_pal_e2_e12 = { "PAL VHF E2-E12", band_data_pal_e2_e12, 11 };
 
-band_entry_t band_data_uhf[] =
-{
+band_entry_t band_data_uhf[] = {
     { "21", 471250 }, { "22", 479250 }, { "23", 487250 },
     { "24", 495250 }, { "25", 503250 }, { "26", 511250 },
     { "27", 519250 }, { "28", 527250 }, { "29", 535250 },
@@ -98,6 +101,7 @@ band_entry_t band_data_uhf[] =
     { "66", 831250 }, { "67", 839250 }, { "68", 847250 },
     { "69", 855250 }
 };
+const band_t band_uhf = { "UHF 21-69", band_data_uhf, 48 };
 
 band_entry_t band_data_us_catv[] = {
     { "1",    73250 }, { "2",    55250 }, { "3",    61250 },
