@@ -364,9 +364,15 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   save_normal_geometry(dpy, win);
   
   if(!has_ewmh_state_fullscreen) {
-    struct timeval starttime;
+    // struct timeval starttime;
 
-#if 1 // bloody wm's that can't cope with unmap/map
+    /* Test. */
+    remove_motif_decorations(dpy, win);
+    
+    XSetWMNormalHints(dpy, win, sizehints);
+    XFree(sizehints);
+
+#if 0 // bloody wm's that can't cope with unmap/map
     // We have to be unmapped to change motif decoration hints 
     XUnmapWindow(dpy, win);
 
@@ -610,19 +616,24 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 
 static void switch_to_normal_state(Display *dpy, Window win)
 {
-  XEvent ev;
+  // XEvent ev;
   XSizeHints *sizehints;
 
   if(!has_ewmh_state_fullscreen) {
-    struct timeval starttime;
+    // struct timeval starttime;
 
     // We don't want to have to replace the window manually when remapping it
     sizehints = XAllocSizeHints();
     sizehints->flags = USPosition;
     sizehints->x = 0; // obsolete but should be set in case
     sizehints->y = 0; // an old wm is used
+
+    /* Test. */ 
+    disable_motif_decorations(dpy, win);
     
-#if 1 //bloody wm's that can't cope with unmap/map
+    XSetWMNormalHints(dpy, win, sizehints);
+    XFree(sizehints);
+#if 0 //bloody wm's that can't cope with unmap/map
     // We have to be unmapped to change motif decoration hints 
     XUnmapWindow(dpy, win);
     
