@@ -2,6 +2,12 @@
  * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
  * Copyright (c) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
+ * CC code from Nathan Laredo's ccdecode.
+ * Lots of 'hey what does this mean?' code from
+ * Billy Biggs and Doug Bell, like all the crap with
+ * XDS and stuff.  Some help from Zapping's vbi library by
+ * Michael H. Schimek and others, released under the GPL.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
