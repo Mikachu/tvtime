@@ -2725,14 +2725,15 @@ int main( int argc, char **argv )
 
     rtctimer = rtctimer_new( 1 );
     if( !rtctimer ) {
-        fputs( _("\n*** /dev/rtc support is needed for smooth video.  "
-                 "We STRONGLY recommend\n"
-                 "*** that you load the 'rtc' kernel module "
-                 "before starting tvtime,\n"
-                 "*** and make sure that your user "
-                 "has access to the device file.\n"
-                 "*** See our support page at " PACKAGE_BUGREPORT
-                 " for more information\n\n"), stderr );
+        fprintf( stderr,
+                 _("\n*** /dev/rtc support is needed for smooth video.  "
+                   "We STRONGLY recommend\n"
+                   "*** that you load the 'rtc' kernel module "
+                   "before starting tvtime,\n"
+                   "*** and make sure that your user "
+                   "has access to the device file.\n"
+                   "*** See our support page at %s"
+                   " for more information\n\n"), PACKAGE_BUGREPORT );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) &&
             !rtctimer_set_interval( rtctimer, 64 ) ) {
@@ -2742,15 +2743,16 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fputs( _("\n*** Failed to get 1024hz resolution from /dev/rtc."
-                         "  This will\n"
-                         "*** cause video to be unsmooth.  Please run tvtime "
-                         "as root, or, with\n"
-                         "*** linux kernel version 2.4.19 or later, "
-                         "please run:\n"
-                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                         "*** See our support page at " PACKAGE_BUGREPORT
-                         " for more information\n\n"), stderr );
+                fprintf( stderr,
+                         _("\n*** Failed to get 1024hz resolution "
+                           "from /dev/rtc.  This will\n"
+                           "*** cause video to be unsmooth.  Please run "
+                           "tvtime as root, or, with\n"
+                           "*** linux kernel version 2.4.19 or later, "
+                           "please run:\n"
+                           "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                           "*** See our support page at %s "
+                           "for more information\n\n"), PACKAGE_BUGREPORT );
             }
         }
     }
