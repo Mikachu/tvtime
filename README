@@ -57,8 +57,8 @@ also save command line arguments to the config file using --saveoptions.
 
      tvtime --saveoptions --norm=pal --frequencies=europe
 
-  Will save to your config file the norm PAL and frequency table Europe
-as your defaults.  See docs/default.tvtime.xml for a default
+  This will save to your config file the norm PAL and frequency table
+Europe as your defaults.  See docs/default.tvtime.xml for a default
 configuration file and the default runtime keybindings.
 
 
@@ -181,8 +181,9 @@ Entries in a list are in the following form:
     -------------------
 
 tvtime still needs a method of editing channel names at runtime
-(should not be hard), a full frequency band scanner, native support for
-the weird frequencies used by some cable providers such as UPC.
+(should not be hard), a full frequency band scanner, and native
+support for the weird frequencies used by some cable providers
+such as UPC.
 
 
 5 Using tvtime in areas that receive both PAL and SECAM stations
