@@ -263,41 +263,32 @@ static void pngscreenshot( const char *filename, uint8_t *frame422,
 static videofilter_t *filter = 0;
 static int filtered_cur = 0;
 
-static void do_pulldown_action( uint8_t *output,
-                                uint8_t *prevfield,
-                                uint8_t *curfield,
-                                uint8_t *nextfield,
-                                tvtime_osd_t *osd,
-                                console_t *con,
-                                vbiscreen_t *vs,
-                                int bottom_field,
-                                int width,
-                                int frame_height,
-                                int fieldstride,
-                                int outstride,
-                                int action )
+static void pulldown_merge_fields( uint8_t *output,
+                                   uint8_t *topfield,
+                                   uint8_t *botfield,
+                                   tvtime_osd_t *osd,
+                                   console_t *con,
+                                   vbiscreen_t *vs,
+                                   int width,
+                                   int frame_height,
+                                   int fieldstride,
+                                   int outstride )
 {
     int i;
 
     for( i = 0; i < frame_height; i++ ) {
         uint8_t *curoutput = output + (i * outstride);
 
-        if( bottom_field == (i & 1) ) {
-            blit_packed422_scanline( curoutput, curfield + ((i / 2) * fieldstride), width );
+        if( i & 1 ) {
+            blit_packed422_scanline( curoutput, botfield + ((i / 2) * fieldstride), width );
         } else {
-            if( pulldown_source( action, bottom_field ) ) {
-                blit_packed422_scanline( curoutput, prevfield + ((i / 2) * fieldstride), width );
-            } else {
-                blit_packed422_scanline( curoutput, nextfield + ((i / 2) * fieldstride), width );
-            }
+            blit_packed422_scanline( curoutput, topfield + ((i / 2) * fieldstride), width );
         }
 
         if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
         if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
     }
-
-    filtered_cur = 1;
 }
 
 static int pdoffset = PULLDOWN_SEQ_AA;
@@ -402,19 +393,20 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
 
 
             if( !pderror ) {
-                int curoffset = pdoffset << 1;
-                if( curoffset > PULLDOWN_SEQ_DD ) curoffset = PULLDOWN_SEQ_AA;
-
                 // We're in pulldown, reverse it.
                 if( !filmmode ) {
                     fprintf( stderr, "Film mode enabled.\n" );
-                    if( osd ) tvtime_osd_set_film_mode( osd, curoffset );
+                    if( osd ) tvtime_osd_set_film_mode( osd, pdoffset );
                     filmmode = 1;
                 }
 
-                do_pulldown_action( output, lastframe, lastframe + instride, curframe,
-                                    osd, con, vs, !bottom_field, width,
-                                    frame_height, instride*2, outstride, curoffset );
+                if( pulldown_source( pdoffset, 0 ) ) {
+                    pulldown_merge_fields( output, lastframe, lastframe + instride,
+                                           osd, con, vs, width, frame_height, instride*2, outstride );
+                } else {
+                    pulldown_merge_fields( output, curframe, lastframe + instride,
+                                           osd, con, vs, width, frame_height, instride*2, outstride );
+                }
 
                 return;
             } else {
@@ -425,12 +417,13 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
                 }
             }
         } else if( !pderror ) {
-            int curoffset = pdoffset << 1;
-            if( curoffset > PULLDOWN_SEQ_DD ) curoffset = PULLDOWN_SEQ_AA;
-
-            do_pulldown_action( output, lastframe + instride, curframe, curframe + instride,
-                                osd, con, vs, !bottom_field, width,
-                                frame_height, instride*2, outstride, curoffset );
+            if( pulldown_source( pdoffset, 1 ) ) {
+                pulldown_merge_fields( output, curframe, lastframe + instride,
+                                       osd, con, vs, width, frame_height, instride*2, outstride );
+            } else {
+                pulldown_merge_fields( output, curframe, curframe + instride,
+                                       osd, con, vs, width, frame_height, instride*2, outstride );
+            }
 
             return;
         }
