@@ -44,7 +44,6 @@
 #include "tvtimeconf.h"
 #include "input.h"
 #include "station.h"
-#include "commands.h"
 #include "utils.h"
 
 #define MAX_KEYSYMS 350

@@ -23,7 +23,6 @@
 #include <string.h>
 #include "osdtools.h"
 #include "tvtimeosd.h"
-#include "commands.h"
 #include "pulldown.h"
 
 typedef struct string_object_s

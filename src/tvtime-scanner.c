@@ -30,7 +30,6 @@
 #include "videoinput.h"
 #include "tvtimeconf.h"
 #include "station.h"
-// #include "commands.h"
 #include "utils.h"
 
 int main( int argc, char **argv )
