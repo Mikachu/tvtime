@@ -700,6 +700,7 @@ int main( int argc, char **argv )
                 } else {
                     cur_tuner_state = TUNER_STATE_NO_SIGNAL;
                     /* OSD should say something here */
+                    tvtime_osd_show_message( osd, "No signal" );
                 }
             default:
                 if( fadepos < 256 ) {
@@ -710,7 +711,7 @@ int main( int argc, char **argv )
             }
         }
 
-        if( cur_tuner_state == TUNER_STATE_HAS_SIGNAL || TUNER_STATE_SIGNAL_DETECTED ) {
+        if( cur_tuner_state == TUNER_STATE_HAS_SIGNAL || cur_tuner_state == TUNER_STATE_SIGNAL_DETECTED ) {
             curframe = videoinput_next_frame( vidin, &curframeid );
             aquired = 1;
         }
