@@ -232,7 +232,11 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
         !osd->strings[ OSD_VOLUME_BAR ].string || !osd->strings[ OSD_DATA_BAR ].string ||
-        !osd->strings[ OSD_MUTED ].string || !osd->strings[ OSD_SHOW_NAME ].string || !osd->strings[ OSD_SHOW_RATING ].string || !osd->strings[ OSD_SHOW_START ].string || !osd->strings[ OSD_SHOW_LENGTH ].string || !osd->strings[ OSD_NETWORK_NAME ].string || !osd->strings[ OSD_NETWORK_CALL ].string || !osd->channel_logo ) {
+        !osd->strings[ OSD_MUTED ].string || !osd->strings[ OSD_SHOW_NAME ].string ||
+        !osd->strings[ OSD_SHOW_RATING ].string || !osd->strings[ OSD_SHOW_START ].string ||
+        !osd->strings[ OSD_SHOW_LENGTH ].string || !osd->strings[ OSD_NETWORK_NAME ].string ||
+        !osd->strings[ OSD_NETWORK_CALL ].string ) {
+
         fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
         tvtime_osd_delete( osd );
         return 0;
@@ -479,7 +483,9 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
-    osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
+    if( osd->channel_logo ) {
+        osd_graphic_show_graphic( osd->channel_logo, OSD_FADE_DELAY );
+    }
 }
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
@@ -513,7 +519,9 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
         osd_string_advance_frame( osd->strings[ i ].string );
     }
 
-    osd_graphic_advance_frame( osd->channel_logo );
+    if( osd->channel_logo ) {
+        osd_graphic_advance_frame( osd->channel_logo );
+    }
 
     if( osd->credits ) {
         credits_advance_frame( osd->credits );
@@ -574,23 +582,25 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     }
 
-    if( osd_graphic_visible( osd->channel_logo ) ) {
-        if( scanline >= osd->channel_logo_ypos &&
-            scanline < osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo ) ) {
+    if( osd->channel_logo ) {
+        if( osd_graphic_visible( osd->channel_logo ) ) {
+            if( scanline >= osd->channel_logo_ypos &&
+                scanline < osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo ) ) {
 
-            int startx = osd->channel_logo_xpos - xpos;
-            int strx = 0;
-            if( startx < 0 ) {
-                strx = -startx;
-                startx = 0;
-            }
-            if( startx < width ) {
-                osd_graphic_composite_packed422_scanline( osd->channel_logo,
-                                                          output + (startx*2),
-                                                          output + (startx*2),
-                                                          width - startx,
-                                                          strx,
-                                                          scanline - osd->channel_logo_ypos );
+                int startx = osd->channel_logo_xpos - xpos;
+                int strx = 0;
+                if( startx < 0 ) {
+                    strx = -startx;
+                    startx = 0;
+                }
+                if( startx < width ) {
+                    osd_graphic_composite_packed422_scanline( osd->channel_logo,
+                                                              output + (startx*2),
+                                                              output + (startx*2),
+                                                              width - startx,
+                                                              strx,
+                                                              scanline - osd->channel_logo_ypos );
+                }
             }
         }
     }
