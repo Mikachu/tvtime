@@ -41,6 +41,8 @@ typedef struct output_api_s
     /* Functions for all outputs. */
     int (* toggle_aspect)( void );
     int (* toggle_fullscreen)( void );
+    void (* set_window_caption)( const char *caption );
+
     void (* poll_events)( input_t *in );
     void (* shutdown)( void );
 } output_api_t;

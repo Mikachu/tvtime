@@ -16,7 +16,7 @@ DIRECTFB_CFLAGS =
 DIRECTFB_LIBS = 
 endif
 
-OPT_CFLAGS = -Wall -I. -O3 -rdynamic -DDATADIR="\"$(tvtimedatadir)\""
+OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic -DDATADIR="\"$(tvtimedatadir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS)

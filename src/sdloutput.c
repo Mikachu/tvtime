@@ -257,6 +257,9 @@ void sdl_unlock_output( void )
 {
     SDL_UnlockYUVOverlay( frame );
 }
+void sdl_set_window_caption( const char *caption )
+{
+}
 
 static output_api_t sdloutput =
 {
@@ -270,8 +273,11 @@ static output_api_t sdloutput =
     sdl_is_interlaced,
     sdl_wait_for_sync,
     sdl_show_frame,
+
     sdl_toggle_aspect,
     sdl_toggle_fullscreen,
+    sdl_set_window_caption,
+
     sdl_poll_events,
     sdl_quit
 };

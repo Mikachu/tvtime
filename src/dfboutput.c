@@ -277,6 +277,10 @@ void dfb_poll_events( input_t *in )
     return;
 }
 
+void dfb_set_window_caption( const char *caption )
+{
+}
+
 output_api_t dfboutput =
 {
     dfb_init,
@@ -292,6 +296,8 @@ output_api_t dfboutput =
 
     dfb_toggle_aspect,
     dfb_toggle_fullscreen,
+    dfb_set_window_caption,
+
     dfb_poll_events,
     dfb_shutdown
 };
