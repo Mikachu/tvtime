@@ -20,7 +20,11 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -58,6 +62,7 @@ static void deinterlace_greedy_packed422_scanline_mmxext( uint8_t *output,
                                                           deinterlace_scanline_data_t *data,
                                                           int width )
 {
+#ifdef ARCH_X86
     mmx_t MaxComb;
     uint8_t *m0 = data->m0;
     uint8_t *t1 = data->t1;
@@ -154,6 +159,7 @@ static void deinterlace_greedy_packed422_scanline_mmxext( uint8_t *output,
     }
     sfence();
     emms();
+#endif
 }
 
 static deinterlace_setting_t settings[] =

@@ -20,7 +20,11 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -40,6 +44,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( uint8_t *outpu
                                                                   deinterlace_scanline_data_t *data,
                                                                   int width )
 {
+#ifdef ARCH_X86
     const mmx_t Mask = { 0x7f7f7f7f7f7f7f7fULL };
     const mmx_t DwordOne = { 0x0000000100000001ULL };    
     const mmx_t DwordTwo = { 0x0000000200000002ULL };    
@@ -142,6 +147,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( uint8_t *outpu
     }
     sfence();
     emms();
+#endif
 }
 
 static void copy_scanline( uint8_t *output,

@@ -22,7 +22,11 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -45,26 +49,7 @@ static void deinterlace_line( uint8_t *dst, uint8_t *lum_m4,
                               uint8_t *lum_m3, uint8_t *lum_m2,
                               uint8_t *lum_m1, uint8_t *lum, int size )
 {
-    /**
-     * C implementation.
-    int sum;
-
-    for(;size > 0;size--) {
-        sum = -lum_m4[0];
-        sum += lum_m3[0] << 2;
-        sum += lum_m2[0] << 1;
-        sum += lum_m1[0] << 2;
-        sum += -lum[0];
-        dst[0] = (sum + 4) >> 3; // This needs to be clipped at 0 and 255: cm[(sum + 4) >> 3];
-        lum_m4++;
-        lum_m3++;
-        lum_m2++;
-        lum_m1++;
-        lum++;
-        dst++;
-    }
-    */
-
+#ifdef ARCH_X86
     mmx_t rounder;
 
     rounder.uw[0]=4;
@@ -103,6 +88,27 @@ static void deinterlace_line( uint8_t *dst, uint8_t *lum_m4,
         dst+=4;
     }
     emms();
+#else
+    /**
+     * C implementation.
+     */
+    int sum;
+
+    for(;size > 0;size--) {
+        sum = -lum_m4[0];
+        sum += lum_m3[0] << 2;
+        sum += lum_m2[0] << 1;
+        sum += lum_m1[0] << 2;
+        sum += -lum[0];
+        dst[0] = (sum + 4) >> 3; // This needs to be clipped at 0 and 255: cm[(sum + 4) >> 3];
+        lum_m4++;
+        lum_m3++;
+        lum_m2++;
+        lum_m1++;
+        lum++;
+        dst++;
+    }
+#endif
 }
 
 
@@ -141,7 +147,11 @@ static deinterlace_method_t vfirmethod =
     "ffmpeg: Vertical Blend",
     "Vertical",
     1,
+#ifdef ARCH_X86
+    MM_ACCEL_X86_MMXEXT,
+#else
     0,
+#endif
     0,
     0,
     0,
