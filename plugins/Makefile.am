@@ -32,7 +32,7 @@ EXTRA_DIST = tomsmocomp/SearchLoop0A.inc tomsmocomp/SearchLoopBottom.inc \
 	tomsmocomp/SearchLoopVA.inc tomsmocomp/SearchLoopVAH.inc \
 	tomsmocomp/StrangeBob.inc tomsmocomp/TomsMoCompAll.inc \
 	tomsmocomp/TomsMoCompAll2.inc tomsmocomp/WierdBob.inc \
-	tomsmocomp/tomsmocompmacros.h greedyh.asm
+	tomsmocomp/tomsmocompmacros.h pointer.inc greedyh.asm
 else
 DSCALER_SRCS = 
 endif
