@@ -114,9 +114,14 @@ const int top_size = 7;
 const int left_size = 7;
 const int bottom_size = 13;
 
+const int small_size_576 = 18;
+const int med_size_576 = 30;
+const int big_size_576 = 80;
+
 tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                               unsigned int channel_rgb, unsigned int other_rgb )
 {
+    int smallsize, medsize, bigsize;
     char *fontfile;
     char *logofile;
 
@@ -160,14 +165,24 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         return 0;
     }
 
-    osd->smallfont = osd_font_new( fontfile, 18, pixel_aspect );
+    if( height == 576 ) {
+        smallsize = small_size_576;
+        medsize = med_size_576;
+        bigsize = big_size_576;
+    } else {
+        smallsize = (int) (((((double) small_size_576) / 576.0) * ((double) height)) + 0.5);
+        medsize = (int) (((((double) med_size_576) / 576.0) * ((double) height)) + 0.5);
+        bigsize = (int) (((((double) big_size_576) / 576.0) * ((double) height)) + 0.5);
+    }
+
+    osd->smallfont = osd_font_new( fontfile, smallsize, pixel_aspect );
     if( !osd->smallfont ) {
         osd_rect_delete( osd->databarbg );
         osd_rect_delete( osd->databar );
         free( osd );
         return 0;
     }
-    osd->medfont = osd_font_new( fontfile, 30, pixel_aspect );
+    osd->medfont = osd_font_new( fontfile, medsize, pixel_aspect );
     if( !osd->medfont ) {
         osd_rect_delete( osd->databarbg );
         osd_rect_delete( osd->databar );
@@ -175,7 +190,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         free( osd );
         return 0;
     }
-    osd->bigfont = osd_font_new( fontfile, 80, pixel_aspect );
+    osd->bigfont = osd_font_new( fontfile, bigsize, pixel_aspect );
     if( !osd->bigfont ) {
         osd_rect_delete( osd->databarbg );
         osd_rect_delete( osd->databar );
@@ -185,7 +200,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         return 0;
     }
 
-    osd->list = osd_list_new( pixel_aspect );
+    osd->list = osd_list_new( osd->smallfont, pixel_aspect );
     if( !osd->list ) {
         osd_rect_delete( osd->databarbg );
         osd_rect_delete( osd->databar );

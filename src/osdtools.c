@@ -768,11 +768,10 @@ struct osd_list_s
     int hilight;
     int width;
     int height;
-    osd_font_t *font;
     osd_string_t *lines[ OSD_LIST_MAX_LINES ];
 };
 
-osd_list_t *osd_list_new( double pixel_aspect )
+osd_list_t *osd_list_new( osd_font_t *font, double pixel_aspect )
 {
     osd_list_t *osdl = malloc( sizeof( osd_list_t ) );
     int i;
@@ -787,15 +786,10 @@ osd_list_t *osd_list_new( double pixel_aspect )
     osdl->width = 0;
     osdl->height = 0;
     osdl->hold = 0;
-    osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
-    if( !osdl->font ) {
-        free( osdl );
-        return 0;
-    }
     memset( osdl->lines, 0, sizeof( osdl->lines ) );
 
     for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
-        osdl->lines[ i ] = osd_string_new( osdl->font );
+        osdl->lines[ i ] = osd_string_new( font );
         if( !osdl->lines[ i ] ) {
             osd_list_delete( osdl );
             return 0;
@@ -821,7 +815,6 @@ void osd_list_delete( osd_list_t *osdl )
     for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
         if( osdl->lines[ i ] ) osd_string_delete( osdl->lines[ i ] );
     }
-    osd_font_delete( osdl->font );
     free( osdl );
 }
 

@@ -134,7 +134,7 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
                                                  int width, int xpos,
                                                  int scanline );
 
-osd_list_t *osd_list_new( double pixel_aspect );
+osd_list_t *osd_list_new( osd_font_t *font, double pixel_aspect );
 void osd_list_delete( osd_list_t *osdl );
 int osd_list_get_hilight( osd_list_t *osdl );
 int osd_list_get_numlines( osd_list_t *osdl );
