@@ -17,7 +17,7 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins
 # DIRECTFB_LIBS = 
 # endif
 
-OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\""
+OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\"" -D_LARGEFILE64_SOURCE
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
@@ -36,10 +36,11 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
 	videofilter.c station.h station.c bands.h configsave.h configsave.c \
 	x11tools.c x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
-	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h
+	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h \
+	diffcomp.h diffcomp.c
 
 bin_PROGRAMS = tvtime tvtime-command
-EXTRA_PROGRAMS = expandpng timingtest
+EXTRA_PROGRAMS = expandpng timingtest rvr
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
@@ -53,7 +54,10 @@ expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-CLEANFILES = expandpng timingtest
+rvr_SOURCES = $(COMMON_SRCS) reepktq.c ree.c rvrmain.c
+rvr_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+
+CLEANFILES = expandpng timingtest rvr
 
 .PHONY: ../plugins/libtvtimeplugins.la wine/libwine.la
 ../plugins/libtvtimeplugins.la:
