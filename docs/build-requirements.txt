@@ -1,0 +1,17 @@
+
+On debian I needed to install the following packages (and their dependencies)
+to build tvtime from source:
+
+g++
+gcc
+gcc-3.2
+g++-3.2
+autoconf
+automake1.7
+libtool
+zlib1g-dev
+libfreeetype6-dev
+libpng3-dev
+libxml2-dev
+xlibs-dev
+
