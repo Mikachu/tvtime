@@ -755,7 +755,10 @@ int videoinput_freq_present( videoinput_t *vidin )
 {
     if( vidin->tuner.tuner > -1 ) {
         if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
-            perror( "ioctl VIDIOCGTUNER" );
+            if( vidin->verbose ) {
+                fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
+                         strerror( errno ) );
+            }
             return 0;
         }
         if( vidin->tuner.signal ) {

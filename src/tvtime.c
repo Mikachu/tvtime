@@ -52,6 +52,7 @@
 #include "commands.h"
 #include "station.h"
 #include "configsave.h"
+#include "config.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -504,6 +505,8 @@ int main( int argc, char **argv )
     int fadepos = 0;
     char number[4];
 
+    fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
+
     setup_speedy_calls();
 
     greedy_plugin_init();
@@ -516,7 +519,6 @@ int main( int argc, char **argv )
     linearblend_plugin_init();
     scalerbob_plugin_init();
     simplemo_plugin_init();
-    
 
     ct = config_new( argc, argv );
     if( !ct ) {
