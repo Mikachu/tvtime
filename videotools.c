@@ -25,12 +25,18 @@
 struct video_correction_s
 {
     int source_black_level;
-    int target_black_level;
     int source_white_level;
+    int target_black_level;
     int target_white_level;
+
+    int source_chroma_start;
+    int source_chroma_end;
+    int target_chroma_start;
+    int target_chroma_end;
+
     double luma_correction;
-    unsigned char *luma_table;
-    unsigned char *chroma_table;
+    unsigned int *luma_table;
+    unsigned int *chroma_table;
     unsigned char *temp_scanline_data;
 };
 
@@ -350,7 +356,8 @@ void packed422_field_to_frame_bot_twoframe_copy( unsigned char *output, int outs
                                                  bot0, width );
         output += outstride;
 
-        blit_packed422_scanline( lastframe, curframe, linestride );
+        blit_packed422_scanline( lastframe, curframe, width );
+        blit_packed422_scanline( lastframe + linestride, curframe + linestride, width );
         curframe += (linestride*2);
         lastframe += (linestride*2);
 
@@ -359,6 +366,122 @@ void packed422_field_to_frame_bot_twoframe_copy( unsigned char *output, int outs
         output += outstride;
     }
     blit_packed422_scanline( lastframe, curframe, width );
+}
+
+void video_correction_packed422_field_to_frame_top_twoframe( video_correction_t *vc,
+    unsigned char *output, int outstride, unsigned char *curframe,
+    unsigned char *lastframe, int width, int height, int linestride )
+{
+    int i;
+
+    /* Copy a scanline. */
+    video_correction_correct_packed422_scanline( vc, output, curframe, width );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
+        output += outstride;
+
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        video_correction_correct_packed422_scanline( vc, output, curframe, width );
+        output += outstride;
+    }
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+}
+
+void video_correction_packed422_field_to_frame_bot_twoframe( video_correction_t *vc,
+    unsigned char *output, int outstride, unsigned char *curframe,
+    unsigned char *lastframe, int width, int height, int linestride )
+{
+    int i;
+
+    curframe += linestride;
+    lastframe += linestride;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    video_correction_correct_packed422_scanline( vc, output, curframe, width );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
+        output += outstride;
+
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        video_correction_correct_packed422_scanline( vc, output, curframe, width );
+        output += outstride;
+    }
+}
+
+void video_correction_packed422_field_to_frame_bot_twoframe_copy( video_correction_t *vc,
+    unsigned char *output, int outstride, unsigned char *curframe,
+    unsigned char *lastframe, int width, int height, int linestride )
+{
+    int i;
+
+    blit_packed422_scanline( lastframe, curframe, linestride );
+    curframe += linestride;
+    lastframe += linestride;
+
+    /* Clear a scanline. */
+    blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+    output += outstride;
+
+    /* Copy a scanline. */
+    video_correction_correct_packed422_scanline( vc, output, curframe, width );
+    output += outstride;
+
+    for( i = 0; i < (height/2) - 1; i++ ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + linestride;
+        unsigned char *bot1 = curframe + (linestride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + linestride;
+        unsigned char *bot0 = lastframe + (linestride*2);
+
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
+        output += outstride;
+
+        blit_packed422_scanline( lastframe, curframe, linestride*2 );
+        curframe += (linestride*2);
+        lastframe += (linestride*2);
+
+        /* Copy a scanline. */
+        video_correction_correct_packed422_scanline( vc, output, curframe, width );
+        output += outstride;
+    }
 }
 
 
@@ -389,6 +512,22 @@ static void video_correction_update_table( video_correction_t *vc )
             vc->luma_table[ i ] = ( (int) (target + 0.5) ) + vc->target_black_level;
         }
     }
+
+/*
+    for( i = 0; i < 256; i++ ) {
+        if( i < vc->source_chroma_start ) {
+            vc->chroma_table[ i ] = vc->target_chroma_start;
+        } else if( i > vc->source_chroma_end ) {
+            vc->chroma_table[ i ] = vc->target_chroma_end;
+        } else {
+            double curval, target;
+
+            curval = ( (double) (i - vc->source_chroma_start) ) / ( (double) (vc->source_chroma_end - vc->source_chroma_start) );
+            target = curval * ( (double) (vc->target_chroma_end - vc->target_chroma_start) );
+            vc->chroma_table[ i ] = ( (int) (target + 0.5) ) + vc->target_chroma_start;
+        }
+    }
+*/
 }
 
 video_correction_t *video_correction_new( void )
@@ -399,13 +538,19 @@ video_correction_t *video_correction_new( void )
     }
 
     /* These are set this way to compensate for the bttv. */
-    vc->source_black_level = 16;
-    vc->source_white_level = 253;
+    vc->source_black_level = 0;
+    vc->source_white_level = 255;
     vc->target_black_level = 16;
     vc->target_white_level = 235;
+
+    vc->source_chroma_start = 2;
+    vc->source_chroma_end   = 253;
+    vc->target_chroma_start = 12;
+    vc->target_chroma_end   = 240;
+
     vc->luma_correction = 1.0;
-    vc->luma_table = (unsigned char *) malloc( 256 );
-    vc->chroma_table = (unsigned char *) malloc( 256 );
+    vc->luma_table = (unsigned int *) malloc( 256 * sizeof( int ) );
+    vc->chroma_table = (unsigned int *) malloc( 256* sizeof( int ) );
     vc->temp_scanline_data = (unsigned char *) malloc( 2048 * 2 );
     if( !vc->luma_table || !vc->chroma_table ) {
         if( vc->luma_table ) free( vc->luma_table );
@@ -442,8 +587,9 @@ void video_correction_correct_packed422_scanline( video_correction_t *vc,
                                                   unsigned char *output,
                                                   unsigned char *input, int width )
 {
+    unsigned int *table = vc->luma_table;
     while( width-- ) {
-        *output++ = vc->luma_table[ *input++ ];
+        *output++ = table[ *input++ ];
         *output++ = *input++;
     }
 }

@@ -149,6 +149,11 @@ int videoinput_get_height( videoinput_t *vidin )
     return vidin->height;
 }
 
+int videoinput_get_numframes( videoinput_t *vidin )
+{
+    return vidin->numframes;
+}
+
 /**
  * Reasonable defaults:
  *
@@ -167,7 +172,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     if( !vidin ) return 0;
 
-    vidin->maxbufs = 16;
+    vidin->maxbufs = 3;
     vidin->curframe = 0;
     vidin->verbose = verbose;
 
@@ -297,7 +302,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     }
 
     vidin->numframes = vidin->gb_buffers.frames;
-    if( vidin->maxbufs < vidin->numframes ) vidin->numframes = vidin->maxbufs;
+    if( vidin->maxbufs < vidin->numframes ) {
+        fprintf( stderr, "videoinput: We got more than %d frames, I'm not sure "
+                 "if we'll crash or not, or what's going to happen...  When did "
+                 "this happen?  email: vektor@dumbterm.net.\n", vidin->maxbufs );
+        vidin->numframes = vidin->maxbufs;
+    }
     vidin->grab_buf = (struct video_mmap *) malloc( sizeof( struct video_mmap ) * vidin->numframes );
 
     /* Try to setup mmap-based capture. */

@@ -60,6 +60,12 @@ void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
                                                     int fieldwidth,
                                                     int fieldheight,
                                                     int fieldstride );
+void video_correction_packed422_field_to_frame_top_twoframe( video_correction_t *vc,
+    unsigned char *output, int outstride, unsigned char *curframe,
+    unsigned char *lastframe, int width, int height, int linestride );
+void video_correction_packed422_field_to_frame_bot_twoframe_copy( video_correction_t *vc,
+    unsigned char *output, int outstride, unsigned char *curframe,
+    unsigned char *lastframe, int width, int height, int linestride );
 
 /**
  * Builds a packed 4:2:2 frame from a field, interpolating to frame size by

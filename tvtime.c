@@ -27,6 +27,7 @@
 #include <time.h>
 #include <stdint.h>
 #include "pngoutput.h"
+#include "pnginput.h"
 #include "frequencies.h"
 #include "videoinput.h"
 #include "rtctimer.h"
@@ -74,6 +75,25 @@ static void build_test_frames( unsigned char *oddframe,
 
 void build_colourbars( unsigned char *output, int width, int height )
 {
+    unsigned char *cb444 = (unsigned char *) malloc( width * 3 );
+    pnginput_t *cb;
+    int i;
+
+    if( !cb444 ) {
+        memset( output, 255, width * height * 2 );
+        return;
+    }
+
+    cb = pnginput_new( "smptebars.png" );
+    for( i = 0; i < pnginput_get_height( cb ); i++ ) {
+        unsigned char *curout = output + (i * width * 2);
+        rgb24_to_packed444_rec601_scanline( cb444, pnginput_get_scanline( cb, i ), width );
+        cheap_packed444_to_packed422_scanline( curout, cb444, width );
+    }
+    pnginput_delete( cb );
+    free( cb444 );
+
+/*
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
     int i;
     if( !cb444 ) { memset( output, 255, width * height * 2 ); return; }
@@ -86,6 +106,7 @@ void build_colourbars( unsigned char *output, int width, int height )
     }
 
     free( cb444 );
+*/
 }
 
 static void pngscreenshot( const char *filename, unsigned char *frame422,
@@ -126,7 +147,9 @@ int main( int argc, char **argv )
     int fieldtime;
     int blittime = 0;
     int curframeid;
+    int lastframeid;
     int skipped = 0;
+    int copymode = 1;
     int verbose;
     tvtime_osd_t *osd;
     int i;
@@ -180,6 +203,12 @@ int main( int argc, char **argv )
 
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
+    if( videoinput_get_numframes( vidin ) > 2 ) {
+        copymode = 0;
+        fprintf( stderr, "woop, not in copy mode.\n" );
+    } else {
+        fprintf( stderr, "darn, stuck in copy mode.\n" );
+    }
 
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
@@ -325,6 +354,10 @@ int main( int argc, char **argv )
     /* Begin capturing frames. */
     videoinput_free_all_frames( vidin );
 
+    if( !copymode ) {
+        lastframe = videoinput_next_frame( vidin, &lastframeid );
+    }
+
     /* Initialize our timestamps. */
     for( i = 0; i < 7; i++ ) gettimeofday( &(checkpoint[ i ]), 0 );
     gettimeofday( &lastframetime, 0 );
@@ -406,12 +439,18 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
             if( config_get_apply_luma_correction( ct ) ) {
+                video_correction_packed422_field_to_frame_top_twoframe( vc, sdl_get_output(),
+                                                       width*2, curframe,
+                                                       lastframe, width,
+                                                       height, width*2 );
+/*
                 video_correction_packed422_field_to_frame_top( vc, 
                                                                sdl_get_output(),
                                                                width*2, 
                                                                curframe,
                                                                width, height/2,
                                                                width*4 );
+*/
             } else {
                 packed422_field_to_frame_top_twoframe( sdl_get_output(),
                                                        width*2, curframe,
@@ -476,17 +515,37 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
             if( config_get_apply_luma_correction( ct ) ) {
+                if( copymode ) {
+                    video_correction_packed422_field_to_frame_bot_twoframe( vc, sdl_get_output(),
+                                                           width*2, curframe,
+                                                           lastframe, width,
+                                                           height, width*2 );
+                } else {
+                    video_correction_packed422_field_to_frame_bot_twoframe_copy( vc, sdl_get_output(),
+                                                           width*2, curframe,
+                                                           lastframe, width,
+                                                           height, width*2 );
+                }
+/*
                 video_correction_packed422_field_to_frame_bot( vc, 
                                                                sdl_get_output(),
                                                                width*2,
                                                                curframe + (width*2),
                                                                width, height/2,
                                                                width*4 );
+*/
             } else {
-                packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
-                                                       width*2, curframe,
-                                                       lastframe, width,
-                                                       height, width*2 );
+                if( copymode ) {
+                    packed422_field_to_frame_bot_twoframe( sdl_get_output(),
+                                                           width*2, curframe,
+                                                           lastframe, width,
+                                                           height, width*2 );
+                } else {
+                    packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
+                                                           width*2, curframe,
+                                                           lastframe, width,
+                                                           height, width*2 );
+                }
 /*
                 packed422_field_to_frame_bot( sdl_get_output(), width*2, 
                                               curframe + (width*2),
@@ -511,7 +570,13 @@ int main( int argc, char **argv )
 
 
         /* We're done with the input now. */
-        videoinput_free_frame( vidin, curframeid );
+        if( copymode ) {
+            videoinput_free_frame( vidin, curframeid );
+        } else {
+            videoinput_free_frame( vidin, lastframeid );
+            lastframeid = curframeid;
+            lastframe = curframe;
+        }
 
 
         /* CHECKPOINT6 : Released a frame to V4L. */

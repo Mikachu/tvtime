@@ -62,6 +62,9 @@ pnginput_t *pnginput_new( const char *filename )
 
     png_init_io( pnginput->png_ptr, pnginput->f );
 
+    /* So paletted pngs work... Need to detect about alpha still though.. */
+    png_set_expand( pnginput->png_ptr );
+
     png_read_png( pnginput->png_ptr, pnginput->info_ptr,
                   PNG_TRANSFORM_IDENTITY, 0 );
 

@@ -66,6 +66,8 @@ unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid );
 void videoinput_free_frame( videoinput_t *vidin, int frameid );
 void videoinput_free_all_frames( videoinput_t *vidin );
 
+int videoinput_get_numframes( videoinput_t *vidin );
+
 /**
  * Returns true if this input has a tuner.
  */
