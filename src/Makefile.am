@@ -95,7 +95,7 @@ $(external_dependencies):
 # FIFO directories.
 .PHONY: install-exec-hook uninstall-hook
 install-exec-hook:
-	-$(INSTALL) -d -m 'ug=rwx,o=rxt' '$(DESTDIR)$(pkgrundir)'             \
+	-$(INSTALL) -d -m 'ug=rwx,o=rxt' '$(DESTDIR)$(pkgrundir)'            \
 	   || touch nofifodir
 	@if [ -f nofifodir ]; then (                                         \
 	  echo 'Warning: I could not create the directory'                   \
@@ -107,7 +107,7 @@ install-exec-hook:
 	-if [ -f nofifodir ]; then                                           \
 	   rm -f nofifodir;                                                  \
 	 else                                                                \
-	   $(INSTALL) -d -m 'ug=rwx,o=rxt' -g '@PKGRUNDIRGROUP@'              \
+	   $(INSTALL) -d -m 'ug=rwx,o=rxt' -g '@PKGRUNDIRGROUP@'             \
 	     '$(DESTDIR)$(pkgrundir)' || touch nofifodir;                    \
 	 fi
 	@if [ -f nofifodir ]; then rm -f nofifodir; (                        \
