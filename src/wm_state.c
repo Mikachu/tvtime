@@ -376,9 +376,9 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
       struct timeval curtime;
       gettimeofday( &curtime, 0 );
       
-	  if( is_withdrawn(dpy, win) ) break;
-	  
-	  if( XPending( dpy ) ) {
+      if( is_withdrawn(dpy, win) ) break;
+
+      if( XPending( dpy ) ) {
         XEvent ev;
         XNextEvent( dpy, &ev );
         if( ev.type == UnmapNotify ) break;
@@ -389,7 +389,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
         break;
       }
       
-	  usleep( 10000 );
+      usleep( 10000 );
     }
     
     remove_motif_decorations(dpy, win);
@@ -632,9 +632,9 @@ static void switch_to_normal_state(Display *dpy, Window win)
       struct timeval curtime;
       gettimeofday( &curtime, 0 );
       
-	  if( is_withdrawn(dpy, win) ) break;
-	  
-	  if( XPending( dpy ) ) {
+      if( is_withdrawn(dpy, win) ) break;
+ 
+      if( XPending( dpy ) ) {
         XEvent ev;
         XNextEvent( dpy, &ev );
         if( ev.type == UnmapNotify ) break;
@@ -645,9 +645,9 @@ static void switch_to_normal_state(Display *dpy, Window win)
         break;
       }
       
-	  usleep( 10000 );
+      usleep( 10000 );
     }
-		
+
     disable_motif_decorations(dpy, win);
     
     XSetWMNormalHints(dpy, win, sizehints);
