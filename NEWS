@@ -5,6 +5,11 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.8
 
+  Users of tvtime 0.9.7:
+    The default key bindings and configuration file format have
+    significantly changed in this release of tvtime.  Please see the
+    documentation for details on using tvtime 0.9.8.
+
   *  New XML config file format for both the tvtime configuration,
      and the station list.
   *  tvtime now has two distinct half-framerate modes: top-field-first
