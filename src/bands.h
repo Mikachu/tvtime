@@ -260,5 +260,6 @@ band_t bands[] = {
     { "Japan Broadcast", band_data_japan_bcast, sizeof( band_data_japan_bcast ) / sizeof( band_entry_t ) },
     { "Japan Cable", band_data_japan_catv, sizeof( band_data_japan_catv ) / sizeof( band_entry_t ) },
 };
+const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
 
 #endif /* BANDS_H_INCLUDED */
