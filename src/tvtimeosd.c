@@ -64,6 +64,10 @@ struct tvtime_osd_s
     osd_font_t *bigfont;
     string_object_t strings[ OSD_MAX_STRING_OBJECTS ];
 
+    osd_list_t *list;
+    int listpos_x;
+    int listpos_y;
+
     osd_animation_t *channel_logo;
     int channel_logo_xpos;
     int channel_logo_ypos;
@@ -114,6 +118,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->film_mode = -1;
     osd->mutestate = 0;
     osd->hold = 0;
+    osd->listpos_x = (width * 30) / 100;
+    osd->listpos_y = (height * 30) / 100;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -142,6 +148,15 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     if( !osd->bigfont ) {
         osd_font_delete( osd->smallfont );
         osd_font_delete( osd->medfont );
+        free( osd );
+        return 0;
+    }
+
+    osd->list = osd_list_new( pixel_aspect );
+    if( !osd->list ) {
+        osd_font_delete( osd->smallfont );
+        osd_font_delete( osd->medfont );
+        osd_font_delete( osd->bigfont );
         free( osd );
         return 0;
     }
@@ -177,7 +192,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont );
 
     /* We create the logo, but it's ok if it fails to load. */
-    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 3 );
+    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 4 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -561,6 +576,36 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
     osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? 100 : 0 );
 }
 
+void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
+{
+    osd_list_set_timeout( osd->list, OSD_FADE_DELAY );
+}
+
+int tvtime_osd_list_get_hilight( tvtime_osd_t *osd )
+{
+    return osd_list_get_hilight( osd->list );
+}
+
+int tvtime_osd_list_get_numlines( tvtime_osd_t *osd )
+{
+    return osd_list_get_numlines( osd->list );
+}
+
+void tvtime_osd_list_set_hilight( tvtime_osd_t *osd, int pos )
+{
+    osd_list_set_hilight( osd->list, pos );
+}
+
+void tvtime_osd_list_set_text( tvtime_osd_t *osd, int line, const char *text )
+{
+    osd_list_set_text( osd->list, line, text );
+}
+
+void tvtime_osd_list_set_lines( tvtime_osd_t *osd, int numlines )
+{
+    osd_list_set_lines( osd->list, numlines );
+}
+
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 {
     char timestamp[ 50 ];
@@ -580,6 +625,8 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     if( osd->channel_logo ) {
         osd_animation_advance_frame( osd->channel_logo );
     }
+
+    osd_list_advance_frame( osd->list );
 }
 
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
@@ -644,6 +691,30 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                                 scanline - osd->channel_logo_ypos );
                 }
             }
+        }
+    }
+
+    if( osd_list_visible( osd->list ) && scanline >= osd->listpos_y ) {
+        int startx;
+        int strx = 0;
+
+        startx = osd->listpos_x - xpos;
+
+        if( startx < 0 ) {
+            strx = -startx;
+            startx = 0;
+        }
+
+        /* Make sure we start somewhere even. */
+        startx = startx & ~1;
+
+        if( startx < width ) {
+            osd_list_composite_packed422_scanline( osd->list,
+                                                   output + (startx*2),
+                                                   output + (startx*2),
+                                                   width - startx,
+                                                   strx,
+                                                   scanline - osd->listpos_y );
         }
     }
 }

@@ -39,13 +39,8 @@ typedef struct osd_string_s osd_string_t;
 typedef struct osd_font_s osd_font_t;
 typedef struct osd_databars_s osd_databars_t;
 typedef struct osd_graphic_s osd_graphic_t;
-typedef struct osd_shape_s osd_shape_t;
 typedef struct osd_animation_s osd_animation_t;
-
-typedef enum OSD_Shapes_e {
-    OSD_Rect        = (1<<0),
-    OSD_Circle      = (1<<1)
-} OSD_Shape;
+typedef struct osd_list_s osd_list_t;
 
 /**
  * Creates a new string with the given truetype font at the given size.
@@ -113,27 +108,6 @@ void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
                                                 uint8_t *background,
                                                 int width );
 
-osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
-                            int video_height, int shape_width,
-                            int shape_height, double aspect, int alpha );
-
-void osd_shape_delete( osd_shape_t *osds );
-void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr );
-void osd_shape_show_shape( osd_shape_t *osds, int timeout );
-int osd_shape_visible( osd_shape_t *osds );
-void osd_shape_set_timeout( osd_shape_t *osds, int timeout );
-void osd_shape_advance_frame( osd_shape_t *osds );
-void osd_shape_composite_packed422( osd_shape_t *osds, 
-                                    uint8_t *output,
-                                    int width, int height, int stride,
-                                    int xpos, int ypos );
-void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
-                                             uint8_t *output,
-                                             uint8_t *background,
-                                             int width, int xpos,
-                                             int scanline );
-
-
 osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int alpha );
 void osd_graphic_delete( osd_graphic_t *osdg );
 int osd_graphic_get_width( osd_graphic_t *osdg );
@@ -160,6 +134,22 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
                                                  uint8_t *background,
                                                  int width, int xpos,
                                                  int scanline );
+
+osd_list_t *osd_list_new( double pixel_aspect );
+void osd_list_delete( osd_list_t *osdl );
+int osd_list_get_hilight( osd_list_t *osdl );
+int osd_list_get_numlines( osd_list_t *osdl );
+void osd_list_set_hilight( osd_list_t *osdl, int pos );
+void osd_list_set_text( osd_list_t *osdl, int line, const char *text );
+void osd_list_set_lines( osd_list_t *osdl, int numlines );
+void osd_list_set_timeout( osd_list_t *osdl, int timeout );
+int osd_list_visible( osd_list_t *osdl );
+void osd_list_advance_frame( osd_list_t *osdl );
+void osd_list_composite_packed422_scanline( osd_list_t *osdl,
+                                            uint8_t *output,
+                                            uint8_t *background,
+                                            int width, int xpos,
+                                            int scanline );
 
 #ifdef __cplusplus
 };

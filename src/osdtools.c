@@ -498,168 +498,6 @@ void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
     }
 }
 
-/* Shape functions */
-struct osd_shape_s
-{
-    int type;
-    int frames_left;
-    int shape_luma;
-    int shape_cb;
-    int shape_cr;
-    int shape_height;
-    int shape_width;
-    int shape_adjusted_width;
-    int image_width;
-    int image_height;
-    double aspect_ratio;
-    int alpha;
-    uint8_t *image4444;
-};
-
-osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
-                            int video_height, int shape_width,
-                            int shape_height, double aspect, int alpha )
-{
-    osd_shape_t *osds = malloc( sizeof( osd_shape_t ) );
-    osds->frames_left = 0;
-    osds->shape_luma = 16;
-    osds->shape_cb = 128;
-    osds->shape_cr = 128;
-    osds->image_width = video_width;
-    osds->image_height = video_height;
-    osds->alpha = alpha;
-    osds->aspect_ratio = aspect / (double)(((double)video_width)/((double)video_height));
-    osds->shape_width = shape_width;
-    osds->shape_height = shape_height;
-    osds->shape_adjusted_width = shape_width;
-    osds->type = shape_type;
-
-    osds->image4444 = malloc( video_width * video_height * 4 );
-    if( !osds ) {
-        free( osds );
-        return 0;
-    }
-
-    return osds;
-}
-
-void osd_shape_delete( osd_shape_t *osds )
-{
-    free( osds->image4444 );
-    free( osds );
-}
-
-void osd_shape_set_timeout( osd_shape_t *osds, int timeout )
-{
-    osds->frames_left = timeout;
-}
-
-void osd_shape_render_image4444( osd_shape_t *osds )
-{
-    double radius_sqrd, x0, y0;
-    int x, y;
-    int width = osds->shape_width;
-    int height = osds->shape_height;
-
-    switch( osds->type ) {
-    case OSD_Rect:
-        blit_colour_packed4444( osds->image4444, width,
-                                height, osds->image_width * 4,
-                                osds->alpha, osds->shape_luma, osds->shape_cb,
-                                osds->shape_cr );
-        break;
-
-    case OSD_Circle:
-        osds->shape_height = osds->shape_width;
-
-        blit_colour_packed4444( osds->image4444, width,
-                                osds->shape_height, osds->image_width * 4,
-                                0, 0, 0, 0 );
-
-        x0 = osds->shape_width / 2.0;
-        y0 = osds->shape_height / 2.0;
-        radius_sqrd = x0*x0;
-
-        for( x = 0; x < width; x++ ) {
-            for( y = 0; y < osds->shape_height; y++ ) {
-                double curx = x*osds->aspect_ratio;
-                int xoffset = x*4;
-                if( ((curx-x0)*(curx-x0) + (y-y0)*(y-y0)) <= radius_sqrd ) {
-                    int offset = y*osds->image_width*4 + xoffset;
-                    osds->image4444[ offset + 0 ] = osds->alpha;
-                    osds->image4444[ offset + 1 ] = osds->shape_luma;
-                    osds->image4444[ offset + 2 ] = osds->shape_cb;
-                    osds->image4444[ offset + 3 ] = osds->shape_cr;
-                }
-            }
-        }
-        break;
-
-    default:
-        blit_colour_packed4444( osds->image4444, width,
-                                height, osds->image_width * 4,
-                                0, 0, 0, 0 );
-
-        break;
-    }
-
-    osds->shape_adjusted_width = width;
-}
-
-void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr )
-{
-    osds->shape_luma = luma;
-    osds->shape_cb = cb;
-    osds->shape_cr = cr;
-    osd_shape_render_image4444( osds );
-}
-
-void osd_shape_show_shape( osd_shape_t *osds, int timeout )
-{
-    osds->frames_left = timeout;
-}
-
-int osd_shape_visible( osd_shape_t *osds )
-{
-    return (osds->frames_left > 0);
-}
-
-void osd_shape_advance_frame( osd_shape_t *osds )
-{
-    if( osds->frames_left > 0 ) {
-        osds->frames_left--;
-    }
-}
-
-void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
-                                             uint8_t *output,
-                                             uint8_t *background,
-                                             int width, int xpos,
-                                             int scanline )
-{
-    if( osds->frames_left ) {
-        if( scanline < osds->shape_height && xpos < osds->shape_adjusted_width ) {
-
-            if( (xpos+width) > osds->shape_adjusted_width ) {
-                width = osds->shape_adjusted_width - xpos;
-            }
-
-            if( osds->frames_left < OSD_FADEOUT_TIME ) {
-                int alpha;
-                alpha = (int) (((((double) osds->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
-                composite_packed4444_alpha_to_packed422_scanline( output, background,
-                    osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
-                    width, alpha );
-            } else {
-                composite_packed4444_to_packed422_scanline( output, background,
-                    osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
-                    width );
-            }
-        }
-    }
-}
-
-
 /* Graphic functions */
 struct osd_graphic_s
 {
@@ -990,4 +828,134 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
     }
 }
 
+#define OSD_LIST_MAX_LINES 10
+
+struct osd_list_s
+{
+    double aspect;
+    int numlines;
+    int hilight;
+    osd_font_t *font;
+    osd_string_t *lines[ OSD_LIST_MAX_LINES ];
+};
+
+osd_list_t *osd_list_new( double pixel_aspect )
+{
+    osd_list_t *osdl = malloc( sizeof( osd_list_t ) );
+    int i;
+
+    if( !osdl ) {
+        return 0;
+    }
+
+    osdl->hilight = -1;
+    osdl->numlines = 0;
+    osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
+    if( !osdl->font ) {
+        free( osdl );
+        return 0;
+    }
+    memset( osdl->lines, 0, sizeof( osdl->lines ) );
+
+    for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
+        osdl->lines[ i ] = osd_string_new( osdl->font );
+        if( !osdl->lines[ i ] ) {
+            osd_list_delete( osdl );
+            return 0;
+        }
+        osd_string_show_text( osdl->lines[ i ], "Blank", 100 );
+        osd_string_set_colour( osdl->lines[ i ], 200, 128, 128 );
+        osd_string_show_border( osdl->lines[ i ], 1 );
+    }
+
+    return osdl;
+}
+
+void osd_list_delete( osd_list_t *osdl )
+{
+    int i;
+
+    for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
+        if( osdl->lines[ i ] ) osd_string_delete( osdl->lines[ i ] );
+    }
+    free( osdl );
+}
+
+void osd_list_set_text( osd_list_t *osdl, int line, const char *text )
+{
+    if( line < OSD_LIST_MAX_LINES ) {
+        osd_string_show_text( osdl->lines[ line ], text, 100 );
+    }
+}
+
+void osd_list_set_lines( osd_list_t *osdl, int numlines )
+{
+    osdl->numlines = numlines;
+}
+
+void osd_list_set_hilight( osd_list_t *osdl, int pos )
+{
+    if( pos < OSD_LIST_MAX_LINES ) {
+        if( osdl->hilight >= 0 ) {
+            osd_string_set_colour( osdl->lines[ osdl->hilight ],
+                                   200, 128, 128 );
+            osd_string_rerender( osdl->lines[ osdl->hilight ] );
+        }
+        osdl->hilight = pos;
+        if( osdl->hilight >= 0 ) {
+            osd_string_set_colour_rgb( osdl->lines[ osdl->hilight ],
+                                       255, 255, 0 );
+            osd_string_rerender( osdl->lines[ osdl->hilight ] );
+        }
+    }
+}
+
+int osd_list_get_hilight( osd_list_t *osdl )
+{
+    return osdl->hilight;
+}
+
+int osd_list_get_numlines( osd_list_t *osdl )
+{
+    return osdl->numlines;
+}
+
+void osd_list_set_timeout( osd_list_t *osdl, int timeout )
+{
+    int i;
+    for( i = 0; i < osdl->numlines; i++ ) {
+        osd_string_set_timeout( osdl->lines[ i ], timeout );
+    }
+}
+
+int osd_list_visible( osd_list_t *osdl )
+{
+    return (osdl->numlines > 0 && osd_string_visible( osdl->lines[ 0 ] ));
+}
+
+void osd_list_advance_frame( osd_list_t *osdl )
+{
+    int i;
+    for( i = 0; i < osdl->numlines; i++ ) {
+        osd_string_advance_frame( osdl->lines[ i ] );
+    }
+}
+
+void osd_list_composite_packed422_scanline( osd_list_t *osdl,
+                                            uint8_t *output,
+                                            uint8_t *background,
+                                            int width, int xpos,
+                                            int scanline )
+{
+    int i;
+
+    for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
+        if( scanline < osd_string_get_height( osdl->lines[ i ] ) ) {
+            osd_string_composite_packed422_scanline( osdl->lines[ i ],
+                                                     output, background,
+                                                     width, xpos, scanline );
+        }
+        scanline -= osd_string_get_height( osdl->lines[ i ] );
+    }
+}
 
