@@ -185,10 +185,15 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     fontfile = "tvtimeSansBold.ttf";
     logofile = "tvtimelogo";
 
-    if( height == 576 ) {
-        osd->backdrop = osd_graphic_new( "backdrop-576.png", pixel_aspect, 256 );
+    /* Disable the backdrop for now. */
+    if( 1 ) {
+        osd->backdrop = 0;
     } else {
-        osd->backdrop = osd_graphic_new( "backdrop-480.png", pixel_aspect, 256 );
+        if( height == 576 ) {
+            osd->backdrop = osd_graphic_new( "backdrop-576.png", pixel_aspect, 256 );
+        } else {
+            osd->backdrop = osd_graphic_new( "backdrop-480.png", pixel_aspect, 256 );
+        }
     }
 
     osd->databar = osd_rect_new();
