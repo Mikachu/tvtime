@@ -248,6 +248,7 @@ struct commands_s {
     int scan_channels;
     int pause;
     int resizewindow;
+    int restarttvtime;
 
     int delay;
 
@@ -384,6 +385,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->change_channel = 0;
     cmd->renumbering = 0;
     cmd->resizewindow = 0;
+    cmd->restarttvtime = 0;
 
     cmd->apply_luma = config_get_apply_luma_correction( cfg );
     cmd->update_luma = 0;
@@ -1479,5 +1481,10 @@ void commands_set_framerate( commands_t *cmd, int framerate )
 int commands_show_deinterlacer_info( commands_t *cmd )
 {
     return cmd->showdeinterlacerinfo;
+}
+
+int commands_restart_tvtime( commands_t *cmd )
+{
+    return cmd->restarttvtime;
 }
 

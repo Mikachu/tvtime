@@ -946,6 +946,7 @@ int main( int argc, char **argv )
     int matte_y = 0;
     int matte_h = 0;
     int matte_mode = 0;
+    int restarttvtime = 0;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1516,6 +1517,10 @@ int main( int argc, char **argv )
         output->poll_events( in );
 
         if( commands_quit( commands ) ) break;
+        if( commands_restart_tvtime( commands ) ) {
+            restarttvtime = 1;
+            break;
+        }
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
@@ -2159,6 +2164,17 @@ int main( int argc, char **argv )
     tvtime_delete( tvtime );
 
     xmlCleanupParser();
+
+    if( restarttvtime ) {
+        char *newargv[ 2 ];
+
+        /* I think I'm doing this correctly... ?? */
+        newargv[ 0 ] = argv[ 0 ];
+        newargv[ 1 ] = 0;
+
+        fprintf( stderr, "tvtime: Restarting.\n" );
+        execve( argv[ 0 ], newargv, environ );
+    }
 
     fprintf( stderr, "tvtime: Thank you for using tvtime.\n" );
     return 0;
