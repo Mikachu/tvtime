@@ -1001,7 +1001,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, _("Setup") );
 
     snprintf( string, sizeof( string ),
-              TVTIME_ICON_STATIONMANAGEMENT "  %s", _("Station management") );
+              TVTIME_ICON_STATIONMANAGEMENT "  %s", _("Channel management") );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
 
@@ -1065,7 +1065,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "stations" );
     snprintf( string, sizeof( string ), "%s - %s",
-              _("Setup"), _("Station management") );
+              _("Setup"), _("Channel management") );
     menu_set_text( menu, 0, string);
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
     commands_add_menu( cmd, menu );
@@ -1083,7 +1083,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "frequencies" );
     snprintf( string, sizeof( string ), "%s - %s - %s", _("Setup"),
-              _("Station management"), _("Frequency table") );
+              _("Channel management"), _("Frequency table") );
     menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     if( vidin ) {
@@ -1095,7 +1095,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu = menu_new( "finetune" );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
     snprintf( string, sizeof( string ), "%s - %s - %s", _("Setup"),
-              _("Station management"), _("Finetune") );
+              _("Channel management"), _("Finetune") );
     menu_set_text( menu, 0, string );
     snprintf( string, sizeof( string ),
               TVTIME_ICON_TVLOGO "  %s: ---", _("Current") );
@@ -1706,7 +1706,7 @@ static void display_current_menu( commands_t *cmd )
             tvtime_osd_list_set_text( cmd->osd, i + 1, text );
         }
         snprintf( string, sizeof( string ), TVTIME_ICON_PLUSBUTTON "  %s",
-                  _("Add current station") );
+                  _("Add current channel") );
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, string );
         snprintf( string, sizeof( string ), TVTIME_ICON_EXIT "  %s", _("Exit") );
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, string );
