@@ -21,12 +21,12 @@
 #include <stdlib.h>
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-#include <assert.h>
 
 #include <sys/resource.h>
 
@@ -64,10 +64,11 @@ static int kdescreensaver_was_running=0;
  */
 void sigchld_handler( int signum )
 {
-  assert( signum == SIGCHLD );
-  ping_xscreensaver_child = 0;
-  stop_xscreensaver = 0;
-  signal( signum, SIG_DFL );
+    if( signum == SIGCHLD ) {
+        ping_xscreensaver_child = 0;
+        stop_xscreensaver = 0;
+        signal( signum, SIG_DFL );
+    }
 }
 
 
@@ -194,8 +195,7 @@ void saver_off(Display *mDisplay) {
          * often. */
         errno = 0;
         result = getpriority( PRIO_PROCESS, 0 );
-        assert( errno == 0 );
-        if( result < 0 ) {
+        if( errno != 0 || result < 0 ) {
           /* Ensure that we are at least 0 nice. */
           setpriority( PRIO_PROCESS, 0, 0 );
         }
