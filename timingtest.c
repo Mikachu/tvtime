@@ -50,7 +50,7 @@ int main( int argc, char **argv )
             source422planar + (width*height) + (width/2 * height), 0, width*2, width, width, height );
         get_time( &after );
         gettimeofday( &time_after, 0 );
-        fprintf( stderr, "top: %10d\n", timediff( &time_after, &time_before ) );
+        fprintf( stderr, "top: %10d\r", timediff( &time_after, &time_before ) );
         avg_sum += timediff( &time_after, &time_before );
         avg_count++;
         usleep( 20 );
@@ -61,11 +61,11 @@ int main( int argc, char **argv )
             source422planar + (width*height) + (width/2 * height) + (width/2), 1, width*2, width, width, height );
         get_time( &after );
         gettimeofday( &time_after, 0 );
-        fprintf( stderr, "bot: %10d\n", timediff( &time_after, &time_before ) );
+        fprintf( stderr, "bot: %10d\r", timediff( &time_after, &time_before ) );
         avg_sum += timediff( &time_after, &time_before );
         avg_count++;
     }
-    fprintf( stderr, "%d tested, average was %f.\n", avg_count, ((double) avg_sum) / ((double) avg_count) );
+    fprintf( stderr, "\n%d fields tested, average was %fus.\n", avg_count, ((double) avg_sum) / ((double) avg_count) );
 
     free( source422planar );
     free( dest422packed );

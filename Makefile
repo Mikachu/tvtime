@@ -23,5 +23,5 @@ timingtest: $(OBJS) timingtest.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean: 
-	rm -f *.o *.png tvtime
+	rm -f *.o *.png tvtime timingtest
 
