@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.13\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-09-18 23:43-0400\n"
+"POT-Creation-Date: 2004-09-25 19:41+0200\n"
 "PO-Revision-Date: 2004-09-19 21:38+0200\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:794 src/commands.c:1439 src/commands.c:1464
+#: src/tvtime.c:794 src/commands.c:1441 src/commands.c:1466
 msgid "Deinterlacer configuration"
 msgstr "Inställningar för deinterlacer"
 
 #: src/tvtime.c:824 src/tvtime.c:843 src/tvtime.c:878 src/tvtime.c:959
-#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:397 src/commands.c:435
-#: src/commands.c:629 src/commands.c:663 src/commands.c:683 src/commands.c:745
-#: src/commands.c:780 src/commands.c:825 src/commands.c:900 src/commands.c:917
-#: src/commands.c:944 src/commands.c:1004 src/commands.c:1265
-#: src/commands.c:1317 src/commands.c:1384 src/commands.c:1456
-#: src/commands.c:1527 src/commands.c:1537 src/commands.c:1585
-#: src/commands.c:1597 src/commands.c:1627 src/commands.c:1660
-#: src/commands.c:1693 src/commands.c:1725
+#: src/tvtime.c:987 src/tvtime.c:1113 src/commands.c:396 src/commands.c:437
+#: src/commands.c:631 src/commands.c:665 src/commands.c:685 src/commands.c:747
+#: src/commands.c:782 src/commands.c:827 src/commands.c:902 src/commands.c:919
+#: src/commands.c:946 src/commands.c:1006 src/commands.c:1267
+#: src/commands.c:1319 src/commands.c:1386 src/commands.c:1458
+#: src/commands.c:1529 src/commands.c:1539 src/commands.c:1587
+#: src/commands.c:1599 src/commands.c:1629 src/commands.c:1662
+#: src/commands.c:1695 src/commands.c:1727
 msgid "Back"
 msgstr "Tillbaka"
 
@@ -51,7 +51,7 @@ msgstr "Halv bildfrekvens, deinterlacear nedre bildfälten: %.2f b/s"
 msgid "Overscan setting"
 msgstr "Översvepning"
 
-#: src/tvtime.c:903 src/commands.c:1416
+#: src/tvtime.c:903 src/commands.c:1418
 msgid "Apply matte"
 msgstr "Lägg på bildmask"
 
@@ -92,7 +92,7 @@ msgstr "Uppe"
 msgid "Bottom"
 msgstr "Nere"
 
-#: src/tvtime.c:997 src/commands.c:1448 src/commands.c:1478
+#: src/tvtime.c:997 src/commands.c:1450 src/commands.c:1480
 msgid "Attempted framerate"
 msgstr "Målvärde för bildfrekvens"
 
@@ -169,7 +169,7 @@ msgstr "Bildmaskering (4:3-signal)"
 # Allokera kanske?
 #: src/tvtime.c:1205 src/tvtime.c:1246 src/tvtime.c:1291 src/tvtime.c:1299
 #: src/tvtime.c:1422 src/tvtime.c:1472 src/tvtime.c:1497 src/tvtime.c:1511
-#: src/tvtime.c:1525 src/tvtimeconf.c:955 src/tvtimeconf.c:1139
+#: src/tvtime.c:1525 src/tvtimeconf.c:959 src/tvtimeconf.c:1143
 #: src/tvtime-command.c:56 src/tvtime-command.c:71 src/tvtime-configure.c:48
 #: src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
 #, c-format
@@ -362,636 +362,630 @@ msgstr ""
 "    tvtime avslutas för att undvika säkerhetsproblem.\n"
 "\n"
 
-#: src/commands.c:186 src/commands.c:928 src/commands.c:1249
-#: src/commands.c:1611 src/commands.c:1644 src/commands.c:1677
-#: src/commands.c:1710
+#: src/commands.c:185 src/commands.c:930 src/commands.c:1251
+#: src/commands.c:1613 src/commands.c:1646 src/commands.c:1679
+#: src/commands.c:1712
 msgid "Current"
 msgstr "Aktuell"
 
 #. TRANSLATORS: This refers to a TV program, not a computer program.
-#: src/commands.c:218 src/commands.c:225
+#: src/commands.c:217 src/commands.c:224
 msgid "No program information available"
 msgstr "Ingen programinformation tillgänglig"
 
-#: src/commands.c:264
+#: src/commands.c:263
 #, c-format
 msgid "Next: %s"
 msgstr "Nästa program: %s"
 
-#: src/commands.c:307
+#: src/commands.c:306
 msgid "Renumber current channel"
 msgstr "Flytta kanal"
 
-#: src/commands.c:315 src/commands.c:318
+#: src/commands.c:314 src/commands.c:317
 msgid "Current channel active in list"
 msgstr "Visa kanal vid bläddring"
 
-#: src/commands.c:328
+#: src/commands.c:327
 msgid "Stop channel scan"
 msgstr "Stoppa kanalsökning"
 
-#: src/commands.c:332
+#: src/commands.c:331
 msgid "Scan channels for signal"
 msgstr "Sök efter kanaler med signal"
 
-#: src/commands.c:340
+#: src/commands.c:339
 msgid "Reset all channels as active"
 msgstr "Visa alla kanaler vid bläddring"
 
-#: src/commands.c:346
+#: src/commands.c:345
 msgid "Finetune current channel"
 msgstr "Fininställning"
 
-#: src/commands.c:353
+#: src/commands.c:352
 msgid "Change NTSC cable mode"
 msgstr "Ändra läge för NTSC-kabel-tv."
 
-#: src/commands.c:359
+#: src/commands.c:358
 msgid "Set current channel as SECAM"
 msgstr "Välj SECAM-läge för denna kanal"
 
-#: src/commands.c:360
+#: src/commands.c:359
 msgid "Set current channel as PAL"
 msgstr "Välj PAL-läge för denna kanal"
 
-#: src/commands.c:371
+#: src/commands.c:370
 msgid "Use PAL-BG audio decoding"
 msgstr "Avkoda ljud som PAL-BG"
 
-#: src/commands.c:376
+#: src/commands.c:375
 msgid "Use PAL-DK audio decoding"
 msgstr "Avkoda ljud som PAL-DK"
 
-#: src/commands.c:384
+#: src/commands.c:383
 msgid "Change frequency table"
 msgstr "Byt frekvenstabell"
 
-#: src/commands.c:390
+#: src/commands.c:389
 msgid "Disable signal detection"
 msgstr "Inaktivera signaldetektorn"
 
-#: src/commands.c:391
+#: src/commands.c:390
 msgid "Enable signal detection"
 msgstr "Aktivera signaldetektorn"
 
-#: src/commands.c:413 src/commands.c:2024
+#: src/commands.c:414 src/commands.c:2026
 msgid "Default language"
 msgstr "Förvalt språk"
 
-#: src/commands.c:428 src/commands.c:2029
+#: src/commands.c:430 src/commands.c:2031
 msgid "Unknown language"
 msgstr "Okänt språk"
 
-#: src/commands.c:594 src/commands.c:1287 src/commands.c:1353
-#: src/commands.c:1781
+#: src/commands.c:596 src/commands.c:1289 src/commands.c:1355
+#: src/commands.c:1783
 msgid "Preferred audio mode"
 msgstr "Önskat ljudläge"
 
-#: src/commands.c:604
+#: src/commands.c:606
 msgid "Default to PAL-DK audio decoding"
 msgstr "Använd PAL-DK som förval vid ljudavkodning"
 
-#: src/commands.c:611 src/commands.c:1292 src/commands.c:1366
+#: src/commands.c:613 src/commands.c:1294 src/commands.c:1368
 msgid "Audio volume boost"
 msgstr "Extra ljudförstärkning"
 
-#: src/commands.c:617 src/commands.c:1297 src/commands.c:1375
+#: src/commands.c:619 src/commands.c:1299 src/commands.c:1377
 msgid "Television standard"
 msgstr "TV-standard"
 
-#: src/commands.c:623 src/commands.c:1302 src/commands.c:1344
+#: src/commands.c:625 src/commands.c:1304 src/commands.c:1346
 msgid "Horizontal resolution"
 msgstr "Vågrät upplösning"
 
-#: src/commands.c:643 src/commands.c:670
+#: src/commands.c:645 src/commands.c:672
 msgid "Cable"
 msgstr "Kabel-tv"
 
-#: src/commands.c:651 src/commands.c:678
+#: src/commands.c:653 src/commands.c:680
 msgid "Broadcast"
 msgstr "Marksänd TV"
 
-#: src/commands.c:658
+#: src/commands.c:660
 msgid "Cable with channels 100+"
 msgstr "Kabel-tv med över 100 kanaler"
 
-#: src/commands.c:690
+#: src/commands.c:692
 msgid "Europe"
 msgstr "Europa"
 
-#: src/commands.c:698
+#: src/commands.c:700
 msgid "Russia"
 msgstr "Ryssland"
 
-#: src/commands.c:705
+#: src/commands.c:707
 msgid "France"
 msgstr "Frankrike"
 
-#: src/commands.c:712
+#: src/commands.c:714
 msgid "Australia"
 msgstr "Australien"
 
-#: src/commands.c:719
+#: src/commands.c:721
 msgid "Australia (Optus)"
 msgstr "Australien (Optus)"
 
-#: src/commands.c:726
+#: src/commands.c:728
 msgid "New Zealand"
 msgstr "Nya Zeeland"
 
-#: src/commands.c:733
+#: src/commands.c:735
 msgid "China Broadcast"
 msgstr "Kina (Marksänd TV)"
 
-#: src/commands.c:740
+#: src/commands.c:742
 msgid "Custom (first run tvtime-scanner)"
 msgstr "Egen (kör tvtime-scanner först)"
 
-#: src/commands.c:757
+#: src/commands.c:759
 msgid "Disabled"
 msgstr "Inaktiverat"
 
-#: src/commands.c:763
+#: src/commands.c:765
 msgid "Quiet"
 msgstr "Tyst"
 
-#: src/commands.c:769
+#: src/commands.c:771
 msgid "Medium"
 msgstr "Mellan"
 
-#: src/commands.c:775
+#: src/commands.c:777
 msgid "Full"
 msgstr "Full"
 
-#: src/commands.c:790
+#: src/commands.c:792
 #, c-format
 msgid "%s  Current: %d pixels"
 msgstr "%s  Aktuell inställning: %d bildpunkter"
 
-#: src/commands.c:797
+#: src/commands.c:799
 msgid "Low (360 pixels)"
 msgstr "Låg (360 bildpunkter)"
 
-#: src/commands.c:803
+#: src/commands.c:805
 msgid "Moderate (576 pixels)"
 msgstr "Medel (576 bildpunkter)"
 
-#: src/commands.c:809
+#: src/commands.c:811
 msgid "Standard (720 pixels)"
 msgstr "Standard (720 bildpunkter)"
 
-#: src/commands.c:815
+#: src/commands.c:817
 msgid "High (768 pixels)"
 msgstr "Hög (768 bildpunkter)"
 
-#: src/commands.c:820 src/commands.c:1379
+#: src/commands.c:822 src/commands.c:1381
 msgid "Restart with new settings"
 msgstr "Starta om med nya inställningar"
 
-#: src/commands.c:881 src/commands.c:1782
+#: src/commands.c:883 src/commands.c:1784
 msgid "Mono"
 msgstr "Mono"
 
-#: src/commands.c:888 src/commands.c:1783
+#: src/commands.c:890 src/commands.c:1785
 msgid "Stereo"
 msgstr "Stereo"
 
-#: src/commands.c:896 src/commands.c:1785
+#: src/commands.c:898 src/commands.c:1787
 msgid "SAP"
 msgstr "SAP"
 
-#: src/commands.c:907 src/commands.c:1785
+#: src/commands.c:909 src/commands.c:1787
 msgid "Primary Language"
 msgstr "Språk 1"
 
-#: src/commands.c:912 src/commands.c:1786
+#: src/commands.c:914 src/commands.c:1788
 msgid "Secondary Language"
 msgstr "Språk 2"
 
-#: src/commands.c:934 src/commands.c:1255 src/commands.c:1617
-#: src/commands.c:1650 src/commands.c:1683 src/commands.c:1715
+#: src/commands.c:936 src/commands.c:1257 src/commands.c:1619
+#: src/commands.c:1652 src/commands.c:1685 src/commands.c:1717
 msgid "Increase"
 msgstr "Öka"
 
-#: src/commands.c:939 src/commands.c:1260 src/commands.c:1622
-#: src/commands.c:1655 src/commands.c:1688 src/commands.c:1720
+#: src/commands.c:941 src/commands.c:1262 src/commands.c:1624
+#: src/commands.c:1657 src/commands.c:1690 src/commands.c:1722
 msgid "Decrease"
 msgstr "Minska"
 
-#: src/commands.c:963
+#: src/commands.c:965
 msgid "BT8x8 luma correction"
 msgstr "Luma-korrigering för BT8x8"
 
-#: src/commands.c:973
+#: src/commands.c:975
 msgid "2-3 pulldown inversion"
 msgstr "2:3-matnings-kompensering"
 
-#: src/commands.c:982
+#: src/commands.c:984
 msgid "Colour invert"
 msgstr "Färginvertering"
 
-#: src/commands.c:990
+#: src/commands.c:992
 msgid "Mirror"
 msgstr "Spegling"
 
-#: src/commands.c:998
+#: src/commands.c:1000
 msgid "Chroma killer"
 msgstr "Färgspärr"
 
-#: src/commands.c:1148 src/commands.c:1183 src/commands.c:1215
-#: src/commands.c:1233 src/commands.c:1245 src/commands.c:1273
-#: src/commands.c:1326 src/commands.c:1344 src/commands.c:1353
-#: src/commands.c:1366 src/commands.c:1375 src/commands.c:1410
-#: src/commands.c:1416 src/commands.c:1422 src/commands.c:1429
-#: src/commands.c:1435 src/commands.c:1463 src/commands.c:1469
-#: src/commands.c:1477 src/commands.c:1483 src/commands.c:1495
-#: src/commands.c:1544 src/commands.c:1607 src/commands.c:1640
-#: src/commands.c:1673 src/commands.c:1706
+#: src/commands.c:1150 src/commands.c:1185 src/commands.c:1217
+#: src/commands.c:1235 src/commands.c:1247 src/commands.c:1275
+#: src/commands.c:1328 src/commands.c:1346 src/commands.c:1355
+#: src/commands.c:1368 src/commands.c:1377 src/commands.c:1412
+#: src/commands.c:1418 src/commands.c:1424 src/commands.c:1431
+#: src/commands.c:1437 src/commands.c:1465 src/commands.c:1471
+#: src/commands.c:1479 src/commands.c:1485 src/commands.c:1497
+#: src/commands.c:1546 src/commands.c:1609 src/commands.c:1642
+#: src/commands.c:1675 src/commands.c:1708
 msgid "Setup"
 msgstr "Inställningar"
 
-#: src/commands.c:1151 src/commands.c:1215 src/commands.c:1234
-#: src/commands.c:1246
+#: src/commands.c:1153 src/commands.c:1217 src/commands.c:1236
+#: src/commands.c:1248
 msgid "Channel management"
 msgstr "Kanalhantering"
 
-#: src/commands.c:1156 src/commands.c:1187 src/commands.c:1274
-#: src/commands.c:1326 src/commands.c:1344 src/commands.c:1353
-#: src/commands.c:1366 src/commands.c:1375
+#: src/commands.c:1158 src/commands.c:1189 src/commands.c:1276
+#: src/commands.c:1328 src/commands.c:1346 src/commands.c:1355
+#: src/commands.c:1368 src/commands.c:1377
 msgid "Input configuration"
 msgstr "Källsignalinställningar"
 
-#: src/commands.c:1161 src/commands.c:1192
+#: src/commands.c:1163 src/commands.c:1194
 msgid "Picture settings"
 msgstr "Bildinställningar"
 
-#: src/commands.c:1166 src/commands.c:1197 src/commands.c:1435
-#: src/commands.c:1464 src/commands.c:1470 src/commands.c:1478
-#: src/commands.c:1484
+#: src/commands.c:1168 src/commands.c:1199 src/commands.c:1437
+#: src/commands.c:1466 src/commands.c:1472 src/commands.c:1480
+#: src/commands.c:1486
 msgid "Video processing"
 msgstr "Videobehandling"
 
-#: src/commands.c:1171 src/commands.c:1202 src/commands.c:1410
-#: src/commands.c:1416 src/commands.c:1422 src/commands.c:1429
+#: src/commands.c:1173 src/commands.c:1204 src/commands.c:1412
+#: src/commands.c:1418 src/commands.c:1424 src/commands.c:1431
 msgid "Output configuration"
 msgstr "Visningsinställningar"
 
-#: src/commands.c:1176 src/commands.c:1207
+#: src/commands.c:1178 src/commands.c:1209
 msgid "Exit menu"
 msgstr "Stäng meny"
 
-#: src/commands.c:1234
+#: src/commands.c:1236
 msgid "Frequency table"
 msgstr "Frekvenstabell"
 
-#: src/commands.c:1246 src/commands.c:2983
+#: src/commands.c:1248 src/commands.c:2985
 msgid "Finetune"
 msgstr "Fininställning"
 
-#: src/commands.c:1278 src/commands.c:1281 src/commands.c:1330
-#: src/commands.c:1333 src/commands.c:3095
+#: src/commands.c:1280 src/commands.c:1283 src/commands.c:1332
+#: src/commands.c:1335 src/commands.c:3097
 msgid "Change video source"
 msgstr "Ändra videokälla"
 
-#: src/commands.c:1307
+#: src/commands.c:1309
 msgid "Toggle closed captions"
 msgstr "Closed captions av/på"
 
-#: src/commands.c:1312
+#: src/commands.c:1314
 msgid "Toggle XDS decoding"
 msgstr "XDS-avkodning av/på"
 
-#: src/commands.c:1422
+#: src/commands.c:1424
 msgid "Overscan"
 msgstr "Översvepning"
 
-#: src/commands.c:1429
+#: src/commands.c:1431
 msgid "Fullscreen position"
 msgstr "Helskärmsposition"
 
-#: src/commands.c:1444
+#: src/commands.c:1446
 msgid "Current deinterlacer description"
 msgstr "Beskrivning av vald deinterlacer"
 
-#: src/commands.c:1452 src/commands.c:1484
+#: src/commands.c:1454 src/commands.c:1486
 msgid "Input filters"
 msgstr "Signalfilter"
 
-#: src/commands.c:1470
+#: src/commands.c:1472
 msgid "Deinterlacer description"
 msgstr "Beskrivning av deinterlacer"
 
-#: src/commands.c:1495 src/commands.c:1544 src/commands.c:1607
-#: src/commands.c:1640 src/commands.c:1673 src/commands.c:1706
+#: src/commands.c:1497 src/commands.c:1546 src/commands.c:1609
+#: src/commands.c:1642 src/commands.c:1675 src/commands.c:1708
 msgid "Picture"
 msgstr "Bild"
 
-#: src/commands.c:1499 src/commands.c:1549 src/commands.c:1607
-#: src/commands.c:3125 src/commands.c:3166
+#: src/commands.c:1501 src/commands.c:1551 src/commands.c:1609
+#: src/commands.c:3127 src/commands.c:3168
 msgid "Brightness"
 msgstr "Ljusstyrka"
 
-#: src/commands.c:1504 src/commands.c:1554 src/commands.c:1640
-#: src/commands.c:3139 src/commands.c:3169
+#: src/commands.c:1506 src/commands.c:1556 src/commands.c:1642
+#: src/commands.c:3141 src/commands.c:3171
 msgid "Contrast"
 msgstr "Kontrast"
 
-#: src/commands.c:1508 src/commands.c:1558 src/commands.c:1673
-#: src/commands.c:3153 src/commands.c:3172
-msgid "Colour"
+#: src/commands.c:1510 src/commands.c:1560 src/commands.c:1675
+#: src/commands.c:3155 src/commands.c:3174
+#, fuzzy
+msgid "Saturation"
 msgstr "Färg"
 
-#: src/commands.c:1512 src/commands.c:1562 src/commands.c:1706
-#: src/commands.c:3111 src/commands.c:3175
+#: src/commands.c:1514 src/commands.c:1564 src/commands.c:1708
+#: src/commands.c:3113 src/commands.c:3177
 msgid "Hue"
 msgstr "Färgton"
 
-#: src/commands.c:1519
+#: src/commands.c:1521
 msgid "Save current settings as defaults"
 msgstr "Spara bildinställningar som förval"
 
-#: src/commands.c:1523 src/commands.c:1533 src/commands.c:1580
-#: src/commands.c:1592
+#: src/commands.c:1525 src/commands.c:1535 src/commands.c:1582
+#: src/commands.c:1594
 msgid "Reset to global defaults"
 msgstr "Återgå till sparade förval"
 
-#: src/commands.c:1569
+#: src/commands.c:1571
 msgid "Save current settings as global defaults"
 msgstr "Spara bildinställningar som förval för alla kanaler"
 
-#: src/commands.c:1575
+#: src/commands.c:1577
 msgid "Save current settings as channel defaults"
 msgstr "Spara bildinställningar som förval för denna kanal"
 
-#: src/commands.c:1739 src/commands.c:2023
+#: src/commands.c:1741 src/commands.c:2025
 msgid "Preferred XMLTV language"
 msgstr "Önskat XMLTV-språk"
 
-#: src/commands.c:1855
+#: src/commands.c:1857
 msgid "Favorites"
 msgstr "Favoriter"
 
-#: src/commands.c:1862
+#: src/commands.c:1864
 msgid "Add current channel"
 msgstr "Lägg till denna kanal"
 
-#: src/commands.c:1864
+#: src/commands.c:1866
 msgid "Exit"
 msgstr "Avsluta"
 
-#: src/commands.c:2158
+#: src/commands.c:2160
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Insomningstimer: %d minuter."
 
-#: src/commands.c:2161
-#, c-format
+#: src/commands.c:2163
 msgid "Sleep off."
 msgstr "Insomningsfunktionen inaktiverad."
 
-#: src/commands.c:2200
-#, c-format
+#: src/commands.c:2202
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Använder PAL-BG-avkodning för den här kanalens ljud."
 
-#: src/commands.c:2203
-#, c-format
+#: src/commands.c:2205
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Använder PAL-DK-avkodning för den här kanalens ljud."
 
-#: src/commands.c:2232
-#, c-format
+#: src/commands.c:2234
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "Avkodar ljud som PAL-DK som förval."
 
-#: src/commands.c:2235
-#, c-format
+#: src/commands.c:2237
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "Avkodar ljud som PAL-BK som förval."
 
-#: src/commands.c:2263
+#: src/commands.c:2265
 msgid "Channel marked as active in the browse list."
 msgstr "Kanalen visas nu vid bläddring."
 
-#: src/commands.c:2266
+#: src/commands.c:2268
 msgid "Channel disabled from the browse list."
 msgstr "Kanalen visas inte längre vid bläddring."
 
-#: src/commands.c:2296
-#, c-format
+#: src/commands.c:2298
 msgid "Capture card volume will not be set by tvtime."
 msgstr "Tvtime kommer inte ställa in capture-kortets ljudstyrka."
 
-#: src/commands.c:2299
+#: src/commands.c:2301
 #, c-format
 msgid "Setting capture card volume to %d%%."
 msgstr "Ställer capture-kortets ljudstyrka till %d%%."
 
-#: src/commands.c:2332
+#: src/commands.c:2334
 msgid "Processing every input field."
 msgstr "Behandlar alla bildfält."
 
-#: src/commands.c:2335
+#: src/commands.c:2337
 msgid "Processing every top field."
 msgstr "Behandlar endast övre bildfälten."
 
-#: src/commands.c:2338
+#: src/commands.c:2340
 msgid "Processing every bottom field."
 msgstr "Behandlar endast undre bildfälten."
 
-#: src/commands.c:2353
+#: src/commands.c:2355
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "Vågrät upplösning blir %d punkter efter omstart."
 
-#: src/commands.c:2410
+#: src/commands.c:2412
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "Vald TV-standard blir %s efter omstart."
 
-#: src/commands.c:2438
-#, c-format
+#: src/commands.c:2440
 msgid "Using default language for XMLTV data."
 msgstr "Använder förvalt språk för XMLTV-data."
 
-#: src/commands.c:2441
+#: src/commands.c:2443
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
 msgstr "Använder okänt språk (%s) för XMLTV-data."
 
-#: src/commands.c:2445
+#: src/commands.c:2447
 #, c-format
 msgid "XMLTV language set to %s (%s)."
 msgstr "XMLTV-språk ställt till %s (%s)."
 
-#: src/commands.c:2480
+#: src/commands.c:2482
 msgid "All channels re-activated."
 msgstr "Alla kanaler visas nu vid bläddring."
 
-#: src/commands.c:2501
+#: src/commands.c:2503
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Flyttar kanal %d. Mata in nytt kanalnummer."
 
-#: src/commands.c:2513
+#: src/commands.c:2515
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Signaldetektorn måste aktiveras för kanalsökning."
 
-#: src/commands.c:2541
+#: src/commands.c:2543
 msgid "Scanning for channels being broadcast."
 msgstr "Söker efter kanaler."
 
-#: src/commands.c:2559
+#: src/commands.c:2561
 msgid "Closed captions disabled."
 msgstr "Closed captions inaktiverade."
 
-#: src/commands.c:2565
+#: src/commands.c:2567
 msgid "Closed captions enabled."
 msgstr "Closed captions aktiverade."
 
-#: src/commands.c:2577
+#: src/commands.c:2579
 msgid "No VBI device configured for CC decoding."
 msgstr "Ingen VBI-enhet vald för CC-avkodning."
 
-#: src/commands.c:2593
+#: src/commands.c:2595
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Kanalens färger avkodas som %s."
 
-#: src/commands.c:2636
+#: src/commands.c:2638
 #, c-format
 msgid "Running: %s"
 msgstr "Kör: %s"
 
-#: src/commands.c:2714
+#: src/commands.c:2716
 msgid "Signal detection enabled."
 msgstr "Signaldetektor aktiverad."
 
-#: src/commands.c:2717
+#: src/commands.c:2719
 msgid "Signal detection disabled."
 msgstr "Signaldetektor inaktiverad."
 
-#: src/commands.c:2730
+#: src/commands.c:2732
 msgid "XDS decoding enabled."
 msgstr "XDS-avkodning aktiverad."
 
-#: src/commands.c:2733
+#: src/commands.c:2735
 msgid "XDS decoding disabled."
 msgstr "XDS-avkodning inaktiverad."
 
-#: src/commands.c:2779
+#: src/commands.c:2781
 msgid "Colour invert enabled."
 msgstr "Färginvertering aktiverad."
 
-#: src/commands.c:2781
+#: src/commands.c:2783
 msgid "Colour invert disabled."
 msgstr "Färginvertering inaktiverad."
 
-#: src/commands.c:2803
+#: src/commands.c:2805
 msgid "Mirror enabled."
 msgstr "Spegling aktiverad."
 
-#: src/commands.c:2805
+#: src/commands.c:2807
 msgid "Mirror disabled."
 msgstr "Spegling inaktiverad."
 
-#: src/commands.c:2827
+#: src/commands.c:2829
 msgid "Chroma kill enabled."
 msgstr "Färgspärr aktiverad."
 
-#: src/commands.c:2829
+#: src/commands.c:2831
 msgid "Chroma kill disabled."
 msgstr "Färgspärr inaktiverad."
 
-#: src/commands.c:2846
+#: src/commands.c:2848
 msgid "Luma correction enabled."
 msgstr "Luma-korrigering aktiverad."
 
-#: src/commands.c:2848
+#: src/commands.c:2850
 msgid "Luma correction disabled."
 msgstr "Luma-korrigering inaktiverad."
 
-#: src/commands.c:2865
+#: src/commands.c:2867
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Översvepning: %.1f%%"
 
-#: src/commands.c:2888
+#: src/commands.c:2890
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr "Lumakorrigeringsvärde: %.1f"
 
-#: src/commands.c:2918
+#: src/commands.c:2920
 msgid "Picture settings reset to defaults."
 msgstr "Bildinställningarna återställda."
 
-#: src/commands.c:2946
+#: src/commands.c:2948
 msgid "Using nominal NTSC cable frequencies."
 msgstr "Använder standardfrekvenser för NTSC-kabel-tv."
 
-#: src/commands.c:2952
+#: src/commands.c:2954
 msgid "Using IRC cable frequencies."
 msgstr "Använder frekvenser för IRC-kabel-tv."
 
-#: src/commands.c:2958
+#: src/commands.c:2960
 msgid "Using HRC cable frequencies."
 msgstr "Använder frekvenser för HRC-kabel-tv."
 
-#: src/commands.c:3042 src/commands.c:3062
+#: src/commands.c:3044 src/commands.c:3064
 msgid "Volume"
 msgstr "Ljudstyrka"
 
-#: src/commands.c:3212
+#: src/commands.c:3214
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "Bildinställningarna sparades som förval för alla kanaler.\n"
 
-#: src/commands.c:3225
+#: src/commands.c:3227
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Bildinställningarna sparades som förval för kanal %d.\n"
 
-#: src/commands.c:3309
+#: src/commands.c:3311
 msgid "Paused."
 msgstr "Stillbild."
 
-#: src/commands.c:3309
+#: src/commands.c:3311
 msgid "Resumed."
 msgstr "Fortsätter."
 
-#: src/tvtimeconf.c:462
+#: src/tvtimeconf.c:466
 #, c-format
 msgid "Error parsing configuration file %s.\n"
 msgstr "Fel vid tolkning av inställningsfilen %s.\n"
 
-#: src/tvtimeconf.c:469
+#: src/tvtimeconf.c:473
 #, c-format
 msgid "No XML root element found in %s.\n"
 msgstr "Inget XML-rotelement hittades i %s.\n"
 
-#: src/tvtimeconf.c:477 src/tvtimeconf.c:551
+#: src/tvtimeconf.c:481 src/tvtimeconf.c:555
 #, c-format
 msgid "%s is not a tvtime configuration file.\n"
 msgstr "%s är inte en tvtime-inställningsfil.\n"
 
-#: src/tvtimeconf.c:509
+#: src/tvtimeconf.c:513
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr ""
 "Inställningsfilen kunde inte tolkas. Inställningar kommer inte att sparas.\n"
 
-#: src/tvtimeconf.c:516
+#: src/tvtimeconf.c:520
 msgid "Could not create new config file.\n"
 msgstr "Kunde inte skapa ny inställningsfil.\n"
 
-#: src/tvtimeconf.c:540
+#: src/tvtimeconf.c:544
 msgid "Error creating configuration file.\n"
 msgstr "Fel vid skapande av inställningsfil.\n"
 
-#: src/tvtimeconf.c:561 src/utils.c:134
+#: src/tvtimeconf.c:565 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr "Kan inte byta ägare för %s: %s.\n"
 
-#: src/tvtimeconf.c:570
+#: src/tvtimeconf.c:574
 msgid ""
 "\n"
 "tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
@@ -1009,33 +1003,35 @@ msgstr ""
 "tvtime är Copyright © 2001, 2002, 2003 Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov, och Achim Schneider.\n"
 
-#: src/tvtimeconf.c:581 src/tvtimeconf.c:631 src/tvtimeconf.c:677
+#: src/tvtimeconf.c:585 src/tvtimeconf.c:635 src/tvtimeconf.c:681
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
 "\n"
-msgstr "användning: %s [ALTERNATIV]...\n\n"
+msgstr ""
+"användning: %s [ALTERNATIV]...\n"
+"\n"
 
-#: src/tvtimeconf.c:582 src/tvtimeconf.c:632
+#: src/tvtimeconf.c:586 src/tvtimeconf.c:636
 msgid "  -a, --widescreen           16:9 mode.\n"
 msgstr "  -a, --widescreen           16:9-läge.\n"
 
-#: src/tvtimeconf.c:583 src/tvtimeconf.c:633
+#: src/tvtimeconf.c:587 src/tvtimeconf.c:637
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr "  -b, --vbidevice=ENHET      VBI-enhet (/dev/vbi0 om ej vald).\n"
 
-#: src/tvtimeconf.c:584 src/tvtimeconf.c:634
+#: src/tvtimeconf.c:588 src/tvtimeconf.c:638
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr "  -c, --channel=KANAL        Välj kanal vid uppstart.\n"
 
-#: src/tvtimeconf.c:585 src/tvtimeconf.c:635 src/tvtimeconf.c:678
+#: src/tvtimeconf.c:589 src/tvtimeconf.c:639 src/tvtimeconf.c:682
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
 "  -d, --device=ENHET         video4linux-enhet (/dev/video0 om ej vald)\n"
 
-#: src/tvtimeconf.c:586 src/tvtimeconf.c:636
+#: src/tvtimeconf.c:590 src/tvtimeconf.c:640
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1074,28 +1070,28 @@ msgstr ""
 "                                 russia\n"
 "                                 custom (kör tvtime-scanner först)\n"
 
-#: src/tvtimeconf.c:602 src/tvtimeconf.c:652 src/tvtimeconf.c:679
+#: src/tvtimeconf.c:606 src/tvtimeconf.c:656 src/tvtimeconf.c:683
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
 "  -F, --configfile=FIL       En ytterligare fil att ladda inställningar "
 "från.\n"
 
-#: src/tvtimeconf.c:603 src/tvtimeconf.c:653 src/tvtimeconf.c:680
+#: src/tvtimeconf.c:607 src/tvtimeconf.c:657 src/tvtimeconf.c:684
 msgid "  -h, --help                 Show this help message.\n"
 msgstr "  -h, --help                 Visa det här hjälpmeddelandet.\n"
 
-#: src/tvtimeconf.c:604 src/tvtimeconf.c:654
+#: src/tvtimeconf.c:608 src/tvtimeconf.c:658
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
 msgstr "  -g, --geometry=GEOMETRI    Ställer in visningsfönstrets storlek.\n"
 
-#: src/tvtimeconf.c:605 src/tvtimeconf.c:655 src/tvtimeconf.c:681
+#: src/tvtimeconf.c:609 src/tvtimeconf.c:659 src/tvtimeconf.c:685
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
 "  -i, --input=SIGNALNUMMER   video4linux signalnummer (0 om ej vald).\n"
 
-#: src/tvtimeconf.c:606 src/tvtimeconf.c:656
+#: src/tvtimeconf.c:610 src/tvtimeconf.c:660
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
@@ -1103,21 +1099,21 @@ msgstr ""
 "  -I, --inputwidth=SAMPLING  Vågrät bildupplösning (720 bildpunkter om ej\n"
 "                             vald).\n"
 
-#: src/tvtimeconf.c:608
+#: src/tvtimeconf.c:612
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
 msgstr "  -k, --slave                Stäng av signalhantering (slavläge).\n"
 
-#: src/tvtimeconf.c:609 src/tvtimeconf.c:658
+#: src/tvtimeconf.c:613 src/tvtimeconf.c:662
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
 msgstr "  -m, --fullsreen            Starta tvtime i helskärmsläge.\n"
 
-#: src/tvtimeconf.c:610 src/tvtimeconf.c:659
+#: src/tvtimeconf.c:614 src/tvtimeconf.c:663
 msgid "  -M, --window               Start tvtime in window mode.\n"
 msgstr "  -M, --window               Starta tvtime i fönsterläge.\n"
 
-#: src/tvtimeconf.c:611 src/tvtimeconf.c:660 src/tvtimeconf.c:682
+#: src/tvtimeconf.c:615 src/tvtimeconf.c:664 src/tvtimeconf.c:686
 msgid ""
 "  -n, --norm=NORM            The norm to use for the input.  tvtime "
 "supports:\n"
@@ -1129,23 +1125,25 @@ msgstr ""
 "                             PAL-N och PAL-60 (NTSC om ej vald).\n"
 "\n"
 
-#: src/tvtimeconf.c:614
+#: src/tvtimeconf.c:618
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
 "  -s, --showdrops            Visa statistik för missade bildrutor\n"
 "                             (för avlusning).\n"
 
-#: src/tvtimeconf.c:615
+#: src/tvtimeconf.c:619
 msgid ""
 "  -S, --saveoptions          Save command line options to the config file.\n"
-msgstr "  -S, --saveoptions          Spara kommandoradsalternativ i inställningsfilen.\n"
+msgstr ""
+"  -S, --saveoptions          Spara kommandoradsalternativ i "
+"inställningsfilen.\n"
 
-#: src/tvtimeconf.c:616 src/tvtimeconf.c:664
+#: src/tvtimeconf.c:620 src/tvtimeconf.c:668
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 msgstr "  -t, --xmltv=FIL            Läs XMLTV-tablåer från en fil.\n"
 
-#: src/tvtimeconf.c:617 src/tvtimeconf.c:665
+#: src/tvtimeconf.c:621 src/tvtimeconf.c:669
 msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
@@ -1153,15 +1151,16 @@ msgstr ""
 "  -l, --xmltvlanguage=SPRÅK  Använd XMLTV-data i ett givet språk, om\n"
 "                             tillgängligt.\n"
 
-#: src/tvtimeconf.c:618
+#: src/tvtimeconf.c:622
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
-msgstr "  -v, --verbose              Skriv avlusningsmeddelanden till stderr.\n"
+msgstr ""
+"  -v, --verbose              Skriv avlusningsmeddelanden till stderr.\n"
 
-#: src/tvtimeconf.c:619
+#: src/tvtimeconf.c:623
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
 msgstr "  -X, --display=DISPLAY      Anslut till specifierad X-server.\n"
 
-#: src/tvtimeconf.c:620 src/tvtimeconf.c:666
+#: src/tvtimeconf.c:624 src/tvtimeconf.c:670
 msgid ""
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
 "                             (defaults to /dev/mixer:line)\n"
@@ -1179,31 +1178,34 @@ msgstr ""
 "                             (/dev/mixer:line om ej vald)\n"
 "\n"
 "                             Giltiga kanaler:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
 "                                 video, radio, monitor\n"
 
-#: src/tvtimeconf.c:663
+#: src/tvtimeconf.c:667
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr "  -R, --prioritet=PRI        Ställ in tvtime-processens prioritet.\n"
 
-#: src/tvtimeconf.c:853 src/tvtimeconf.c:862 src/tvtimeconf.c:924
-#: src/tvtimeconf.c:1055 src/tvtimeconf.c:1220
+#: src/tvtimeconf.c:857 src/tvtimeconf.c:866 src/tvtimeconf.c:928
+#: src/tvtimeconf.c:1059 src/tvtimeconf.c:1224
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr "Läser inställningar från %s\n"
 
-#: src/tvtimeconf.c:962
+#: src/tvtimeconf.c:966
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
 msgstr "Kan inte köra två instanser av tvtime med samma konfiguration.\n"
 
-#: src/tvtimeconf.c:973
+#: src/tvtimeconf.c:977
 msgid "Saving command line options.\n"
 msgstr "Sparar kommandoradsalternativen.\n"
 
-#: src/tvtimeconf.c:1146
+#: src/tvtimeconf.c:1150
 msgid "Cannot update configuration while tvtime running.\n"
 msgstr "Kan inte uppdatera inställningsfilen samtidigt som tvtime körs.\n"
 
@@ -1225,14 +1227,14 @@ msgstr "Kan inte skapa %s: %s\n"
 msgid "Cannot open %s: %s\n"
 msgstr "Kan inte öppna %s: %s\n"
 
-#: src/utils.c:655
+#: src/utils.c:658
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
 "Kan ej initiera teckenkonverterare (från UTF-8 till %s):\n"
 "fel vid iconv_open (%s).\n"
 
-#: src/utils.c:666
+#: src/utils.c:669
 #, c-format
 msgid ""
 "\n"
@@ -1250,7 +1252,6 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
-#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1259,7 +1260,6 @@ msgstr ""
 "Tillgängliga kommandon:\n"
 
 #: src/tvtime-command.c:80
-#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime är inte igång.\n"
 
@@ -1320,3 +1320,6 @@ msgstr "Signal funnen"
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
+
+#~ msgid "Colour"
+#~ msgstr "Färg"
