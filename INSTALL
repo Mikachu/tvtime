@@ -31,6 +31,31 @@ should also be set to the same group.  You may wish to create a `video'
 group to limit video playing to a certain group of users.  Consult
 your system documentation for how to do this.
 
+
+Why --with-fifogroup?
+---------------------
+
+This is a change from the behaviour of tvtime previous to, and including,
+version 0.9.7.  The command pipe, or FIFO, was ~/.tvtime/tvtimefifo, 
+but is now created as $(localstatedir)/run/tvtime/TV-username/tvtime.
+You may set $(localstatedir) during the configure step.  We do this for
+several reasons.
+
+   First, many installations mount home directories on a network file
+share.  Unfortunately, pipes do not work consistently over network drives.
+
+   Secondly, we need to place this directory in a locally mounted drive.
+According to the various standards, this should be the /var directory.
+Taking a page from GNU Screen, we chose /var/run/tvtime as the location of
+our pipes.  This directory must be writable by the users of tvtime, so
+that they may create pipes within it.
+
+   Thirdly, we must prevent users from deleting other users' pipes.
+Therefore, we put each pipe within its own subdirectory, which is
+the username prefixed with `TV-'.  Since directories must be empty before
+they can be removed, this effectively prevents the removal of the pipe.
+
+
 -----
 [1] You can confirm which groups you are in by using the `groups' command.
     If you are not in the `video' group, you should get your system 
