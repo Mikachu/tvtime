@@ -269,6 +269,9 @@ int sdl_poll_events( void )
             case SDLK_F8:
                 curcommand |= TVTIME_COLOUR_UP;
                 break;
+            case SDLK_F12:
+                curcommand |= TVTIME_SHOW_TEST;
+                break;
 
             default:
                 break;

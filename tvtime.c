@@ -95,6 +95,20 @@ static void print_usage( char **argv )
 
 static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
 {
+    osd_string_t *test_string;
+
+    test_string = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
+    blit_colour_yuy2( oddframe, width, height, width*2, 16, 128, 128 );
+    blit_colour_yuy2( evenframe, width, height, width*2, 80, 128, 128 );
+
+    osd_string_set_colour( test_string, 235, 128, 128 );
+    osd_string_show_text( test_string, "Odd Field", 80 );
+    osd_string_composite_packed422( test_string, oddframe, width, height, width*2, 50, 50, 0 );
+
+    osd_string_set_colour( test_string, 235, 128, 128 );
+    osd_string_show_text( test_string, "Even Field", 80 );
+    osd_string_composite_packed422( test_string, evenframe, width, height, width*2, 50, 150, 0 );
+    osd_string_delete( test_string );
 }
 
 int main( int argc, char **argv )
@@ -129,6 +143,9 @@ int main( int argc, char **argv )
     // osd_shape_t *osd_rect;
     int c, i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
+    unsigned char *testframe_odd;
+    unsigned char *testframe_even;
+    int showtest = 0;
 
 
     /* Default device. */
@@ -187,6 +204,14 @@ int main( int argc, char **argv )
     }
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
+
+    testframe_odd = (unsigned char *) malloc( width * height * 2 );
+    testframe_even = (unsigned char *) malloc( width * height * 2 );
+    if( !testframe_odd || !testframe_even ) {
+        fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
+        return 1;
+    }
+    build_test_frames( testframe_odd, testframe_even, width, height );
 
     /* Setup OSD stuff. */
     channel_number = osd_string_new( "helr.ttf", 80, width, height, 4.0 / 3.0 );
@@ -316,6 +341,9 @@ int main( int argc, char **argv )
             }
             if( commands & TVTIME_DEBUG ) {
                 printdebug = 1;
+            }
+            if( commands & TVTIME_SHOW_TEST ) {
+                showtest = !showtest;
             }
             if( commands & TVTIME_LUMA_UP || commands & TVTIME_LUMA_DOWN ) {
                 if( !apply_luma_correction ) {
@@ -494,33 +522,37 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the top field. */
-        if( output420 ) {
-            luma_plane_field_to_frame( sdl_get_output(), curluma,
-                                       width, height, width*2, 0 );
-            chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
-                                         width/2, height/2, width*2, 0 );
-            chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
-                                         width/2, height/2, width*2, 0 );
+        if( showtest ) {
+            memcpy( sdl_get_output(), testframe_even, width*height*2 );
         } else {
-            if( apply_luma_correction ) {
-                video_correction_planar422_field_to_packed422_frame( vc,
-                                                                     sdl_get_output(),
-                                                                     curluma,
-                                                                     curcb422,
-                                                                     curcr422,
-                                                                     0, width * 2, width, width, height );
+            if( output420 ) {
+                luma_plane_field_to_frame( sdl_get_output(), curluma,
+                                           width, height, width*2, 0 );
+                chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
+                                             width/2, height/2, width*2, 0 );
+                chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
+                                             width/2, height/2, width*2, 0 );
             } else {
-                planar422_field_to_packed422_frame( sdl_get_output(), curluma,
-                                                    curcb422, curcr422, 0, width * 2,
-                                                    width, width, height );
-            }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
-            // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
-            if( mixer_ismute() ) {
-                osd_string_show_text( muted_osd, "Mute", 100 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-            } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                if( apply_luma_correction ) {
+                    video_correction_planar422_field_to_packed422_frame( vc,
+                                                                         sdl_get_output(),
+                                                                         curluma,
+                                                                         curcb422,
+                                                                         curcr422,
+                                                                         0, width * 2, width, width, height );
+                } else {
+                    planar422_field_to_packed422_frame( sdl_get_output(), curluma,
+                                                        curcb422, curcr422, 0, width * 2,
+                                                        width, width, height );
+                }
+                osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+                // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
+                if( mixer_ismute() ) {
+                    osd_string_show_text( muted_osd, "Mute", 100 );
+                    osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                } else {
+                    osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                }
             }
         }
 
@@ -553,35 +585,39 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the bottom field. */
-        if( output420 ) {
-            luma_plane_field_to_frame( sdl_get_output(), curluma + width,
-                                       width, height, width*2, 1 );
-            chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
-                                         width/2, height/2, width*2, 1 );
-            chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
-                                         width/2, height/2, width*2, 1 );
+        if( showtest ) {
+            memcpy( sdl_get_output(), testframe_odd, width*height*2 );
         } else {
-            if( apply_luma_correction ) {
-                video_correction_planar422_field_to_packed422_frame( vc,
-                                                                     sdl_get_output(),
-                                                                     curluma + width,
-                                                                     curcb422 + (width/2),
-                                                                     curcr422 + (width/2),
-                                                                     1, width * 2, width, width, height );
+            if( output420 ) {
+                luma_plane_field_to_frame( sdl_get_output(), curluma + width,
+                                           width, height, width*2, 1 );
+                chroma_plane_field_to_frame( sdl_get_cb(), curcb422,
+                                             width/2, height/2, width*2, 1 );
+                chroma_plane_field_to_frame( sdl_get_cr(), curcr422,
+                                             width/2, height/2, width*2, 1 );
             } else {
-                planar422_field_to_packed422_frame( sdl_get_output(), curluma + width,
-                                                    curcb422 + (width / 2),
-                                                    curcr422 + (width / 2),
-                                                    1, width * 2, width, width, height );
-            }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
-            // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
+                if( apply_luma_correction ) {
+                    video_correction_planar422_field_to_packed422_frame( vc,
+                                                                         sdl_get_output(),
+                                                                         curluma + width,
+                                                                         curcb422 + (width/2),
+                                                                         curcr422 + (width/2),
+                                                                         1, width * 2, width, width, height );
+                } else {
+                    planar422_field_to_packed422_frame( sdl_get_output(), curluma + width,
+                                                        curcb422 + (width / 2),
+                                                        curcr422 + (width / 2),
+                                                        1, width * 2, width, width, height );
+                }
+                osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+                // osd_shape_composite_packed422( osd_rect, sdl_get_output(), width, height, width*2, 50, 50 );
 
-            if( mixer_ismute() ) {
-                osd_string_show_text( muted_osd, "Mute", 51 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
-            } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                if( mixer_ismute() ) {
+                    osd_string_show_text( muted_osd, "Mute", 51 );
+                    osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                } else {
+                    osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height, width*2, 20, height-40, 0 );
+                }
             }
         }
 

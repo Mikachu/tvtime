@@ -174,6 +174,15 @@ void blit_colour_scanline_yuy2( unsigned char *output, int width, int y, int cb,
     }
 }
 
+void blit_colour_yuy2( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr )
+{
+    int i;
+
+    for( i = 0; i < height; i++ ) {
+        blit_colour_scanline_yuy2( output + (i * stride), width, luma, cb, cr );
+    }
+}
+
 static inline void interpolate_scanline_packed_422( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,

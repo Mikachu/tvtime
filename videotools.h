@@ -61,6 +61,7 @@ void planar422_field_to_packed422_frame( unsigned char *output,
 void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
 void blit_colour_scanline_yuy2( unsigned char *output, int width, int luma, int cb, int cr );
 void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr );
+void blit_colour_yuy2( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr );
 
 /**
  * Builds a plane from a field interpolating to frame size by linear

@@ -58,6 +58,7 @@ enum tvtime_commands
     TVTIME_COLOUR_DOWN   = (1<<27),
     TVTIME_COLOUR_UP     = (1<<28),
 
+    TVTIME_SHOW_TEST     = (1<<30),
     TVTIME_DEBUG         = (1<<31)
 };
 
