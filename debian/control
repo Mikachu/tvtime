@@ -8,6 +8,7 @@ Standards-Version: 3.5.9
 Package: tvtime
 Architecture: any
 Depends: ${shlibs:Depends}, ttf-freefont
+Suggests: liblircclient0
 Description: A high quality television application
  tvtime is a high quality television application for use with video 
  capture cards.  tvtime processes the input from a capture card and 
