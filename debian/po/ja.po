@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-11-03 16:20-0500\n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
 "PO-Revision-Date: 2003-11-26 15:02+0900\n"
 "Last-Translator: Hideki Yamane <henrich@samba.gr.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
@@ -24,52 +24,67 @@ msgstr ""
 "Content-Type: text/plain; charset=EUC-JP\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Type: select
 #. Choices
 #: ../templates:3
 msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
 msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid "Select the default television standard for your location"
 msgstr "あなたの地域での標準のテレビ放送形式を選択してください"
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid ""
 "North American users should select NTSC.  Most areas in the world use PAL."
-msgstr "北米地域のユーザは NTSC を選択してください。世界の他の地域では、ほとんどが PAL を利用しています。(なお、日本は NTSC を利用しています)"
+msgstr ""
+"北米地域のユーザは NTSC を選択してください。世界の他の地域では、ほとんどが "
+"PAL を利用しています。(なお、日本は NTSC を利用しています)"
 
+#. Type: select
 #. Choices
 #: ../templates:9
 msgid "Cable, Broadcast, Cable including channels 100+"
 msgstr "ケーブルテレビ, 地上波放送, 100チャンネル以上のケーブルテレビ"
 
+#. Type: select
 #. Choices
 #: ../templates:17
 msgid "Cable, Broadcast"
 msgstr "ケーブルテレビ, 地上波放送"
 
+#. Type: select
 #. Description
 #: ../templates:18
 msgid ""
 "The frequency table specifies which frequencies correspond to the familiar "
 "channel numbers.  Select broadcast if you use an antenna for over-the-air "
 "signals."
-msgstr "周波数テーブルはよく知られたチャンネル番号と一致する周波数を指定します。(通常の) アンテナを利用している場合は地上波放送を選択してください。"
+msgstr ""
+"周波数テーブルはよく知られたチャンネル番号と一致する周波数を指定します。(通常"
+"の) アンテナを利用している場合は地上波放送を選択してください。"
 
+#. Type: select
 #. Choices
 #: ../templates:25
 msgid ""
 "Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
 "Optus, Custom (must run tvtime-scanner first)"
-msgstr "ヨーロッパ, フランス, ロシア, オーストラリア, ニュージーランド, 中国, Optus (オーストラリア) , カスタム (最初に tvtime-scanner を走らせて下さい)"
+msgstr ""
+"ヨーロッパ, フランス, ロシア, オーストラリア, ニュージーランド, 中国, Optus "
+"(オーストラリア) , カスタム (最初に tvtime-scanner を走らせて下さい)"
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid "Select the default frequency table"
 msgstr "標準の周波数帯を選択してください"
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid ""
@@ -77,48 +92,65 @@ msgid ""
 "Optus.  If you are a user of a cable company that does not use standard "
 "frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
 "the tvtime-scanner application before using tvtime."
-msgstr "オーストラリアの Optus ケーブルテレビのユーザは Optus (オーストラリア) を選ぶ必要があります。通常の周波数を利用しない Casema や UPC や Mixtics などのケーブルテレビ会社のユーザは、カスタムを選択して tvtime を利用する前に tvtime-scanner アプリケーションを実行してください。"
+msgstr ""
+"オーストラリアの Optus ケーブルテレビのユーザは Optus (オーストラリア) を選ぶ"
+"必要があります。通常の周波数を利用しない Casema や UPC や Mixtics などのケー"
+"ブルテレビ会社のユーザは、カスタムを選択して tvtime を利用する前に tvtime-"
+"scanner アプリケーションを実行してください。"
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid "Specify your default television capture device"
 msgstr "標準のテレビキャプチャ用デバイスを指定してください"
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid ""
 "This should be the video4linux device which corresponds to your capture card."
 msgstr "キャプチャカードに適合した video4linux デバイスである必要があります。"
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid "Specify a device to use for VBI decoding"
-msgstr "VBI デコード用のデバイスを指定してください (これは文字放送や Adams, BitCast 等で利用します)"
+msgstr ""
+"VBI デコード用のデバイスを指定してください (これは文字放送や Adams, BitCast "
+"等で利用します)"
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid ""
 "This will only be used in NTSC areas for decoding closed captions and XDS "
 "channel information."
-msgstr "これは NTSC の地域のみで字幕と XDS チャンネル情報のデコードに使用されます。"
+msgstr ""
+"これは NTSC の地域のみで字幕と XDS チャンネル情報のデコードに使用されます。"
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
 msgstr "`/usr/bin/tvtime' を root に setuid しますか?"
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid ""
 "This allows tvtime to run at a high priority to ensure smooth video and "
 "should be used for high quality video output even during high CPU load."
-msgstr "CPU の負荷が高い場合でも tvtime を高い優先度で動作させ、滑らかで高品質の画像を出力するようにします。"
+msgstr ""
+"CPU の負荷が高い場合でも tvtime を高い優先度で動作させ、滑らかで高品質の画像"
+"を出力するようにします。"
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid "Specify the process priority for the tvtime binary"
 msgstr "tvtime プログラムのプロセスの優先度を指定してください"
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid ""
@@ -126,4 +158,7 @@ msgid ""
 "processes on the system.  The allowed range is from -19 to 19. Lower values "
 "indicate higher priority, and a value of 0 would give tvtime the same "
 "priority as a normal process."
-msgstr "ここでは、システム上の他のプロセスに対しての、tvtime のプロセスの優先度を設定できます。-19 から 19 までの範囲が入力可能です。低い値は優先度が高いことを意味し、0 の場合は通常のプロセスと同じ優先度を tvtime に与えます。"
+msgstr ""
+"ここでは、システム上の他のプロセスに対しての、tvtime のプロセスの優先度を設定"
+"できます。-19 から 19 までの範囲が入力可能です。低い値は優先度が高いことを意"
+"味し、0 の場合は通常のプロセスと同じ優先度を tvtime に与えます。"

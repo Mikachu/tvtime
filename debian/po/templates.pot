@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-20 22:06+0200\n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,32 +24,38 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Type: select
 #. Choices
 #: ../templates:3
 msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
 msgstr ""
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid "Select the default television standard for your location"
 msgstr ""
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid ""
 "North American users should select NTSC.  Most areas in the world use PAL."
 msgstr ""
 
+#. Type: select
 #. Choices
 #: ../templates:9
 msgid "Cable, Broadcast, Cable including channels 100+"
 msgstr ""
 
+#. Type: select
 #. Choices
 #: ../templates:17
 msgid "Cable, Broadcast"
 msgstr ""
 
+#. Type: select
 #. Description
 #: ../templates:18
 msgid ""
@@ -58,6 +64,7 @@ msgid ""
 "signals."
 msgstr ""
 
+#. Type: select
 #. Choices
 #: ../templates:25
 msgid ""
@@ -65,11 +72,13 @@ msgid ""
 "Optus, Custom (must run tvtime-scanner first)"
 msgstr ""
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid "Select the default frequency table"
 msgstr ""
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid ""
@@ -79,22 +88,26 @@ msgid ""
 "the tvtime-scanner application before using tvtime."
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid "Specify your default television capture device"
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid ""
 "This should be the video4linux device which corresponds to your capture card."
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid "Specify a device to use for VBI decoding"
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid ""
@@ -102,11 +115,13 @@ msgid ""
 "channel information."
 msgstr ""
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
 msgstr ""
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid ""
@@ -114,11 +129,13 @@ msgid ""
 "should be used for high quality video output even during high CPU load."
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid "Specify the process priority for the tvtime binary"
 msgstr ""
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid ""

@@ -98,6 +98,8 @@ install: build
 	# Add KDE menu item
 	-mkdir -p $(CURDIR)/debian/tvtime/usr/share/applnk/Multimedia/
 	-cp -f $(CURDIR)/docs/net-tvtime.desktop $(CURDIR)/debian/tvtime/usr/share/applnk/Multimedia/
+	# Add Lintian override
+	install -m 644 debian/lintian.override $(CURDIR)/debian/tvtime/usr/share/lintian/overrides/tvtime
 
 
 # Build architecture-independent files here.

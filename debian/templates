@@ -52,7 +52,7 @@ _Description: Do you wish to make `/usr/bin/tvtime' setuid root?
 
 Template: tvtime/processpriority
 Type: string
-Default: -19
+Default: -10
 _Description: Specify the process priority for the tvtime binary
  This setting controls the priority of the tvtime process relative to other
  processes on the system.  The allowed range is from -19 to 19. Lower

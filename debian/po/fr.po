@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime_0.9.10-7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-20 22:06+0200\n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
 "PO-Revision-Date: 2003-10-22 09:52+0200\n"
 "Last-Translator: Michel Grentzinger <mic.grentz@online.fr>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
@@ -21,16 +21,19 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Type: select
 #. Choices
 #: ../templates:3
 msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
 msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid "Select the default television standard for your location"
 msgstr "Standard de télévision en vigueur dans votre région"
 
+#. Type: select
 #. Description
 #: ../templates:4
 msgid ""
@@ -39,16 +42,19 @@ msgstr ""
 "Les utilisateurs français devraient choisir SECAM, les nord-américains NTSC. "
 "La plupart des autres zones utilisent le standard PAL."
 
+#. Type: select
 #. Choices
 #: ../templates:9
 msgid "Cable, Broadcast, Cable including channels 100+"
 msgstr "Câble, Hertzien, Câble comprenant plus de 100 canaux"
 
+#. Type: select
 #. Choices
 #: ../templates:17
 msgid "Cable, Broadcast"
 msgstr "Câble, Hertzien"
 
+#. Type: select
 #. Description
 #: ../templates:18
 msgid ""
@@ -60,6 +66,7 @@ msgstr ""
 "les numéros des canaux habituels. Choisissez « Hertzien » si vous utilisez "
 "une antenne pour recevoir la télévision."
 
+#. Type: select
 #. Choices
 #: ../templates:25
 msgid ""
@@ -69,11 +76,13 @@ msgstr ""
 "Europe, France, Russie, Australie, Nouvelle-Zélande, Chine hertzien, "
 "Australie Optus, Personnalisé (vous devrez d'abord exécuter tvtime-scanner)"
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid "Select the default frequency table"
 msgstr "Table de fréquence par défaut"
 
+#. Type: select
 #. Description
 #: ../templates:26
 msgid ""
@@ -88,11 +97,13 @@ msgstr ""
 "veuillez choisir « Personnalisé » et exécutez l'application tvtime-scanner "
 "avant d'utiliser tvtime. "
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid "Specify your default television capture device"
 msgstr "Périphérique télévisuel de capture par défaut"
 
+#. Type: string
 #. Description
 #: ../templates:35
 msgid ""
@@ -101,11 +112,13 @@ msgstr ""
 "Il devrait s'agir du périphérique video4linux correspondant à votre carte "
 "d'acquisition."
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid "Specify a device to use for VBI decoding"
 msgstr "Périphérique à utiliser pour le décodage VBI"
 
+#. Type: string
 #. Description
 #: ../templates:42
 msgid ""
@@ -115,11 +128,13 @@ msgstr ""
 "Cela sera utilisé uniquement dans les zones NTSC pour le décodage des "
 "acquisitions fermées et les informations XDS des canaux."
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
 msgstr "Souhaitez-vous rendre /usr/bin/tvtime « setuid root » ?"
 
+#. Type: boolean
 #. Description
 #: ../templates:49
 msgid ""
@@ -131,11 +146,13 @@ msgstr ""
 "la vidéo et devrait être utilisé pour produire des sorties vidéo de haute "
 "qualité, même lors des fortes charges du processeur."
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid "Specify the process priority for the tvtime binary"
 msgstr "Veuillez indiquer la priorité du processus pour l'exécutable tvtime"
 
+#. Type: string
 #. Description
 #: ../templates:56
 msgid ""
