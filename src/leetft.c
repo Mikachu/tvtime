@@ -131,13 +131,12 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
     int pen_x, i;
     int prev = 0;
 
-    bbox.xMin = bbox.yMin = 32767*64; // 32767;
-    bbox.xMax = bbox.yMax = -32767*64;
-
-    pen_x = 0;
+    bbox.xMin = bbox.yMin = INT_MAX;
+    bbox.xMax = bbox.yMax = -INT_MAX;
 
     use_kerning = FT_HAS_KERNING( face );
     previous = 0;
+    pen_x = 0;
 
     for( i = 0; i < len; i++ ) {
         int cur = text[ i ];
@@ -151,16 +150,13 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
                 FT_Vector  delta;
                 FT_Get_Kerning( face, previous, glyphindex[ i ], ft_kerning_unfitted, &delta );
                 pen_x += ( delta.x * 1024 );
-
-                /* fprintf( stderr, "%c-%c: delta.x %.4f, pos %d, adv %d\n",
-                   prev, text[ i ], ( (double) delta.x ) / 64.0, pen_x, glyphs[ cur ]->advance.x ); */
             }
             prev = text[ i ];
 
-            // store current pen position
+            /* Save the current pen position. */
             glyphpos[ i ] = pen_x;
 
-            // pen_x += glyphs[ cur ]->advance.x >> 16;
+            /* Advance is in 16.16 format. */
             pen_x += glyphs[ cur ]->advance.x;
             previous = glyphindex[ i ];
 
@@ -283,15 +279,11 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
         *width += -string_bbox.xMin;
         push_x = -string_bbox.xMin;
     }
-    *width = (*width + 32768) >> 16;
-
-    /* Hack, why are we not wide enough? */
-    *width += 32;
+    *width = ( (*width + 32768) >> 16 ) + 1;
 
     /* The numbers I get for a height all seem to make sense. */
     *height = font->fontsize - ((string_bbox.yMin + 32) >> 6);
 
-    // fprintf( stderr, "text %dx%d\n", *width, *height );
     if( *width * *height > outsize ) {
         *width = *height = 0;
         return;
