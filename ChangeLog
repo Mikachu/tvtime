@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Fixed tvtime-command handling for commands that take
+      arguments but don't get them.
   * vektor: React to button events on release not on press.
   * larman: Display the upcoming show name from XMLTV.
   * vektor: Added CHANNEL_JUMP as a name alias for CHANNEL_PREV.

@@ -73,7 +73,7 @@ int main( int argc, char **argv )
             int cmd = tvtime_string_to_command( argv[ i ] );
             if( cmd == TVTIME_NOCOMMAND ) {
                 fprintf( stderr, "%s: Invalid command '%s'\n", argv[ 0 ], argv[ i ] );
-            } else if( tvtime_command_takes_arguments( cmd ) ) {
+            } else if( tvtime_command_takes_arguments( cmd ) && (i + 1) < argc ) {
                 const char *name = tvtime_command_to_string( cmd );
                 const char *arg = argv[ ++i ];
                 fprintf( stdout, "%s: Sending command %s with argument %s.\n", argv[ 0 ], name, arg );
