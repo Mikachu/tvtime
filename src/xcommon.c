@@ -881,9 +881,10 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     xswa.backing_store = NotUseful;
     xswa.save_under = False;
     xswa.background_pixel = BlackPixel( display, screen );
-    xswa.event_mask = ButtonPressMask | ButtonReleaseMask | StructureNotifyMask |
-                      KeyPressMask | PointerMotionMask | VisibilityChangeMask |
-                      FocusChangeMask | PropertyChangeMask;
+    xswa.event_mask = ButtonPressMask | ButtonReleaseMask |
+                      StructureNotifyMask | KeyPressMask | PointerMotionMask |
+                      VisibilityChangeMask | FocusChangeMask |
+                      PropertyChangeMask | ExposureMask;
 
     mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWEventMask);
 
@@ -1111,6 +1112,12 @@ void xcommon_clear_screen( void )
     XSync( display, False );
 }
 
+void xcommon_clear_area( int x, int y, int w, int h )
+{
+    XSetForeground( display, gc, xcommon_colourkey );
+    XFillRectangle( display, output_window, gc, x, y, w, h );
+}
+
 /**
  * Called after unmapping a window - waits until the window is unmapped.
  */
@@ -1263,6 +1270,10 @@ void xcommon_poll_events( input_t *in )
     int motion = 0;
     int motion_x = 0;
     int motion_y = 0;
+    int bx = -1;
+    int by = -1;
+    int bw = -1;
+    int bh = -1;
 
     while( XPending( display ) ) {
         KeySym mykey;
@@ -1280,6 +1291,33 @@ void xcommon_poll_events( input_t *in )
             }
             break;
 
+        case Expose:
+            if( bx < 0 ) {
+                bx = event.xexpose.x;
+                by = event.xexpose.y;
+                bw = event.xexpose.width;
+                bh = event.xexpose.height;
+            } else {
+#define MIN(x,y)((x)<(y)?(x):(y))
+#define MAX(x,y)((x)>(y)?(x):(y))
+                int dx, dy, dw, dh;
+                int cx, cy, cw, ch;
+                cx = event.xexpose.x;
+                cy = event.xexpose.y;
+                cw = event.xexpose.width;
+                ch = event.xexpose.height;
+                dx = MIN(bx, cx);
+                dy = MIN(by, cy);
+                dw = MAX(bx + bw, cx + cw) - dx;
+                dh = MAX(by + bh, cy + ch) - dy;
+#undef MAX
+#undef MIN
+                bx = dx;
+                by = dy;
+                bw = dw;
+                bh = dh;
+            }
+            break;
         case DestroyNotify:
             if( event.xdestroywindow.window != wm_window ) {
                 break;
@@ -1476,6 +1514,10 @@ void xcommon_poll_events( input_t *in )
              */
             xcommon_toggle_fullscreen( 0, 0 );
         }
+    }
+
+    if( bx >= 0 ) {
+        xcommon_clear_area( bx, by, bw, bh );
     }
 
     if( reconfigure ) {
