@@ -110,7 +110,7 @@ int hashtable_resize( hashtable_t *htold )
         // Resizes the hash table to be 4 times bigger than before.
         hashtable_t *htnew = hashtable_init (htold->size * 4);
         if (htnew == NULL)
-                return 1;
+                return 0;
         for (struct hashtable_object *p = &htold->table[0];
              p < &htold->table[htold->size]; p++) {
                 if (p->status == IN_USE)
@@ -120,7 +120,7 @@ int hashtable_resize( hashtable_t *htold )
         htold->table = htnew->table;
         htold->size = htnew->size;
         free (htnew);
-        return 0;
+        return 1;
 }
 
 int hashtable_insert( hashtable_t *ht, int index, void *data )
@@ -135,9 +135,9 @@ int hashtable_insert( hashtable_t *ht, int index, void *data )
 		else {
                         // The hash table is full. Resize it.
                         // BEWARE, untested code. (pvz)
-                        if (hashtable_resize (ht) == 1) {
+                        if (!hashtable_resize (ht)) {
                                 // Out of memory!
-                                return 1;
+                                return 0;
                         } else {
                                 // Let's try this again.
                                 probe = 0;
@@ -147,28 +147,18 @@ int hashtable_insert( hashtable_t *ht, int index, void *data )
 	obj->status = IN_USE;
 	obj->index = index;
 	obj->data = data;
-	return 0;
+	return 1;
 }
 
 int hashtable_delete( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj = hashtable_find (ht, index);
 	if (obj == NULL)
-		return 1;
+		return 0;
 	else {
 		obj->status = CLEARED;
-		return 0;
+		return 1;
 	}
-}
-
-// Caution: Only use when you're certain all elements have been allocated
-// using malloc.
-void hashtable_freeall( hashtable_t *ht )
-{
-        for (struct hashtable_object *p = ht->table;
-             p < ht->table + ht->size; p++)
-                if (p->status == IN_USE)
-                        free (p->data);
 }
 
 void hashtable_destroy( hashtable_t *ht )
@@ -176,3 +166,4 @@ void hashtable_destroy( hashtable_t *ht )
 	free (ht->table);
 	free (ht);
 }
+

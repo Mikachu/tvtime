@@ -23,14 +23,41 @@
 extern "C" {
 #endif
 
+/**
+ * Class providing a resizing hash table for storing pointers to objects
+ * whose memory is externally managed.
+ */
+
 typedef struct hashtable_s hashtable_t;
 
+/**
+ * Create a new hash table with the given initial size.
+ */
 hashtable_t *hashtable_init( size_t size );
-void *hashtable_lookup( hashtable_t *ht, int index );
-int hashtable_insert( hashtable_t *ht, int index, void *data );
-int hashtable_delete( hashtable_t *ht, int index );
+
+/**
+ * Frees the memory used by the table.  Does not free any of the
+ * inserted elements.
+ */
 void hashtable_destroy( hashtable_t *ht );
-void hashtable_freeall( hashtable_t *ht );
+
+/**
+ * Looks up and returns an element from the hash table.  Returns 0 on
+ * error.
+ */
+void *hashtable_lookup( hashtable_t *ht, int index );
+
+/**
+ * Insert a new element into the hash table, resizing the hash table if
+ * necessary.  Returns 0 on error.
+ */
+int hashtable_insert( hashtable_t *ht, int index, void *data );
+
+/**
+ * Deletes an element from the hash table.  Will not free the memory if
+ * the object was a pointer.
+ */
+int hashtable_delete( hashtable_t *ht, int index );
 
 #ifdef __cplusplus
 };
