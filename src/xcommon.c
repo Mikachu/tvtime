@@ -762,7 +762,7 @@ void xcommon_poll_events( input_t *in )
         case VisibilityNotify:
             if( !output_on_root ) {
                 if( event.xvisibility.state == VisibilityFullyObscured ) {
-                    if( !xcommon_exposed ) {
+                    if( xcommon_exposed ) {
                         xcommon_exposed = 0;
                         if( xcommon_verbose ) {
                             fprintf( stderr, "xvoutput: Window fully obscured, marking window as hidden (%lu).\n",
