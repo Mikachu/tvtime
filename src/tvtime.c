@@ -909,7 +909,7 @@ static void build_output_menu( menu_t *menu, int widescreen,
         cur++;
     }
 
-    snprintf( string, sizeof( string ), "%c%c%c  Apply matte", 0xee, 0x80, 0xb1 );
+    snprintf( string, sizeof( string ), "%c%c%c  Apply matte", 0xee, 0x80, 0x81 );
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
     menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
