@@ -137,6 +137,7 @@ DebugMode = 0
 # key_finetune_up            = .
 
 key_quit                   = \0033
+key_quit                   = q
 key_channel_up             = \0421
 key_channel_down           = \0422
 key_luma_correction_toggle = c

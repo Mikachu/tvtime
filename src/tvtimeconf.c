@@ -186,6 +186,7 @@ config_t *config_new( int argc, char **argv )
     memset( ct->keymap, 0, 8*MAX_KEYSYMS * sizeof( int ) );
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
+    ct->keymap[ 'q' ] = TVTIME_QUIT;
     ct->keymap[ I_UP ] = TVTIME_CHANNEL_UP;
     ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ 'c' ] = TVTIME_LUMA_CORRECTION_TOGGLE;
