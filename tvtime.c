@@ -35,7 +35,7 @@
 #include "osd.h"
 
 /* Number of frames to wait for next channel digit */
-#define CHANNEL_DELAY 50
+#define CHANNEL_DELAY 100
 
 
 /**

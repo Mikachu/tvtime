@@ -1346,12 +1346,26 @@ int frequencies_find_current_index( videoinput_t *vidin )
 
 int frequencies_find_named_channel( char *str )
 {
-    int i;
+    int i, diff;
+    char paddedstr[6];
     
     if( !str ) return -1;
 
+    diff = 5-strlen(str);
+    memset( paddedstr, '0', diff);
+    paddedstr[diff] = '\0';
+    strcat( paddedstr, str );
+
     for( i=0; i < chancount; i++ ) {
-        if( !strncasecmp(chanlist[i].name, str, 3) )
+        char tmp[6];
+        int diff2;
+
+        diff2 = 5-strlen(chanlist[i].name);
+        memset( tmp, '0', diff2);
+        tmp[diff2] = '\0';
+        strcat( tmp, chanlist[i].name );
+
+        if( !strcasecmp(tmp, paddedstr) )
             break;
     }
 
