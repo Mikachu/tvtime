@@ -89,6 +89,8 @@ static command_names_t command_table[] = {
     { "HUE_DOWN", TVTIME_HUE_DOWN },
     { "HUE_UP", TVTIME_HUE_UP },
 
+    { "KEY_EVENT", TVTIME_KEY_EVENT },
+
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
     { "LUMA_UP", TVTIME_LUMA_UP },
 
@@ -1067,6 +1069,7 @@ int commands_in_menu( commands_t *cmd )
 void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 {
     int volume;
+    int key;
 
     if( tvtime_cmd == TVTIME_NOCOMMAND ) return;
 
@@ -1126,6 +1129,15 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( set_menu( cmd, arg ) || set_menu( cmd, "root" ) ) {
                 display_current_menu( cmd );
             }
+        }
+        break;
+
+    case TVTIME_KEY_EVENT:
+        key = input_string_to_special_key( arg );
+        if( !key ) key = arg[ 0 ];
+        tvtime_cmd = config_key_to_command( cmd->cfg, key );
+        if( tvtime_cmd != TVTIME_KEY_EVENT ) {
+            commands_handle( cmd, tvtime_cmd, arg );
         }
         break;
 

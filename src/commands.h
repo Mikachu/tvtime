@@ -128,6 +128,8 @@ enum tvtime_commands
 
     TVTIME_DISPLAY_MESSAGE,
 
+    TVTIME_KEY_EVENT,
+
     /* Everything below here is a menu-mode command. */
     TVTIME_MENU_UP,
     TVTIME_MENU_DOWN,
