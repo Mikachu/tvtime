@@ -62,6 +62,11 @@ typedef struct videoinput_s videoinput_t;
 const char *videoinput_norm_name( int norm );
 
 /**
+ * Returns a text version of the audio mode.
+ */
+const char *videoinput_audio_mode_name( int mode );
+
+/**
  * Create a new input device from the given device name and which input
  * number (cable, composite1, composite2, etc) to use.
  *
@@ -167,6 +172,16 @@ int videoinput_get_input_num( videoinput_t *vidin );
  * Returns the name of the current input.
  */
 const char *videoinput_get_input_name( videoinput_t *vidin );
+
+/**
+ * Returns the current audio mode.
+ */
+int videoinput_get_audio_mode( videoinput_t *vidin );
+
+/**
+ * Sets the current audio mode.
+ */
+void videoinput_set_audio_mode( videoinput_t *vidin, int mode );
 
 /**
  * Mute the mixer if mute != 0
