@@ -16,15 +16,23 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-struct hashtable {
-	size_t size;
-	struct hashtable_object *table;
-};
+#ifndef HASHTABLE_H_INCLUDED
+#define HASHTABLE_H_INCLUDED
 
-struct hashtable *hashtable_init (size_t size);
-//struct hashtable_object *hashtable_find (struct hashtable *ht, int index);
-void *hashtable_lookup (struct hashtable *ht, int index);
-int hashtable_insert (struct hashtable *ht, int index, void *data);
-int hashtable_delete (struct hashtable *ht, int index);
-void hashtable_destroy (struct hashtable *ht);
-void hashtable_freeall (struct hashtable *ht);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct hashtable_s hashtable_t;
+
+hashtable_t *hashtable_init( size_t size );
+void *hashtable_lookup( hashtable_t *ht, int index );
+int hashtable_insert( hashtable_t *ht, int index, void *data );
+int hashtable_delete( hashtable_t *ht, int index );
+void hashtable_destroy( hashtable_t *ht );
+void hashtable_freeall( hashtable_t *ht );
+
+#ifdef __cplusplus
+};
+#endif
+#endif /* HASHTABLE_H_INCLUDED */

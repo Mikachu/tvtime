@@ -19,16 +19,20 @@
 #include <stdlib.h>
 #include "hashtable.h"
 
+struct hashtable_s {
+	size_t size;
+	struct hashtable_object *table;
+};
+
 struct hashtable_object {
 	enum { NEVER_USED, CLEARED, IN_USE } status;
 	int index;
 	void *data;
 };
 
-struct hashtable *
-hashtable_init (size_t size)
+hashtable_t *hashtable_init( size_t size )
 {
-	struct hashtable *ht;
+	hashtable_t *ht;
 	ht = malloc (sizeof (*ht));
 	if (ht == NULL)
 		return NULL;
@@ -48,15 +52,13 @@ hashtable_init (size_t size)
 	return ht;
 }
 
-static struct hashtable_object *
-hashtable_probe (struct hashtable *ht, int index, int probe)
+static struct hashtable_object * hashtable_probe( hashtable_t *ht, int index, int probe )
 {
 	// Quadratic probing
 	return &ht->table[(index + probe*probe) % ht->size];
 }    
 
-static struct hashtable_object *
-hashtable_find (struct hashtable *ht, int index)
+static struct hashtable_object *hashtable_find( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj;
 	for (int probe = 0; probe < ht->size; probe++) {
@@ -93,8 +95,7 @@ hashtable_find (struct hashtable *ht, int index)
 	return NULL;
 }
 
-void *
-hashtable_lookup (struct hashtable *ht, int index)
+void *hashtable_lookup( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj = hashtable_find (ht, index);
 	if (obj == NULL)
@@ -104,11 +105,10 @@ hashtable_lookup (struct hashtable *ht, int index)
 }
 
 // BEWARE. Untested code. (pvz)
-int
-hashtable_resize (struct hashtable *htold)
+int hashtable_resize( hashtable_t *htold )
 {
         // Resizes the hash table to be 4 times bigger than before.
-        struct hashtable *htnew = hashtable_init (htold->size * 4);
+        hashtable_t *htnew = hashtable_init (htold->size * 4);
         if (htnew == NULL)
                 return 1;
         for (struct hashtable_object *p = &htold->table[0];
@@ -123,8 +123,7 @@ hashtable_resize (struct hashtable *htold)
         return 0;
 }
 
-int
-hashtable_insert (struct hashtable *ht, int index, void *data)
+int hashtable_insert( hashtable_t *ht, int index, void *data )
 {
 	int probe = 0;
 	struct hashtable_object *obj;
@@ -151,8 +150,7 @@ hashtable_insert (struct hashtable *ht, int index, void *data)
 	return 0;
 }
 
-int
-hashtable_delete (struct hashtable *ht, int index)
+int hashtable_delete( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj = hashtable_find (ht, index);
 	if (obj == NULL)
@@ -165,8 +163,7 @@ hashtable_delete (struct hashtable *ht, int index)
 
 // Caution: Only use when you're certain all elements have been allocated
 // using malloc.
-void
-hashtable_freeall (struct hashtable *ht)
+void hashtable_freeall( hashtable_t *ht )
 {
         for (struct hashtable_object *p = ht->table;
              p < ht->table + ht->size; p++)
@@ -174,8 +171,7 @@ hashtable_freeall (struct hashtable *ht)
                         free (p->data);
 }
 
-void
-hashtable_destroy (struct hashtable *ht)
+void hashtable_destroy( hashtable_t *ht )
 {
 	free (ht->table);
 	free (ht);

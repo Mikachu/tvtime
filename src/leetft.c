@@ -38,8 +38,8 @@ struct ft_font_s
     int fontsize;
     int xdpi;
     FT_Face face;
-    struct hashtable *glyphs; // These contain FT_Glyph
-    struct hashtable *bitmaps;
+    hashtable_t *glyphs; // These contain FT_Glyph
+    hashtable_t *bitmaps;
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
     int max_height;
@@ -200,7 +200,7 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points )
     return ( font->xdpi * points * 65536 ) / 72;
 }
 
-static FT_BBox prerender_text( FT_Face face, struct hashtable *glyphs, FT_UInt *glyphpos,
+static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphs, FT_UInt *glyphpos,
                                FT_UInt *glyphindex, const char *text, int len )
 {
     FT_Bool use_kerning;
