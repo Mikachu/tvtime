@@ -44,6 +44,7 @@ struct station_mgr_s
     int us_cable_mode;
     int is_us_cable;
     int last_channel;
+    int new_install;
     char band_and_frequency[ 1024 ];
     char stationrc[255];
 };
@@ -231,10 +232,12 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
     mgr->is_us_cable = 0;
     mgr->us_cable_mode = us_cable_mode;
     mgr->last_channel = 0;
+    mgr->new_install = 0;
 
     if( !station_readconfig( mgr ) ) {
         fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
 
+        mgr->new_install = 1;
         frequencies = table;
         fprintf( stderr, "station: Adding frequency table %s, all channels active\n", frequencies );
 
@@ -294,6 +297,11 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
 void station_delete( station_mgr_t *mgr )
 {
     free( mgr );
+}
+
+int station_is_new_install( station_mgr_t *mgr )
+{
+    return mgr->new_install;
 }
 
 int station_set( station_mgr_t *mgr, int pos )

@@ -36,6 +36,11 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose );
 void station_delete( station_mgr_t *mgr );
 
 /**
+ * Is this a clean startup?
+ */
+int station_is_new_install( station_mgr_t *mgr );
+
+/**
  * Set the current channel.
  */
 int station_set( station_mgr_t *mgr, int pos );

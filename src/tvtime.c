@@ -1209,6 +1209,10 @@ int main( int argc, char **argv )
     for( i = 0; i < config_get_framerate_mode( ct ); i++ ) {
         commands_handle( commands, TVTIME_TOGGLE_HALF_FRAMERATE, 0 );
     }
+    /* If we are a new install, start scanning channels. */
+    if( station_is_new_install( stationmgr ) ) {
+        commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
+    }
 
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
