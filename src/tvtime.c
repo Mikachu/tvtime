@@ -1697,6 +1697,11 @@ int main( int argc, char **argv )
         if( !output_success ) break;
     }
 
+    /* Remember to save our settings if we were scanning. */
+    if( scanning ) {
+        station_writeconfig( stationmgr );
+    }
+
     if( config_get_configsave( ct ) ) {
         snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
         configsave( config_get_configsave( ct ), "StartupPrevChannel", number );
