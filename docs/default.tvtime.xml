@@ -230,38 +230,40 @@
     to multiple keys and mouse buttons.  Up to nine mouse buttons
     are supported.
 
+
     Commands known to tvtime:
 
-    AUTO_ADJUST_PICT           FINETUNE_UP              
-    BRIGHTNESS_DOWN            HUE_DOWN                 
-    BRIGHTNESS_UP              HUE_UP                   
-    CHANNEL_1                  LUMA_UP                  
-    CHANNEL_2                  LUMA_DOWN                
-    CHANNEL_3                  MIXER_MUTE               
-    CHANNEL_4                  MIXER_UP                 
-    CHANNEL_5                  MIXER_DOWN               
-    CHANNEL_6                  OVERSCAN_DOWN            
-    CHANNEL_7                  OVERSCAN_UP              
-    CHANNEL_8                  SCREENSHOT               
-    CHANNEL_9                  SCROLL_CONSOLE_DOWN      
-    CHANNEL_0                  SCROLL_CONSOLE_UP        
-    CHANNEL_DOWN               SHOW_STATS               
-    CHANNEL_ACTIVATE_ALL       TOGGLE_ASPECT            
-    CHANNEL_PREV               TOGGLE_AUDIO_MODE        
-    CHANNEL_RENUMBER           TOGGLE_BARS              
-    CHANNEL_SAVE_TUNING        TOGGLE_CC                
-    CHANNEL_SCAN               TOGGLE_CONSOLE           
-    CHANNEL_SKIP               TOGGLE_DEINTERLACER      
-    CHANNEL_UP                 TOGGLE_FULLSCREEN        
-    COLOUR_DOWN                TOGGLE_FRAMERATE         
-    COLOUR_UP                  TOGGLE_INPUT             
-    COLOR_DOWN                 TOGGLE_LUMA_CORRECTION   
-    COLOR_UP                   TOGGLE_MODE              
-    CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE   
-    CONTRAST_UP                TOGGLE_PAUSE             
-    DISPLAY_INFO               TOGGLE_PULLDOWN_DETECTION
-    ENTER                      QUIT                     
-    FINETUNE_DOWN                                       
+      AUTO_ADJUST_PICT           FINETUNE_UP              
+      BRIGHTNESS_DOWN            HUE_DOWN                 
+      BRIGHTNESS_UP              HUE_UP                   
+      CHANNEL_1                  LUMA_DOWN                
+      CHANNEL_2                  LUMA_UP                  
+      CHANNEL_3                  MIXER_MUTE               
+      CHANNEL_4                  MIXER_DOWN               
+      CHANNEL_5                  MIXER_UP                 
+      CHANNEL_6                  OVERSCAN_DOWN            
+      CHANNEL_7                  OVERSCAN_UP              
+      CHANNEL_8                  SCREENSHOT               
+      CHANNEL_9                  SCROLL_CONSOLE_DOWN      
+      CHANNEL_0                  SCROLL_CONSOLE_UP        
+      CHANNEL_ACTIVATE_ALL       SHOW_STATS               
+      CHANNEL_DOWN               TOGGLE_ASPECT            
+      CHANNEL_PREV               TOGGLE_AUDIO_MODE        
+      CHANNEL_RENUMBER           TOGGLE_BARS              
+      CHANNEL_SAVE_TUNING        TOGGLE_CC                
+      CHANNEL_SCAN               TOGGLE_CONSOLE           
+      CHANNEL_SKIP               TOGGLE_DEINTERLACER      
+      CHANNEL_UP                 TOGGLE_FULLSCREEN        
+      COLOUR_DOWN                TOGGLE_FRAMERATE         
+      COLOUR_UP                  TOGGLE_INPUT             
+      COLOR_DOWN                 TOGGLE_LUMA_CORRECTION   
+      COLOR_UP                   TOGGLE_MODE              
+      CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE   
+      CONTRAST_UP                TOGGLE_PAUSE             
+      DISPLAY_INFO               TOGGLE_PULLDOWN_DETECTION
+      ENTER                      QUIT                     
+      FINETUNE_DOWN                                       
+
 
     Special keys known by tvtime:
 
