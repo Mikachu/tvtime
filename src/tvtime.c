@@ -1997,7 +1997,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 }
             } else if( osd ) {
                 tvtime_osd_show_message( osd,
-                    _("2-3 Pulldown detection is not"
+                    _("2-3 pulldown inversion is not"
                       " valid with your TV norm.") );
             }
         }
