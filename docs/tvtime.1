@@ -6,7 +6,7 @@
 .LP 
 tvtime [\-ahkmsSv] [\-F <config file>] [\-r <rvrfile>] [\-H <height>]
 [\-I <sampling>] [\-d <device>] [\-b <device>] [\-i <input>]
-[\-n <norm>] [\-f <frequencies>]
+[\-n <norm>] [\-f <frequencies>] [\-c <channel>]
        
 .SH "DESCRIPTION"
 .LP 
@@ -107,6 +107,11 @@ VBI device to use (defaults to /dev/vbi0).
 video4linux input number (defaults to 0).  Cards commonly have a bunch
 of sources, for example, for my WinTV card source 0 is my tuner and
 source 1 is the composite input.
+
+.TP
+.B \-c
+On startup, tvtime will tune to the given channel.  Otherwise, the
+channels from the config file will be used.
 
 .TP
 .B \-n
