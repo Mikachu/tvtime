@@ -65,6 +65,9 @@ static Cmd_Names cmd_table[] = {
     { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
     { "COLOUR_UP", TVTIME_COLOUR_UP },
 
+    { "COLOR_DOWN", TVTIME_COLOUR_DOWN },
+    { "COLOR_UP", TVTIME_COLOUR_UP },
+
     { "CONT_DOWN", TVTIME_CONT_DOWN },
     { "CONT_UP", TVTIME_CONT_UP },
 
