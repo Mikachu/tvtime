@@ -1,0 +1,120 @@
+License Exception
+=================
+
+The following is the license exception from John Adcock, copyright
+holder of DScaler, and its associated libraries.
+
+From John@adcock8.freeserve.co.uk Sat Apr 26 04:22:21 2003
+Return-path: <John@adcock8.freeserve.co.uk>
+Envelope-to: sfllaw@localhost
+Delivery-date: Sat, 26 Apr 2003 04:22:21 -0400
+Received: from localhost ([127.0.0.1] ident=fetchmail)
+	by alps with esmtp (Exim 3.35 #1 (Debian))
+	id 199Kwv-0008JV-00
+	for <sfllaw@localhost>; Sat, 26 Apr 2003 04:22:21 -0400
+Received: from engmail.uwaterloo.ca [129.97.50.62]
+	by localhost with IMAP (fetchmail-5.9.11)
+	for sfllaw@localhost (single-drop); Sat, 26 Apr 2003 04:22:21 -0400 (EDT)
+Received: from cmailg1.svr.pol.co.uk (cmailg1.svr.pol.co.uk [195.92.195.171])
+	by engmail.uwaterloo.ca (8.12.6p2/8.12.6) with ESMTP id h3Q8JOFc027694
+	for <sfllaw@engmail.uwaterloo.ca>; Sat, 26 Apr 2003 04:19:24 -0400 (EDT)
+	(envelope-from John@adcock8.freeserve.co.uk)
+Received: from user-1158.bbd21tcl.dsl.pol.co.uk ([81.77.228.134] helo=server.adcock8.freeserve.co.uk)
+	by cmailg1.svr.pol.co.uk with esmtp (Exim 4.14)
+	id 199Ku3-0000MY-NI; Sat, 26 Apr 2003 09:19:23 +0100
+Subject: RE: [sfllaw@engmail.uwaterloo.ca: License exception for John Adcock]
+Date: Sat, 26 Apr 2003 09:25:00 +0100
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <096750F779A5B046A1FDB017280E7456044F3B@server.adcock8.freeserve.co.uk>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+X-MimeOLE: Produced By Microsoft Exchange V6.0.6249.0
+content-class: urn:content-classes:message
+Thread-Topic: [sfllaw@engmail.uwaterloo.ca: License exception for John Adcock]
+Thread-Index: AcMLZ2ttNuS17YvySxKV6SNc+niBwQAZWQew
+From: "John Adcock" <John@adcock8.freeserve.co.uk>
+To: "Billy Biggs" <vektor@dumbterm.net>
+Cc: <sfllaw@engmail.uwaterloo.ca>
+Content-Transfer-Encoding: 8bit
+X-MIME-Autoconverted: from quoted-printable to 8bit by engmail.uwaterloo.ca id h3Q8JOFc027694
+X-Spam-Status: No, hits=0.0 required=5.0 tests= version=2.20
+X-Spam-Level: 
+Status: RO
+Content-Length: 2978
+Lines: 73
+
+This is a weird one, but this is how I think the GPL applies here. You
+want to redistribute some dlls that I have built, and I have allowed
+redistribution of the dlls under the terms of the GPL,  In releasing my
+source under the GPL I say you can build that dlls with the source I
+also have made available.  
+
+Under the GPL you may then further redistribute the dlls to your heart's
+content (as long as you also are willing to supply the same source I
+did), as long as you trust me that the dll's are built from that source
+(which they were) and don't change the source (which you haven't) there
+is no additional restriction on redistribution.  I don't think it
+matters that you can't actually compile the dlls yourself because you're
+running on linux or even that the code currently requires a non-free
+compiler to compile (although this is a grey area).  But then I'm not a
+lawyer.
+
+If you want to cover your posteriors with a clause as you outline I've
+no problem with that but I really don't think it is required.  Also I
+hope that we can get cross platform compilation sorted soon and these
+annoying legal issues will go away.
+
+John
+
+> -----Original Message-----
+> From: Billy Biggs [mailto:vektor@dumbterm.net] 
+> Sent: 21 April 2003 19:51
+> To: John Adcock
+> Subject: [sfllaw@engmail.uwaterloo.ca: License exception for 
+> John Adcock]
+> 
+> 
+>   Thoughts?  Should I post this to deinterlace-discuss?
+> 
+>   Many thanks,
+>   -Billy
+> 
+> ----- Forwarded message from Simon Law 
+> <sfllaw@engmail.uwaterloo.ca> -----
+> 
+> Date: Sun, 20 Apr 2003 23:22:02 -0400
+> From: Simon Law <sfllaw@engmail.uwaterloo.ca>
+> To: Billy Biggs <vektor@dumbterm.net>
+> Subject: License exception for John Adcock
+> 
+> Hi Billy,
+> 
+> 	From my reading of John's mailing list posting, 
+> http://sourceforge.net/mailarchive/forum.php?thread_id=1937234&forum_id=6588
+> the following exception statement seems to be in line with his thinking.
+> 
+> In addition to the GNU General Public License, as a special exception to
+> Section 3, John Adcock gives permission to distribute the Program,
+> DScaler, where the source code distributed need not include anything
+> that is normally distributed (in either source or binary form) with
+> major components (compiler, kernel, and so on) of the Microsoft Windows
+> family of operating systems, unless that component itself accompanies
+> the executable.  You must obey the GNU General Public License in all
+> respects for all of the Program code used.  If you modify the Program,
+> you may extend this exception to your version of the file, but you are
+> not obligated to do so.  If you do not wish to do so, delete this
+> exception statement from your version.
+> 
+> 	It is best if you capture his entire response OK-ing this
+> statement, and we can put it in COPYING.DScaler in your distribution.
+> Sorry for the inconvenience.
+> 
+> Simon
+> 
+> P.S. Why did I have to be a Free Software developer, and not a lawyer?
+>      My parents would have been much more proud.
+> 
+> ----- End forwarded message -----
+> 
