@@ -4,7 +4,7 @@
 .B tvtime \- a high quality television application
 .SH "SYNTAX"
 .LP 
-tvtime [\-ahmsSv] [\-F <config file>] [\-r <rvrfile>] [\-H <height>]
+tvtime [\-ahkmsSv] [\-F <config file>] [\-r <rvrfile>] [\-H <height>]
 [\-I <sampling>] [\-d <device>] [\-b <device>] [\-i <input>]
 [\-n <norm>] [\-f <frequencies>]
        
@@ -43,8 +43,17 @@ experience.
 .B \-a
 This option starts tvtime in 16:9 aspect ratio mode.
 
+.TP
 .B \-h
 Show usage information.
+
+.TP
+.B \-k
+Disables keyboard input in tvtime for slave mode.  Slave mode was added
+for integration with PVR applications like freevo or mythtv, so that
+freevo can handle keyboard input while tvtime is running.  In slave
+mode, keystrokes are ignored but they are printed to stdout, and
+commands are read from stdin in the same syntax as 'tvtime-command'.
 
 .TP
 .B \-m
