@@ -791,6 +791,35 @@ static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
     tvtime_osd_show_list( osd, 1 );
 }
 
+static void build_deinterlacer_menu( menu_t *menu, int curmethod )
+{
+    int nummethods = get_num_deinterlace_methods();
+    char string[ 128 ];
+    int i;
+
+    for( i = 0; i < nummethods; i++ ) {
+        if( i == curmethod ) {
+            snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5,
+                      get_deinterlace_method( i )->name );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4,
+                      get_deinterlace_method( i )->name );
+        }
+        menu_set_text( menu, i + 1, string );
+        menu_set_enter_command( menu, i + 1, TVTIME_SET_DEINTERLACER,
+                                get_deinterlace_method( i )->short_name );
+        menu_set_right_command( menu, i + 1, TVTIME_SET_DEINTERLACER,
+                                get_deinterlace_method( i )->short_name );
+        menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    }
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, nummethods + 1, string );
+    menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
+}
+
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1294,6 +1323,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;
     }
+    build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
 
     if( tvtime->inputfilter ) {
         /* Setup the video correction tables. */
@@ -1686,10 +1716,27 @@ int main( int argc, char **argv )
             curmethod = get_deinterlace_method( curmethodid );
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
+                build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
+                commands_refresh_menu( commands );
                 osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
+            config_save( ct, "DeinterlaceMethod", curmethod->short_name );
+        }
+        if( commands_set_deinterlacer( commands ) ) {
+            curmethodid = 0;
+            curmethod = get_deinterlace_method( 0 );
+            while( strcasecmp( commands_get_new_deinterlacer( commands ), curmethod->short_name ) ) {
+                curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+                curmethod = get_deinterlace_method( curmethodid );
+                if( !curmethodid ) break;
+            }
+            if( osd ) {
+                build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
+                commands_refresh_menu( commands );
+            }
+            tvtime_set_deinterlacer( tvtime, curmethod );
             config_save( ct, "DeinterlaceMethod", curmethod->short_name );
         }
         if( commands_update_luma_power( commands ) ) {

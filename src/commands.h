@@ -80,6 +80,7 @@ enum tvtime_commands
     TVTIME_TOGGLE_PULLDOWN_DETECTION,
 
     TVTIME_SET_NORM,
+    TVTIME_SET_DEINTERLACER,
 
     TVTIME_MENUMODE,
     TVTIME_DISPLAY_INFO,
@@ -163,6 +164,8 @@ void commands_delete( commands_t *cmd );
 void commands_handle( commands_t *cmd, int command, const char *arg );
 
 void commands_add_menu( commands_t *cmd, menu_t *menu );
+menu_t *commands_get_menu( commands_t *cmd, const char *menuname );
+void commands_refresh_menu( commands_t *cmd );
 
 double commands_get_luma_power( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
@@ -200,6 +203,8 @@ int commands_restart_tvtime( commands_t *cmd );
 int commands_apply_luma_correction( commands_t *cmd );
 int commands_apply_colour_invert( commands_t *cmd );
 int commands_apply_mirror( commands_t *cmd );
+int commands_set_deinterlacer( commands_t *cmd );
+const char *commands_get_new_deinterlacer( commands_t *cmd );
 const char *commands_get_new_norm( commands_t *cmd );
 
 #ifdef __cplusplus

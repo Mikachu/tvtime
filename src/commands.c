@@ -112,6 +112,7 @@ static command_names_t command_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
 
+    { "SET_DEINTERLACER", TVTIME_SET_DEINTERLACER },
     { "SET_NORM", TVTIME_SET_NORM },
 
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
@@ -148,7 +149,6 @@ enum menu_type
 {
     MENU_REDIRECT,
     MENU_FAVORITES,
-    MENU_DEINTERLACER,
     MENU_USER
 };
 
@@ -161,7 +161,6 @@ typedef struct menu_names_s {
 static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
     { "favorites", MENU_FAVORITES, 0 },
-    { "deinterlacer", MENU_DEINTERLACER, 0 },
     { "color", MENU_REDIRECT, "colour" }
 };
 
@@ -257,7 +256,9 @@ struct commands_s {
     int pause;
     int resizewindow;
     int restarttvtime;
+    int setdeinterlacer;
     const char *newnorm;
+    char deinterlacer[ 128 ];
 
     int delay;
 
@@ -484,7 +485,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->renumbering = 0;
     cmd->resizewindow = 0;
     cmd->restarttvtime = 0;
-    cmd->newnorm = "";
+    cmd->setdeinterlacer = 0;
 
     cmd->apply_invert = 0;
     cmd->apply_mirror = 0;
@@ -679,6 +680,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "deinterlacer" );
+    menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer configuration" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "filters" );
@@ -949,14 +954,21 @@ static void display_current_menu( commands_t *cmd )
     tvtime_osd_show_list( cmd->osd, 1 );
 }
 
-static menu_t *find_menu( commands_t *cmd, const char *menuname )
+void commands_refresh_menu( commands_t *cmd )
+{
+    if( cmd->menuactive ) {
+        display_current_menu( cmd );
+    }
+}
+
+menu_t *commands_get_menu( commands_t *cmd, const char *menuname )
 {
     int i;
 
     for( i = 0; i < tvtime_num_builtin_menus(); i++ ) {
         if( !strcasecmp( menu_table[ i ].name, menuname ) ) {
             if( menu_table[ i ].menutype == MENU_REDIRECT ) {
-                return find_menu( cmd, menu_table[ i ].dest );
+                return commands_get_menu( cmd, menu_table[ i ].dest );
             } else {
                 return 0;
             }
@@ -1171,7 +1183,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
             station_writeconfig( cmd->stationmgr );
         }
-    break;
+        break;
+
+    case TVTIME_SET_DEINTERLACER:
+        cmd->setdeinterlacer = 1;
+        snprintf( cmd->deinterlacer, sizeof( cmd->deinterlacer ), "%s", arg );
+        break;
 
     case TVTIME_SET_NORM:
         if( !arg || !*arg ) {
@@ -1195,12 +1212,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
 
         if( cmd->osd ) {
-            menu_t *normmenu = find_menu( cmd, "norm" );
+            menu_t *normmenu = commands_get_menu( cmd, "norm" );
             char message[ 128 ];
             reset_norm_menu( normmenu, cmd->newnorm );
-            if( cmd->menuactive ) {
-                display_current_menu( cmd );
-            }
+            commands_refresh_menu( cmd );
             sprintf( message, "Television standard will be %s on restart.",
                      cmd->newnorm );
             tvtime_osd_show_message( cmd->osd, message );
@@ -1275,7 +1290,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 }
 
                 if( cmd->osd ) {
-                    menu_t *stationmenu = find_menu( cmd, "stations" );
+                    menu_t *stationmenu = commands_get_menu( cmd, "stations" );
                     char string[ 128 ];
 
                     if( cmd->scan_channels ) {
@@ -1284,9 +1299,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                         sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
                     }
                     menu_set_text( stationmenu, 4, string );
-                    if( cmd->menuactive ) {
-                        display_current_menu( cmd );
-                    }
+                    commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
                         tvtime_osd_set_hold_message( cmd->osd, "Scanning for active channels." );
@@ -1397,7 +1410,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_COLOUR_INVERT:
         cmd->apply_invert = !cmd->apply_invert;
         if( cmd->osd ) {
-            menu_t *filtermenu = find_menu( cmd, "filters" );
+            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
             char string[ 128 ];
 
             if( cmd->apply_invert ) {
@@ -1406,9 +1419,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xa4 );
             }
             menu_set_text( filtermenu, 2, string );
-            if( cmd->menuactive ) {
-                display_current_menu( cmd );
-            }
+            commands_refresh_menu( cmd );
 
             if( cmd->apply_invert ) {
                 tvtime_osd_show_message( cmd->osd, "Colour invert enabled." );
@@ -1421,7 +1432,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_MIRROR:
         cmd->apply_mirror = !cmd->apply_mirror;
         if( cmd->osd ) {
-            menu_t *filtermenu = find_menu( cmd, "filters" );
+            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
             char string[ 128 ];
 
             if( cmd->apply_mirror ) {
@@ -1430,9 +1441,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xa4 );
             }
             menu_set_text( filtermenu, 3, string );
-            if( cmd->menuactive ) {
-                display_current_menu( cmd );
-            }
+            commands_refresh_menu( cmd );
 
             if( cmd->apply_mirror ) {
                 tvtime_osd_show_message( cmd->osd, "Mirror enabled." );
@@ -1445,7 +1454,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_LUMA_CORRECTION:
         cmd->apply_luma = !cmd->apply_luma;
         if( cmd->osd ) {
-            menu_t *filtermenu = find_menu( cmd, "filters" );
+            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
             char string[ 128 ];
 
             if( cmd->apply_luma ) {
@@ -1454,9 +1463,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xa4 );
             }
             menu_set_text( filtermenu, 1, string );
-            if( cmd->menuactive ) {
-                display_current_menu( cmd );
-            }
+            commands_refresh_menu( cmd );
 
             if( cmd->apply_luma ) {
                 tvtime_osd_show_message( cmd->osd, "Luma correction enabled." );
@@ -1865,6 +1872,7 @@ void commands_next_frame( commands_t *cmd )
     cmd->togglematte = 0;
     cmd->update_luma = 0;
     cmd->resizewindow = 0;
+    cmd->setdeinterlacer = 0;
 }
 
 int commands_quit( commands_t *cmd )
@@ -2005,5 +2013,15 @@ int commands_restart_tvtime( commands_t *cmd )
 const char *commands_get_new_norm( commands_t *cmd )
 {
     return cmd->newnorm;
+}
+
+int commands_set_deinterlacer( commands_t *cmd )
+{
+    return cmd->setdeinterlacer;
+}
+
+const char *commands_get_new_deinterlacer( commands_t *cmd )
+{
+    return cmd->deinterlacer;
 }
 
