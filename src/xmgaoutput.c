@@ -81,6 +81,8 @@ static void mga_reconfigure( void )
     if( ioctl( mga_fd, MGA_VID_CONFIG, &mga_config ) ) {
         fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n", strerror( errno ) );
     }
+
+    xcommon_clear_screen();
 }
 
 static int mga_set_input_size( int inputwidth, int inputheight )

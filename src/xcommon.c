@@ -743,6 +743,7 @@ void xcommon_poll_events( input_t *in )
         case MapNotify:
             if( !output_on_root ) {
                 xcommon_exposed = 1;
+                xcommon_clear_screen();
                 if( xcommon_verbose ) {
                     fprintf( stderr, "xvoutput: Received a map, marking window as visible (%lu).\n",
                              event.xany.serial );
@@ -770,6 +771,7 @@ void xcommon_poll_events( input_t *in )
                     }
                 } else if( !xcommon_exposed ) {
                     xcommon_exposed = 1;
+                    xcommon_clear_screen();
                     if( xcommon_verbose ) {
                         fprintf( stderr, "xvoutput: Window made visible, marking window as visible (%lu).\n",
                                  event.xany.serial );
