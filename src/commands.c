@@ -108,6 +108,10 @@ static command_names_t command_table[] = {
     { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
     { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
 
+    { "PICTURE", TVTIME_PICTURE },
+    { "PICTURE_UP", TVTIME_PICTURE_UP },
+    { "PICTURE_DOWN", TVTIME_PICTURE_DOWN },
+
     { "RESTART", TVTIME_RESTART },
 
     { "SAVE_PICTURE_GLOBAL", TVTIME_SAVE_PICTURE_GLOBAL },
@@ -254,6 +258,8 @@ struct commands_s {
     int digit_counter;
     int quit;
     int inputnum;
+
+    int picturemode;
 
     int displayinfo;
     int screenshot;
@@ -635,6 +641,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->quit = 0;
     cmd->showbars = 0;
+    cmd->picturemode = 3;
     cmd->showdeinterlacerinfo = 0;
     cmd->printdebug = 0;
     cmd->screenshot = 0;
@@ -2093,6 +2100,49 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 menu_set_value( commands_get_menu( cmd, "colour" ),colour );
                 commands_refresh_menu( cmd );
             }
+        }
+        break;
+
+    case TVTIME_PICTURE:
+        cmd->picturemode = (cmd->picturemode + 1) % 4;
+        if( cmd->osd && cmd->vidin ) {
+            if( cmd->picturemode == 0 ) {
+                int cur = videoinput_get_brightness( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, "Brightness", cur );
+            } else if( cmd->picturemode == 1 ) {
+                int cur = videoinput_get_contrast( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, "Contrast", cur );
+            } else if( cmd->picturemode == 2 ) {
+                int cur = videoinput_get_colour( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, "Colour", cur );
+            } else if( cmd->picturemode == 3 ) {
+                int cur = videoinput_get_hue( cmd->vidin );
+                tvtime_osd_show_data_bar( cmd->osd, "Hue", cur );
+            }
+        }
+        break;
+
+    case TVTIME_PICTURE_UP:
+        if( cmd->picturemode == 0 ) {
+            commands_handle( cmd, TVTIME_BRIGHTNESS_UP, "" );
+        } else if( cmd->picturemode == 1 ) {
+            commands_handle( cmd, TVTIME_CONTRAST_UP, "" );
+        } else if( cmd->picturemode == 2 ) {
+            commands_handle( cmd, TVTIME_COLOUR_UP, "" );
+        } else if( cmd->picturemode == 3 ) {
+            commands_handle( cmd, TVTIME_HUE_UP, "" );
+        }
+        break;
+
+    case TVTIME_PICTURE_DOWN:
+        if( cmd->picturemode == 0 ) {
+            commands_handle( cmd, TVTIME_BRIGHTNESS_DOWN, "" );
+        } else if( cmd->picturemode == 1 ) {
+            commands_handle( cmd, TVTIME_CONTRAST_DOWN, "" );
+        } else if( cmd->picturemode == 2 ) {
+            commands_handle( cmd, TVTIME_COLOUR_DOWN, "" );
+        } else if( cmd->picturemode == 3 ) {
+            commands_handle( cmd, TVTIME_HUE_DOWN, "" );
         }
         break;
 
