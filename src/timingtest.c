@@ -54,7 +54,8 @@ static const char *tests[] = {
    "interpolate_packed422_scanline_c 720x480 frame",
    "interpolate_packed422_scanline_mmxext 720x480 frame",
    "blend_packed422_scanline_c 720x480 120/256 frame",
-   "blend_packed422_scanline_mmxext 720x480 120/256 frame" 
+   "blend_packed422_scanline_mmxext 720x480 120/256 frame",
+   "comb_factor_packed422_scanline 720x480 frame" 
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -188,6 +189,15 @@ int main( int argc, char **argv )
                 blend_packed422_scanline_mmxext( dest422packed + (stride*j),
                                                  source422packed + (stride*j),
                                                  source422packed2 + (stride*j), width, 120 );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "comb_factor_packed422_scanline 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height/2; j++ ) {
+                comb_factor_packed422_scanline( source422packed + (stride*j*2),
+                                                source422packed2 + (stride*(j+1)*2),
+                                                source422packed + (stride*j*2) + (stride*2),
+                                                width );
             }
             rdtscll( after );
         }

@@ -250,6 +250,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              int instride,
                                              int outstride )
 {
+    unsigned int comb = 0;
     int i;
 
     if( !curmethod->scanlinemode ) {
@@ -331,6 +332,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                 data.bb3 = 0;
             }
 
+
+            // comb += comb_factor_packed422_scanline( data.t0, data.m1, data.b0, width );
+
             curmethod->interpolate_scanline( output, &data, width );
             if( correct_input ) {
                 video_correction_correct_packed422_scanline( vc, output, output, width );
@@ -399,6 +403,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             scanline++;
         }
     }
+
+    // fprintf( stderr, "comb: %d\n", comb );
 }
 
 static void tvtime_build_interlaced_frame( unsigned char *output,

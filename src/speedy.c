@@ -93,12 +93,13 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
 }
 
 
-void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
-                                     unsigned char *bot, int width )
+unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
+                                             unsigned char *bot, int width )
 {
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     const mmx_t qwOnes = { 0x0001000100010001ULL };
     mmx_t qwThreshold;
+    unsigned int temp1, temp2;
 
     SPEEDY_START();
 
@@ -155,9 +156,20 @@ void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
         mid += 8;
         bot += 8;
     }
+
+    movd_r2m( mm7, temp1 );
+    psrlq_i2r( 32, mm7 );
+    movd_r2m( mm7, temp2 );
+    temp1 += temp2;
+    temp2 = temp1;
+    temp1 >>= 16;
+    temp1 += temp2 & 0xffff;
+
     emms();
 
     SPEEDY_END();
+
+    return temp1;
 }
 
 /*

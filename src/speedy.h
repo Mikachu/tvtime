@@ -113,6 +113,9 @@ void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
 void premultiply_packed4444_scanline_c( unsigned char *output, unsigned char *input, int width );
 void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned char *input, int width );
 
+unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
+                                             unsigned char *bot, int width );
+
 /**
  * Here are the function pointers which will be initialized to point at the
  * fastest available version of the above after a call to setup_speedy_calls().
