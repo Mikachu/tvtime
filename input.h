@@ -20,6 +20,10 @@
 #ifndef INPUT_H_INCLUDED
 #define INPUT_H_INCLUDED
 
+#include "osd.h"
+#include "videoinput.h"
+#include "config.h"
+
 typedef struct input_s input_t;
 
 typedef enum InputEvent_e {
@@ -61,6 +65,11 @@ typedef enum InputEvent_e {
 #define I_F13                   294
 #define I_F14                   295
 #define I_F15                   296
+
+/* Misc. */
+#define I_ENTER                 13
+#define I_PRINT                 316
+#define I_MENU                  319
 
 
 input_t *input_new( config_t *cfg, osd_t *osd, videoinput_t *vidin );
