@@ -21,6 +21,8 @@
 
 typedef struct osd_string_s osd_string_t;
 
+typedef struct osd_graphic_s osd_graphic_t;
+
 typedef enum OSD_Shapes_e {
     OSD_Rect        = (1<<0),
     OSD_Circle      = (1<<1)
@@ -60,5 +62,21 @@ void osd_shape_set_colour( osd_shape_t *osds, int luma, int cb, int cr );
 void osd_shape_show_shape( osd_shape_t *osds, int timeout );
 int osd_shape_visible( osd_shape_t *osds );
 void osd_shape_advance_frame( osd_shape_t *osds );
+
+
+osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
+                                int video_height, double aspect );
+void osd_graphic_delete( osd_graphic_t *osdg );
+void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout, int alpha );
+int osd_graphic_visible( osd_graphic_t *osdg );
+void osd_graphic_advance_frame( osd_graphic_t *osdg );
+void osd_graphic_composite_packed444( osd_string_t *osds, 
+                                      unsigned char *output,
+                                      int width, int height, int stride,
+                                      int xpos, int ypos );
+void osd_graphic_composite_packed422( osd_graphic_t *osdg, 
+                                      unsigned char *output,
+                                      int width, int height, int stride,
+                                      int xpos, int ypos );
 
 #endif /* OSD_H_INCLUDED */

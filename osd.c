@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include "videotools.h"
+#include "speedy.h"
+#include "pnginput.h"
 #include "efs.h"
 #include "osd.h"
 
@@ -303,3 +305,140 @@ unsigned char *osd_shape_get_scanline( osd_shape_t *osds, int line )
     return scanline;
 }
 
+struct osd_graphic_s
+{
+    pnginput_t *png;
+    int frames_left;
+
+    unsigned char *image4444;
+    int image_width;
+    int image_height;
+    int image_aspect;
+    int alpha;
+};
+
+osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
+                                int video_height, double video_aspect )
+{
+    osd_graphic_t *osdg = (osd_graphic_t *) malloc( sizeof( struct osd_graphic_s ) );
+    if( !osdg ) {
+        return NULL;
+    }
+
+    osdg->png = pnginput_new( filename );
+    if( !osdg->png ) {
+        free( osdg );
+        return NULL;
+    }
+
+    osdg->frames_left = 0;
+    osdg->image4444 = (unsigned char *)malloc( video_width * video_height * 4);
+    if( !osdg->image4444 ) {
+        pnginput_delete( osdg->png );
+        free( osdg );
+        return NULL;
+    }
+    osdg->image_width = video_width;
+    osdg->image_height = video_height;
+    osdg->image_aspect = video_aspect;
+    osdg->alpha = 255;
+
+    return osdg;
+}
+
+void osd_graphic_delete( osd_graphic_t *osdg )
+{
+    if( !osdg ) return;
+
+    pnginput_delete( osdg->png );
+    free( osdg->image4444 );
+    free( osdg );
+}
+
+void composite_packed444_to_packed4444_alpha_scanline( unsigned char *output, 
+                                                       unsigned char *input,
+                                                       int width, int alpha)
+{
+    int i;
+
+    if( !alpha ) return;
+
+    for( i = 0; i < width; i++ ) {
+        output[ 0 ] = alpha & 0xff;
+        output[ 1 ] = input[ 0 ] & 0xff;
+        output[ 2 ] = input[ 1 ] & 0xff;
+        output[ 3 ] = input[ 2 ] & 0xff;
+
+        output += 4;
+        input += 3;
+    }
+
+}
+
+void osd_graphic_render_image4444( osd_graphic_t *osdg )
+{
+    int i, width, height;
+    unsigned char *scanline;
+    unsigned char *cb444;
+    unsigned char *curout;
+    int has_alpha = pnginput_has_alpha( osdg->png );
+
+    width = pnginput_get_width( osdg->png );
+    height = pnginput_get_width( osdg->png );
+
+    cb444 = (unsigned char *) malloc( width * 3 );
+    if( !cb444 ) return;
+
+
+    curout = osdg->image4444;
+    for( i=0; i < height; i++ ) {
+
+        scanline = pnginput_get_scanline( osdg->png, i );
+        if( has_alpha ) {
+            rgba32_to_packed4444_rec601_scanline( curout, scanline, width );
+        } else {
+            rgb24_to_packed444_rec601_scanline( cb444, scanline, width );
+            composite_packed444_to_packed4444_alpha_scanline( curout, 
+                                                              cb444, 
+                                                              width, 
+                                                              255 );
+        }
+        curout += osdg->image_width*4;
+    }
+}
+
+void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout, int alpha )
+{
+    osdg->frames_left = timeout;
+    osdg->alpha = alpha;
+    osd_graphic_render_image4444( osdg );
+}
+
+int osd_graphic_visible( osd_graphic_t *osdg )
+{
+    return (osdg->frames_left != 0);
+}
+
+void osd_graphic_advance_frame( osd_graphic_t *osdg )
+{
+    if( osdg->frames_left > 0)
+        osdg->frames_left--;
+}
+
+
+
+void osd_graphic_composite_packed422( osd_graphic_t *osdg, 
+                                      unsigned char *output,
+                                      int width, int height, int stride,
+                                      int xpos, int ypos )
+{
+    if( !osdg->png ) return;
+    if( !osdg->frames_left ) return;
+
+    composite_packed4444_alpha_to_packed422( output, width, height, stride,
+                                       osdg->image4444, 
+                                       pnginput_get_width( osdg->png ),
+                                       pnginput_get_height( osdg->png ),
+                                       osdg->image_width*4,
+                                       xpos, ypos, osdg->alpha );
+}

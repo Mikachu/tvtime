@@ -27,6 +27,7 @@ struct tvtime_osd_s
     osd_string_t *data_bar;
     osd_string_t *muted_osd;
     osd_string_t *channel_info;
+    osd_graphic_t *channel_logo;
     int muted;
 };
 
@@ -61,6 +62,9 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd_string_show_text( osd->muted_osd, "Mute", 100 );
     osd->muted = 0;
 
+    osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
+                                         frameaspect );
+
     return osd;
 }
 
@@ -94,6 +98,11 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 {
     osd_string_show_text( osd->data_bar, message, 80 );
     osd_string_set_timeout( osd->volume_bar, 0 );
+}
+
+void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
+{
+    osd_graphic_show_graphic( osd->channel_logo, 10, 250 );
 }
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
@@ -131,6 +140,10 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
     } else if( osd_string_visible( osd->volume_bar ) ) {
         osd_string_composite_packed422( osd->volume_bar, output, width, height,
                                         stride, 20, height - 40, 0 );
+    } else if( osd_graphic_visible( osd->channel_logo ) ) {
+        osd_graphic_composite_packed422( osd->channel_logo, output, width, 
+                                         height, stride, 20, height - 60 );
+
     }
 }
 
@@ -140,5 +153,6 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     osd_string_advance_frame( osd->channel_info );
     osd_string_advance_frame( osd->volume_bar );
     osd_string_advance_frame( osd->data_bar );
+    osd_graphic_advance_frame( osd->channel_logo );
 }
 

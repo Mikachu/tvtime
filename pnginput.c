@@ -12,6 +12,7 @@ struct pnginput_s
     png_structp png_ptr;
     png_infop info_ptr;
     png_infop end_info;
+    int has_alpha;
 };
 
 pnginput_t *pnginput_new( const char *filename )
@@ -77,6 +78,13 @@ pnginput_t *pnginput_new( const char *filename )
 
     png_get_gAMA( pnginput->png_ptr, pnginput->info_ptr, &gamma );
 
+    if( colour_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+        colour_type == PNG_COLOR_TYPE_RGB_ALPHA ) {
+        pnginput->has_alpha = 1;
+    } else {
+        pnginput->has_alpha = 0;
+    }
+
     /*
     fprintf( stderr, "width %u, height %u, depth %d, "
                      "colour %d, rowbytes %d, gamma %f\n",
@@ -106,3 +114,7 @@ unsigned int pnginput_get_height( pnginput_t *pnginput )
     return png_get_image_height( pnginput->png_ptr, pnginput->info_ptr );
 }
 
+int pnginput_has_alpha( pnginput_t *pnginput )
+{
+    return pnginput->has_alpha;
+}

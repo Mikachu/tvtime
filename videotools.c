@@ -1076,6 +1076,26 @@ void rgb24_to_packed444_rec601_scanline( unsigned char *output,
     }
 }
 
+void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
+                                           unsigned char *input, int width )
+{
+    if( !conv_RY_inited ) init_RGB_to_YCbCr_tables();
+
+    while( width-- ) {
+        int r = input[ 0 ];
+        int g = input[ 1 ];
+        int b = input[ 2 ];
+        int a = input[ 3 ];
+        
+        output[ 0 ] = a;
+        output[ 1 ] = (Y_R[ r ] + Y_G[ g ] + Y_B[ b ]) >> FP_BITS;
+        output[ 2 ] = (Cb_R[ r ] + Cb_G[ g ] + Cb_B[ b ]) >> FP_BITS;
+        output[ 3 ] = (Cr_R[ r ] + Cr_G[ g ] + Cr_B[ b ]) >> FP_BITS;
+        output += 4;
+        input += 4;
+    }
+}
+
 void packed444_to_rgb24_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width )
 {

@@ -141,6 +141,8 @@ void packed444_to_rgb24_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width );
 void rgb24_to_packed444_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width );
+void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
+                                           unsigned char *input, int width );
 
 /**
  * Frame functions.

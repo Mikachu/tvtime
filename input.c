@@ -138,6 +138,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_MENUMODE:
              in->togglemenumode = 1;
+             tvtime_osd_show_channel_logo( in->osd );
              input_menu_init( in );
              break;
 
@@ -402,6 +403,9 @@ void input_next_frame( input_t *in )
     }
 
     if( in->videohold ) in->videohold--;
+
+    if( in->togglemenumode ) tvtime_osd_show_channel_logo( in->osd );
+
     in->printdebug = 0;
     in->screenshot = 0;
     in->togglefullscreen = 0;

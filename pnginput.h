@@ -16,6 +16,7 @@ void pnginput_delete( pnginput_t *pnginput );
 unsigned int pnginput_get_width( pnginput_t *pnginput );
 unsigned int pnginput_get_height( pnginput_t *pnginput );
 unsigned char *pnginput_get_scanline( pnginput_t *pnginput, int num );
+int pnginput_has_alpha( pnginput_t *pnginput );
 
 #ifdef __cplusplus
 };
