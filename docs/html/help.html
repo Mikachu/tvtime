@@ -60,6 +60,20 @@ which you can subscribe to, or read on the web.</p>
 <h3><a name="summary">2. Summary of new features by release</a></h3>
 
 <table border="0" width="100%">
+<tr><th class="version"><b>tvtime 0.9.8.3</b>
+<td>
+<ol>
+<li>Support for norm switching between "compatible" norms for areas
+which receive both SECAM and PAL format stations.
+<li>Added support for the mga_vid driver for the Matrox G200/G400 series
+cards from mplayer.
+<li>Semi-experimental of the X code for better fullscreen support under
+many window managers.  Testing appreciated.
+<li>Support for changing the mixer device and channel (see 'man tvtime'
+and the config file documentation).
+<li>Slightly less partial experimental UTF-8 support. Now works with any
+simple left-to-right scripts which are in FreeSansBold.ttf .
+</ol>
 <tr><th class="version"><b>tvtime 0.9.8.2</b>
 <td>
 <ol>
@@ -128,6 +142,26 @@ bugs, please see
 hardware and driver support page</a>.</p>
 
 <table border="0" width="100%">
+<tr><th class="version"><b>tvtime 0.9.8.3</b>
+<td>
+<ol>
+<li>tvtime does not modify V4L input volume, so if it is set
+incorrectly before running tvtime you may not get sound
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729964&amp;group_id=64301&amp;atid=506987">bug 729964</a>).
+<li>tvtime does not support the standard -geometry command line option
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727947&amp;group_id=64301&amp;atid=506987">bug 727947</a>).
+<li>tvtime does not support the standard -display command line option
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727946&amp;group_id=64301&amp;atid=506987">bug 727946</a>).
+<li>tvtime does not support the linux-dvb driver
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694544&amp;group_id=64301&amp;atid=506987">bug 694544</a>).
+<li>dalias' pulldown detection algorithm is currently disabled
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=751093&amp;group_id=64301&amp;atid=506987">bug 751093</a>).
+<li>No support for PAL-60
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729660&amp;group_id=64301&amp;atid=506987">bug 729660</a>).
+<li>No runtime norm switching for non-compatible norms (PAL/NTSC
+switching)
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=743918&amp;group_id=64301&amp;atid=506987">bug 743918</a>).
+</ol>
 <tr><th class="version"><b>tvtime 0.9.8.2</b>
 <td>
 <ol>
