@@ -24,7 +24,11 @@ static deinterlace_method_t linearmethod =
     deinterlace_scanline_linear
 };
 
+#ifdef BUILD_TVTIME_PLUGINS
 void deinterlace_plugin_init( void )
+#else
+void linear_plugin_init( void )
+#endif
 {
     fprintf( stderr, "linear: Registering linear interpolation deinterlacing algorithm.\n" );
     register_deinterlace_method( &linearmethod );

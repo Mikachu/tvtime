@@ -238,7 +238,11 @@ static deinterlace_method_t twoframe =
     deinterlace_twoframe_packed422_scanline_mmxext
 };
 
+#ifdef BUILD_TVTIME_PLUGINS
 void deinterlace_plugin_init( void )
+#else
+void twoframe_plugin_init( void )
+#endif
 {
     fprintf( stderr, "twoframe: Registering 2-Frame deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &twoframe );

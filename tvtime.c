@@ -41,6 +41,7 @@
 #include "speedy.h"
 #include "deinterlace.h"
 #include "menu.h"
+#include "plugins/plugins.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -286,9 +287,14 @@ int main( int argc, char **argv )
     menu_t *menu;
 
     setup_speedy_calls();
+    /*
     register_deinterlace_plugin( "plugins/linear.so" );
     register_deinterlace_plugin( "plugins/twoframe.so" );
     register_deinterlace_plugin( "plugins/greedy2frame.so" );
+    */
+    greedy2frame_plugin_init();
+    twoframe_plugin_init();
+    linear_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {

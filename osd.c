@@ -245,7 +245,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int video_width,
     osds->shape_adjusted_width = shape_width;
     osds->type = shape_type;
 
-    osds->image4444 = (unsigned char *)malloc( video_width *video_height * 4);
+    osds->image4444 = (unsigned char *) malloc( video_width * video_height * 4);
     if( !osds ) {
         free( osds );
         return NULL;

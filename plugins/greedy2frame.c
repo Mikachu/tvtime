@@ -163,7 +163,11 @@ static deinterlace_method_t greedymethod =
     deinterlace_greedytwoframe_packed422_scanline_mmxext
 };
 
+#ifdef BUILD_TVTIME_PLUGINS
 void deinterlace_plugin_init( void )
+#else
+void greedy2frame_plugin_init( void )
+#endif
 {
     fprintf( stderr, "greedy2frame: Registering Greedy 2-Frame deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &greedymethod );
