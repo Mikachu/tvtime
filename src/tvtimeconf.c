@@ -715,7 +715,7 @@ config_t *config_new( void )
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_TOGGLE_MUTE;
-    ct->buttonmap[ 3 ] = TVTIME_TOGGLE_INPUT;
+    ct->buttonmap[ 3 ] = TVTIME_SHOW_MENU;
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_INC;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DEC;
 

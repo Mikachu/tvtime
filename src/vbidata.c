@@ -1031,37 +1031,37 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )
 {
-    int scanline = 11; /* Process line 21. */
-    int k;
-
     if( read( vbi->fd, vbi->buf, 65536 ) < 65536 ) {
         if( vbi->verbose ) {
-            fprintf( stderr, "vbidata: Error, can't read vbi data.\n" );
+            fprintf( stderr, "vbidata: Can't read vbi data: %s\n",
+                     strerror( errno ) );
         }
-        return;
-    }
+    } else {
+        int scanline = 11; /* Process line 21. */
+        int k;
 
-    /* Apply diz' new filter. */
-    for( k = 1; k < 7; k++ ) {
-        int j = scanline * 2048;
-        int i;
+        /* Apply diz' new filter. */
+        for( k = 1; k < 7; k++ ) {
+            int j = scanline * 2048;
+            int i;
 
-        for( i = 1600; i > 0; i-- ) {
-            vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+            for( i = 1600; i > 0; i-- ) {
+                vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+            }
         }
-    }
-    ProcessLine( vbi, &vbi->buf[ scanline * 2048 ], 0 );
+        ProcessLine( vbi, &vbi->buf[ scanline * 2048 ], 0 );
 
-    /* Apply diz' new filter. */
-    for( k = 1; k < 7; k++ ) {
-        int j = ( 16 + scanline )*2048;
-        int i;
+        /* Apply diz' new filter. */
+        for( k = 1; k < 7; k++ ) {
+            int j = ( 16 + scanline )*2048;
+            int i;
 
-        for( i = 1600; i > 0; i-- ) {
-            vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+            for( i = 1600; i > 0; i-- ) {
+                vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+            }
         }
+        ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
     }
-    ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
 }
 
 const char *vbidata_get_program_name( vbidata_t *vbi )
