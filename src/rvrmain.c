@@ -23,8 +23,6 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-static const char *videodev = "/dev/video1";
-
 static const int block_size = 4096;
 
 static const int use_hufftftm = 1;
@@ -187,18 +185,24 @@ static void *disk_writer_thread_main( void *crap )
 
 int main( int argc, char **argv )
 {
-    config_t *cfg = config_new( 0, 0 );
+    config_t *cfg = config_new( argc, argv );
     int headersize, i;
     int norm = 0;
 
+    if( !cfg ) {
+        fprintf( stderr, "rvr: Can't create config reader!  Exiting.\n" );
+        return 1;
+    }
+
     /* Check args. */
-    if( argc < 2 ) {
-        fprintf( stderr, "Usage: %s <output filename>\n", argv[ 0 ] );
+    if( !config_get_rvr_filename( cfg ) ) {
+        fprintf( stderr, "Usage: %s -r filename.rvr\n", argv[ 0 ] );
         return 1;
     }
 
     /* Open file for writing early, to make sure we can. */
-    outfd = open( argv[ 1 ], O_WRONLY|O_CREAT|O_LARGEFILE, S_IREAD|S_IWRITE|S_IRGRP|S_IROTH );
+    outfd = open( config_get_rvr_filename( cfg ),
+                  O_WRONLY|O_CREAT|O_LARGEFILE, S_IREAD|S_IWRITE|S_IRGRP|S_IROTH );
     if( outfd < 0 ) {
         fprintf( stderr, "rvr: Can't open %s for writing (%s).\n",
                  argv[ 1 ], strerror( errno ) );
@@ -262,10 +266,6 @@ int main( int argc, char **argv )
     for( i = 0; i < fileheader->headersize - sizeof( ree_file_header_t ); i++ ) {
         write( outfd, &headersize, 1 );
     }
-
-    /* Tell the user how happy we are. */
-    fprintf( stderr, "rvr: Capturing from %s at %dx%d.\n",
-             videodev, fileheader->width, fileheader->height );
 
     /* Make the queues (the first will take a while! */
     fprintf( stderr, "rvr: Creating video packet queue.\n" );
