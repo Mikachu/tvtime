@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "DS_ApiCommon.h"
+#include "dscalerapi.h"
 #include "deinterlace.h"
 #include "speedy.h"
 

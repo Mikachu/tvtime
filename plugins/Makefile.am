@@ -21,7 +21,8 @@ OPT_CFLAGS = -Wall -I. -pedantic
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
 if ARCH_386
-DSCALER_SRCS = greedyhmacros.h kdetv_greedyh.c kdetv_tomsmocomp.c
+DSCALER_SRCS = dscalerapi.h greedyhmacros.h kdetv_greedyh.c \
+	kdetv_tomsmocomp.c
 EXTRA_DIST = greedyh.asm \
 	tomsmocomp/SearchLoop0A.inc tomsmocomp/SearchLoopBottom.inc \
 	tomsmocomp/SearchLoopEdgeA.inc tomsmocomp/SearchLoopEdgeA8.inc \
