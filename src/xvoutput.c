@@ -140,6 +140,7 @@ static int xv_check_extension( void )
                 if( xv_port_has_yuy2( adaptorInfo[ i ].base_id + j ) ) {
                     if( XvGrabPort( display, adaptorInfo[ i ].base_id + j, 0 ) == Success ) {
                         xv_port = adaptorInfo[ i ].base_id + j;
+                        fprintf( stderr, "xvoutput: Using XVIDEO adaptor %lu.\n", adaptorInfo[ i ].base_id + j );
                         XvFreeAdaptorInfo( adaptorInfo );
                         return 1;
                     }
