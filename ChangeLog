@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) We now set the window and palette with V4L before using mmap
+    mode.  This should solve some issues with V4L drivers other than bttv.
   * (vektor) Fixed a bunch of OSD crap relating to inputs with no tuner, and
     some unnecessary error messages will be avoided.
   * (batchall) Added a more flexible station subsystem. Deactivated channels

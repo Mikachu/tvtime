@@ -111,6 +111,8 @@ struct videoinput_s
 
     int muted;
     int user_muted;
+
+    struct video_picture temp_pict;
 };
 
 static int alarms;
@@ -250,7 +252,6 @@ static const char *get_norm_name( int norm )
     return "ntsc";
 }
 
-
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                               int norm, int verbose )
 {
@@ -354,6 +355,63 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
     vidin->width = capwidth;
 
+    /* Set the format using the SPICT ioctl. */
+    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
+                 "process the output: %s.\n", strerror( errno ) );
+        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
+                 "indicating your capture card, driver, and the error message above.\n" );
+        close( vidin->grab_fd );
+        free( vidin );
+        return 0;
+    }
+
+    grab_pict.depth = 16;
+    grab_pict.palette = VIDEO_PALETTE_YUV422;
+    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
+        fprintf( stderr, "videoinput: Can't get Y'CbCr 4:2:2 packed images from the card, unable to"
+                 "process the output: %s.\n", strerror( errno ) );
+        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
+                 "indicating your capture card, driver, and the error message above.\n" );
+        close( vidin->grab_fd );
+        free( vidin );
+        return 0;
+    }
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: Brightness %d, hue %d, colour %d, contrast %d, "
+                         "whiteness %d, depth %d, palette %d.\n",
+                 grab_pict.brightness, grab_pict.hue, grab_pict.colour, grab_pict.contrast,
+                 grab_pict.whiteness, grab_pict.depth, grab_pict.palette );
+    }
+
+    /* Set and get the window settings. */
+    memset( &(vidin->grab_win), 0, sizeof( struct video_window ) );
+    vidin->grab_win.width = vidin->width;
+    vidin->grab_win.height = vidin->height;
+    if( ioctl( vidin->grab_fd, VIDIOCSWIN, &(vidin->grab_win) ) < 0 ) {
+        fprintf( stderr, "videoinput: Failed to set the window size (capture width and height): %s\n",
+                 strerror( errno ) );
+        close( vidin->grab_fd );
+        free( vidin );
+        return 0;
+    }
+    if( ioctl( vidin->grab_fd, VIDIOCGWIN, &(vidin->grab_win) ) < 0 ) {
+        perror( "ioctl VIDIOCGWIN" );
+        return 0;
+    }
+    if( !(vidin->grab_win.flags & 1) ) {
+        fprintf( stderr, "videoinput: Capture card claims the frames provided aren't "
+                         "interlaced.  Is that true?\n" );
+        fprintf( stderr, "videoinput: Please send a log of 'tvtime -v' along with what driver you're "
+                         "using to http://tvtime.sourceforge.net/ under 'report bugs'.\n" );
+    }
+    if( vidin->verbose ) {
+        fprintf( stderr, "videoinput: V4LWIN set to (%d,%d/%dx%d), chromakey %d, flags %d, clips %d.\n",
+             vidin->grab_win.x, vidin->grab_win.y, vidin->grab_win.width,
+             vidin->grab_win.height, vidin->grab_win.chromakey,
+             vidin->grab_win.flags, vidin->grab_win.clipcount );
+    }
+
     /* Try to set up mmap-based capture. */
     if( ioctl( vidin->grab_fd, VIDIOCGMBUF, &(vidin->gb_buffers) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get capture buffer properties.  No mmap support?\n"
@@ -398,41 +456,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
 
     vidin->have_mmap = 0;
-
-    /* Set the format using the SPICT ioctl. */
-    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get image information from the card, unable to"
-                 "process the output: %s.\n", strerror( errno ) );
-        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
-                 "indicating your capture card, driver, and the error message above.\n" );
-        close( vidin->grab_fd );
-        free( vidin );
-        return 0;
-    }
-    grab_pict.depth = 16;
-    grab_pict.palette = VIDEO_PALETTE_YUV422;
-    if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get Y'CbCr 4:2:2 packed images from the card, unable to"
-                 "process the output: %s.\n", strerror( errno ) );
-        fprintf( stderr, "videoinput: Please post a bug report to http://sourceforge.net/projects/tvtime/"
-                 "indicating your capture card, driver, and the error message above.\n" );
-        close( vidin->grab_fd );
-        free( vidin );
-        return 0;
-    }
-
-    /* Set and get the window settings. */
-    memset( &(vidin->grab_win), 0, sizeof( struct video_window ) );
-    vidin->grab_win.width = vidin->width;
-    vidin->grab_win.height = vidin->height;
-    if( ioctl( vidin->grab_fd, VIDIOCSWIN, &(vidin->grab_win) ) < 0 ) {
-        perror( "ioctl VIDIOCSWIN" );
-        return 0;
-    }
-    if( ioctl( vidin->grab_fd, VIDIOCGWIN, &(vidin->grab_win) ) < 0 ) {
-        perror( "ioctl VIDIOCGWIN" );
-        return 0;
-    }
     vidin->grab_size = (vidin->grab_win.width * vidin->grab_win.height * 2);
     vidin->grab_data = (unsigned char *) malloc( vidin->grab_size );
     vidin->numframes = 2;
