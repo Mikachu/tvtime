@@ -497,6 +497,7 @@ int main( int argc, char **argv )
     commands_t *commands = 0;
     int usevbi = 1;
     int fadepos = 0;
+    char number[4];
 
     setup_speedy_calls();
 
@@ -524,6 +525,7 @@ int main( int argc, char **argv )
     }
 
     stationmgr = station_init( ct );
+    station_set( stationmgr, config_get_start_channel( ct ) );
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         norm = VIDEOINPUT_PAL;
@@ -848,7 +850,6 @@ int main( int argc, char **argv )
             }
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
-            char number[4];
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
@@ -1075,6 +1076,8 @@ int main( int argc, char **argv )
         }
     }
 
+    snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
+    configsave( "StartChannel", number, 1 );
     output->shutdown();
 
     if( verbose ) {

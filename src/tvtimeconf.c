@@ -125,6 +125,8 @@ struct config_s
 
     int use_vbi;
     char *vbidev;
+
+    int start_channel;
 };
 
 void config_init( config_t *ct );
@@ -211,6 +213,7 @@ config_t *config_new( int argc, char **argv )
     ct->preferred_deinterlace_method = 0;
     ct->check_freq_present = 1;
     ct->use_vbi = 0;
+    ct->start_channel = 1;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -449,6 +452,9 @@ void config_init( config_t *ct )
         ct->other_text_rgb = parse_colour( tmp );
     }
 
+    if( (tmp = parser_get( &(ct->pf), "StartChannel", 1 )) ) {
+        ct->start_channel = atoi( tmp );
+    }
 
     if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
         ct->finetune = atoi( tmp );
@@ -711,6 +717,11 @@ int config_get_inputwidth( config_t *ct )
 int config_get_aspect( config_t *ct )
 {
     return ct->aspect;
+}
+
+int config_get_start_channel( config_t *ct )
+{
+    return ct->start_channel;
 }
 
 int config_get_inputnum( config_t *ct )
