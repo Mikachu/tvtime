@@ -82,9 +82,9 @@ CLEANFILES = expandpng timingtest rvr
 
 # Satisfy extra-directory dependencies.  Unfortunately, this causes
 # libtool to re-link each and every time.  (Recursive make is evil!)
-EXTERNAL_LIBRARIES = ../plugins/libtvtimeplugins.la wine/libwine.la
-.PHONY: $(EXTERNAL_LIBRARIES)
-$(EXTERNAL_LIBRARIES):
+external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
+.PHONY: $(external_dependencies)
+$(external_dependencies):
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
 
 # Hook into the installation and uninstallation to create the required
