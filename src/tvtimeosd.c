@@ -965,6 +965,10 @@ void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
 {
     const char *message5 = 0;
 
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                               osd->other_r, osd->other_g, osd->other_b );
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
+                               osd->other_r, osd->other_g, osd->other_b );
     if ( next_title ) {
         if ( !message3 ) {
             message3 = next_title;
@@ -973,16 +977,10 @@ void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
         }
         else if ( !message4 ) {
             message4 = next_title;
-            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
-                                       osd->other_r, osd->other_g, osd->other_b );
             osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
                                        osd->other_r, osd->other_g, osd->channel_b );
         }
         else {
-            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
-                                       osd->other_r, osd->other_g, osd->other_b );
-            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
-                                       osd->other_r, osd->other_g, osd->other_b );
             message5 = next_title;
         }
     }
