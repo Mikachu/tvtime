@@ -210,6 +210,24 @@ config_t *config_new( int argc, char **argv )
                          "using %d instead.\n", ct->inputwidth );
     }
 
+    if( ct->inputwidth < 100 ) {
+        fprintf( stderr, "config: Width %d too low, using value 100 instead.  "
+                 "If your card supports\n\tsuch low input resolutions, and you "
+                 "have a reason for wanting to use\n\tthem, please submit a "
+                 "bug report at http://www.sourceforge.net/projects/tvtime/.\n",
+                 ct->inputwidth );
+        ct->inputwidth = 100;
+    }
+
+    if( ct->inputwidth > 768 ) {
+        fprintf( stderr, "config: Width %d too large.  We have no way of verifying from\n\t"
+                 "video4linux our max capture width, so we have capped it at 768 for\n\t"
+                 "now.  If you know your card supports higher sampling rates, please\n\t"
+                 "submit a bug report at http://www.sourceforge.net/projects/tvtime/.\n",
+                 ct->inputwidth );
+        ct->inputwidth = 768;
+    }
+
     return ct;
 }
 

@@ -92,14 +92,14 @@ struct videoinput_s
 static void free_frame( videoinput_t *vidin, int frameid )
 {
     if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frameid ) < 0 ) {
-        perror( "VIDIOCMCAPTURE" );
+        fprintf( stderr, "videoinput: Can't free frame %d: %s\n", frameid, strerror( errno ) );
     }
 }
 
 static void wait_for_frame( videoinput_t *vidin, int frameid )
 {
     if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frameid ) < 0 ) {
-        perror( "VIDIOCSYNC" );
+        fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n", frameid, strerror( errno ) );
     }
 }
 
