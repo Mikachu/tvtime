@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-09-08 09:15-0300\n"
+"POT-Creation-Date: 2003-09-11 00:24-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,193 +16,201 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/tvtime.c:1839
+#: src/tvtime.c:1817
 msgid "Fullscreen mode active."
 msgstr ""
 
-#: src/tvtime.c:1842
+#: src/tvtime.c:1820
 msgid "Windowed mode active."
 msgstr ""
 
-#: src/tvtime.c:1852
+#: src/tvtime.c:1830
 msgid "Window set as always-on-top."
 msgstr ""
 
-#: src/tvtime.c:1854
+#: src/tvtime.c:1832
 msgid "Window set to normal stacking."
 msgstr ""
 
-#: src/tvtime.c:1867
+#: src/tvtime.c:1845
 msgid "16:9 display mode active."
 msgstr ""
 
-#: src/tvtime.c:1872
+#: src/tvtime.c:1850
 msgid "4:3 display mode active."
 msgstr ""
 
-#: src/tvtime.c:1930
+#: src/tvtime.c:1927
 msgid "2-3 Pulldown detection disabled."
 msgstr ""
 
-#: src/tvtime.c:1932
+#: src/tvtime.c:1929
 msgid "2-3 Pulldown detection enabled."
 msgstr ""
 
-#: src/tvtime.c:1938
+#: src/tvtime.c:1934
 msgid "2-3 Pulldown detection is not valid with your TV norm."
 msgstr ""
 
-#: src/tvtime.c:2252 src/tvtime.c:2369
+#: src/tvtime.c:2248 src/tvtime.c:2365
 #, c-format
 msgid "Screenshot: %s"
 msgstr ""
 
-#: src/commands.c:1904
+#: src/commands.c:1985
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr ""
 
-#: src/commands.c:1907
+#: src/commands.c:1988
 msgid "Sleep off."
 msgstr ""
 
-#: src/commands.c:1958
+#: src/commands.c:2039
 msgid "Channel marked as active in the browse list."
 msgstr ""
 
-#: src/commands.c:1960
+#: src/commands.c:2041
 msgid "Channel disabled from the browse list."
 msgstr ""
 
-#: src/commands.c:2002
+#: src/commands.c:2083
 msgid "Processing every input field."
 msgstr ""
 
-#: src/commands.c:2004
+#: src/commands.c:2085
 msgid "Processing every top field."
 msgstr ""
 
-#: src/commands.c:2006
+#: src/commands.c:2087
 msgid "Processing every bottom field."
 msgstr ""
 
-#: src/commands.c:2018
+#: src/commands.c:2099
 #, c-format
 msgid "Sharpness will be %d on restart."
 msgstr ""
 
-#: src/commands.c:2050
+#: src/commands.c:2137
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr ""
 
-#: src/commands.c:2078
+#: src/commands.c:2165
 msgid "All channels re-activated."
 msgstr ""
 
-#: src/commands.c:2098
+#: src/commands.c:2185
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr ""
 
-#: src/commands.c:2109
+#: src/commands.c:2196
 msgid "Scanner unavailable: Signal checking disabled."
 msgstr ""
 
-#: src/commands.c:2135
+#: src/commands.c:2222
 msgid "Scanning for active channels."
 msgstr ""
 
-#: src/commands.c:2151
+#: src/commands.c:2238
 msgid "Closed captions disabled."
 msgstr ""
 
-#: src/commands.c:2154
+#: src/commands.c:2241
 msgid "Closed captions enabled."
 msgstr ""
 
-#: src/commands.c:2158
+#: src/commands.c:2245
 msgid "No VBI device configured for CC decoding."
 msgstr ""
 
-#: src/commands.c:2172
+#: src/commands.c:2259
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr ""
 
-#: src/commands.c:2201
+#: src/commands.c:2288
 #, c-format
 msgid "Running: %s"
 msgstr ""
 
-#: src/commands.c:2277
+#: src/commands.c:2364
 msgid "Signal detection enabled."
 msgstr ""
 
-#: src/commands.c:2279
+#: src/commands.c:2366
 msgid "Signal detection disabled."
 msgstr ""
 
-#: src/commands.c:2328
+#: src/commands.c:2378
+msgid "XDS decoding enabled."
+msgstr ""
+
+#: src/commands.c:2380
+msgid "XDS decoding disabled."
+msgstr ""
+
+#: src/commands.c:2426
 msgid "Colour invert enabled."
 msgstr ""
 
-#: src/commands.c:2330
+#: src/commands.c:2428
 msgid "Colour invert disabled."
 msgstr ""
 
-#: src/commands.c:2350
+#: src/commands.c:2445
 msgid "Mirror enabled."
 msgstr ""
 
-#: src/commands.c:2352
+#: src/commands.c:2447
 msgid "Mirror disabled."
 msgstr ""
 
-#: src/commands.c:2372
+#: src/commands.c:2464
 msgid "Chroma kill enabled."
 msgstr ""
 
-#: src/commands.c:2374
+#: src/commands.c:2466
 msgid "Chroma kill disabled."
 msgstr ""
 
-#: src/commands.c:2394
+#: src/commands.c:2483
 msgid "Luma correction enabled."
 msgstr ""
 
-#: src/commands.c:2397
+#: src/commands.c:2486
 msgid "Luma correction disabled."
 msgstr ""
 
-#: src/commands.c:2410
+#: src/commands.c:2499
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr ""
 
-#: src/commands.c:2435
+#: src/commands.c:2524
 #, c-format
 msgid "Luma correction value: %.1f"
 msgstr ""
 
-#: src/commands.c:2465
+#: src/commands.c:2554
 msgid "Picture settings reset to defaults."
 msgstr ""
 
-#: src/commands.c:2717
+#: src/commands.c:2806
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 
-#: src/commands.c:2729
+#: src/commands.c:2818
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr ""
 
-#: src/commands.c:2811
+#: src/commands.c:2900
 msgid "Paused."
 msgstr ""
 
-#: src/commands.c:2811
+#: src/commands.c:2900
 msgid "Resumed."
 msgstr ""
 
@@ -311,6 +319,7 @@ msgid ""
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
 "                             centre (default).\n"
+"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
 "  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
@@ -326,7 +335,7 @@ msgid ""
 "                                 video, radio, monitor\n"
 msgstr ""
 
-#: src/tvtimeconf.c:714
+#: src/tvtimeconf.c:715
 #, c-format
 msgid ""
 "usage: %s [OPTION]...\n"
