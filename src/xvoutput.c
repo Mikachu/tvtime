@@ -397,10 +397,10 @@ static void calculate_video_area( void )
 
     /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
     curwidth = output_width;
-    curheight = ( output_width * sar_frac_n * heightratio ) / ( sar_frac_d * widthratio );
+    curheight = ( output_width * sar_frac_d * heightratio ) / ( sar_frac_n * widthratio );
     if( curheight > output_height ) {
         curheight = output_height;
-        curwidth = ( output_height * sar_frac_d * widthratio ) / ( sar_frac_n * heightratio );
+        curwidth = ( output_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
     }
 
     video_area.x = ( output_width - curwidth ) / 2;
