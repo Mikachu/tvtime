@@ -372,11 +372,24 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 
     // Wait for window to be unmapped
     gettimeofday( &starttime, 0 );
-    while( !is_withdrawn(dpy, win) ) {
-        struct timeval curtime;
-        gettimeofday( &curtime, 0 );
-        if( timediff( &curtime, &starttime ) > 500000 ) break;
-        usleep( 10000 );
+    for(;;) {
+      struct timeval curtime;
+      gettimeofday( &curtime, 0 );
+      
+	  if( is_withdrawn(dpy, win) ) break;
+	  
+	  if( XPending( dpy ) ) {
+        XEvent ev;
+        XNextEvent( dpy, &ev );
+        if( ev.type == UnmapNotify ) break;
+      }
+      
+      if( timediff( &curtime, &starttime ) > 500000 ) {
+        printf("Window unmap timeout hit\n");
+        break;
+      }
+      
+	  usleep( 10000 );
     }
     
     remove_motif_decorations(dpy, win);
@@ -614,7 +627,6 @@ static void switch_to_normal_state(Display *dpy, Window win)
     XUnmapWindow(dpy, win);
     
     // Wait for window to be unmapped
-<<<<<<< wm_state.c
     gettimeofday( &starttime, 0 );
     for(;;) {
       struct timeval curtime;
@@ -636,16 +648,6 @@ static void switch_to_normal_state(Display *dpy, Window win)
 	  usleep( 10000 );
     }
 		
-=======
-    gettimeofday( &starttime, 0 );
-    while( !is_withdrawn(dpy, win) ) {
-        struct timeval curtime;
-        gettimeofday( &curtime, 0 );
-        if( timediff( &curtime, &starttime ) > 500000 ) break;
-        usleep( 10000 );
-    }
-    
->>>>>>> 1.18
     disable_motif_decorations(dpy, win);
     
     XSetWMNormalHints(dpy, win, sizehints);
