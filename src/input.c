@@ -51,7 +51,6 @@ struct input_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
-    int togglecorrection;
     
     int togglemenumode;
     menu_t *menu;
@@ -83,7 +82,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
-    in->togglecorrection = 0;
 
     return in;
 }
@@ -169,7 +167,14 @@ void input_callback( input_t *in, InputEvent command, int arg )
              break;
 
          case TVTIME_LUMA_CORRECTION_TOGGLE:
-             in->togglecorrection = 1;
+             config_set_apply_luma_correction( in->cfg, !config_get_apply_luma_correction( in->cfg ) );
+             if( in->osd ) {
+                 if( config_get_apply_luma_correction( in->cfg ) ) {
+                     tvtime_osd_show_message( in->osd, "Luma correction enabled." );
+                 } else {
+                     tvtime_osd_show_message( in->osd, "Luma correction disabled." );
+                 }
+             }
              break;
 
          case TVTIME_LUMA_UP:
@@ -195,6 +200,13 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
                  video_correction_set_luma_power( in->vc,
                      config_get_luma_correction( in->cfg ) );
+
+                 if( in->osd ) {
+                     char message[ 200 ];
+                     sprintf( message, "Luma correction value: %.1f", 
+                                        config_get_luma_correction( in->cfg ) );
+                     tvtime_osd_show_message( in->osd, message );
+                 }
              }
              break;
 
@@ -396,11 +408,6 @@ int input_toggle_deinterlacing_mode( input_t *in )
     return in->toggledeinterlacingmode;
 }
 
-int input_toggle_luma_correction( input_t *in )
-{
-    return in->togglecorrection;
-}
-
 int input_toggle_menu( input_t *in )
 {
     in->togglemenumode = !in->togglemenumode;
@@ -435,7 +442,6 @@ void input_next_frame( input_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
-    in->togglecorrection = 0;
 }
 
 

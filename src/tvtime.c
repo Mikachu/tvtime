@@ -595,16 +595,6 @@ int main( int argc, char **argv )
                 tvtime_osd_show_message( osd, curmethod->name );
             }
         }
-        if( input_toggle_luma_correction( in ) ) {
-            config_set_apply_luma_correction( ct, !config_get_apply_luma_correction( ct ) );
-            if( osd ) {
-                if( config_get_apply_luma_correction( ct ) ) {
-                    tvtime_osd_show_message( osd, "Luma correction enabled." );
-                } else {
-                    tvtime_osd_show_message( osd, "Luma correction disabled." );
-                }
-            }
-        }
         if( osd ) {
             tvtime_osd_volume_muted( osd, mixer_ismute() );
         }
