@@ -3,24 +3,16 @@
 # depend on what you have configured in your lircd.conf file.  Please
 # refer to this and adjust the labels below accordingly.
 #
-# tvtime can be controlled both through its native lirc support, and
-# through a separate program, tvtime-command.  In both cases, the
-# commands available are the same.  For a list of commands, see 'man
-# tvtime-command'.  Any of the commands available through this interface
-# are available inside lirc.
+# tvtime is controlled through a separate program called tvtime-command.
+# For a list of commands, see 'man tvtime-command'.  Key events can
+# be 'faked' using the command KEY_EVENT, which allows for mapping a
+# single remote control button to both a menu mode command and a normal
+# mode command.
 #
-# To use tvtime's native lirc support, use this syntax in your config:
-# begin
-#    prog = tvtime
-#    button = CH+
-#    config = CHANNEL_INC
-# end
-#
-# Alternatively, you can use the 'tvtime-command' helper application:
 # begin
 #    prog = irexec
-#    button = CH+
-#    config = tvtime-command CHANNEL_INC
+#    button = DISPLAY
+#    config = tvtime-command DISPLAY_INFO
 # end
 
 
@@ -38,117 +30,117 @@ end
 # The following defines most of the common buttons found on a remote and
 # what commads they would map to inside tvtime.
 begin
-    prog = tvtime
+    prog = irexec
     button = source
-    config = TOGGLE_INPUT
+    config = tvtime-command TOGGLE_INPUT
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = DISPLAY
-    config = DISPLAY_INFO
+    config = tvtime-command DISPLAY_INFO
     repeat = 1
 end
-begin                                                                                                          
-    prog = tvtime                                                                                              
-    button = FULLSCREEN                                                                                        
-    config = TOGGLE_FULLSCREEN                                                                                 
-end                                                                                                            
-begin                                                                                                          
-    prog = tvtime                                                                                              
-    button = CC                                                                                                
-    config = TOGGLE_CC                                                                                         
-end                                                                                                            
+begin
+    prog = irexec
+    button = FULLSCREEN
+    config = tvtime-command TOGGLE_FULLSCREEN
+end
+begin
+    prog = irexec
+    button = CC
+    config = tvtime-command TOGGLE_CC
+end
 
 begin
-    prog = tvtime
+    prog = irexec
     button = VOL_UP
-    config = MIXER_UP
+    config = tvtime-command MIXER_UP
     repeat = 2
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = VOL_DOWN
-    config = MIXER_DOWN
+    config = tvtime-command MIXER_DOWN
     repeat = 2
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = MUTE
-    config = TOGGLE_MUTE
+    config = tvtime-command TOGGLE_MUTE
 end
 
 begin
-    prog = tvtime
+    prog = irexec
     button = CH+
-    config = CHANNEL_INC
+    config = tvtime-command KEY_EVENT up
     repeat = 1
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = CH-
-    config = CHANNEL_DEC
+    config = tvtime-command KEY_EVENT down
     repeat = 1
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = RECALL
-    config = CHANNEL_PREV
+    config = tvtime-command KEY_EVENT backspace
     repeat = 1
 end
 
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 1
-    config = CHANNEL_1
+    config = tvtime-command CHANNEL_1
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 2
-    config = CHANNEL_2
+    config = tvtime-command CHANNEL_2
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 3
-    config = CHANNEL_3
+    config = tvtime-command CHANNEL_3
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 4
-    config = CHANNEL_4
+    config = tvtime-command CHANNEL_4
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 5
-    config = CHANNEL_5
+    config = tvtime-command CHANNEL_5
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 6
-    config = CHANNEL_6
+    config = tvtime-command CHANNEL_6
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 7
-    config = CHANNEL_7
+    config = tvtime-command CHANNEL_7
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 8
-    config = CHANNEL_8
+    config = tvtime-command CHANNEL_8
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 9
-    config = CHANNEL_9
+    config = tvtime-command CHANNEL_9
 end
 begin
-    prog   = tvtime
+    prog   = irexec
     button = 0
-    config = CHANNEL_0
+    config = tvtime-command CHANNEL_0
 end
 begin
-    prog = tvtime
+    prog = irexec
     button = ENTER
-    config = ENTER
+    config = tvtime-command KEY_EVENT enter
 end
 
