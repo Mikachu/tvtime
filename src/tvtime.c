@@ -2725,10 +2725,10 @@ int main( int argc, char **argv )
     lfprintf( stderr, _("Running %s.\n"), PACKAGE_STRING );
 
     /* Disable this code for a release. */
-    lfputs( _("\n"
+    fprintf( stderr, "\n"
              "*** WARNING: This is a DEVELOPMENT version of tvtime.\n"
              "*** Please do not redistribute snapshots, and please submit\n"
-             "*** bug reports for released versions only!\n\n"), stderr );
+             "*** bug reports for released versions only!\n\n" );
 
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
