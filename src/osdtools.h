@@ -146,6 +146,7 @@ void osd_list_set_text( osd_list_t *osdl, int line, const char *text );
 void osd_list_set_lines( osd_list_t *osdl, int numlines );
 void osd_list_set_timeout( osd_list_t *osdl, int timeout );
 void osd_list_set_hold( osd_list_t *osdl, int hold );
+void osd_list_set_minimum_width( osd_list_t *osdl, int minwidth );
 int osd_list_get_width( osd_list_t *osdl );
 int osd_list_visible( osd_list_t *osdl );
 int osd_list_get_line_pos( osd_list_t *osdl, int y );

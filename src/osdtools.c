@@ -812,6 +812,7 @@ struct osd_list_s
     int numlines;
     int hilight;
     int width;
+    int minwidth;
     int height;
     osd_string_t *lines[ OSD_LIST_MAX_LINES ];
 };
@@ -829,6 +830,7 @@ osd_list_t *osd_list_new( osd_font_t *font, double pixel_aspect )
     osdl->numlines = 0;
     osdl->frames_left = 0;
     osdl->width = 0;
+    osdl->minwidth = 0;
     osdl->height = 0;
     osdl->hold = 0;
     memset( osdl->lines, 0, sizeof( osdl->lines ) );
@@ -917,7 +919,7 @@ void osd_list_set_timeout( osd_list_t *osdl, int timeout )
     }
 
     if( timeout ) {
-        osdl->width = 0;
+        osdl->width = osdl->minwidth;
         osdl->height = 0;
         for( i = 0; i < osdl->numlines; i++ ) {
             int width = osd_string_get_width( osdl->lines[ i ] );
@@ -1101,6 +1103,11 @@ void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
     }
 }
 
+void osd_list_set_minimum_width( osd_list_t *osdl, int minwidth )
+{
+    osdl->minwidth = minwidth;
+}
+
 int osd_list_set_multitext( osd_list_t *osdl, int cur, const char *textarg,
                              int numlines, int maxwidth )
 {
@@ -1119,7 +1126,6 @@ int osd_list_set_multitext( osd_list_t *osdl, int cur, const char *textarg,
      * We make a copy of the textarg, since we'll want to be able to do
      * changes to our local copy.
      */
-
     snprintf( text, 4096, "%s", textarg );
     
     while( cur <= lastline ) {
@@ -1183,3 +1189,4 @@ int osd_list_set_multitext( osd_list_t *osdl, int cur, const char *textarg,
     }
     return cur;
 }
+

@@ -117,6 +117,8 @@ struct tvtime_osd_s
 
     int margin_left;
     int margin_right;
+    int margin_inner_left;
+    int margin_inner_right;
     int margin_top;
     int margin_bottom;
 
@@ -133,6 +135,7 @@ struct tvtime_osd_s
 
 const int top_size = 7;
 const int left_size = 7;
+const int left_inner_size = 10;
 const int bottom_size = 13;
 
 const int small_size_576 = 18;
@@ -167,6 +170,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     osd->margin_left = ((width * left_size) / 100) & ~1;
     osd->margin_right = (width - ((width * left_size) / 100)) & ~1;
+    osd->margin_inner_left = ((width * left_inner_size) / 100) & ~1;
+    osd->margin_inner_right = (width - ((width * left_inner_size) / 100)) & ~1;
     osd->margin_top = (height * top_size) / 100;
     osd->margin_bottom = height - osd->margin_top;
 
@@ -534,6 +539,7 @@ void tvtime_osd_clear( tvtime_osd_t *osd )
     if( osd->info_icon ) osd_animation_set_timeout( osd->info_icon, 0 );
     if( osd->chinfo ) {
         osd_list_set_timeout( osd->list, 0 );
+        osd_list_set_minimum_width( osd->list, 0 );
         osd->chinfo = 0;
     }
 }
@@ -795,6 +801,12 @@ void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist, int chinfo )
 {
     osd->chinfo = chinfo;
     if( showlist ) {
+        if( chinfo ) {
+            osd_list_set_minimum_width( osd->list,
+                        osd->margin_inner_right - osd->margin_inner_left );
+        } else {
+            osd_list_set_minimum_width( osd->list, 0 );
+        }
         osd_list_set_timeout( osd->list, osd->menudelay );
         if( chinfo ) {
             osd_list_set_hold( osd->list, 1 );
@@ -804,6 +816,7 @@ void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist, int chinfo )
     } else {
         osd_list_set_timeout( osd->list, 0 );
         osd_list_set_hold( osd->list, 0 );
+        osd_list_set_minimum_width( osd->list, 0 );
     }
 }
 
@@ -1054,7 +1067,6 @@ void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *title,
 int tvtime_osd_list_set_multitext( tvtime_osd_t *osd, int cur,
                                    const char *text, int numlines )
 {
-    return osd_list_set_multitext( osd->list, cur, text, numlines,
-                                   /*osd->margin_right - osd->margin_left*/
-                                   80 );
+    return osd_list_set_multitext( osd->list, cur, text, numlines, 65 );
 }
+
