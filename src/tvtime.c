@@ -274,6 +274,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
 
         curmethod->interpolate_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, output, output, width );
+        }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
 
