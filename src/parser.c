@@ -151,7 +151,7 @@ int parser_new( parser_file_t *pf, const char *filename )
         ptr++;
     }
     ptr = pf->file_contents;
-    for( ; ptr < pf->file_contents + pf->file_length + 1; ) {
+    for( ; ptr < pf->file_contents + pf->file_length; ) {
         switch( *ptr ) {
         case ' ':
         case '\t':

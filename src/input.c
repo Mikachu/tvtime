@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
@@ -43,6 +44,7 @@ struct input_s {
     int videohold;
     int quit;
     int inputnum;
+    int muted;
 
     int screenshot;
     int printdebug;
@@ -81,6 +83,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
+    in->muted = 0;
 
     return in;
 }
@@ -110,6 +113,12 @@ void input_channel_change_relative( input_t *in, int offset )
         videoinput_set_tuner_freq( in->vidin, 
                                    chanlist[ chanindex ].freq +
                                    config_get_finetune( in->cfg ) );
+
+        if( config_get_mutetvcard( in->cfg ) && in->muted ) {
+            usleep( 80000 );
+            videoinput_mute( in->vidin, 1 );
+        }
+
         in->videohold = CHANNEL_HOLD;
 
         if( verbose ) fprintf( stderr, "tvtime: Changing to "
@@ -252,6 +261,12 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                            videoinput_get_tuner_freq( in->vidin ) +
                                            config_get_finetune( in->cfg ) +
                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
+
+                if( config_get_mutetvcard( in->cfg ) && in->muted ) {
+                    usleep( 80000 );
+                    videoinput_mute( in->vidin, 1 );
+                }
+
                 if( in->osd ) {
                     char message[ 200 ];
                     sprintf( message, "Tuning: %4.2fMhz.", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
@@ -280,7 +295,12 @@ void input_callback( input_t *in, InputEvent command, int arg )
             break;
 
         case TVTIME_MIXER_MUTE:
-            mixer_toggle_mute();
+            if( !config_get_mutetvcard( in->cfg ) ) {
+                mixer_toggle_mute();
+            } else {
+                videoinput_mute( in->vidin, !in->muted );
+                in->muted = !in->muted;
+            }
             break;
 
         case TVTIME_TV_VIDEO:
@@ -371,6 +391,11 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             in->vidin, 
                             chanlist[ chanindex ].freq +
                             config_get_finetune( in->cfg ) );
+
+                        if( config_get_mutetvcard( in->cfg ) && in->muted ) {
+                            usleep( 80000 );
+                            videoinput_mute( in->vidin, 1 );
+                        }
 
                         in->videohold = CHANNEL_HOLD;
 

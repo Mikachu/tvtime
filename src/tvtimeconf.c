@@ -90,6 +90,7 @@ struct config_s
 
     int inputwidth;
     int inputnum;
+    int mutetvcard;
     char *v4ldev;
     char *norm;
     char *freq;
@@ -162,6 +163,7 @@ config_t *config_new( int argc, char **argv )
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
     ct->inputnum = 0;
+    ct->mutetvcard = 0;
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
@@ -345,6 +347,10 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
         ct->finetune = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "MuteTVCard", 1 )) ) {
+        ct->mutetvcard = atoi( tmp );
     }
 
     config_init_keymap( ct );
@@ -630,6 +636,11 @@ const char *config_get_timeformat( config_t *ct )
 int config_get_finetune( config_t *ct )
 {
     return ct->finetune;
+}
+
+int config_get_mutetvcard( config_t *ct )
+{
+    return ct->mutetvcard;
 }
 
 #ifdef TESTHARNESS

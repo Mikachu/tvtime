@@ -619,6 +619,28 @@ int videoinput_has_tuner( videoinput_t *vidin )
     return (vidin->tuner_number > -1);
 }
 
+void videoinput_mute( videoinput_t *vidin, int mute )
+{
+    if( mute ) {
+        vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
+                     "might cause this.  Post a bug report with your driver info to "
+                     "http://www.sourceforge.net/projects/tvtime/\n" );
+            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+        }
+    } else {
+        vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
+        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
+                     "might cause this.  Post a bug report with your driver info to "
+                     "http://www.sourceforge.net/projects/tvtime/\n" );
+            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+        }
+    }
+
+}
+
 /* freqKHz is in KHz (duh) */
 void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 {

@@ -161,6 +161,11 @@ int videoinput_get_input_num( videoinput_t *vidin );
 const char *videoinput_get_input_name( videoinput_t *vidin );
 
 /**
+ * Mute the mixer if mute != 0
+ */
+void videoinput_mute( videoinput_t *vidin, int mute );
+
+/**
  * Sets the current input.
  */
 void videoinput_set_input_num( videoinput_t *vidin, int inputnum );
