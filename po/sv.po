@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.13\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2004-10-28 00:03-0400\n"
-"PO-Revision-Date: 2004-09-19 21:38+0200\n"
+"PO-Revision-Date: 2004-10-28 20:37+0200\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -545,9 +545,9 @@ msgid "High (768 pixels)"
 msgstr "Hög (768 bildpunkter)"
 
 #: src/commands.c:838
-#, fuzzy, c-format
+#, c-format
 msgid "%s  Maximum (%d pixels)"
-msgstr "%s  Aktuell inställning: %d bildpunkter"
+msgstr "%s  Maximal (%d bildpunkter)"
 
 #: src/commands.c:848 src/commands.c:1388
 msgid "Restart with new settings"
@@ -699,9 +699,8 @@ msgstr "Kontrast"
 
 #: src/commands.c:1516 src/commands.c:1566 src/commands.c:1681
 #: src/commands.c:3144 src/commands.c:3163
-#, fuzzy
 msgid "Saturation"
-msgstr "Färg"
+msgstr "Färgmättnad"
 
 #: src/commands.c:1520 src/commands.c:1570 src/commands.c:1714
 #: src/commands.c:3102 src/commands.c:3166
@@ -1317,18 +1316,4 @@ msgstr "Signal funnen"
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
-
-#~ msgid "BT8x8 luma correction"
-#~ msgstr "Luma-korrigering för BT8x8"
-
-#~ msgid "Luma correction enabled."
-#~ msgstr "Luma-korrigering aktiverad."
-
-#~ msgid "Luma correction disabled."
-#~ msgstr "Luma-korrigering inaktiverad."
-
-#~ msgid "Luma correction value: %.1f"
-#~ msgstr "Lumakorrigeringsvärde: %.1f"
-
-#~ msgid "Colour"
-#~ msgstr "Färg"
+"Hittade en kanal på %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
