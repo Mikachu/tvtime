@@ -49,7 +49,7 @@ struct performance_s
     int time_top_to_bot;
 
     int total_blits;
-    int blit_count_ceiling;
+    int curblit;
     double total_blit_time[ NUM_TO_AVERAGE ];
     double total_blitting_ms;
     
@@ -71,9 +71,9 @@ performance_t *performance_new( int fieldtimeus )
     perf->time_top_to_bot = 0;
     perf->drop_reset = 0;
     perf->total_blits = 0;
-    perf->total_blitting_ms = 0;
-    perf->blit_count_ceiling = 0;
-    memset( perf->total_blit_time, 0, sizeof(perf->total_blit_time) );
+    perf->curblit = 0;
+    perf->total_blitting_ms = 0.0;
+    memset( perf->total_blit_time, 0, sizeof( perf->total_blit_time ) );
     gettimeofday( &perf->lastframetime, 0 );
     gettimeofday( &perf->acquired_input, 0 );
     gettimeofday( &perf->show_bot, 0 );
@@ -114,16 +114,10 @@ void performance_checkpoint_show_bot_field( performance_t *perf )
     gettimeofday( &perf->show_bot, 0 );
     perf->time_top_to_bot = timediff( &perf->show_bot, &perf->show_top );
      
-    if( perf->total_blits > NUM_TO_AVERAGE - 1 ) {
-        perf->total_blits = 0;
-    }
-   
-    perf->total_blitting_ms -= perf->total_blit_time[ perf->total_blits ];
-    perf->total_blit_time[ perf->total_blits ] = ((double) timediff( &perf->show_bot, &perf->lastframetime )) / 1000.0;
-    perf->total_blitting_ms += perf->total_blit_time[ perf->total_blits ];
-
-    if( perf->blit_count_ceiling < NUM_TO_AVERAGE ) perf->blit_count_ceiling++;
-
+    perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
+    perf->total_blit_time[ perf->curblit ] = ((double) timediff( &perf->show_bot, &perf->acquired_input )) / 1000.0;
+    perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
+    perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
     perf->total_blits++;
 }
 
@@ -142,16 +136,10 @@ void performance_checkpoint_show_top_field( performance_t *perf )
     gettimeofday( &perf->show_top, 0 );
     perf->time_bot_to_top = timediff( &perf->show_top, &perf->show_bot );
     
-    if( perf->total_blits > NUM_TO_AVERAGE - 1 ) {
-        perf->total_blits = 0;
-    }
-
-    perf->total_blitting_ms -= perf->total_blit_time[ perf->total_blits ];
-    perf->total_blit_time[ perf->total_blits ] = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
-    perf->total_blitting_ms += perf->total_blit_time[ perf->total_blits ];
-
-    if( perf->blit_count_ceiling < NUM_TO_AVERAGE ) perf->blit_count_ceiling++;
-    
+    perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
+    perf->total_blit_time[ perf->curblit ] = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
+    perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
+    perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
     perf->total_blits++;
 }
 
@@ -176,17 +164,25 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
     double show_top = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
     double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
     double cycle_time = ((double) timediff( &perf->acquired_input, &perf->lastframetime )) / 1000.0;
+    double nummeasured = NUM_TO_AVERAGE;
+    double avgblittime;
 
     //double blit_time = show_bot;
     //if( show_bot > show_top ) blit_time = show_top;
 
+    if( nummeasured > perf->total_blits ) {
+        nummeasured = perf->total_blits;
+    }
+    avgblittime = perf->total_blitting_ms / nummeasured;
+
     fprintf( stderr, "tvtime: acquire %5.2fms, show bot %5.2fms, build top %5.2fms\n"
                      "tvtime: waitbot %5.2fms, show top %5.2fms, build bot %5.2fms\n"
-		     "tvtime: total_blits: %d, total_blitting_ms: %.2f, blit_count_ceiling: %d\n",
-             acquire, show_bot, constructed_top, wait_for_bot, show_top, constructed_bot, perf->total_blits, perf->total_blitting_ms, perf->blit_count_ceiling );
+		     "tvtime: total_blits: %d, average blit time: %.2f\n",
+             acquire, show_bot, constructed_top, wait_for_bot, show_top, constructed_bot,
+             perf->total_blits, avgblittime );
 
     fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, used %.2f%% CPU to deinterlace.\n",
-             ( ( (double) framesize ) / (perf->total_blitting_ms / perf->blit_count_ceiling) ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
+             ( ((double) framesize) / avgblittime ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
              ( ( constructed_top + constructed_bot ) / cycle_time ) * 100.0 );
     fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2f, bot-to-top: %5.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
