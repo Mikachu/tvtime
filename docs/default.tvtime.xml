@@ -91,10 +91,10 @@
 
 
   <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
-  <option name="StartupWidescreen" value="0"/>
+  <option name="Widescreen" value="0"/>
 
   <!-- Default to a 768x576 window. -->
-  <option name="StartupOutputHeight" value="576"/>
+  <option name="OutputHeight" value="576"/>
 
   <!--
     This sets the percent of the sides to leave to the overscan, that is,
@@ -110,7 +110,7 @@
     set at runtime so that when you quit tvtime in fullscreen, starting it
     again will start back in fullscreen mode.
   -->
-  <option name="StartupFullscreen" value="0"/>
+  <option name="Fullscreen" value="0"/>
 
   <!--
     This sets the framerate of the output from tvtime.
@@ -126,7 +126,7 @@
     video game consoles.  Use weave and select either TFF or BFF, whichever
     does not exhibit interlace effects.
   -->
-  <option name="StartupFramerateMode" value="0"/>
+  <option name="FramerateMode" value="0"/>
 
 
   <!--
@@ -185,9 +185,9 @@
     The following settings are saved at runtime to remember your current
     channel, previous channel, and deinterlacer used.
   -->
-  <option name="StartupPrevChannel" value="2"/>
-  <option name="StartupChannel" value="2"/>
-  <option name="StartupDeinterlaceMethod" value="0"/>
+  <option name="PrevChannel" value="2"/>
+  <option name="Channel" value="2"/>
+  <option name="DeinterlaceMethod" value="GreedyH"/>
 
 
   <!--
@@ -212,8 +212,15 @@
     Weave          Weave Last Field
   -->
 
-  <mode name="LargeWindow" deinterlacer="GreedyH" fullscreen="0" window_height="576" framerate_mode="0"/>
-  <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
+  <mode name="LargeWindow">
+    <option name="DeinterlaceMethod" value="GreedyH"/>
+  </mode>
+
+  <mode name="SmallWindow">
+    <option name="DeinterlaceMethod" value="OverlayBob"/>
+    <option name="FramerateMode" value="1"/>
+    <option name="OutputHeight" value="288"/>
+  </mode>
 
 
   <!--

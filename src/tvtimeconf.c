@@ -41,14 +41,8 @@
 #define MAX_BUTTONS 10
 
 /* Mode list. */
-
 typedef struct tvtime_modelist_s tvtime_modelist_t;
-
-struct tvtime_modelist_s
-{
-    tvtime_mode_settings_t settings;
-    tvtime_modelist_t *next;
-};
+static void copy_config( config_t *dest, config_t *src );
 
 /* Key names. */
 typedef struct key_name_s key_name_t;
@@ -105,19 +99,19 @@ struct config_s
     int debug;
     int fullscreen;
     int priority;
-
     int ntsc_mode;
 
     int apply_luma_correction;
     double luma_correction;
+
+    int *keymap;
+    int *buttonmap;
 
     int inputwidth;
     int inputnum;
     char *v4ldev;
     char *norm;
     char *freq;
-    int *keymap;
-    int *buttonmap;
     char *ssdir;
     char *timeformat;
     unsigned int menu_bg_rgb;
@@ -130,7 +124,7 @@ struct config_s
 
     char *rvr_filename;
 
-    int deinterlace_method;
+    char *deinterlace_method;
     int check_freq_present;
 
     int use_vbi;
@@ -150,6 +144,15 @@ struct config_s
     int nummodes;
     tvtime_modelist_t *modelist;
 };
+
+/* Mode list. */
+struct tvtime_modelist_s
+{
+    config_t settings;
+    char *name;
+    tvtime_modelist_t *next;
+};
+
 
 static unsigned int parse_colour( const char *str )
 {
@@ -203,7 +206,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     if( name && value ) {
         char *curval = (char *) value;
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupOutputHeight" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
             ct->outputheight = atoi( curval );
         }
 
@@ -215,7 +218,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->verbose = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupWidescreen" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
             ct->aspect = atoi( curval );
         }
 
@@ -253,11 +256,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->priority = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupFullscreen" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "Fullscreen" ) ) {
             ct->fullscreen = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupFramerateMode" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "FramerateMode" ) ) {
             ct->framerate = atoi( curval );
         }
 
@@ -299,11 +302,11 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->other_text_rgb = parse_colour( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupPrevChannel" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "PrevChannel" ) ) {
             ct->prev_channel = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupChannel" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "Channel" ) ) {
             ct->start_channel = atoi( curval );
         }
 
@@ -317,8 +320,9 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             }
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "StartupDeinterlaceMethod" ) ) {
-            ct->deinterlace_method = atoi( curval );
+        if( !xmlStrcasecmp( name, BAD_CAST "DeinterlaceMethod" ) ) {
+            if( ct->deinterlace_method ) free( ct->deinterlace_method );
+            ct->deinterlace_method = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "CheckForSignal" ) ) {
@@ -378,56 +382,21 @@ static void parse_mode( config_t *ct, xmlNodePtr node )
     if( name ) {
         tvtime_modelist_t *mode = (tvtime_modelist_t *) malloc( sizeof( tvtime_modelist_t ) );
         if( mode ) {
-            xmlChar *deinterlacer = xmlGetProp( node, BAD_CAST "deinterlacer" );
-            xmlChar *fullscreen = xmlGetProp( node, BAD_CAST "fullscreen" );
-            xmlChar *fullscreen_width = xmlGetProp( node, BAD_CAST "fullscreen_width" );
-            xmlChar *fullscreen_height = xmlGetProp( node, BAD_CAST "fullscreen_height" );
-            xmlChar *window_height = xmlGetProp( node, BAD_CAST "window_height" );
-            xmlChar *framerate_mode = xmlGetProp( node, BAD_CAST "framerate_mode" );
 
-            if( deinterlacer ) {
-                mode->settings.deinterlacer = strdup( (char *) deinterlacer );
-                xmlFree( deinterlacer );
-            } else {
-                mode->settings.deinterlacer = strdup( "Linear" );
+            /* Start with the default settings from the config file. */
+            copy_config( &(mode->settings), ct );
+
+            node = node->xmlChildrenNode;
+            while( node ) {
+                if( !xmlIsBlankNode( node ) ) {
+                    if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
+                        parse_option( &(mode->settings), node );
+                    }
+                }
+                node = node->next;
             }
 
-            if( fullscreen ) {
-                mode->settings.fullscreen = atoi( (char *) fullscreen );
-                xmlFree( fullscreen );
-            } else {
-                mode->settings.fullscreen = 0;
-            }
-
-            if( fullscreen_width ) {
-                mode->settings.fullscreen_width = atoi( (char *) fullscreen_width );
-                xmlFree( fullscreen_width );
-            } else {
-                mode->settings.fullscreen_width = 0;
-            }
-
-            if( fullscreen_height ) {
-                mode->settings.fullscreen_height = atoi( (char *) fullscreen_height );
-                xmlFree( fullscreen_height );
-            } else {
-                mode->settings.fullscreen_height = 0;
-            }
-
-            if( window_height ) {
-                mode->settings.window_height = atoi( (char *) window_height );
-                xmlFree( window_height );
-            } else {
-                mode->settings.window_height = 0;
-            }
-
-            if( framerate_mode ) {
-                mode->settings.framerate_mode = atoi( (char *) framerate_mode );
-                xmlFree( framerate_mode );
-            } else {
-                mode->settings.framerate_mode = 0;
-            }
-
-            mode->settings.name = strdup( (char *) name );
+            mode->name = strdup( (char *) name );
             mode->next = ct->modelist;
             ct->modelist = mode;
             ct->nummodes++;
@@ -552,7 +521,7 @@ config_t *config_new( void )
     ct->menu_bg_rgb = 4278190080U;     /* opaque black (billy: says who?) */
     ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
     ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
-    ct->deinterlace_method = 0;
+    ct->deinterlace_method = strdup( "GreedyH" );
     ct->check_freq_present = 1;
     ct->use_vbi = 0;
     ct->start_channel = 1;
@@ -755,10 +724,10 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
          * you can save on the command line.
          */
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->aspect );
-        configsave( ct->configsave, "StartupWidescreen", tempstring );
+        configsave( ct->configsave, "Widescreen", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
-        configsave( ct->configsave, "StartupFullscreen", tempstring );
+        configsave( ct->configsave, "Fullscreen", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         configsave( ct->configsave, "Verbose", tempstring );
@@ -796,9 +765,34 @@ void config_delete( config_t *ct )
     if( ct->rvr_filename ) free( ct->rvr_filename );
     if( ct->vbidev ) free( ct->vbidev );
     if( ct->config_filename ) free( ct->config_filename );
+    if( ct->deinterlace_method ) free( ct->deinterlace_method );
     if( ct->configsave ) configsave_close( ct->configsave );
     /* TODO: Free modelist. */
     free( ct );
+}
+
+static void copy_config( config_t *dest, config_t *src )
+{
+    (*dest) = (*src);
+
+    /* Some of these I am keeping invalid for now. */
+    dest->keymap = 0;
+    dest->buttonmap = 0;
+    dest->v4ldev = 0;
+    dest->vbidev = 0;
+    dest->command_pipe_dir = 0;
+    dest->command_pipe = 0;
+    dest->rvr_filename = 0;
+    dest->config_filename = 0;
+    dest->modelist = 0;
+    dest->nummodes = 0;
+
+    /* Useful strings must be copied. */
+    dest->norm = strdup( src->norm );
+    dest->freq = strdup( src->freq );
+    dest->ssdir = strdup( src->ssdir );
+    dest->timeformat = strdup( src->timeformat );
+    dest->deinterlace_method = strdup( src->timeformat );
 }
 
 int config_key_to_command( config_t *ct, int key )
@@ -874,7 +868,7 @@ int config_get_apply_luma_correction( config_t *ct )
     return ct->apply_luma_correction;
 }
 
-int config_get_deinterlace_method( config_t *ct )
+const char *config_get_deinterlace_method( config_t *ct )
 {
     return ct->deinterlace_method;
 }
@@ -999,7 +993,7 @@ int config_get_num_modes( config_t *ct )
     return ct->nummodes;
 }
 
-tvtime_mode_settings_t *config_get_mode_info( config_t *ct, int mode )
+config_t *config_get_mode_info( config_t *ct, int mode )
 {
     tvtime_modelist_t *cur = ct->modelist;
 

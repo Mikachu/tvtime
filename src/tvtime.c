@@ -1026,13 +1026,13 @@ int main( int argc, char **argv )
                          "available, exiting.\n" );
         return 1;
     }
-    curmethodid = config_get_deinterlace_method( ct );
-    if( curmethodid >= get_num_deinterlace_methods() ||
-        curmethodid < 0) {
-        fprintf( stderr, "tvtime: Invalid deinterlace method, using first method found.\n" );
-        curmethodid = 0;
+    curmethodid = 0;
+    curmethod = get_deinterlace_method( 0 );
+    while( strcasecmp( config_get_deinterlace_method( ct ), curmethod->short_name ) ) {
+        curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+        curmethod = get_deinterlace_method( curmethodid );
+        if( !curmethodid ) break;
     }
-    curmethod = get_deinterlace_method( curmethodid );
 
     /* Build colourbars. */
     colourbars = (unsigned char *) malloc( width * height * 2 );
@@ -1327,12 +1327,12 @@ int main( int argc, char **argv )
         screenshot = commands_take_screenshot( commands );
         paused = commands_pause( commands );
         if( commands_toggle_mode( commands ) && config_get_num_modes( ct ) ) {
-            tvtime_mode_settings_t *cur;
+            config_t *cur;
             preset_mode = (preset_mode + 1) % config_get_num_modes( ct );
             cur = config_get_mode_info( ct, preset_mode );
             if( cur ) {
                 int firstmethod = curmethodid;
-                while( strcasecmp( cur->deinterlacer, curmethod->short_name ) ) {
+                while( strcasecmp( config_get_deinterlace_method( cur ), curmethod->short_name ) ) {
                     curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
                     curmethod = get_deinterlace_method( curmethodid );
                     if( curmethodid == firstmethod ) break;
@@ -1340,13 +1340,13 @@ int main( int argc, char **argv )
                 if( osd ) {
                     tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 }
-                if( cur->fullscreen && !output->is_fullscreen() ) {
-                    output->toggle_fullscreen( cur->fullscreen_width, cur->fullscreen_height );
-                } else if( cur->window_height ) {
-                    output->set_window_height( cur->window_height );
+                if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
+                    output->toggle_fullscreen( 0, 0 );
+                } else {
+                    output->set_window_height( config_get_outputheight( cur ) );
                 }
-                if( framerate_mode != cur->framerate_mode ) {
-                    commands_set_framerate( commands, cur->framerate_mode );
+                if( framerate_mode != config_get_framerate_mode( cur ) ) {
+                    commands_set_framerate( commands, config_get_framerate_mode( cur ) );
                 } else if( osd ) {
                     tvtime_osd_show_info( osd );
                 }
@@ -1366,12 +1366,12 @@ int main( int argc, char **argv )
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "StartupFullScreen", "1" );
+                    configsave( config_get_configsave( ct ), "FullScreen", "1" );
                 }
                 if( osd ) tvtime_osd_show_message( osd, "Fullscreen mode active." );
             } else {
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "StartupFullScreen", "0" );
+                    configsave( config_get_configsave( ct ), "FullScreen", "0" );
                 }
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
@@ -1380,12 +1380,12 @@ int main( int argc, char **argv )
             if( output->toggle_aspect() ) {
                 if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "StartupWideScreen", "1" );
+                    configsave( config_get_configsave( ct ), "WideScreen", "1" );
                 }
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
                 if( config_get_configsave( ct ) ) {
-                    configsave( config_get_configsave( ct ), "StartupWideScreen", "0" );
+                    configsave( config_get_configsave( ct ), "WideScreen", "0" );
                 }
             }
         }
@@ -1409,9 +1409,7 @@ int main( int argc, char **argv )
                 tvtime_osd_show_info( osd );
             }
             if( config_get_configsave( ct ) ) {
-                snprintf( number, 3, "%d", curmethodid );
-                number[3] = '\0';
-                configsave( config_get_configsave( ct ), "StartupDeinterlaceMethod", number );
+                configsave( config_get_configsave( ct ), "DeinterlaceMethod", curmethod->short_name );
             }
         }
         if( commands_update_luma_power( commands ) ) {
@@ -1748,13 +1746,13 @@ int main( int argc, char **argv )
 
     if( config_get_configsave( ct ) ) {
         snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
-        configsave( config_get_configsave( ct ), "StartupPrevChannel", number );
+        configsave( config_get_configsave( ct ), "PrevChannel", number );
 
         snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
-        configsave( config_get_configsave( ct ), "StartupChannel", number );
+        configsave( config_get_configsave( ct ), "Channel", number );
 
         snprintf( number, 3, "%d", framerate_mode );
-        configsave( config_get_configsave( ct ), "StartupFramerateMode", number );
+        configsave( config_get_configsave( ct ), "FramerateMode", number );
 
         if( vidin ) {
             snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );

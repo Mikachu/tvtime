@@ -24,18 +24,6 @@
 #include "configsave.h"
 
 typedef struct config_s config_t;
-typedef struct tvtime_mode_settings_s tvtime_mode_settings_t;
-
-struct tvtime_mode_settings_s
-{
-    const char *name;
-    const char *deinterlacer;
-    int fullscreen;
-    int fullscreen_width;
-    int fullscreen_height;
-    int window_height;
-    int framerate_mode;
-};
 
 config_t *config_new( void );
 void config_delete( config_t *ct );
@@ -64,7 +52,7 @@ int config_get_priority( config_t *ct );
 uid_t config_get_uid( config_t *ct );
 const char *config_get_command_pipe_dir( config_t *ct );
 const char *config_get_command_pipe( config_t *ct );
-int config_get_deinterlace_method( config_t *ct );
+const char *config_get_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );
 int config_get_prev_channel( config_t *ct );
 const char *config_get_screenshot_dir( config_t *ct );
@@ -82,6 +70,6 @@ char *config_get_vbidev( config_t *ct );
 configsave_t *config_get_configsave( config_t *ct );
 
 int config_get_num_modes( config_t *ct );
-tvtime_mode_settings_t *config_get_mode_info( config_t *ct, int mode );
+config_t *config_get_mode_info( config_t *ct, int mode );
 
 #endif /* TVTIMECONF_H_INCLUDED */
