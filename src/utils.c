@@ -181,6 +181,8 @@ char *get_tvtime_fifo_filename( uid_t uid )
 
     /* Try to get a hostname */
     hostname = malloc( hostname_size * sizeof( char ) );
+    if (hostname == 0)
+        return 0;
     errno = 0;
     while( gethostname( hostname, hostname_size ) < 0 ) {
         if( errno == ENAMETOOLONG ) {
@@ -195,8 +197,8 @@ char *get_tvtime_fifo_filename( uid_t uid )
             }
         } else {
             /* Unknown error.  Put errno in the filename for interest. */
-            free( hostname );
-            asprintf( &hostname, "unknown%d", errno );
+            snprintf( hostname, hostname_size, "unknown%d", errno );
+            break;
         }
     }
 
