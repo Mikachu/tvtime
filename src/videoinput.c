@@ -891,7 +891,16 @@ void videoinput_delete( videoinput_t *vidin )
     /* Mute audio on exit. */
     videoinput_mute( vidin, 1 );
 
-    if( !vidin->isv4l2 ) {
+    if( vidin->isv4l2 ) {
+        int i;
+
+        videoinput_stop_capture_v4l2( vidin );
+        videoinput_free_all_frames( vidin );
+
+        for( i = 0; i < vidin->numframes; i++ ) {
+            munmap( vidin->capbuffers[ i ].data, vidin->capbuffers[ i ].length );
+        }
+    } else {
         if( vidin->have_mmap ) {
             munmap( vidin->map, vidin->gb_buffers.size );
             free( vidin->grab_buf );
