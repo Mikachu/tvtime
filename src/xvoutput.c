@@ -363,13 +363,23 @@ static void xv_alloc_frame( void )
     }
 }
 
+/**
+ * Some math:
+ *
+ * pixel size = pw/ph
+ * screen size = sw/sh
+ * resolution = rw/rh
+ *
+ * sw = pw*rw   therefore pw = sw / rw
+ * sh = ph*rh   therefore ph = sh / rh
+ */
+
 static void calculate_video_area( void )
 {
     int curwidth, curheight;
     int widthratio = output_aspect ? 16 : 4;
     int heightratio = output_aspect ? 9 : 3;
     int sar_frac_n, sar_frac_d;
-    int sqpx_width, sqpx_height;
 
     if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
         if( xvoutput_verbose ) {
@@ -385,21 +395,13 @@ static void calculate_video_area( void )
         sar_frac_d = 1;
     }
 
-    /* Correct for non-square pixel displays. */
-    sqpx_width = output_width * sar_frac_d;
-    sqpx_height = output_height * sar_frac_n;
-
-    /* Correct for our current aspect ratio (4:3 or 16:9). */
-    curwidth = sqpx_width;
-    curheight = ( sqpx_width * heightratio ) / widthratio;
-    if( curheight > sqpx_height ) {
-        curheight = sqpx_height;
-        curwidth = ( sqpx_height * widthratio ) / heightratio;
+    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
+    curwidth = output_width;
+    curheight = ( output_width * sar_frac_n * heightratio ) / ( sar_frac_d * widthratio );
+    if( curheight > output_height ) {
+        curheight = output_height;
+        curwidth = ( output_height * sar_frac_d * widthratio ) / ( sar_frac_n * heightratio );
     }
-
-    /* Reverse correction for non-square pixel displays. */
-    curwidth /= sar_frac_d;
-    curheight /= sar_frac_n;
 
     video_area.x = ( output_width - curwidth ) / 2;
     video_area.y = ( output_height - curheight ) / 2;
