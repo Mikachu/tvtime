@@ -116,17 +116,30 @@ int tvtime_get_command_id( int pos )
 
 int tvtime_string_to_command( const char *str )
 {
-    int i;
+    if( str ) {
+        int i;
 
-    if( !str ) return TVTIME_NOCOMMAND;
-
-    for( i = 0; i < tvtime_num_commands(); i++ ) {
-        if( !strcasecmp( cmd_table[ i ].name, str ) ) {
-            return cmd_table[ i ].command;
+        for( i = 0; i < tvtime_num_commands(); i++ ) {
+            if( !strcasecmp( str, tvtime_get_command( i ) ) ) {
+                return tvtime_get_command_id( i );
+            }
         }
     }
 
-    return -1;
+    return TVTIME_NOCOMMAND;
+}
+
+const char *tvtime_command_to_string( int command )
+{
+    int i;
+
+    for( i = 0; i < tvtime_num_commands(); i++ ) {
+        if( tvtime_get_command_id( i ) == command ) {
+            return tvtime_get_command( i );
+        }
+    }
+
+    return "ERROR";
 }
 
 struct commands_s {

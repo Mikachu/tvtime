@@ -112,6 +112,7 @@ enum tvtime_commands
 };
 
 int tvtime_string_to_command( const char *str );
+const char *tvtime_command_to_string( int command );
 int tvtime_num_commands( void );
 const char *tvtime_get_command( int pos );
 int tvtime_get_command_id( int pos );
