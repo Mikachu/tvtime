@@ -1,5 +1,7 @@
 
 0.9.8
+  * vektor: Used dalias' new quater-scanline interpolation method for
+      overlay bob (improves quality).
   * vektor: Added Australia Optus cable frequencies, for users who want
       to avoid using their set-top box.
   * vektor: Channel now switches after timeout if you're typing in
