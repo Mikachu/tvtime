@@ -239,10 +239,17 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
              grab_pict.brightness, grab_pict.hue, grab_pict.colour,
              grab_pict.contrast );
 
-    grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
-    grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
-    grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
-    grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_NTSC) / 511.0) * 65535.0);
+    if( palmode ) {
+        grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
+        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
+        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_PAL) / 511.0) * 65535.0);
+    } else {
+        grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
+        grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
+        grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_NTSC) / 511.0) * 65535.0);
+    }
     if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
@@ -370,7 +377,7 @@ void videoinput_mute( int mute )
     }
 }
 
-int videoinput_get_tuner_freq() 
+int videoinput_get_tuner_freq( void ) 
 {
     unsigned long frequency;
     if( ioctl( grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
