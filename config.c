@@ -141,6 +141,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_SHOW_BARS ]      = I_F11;
     ct->keymap[ TVTIME_SHOW_TEST ]      = I_F12;
     ct->keymap[ TVTIME_DEBUG ]          = 'd';
+    ct->keymap[ TVTIME_SCREENSHOT ]     = 's';
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 245 );
@@ -148,10 +149,7 @@ config_t *config_new( int argc, char **argv )
         configFile = base;
     }
 
-    if( !parser_new( &(ct->pf), configFile ) ) {
-        fprintf( stderr, "config: Could not read configuration from %s\n", 
-                 configFile );
-    } else {
+    if( parser_new( &(ct->pf), configFile ) ) {
         config_init( ct );
     }
 
@@ -481,6 +479,11 @@ void config_init_keymap( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "key_debug")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_DEBUG ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_screenshot")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_SCREENSHOT ] = key;
     }
    
 }

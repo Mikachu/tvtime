@@ -37,9 +37,6 @@
 #include "config.h"
 #include "input.h"
 
-/* Number of frames to pause during channel change. */
-#define CHANNEL_HOLD 2
-
 /**
  * Warning tolerance, just for debugging.
  */
@@ -51,7 +48,9 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
+static void build_test_frames( unsigned char *oddframe,
+                               unsigned char *evenframe,
+                               int width, int height )
 {
     osd_string_t *test_string;
 
@@ -61,11 +60,13 @@ static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe
 
     osd_string_set_colour( test_string, 235, 128, 128 );
     osd_string_show_text( test_string, "Odd Field", 80 );
-    osd_string_composite_packed422( test_string, oddframe, width, height, width*2, 50, 50, 0 );
+    osd_string_composite_packed422( test_string, oddframe, width,
+                                    height, width*2, 50, 50, 0 );
 
     osd_string_set_colour( test_string, 235, 128, 128 );
     osd_string_show_text( test_string, "Even Field", 80 );
-    osd_string_composite_packed422( test_string, evenframe, width, height, width*2, 50, 150, 0 );
+    osd_string_composite_packed422( test_string, evenframe, width,
+                                    height, width*2, 50, 150, 0 );
     osd_string_delete( test_string );
 }
 
@@ -99,7 +100,8 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 
     for( i = 0; i < height; i++ ) {
         unsigned char *input422 = frame422 + (i * stride);
-        //chroma422_to_chroma444_rec601_scanline( tempscanline, input422, width );
+        // chroma422_to_chroma444_rec601_scanline( tempscanline,
+        //                                         input422, width );
         cheap_packed422_to_packed444_scanline( tempscanline, input422, width );
         packed444_to_rgb24_rec601_scanline( tempscanline, tempscanline, width );
         pngoutput_scanline( pngout, tempscanline );
@@ -124,7 +126,6 @@ int main( int argc, char **argv )
     int skipped = 0;
     int verbose;
     tvtime_osd_t *osd;
-    int videohold = CHANNEL_HOLD;
     int i;
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
@@ -216,7 +217,6 @@ int main( int argc, char **argv )
             if( rc == -1 ) {
                 /* set to a known frequency */
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
-                videohold = CHANNEL_HOLD;
 
                 if( verbose ) fprintf( stderr, 
                                        "tvtime: Changing to channel %s.\n", 
@@ -324,15 +324,32 @@ int main( int argc, char **argv )
         struct timeval blitstart;
         struct timeval blitend;
         int printdebug = 0;
+        int showbars, showtest, videohold, screenshot;
 
         sdl_poll_events( in );
-        if ( !input_next_frame( in ) ) break;
+
+        if( input_quit( in ) ) break;
+        videohold = input_videohold( in );
+        printdebug = input_print_debug( in );
+        showbars = input_show_bars( in );
+        showtest = input_show_test( in );
+        screenshot = input_take_screenshot( in );
+
+        input_next_frame( in );
 
         /* CHECKPOINT1 : Blit the second field */
         gettimeofday( &(checkpoint[ 0 ]), 0 );
 
         /* Aquire the next frame. */
         curframe = videoinput_next_image( vidin );
+
+        if( screenshot ) {
+            char filename[ 256 ];
+            sprintf( filename, "tvtime-shot-%d-%d.png",
+                     (int) checkpoint[ 0 ].tv_sec,
+                     (int) checkpoint[ 0 ].tv_usec );
+            pngscreenshot( filename, curframe, width, height, width * 2 );
+        }
 
         /* CHECKPOINT2 : Got the frame */
         gettimeofday( &(checkpoint[ 1 ]), 0 );
@@ -351,7 +368,8 @@ int main( int argc, char **argv )
                      timediff( &(checkpoint[ 6 ]), &(checkpoint[ 5 ]) ),
                      timediff( &(checkpoint[ 0 ]), &(checkpoint[ 6 ]) ) );
         }
-        if( config_get_debug( ct ) && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
+        if( config_get_debug( ct ) && ((timediff( &curframetime,
+                           &lastframetime ) - tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
                      skipped++,
                      timediff( &curframetime, &lastframetime ), (fieldtime*2) );
@@ -360,22 +378,28 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the top field. */
-        if( config_get_apply_luma_correction( ct ) ) {
-            video_correction_packed422_field_to_frame_top( vc, 
-                                                           sdl_get_output(),
-                                                           width*2, 
-                                                           curframe,
-                                                           width, height/2,
-                                                           width*4 );
+        if( showbars ) {
+            memcpy( sdl_get_output(), colourbars, width*height*2 );
+        } else if( showtest ) {
+            memcpy( sdl_get_output(), testframe_even, width*height*2 );
         } else {
-            packed422_field_to_frame_top( sdl_get_output(), width*2, 
-                                          curframe,
-                                          width, height/2, width*4 );
-        }
+            if( config_get_apply_luma_correction( ct ) ) {
+                video_correction_packed422_field_to_frame_top( vc, 
+                                                               sdl_get_output(),
+                                                               width*2, 
+                                                               curframe,
+                                                               width, height/2,
+                                                               width*4 );
+            } else {
+                packed422_field_to_frame_top( sdl_get_output(), width*2, 
+                                              curframe,
+                                              width, height/2, width*4 );
+            }
 
-        tvtime_osd_volume_muted( osd, mixer_ismute() );
-        tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
-                                        height, width*2 );
+            tvtime_osd_volume_muted( osd, mixer_ismute() );
+            tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
+                                            height, width*2 );
+        }
 
 
         /* CHECKPOINT3 : Constructed the top field. */
@@ -388,7 +412,8 @@ int main( int argc, char **argv )
         /**
          * I'm commenting this out for now, tvtime takes
          * too much CPU here -Billy
-        while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
+        while( timediff( &curfieldtime, &lastfieldtime )
+                                < (fieldtime-blittime) ) {
             if( rtctimer ) {
                 rtctimer_next_tick( rtctimer );
             } else {
@@ -398,7 +423,7 @@ int main( int argc, char **argv )
         }
         */
         gettimeofday( &blitstart, 0 );
-        if( !videohold && !input_get_videohold( in ) ) sdl_show_frame();
+        if( !videohold ) sdl_show_frame();
         gettimeofday( &blitend, 0 );
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
@@ -409,21 +434,27 @@ int main( int argc, char **argv )
 
 
         /* Build the output from the bottom field. */
-        if( config_get_apply_luma_correction( ct ) ) {
-            video_correction_packed422_field_to_frame_bot( vc, 
-                                                           sdl_get_output(),
-                                                           width*2,
-                                                           curframe + (width*2),
-                                                           width, height/2,
-                                                           width*4 );
+        if( showbars ) {
+            memcpy( sdl_get_output(), colourbars, width*height*2 );
+        } else if( showtest ) {
+            memcpy( sdl_get_output(), testframe_odd, width*height*2 );
         } else {
-            packed422_field_to_frame_bot( sdl_get_output(), width*2, 
-                                          curframe + (width*2),
-                                          width, height/2, width*4 );
+            if( config_get_apply_luma_correction( ct ) ) {
+                video_correction_packed422_field_to_frame_bot( vc, 
+                                                               sdl_get_output(),
+                                                               width*2,
+                                                               curframe + (width*2),
+                                                               width, height/2,
+                                                               width*4 );
+            } else {
+                packed422_field_to_frame_bot( sdl_get_output(), width*2, 
+                                              curframe + (width*2),
+                                              width, height/2, width*4 );
+            }
+            tvtime_osd_volume_muted( osd, mixer_ismute() );
+            tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
+                                            height, width*2 );
         }
-        tvtime_osd_volume_muted( osd, mixer_ismute() );
-        tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
-                                        height, width*2 );
 
 
         /* CHECKPOINT5 : Built the second field */
@@ -455,15 +486,12 @@ int main( int argc, char **argv )
 
         /* Display the bottom field. */
         gettimeofday( &blitstart, 0 );
-        if( !videohold && !input_get_videohold( in ) ) sdl_show_frame();
+        if( !videohold ) sdl_show_frame();
         gettimeofday( &blitend, 0 );
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
 
         tvtime_osd_advance_frame( osd );
-
-        if( videohold ) videohold--;
-        if( input_get_videohold( in ) ) input_dec_videohold( in );
     }
 
     sdl_quit();

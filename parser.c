@@ -43,7 +43,6 @@ void parser_delete( parser_file_t *pf )
 
 int parser_openfile( parser_file_t *pf, const char *filename )
 {
-
     if( !filename ) return 0;
 
     if( pf->fh ) {
@@ -53,7 +52,8 @@ int parser_openfile( parser_file_t *pf, const char *filename )
 
     pf->fh = fopen( filename, "r" );
     if( !(pf->fh) ) {
-        perror( "parser_openfile" );
+        fprintf( stderr, "parser: Can't open %s: %s\n",
+                 filename, strerror( errno ) );
         return 0;
     }
 
@@ -124,8 +124,6 @@ int parser_new( parser_file_t *pf, const char *filename )
     pf->num_pairs = 0;
 
     if( !parser_openfile( pf, filename) ) {
-        fprintf( stderr, "parser: Could not open %s.\n", 
-                 filename ? filename : "(null)" );
         return 0;
     }
 

@@ -43,6 +43,11 @@ struct input_s {
     int digit_counter;
     int videohold;
     int quit;
+
+    int screenshot;
+    int printdebug;
+    int showbars;
+    int showtest;
 };
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
@@ -60,8 +65,13 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->vc = vc;
     in->frame_counter = 0;
     in->digit_counter = 0;
+
     in->videohold = 0;
     in->quit = 0;
+    in->showbars = 0;
+    in->showtest = 0;
+    in->printdebug = 0;
+    in->screenshot = 0;
 
     return in;
 }
@@ -92,6 +102,22 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_QUIT:
              in->quit = 1;
+             break;
+
+         case TVTIME_DEBUG:
+             in->printdebug = 1;
+             break;
+
+         case TVTIME_SCREENSHOT:
+             in->screenshot = 1;
+             break;
+
+         case TVTIME_SHOW_TEST:
+             in->showtest = !in->showtest;
+             break;
+
+         case TVTIME_SHOW_BARS:
+             in->showbars = !in->showbars;
              break;
 
          case TVTIME_CHANNEL_CHAR:
@@ -246,15 +272,43 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
 }
 
-int input_next_frame( input_t *in )
+int input_quit( input_t *in )
 {
-    if( in->quit ) return 0;
+    return in->quit;
+}
 
+int input_print_debug( input_t *in )
+{
+    return in->printdebug;
+}
+
+int input_show_bars( input_t *in )
+{
+    return in->showbars;
+}
+
+int input_show_test( input_t *in )
+{
+    return in->showtest;
+}
+
+int input_take_screenshot( input_t *in )
+{
+    return in->screenshot;
+}
+
+int input_videohold( input_t *in )
+{
+    return in->videohold;
+}
+
+void input_next_frame( input_t *in )
+{
     /* Decrement the frame counter if user is typing digits */
     if( in->frame_counter > 0 ) in->frame_counter--;
 
     if( in->frame_counter == 0 ) {
-        memset( (void*)in->next_chan_buffer, 0, 5 );
+        memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
     }
 
@@ -267,17 +321,8 @@ int input_next_frame( input_t *in )
         tvtime_osd_show_channel_number( in->osd, input_text );
     }
 
-    return 1;
-}
-
-void input_dec_videohold( input_t *in ) 
-{
-    if( in ) in->videohold--;
-}
-
-int input_get_videohold( input_t *in )
-{
-    if( in ) return in->videohold;
-    return 0;
+    if( in->videohold ) in->videohold--;
+    in->printdebug = 0;
+    in->screenshot = 0;
 }
 

@@ -76,12 +76,17 @@ typedef enum InputEvent_e {
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin, 
                     tvtime_osd_t *osd, video_correction_t *vc );
-void    input_delete( input_t *in );
-void    input_callback( input_t *in, InputEvent command, int arg );
-int     input_next_frame( input_t *in );
+void input_delete( input_t *in );
+void input_callback( input_t *in, InputEvent command, int arg );
 
-/* XXX: these are temporary */
-int     input_get_videohold( input_t *in );
-void    input_dec_videohold( input_t *in );
+
+int input_quit( input_t *in );
+int input_take_screenshot( input_t *in );
+int input_videohold( input_t *in );
+int input_print_debug( input_t *in );
+int input_show_bars( input_t *in );
+int input_show_test( input_t *in );
+
+void input_next_frame( input_t *in );
 
 #endif /* INPUT_H_INCLUDED */
