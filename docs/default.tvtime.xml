@@ -95,12 +95,13 @@
   <option name="XMLTVFile" value="none"/>
 
   <!--
-    Set this to 1 to enable VBI decoding.  tvtime supports decoding of
-    closed captions and XDS channel information data.  Both of these
-    standards are specific to NTSC regions, since that's what the
-    tvtime authors use. :)
+    Set this to 1 to enable XDS channel information decoding.  This
+    option is specific to NTSC regions.  XDS is used to send information
+    about the channel including the network name and call letters, and
+    sometimes information about the current show.  This information is
+    then shown on the OSD and saved to the stationlist.xml file.
   -->
-  <option name="UseVBI" value="0"/>
+  <option name="UseXDS" value="0"/>
 
   <!--
     This sets which device to use for VBI decoding.

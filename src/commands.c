@@ -140,6 +140,7 @@ struct commands_s {
     int setfreqtable;
     char newfreqtable[ 128 ];
     int checkfreq;
+    int usexds;
 
     int delay;
 
@@ -916,6 +917,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->setfreqtable = 0;
     snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", config_get_v4l_freq( cfg ) );
     cmd->checkfreq = config_get_check_freq_present( cfg );
+    cmd->usexds = config_get_usexds( cfg );
 
     /* Number of frames to wait for next channel digit. */
     cmd->delay = 1000000 / fieldtime;
@@ -2279,6 +2281,20 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 tvtime_osd_show_message( cmd->osd, _("Signal detection disabled.") );
             }
             commands_refresh_menu( cmd );
+        }
+        break;
+
+    case TVTIME_TOGGLE_XDS:
+        if( videoinput_get_height( cmd->vidin ) == 480 && cmd->vbi ) {
+            cmd->usexds = !cmd->usexds;
+            vbidata_capture_xds( cmd->vbi, cmd->usexds );
+            if( cmd->osd ) {
+                if( cmd->usexds ) {
+                    tvtime_osd_show_message( cmd->osd, _("XDS decoding enabled.") );
+                } else {
+                    tvtime_osd_show_message( cmd->osd, _("XDS decoding disabled.") );
+                }
+            }
         }
         break;
 

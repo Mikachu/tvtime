@@ -106,7 +106,7 @@ struct config_s
     char *deinterlace_method;
     int check_freq_present;
 
-    int use_vbi;
+    int use_xds;
     char *vbidev;
 
     int start_channel;
@@ -326,8 +326,8 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->inputnum = atoi( curval );
         }
 
-        if( !xmlStrcasecmp( name, BAD_CAST "UseVBI" ) ) {
-            ct->use_vbi = atoi( curval );
+        if( !xmlStrcasecmp( name, BAD_CAST "UseXDS" ) ) {
+            ct->use_xds = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ProcessPriority" ) ) {
@@ -784,7 +784,7 @@ config_t *config_new( void )
     ct->deinterlace_method = strdup( "GreedyH" );
     ct->check_freq_present = 1;
 
-    ct->use_vbi = 0;
+    ct->use_xds = 0;
     ct->vbidev = strdup( "/dev/vbi0" );
 
     ct->start_channel = 1;
@@ -977,7 +977,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                       break;
             case 'I': ct->inputwidth = atoi( optarg ); break;
             case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
-            case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+            case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
             case 'i': ct->inputnum = atoi( optarg ); break;
             case 'c': ct->prev_channel = ct->start_channel;
                       ct->start_channel = atoi( optarg ); break;
@@ -1037,9 +1037,6 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         config_save( ct, "InputWidth", tempstring );
 
         config_save( ct, "V4LDevice", ct->v4ldev );
-
-        snprintf( tempstring, sizeof( tempstring ), "%d", ct->use_vbi );
-        config_save( ct, "UseVBI", tempstring );
         config_save( ct, "VBIDevice", ct->vbidev );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
@@ -1117,7 +1114,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                       ct->v4ldev = strdup( optarg );
                   }
                   break;
-        case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': if( !optarg ) {
                       fprintf( stdout, "V4LInput:%d\n", config_get_inputnum( ct ) );
                   } else {
@@ -1206,8 +1203,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
         config_save( ct, "V4LDevice", ct->v4ldev );
 
-        snprintf( tempstring, sizeof( tempstring ), "%d", ct->use_vbi );
-        config_save( ct, "UseVBI", tempstring );
         config_save( ct, "VBIDevice", ct->vbidev );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
@@ -1594,9 +1589,9 @@ uid_t config_get_uid( config_t *ct )
     return ct->uid;
 }
 
-int config_get_usevbi( config_t *ct )
+int config_get_usexds( config_t *ct )
 {
-    return ct->use_vbi;
+    return ct->use_xds;
 }
 
 char *config_get_vbidev( config_t *ct )

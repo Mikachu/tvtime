@@ -187,16 +187,13 @@ Set this to a filename to get show listings from an xmltv file.
 Set to "none" if you do not wish to use xmltv.
 
 .TP
-<option name="UseVBI" value="0"/>
+<option name="UseXDS" value="0"/>
 Set this to
 .I 1
-to enable VBI decoding.
-.B tvtime
-supports decoding of closed
-captions and XDS channel information data.  Both of these standards are
-specific to NTSC regions, since that's what the
-.B tvtime
-authors use. :)
+to enable XDS channel information decoding.  This
+option is specific to NTSC regions.  XDS is used to send information
+about the channel including the network name and call letters, and
+sometimes information about the current show.
 
 .TP
 <option name="VBIDevice" value="/dev/vbi0"/>

@@ -1182,7 +1182,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     DIR *fifodir = 0;
     fifo_t *fifo = 0;
     commands_t *commands = 0;
-    int usevbi = 1;
     int fadepos = 0;
     int scanwait = scan_delay;
     int scanning = 0;
@@ -1618,30 +1617,24 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         return 1;
     }
 
-    usevbi = config_get_usevbi( ct );
-    if( usevbi ) {
+    /* Setup VBI stuff for NTSC-like norms. */
+    if( height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
             fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
         }
+
+        vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
+        if( !vbidata ) {
+            fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+        } else {
+            vbidata_capture_mode( vbidata, CAPTURE_OFF );
+            vbidata_capture_xds( vbidata, config_get_usexds( ct ) );
+        }
+        commands_set_vbidata( commands, vbidata );
     }
     if( tvtime->outputfilter ) {
         outputfilter_set_vbiscreen( tvtime->outputfilter, vs );
-    }
-
-    /* Open the VBI device. */
-    if( usevbi ) {
-        if( height == 480 ) {
-            vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
-            if( !vbidata ) {
-                fprintf( stderr, "tvtime: Could not create vbidata.\n" );
-            } else {
-                vbidata_capture_mode( vbidata, CAPTURE_OFF );
-            }
-            commands_set_vbidata( commands, vbidata );
-        } else {
-            fprintf( stderr, "tvtime: VBI decoding not available for your TV norm.\n" );
-        }
     }
 
     /* Randomly assign a tagline as the window caption. */

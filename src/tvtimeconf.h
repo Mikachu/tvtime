@@ -92,7 +92,7 @@ double config_get_overscan( config_t *ct );
 
 int config_get_check_freq_present( config_t *ct );
 
-int config_get_usevbi( config_t *ct );
+int config_get_usexds( config_t *ct );
 char *config_get_vbidev( config_t *ct );
 
 int config_get_num_modes( config_t *ct );
