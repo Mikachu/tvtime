@@ -1,5 +1,8 @@
 
 0.9.13 -
+  * vektor: Return the magic number 3 when tvtime exits from a SLEEP
+      command.  Useful for writing scripts that do something after tvtime
+      quits from sleep mode.
   * vektor: We now set the aspect ratio hints based on the matte setting.
   * vektor: Fixed a nasty segfault when the capture card driver errors out
       on the first few frames.

@@ -1181,6 +1181,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int matte_h = 0;
     int matte_mode = 0;
     int restarttvtime = 0;
+    int return_value = 0;
     int i;
 
     ct = config_new();
@@ -1670,8 +1671,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
         /* Check if it's time to sleep and dream well */
         if( commands_sleeptimer( commands ) &&
-            commands_sleeptimer_do_shutdown( commands ) )
+            commands_sleeptimer_do_shutdown( commands ) ) {
+            /**
+             * Return the special constant 3 if we've exited
+             * from a sleep timer.
+             */
+            return_value = 3;
             break;
+        }
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
@@ -2570,7 +2577,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
 
     lfprintf( stderr, _("Thank you for using tvtime.\n") );
-    return 0;
+    return return_value;
 }
 
 int main( int argc, char **argv )
