@@ -51,6 +51,7 @@ struct input_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
+    int togglecorrection;
     
     int togglemenumode;
     menu_t *menu;
@@ -82,6 +83,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
+    in->togglecorrection = 0;
 
     return in;
 }
@@ -164,6 +166,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
              in->digit_counter++;
              in->digit_counter %= 4;
              in->frame_counter = CHANNEL_DELAY;
+             break;
+
+         case TVTIME_LUMA_CORRECTION_TOGGLE:
+             in->togglecorrection = 1;
              break;
 
          case TVTIME_LUMA_UP:
@@ -390,6 +396,11 @@ int input_toggle_deinterlacing_mode( input_t *in )
     return in->toggledeinterlacingmode;
 }
 
+int input_toggle_luma_correction( input_t *in )
+{
+    return in->togglecorrection;
+}
+
 int input_toggle_menu( input_t *in )
 {
     in->togglemenumode = !in->togglemenumode;
@@ -424,6 +435,7 @@ void input_next_frame( input_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->togglecorrection = 0;
 }
 
 

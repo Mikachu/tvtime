@@ -459,13 +459,20 @@ int main( int argc, char **argv )
     }
 
     /* Setup the video correction tables. */
-    if( config_get_apply_luma_correction( ct ) ) {
-        vc = video_correction_new();
-        if( !vc ) {
-            fprintf( stderr, "tvtime: Can't initialize luma "
-                             "and chroma correction tables.\n" );
-            return 1;
+    if( verbose ) {
+        if( config_get_apply_luma_correction( ct ) ) {
+            fprintf( stderr, "tvtime: Luma correction enabled.\n" );
+        } else {
+            fprintf( stderr, "tvtime: Luma correction disabled.\n" );
         }
+    }
+
+    vc = video_correction_new();
+    if( !vc ) {
+        fprintf( stderr, "tvtime: Can't initialize luma "
+                         "and chroma correction tables.\n" );
+        return 1;
+    } else {
         if( config_get_luma_correction( ct ) < 0.0 || 
             config_get_luma_correction( ct ) > 10.0 ) {
             fprintf( stderr, "tvtime: Luma correction value out of range. "
@@ -478,11 +485,8 @@ int main( int argc, char **argv )
         }
         video_correction_set_luma_power( vc, 
                                          config_get_luma_correction( ct ) );
-    } else {
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Luma correction disabled.\n" );
-        }
     }
+
 
     in = input_new( ct, vidin, osd, vc );
     if( !in ) {
@@ -591,6 +595,16 @@ int main( int argc, char **argv )
                 tvtime_osd_show_message( osd, curmethod->name );
             }
         }
+        if( input_toggle_luma_correction( in ) ) {
+            config_set_apply_luma_correction( ct, !config_get_apply_luma_correction( ct ) );
+            if( osd ) {
+                if( config_get_apply_luma_correction( ct ) ) {
+                    tvtime_osd_show_message( osd, "Luma correction enabled." );
+                } else {
+                    tvtime_osd_show_message( osd, "Luma correction disabled." );
+                }
+            }
+        }
         if( osd ) {
             tvtime_osd_volume_muted( osd, mixer_ismute() );
         }
@@ -643,7 +657,7 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
             tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, 0, config_get_apply_luma_correction( ct ),
+                                osd, menu, 0, vc && config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
         }
         if( screenshot ) {
@@ -694,7 +708,7 @@ int main( int argc, char **argv )
             blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
             tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, 1, config_get_apply_luma_correction( ct ),
+                                osd, menu, 1, vc && config_get_apply_luma_correction( ct ),
                                 width, height, width * 2, width * 2 );
         }
         if( screenshot ) {

@@ -126,6 +126,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ TVTIME_QUIT ]           = I_ESCAPE;
     ct->keymap[ TVTIME_CHANNEL_UP ]     = I_UP;
     ct->keymap[ TVTIME_CHANNEL_DOWN ]   = I_DOWN;
+    ct->keymap[ TVTIME_LUMA_CORRECTION_TOGGLE ] = 'c';
     ct->keymap[ TVTIME_LUMA_UP ]        = 'j';
     ct->keymap[ TVTIME_LUMA_DOWN ]      = 'h';
     ct->keymap[ TVTIME_MIXER_MUTE ]     = 'm';
@@ -411,6 +412,11 @@ void config_init_keymap( config_t *ct )
         ct->keymap[ TVTIME_CHANNEL_DOWN ] = key;
     }
 
+    if( (tmp = parser_get( &(ct->pf), "key_luma_correction_toggle")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_LUMA_CORRECTION_TOGGLE ] = key;
+    }
+
     if( (tmp = parser_get( &(ct->pf), "key_luma_up")) ) {
         key = string_to_key( tmp );
         ct->keymap[ TVTIME_LUMA_UP ] = key;
@@ -585,6 +591,11 @@ int config_get_tuner_number( config_t *ct )
 int config_get_apply_luma_correction( config_t *ct )
 {
     return ct->apply_luma_correction;
+}
+
+void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction )
+{
+    ct->apply_luma_correction = apply_luma_correction;
 }
 
 double config_get_luma_correction( config_t *ct )
