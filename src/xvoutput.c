@@ -386,8 +386,8 @@ static void calculate_video_area( void )
     }
 
     /* Correct for non-square pixel displays. */
-    sqpx_width = output_width * sar_frac_n;
-    sqpx_height = output_height * sar_frac_d;
+    sqpx_width = output_width * sar_frac_d;
+    sqpx_height = output_height * sar_frac_n;
 
     /* Correct for our current aspect ratio (4:3 or 16:9). */
     curwidth = sqpx_width;
@@ -398,8 +398,8 @@ static void calculate_video_area( void )
     }
 
     /* Reverse correction for non-square pixel displays. */
-    curwidth /= sar_frac_n;
-    curheight /= sar_frac_d;
+    curwidth /= sar_frac_d;
+    curheight /= sar_frac_n;
 
     video_area.x = ( output_width - curwidth ) / 2;
     video_area.y = ( output_height - curheight ) / 2;
