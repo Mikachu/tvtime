@@ -155,6 +155,24 @@ Sets the call letters of the network for the OSD display.  In NTSC
 regions, this is set from the XDS information in the VBI if VBI decoding
 is enabled.
 
+.TP
+.B xmltvid
+Sets the XMLTV channel identifier to associate this channel with if tvtime
+cannot automatically make the association.  For following channel definition
+in an XMLTV file:
+
+  <channel id="I10119.labs.zap2it.com">
+    <display-name>CICA</display-name>
+    <display-name>TV Ontario (CICA)</display-name>
+    <display-name>Canadian Independent</display-name>
+  </channel>
+
+An associated stationlist entry would be:
+
+    <station name="2" active="1" position="0"
+             band="Custom" channel="55.69MHz"
+             xmltvid="I10119.labs.zap2it.com"/>
+
 .SH AUTHORS
 
 Achim Schneider,
