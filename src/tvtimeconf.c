@@ -169,6 +169,7 @@ static void print_usage( char **argv )
                      "\t  \t\tnewzealand\n"
                      "\t  \t\titaly\n"
                      "\t  \t\tfrance\n"
+                     "\t  \t\trussia\n"
                      "\t  \t\targentina\n\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
 			         "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
