@@ -553,18 +553,19 @@ config_t *config_new( void )
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
-    ct->keymap[ I_F1 ] = TVTIME_HUE_DOWN;
-    ct->keymap[ I_F2 ] = TVTIME_HUE_UP;
-    ct->keymap[ I_F3 ] = TVTIME_BRIGHTNESS_DOWN;
-    ct->keymap[ I_F4 ] = TVTIME_BRIGHTNESS_UP;
-    ct->keymap[ I_F5 ] = TVTIME_CONTRAST_DOWN;
-    ct->keymap[ I_F6 ] = TVTIME_CONTRAST_UP;
-    ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
-    ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
+    ct->keymap[ I_F1 ] = TVTIME_BRIGHTNESS_DOWN;
+    ct->keymap[ I_F2 ] = TVTIME_BRIGHTNESS_UP;
+    ct->keymap[ I_F3 ] = TVTIME_CONTRAST_DOWN;
+    ct->keymap[ I_F4 ] = TVTIME_CONTRAST_UP;
+    ct->keymap[ I_F5 ] = TVTIME_COLOUR_DOWN;
+    ct->keymap[ I_F6 ] = TVTIME_COLOUR_UP;
+    ct->keymap[ I_F7 ] = TVTIME_HUE_DOWN;
+    ct->keymap[ I_F8 ] = TVTIME_HUE_UP;
     ct->keymap[ I_F9 ] = TVTIME_CHANNEL_SAVE_TUNING;
     ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
     ct->keymap[ I_F11 ] = TVTIME_CHANNEL_ACTIVATE_ALL;
-    ct->keymap[ I_F12 ] = TVTIME_TOGGLE_BARS;
+    ct->keymap[ I_F12 ] = TVTIME_CHANNEL_SKIP;
+    ct->keymap[ 'r' ] = TVTIME_CHANNEL_RENUMBER;
     ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
@@ -574,7 +575,6 @@ config_t *config_new( void )
     ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
-    ct->keymap[ 'r' ] = TVTIME_CHANNEL_SKIP;
     ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
@@ -584,7 +584,7 @@ config_t *config_new( void )
     ct->keymap[ 'e' ] = TVTIME_TOGGLE_AUDIO_MODE;
     ct->keymap[ '<' ] = TVTIME_OVERSCAN_DOWN;
     ct->keymap[ '>' ] = TVTIME_OVERSCAN_UP;
-    ct->keymap[ 'b' ] = TVTIME_CHANNEL_RENUMBER;
+    ct->keymap[ 'b' ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );

@@ -325,31 +325,31 @@
     <keyboard key="enter"/>
   </bind>
 
-  <bind command="hue_down">
+  <bind command="brightness_down">
     <keyboard key="F1"/>
   </bind>
-  <bind command="hue_up">
+  <bind command="brightness_up">
     <keyboard key="F2"/>
   </bind>
 
-  <bind command="brightness_down">
+  <bind command="contrast_down">
     <keyboard key="F3"/>
   </bind>
-  <bind command="brightness_up">
+  <bind command="contrast_up">
     <keyboard key="F4"/>
   </bind>
 
-  <bind command="contrast_down">
+  <bind command="colour_down">
     <keyboard key="F5"/>
   </bind>
-  <bind command="contrast_up">
+  <bind command="colour_up">
     <keyboard key="F6"/>
   </bind>
 
-  <bind command="colour_down">
+  <bind command="hue_down">
     <keyboard key="F7"/>
   </bind>
-  <bind command="colour_up">
+  <bind command="hue_up">
     <keyboard key="F8"/>
   </bind>
 
@@ -359,13 +359,19 @@
   <bind command="channel_scan">
     <keyboard key="F10"/>
   </bind>
-
   <bind command="channel_activate_all">
     <keyboard key="F11"/>
   </bind>
+  <bind command="channel_skip">
+    <keyboard key="F12"/>
+  </bind>
+
+  <bind command="channel_renumber">
+    <keyboard key="r"/>
+  </bind>
 
   <bind command="toggle_bars">
-    <keyboard key="F12"/>
+    <keyboard key="b"/>
   </bind>
 
   <bind command="show_stats">
@@ -409,10 +415,6 @@
     <keyboard key=" "/>
   </bind>
 
-  <bind command="channel_skip">
-    <keyboard key="r"/>
-  </bind>
-
   <bind command="toggle_console">
     <keyboard key="`"/>
   </bind>
@@ -446,10 +448,6 @@
   </bind>
   <bind command="overscan_down">
     <keyboard key="&lt;"/>
-  </bind>
-
-  <bind command="channel_renumber">
-    <keyboard key="b"/>
   </bind>
 
   <bind command="display_info">
