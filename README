@@ -93,6 +93,33 @@ like -l 1.3 or -l 0.8 or similar.  This applies a gamma correction curve
 to the luminance channel, and will distort your colour, but maybe in a
 way that you find improves your mood. :)
 
+4.  Key Bindings
+
+  Luminace Correction
+  -------------------
+  k              : decrease correction value by 0.1
+  l              : increase correction value by 0.1
+
+  Volume
+  ------
+  m              : toggle mute
+  keypad +       : increase volume of tuner audio by 1%
+  keypad -       : decrease volume of tuner audio by 1%
+
+  Tuning
+  ------
+  keypad numbers : input a channel (station) to tune to on the keypad
+                 : Note: you have to be relatively quick between number
+                 :       presses. no more than half a second apart.
+  up arrow       : go to next channel
+  down arrow     : go to prev channel
+
+  Misc
+  ----
+  f              : toggle fullscreen mode
+  q or escape    : quit
+
+
 Authors and contributors
 
   Billy Biggs <vektor@dumbterm.net>
