@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Fixed the XMLTV code to handle entries where the timezone
+      does not match the local timezone.
   * vektor: Changed fifodir to /tmp.  This is both easier for packaging,
       and more FHS-correct.
   * vektor: Added logic to decode channel names from tv_grab_na.
