@@ -103,7 +103,7 @@ void filter_deinterlace_methods( int accel, int fields_available )
         if( (cur->method->accelrequired & accel) != cur->method->accelrequired ) {
             /* This method is no good, drop it from the list. */
             fprintf( stderr, "deinterlace: %s disabled: required "
-                     "CPU accelleration features unavailable.\n",
+                     "CPU acceleration features unavailable.\n",
                      cur->method->short_name );
             drop = 1;
         }
