@@ -1,5 +1,8 @@
 
 0.9.11 -
+  * vektor: Don't set our own colourkey, just re-define the system colour
+      key instead.  This lets users change it if they want to do silly
+      transparency effects.
   * vektor: Added new commands UP, DOWN, LEFT, and RIGHT.  These will help
       make the commands from lirc or similar make more sense without
       resorting to fake keystroke events.  This has the side effect of
@@ -22,7 +25,7 @@
   * vektor: React to button events on release not on press.
   * larman: Display the upcoming show name from XMLTV.
   * vektor: Added CHANNEL_JUMP as a name alias for CHANNEL_PREV.
-  * vektor: Documents some commands which we forgot about in the man
+  * vektor: Document some commands which we forgot about in the man
       page for tvtime-command: DISPLAY_MESSAGE, KEY_EVENT,
       SHOW_DEINTERLACER_INFO, SHOW_MENU, SET_MATTE, and SLEEP.
   * vektor: Save state of the mirror filter across sessions.
