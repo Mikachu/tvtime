@@ -562,7 +562,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
             ev.xclient.data.l[2] = 0;
 
-            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask, &ev );
+            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
             int x, y, w, h;
             double refresh;
@@ -633,7 +633,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_FULLSCREEN", False );
             ev.xclient.data.l[2] = 0;
 
-            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask, &ev );
+            XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
             XReparentWindow( display, output_window, wm_window, 0, 0);
             XUnmapWindow( display, fs_window );
