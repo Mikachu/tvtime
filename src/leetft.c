@@ -135,6 +135,11 @@ void ft_font_delete( ft_font_t *font )
     }
 }
 
+int ft_font_get_size( ft_font_t *font )
+{
+    return font->fontsize;
+}
+
 static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos,
                                FT_UInt *glyphindex, const char *text, int len )
 {

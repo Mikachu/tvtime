@@ -45,6 +45,11 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect );
  */
 void ft_font_delete( ft_font_t *font );
 
+/**
+ * Returns the size of the font.
+ */
+int ft_font_get_size( ft_font_t *font );
+
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
                      int subpix_pos, int *width, int *height, int outsize );
 
