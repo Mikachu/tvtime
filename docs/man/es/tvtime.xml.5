@@ -1,0 +1,514 @@
+.\" Página man para tvtime.xml en castellano.
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"  Traducido al castellano por Iván Eixarch Calvo.
+.\"  Envíen correcciones a: ivan@bonacamp.com
+.\"
+.\"  Última revisión: 6-1-2005 (Iván Eixarch Calvo).
+.\"
+.TH tvtime.xml 5 "October 2004" "tvtime 0.9.15"
+
+.SH NOMBRE
+tvtime.xml \- fichero de configuración de tvtime
+
+.SH SINOPSIS
+
+.I ~/.tvtime/tvtime.xml
+.br
+.I /etc/tvtime/tvtime.xml
+.br
+
+.SH DESCRIPCIÓN
+
+El archivo
+.I tvtime.xml
+es el principal fichero de configuración de
+.BR tvtime .
+Contiene todos los ajustes por defecto y las asociaciones de teclas. El archivo
+.I tvtime.xml
+es actualizado por
+.B tvtime
+en ejecución, para conservar ajustes entre sesiones.  Por esta razon, no
+debes editar el fichero
+.I tvtime.xml
+mientras
+.B tvtime
+está en ejecución, o tus cambios podrían ser sobre-escritos.
+
+La sintaxis global es como sigue:
+
+    <?xml version="1.0"?>
+    <!DOCTYPE tvtime PUBLIC "-//tvtime//DTD tvtime 1.0//EN"
+      "http://tvtime.sourceforge.net/DTD/tvtime1.dtd">
+    <tvtime xmlns="http://tvtime.sourceforge.net/DTD/">
+    </tvtime>
+
+Puedes encontrar el DTD y más información sobre los archivos de
+configuración XML en
+.nh
+.UR http://tvtime.sourceforge.net/DTD/
+http://tvtime.sourceforge.net/DTD/
+.UE
+.hy
+
+.SH OPCIONES
+
+.B tvtime
+soporta multitud de opciones. La etiqueta <option> debe estar contenida
+dentro de una etiqueta <tvtime>
+
+Lo siguiente es una lista de opciones y sus valores por defecto, 
+acompañadas de una descripción de lo que la opción hace.
+
+.TP
+<option name="Verbose" value="0"/>
+El modo verboso indica que debe mostrarse todos los mensajes informativos
+y de precaución por stderr mientras ejecuta
+.BR tvtime .
+De otra forma, sólo los errores críticos serían mostrados.
+
+.TP
+<option name="V4LDevice" value="/dev/video0"/>
+Establece el dispositivo de captura por defecto.
+
+.TP
+<option name="V4LInput" value="0"/>
+Establece la entrada de la capturadora que abre por defecto
+.BR tvtime .
+Por ejemplo, mi tarjeta WinTV tiene el sintonizador en
+.IR 0 ,
+y la entrada de video compuesto en
+.IR 1 .
+Las fuentes pueden cambiarse en tiempo de ejecución usando el comando
+.B toggle_input
+cuya tecla asociada es \(lqi\(rq por defecto.
+
+.TP
+<option name="Norm" value="NTSC"/>
+Establece la norma de TV por defecto. Valores válidos son:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@NTSC\-JP
+\(bu@SECAM
+\(bu@PAL
+\(bu@PAL\-Nc
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@PAL\-60
+.TE
+
+.TP
+<option name="SaveAndRestorePictureSettings" value="1"/>
+Esta opción indica si
+.B
+tvtime
+debería guardar y restaurar sus propios ajustes de imágen
+tanto al arrancar como al cambiar de canal.
+
+.TP
+<option name="AudioMode" value="stereo"/>
+.B
+Esta opción guarda el último modo de audio usado. Se usará para
+recordar qué modo de audio se usará cuando la aplicación sea
+iniciada la próxima vez. Opciones válidas son "mono", "stereo",
+"lang1", "lang2" o "sap".
+
+.TP
+<option name="AudioBoost" value="-1"/>
+.B
+Esta opción establece la amplificación de audio. Se trata de un
+porcentaje que establece el nivel de volumen procedente de la
+tarjeta capturadora. Por defecto, tvtime no utiliza esta amplificación.
+Sin embargo, como a veces el volumen por defecto de la capturadora
+no es idóneo o ha sido establecido por otra aplicación, puedes usar
+este valor para tener siempre tu volumen preferido. Usa -1 para
+que tvtime no utilice esta amplificación.
+
+.TP
+<option name="ShowCC" value="0"/>
+.B
+Esta opción guarda el estado de la decodificación "closed caption".
+Se denomina "closed caption" a la trascripción textual de la señal
+de audio específica de NTSC para los disminuídos auditivos.
+
+.TP
+<option name="ColourInvert" value="0"/>
+.B
+Este valor guarda el estado (activado-desactivado) del filtro de 
+inversión de color entre sesiones.
+
+.TP
+<option name="MirrorInput" value="0"/>
+.B
+Este valor guarda el estado (activado-desactivado) del filtro espejo
+entre sesiones.
+
+.TP
+<option name="Frequencies" value="US-Cable"/>
+Establece la tabla de frecuencias por defecto que se usará por cualquier
+sintonizador encontrado.
+Las posibilidades son:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us-cable
+\(bu@us-broadcast
+\(bu@japan-cable
+\(bu@japan-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+.TE
+
+.TP
+<option name="NTSCCableMode" value="Standard"/>
+Existen dos estándar de cable especiales NTSC en EEUU: IRC y HRC.
+En IRC, los canales 5 y 6 operan sobre frecuencias diferentes y
+el modo HRC cambia todas las frecuencias a razón de 1.25MHz (y
+esto también ocurre en los canales 5 y 6). Usa esta opción
+para establecer el modo de cable a
+.IR Standard ,
+.IR IRC ", or "
+.IR HRC .
+Es muy extraño encontrar sistemas de cable que usen IRC o HRC.
+
+.TP
+<option name="CheckForSignal" value="1"/>
+Establece si
+.B tvtime
+debe comprobar si detecta señal cuando cambias de canal, etc.
+Si tu tarjeta no apesta, no deberías necesitar desactivarlo.
+Deshabilitar esta opción deshabilitará también el escáner de canales.
+
+.TP
+<option name="InputWidth" value="720"/>
+Establece cúantos pixels por scanline son recogidas de la tarjeta capturadora.
+A mayor muestreo mayor calidad de imágen, mientras que con un muestreo menor
+haremos menor trabajo y en consecuencia
+.B tvtime
+se ejecutará más rápido.  Si tienes una CPU lenta
+(menor o igual a 500Mhz), valores de
+.IR 480 \ or\  400
+puede que te vayan bien.  Para la mejor calidad, escoge un valor alto como
+.IR 720 \ or\  768 .
+Muchas capturadoras no pueden muestrear más de
+.I 768
+pixels por scanline.
+
+.TP
+<option name="XMLTVFile" value="none"/>
+Establece el fichero xmltv del que se obtendrán los listados de programas.
+Selecciona "none" si no quieres usar xmltv.
+
+.TP
+<option name="XMLTVLanguage" value="none"/>
+Usa los datos de XMLTV en el lenguaje dado si está disponible.
+Los lenguajes se representan por dos letras que constituyen el
+código del lenguaje (por ejemplo, "es" de España). Si es "none"
+o no está configurada esta opción se usará el lenguaje por defecto
+del fichero.
+
+.TP
+<option name="UseXDS" value="0"/>
+Establécelo a
+.I 1
+para activar la decodificación de información de canal XDS.
+Esta opción es específica para regiones NTSC.  XDS se utiliza para
+enviar información sobre los canales incluyendo el nombre de la
+red de trabajo y las cartas de llamadas, y algo de información
+sobre el programa actual.
+
+.TP
+<option name="VBIDevice" value="/dev/vbi0"/>
+Establece cual dispositivo se usará para decodificación VBI.
+
+.TP
+<option name="MixerDevice" value="/dev/mixer:line"/>
+Establece el dispositivo mezclador y el canal. El formato es
+nombre dispositivo: nombre canal. Canales válidos son:
+
+.nh
+.IR vol ", " bass ", " treble ", " synth ", " pcm ", " speaker ", "
+.IR line ", "  mic ", "  cd ", "  mix ", "  pcm2 ", " rec ", " 
+.IR igain ", "  ogain ", "  line1 ", "  line2 ", "  line3 ", "
+.IR dig1 ", "  dig2 ", "  dig3 ", "  phin ", " phout ", " video ", "
+.IR radio ", "  monitor
+.hy
+
+.TP
+<option name="Widescreen" value="0"/>
+Esta opción activa el modo 16:9 por defecto al arrancar.
+
+.TP
+<option name="WindowGeometry" value="0x576"/>
+Establece la geometría de la ventana. Un valor de anchura 0 significa
+que será calculado el ancho apropiado para la altura indicada. Para una
+escala 4:3 en una pantalla de pixel cuadrado es por defecto
+.RI 768\[mu] 576
+window.
+
+.TP
+<option name="Overscan" value="0.0"/>
+Establece el porcentaje de los lados que se reservan al overscan, esto
+es, no se muestran por completo. Un área de acción segura en una
+televisión es un 10% para el overscan, pero es un poco restrictivo.
+Si quieres que
+.B tvtime
+parezca una TV, un buen valor sería 6\[en]8%.  El valor se expresa
+en porcentaje, así que para un 8%, usa
+.IR 8.0 .
+
+.TP
+<option name="Fullscreen" value="0"/>
+Establécelo a
+.I 1
+para que
+.B tvtime
+se inicie a pantalla completa.  Este ajuste se guarda en tiempo de ejecucion,
+así que cuando te sales de 
+.B tvtime
+en pantalla completa, al iniciar de nuevo estarás en pantalla completa.
+
+.TP
+<option name="AlwaysOnTop" value="0"/>
+Establécelo a
+.I 1
+para que
+.B tvtime
+se inicie en modo "siempre visible" si lo soporta tu gestor de ventanas.
+Este ajuste se guarda en tiempo de ejecucion, así que cuando te sales de 
+.B tvtime
+en modo "siempre visible", al iniciar de nuevo estarás en modo "siempre visible".
+
+.TP
+<option name="FullscreenPosition" value="Centre"/>
+Establece la posición de la salida cuando estás en pantalla completa:
+.I top (arriba),
+.I bottom (abajo)
+o
+.I centre (centrado).
+Cuando escoges
+.I top,
+.B tvtime
+en pantalla completa situará su salida en la parte superior de la pantalla.
+Úsalo si tienes un proyector para ayudar a
+.B tvtime
+a encajar la imágen apropiadamente.
+
+.TP
+<option name="FramerateMode" value="0"/>
+Establece la tasa de cuadros (framerate) mandadas a la salida por
+.BR tvtime .
+.RS
+.TP 4
+.I 0
+Modo completo, cada cuadro es desentrelazado.
+59.94fps para NTSC, 50fps para PAL.
+
+.TP
+.I 1
+Modo medio, se desentrelazan todos los campos superiores de un cuadro (TFF).
+29.97fps para NTSC, 25fps para PAL.
+
+.TP
+.I 2
+Modo medio, se desentrelazan todos los campos inferiores de un cuadro (BFF).
+29.97fps para NTSC, 25fps para PAL.
+.RE
+.IP
+Los dos modos con media tasa de cuadros son útiles para el contenido
+progresivo de las consolas de video-juegos.  Usa weave y selecciona TFF o BFF, 
+el que no presente efectos de entrelazado.
+
+.TP
+<option name="QuietScreenshots" value="0"/>
+Cuando activas esta opción, las capturas de pantalla no se anuncian
+en el OSD. Esto es útil si tomas muchas capturas de pantalla y no
+quieres que el texto aparezca en ninguna.
+
+.TP
+<option name="ProcessPriority" value="-10"/>
+Establece la prioridad de proceso. Por defecto,
+.B tvtime
+intenta asignarse a sí mismo una prioridad
+.I \[en]10
+la cual es mayor que las aplicaciones normales. Valores aceptables son desde
+.IR \[en]20 " a " 20 ,
+siendo el valor menor el que otorga una mayor prioridad.
+
+.TP
+<option name="TimeFormat" value="%X"/>
+Establece el formato de hora que es sobreimpresionado por
+.B tvtime.
+El formato es un string con el mismo formato que
+.BR strftime (3).
+Se usa el formato de hora de tu región (locale) por defecto.
+
+.TP
+<option name="ScreenShotDir" value="~"/>
+Es el directorio en el que son situadas las capturas de pantalla.
+El home de usuario es el valor por defecto.
+
+.TP
+.PD 0
+<option name="ChannelTextFG" value="0xFFFFFF00"/>
+.TP
+.PD
+<option name="OtherTextFG" value="0xFFF5DEB3"/>
+Estas opciones establecen los colores ARGB que se usan para el
+texto sobreimpresionado. El color por defecto para el nombre del
+canal es \(lqyellow\(rq
+.RI ( 0xffffff00 ),
+y el del texto circundante es \(lqwheat\(rq
+.RI ( 0xfff5deb3 ).
+El formato de color puede expresarse en hexadecimal o en decimal.
+Si el canal alfa no es especificado vale, por defecto, \(lqopaque\(rq
+.RI ( 255 ).
+
+.RS
+.TP 10
+Ejemplos:
+.IR 0xffaadd ,
+.IR 0xff0000ff ,
+.IR 0xff ,
+.IR 0xffff ,
+.IR "255 255 0" ,
+.IR 0 ,
+.IR 16777215 .
+.RE
+
+.TP
+<option name="UnmuteVolume" value="-1"/>
+Esta opción guarda el volumen antes de estar mudo entre sesiones.
+No deberías necesitar establecerlo nunca tú mismo.
+
+.TP
+<option name="Muted" value="0"/>
+Esta opción guarda si tvtime estuvo mudo o no cuando saliste la última
+vez. No deberías necesitar establecerlo nunca tú mismo.
+
+.TP
+<option name="MuteOnExit" value="1"/>
+Esta opción controla si tvtime debería silenciar su dispositivo mezclador
+al salir. Por defecto, tvtime silencia el dispositivo mezclador para
+trabajar con tarjetas capturadoras ruidosas. Desactivar esta opción
+puede tener efectos adversos en otras aplicaciones.
+
+.TP
+<option name="PrevChannel" value="2"/>
+Esta opción se guarda en ejecución para recordar el canal previo.
+
+.TP
+<option name="Channel" value="2"/>
+Esta opción se guarda en ejecución para recordar el canal actual.
+
+.TP
+<option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
+Esta opción se guarda en ejecución para recordar el desentrelazador usado.
+
+Desentrelazadores soportados son:
+.RS
+.TP 15
+.PD 0
+.I TelevisionFull
+Television: Full Resolution
+.TP
+.I TelevisionHalf
+Television: Half Resolution
+.TP
+.I BlurVertical
+Blur: Vertical
+.TP
+.I BlurTemporal
+Blur: Temporal
+.TP
+.I AdaptiveSearch
+Motion Adaptive: Motion Search
+.TP
+.I AdaptiveAdvanced
+Motion Adaptive: Advanced Detection
+.TP
+.I AdaptiveSimple
+Motion Adaptive: Simple Detection
+.TP
+.I ProgressiveTFF
+Progressive: Top Field First
+.TP
+.I ProgressiveBFF
+Progressive: Bottom Field First
+.PD
+.RE
+
+.SH BINDINGS
+
+Tanto las pulsaciones de teclas como los clicks del ratón pueden asociarse a comandos de
+.B tvtime.  
+Para encontrar una descripción de cada comando, consulta
+.BR tvtime-command (1).
+
+Múltiples teclas y botones del ratón pueden estar asociadas al mismo comando.
+Por comodidad,
+.B tvtime
+provee alias para teclas especiales. Las teclas especiales reconocidas por 
+.B tvtime
+son:
+
+.nh
+.IR Up ", " Down ", " Left ", " Right ", " Insert ", " Home ", " End ",R "
+.IR PageUp ", " PageDown ", " F1 ", " F2 ", " F3 ", " F4 ", " F5 ", "
+.IR F6 ", " F7 ", " F8 ", " F9 ", " F10 ", " F11 ", " F12 ", " F13 ", "
+.IR F14 ", " F15 ", " Backspace ", " Escape ", " Enter ", " Print ", " Menu
+.hy
+
+Un ejemplo de asociación de tecla podría ser para el comando
+.IR CHANNEL_INC .
+En este caso, tenemos dos teclas
+.RI ( Up " and " k )
+asociadas al comando, así como el botón del ratón
+.RI ( 4 ).
+
+    <bind command="channel_inc">
+      <keyboard key="up"/>
+      <keyboard key="k"/>
+      <mouse button="4"/>
+    </bind>
+
+Algunos comandos pueden recibir argumentos; por ejemplo, el comando
+.IT SCREENSHOT
+puede coger como argumento el nombre del fichero. Los argumentos pueden
+ser enviados a una asociación de tecla como sigue:
+
+    <bind command="screenshot" argument="/tmp/last-screenshot.png">
+      <keyboard key="s"/>
+    </bind>
+
+.SH AUTOR
+
+Billy Biggs.
+
+.SH "VÉASE TAMBIÉN"
+
+.BR tvtime (1),
+.BR tvtime-configure (1),
+.BR tvtime-command (1),
+.BR tvtime-scanner (1),
+.IR stationlist.xml (5).

@@ -1,0 +1,192 @@
+.\" Página man para stationlist.xml en castellano
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"  Traducido al castellano por Iván Eixarch Calvo.
+.\"  Envíen correcciones a: ivan@bonacamp.com
+.\"
+.\"  Última revisión: 6-1-2005 (Iván Eixarch Calvo).
+.\"
+.TH stationlist.xml 5 "Octubre 2004" "tvtime 0.9.15"
+
+.SH NOMBRE
+stationlist.xml \- fichero de configuración de emisoras para tvtime
+
+.SH SINOPSIS
+
+.I ~/.tvtime/stationlist.xml
+
+.SH DESCRIPCIÓN
+
+El fichero
+.I stationlist.xml
+contiene la configuración de canales para tarjetas capturadoras con
+sintonizador.  Tiene una lista de canales activos con su frecuencia,
+información de renumeración y nombre del canal.  El fichero
+.I stationlist.xml
+es actualizado por
+.B tvtime
+en tiempo de ejecución para almacenar ajustes entre sesiones. Por
+esta razón, no deberías editar este fichero mientras
+.B tvtime
+está corriendo o tus cambios pueden ser sobre-escritos.
+
+Este fichero se crea o actualiza siempre que la información relativa
+al canal cambie en
+.BR tvtime .
+Ocurre cuando renumeras un canal, usas el escáner de canales o activas
+o desactivas manualmente un canal específico de la lista.
+
+Los ajustes del canal se guardan en relación a su norma y tabla de frecuencias.
+
+    <?xml version="1.0"?>
+    <!DOCTYPE stationlist PUBLIC "-//tvtime//DTD stationlist 1.0//EN"
+      "http://tvtime.sourceforge.net/DTD/stationlist.dtd">
+    <stationlist xmlns="http://tvtime.sourceforge.net/DTD/">
+      <list norm="NTSC" frequencies="US-Cable">
+        <station ... />
+        ... station list
+      </list>
+    </stationlist>
+
+Es decir, cada combinación norma/frecuencia tendrá su propia sección en
+el archivo de configuración. El nombre de la frecuencia no es especial, puedes tener
+frequencies="foobar", ejecutar
+.br
+.h'4n'tvtime -f foobar
+.br
+y obtendrás los resultados deseados.  La norma; sin embargo, debe coincidir
+con la que estás usando.
+
+Las entradas en una lista están de la siguiente forma:
+
+    <station name="CNN" active="1" position="18"
+             band="US Cable" channel="18"/>
+    <station name="DSF" active="1" position="12"
+             band="VHF E2-E12" channel="E12"/>
+
+
+.SH EMISORAS
+
+Cada emisora (station) tiene sus propiedades que deberán ser establecidas.
+
+.TP
+.B name
+El nombre (leible por los humanos) del canal actual.
+
+.TP
+.B active
+Cuando se establece a
+.IR 1 ,
+el canal está activo.  Para desactivarlo, establecerlo a
+.IR 0 .
+
+.TP
+.B position
+Especifica la posición que el canal ocupa en el dial.
+Permite a los usuarios asociar arbitrariamente cualquier
+canal con una posición en el dial.
+
+.TP
+.PD 0
+.B band
+.TP
+.B channel
+
+Las bandas (bands) y canales (channels) disponibles en
+.B tvtime
+son:
+.PD
+
+.TS
+nokeep tab (@);
+lb lb
+l l.
+Nombre de la banda@Canales proporcionados
+US Cable@1\[en]99
+US Cable 100@100\[en]125
+US Two-Way@T7, T8, T9, T10, T11, T12 T13, T14
+US Broadcast@2\[en]83
+China Broadcast@1\[en]68, A1\[en]A7, B1\[en]B31, C1\[en]C5
+Japan Broadcast@1\[en]62
+Japan Cable@13\[en]63
+VHF E2-E12@E1\[en]E12
+VHF S1-S41@S1\[en]S41
+VHF Misc@X, Y, Z, Z+1, Z+2
+VHF France@K01\[en]K10, KB\[en]KQ, H01\[en]H19
+VHF Russia@R1\[en]R12, SR1\[en]SR19
+VHF Australia@AS1\[en]AS12, AS5A, AS9A
+VHF Italy@A\[en]H, H1, H2
+VHF Ireland@I1\[en]I9
+UHF@U21\[en]U69
+UHF Australia@AU28\[en]AU69
+Australia Optus@01\[en]058
+.TE
+
+Pueden incluirse manualmente canales personalizados especificando
+su frecuencia en megahertzios:
+
+    <station name="2" active="1" position="0"
+             band="Custom" channel="55.69MHz"/>
+
+.TP
+.B norm
+Puede especificarse una norma por canal en la lista de emisoras.
+Si recibes emisoras PAL y SECAM, puedes escoger el formato
+de codificación de color para cada señal. Los únicos valores válidos
+son PAL o SECAM.
+
+.TP
+.B network
+Establece el nombre de la red de trabajo para el OSD. En regiones NTSC,
+se establece desde la información XDS en el VBI siempre que la decodificación
+VBI esté activada.
+
+.TP
+.B call
+Establece las "call letters" de la red de trabajo para el OSD.
+En regiones NTSC, se establece desde la información XDS en el VBI 
+siempre que la decodificación VBI esté activada.
+
+.TP
+.B xmltvid
+Establece el identificador de canal XMLTV para asociarlo con tvtime si
+éste no puede esociarlo automáticamente.  Suponiendo que la definición del
+canal en un fichero XMLTV es:
+
+  <channel id="I10119.labs.zap2it.com">
+    <display-name>CICA</display-name>
+    <display-name>TV Ontario (CICA)</display-name>
+    <display-name>Canadian Independent</display-name>
+  </channel>
+
+La entrada asociada en el stationlist sería:
+
+    <station name="2" active="1" position="0"
+             band="Custom" channel="55.69MHz"
+             xmltvid="I10119.labs.zap2it.com"/>
+
+.SH AUTORES
+
+Achim Schneider,
+Billy Biggs.
+
+.SH "VÉASE TAMBIÉN"
+
+.BR tvtime (1),
+.BR tvtime-command (1),
+.BR tvtime-scanner (1),
+.IR tvtime.xml (5).

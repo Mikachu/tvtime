@@ -1,0 +1,250 @@
+.\" Página man para tvtime-configure en castellano
+.\" Copyright (c) 2003, 2004  Billy Biggs
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"  Traducido al castellano por Iván Eixarch Calvo.
+.\"  Envíen correcciones a: ivan@bonacamp.com
+.\"
+.\"  Última revisión: 6-1-2005 (Iván Eixarch Calvo).
+.\"
+.TH tvtime-configure 1 "Octubre 2004" "tvtime 0.9.15"
+
+.SH NOMBRE
+tvtime\-configure \- cambia valores en el archivo de configuracón de
+.B tvtime
+
+.SH SINOPSIS
+
+.B tvtime\-configure
+[
+.IR OPCIÓN
+] ...
+
+.SH DESCRIPCIÓN
+
+.B tvtime\-configure
+permite al usuario establecer ajustes en la configuración de
+.B tvtime
+sin arrancar la aplicación. Esto es útil a la hora de instalar
+programas como debconf para permitirle configurar tvtime sin tener
+que escribir un parser para el fichero de configuración. Las opciones
+de la línea de comandos es un subconjunto de las opciones de
+.B tvtime.
+
+.SH OPCIONES
+
+.TP
+.B \-a, \-\-widescreen
+Esta opción arranca
+.B tvtime
+en modo 16:9.
+
+.TP
+.B \-h, \-\-help
+Muestra información de uso.
+
+.TP
+.B \-m, \-\-fullscreen
+Arranca
+.B tvtime
+a pantalla completa.
+
+.TP
+.B \-M, \-\-window
+Arranca
+.B tvtime
+en ventana.
+
+.TP
+.B \-p, \-\-fspos=POS
+Establece la posición de la pantalla completa. Úsalo si
+tienes un proyector para ayudar a
+.B tvtime
+a encajarlo apropiadamente en tu pantalla.
+.TS
+nokeep tab (@);
+l l.
+\(bu@top
+\(bu@bottom
+\(bu@centre (por defecto)
+.TE
+
+.TP
+.B \-F, \-\-configfile=FICHERO
+Fichero de configuración adicional cuyos ajustes serán aplicados.
+
+.TP
+.B \-H, \-\-height=ALTURA
+Establece la altura de la ventana de salida en scanlines.
+Por defecto, el tamaño de la ventana de salida es de
+.I 576
+scanlines.
+
+.TP
+.B -I, \-\-inputwidth=MUESTREO
+Muestreo de scanline en V4L (
+.IR 720 
+por defecto ).
+Establece cúantos pixels por scanline son recogidas de la tarjeta capturadora.
+A mayor muestreo, mayor calidad de imágen.  Sin embargo, con un muestreo menor
+haremos menor trabajo y, en consecuencia,
+.B tvtime
+se ejecutará más rápido.  Si tienes una CPU lenta
+(en torno a 500Mhz), valores de
+.IR 480 \ o \  400
+puede que te vayan bien.  Para la mejor calidad, escoge un valor alto como
+.IR 720 \ o \  768 .
+Muchas capturadoras no pueden muestrear más de
+.I 768
+pixels por scanline.
+
+.TP
+.B \-d, \-\-device=NOMBRE
+dispositivo video4linux que se usará (
+.IR /dev/video0 
+por defecto ).
+
+.TP
+.B \-b, \-\-vbidevice=DISPOSITIVO
+dispositivo VBI que se usará (
+.IR /dev/vbi0 
+por defecto ).
+
+.TP
+.B \-i, \-\-input=NUMEROENTRADA
+Número de entrada de video4linux (
+.IR 0 
+por defecto).
+Comúnmente las tarjetas tienen varias
+fuentes; por ejemplo, en mi tarjeta WinTV,
+.I fuente 0
+es mi sintonizador y
+.I fuente 1
+es mi entrada de video compuesto.
+
+.TP
+.B \-c, \-\-channel=CANAL
+Al iniciarse,
+.B tvtime
+sintonizará el canal dado.  De otra forma,
+serán usados los canales del archivo de configuración.
+
+.TP
+.B \-n, \-\-norm=NORMA
+El modo para establecer la norma (
+.IR NTSC
+por defecto ).
+Valores válidos son:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@PAL
+\(bu@SECAM
+\(bu@PAL\-NC
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@NTSC\-JP
+.TE
+
+.TP
+.B \-f, \-\-frequencies=NOMBRE
+Los canales que recibes con tu sintonizador (
+.IR us\-cable 
+por defecto ).
+Valores válidos son:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us\-cable
+\(bu@us\-broadcast
+\(bu@japan\-cable
+\(bu@japan\-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia\-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+\(bu@custom (primero ejecuta 'tvtime-scanner')
+.TE
+
+.TP
+.B \-R, \-\-priority=PRI
+Establece la prioridad del proceso (ver
+.BR nice (1))
+con la que tvtime se ejecutará.
+
+.TP
+.B \-t, \-\-xmltv=FICHERO
+Lee los listados XMLTV del fichero dado para visualizarlos en el OSD.
+Los canales se buscarán basándose en su nombre y
+.B tvtime
+visualizará el título, subtítulo y la descripción 
+del programa en el OSD.
+
+.TP
+.B \-l, \-\-xmltvlanguage=LENGUAJE
+Usa los datos de XMLTV en el lenguaje dado si está disponible.
+Los lenguajes se representan por dos letras que constituyen el
+código del lenguaje (por ejemplo, "es" de España). Si es "none"
+o no está configurada esta opción, se usará el lenguaje por defecto
+del fichero.
+
+.TP
+.B \-x, \-\-mixer=DISPOSITIVO[:CH]
+El dispositivo mezclador y el canal para el control de volumen (
+.IR /dev/mixer:line 
+por defecto ).
+Canales válidos son:
+.TS
+nokeep tab (@);
+l l.
+\(bu@vol
+\(bu@bass
+\(bu@treble
+\(bu@synth
+\(bu@pcm
+\(bu@speaker
+\(bu@line
+\(bu@mic
+\(bu@cd
+\(bu@mix
+\(bu@pcm2
+\(bu@rec
+\(bu@igain
+\(bu@ogain
+\(bu@line1
+\(bu@line2
+\(bu@line3
+\(bu@dig1
+\(bu@dig2
+\(bu@dig3
+\(bu@phin
+\(bu@phout
+\(bu@video
+\(bu@radio
+\(bu@monitor
+.TE
+
+.SH AUTORES
+
+Billy Biggs.
+
+.SH "VÉASE TAMBIÉN"
+
+.BR tvtime (1),
+.IR tvtime.xml (5),

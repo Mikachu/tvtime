@@ -1,5 +1,5 @@
-# docs/Makefile.am distributes the tvtime manuals
-# Copyright (C) 2004  Ingo van Lil
+# docs/man/en/Makefile.am distributes spanish tvtime manuals
+# Copyright (C) 2005  Billy Biggs
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,5 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-SUBDIRS = de en es
+man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5 \
+	tvtime-configure.1 tvtime-scanner.1
+
+EXTRA_DIST = $(man_MANS)
 
