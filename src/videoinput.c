@@ -764,8 +764,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                 return 0;
             }
 
-            vidin->capbuffers[ i ].data = mmap( 0, vidbuf->length, PROT_READ | PROT_WRITE,
-                                                MAP_SHARED, vidin->grab_fd, vidbuf->m.offset );
+            vidin->capbuffers[ i ].data = mmap( 0, vidbuf->length,
+                                                PROT_READ | PROT_WRITE,
+                                                MAP_SHARED, vidin->grab_fd,
+                                                vidbuf->m.offset );
             if( vidin->capbuffers[ i ].data == MAP_FAILED ) {
                 fprintf( stderr, "videoinput: Can't map buffer %d: %s.\n",
                          i, strerror( errno ) );
@@ -802,9 +804,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                 vidin->numframes = vidin->gb_buffers.frames;
             }
 
-            vidin->grab_buf = malloc( sizeof( struct video_mmap ) * vidin->numframes );
+            vidin->grab_buf = malloc( sizeof( struct video_mmap ) *
+                                      vidin->numframes );
             if( !vidin->grab_buf ) {
-                fprintf( stderr, "videoinput: Can't allocate grab_buf memory.\n" );
+                fprintf( stderr, "videoinput: Can't allocate memory.\n" );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -812,13 +815,18 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
             /* Setup mmap capture buffers. */
             for( i = 0; i < vidin->numframes; i++ ) {
-                vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422; /* Y'CbCr 4:2:2 Packed. */
+                if( vidin->isuyvy ) {
+                    vidin->grab_buf[ i ].format = VIDEO_PALETTE_UYVY;
+                } else {
+                    vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422;
+                }
                 vidin->grab_buf[ i ].frame = i;
                 vidin->grab_buf[ i ].width = vidin->width;
                 vidin->grab_buf[ i ].height = vidin->height;
             }
 
-            vidin->map = (uint8_t *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
+            vidin->map = (uint8_t *) mmap( 0, vidin->gb_buffers.size,
+                                           PROT_READ|PROT_WRITE,
                                            MAP_SHARED, vidin->grab_fd, 0 );
             if( vidin->map != MAP_FAILED ) {
                 vidin->have_mmap = 1;
@@ -830,7 +838,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             }
         }
 
-        /* Fallback to read().  THIS CODE IS UNTESTED.  IS THIS EVEN FINISHED? */
+        /* Fallback to read(). THIS CODE IS UNTESTED. IS THIS EVEN FINISHED? */
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
         }
