@@ -205,9 +205,11 @@ int main( int argc, char **argv )
     height = videoinput_get_height( vidin );
     if( videoinput_get_numframes( vidin ) > 2 ) {
         copymode = 0;
-        fprintf( stderr, "woop, not in copy mode.\n" );
     } else {
-        fprintf( stderr, "darn, stuck in copy mode.\n" );
+        fprintf( stderr, "tvtime: Can't get 3 buffers from V4L: forced to "
+                "keep our own copy of previous frames.\n"
+                "tvtime: If you are using the bttv driver, do 'modprobe bttv "
+                "gbuffers=3' next time.\n" );
     }
 
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
@@ -443,24 +445,11 @@ int main( int argc, char **argv )
                                                        width*2, curframe,
                                                        lastframe, width,
                                                        height, width*2 );
-/*
-                video_correction_packed422_field_to_frame_top( vc, 
-                                                               sdl_get_output(),
-                                                               width*2, 
-                                                               curframe,
-                                                               width, height/2,
-                                                               width*4 );
-*/
             } else {
                 packed422_field_to_frame_top_twoframe( sdl_get_output(),
                                                        width*2, curframe,
                                                        lastframe, width,
                                                        height, width*2 );
-/*
-                packed422_field_to_frame_top( sdl_get_output(), width*2, 
-                                              curframe,
-                                              width, height/2, width*4 );
-*/
             }
 
             tvtime_osd_volume_muted( osd, mixer_ismute() );
@@ -526,14 +515,6 @@ int main( int argc, char **argv )
                                                            lastframe, width,
                                                            height, width*2 );
                 }
-/*
-                video_correction_packed422_field_to_frame_bot( vc, 
-                                                               sdl_get_output(),
-                                                               width*2,
-                                                               curframe + (width*2),
-                                                               width, height/2,
-                                                               width*4 );
-*/
             } else {
                 if( copymode ) {
                     packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
@@ -546,11 +527,6 @@ int main( int argc, char **argv )
                                                            lastframe, width,
                                                            height, width*2 );
                 }
-/*
-                packed422_field_to_frame_bot( sdl_get_output(), width*2, 
-                                              curframe + (width*2),
-                                              width, height/2, width*4 );
-*/
             }
             tvtime_osd_volume_muted( osd, mixer_ismute() );
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
