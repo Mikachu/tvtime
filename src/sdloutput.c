@@ -239,6 +239,10 @@ static void sdl_poll_events( input_t *in )
         if( event.type == SDL_MOUSEBUTTONDOWN ) {
             input_callback( in, I_BUTTONPRESS, event.button.button );
         }
+
+        if( event.type == SDL_MOUSEBUTTONUP ) {
+            input_callback( in, I_BUTTONRELEASE, event.button.button );
+        }
     }
 }
 
