@@ -1082,7 +1082,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     menu = menu_new( "frequencies" );
-    /* The below line reduces number of strings requiring translation. */
     snprintf( string, sizeof( string ), "%s - %s - %s", _("Setup"),
               _("Station management"), _("Frequency table") );
     menu_set_text( menu, 0, string );
@@ -1094,7 +1093,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     menu = menu_new( "finetune" );
-    /* The below line reduces number of strings requiring translation. */
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
     snprintf( string, sizeof( string ), "%s - %s - %s", _("Setup"),
               _("Station management"), _("Finetune") );
     menu_set_text( menu, 0, string );
@@ -1169,6 +1168,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
     snprintf( string, sizeof( string ),
               "%s - %s", _("Setup"), _("Input configuration") );
     menu_set_text (menu, 0, string);
@@ -1926,6 +1926,35 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         tvtime_cmd = config_key_to_command( cmd->cfg, key );
         if( tvtime_cmd != TVTIME_KEY_EVENT ) {
             commands_handle( cmd, tvtime_cmd, arg );
+        }
+        break;
+
+    case TVTIME_UP:
+        if( cmd->menuactive ) {
+            commands_handle( cmd, TVTIME_MENU_UP, "" );
+        } else {
+            commands_handle( cmd, TVTIME_CHANNEL_INC, "" );
+        }
+        break;
+    case TVTIME_DOWN:
+        if( cmd->menuactive ) {
+            commands_handle( cmd, TVTIME_MENU_DOWN, "" );
+        } else {
+            commands_handle( cmd, TVTIME_CHANNEL_DEC, "" );
+        }
+        break;
+    case TVTIME_LEFT:
+        if( cmd->menuactive ) {
+            commands_handle( cmd, TVTIME_MENU_BACK, "" );
+        } else {
+            commands_handle( cmd, TVTIME_MIXER_DOWN, "" );
+        }
+        break;
+    case TVTIME_RIGHT:
+        if( cmd->menuactive ) {
+            commands_handle( cmd, TVTIME_MENU_ENTER, "" );
+        } else {
+            commands_handle( cmd, TVTIME_MIXER_UP, "" );
         }
         break;
 

@@ -135,6 +135,12 @@ cron jobs or other scripts to send notifications to a user running
 tvtime.
 
 .TP
+.B DOWN
+This command provides the dual functionality of channel down or menu arrow
+down, depending on whether the menu is currently active.  This command is
+to be used together with the LEFT, RIGHT and UP commands.
+
+.TP
 .B ENTER
 Sends a virtual enter command.  Use this when changing the channel:
 .br
@@ -163,6 +169,12 @@ Increases the hue setting of the input.
 Sends a fake keystroke event to tvtime.  This is useful for
 doing complex operations via a remote control, as you can
 indirect events to tvtime's internal key binding system.
+
+.TP
+.B LEFT
+This command provides the dual functionality of mixer volume down or
+menu back command, depending on whether the menu is currently active.
+This command is to be used together with the RIGHT, UP and DOWN commands.
 
 .TP
 .B LUMA_DOWN
@@ -246,6 +258,12 @@ Decreases the current picture setting value (brightness/contrast/colour/hue).
 .B RESTART
 Asks tvtime to restart itself.  This is used in the menu when we have changed
 a value that we can't yet change at runtime.
+
+.TP
+.B RIGHT
+This command provides the dual functionality of mixer volume up or
+menu enter command, depending on whether the menu is currently active.
+This command is to be used together with the LEFT, UP and DOWN commands.
 
 .TP
 .B RUN_COMMAND
@@ -490,6 +508,12 @@ Toggles on and off tvtime's XDS decoding code.  XDS is used to send information
 about the channel including the network name and call letters, and
 sometimes information about the current show.  This information is then shown
 on the OSD and saved to the stationlist.xml file.
+
+.TP
+.B UP
+This command provides the dual functionality of channel up or menu arrow up,
+depending on whether the menu is currently active.  This command is to be
+used together with the LEFT, RIGHT and DOWN commands.
 
 .TP
 .B QUIT

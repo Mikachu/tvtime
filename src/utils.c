@@ -503,6 +503,8 @@ static command_names_t command_table[] = {
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
     { "DISPLAY_MESSAGE", TVTIME_DISPLAY_MESSAGE },
 
+    { "DOWN", TVTIME_DOWN },
+
     { "ENTER", TVTIME_ENTER },
 
     { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
@@ -512,6 +514,8 @@ static command_names_t command_table[] = {
     { "HUE_UP", TVTIME_HUE_UP },
 
     { "KEY_EVENT", TVTIME_KEY_EVENT },
+
+    { "LEFT", TVTIME_LEFT },
 
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
     { "LUMA_UP", TVTIME_LUMA_UP },
@@ -534,6 +538,7 @@ static command_names_t command_table[] = {
     { "PICTURE_DOWN", TVTIME_PICTURE_DOWN },
 
     { "RESTART", TVTIME_RESTART },
+    { "RIGHT", TVTIME_RIGHT },
     { "RUN_COMMAND", TVTIME_RUN_COMMAND },
 
     { "SAVE_PICTURE_GLOBAL", TVTIME_SAVE_PICTURE_GLOBAL },
@@ -583,6 +588,8 @@ static command_names_t command_table[] = {
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
     { "TOGGLE_SIGNAL_DETECTION", TVTIME_TOGGLE_SIGNAL_DETECTION },
     { "TOGGLE_XDS", TVTIME_TOGGLE_XDS },
+
+    { "UP", TVTIME_UP },
 
     { "QUIT", TVTIME_QUIT },
 };

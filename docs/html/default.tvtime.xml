@@ -423,39 +423,33 @@
     <mouse button="3"/>
   </bind>
 
-  <bind command="channel_inc">
+  <bind command="up">
     <keyboard key="up"/>
     <mouse button="4"/>
   </bind>
 
-  <bind command="channel_dec">
+  <bind command="down">
     <keyboard key="down"/>
     <mouse button="5"/>
+  </bind>
+
+  <bind command="left">
+    <keyboard key="left"/>
+    <keyboard key="-"/>
+  </bind>
+
+  <bind command="right">
+    <keyboard key="right"/>
+    <keyboard key="+"/>
   </bind>
 
   <bind command="channel_prev">
     <keyboard key="backspace"/>
   </bind>
 
-  <bind command="finetune_up">
-    <keyboard key="right"/>
-  </bind>
-
-  <bind command="finetune_down">
-    <keyboard key="left"/>
-  </bind>
-
   <bind command="toggle_mute">
     <keyboard key="m"/>
     <mouse button="2"/>
-  </bind>
-
-  <bind command="mixer_up">
-    <keyboard key="+"/>
-  </bind>
-
-  <bind command="mixer_down">
-    <keyboard key="-"/>
   </bind>
 
   <bind command="enter">
@@ -538,7 +532,6 @@
     <keyboard key="v"/>
   </bind>
 
-
   <!--
     The following keys are active when tvtime is displaying the menu.
    -->
@@ -553,24 +546,6 @@
   <bind command="menu_enter">
     <keyboard key="enter"/>
     <mouse button="1"/>
-  </bind>
-
-  <bind command="menu_down">
-    <keyboard key="down"/>
-    <mouse button="5"/>
-  </bind>
-
-  <bind command="menu_up">
-    <keyboard key="up"/>
-    <mouse button="4"/>
-  </bind>
-
-  <bind command="menu_left">
-    <keyboard key="left"/>
-  </bind>
-
-  <bind command="menu_right">
-    <keyboard key="right"/>
   </bind>
 
   <!--

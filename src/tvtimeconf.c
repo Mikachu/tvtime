@@ -842,10 +842,10 @@ config_t *config_new( void )
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
     ct->keymap[ I_ESCAPE ] = TVTIME_QUIT;
     ct->keymap[ 'q' ] = TVTIME_QUIT;
-    ct->keymap[ I_UP ] = TVTIME_CHANNEL_INC;
-    ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DEC;
-    ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
-    ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
+    ct->keymap[ I_UP ] = TVTIME_UP;
+    ct->keymap[ I_DOWN ] = TVTIME_DOWN;
+    ct->keymap[ I_LEFT ] = TVTIME_LEFT;
+    ct->keymap[ I_RIGHT ] = TVTIME_RIGHT;
     ct->keymap[ I_BACKSPACE ] = TVTIME_CHANNEL_PREV;
     ct->keymap[ 'c' ] = TVTIME_TOGGLE_CC;
     ct->keymap[ 'm' ] = TVTIME_TOGGLE_MUTE;

@@ -212,6 +212,11 @@ enum tvtime_commands
     TVTIME_DISPLAY_MESSAGE,
     TVTIME_KEY_EVENT,
 
+    TVTIME_UP,
+    TVTIME_DOWN,
+    TVTIME_LEFT,
+    TVTIME_RIGHT,
+
     /* Everything below here is a menu-mode command. */
     TVTIME_MENU_UP,
     TVTIME_MENU_DOWN,

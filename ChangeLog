@@ -1,5 +1,9 @@
 
 0.9.11 -
+  * vektor: Added new commands UP, DOWN, LEFT, and RIGHT.  These will help
+      make the commands from lirc or similar make more sense without
+      resorting to fake keystroke events.  This has the side effect of
+      changing the binding of left/right to be volume instead of fine tuning.
   * vektor: Bring back lirc support, but using dlopen() to find the
       lirc_client library instead of explicitly linking against it.  This
       avoids any ugly dependency problems with packaging tvtime.

@@ -70,22 +70,21 @@ configuration file and the default runtime keybindings.
 
 Here are the core set of key bindings you want to learn for using tvtime:
 
-    Escape or q     Quit
-    F1 or tab       Show menu
-    up/down         Change channels
-    0-9 and Enter   Change channels
-    Backspace       Jump to previous channel
-    i               Change input
-    m               Mute
-    +/-             Volume control
-    f               Fullscreen
-    s               Take a screenshot
-    d               Display debug statistics
+    Escape or q        Quit
+    F1 or tab          Show menu
+    up/down            Change channels
+    0-9 and Enter      Change channels
+    Backspace          Jump to previous channel
+    i                  Change input
+    m                  Mute
+    +/- and left/right Volume control
+    f                  Fullscreen
+    s                  Take a screenshot
+    d                  Display debug statistics
 
   Here are some advanced keys.  These features are all configurable via
 the menu, but some of these may be useful if you use the features often:
 
-    left/right      Channel finetuning
     < / >           Overscan setting
     e               Toggle audio mode (stereo/mono/SAP)
     a               Change output aspect ratio
