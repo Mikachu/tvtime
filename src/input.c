@@ -421,7 +421,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
             }
             */
             in->muted = !in->muted;
-            tvtime_osd_volume_muted( in->osd, !in->muted );
+            tvtime_osd_volume_muted( in->osd, in->muted );
             videoinput_mute( in->vidin, in->muted );
             break;
 
