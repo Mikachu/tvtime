@@ -725,12 +725,7 @@ int config_get_apply_luma_correction( config_t *ct )
 
 int config_get_preferred_deinterlace_method( config_t *ct )
 {
-	return ct->preferred_deinterlace_method;
-}
-
-void config_set_preferred_deinterlace_method( config_t *ct, int preferred_deinterlace_method )
-{
-	ct->preferred_deinterlace_method = preferred_deinterlace_method;
+    return ct->preferred_deinterlace_method;
 }
 
 void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction )

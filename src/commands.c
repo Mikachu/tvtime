@@ -298,8 +298,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                      "Run with -c to use it.\n" );
         } else {
             char message[ 200 ];
-            config_set_luma_correction( 
-                in->cfg, 
+            config_set_luma_correction( in->cfg, 
                 config_get_luma_correction( in->cfg ) + 
                 ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 ));
 

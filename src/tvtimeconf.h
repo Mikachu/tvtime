@@ -19,6 +19,8 @@
 #ifndef TVTIMECONF_H_INCLUDED
 #define TVTIMECONF_H_INCLUDED
 
+#include "parser.h"
+
 typedef struct config_s config_t;
 
 /** 
@@ -115,22 +117,11 @@ int config_get_priority( config_t *ct );
 char *config_get_command_pipe( config_t *ct );
 int config_get_preferred_deinterlace_method( config_t *ct );
 
-#include "parser.h"
 parser_file_t *config_get_parsed_file( config_t *ct );
 
-void config_set_verbose( config_t *ct, int verbose );
-void config_set_debug( config_t *ct, int debug );
-void config_set_outputwidth( config_t *ct, int outputwidth );
-void config_set_inputwidth( config_t *ct, int inputwidth );
-void config_set_aspect( config_t *ct, int aspect );
-void config_set_inputnum( config_t *ct, int inputnum );
 void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction );
 void config_set_luma_correction( config_t *ct, double luma_correction );
-void config_set_v4l_device( config_t *ct, const char *v4ldev );
-void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
-void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
-void config_set_timeformat( config_t *ct, const char *format );
-void config_set_preferred_deinterlace_method( config_t *ct, int preferred_deinterlace_method );
+
 int config_get_check_freq_present( config_t *ct );
 
 void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr );
