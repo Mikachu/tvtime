@@ -1,0 +1,1226 @@
+# Russian translation of tvtime.
+# Copyright (C) 2003 Billy Biggs
+# This file is distributed under the same license as the tvtime package.
+# Alexander Belov <asbel@mail.ru>, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime cvs\n"
+"Report-Msgid-Bugs-To: http://tvtime.net/\n"
+"POT-Creation-Date: 2003-10-08 23:00+0600\n"
+"PO-Revision-Date: 2003-10-08 23:00+0600\n"
+"Last-Translator: Alexander Belov <asbel@mail.ru>\n"
+"Language-Team: Alexander Belov <asbel@mail.ru>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/tvtime.c:824 src/tvtime.c:842 src/tvtime.c:876 src/tvtime.c:940
+#: src/tvtime.c:968 src/tvtime.c:1094 src/commands.c:370 src/commands.c:544
+#: src/commands.c:564 src/commands.c:626 src/commands.c:672 src/commands.c:747
+#: src/commands.c:764 src/commands.c:791 src/commands.c:856
+#: src/commands.c:1114 src/commands.c:1161 src/commands.c:1197
+#: src/commands.c:1235 src/commands.c:1307 src/commands.c:1378
+#: src/commands.c:1388 src/commands.c:1436 src/commands.c:1448
+#: src/commands.c:1478 src/commands.c:1511 src/commands.c:1544
+#: src/commands.c:1576
+msgid "Back"
+msgstr "Назад"
+
+#: src/tvtime.c:854 src/tvtime.c:980
+#, c-format
+msgid "Full rate: %.2ffps"
+msgstr "Полная: %.2f кадров/сек."
+
+#: src/tvtime.c:862 src/tvtime.c:984
+#, c-format
+msgid "Half rate, deinterlace top fields: %.2ffps"
+msgstr "Половинная, строчная развертка верхних областей: %.2f кадров/сек."
+
+#: src/tvtime.c:869 src/tvtime.c:988
+#, c-format
+msgid "Half rate, deinterlace bottom fields: %.2ffps"
+msgstr "Половинная, строчная развертка нижних областей: %.2f кадров/сек."
+
+#: src/tvtime.c:892
+msgid "Overscan setting"
+msgstr "Приближение"
+
+#: src/tvtime.c:899 src/commands.c:1267
+msgid "Apply matte"
+msgstr "Изменение размера изображения"
+
+#: src/tvtime.c:907
+msgid "16:9 output"
+msgstr "размер 16:9"
+
+#: src/tvtime.c:916
+msgid "Fullscreen"
+msgstr "Полный экран"
+
+#: src/tvtime.c:923
+msgid "Set fullscreen position"
+msgstr "Установка полноэкранного положения"
+
+#: src/tvtime.c:933
+msgid "Always-on-top"
+msgstr "Всегда впереди"
+
+#: src/tvtime.c:951
+msgid "Centre"
+msgstr "В центре"
+
+#: src/tvtime.c:958
+msgid "Top"
+msgstr "Вверху"
+
+#: src/tvtime.c:964
+msgid "Bottom"
+msgstr "Внизу"
+
+#: src/tvtime.c:978
+msgid "Frame drop setting"
+msgstr "Пропуск кадров"
+
+#: src/tvtime.c:1005
+msgid "Performance estimates"
+msgstr "Характеристики"
+
+#: src/tvtime.c:1007
+msgid "Deinterlacer"
+msgstr "Алгоритм сглаживания черезстрочности"
+
+#: src/tvtime.c:1010
+#, c-format
+msgid "Input: %s at %dx%d"
+msgstr "Сигнал: %s - %dx%d"
+
+#: src/tvtime.c:1014
+#, c-format
+msgid "Attempted framerate: %.2ffps"
+msgstr "Частота кадров в секунду:  %.2f"
+
+#: src/tvtime.c:1018
+#, c-format
+msgid "Average blit time: %.2fms (%.0fMB/sec)"
+msgstr "Среднее время смены кадров:  %.2fмсек (%.0fМб/сек)"
+
+#: src/tvtime.c:1022
+#, c-format
+msgid "Average render time: %5.2fms"
+msgstr "Средняя скорость перерисовки: %5.2fмсек"
+
+#: src/tvtime.c:1026
+#, c-format
+msgid "Dropped frames: %d"
+msgstr "Пропущенные кадры: %d"
+
+#: src/tvtime.c:1032
+#, c-format
+msgid "Blit spacing: %4.1f/%4.1fms (want %4.1fms)"
+msgstr "Частота смены кадров: %4.1f/%4.1fмсек (должно быть %4.1fмсек)"
+
+#: src/tvtime.c:1051 src/tvtime.c:1104
+msgid "16:9 + Overscan"
+msgstr "16:9 + приближение"
+
+#: src/tvtime.c:1056 src/tvtime.c:1083
+msgid "1.85:1"
+msgstr "1.85:1"
+
+#: src/tvtime.c:1061 src/tvtime.c:1088
+msgid "2.35:1"
+msgstr "2.35:1"
+
+#: src/tvtime.c:1066 src/tvtime.c:1107
+msgid "4:3 centre"
+msgstr "4:3 центр"
+
+#: src/tvtime.c:1072 src/tvtime.c:1110
+msgid "4:3 + Overscan"
+msgstr "4:3 + приближение"
+
+#: src/tvtime.c:1078
+msgid "16:9"
+msgstr "16:9"
+
+#: src/tvtime.c:1103
+msgid "Matte setting (Anamorphic input)"
+msgstr "Установки измененного размера изображения (искаженое изображение)"
+
+#: src/tvtime.c:1109
+msgid "Matte setting (4:3 input)"
+msgstr "Установки измененного размера изображения (4:3)"
+
+#: src/tvtime.c:1186
+msgid "tvtime: Can't set configuration options, exiting.\n"
+msgstr "Не могу установить конфигурационные параметры, завершение работы.\n"
+
+#: src/tvtime.c:1204
+#, c-format
+msgid "tvtime: Can't renice to %d.\n"
+msgstr "Не могу сменить приоритет выполнения tvtime на %d.\n"
+
+#: src/tvtime.c:1211
+msgid "tvtime: Sending fields to interlaced output devices.\n"
+msgstr "Отображение изображения на устройстве с черезстрочной разверткой.\n"
+
+#: src/tvtime.c:1214
+msgid "tvtime: Sending frames to interlaced output devices.\n"
+msgstr "Отображение кадров на устройстве с черезстрочной разверткой.\n"
+
+#: src/tvtime.c:1257
+msgid ""
+"tvtime: Output driver failed to initialize: no video output available.\n"
+msgstr "Не могу инициализаровать драйвер вывода видео: нет доступных устройств.\n"
+
+#: src/tvtime.c:1273
+msgid "tvtime: Can't initialize input filters.\n"
+msgstr "Не могу инициализировать фильтры на входном сигнале.\n"
+
+#: src/tvtime.c:1276
+msgid "tvtime: Can't initialize output filters.\n"
+msgstr "Не могу инициализировать фильтры на выходном сигнале.\n"
+
+#: src/tvtime.c:1318
+msgid "tvtime: Can't initialize performance monitor, exiting.\n"
+msgstr "Не могу инициализировать монитор слежения за производительностью, завершение работы\n"
+
+#: src/tvtime.c:1327
+msgid "tvtime: Can't create stationmanager (no memory?), exiting.\n"
+msgstr "Не могу создать управление станциями, возможно не хватает памяти, завершение работы.\n"
+
+#: src/tvtime.c:1341 src/tvtime.c:1352
+#, c-format
+msgid "Can't open rvr file '%s'."
+msgstr "Не могу открыть rvr файл '%s'."
+
+#: src/tvtime.c:1359
+#, c-format
+msgid "tvtime: RVR frame sampling %d pixels per scanline.\n"
+msgstr "RVR кадр: %d точек на строку.\n"
+
+#: src/tvtime.c:1369
+#, c-format
+msgid "Can't open video4linux device '%s'."
+msgstr "Не могу открыть устройство video4linux '%s'."
+
+#: src/tvtime.c:1393
+#, c-format
+msgid "tvtime: V4L sampling %d pixels per scanline.\n"
+msgstr "V4L изображение %d точек на строку.\n"
+
+#: src/tvtime.c:1401
+#, c-format
+msgid "tvtime: Can't display input size %dx%d.\n"
+msgstr "Невозможно получить входной сигнал с разрешением %dx%d.\n"
+
+#: src/tvtime.c:1421
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Not enough to continue.  "
+"Exiting.\n"
+msgstr ""
+"V4l буфер дает зазервировать только %d кадров. Этого недостаточно для работы."
+"Завершение работы.\n"
+
+#: src/tvtime.c:1426
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
+"plugins\n"
+"tvtime: to those which only need 1 field.\n"
+msgstr ""
+"V4l буфер дает зазервировать только %d кадров. Ограничение для модулей "
+"сглаживания черезстрочности\n"
+"используется только 1 область.\n"
+
+#: src/tvtime.c:1432
+#, c-format
+msgid ""
+"tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
+"plugins\n"
+"tvtime: to those which only need 2 fields.\n"
+msgstr ""
+"V4l буфер дает зазервировать только %d кадров. Ограничение для модулей "
+"сглаживания черезстрочности\n"
+"используется только 2 области.\n"
+
+#: src/tvtime.c:1442
+#, c-format
+msgid ""
+"\n"
+"*** You are using the bttv driver, but without enough gbuffers available.\n"
+"*** See the support page at %s for information\n"
+"*** on how to increase your gbuffers setting.\n"
+"\n"
+msgstr ""
+"\n"
+"*** Ваш bttv драйвер работает с маленьким размером параметра gbuffers.\n"
+"*** Прочтите на %s информацию о том\n"
+"*** как увеличить установки параметра gbuffers\n"
+"\n"
+
+#: src/tvtime.c:1459
+msgid "tvtime: No deinterlacing methods available, exiting.\n"
+msgstr "Нет доступных способов сглаживания черезстрочности, завершение работы.\n"
+
+#: src/tvtime.c:1480
+msgid "tvtime: Can't allocate extra frame storage memory.\n"
+msgstr "Невозможно выделить дополнительную память для хранения кадров.\n"
+
+#: src/tvtime.c:1498
+msgid "tvtime: OSD initialization failed, OSD disabled.\n"
+msgstr "Не могу инициализоровать ОSD, работаем без OSD.\n"
+
+#: src/tvtime.c:1514
+msgid "No video source"
+msgstr "Нет сигнала"
+
+#: src/tvtime.c:1531
+msgid "tvtime: Can't create command handler.\n"
+msgstr "Не могу создать управление командами.\n"
+
+#: src/tvtime.c:1558
+msgid ""
+"tvtime: Card requires conversion from UYVY, but we failed to initialize our "
+"converter!\n"
+msgstr ""
+"Требуется преобразование сигнала UYVY. Инициализация конвертора "
+"не прошла\n"
+
+#: src/tvtime.c:1566
+msgid "tvtime: Cannot find FIFO directory.  FIFO disabled.\n"
+msgstr "Не могу найти каталог для FIFO. FIFO недоступно.\n"
+
+#: src/tvtime.c:1573
+#, c-format
+msgid "tvtime: Cannot create directory %s.  FIFO disabled.\n"
+msgstr "Не могу создать каталог %s. FIFO недоступно.\n"
+
+#: src/tvtime.c:1580
+#, c-format
+msgid "tvtime: %s is not a directory.  FIFO disabled.\n"
+msgstr "%s не является каталогом. FIFO недоступно.\n"
+
+#: src/tvtime.c:1592
+#, c-format
+msgid "tvtime: You do not own %s.  FIFO disabled.\n"
+msgstr "Вы не являетесь владельцем %s. FIFO недоступно.\n"
+
+#: src/tvtime.c:1598
+#, c-format
+msgid "tvtime: Cannot stat %s.  FIFO disabled.\n"
+msgstr "Не могу получить статус %s. FIFO недоступно.\n"
+
+#: src/tvtime.c:1611
+msgid "tvtime: Cannot find FIFO file.  Failed to create FIFO object.\n"
+msgstr "Не могу найти FIFO файл. Ошибка создания объекта FIFO.\n"
+
+#: src/tvtime.c:1616
+msgid "tvtime: Not reading input from FIFO.  Failed to create FIFO object.\n"
+msgstr "Не могу прочитать из FIFO. Ошибка создания объекта FIFO.\n"
+
+#: src/tvtime.c:1629
+msgid "tvtime: Could not setup console.\n"
+msgstr "Не могу настроить консоль.\n"
+
+#: src/tvtime.c:1643
+msgid "tvtime: Can't create input handler.\n"
+msgstr "Не могу создать управление входящим сигналом.\n"
+
+#: src/tvtime.c:1651
+msgid "tvtime: Could not create vbiscreen, closed captions unavailable.\n"
+msgstr "Не могу создать vbiscreen, скрытые титры недоступны.\n"
+
+#: src/tvtime.c:1657
+msgid "tvtime: Could not create vbidata.\n"
+msgstr "Не могу создать vbidata.\n"
+
+#: src/tvtime.c:1906
+msgid "Window set as always-on-top."
+msgstr "Режим 'поверх всех окон'"
+
+#: src/tvtime.c:1909
+msgid "Window set to normal stacking."
+msgstr "Режим нормального положения окна"
+
+#: src/tvtime.c:1926
+msgid "16:9 display mode active."
+msgstr "Включен режим 16:9"
+
+#: src/tvtime.c:1933
+msgid "4:3 display mode active."
+msgstr "Включен режим 4:3"
+
+#: src/tvtime.c:2039
+msgid "2-3 Pulldown detection disabled."
+msgstr "2-3 режим понижения выключен"
+
+#: src/tvtime.c:2042
+msgid "2-3 Pulldown detection enabled."
+msgstr "2-3 режим понижения включен"
+
+#: src/tvtime.c:2047
+msgid "2-3 Pulldown detection is not valid with your TV norm."
+msgstr "2-3 режим понижения не работает в текущем ТВ стандарте."
+
+#: src/tvtime.c:2281
+#, c-format
+msgid "tvtime: Stats using '%s' at %dx%d.\n"
+msgstr "Используется '%s' - %dx%d.\n"
+
+#: src/tvtime.c:2419 src/tvtime.c:2560
+#, c-format
+msgid "Screenshot: %s"
+msgstr "Снимок экрана: %s"
+
+#: src/tvtime.c:2648
+msgid "tvtime: Cleaning up.\n"
+msgstr "Очистка.\n"
+
+#: src/tvtime.c:2691
+msgid "tvtime: Restarting.\n"
+msgstr "Перезапуск.\n"
+
+#: src/tvtime.c:2695
+msgid "tvtime: Thank you for using tvtime.\n"
+msgstr "Спасибо за использование tvtime.\n"
+
+#: src/tvtime.c:2711
+#, c-format
+msgid "tvtime: Running %s.\n"
+msgstr "Запущен: %s.\n"
+
+#: src/tvtime.c:2714
+msgid ""
+"\n"
+"*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
+"*** We often break stuff during development.  Please submit bug reports\n"
+"*** based on released versions only!!\n"
+"\n"
+msgstr ""
+"\n"
+"*** Внимание: Вы используете НЕСТАБИЛЬНУЮ версию tvtime.\n"
+"*** Мы даже ошибаемся в процессе разработки. Пожалуйста, посылайте\n"
+"*** сообщения об ошибках только о стабильных версиях!!!\n"
+"\n"
+
+#: src/tvtime.c:2723
+msgid ""
+"tvtime: Can't get realtime priority for better performance, need root "
+"access.\n"
+msgstr ""
+"Не могу установить режим реального времени для наилучшего качества работы,"
+"необходим доступ от root.\n"
+
+#: src/tvtime.c:2730
+#, c-format
+msgid ""
+"\n"
+"*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+"*** that you load the 'rtc' kernel module before starting tvtime,\n"
+"*** and make sure that your user has access to the device file.\n"
+"*** See our support page at %s for more information\n"
+"\n"
+msgstr ""
+"\n"
+"*** Для сглаженнго изображения необходим /dev/rtc. Мы очень рекомендуем\n"
+"*** загружать модуль ядра 'rtc' перед запуском tvtime, и убедитесь в том,\n"
+"*** что у Вас есть доступ до /dev/rtc.\n"
+"*** Более полную информацию можно получить на странице %s\n"
+"\n"
+
+#: src/tvtime.c:2748
+#, c-format
+msgid ""
+"\n"
+"*** Failed to get 1024hz resolution from /dev/rtc.  This will cause\n"
+"*** video to not be smooth.  Please run tvtime as root, or change\n"
+"*** the maximum resolution by running this command as root:\n"
+"***       sysctl -w dev.rtc.max-user-freq=1024\n"
+"*** See our support page at %s for more information\n"
+"\n"
+msgstr ""
+"\n"
+"*** Не устанавливается частота 1024Гц устройства /dev/rtc. Это может\n"
+"*** повлиять на сглаживание изображения. Запустите tvtime от \n"
+"*** пользователя root или измените этот параметр командой\n"
+"***       sysctl -w dev.rtc.max-user-freq=1024\n"
+"*** Для получения подробной информации зайдите на %s\n"
+"\n"
+
+#: src/commands.c:185 src/commands.c:775 src/commands.c:1098
+#: src/commands.c:1462 src/commands.c:1495 src/commands.c:1528
+#: src/commands.c:1561
+msgid "Current"
+msgstr "Текущий"
+
+#: src/commands.c:297
+msgid "Renumber current channel"
+msgstr "Перенумеровать текущий канал"
+
+#: src/commands.c:305 src/commands.c:308
+msgid "Current channel active in list"
+msgstr "Текущий канал активирован"
+
+#: src/commands.c:318
+msgid "Stop channel scan"
+msgstr "Остановка сканирования каналов"
+
+#: src/commands.c:322
+msgid "Scan channels for signal"
+msgstr "Сканирование каналов"
+
+#: src/commands.c:330
+msgid "Reset all channels as active"
+msgstr "Активировать все каналы"
+
+#: src/commands.c:336
+msgid "Finetune current channel"
+msgstr "Подстроить текущий канал"
+
+#: src/commands.c:343
+msgid "Change NTSC cable mode"
+msgstr "Изменить режим отображения кабельного NTSC"
+
+#: src/commands.c:349
+msgid "Set current channel as SECAM"
+msgstr "Показывать этот канал в режиме SECAM"
+
+#: src/commands.c:350
+msgid "Set current channel as PAL"
+msgstr "Показывать этот канал в режиме PAL"
+
+#: src/commands.c:357
+msgid "Change frequency table"
+msgstr "Изменить таблицу каналов"
+
+#: src/commands.c:363
+msgid "Disable signal detection"
+msgstr "Выключить обнаружение входного сигнала"
+
+#: src/commands.c:364
+msgid "Enable signal detection"
+msgstr "Включить обнаружение входного сигнала"
+
+#: src/commands.c:524 src/commands.c:551
+msgid "Cable"
+msgstr "Кабельное"
+
+#: src/commands.c:532 src/commands.c:559
+msgid "Broadcast"
+msgstr "Широковещательное"
+
+#: src/commands.c:539
+msgid "Cable with channels 100+"
+msgstr "Кабельное с каналами 100+"
+
+#: src/commands.c:571
+msgid "Europe"
+msgstr "Европа"
+
+#: src/commands.c:579
+msgid "Russia"
+msgstr "Россия"
+
+#: src/commands.c:586
+msgid "France"
+msgstr "Франция"
+
+#: src/commands.c:593
+msgid "Australia"
+msgstr "Австралия"
+
+#: src/commands.c:600
+msgid "Australia (Optus)"
+msgstr "Австралия (Optus)"
+
+#: src/commands.c:607
+msgid "New Zealand"
+msgstr "Новая Зеландия"
+
+#: src/commands.c:614
+msgid "China Broadcast"
+msgstr "Китай"
+
+#: src/commands.c:621
+msgid "Custom (first run tvtime-scanner)"
+msgstr "Другое (запустите tvtime-scanner)"
+
+#: src/commands.c:637
+#, c-format
+msgid "%s  Current: %d pixels"
+msgstr "%s: %d pixels"
+
+#: src/commands.c:644
+msgid "Low (360 pixels)"
+msgstr "Низкое (360 точек)"
+
+#: src/commands.c:650
+msgid "Moderate (576 pixels)"
+msgstr "Умеренное (576 точек)"
+
+#: src/commands.c:656
+msgid "Standard (720 pixels)"
+msgstr "Стандартное (720 точек)"
+
+#: src/commands.c:662
+msgid "High (768 pixels)"
+msgstr "Высокое (768 точек)"
+
+#: src/commands.c:667 src/commands.c:1230
+msgid "Restart with new settings"
+msgstr "Перезапустить с новыми установками"
+
+#: src/commands.c:728
+msgid "Mono"
+msgstr "Моно"
+
+#: src/commands.c:735
+msgid "Stereo"
+msgstr "Стерео"
+
+#: src/commands.c:743
+msgid "SAP"
+msgstr "SAP"
+
+#: src/commands.c:754
+msgid "Primary Language"
+msgstr "Основной язык"
+
+#: src/commands.c:759
+msgid "Secondary Language"
+msgstr "Дополнительный язык"
+
+#: src/commands.c:781 src/commands.c:1104 src/commands.c:1468
+#: src/commands.c:1501 src/commands.c:1534 src/commands.c:1566
+msgid "Increase"
+msgstr "Увеличить"
+
+#: src/commands.c:786 src/commands.c:1109 src/commands.c:1473
+#: src/commands.c:1506 src/commands.c:1539 src/commands.c:1571
+msgid "Decrease"
+msgstr "Уменьшить"
+
+#: src/commands.c:811
+msgid "BT8x8 luma correction"
+msgstr "BT8x8 цветовая коррекция"
+
+#: src/commands.c:821
+msgid "2-3 pulldown inversion"
+msgstr "2-3 пониженная инверсия"
+
+#: src/commands.c:830 src/commands.c:838
+msgid "Colour invert"
+msgstr "Инвертировать цвета"
+
+#: src/commands.c:842
+msgid "Mirror"
+msgstr "Зеркальное отображение"
+
+#: src/commands.c:850
+msgid "Chroma killer"
+msgstr "Чернобелое изображение"
+
+#: src/commands.c:998 src/commands.c:1033 src/commands.c:1065
+#: src/commands.c:1083 src/commands.c:1094 src/commands.c:1122
+#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
+#: src/commands.c:1226 src/commands.c:1261 src/commands.c:1267
+#: src/commands.c:1273 src/commands.c:1280 src/commands.c:1286
+#: src/commands.c:1314 src/commands.c:1320 src/commands.c:1328
+#: src/commands.c:1334 src/commands.c:1346 src/commands.c:1395
+#: src/commands.c:1458 src/commands.c:1491 src/commands.c:1524
+#: src/commands.c:1557
+msgid "Setup"
+msgstr "Настройки"
+
+#: src/commands.c:1001 src/commands.c:1065 src/commands.c:1084
+#: src/commands.c:1095
+msgid "Station management"
+msgstr "Настройки каналов"
+
+#: src/commands.c:1006 src/commands.c:1037 src/commands.c:1123
+#: src/commands.c:1169 src/commands.c:1205 src/commands.c:1213
+msgid "Input configuration"
+msgstr "Основные настройки"
+
+#: src/commands.c:1011 src/commands.c:1042
+msgid "Picture settings"
+msgstr "Настройки изображения"
+
+#: src/commands.c:1016 src/commands.c:1047 src/commands.c:1286
+#: src/commands.c:1315 src/commands.c:1321 src/commands.c:1329
+#: src/commands.c:1335
+msgid "Video processing"
+msgstr "Обработка видеосигнала"
+
+#: src/commands.c:1021 src/commands.c:1052 src/commands.c:1261
+#: src/commands.c:1267 src/commands.c:1273 src/commands.c:1280
+msgid "Output configuration"
+msgstr "Дополнительные настройки изображения"
+
+#: src/commands.c:1026 src/commands.c:1057
+msgid "Exit menu"
+msgstr "Выход из меню"
+
+#: src/commands.c:1084
+msgid "Frequency table"
+msgstr "Частотная таблица"
+
+#: src/commands.c:1095 src/commands.c:2601
+msgid "Finetune"
+msgstr "Подстройка"
+
+#: src/commands.c:1127 src/commands.c:1130 src/commands.c:1173
+#: src/commands.c:1176 src/commands.c:2707
+msgid "Change video source"
+msgstr "Изменить входной канал"
+
+#: src/commands.c:1136 src/commands.c:1182 src/commands.c:1213
+msgid "Preferred audio mode"
+msgstr "Настройка звука"
+
+#: src/commands.c:1141 src/commands.c:1187 src/commands.c:1226
+msgid "Television standard"
+msgstr "Телевизионный стандарт"
+
+#: src/commands.c:1146 src/commands.c:1192 src/commands.c:1205
+msgid "Sharpness"
+msgstr "Резкость"
+
+#: src/commands.c:1151
+msgid "Toggle closed captions"
+msgstr "Переключение скрытых титров"
+
+#: src/commands.c:1156
+msgid "Toggle XDS decoding"
+msgstr "Переключение XDS декодирования"
+
+#: src/commands.c:1226
+msgid "Input Configuration"
+msgstr "Настройка входящих параметров"
+
+#: src/commands.c:1273
+msgid "Overscan"
+msgstr "Приближение"
+
+#: src/commands.c:1280
+msgid "Fullscreen position"
+msgstr "Положение изображения при полном экране"
+
+#: src/commands.c:1290 src/commands.c:1315
+msgid "Deinterlacer configuration"
+msgstr "Настройка сглаживания черезстрочности"
+
+#: src/commands.c:1295
+msgid "Current deinterlacer description"
+msgstr "Описание текущего режима обработки черезстрочности"
+
+#: src/commands.c:1299 src/commands.c:1329
+msgid "Attempted framerate"
+msgstr "Частота кадров"
+
+#: src/commands.c:1303 src/commands.c:1335
+msgid "Input filters"
+msgstr "Фильтры"
+
+#: src/commands.c:1321
+msgid "Deinterlacer description"
+msgstr "Описание режима обработки черезстрочности"
+
+#: src/commands.c:1346 src/commands.c:1395 src/commands.c:1458
+#: src/commands.c:1491 src/commands.c:1524 src/commands.c:1557
+msgid "Picture"
+msgstr "Изображение"
+
+#: src/commands.c:1350 src/commands.c:1400 src/commands.c:1458
+#: src/commands.c:2737 src/commands.c:2778
+msgid "Brightness"
+msgstr "Яркость"
+
+#: src/commands.c:1355 src/commands.c:1405 src/commands.c:1491
+#: src/commands.c:2751 src/commands.c:2781
+msgid "Contrast"
+msgstr "Контрасность"
+
+#: src/commands.c:1359 src/commands.c:1409 src/commands.c:1524
+#: src/commands.c:2765 src/commands.c:2784
+msgid "Colour"
+msgstr "Цвет"
+
+#: src/commands.c:1363 src/commands.c:1413 src/commands.c:1557
+#: src/commands.c:2723 src/commands.c:2787
+msgid "Hue"
+msgstr "Оттенки"
+
+#: src/commands.c:1370
+msgid "Save current settings as defaults"
+msgstr "Сохранить текущие установки"
+
+#: src/commands.c:1374 src/commands.c:1384 src/commands.c:1431
+#: src/commands.c:1443
+msgid "Reset to global defaults"
+msgstr "Сбросить установки к начальным"
+
+#: src/commands.c:1420
+msgid "Save current settings as global defaults"
+msgstr "Сохранить текущие установки как начальные"
+
+#: src/commands.c:1426
+msgid "Save current settings as channel defaults"
+msgstr "Сохранить текущие установки для этого канала"
+
+#: src/commands.c:1703
+msgid "Add current station"
+msgstr "Добавить текущую станцию"
+
+#: src/commands.c:1705
+msgid "Exit"
+msgstr "Выход"
+
+#: src/commands.c:1948
+#, c-format
+msgid "Sleep in %d minutes."
+msgstr "Бездействовать %d минут."
+
+#: src/commands.c:1951
+msgid "Sleep off."
+msgstr "Отключить бездействие"
+
+#: src/commands.c:2002
+msgid "Channel marked as active in the browse list."
+msgstr "Канал помечен активным"
+
+#: src/commands.c:2004
+msgid "Channel disabled from the browse list."
+msgstr "Канал отключен"
+
+#: src/commands.c:2046
+msgid "Processing every input field."
+msgstr "Обработка каждой входящей области"
+
+#: src/commands.c:2048
+msgid "Processing every top field."
+msgstr "Обаботка каждой верхней области"
+
+#: src/commands.c:2050
+msgid "Processing every bottom field."
+msgstr "Обаботка каждой нижней области."
+
+#: src/commands.c:2063
+#, c-format
+msgid "Sharpness will be %d on restart."
+msgstr "После перезапуска резкость будет %d."
+
+#: src/commands.c:2109
+#, c-format
+msgid "Television standard will be %s on restart."
+msgstr "После перезапуска телевизионный стандарт будет %s."
+
+#: src/commands.c:2138
+msgid "All channels re-activated."
+msgstr "Все каналы активированы"
+
+#: src/commands.c:2158
+#, c-format
+msgid "Remapping %d.  Enter new channel number."
+msgstr "Переименовать %d. Введите новый номер канала"
+
+#: src/commands.c:2169
+msgid "Scanner unavailable with signal checking disabled."
+msgstr "Сканер не работает при отключенном автоопределении входного сигнала"
+
+#: src/commands.c:2195
+msgid "Scanning for channels being broadcast."
+msgstr "Сканирование каналов."
+
+#: src/commands.c:2211
+msgid "Closed captions disabled."
+msgstr "Скрытые титры выключены"
+
+#: src/commands.c:2214
+msgid "Closed captions enabled."
+msgstr "Скрытые титры включены"
+
+#: src/commands.c:2223
+msgid "No VBI device configured for CC decoding."
+msgstr "Устройчтво VBI не настроено для декодирования CC"
+
+#: src/commands.c:2238
+#, c-format
+msgid "Colour decoding for this channel set to %s."
+msgstr "Декодирование цвета для этого канала установлено в %s."
+
+#: src/commands.c:2279
+#, c-format
+msgid "Running: %s"
+msgstr "Запущен: %s"
+
+#: src/commands.c:2355
+msgid "Signal detection enabled."
+msgstr "Автоопределение сигнала включено"
+
+#: src/commands.c:2357
+msgid "Signal detection disabled."
+msgstr "Автоопределение сигнала выключено"
+
+#: src/commands.c:2369
+msgid "XDS decoding enabled."
+msgstr "Декодирование XDS включено"
+
+#: src/commands.c:2371
+msgid "XDS decoding disabled."
+msgstr "Декодирование XDS выключено"
+
+#: src/commands.c:2417
+msgid "Colour invert enabled."
+msgstr "Цвета инвертированы"
+
+#: src/commands.c:2419
+msgid "Colour invert disabled."
+msgstr "Нормальные цвета"
+
+#: src/commands.c:2441
+msgid "Mirror enabled."
+msgstr "Зеркальное изображение"
+
+#: src/commands.c:2443
+msgid "Mirror disabled."
+msgstr "Нормальное изображение"
+
+#: src/commands.c:2465
+msgid "Chroma kill enabled."
+msgstr "Чернобелое изображение"
+
+#: src/commands.c:2467
+msgid "Chroma kill disabled."
+msgstr "Цветное изображение"
+
+#: src/commands.c:2484
+msgid "Luma correction enabled."
+msgstr "Включена коррекция цвета"
+
+#: src/commands.c:2486
+msgid "Luma correction disabled."
+msgstr "Коррекция цвета выключена"
+
+#: src/commands.c:2503
+#, c-format
+msgid "Overscan: %.1f%%"
+msgstr "Приближение: %.1f%%"
+
+#: src/commands.c:2525
+#, c-format
+msgid "Luma correction value: %.1f"
+msgstr "Значение коррекции цвета: %.1f"
+
+#: src/commands.c:2555
+msgid "Picture settings reset to defaults."
+msgstr "Установки для изображения сброшены к начальным"
+
+#: src/commands.c:2660 src/commands.c:2674
+msgid "Volume"
+msgstr "Громкость"
+
+#: src/commands.c:2823
+msgid "Saved current picture settings as global defaults.\n"
+msgstr "Текущие установки изображения сохранены как начальные.\n"
+
+#: src/commands.c:2836
+#, c-format
+msgid "Saved current picture settings on channel %d.\n"
+msgstr "Текущие установки изображения сохранены для этого канала %d.\n"
+
+#: src/commands.c:2918
+msgid "Paused."
+msgstr "Пауза."
+
+#: src/commands.c:2918
+msgid "Resumed."
+msgstr "Продолжение."
+
+#: src/tvtimeconf.c:626
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (first run tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -k, --slave                Disables input handling in tvtime (slave "
+"mode).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+"  -S, --saveoptions          Save command line options to the config file.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -v, --verbose              Print debugging messages to stderr.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"использование: %s [ОПЦИИ]...\n"
+"\n"
+"  -a, --widescreen           Режим 16:9.\n"
+"  -b, --vbidevice=DEVICE     Устройство VBI (по умолчанию /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      После запуска включить указанный канал.\n"
+"  -d, --device=DEVICE        Устройство video4linux (по умолчанию /dev/video0).\n"
+"  -D, --driver=NAME          Выводить через: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv или SDL (по умолчанию Xv).\n"
+"  -f, --frequencies=NAME     Частотная таблица.\n"
+"                             (по умолчанию us-cable).\n"
+"\n"
+"                             Возможные значения:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (запустите tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
+"  -h, --help                 Показать помощь.\n"
+"  -H, --height=HEIGHT        Ширина окна (по умолчанию 576).\n"
+"  -i, --input=INPUTNUM       video4linux входной канал (ТВ по умолчанию 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux количество строк\n"
+"                             (по умолчанию 720).\n"
+"  -k, --slave                Отключить управление tvtime"
+"\n"
+"  -m, --fullscreen           Полноэкранный режим.\n"
+"  -M, --window               Оконный режим.\n"
+"  -n, --norm=NORM            Выбрать стандарт. tvtime "
+"поддерживает:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Установить позицию при полноэкранном режиме:\n"
+"                             top, bottom or centre (по умолчанию).\n"
+"  -r, --rvr=FILE             RVR записывает файл для проигрывания (для отладки).\n"
+"  -s, --showdrops            Печатать статус пропущенных кадров (для отладки).\n"
+"  -S, --saveoptions          Сохранить опции командной строки в файл конфигурации.\n"
+"  -t, --xmltv=FILE           Читать список XMLTV из файла.\n"
+"  -v, --verbose              Печатать отладочную информацию на stderr.\n"
+"  -x, --mixer=DEVICE[:CH]    Микшер и канал для управления звуком.\n"
+"                             (по умолчанию /dev/mixer:line)\n"
+"\n"
+"                             Возможные каналы:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:680
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"использование: %s [ОПЦИИ]...\n"
+"\n"
+"  -a, --widescreen           Режим 16:9.\n"
+"  -b, --vbidevice=DEVICE     Устройство VBI (по умолчанию /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      После запуска включить указанный канал.\n"
+"  -d, --device=DEVICE        Устройство video4linux (по умолчанию /dev/video0).\n"
+"  -D, --driver=NAME          Выводить через: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv или SDL (по умолчанию Xv).\n"
+"  -f, --frequencies=NAME     Частотная таблица.\n"
+"                             (по умолчанию us-cable).\n"
+"\n"
+"                             Возможные значения:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (запустите tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
+"  -h, --help                 Показать помощь.\n"
+"  -H, --height=HEIGHT        Ширина окна (по умолчанию 576).\n"
+"  -i, --input=INPUTNUM       video4linux входной канал (ТВ по умолчанию 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux количество строк\n"
+"                             (по умолчанию 720).\n"
+"  -k, --slave                Отключить управление tvtime"
+"\n"
+"  -m, --fullscreen           Полноэкранный режим.\n"
+"  -M, --window               Оконный режим.\n"
+"  -n, --norm=NORM            Выбрать стандарт. tvtime "
+"поддерживает:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Установить позицию при полноэкранном режиме:\n"
+"                             top, bottom or centre (по умолчанию).\n"
+"  -r, --rvr=FILE             RVR записывает файл для проигрывания (для отладки).\n"
+"  -s, --showdrops            Печатать статус пропущенных кадров (для отладки).\n"
+"  -S, --saveoptions          Сохранить опции командной строки в файл конфигурации.\n"
+"  -t, --xmltv=FILE           Читать список XMLTV из файла.\n"
+"  -v, --verbose              Печатать отладочную информацию на stderr.\n"
+"  -x, --mixer=DEVICE[:CH]    Микшер и канал для управления звуком.\n"
+"                             (по умолчанию /dev/mixer:line)\n"
+"\n"
+"                             Возможные каналы:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:730
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+msgstr ""
+"использование: %s [ОПЦИИ]...\n"
+"\n"
+"  -d, --device=DEVICE        устройство video4linux (по умолчанию /dev/video0).\n"
+"  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
+"  -h, --help                 Показать подсказку.\n"
+"  -i, --input=INPUTNUM       video4linux номер канала (ТВ по умолчанию 0).\n"
+"  -n, --norm=NORM            Выбрать стандарт. tvtime "
+"поддерживает:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+
+#: src/utils.c:666
+#, c-format
+msgid ""
+"\n"
+"*** Since your console is set for the %s codeset, rather than UTF-8,\n"
+"*** console messages may be partially or completely illegible on your "
+"terminal.\n"
+"*** This is a known bug, and will probably be fixed for the next release of\n"
+"*** tvtime. You can work around this problem by launching tvtime using a UTF-"
+"8\n"
+"*** aware terminal. See %s for more information.\n"
+"\n"
+msgstr ""
+"\n"
+"*** Since your console is set for the %s codeset, rather than UTF-8,\n"
+"*** console messages may be partially or completely illegible on your "
+"terminal.\n"
+"*** This is a known bug, and will probably be fixed for the next release of\n"
+"*** tvtime. You can work around this problem by launching tvtime using a UTF-"
+"8\n"
+"*** aware terminal. See %s for more information.\n"
+"\n"
