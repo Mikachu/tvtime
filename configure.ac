@@ -36,28 +36,6 @@ AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday
 AM_GNU_GETTEXT
 
 dnl ---------------------------------------------
-dnl libsdl
-dnl ---------------------------------------------
-AC_ARG_WITH([sdl], 
-            AC_HELP_STRING([--without-sdl], [Use this to disable our SDL output layer (enabled by default)]),
-            [CHECK_SDL="$withval"], [CHECK_SDL="yes"])
-if test "$CHECK_SDL" = "yes" ; then
-    AM_PATH_SDL(1.2.2,AC_DEFINE([HAVE_SDL],,[Define this to include SDL support]),)
-fi
-
-dnl ---------------------------------------------
-dnl libmpeg2
-dnl ---------------------------------------------
-AC_ARG_WITH([libmpeg2],
-            AC_HELP_STRING([--with-libmpeg2],
-                [Use this to enable MPEG2 input (disabled by default)]),
-            [USE_MPEG2="$withval"], [USE_MPEG2="no"])
-if test "$USE_MPEG2" != "no" ; then
-    AC_DEFINE([HAVE_LIBMPEG2],,[Define this to enable MPEG2 input])
-fi
-AM_CONDITIONAL(HAVE_LIBMPEG2, [test x"$USE_MPEG2" != "xno"])
-
-dnl ---------------------------------------------
 dnl dynamic linker
 dnl ---------------------------------------------
 AC_CHECK_LIB(c, dlopen,
@@ -131,37 +109,6 @@ dnl	fi
 fi
 AC_SUBST(XML2_LIBS)
 AC_SUBST(XML2_FLAG)
-
-
-dnl ---------------------------------------------
-dnl directfb
-dnl ---------------------------------------------
-dnl Test for directfb
-
-AC_ARG_WITH([directfb], 
-            AC_HELP_STRING([--without-directfb],
-                           [Use this to disable our DirectFB output layer (enabled by default)]),
-            [CHECK_DFB="$withval"], [CHECK_DFB="yes"])
-DIRECTFB_CONFIG="no"
-if test "$CHECK_DFB" = "yes" ; then
-    AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
-    if test "$DIRECTFB_CONFIG" != "no" ; then
-      AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
-      CFLAGS="`directfb-config --cflags` $CFLAGS"
-      AC_CHECK_DECL(DLBM_TRIPLE, [AC_DEFINE([DIRECTFB_HAS_TRIPLE],,[DirectFB Supports triple buffering])],,[#include <directfb.h>])
-      AC_CHECK_DECL(DLCAPS_FIELD_PARITY, [AC_DEFINE([DIRECTFB_HAS_FIELD_PARITY],,[DirectFB Supports setting field parity])],,[#include <directfb.h>])
-      AC_CHECK_DECL(DLCAPS_FLICKER_FILTERING, [AC_DEFINE([DIRECTFB_HAS_FLICKER_FILTERING],,[DirectFB Supports setting flicker filtering])],,[#include <directfb.h>])
-      DIRECTFB_VERSION_STRING=`directfb-config --version`
-      DIRECTFB_MAJOR=`directfb-config --version | awk 'BEGIN {FS = "."} {print $1}'`
-      DIRECTFB_MINOR=`directfb-config --version | awk 'BEGIN {FS = "."} {print $2}'`
-      DIRECTFB_MICRO=`directfb-config --version | awk 'BEGIN {FS = "."} {print $3}'`
-      AC_DEFINE_UNQUOTED(DIRECTFB_VERSION_STRING, "${DIRECTFB_VERSION_STRING}", [DirectFB Version String])
-      AC_DEFINE_UNQUOTED(DIRECTFB_MAJOR, ${DIRECTFB_MAJOR}, [DirectFB Major Version])
-      AC_DEFINE_UNQUOTED(DIRECTFB_MINOR, ${DIRECTFB_MINOR}, [DirectFB Minor Version])
-      AC_DEFINE_UNQUOTED(DIRECTFB_MICRO, ${DIRECTFB_MICRO}, [DirectFB Micro Version])
-    fi
-fi
-AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
 
 dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension
@@ -298,8 +245,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_C_BIGENDIAN
 AC_C_ATTRIBUTE_ALIGNED
-
-dnl builtin([include],[libmpeg2/configure.incl])
 
 AC_CONFIG_FILES([
 	Makefile

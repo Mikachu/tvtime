@@ -34,22 +34,6 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins
 # Set the following if you want to specify an additional font directory
 # FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
-if HAVE_DIRECTFB
-DIRECTFB_CFLAGS = `directfb-config --cflags`
-DIRECTFB_LIBS = `directfb-config --libs`
-else
-DIRECTFB_CFLAGS = 
-DIRECTFB_LIBS = 
-endif
-
-if HAVE_LIBMPEG2
-MPEG2_CFLAGS = 
-MPEG2_LIBS = -lmpeg2
-else
-MPEG2_CFLAGS = 
-MPEG2_LIBS = 
-endif
-
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
@@ -70,26 +54,25 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	performance.c vbidata.h vbidata.c credits.c credits.h console.h \
 	console.c speedtools.h vbiscreen.h vbiscreen.c fifo.h fifo.c \
 	commands.h commands.c videofilter.h videofilter.c station.h station.c \
-	bands.h utils.h utils.c diffcomp.h diffcomp.c rvrreader.h rvrreader.c \
-	ree.h ree.c pulldown.h pulldown.c hashtable.h hashtable.c cpuinfo.h \
+	bands.h utils.h utils.c diffcomp.h diffcomp.c pulldown.h pulldown.c \
+	hashtable.h hashtable.c cpuinfo.h \
 	cpuinfo.c videodev.h videodev2.h menu.c menu.h outputfilter.h \
-	outputfilter.c dfbmatroxtv.c xmltv.h xmltv.c gettext.h \
-	tvtimeglyphs.h mpeg2input.h mpeg2input.c
+	outputfilter.c xmltv.h xmltv.c gettext.h \
+	tvtimeglyphs.h
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
-	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
-	xcommon.h xcommon.c sdloutput.h sdloutput.c
+	xcommon.h xcommon.c
 
 bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
-EXTRA_PROGRAMS = expandpng timingtest rvr
+EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) $(DSCALER_SRCS) $(OUTPUT_SRCS) tvtime.c
-tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
-	$(FONT_CFLAGS) $(MPEG2_CFLAGS) $(AM_CFLAGS)
-tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
-	$(DYNAMIC_LD_LIBS) $(MPEG2_LIBS) -lm
+tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
+	$(PLUGINS_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+	$(FONT_CFLAGS) $(AM_CFLAGS)
+tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
+	$(DYNAMIC_LD_LIBS) -lm
 if ARCH_386
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread
@@ -106,27 +89,21 @@ tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.h tvtimeconf.c \
-	station.c tvtime-scanner.c
+	station.c tvtime-scanner.c mixer.h mixer.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
-timingtest_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
-	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
+timingtest_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
+	$(PLUGINS_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
-timingtest_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
+timingtest_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+	$(PLUGINS_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
 timingtest_LDADD = -lpthread
 
-rvr_SOURCES = reepktq.h reepktq.c rtctimer.h rtctimer.c utils.h utils.c \
-	videoinput.h videoinput.c tvtimeconf.h tvtimeconf.c rvrmain.c \
-	diffcomp.h diffcomp.c
-rvr_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
-rvr_LDADD = $(ZLIB_LIBS) $(XML2_LIBS) -lpthread
-
-CLEANFILES = expandpng timingtest rvr
+CLEANFILES = expandpng timingtest
 
 # Satisfy extra-directory dependencies.  Unfortunately, this causes
 # libtool to re-link each and every time.  (Recursive make is evil!)
