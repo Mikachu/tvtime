@@ -29,7 +29,6 @@ AC_HEADER_TIME
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
-AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday seteuid memset setreuid setpriority signal sigemptyset sigaction strerror vsscanf wordexp wordfree])
 
