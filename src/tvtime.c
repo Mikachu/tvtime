@@ -750,6 +750,8 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
         output += outstride;
         scanline += 2;
     }
+
+    tvtime->filtered_curframe = 1;
 }
 
 int main( int argc, char **argv )
