@@ -1,170 +1,144 @@
-#This is an example config file for your LIRC remote.  All buttons depend
-#on what you have configured in your lircd.conf file.  Please refer to this
-#and adjust the labels below accordingly.
+
+# This is an example config file for your LIRC remote.  All buttons
+# depend on what you have configured in your lircd.conf file.  Please
+# refer to this and adjust the labels below accordingly.
 #
-#tvtime uses a seperate program, tvtime-command, for sending commands to
-#a running tvtime.  You can add, remove or edit any entry listed here. There
-#are more commands that can be sent to tvtime, therefore you can bind more
-#buttons to do more things.  To get a list of these commands you can either
-#refer to the included manpage or run tvtime-command without any options.
+# tvtime can be controlled both through its native lirc support, and
+# through a separate program, tvtime-command.  In both cases, the
+# commands available are the same.  For a list of commands, see 'man
+# tvtime-command'.  Any of the commands available through this interface
+# are available inside lirc.
+#
+# To use tvtime's native lirc support, use this syntax in your config:
+# begin
+#    prog = tvtime
+#    button = CH+
+#    config = CHANNEL_INC
+# end
+#
+# Alternatively, you can use the 'tvtime-command' helper application:
+# begin
+#    prog = irexec
+#    button = CH+
+#    config = tvtime-command CHANNEL_INC
+# end
+
+
+# This section includes two configs, what this does is that it allows
+# you to open tvtime and close tvtime with one button.  If your remote
+# has seperate buttons for this, then you can break it apart.
+begin
+    prog = irexec
+    button = POWER
+    config = tvtime &
+    config = tvtime-command QUIT
+end
+
+
+# The following defines most of the common buttons found on a remote and
+# what commads they would map to inside tvtime.
+begin
+    prog = tvtime
+    button = source
+    config = TOGGLE_INPUT
+end
+begin
+    prog = tvtime
+    button = DISPLAY
+    config = DISPLAY_INFO
+    repeat = 1
+end
 
 begin
-  prog = irexec
-  button = POWER
-  config = tvtime &
-  config = tvtime-command QUIT
+    prog = tvtime
+    button = VOL_UP
+    config = MIXER_UP
+    repeat = 2
+end
+begin
+    prog = tvtime
+    button = VOL_DOWN
+    config = MIXER_DOWN
+    repeat = 2
+end
+begin
+    prog = tvtime
+    button = MUTE
+    config = TOGGLE_MUTE
 end
 
-#The above section includes two configs, what this does is that it allows
-#you to open tvtime and close tvtime with one button.  If your remote has
-#seperate buttons for this, then you can break it apart.
-
 begin
-  prog = irexec
-  button = MTS
-  repeat = 1
-  config = xset dpms force off
-  config = xset -dpms  
+    prog = tvtime
+    button = CH+
+    config = CHANNEL_INC
+    repeat = 1
+end
+begin
+    prog = tvtime
+    button = CH-
+    config = CHANNEL_DEC
+    repeat = 1
+end
+begin
+    prog = tvtime
+    button = RECALL
+    config = CHANNEL_PREV
+    repeat = 1
 end
 
-#This next option I found useful when watching tv from bed.  Rather then
-#get up and turn off the monitor after view, I just bounded a key on the
-#remote to turn the monitor off when pressed, and turn it back on when
-#pressed again.  I'm sure there is a better way to do this, I have
-#expereinced problems with the monitor coming back on sometimes.  If
-#you have any suggestions, please email me and let me know.  I just chose
-#an unused key for this.
+begin
+    prog   = tvtime
+    button = 1
+    config = CHANNEL_1
+end
+begin
+    prog   = tvtime
+    button = 2
+    config = CHANNEL_2
+end
+begin
+    prog   = tvtime
+    button = 3
+    config = CHANNEL_3
+end
+begin
+    prog   = tvtime
+    button = 4
+    config = CHANNEL_4
+end
+begin
+    prog   = tvtime
+    button = 5
+    config = CHANNEL_5
+end
+begin
+    prog   = tvtime
+    button = 6
+    config = CHANNEL_6
+end
+begin
+    prog   = tvtime
+    button = 7
+    config = CHANNEL_7
+end
+begin
+    prog   = tvtime
+    button = 8
+    config = CHANNEL_8
+end
+begin
+    prog   = tvtime
+    button = 9
+    config = CHANNEL_9
+end
+begin
+    prog   = tvtime
+    button = 0
+    config = CHANNEL_0
+end
+begin
+    prog = tvtime
+    button = ENTER
+    config = ENTER
+end
 
-begin
-  prog = irexec
-  button = VOL_DOWN
-  repeat = 1
-  config = tvtime-command MIXER_DOWN
-end
-begin
-  prog = irexec
-  button = VOL_UP
-  repeat = 1
-  config = tvtime-command MIXER_UP
-end
-begin
-  prog = irexec
-  button = MUTE
-  repeat = 0
-  config = tvtime-command MIXER_MUTE
-end
-begin
-  prog = irexec
-  button = CH_DOWN
-  repeat = 1
-  config = tvtime-command CHANNEL_DOWN
-end
-begin
-  prog = irexec
-  button = CH_UP
-  repeat = 1
-  config = tvtime-command CHANNEL_UP
-end
-begin
-  prog = irexec
-  button = FULLSCREEN
-  repeat = 0
-  config = tvtime-command TOGGLE_FULLSCREEN
-end
-begin
-  prog = irexec
-  button = 1
-  repeat = 1
-  config = tvtime-command CHANNEL_1
-end
-begin
-  prog = irexec
-  button = 2
-  repeat = 1
-  config = tvtime-command CHANNEL_2
-end
-begin
-  prog = irexec
-  button = 3
-  repeat = 1
-  config = tvtime-command CHANNEL_3
-end
-begin
-  prog = irexec
-  button = 4
-  repeat = 1
-  config = tvtime-command CHANNEL_4
-end
-begin
-  prog = irexec
-  button = 5
-  repeat = 1
-  config = tvtime-command CHANNEL_5
-end
-begin
-  prog = irexec
-  button = 6
-  repeat = 1
-  config = tvtime-command CHANNEL_6
-end
-begin
-  prog = irexec
-  button = 7
-  repeat = 1
-  config = tvtime-command CHANNEL_7
-end
-begin
-  prog = irexec
-  button = 8
-  repeat = 1
-  config = tvtime-command CHANNEL_8
-end
-begin
-  prog = irexec
-  button = 9
-  repeat = 1
-  config = tvtime-command CHANNEL_9
-end
-begin
-  prog = irexec
-  button = 0
-  repeat = 1
-  config = tvtime-command CHANNEL_0
-end
-begin
-  prog = irexec
-  button = DISPLAY
-  repeat = 1
-  config = tvtime-command DISPLAY_INFO
-end
-begin
-  prog = irexec
-  button = ENTER
-  config = tvtime-command ENTER
-end
-begin
-  prog = irexec
-  button = FINE_UP
-  config = tvtime-command FINETUNE_UP
-end
-begin
-  prog = irexec
-  button = FINE_DOWN
-  config = tvtime-command FINETUNE_DOWN
-end
-begin
-  prog = irexec
-  button = CC
-  config = tvtime-command TOGGLE_CC
-end
-begin
-  prog = irexec
-  button = Video
-  config = tvtime-command TOGGLE_DEINTERLACER
-end
-begin
-  prog = irexec
-  button = RECALL
-  repeat = 1
-  config = tvtime-command CHANNEL_PREV
-end
