@@ -53,7 +53,7 @@ struct console_s
 
     int frame_width;  
     int frame_height;
-    int frame_aspect;
+    double frame_aspect;
 
     int x, y; /* where to draw console */
     int width, height;  /* the size box we have to draw in */
