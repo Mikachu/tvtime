@@ -218,7 +218,6 @@ static void get_program_info( xmltv_t *xmltv, xmlNodePtr program )
 
 static void get_next_title( xmltv_t *xmltv, xmlNodePtr program )
 {
-    program = program->next;
     if ( program ) {
         program = program->xmlChildrenNode;
         while( program ) {
