@@ -940,7 +940,7 @@ static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_
     __asm__ __volatile__(
         "   movq      %0, %%rsi         \n"
         "   movq      %1, %%rdi         \n"
-		"   xorq      %%rdx, %%rdx      \n"
+        "   xorq      %%rdx, %%rdx      \n"
         "   movl      %2, %%edx         \n"
         "   shrq      $3, %%rdx         \n"
 

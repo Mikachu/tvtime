@@ -1315,7 +1315,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         vidin = 0;
      } else {
         const char *audiomode = config_get_audio_mode( ct );
-	int dkmode = config_get_pal_audio_mode( ct );
+        int dkmode = config_get_pal_audio_mode( ct );
         videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
 
         if( audiomode ) {
@@ -2539,8 +2539,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             config_save( ct, "AudioMode", "stereo" );
         }
 
-	snprintf( number, 4, "%d", videoinput_get_pal_audio_mode( vidin ) );
-	config_save( ct, "PalDKMode", number );
+        snprintf( number, 4, "%d", videoinput_get_pal_audio_mode( vidin ) );
+        config_save( ct, "PalDKMode", number );
     }
 
     output->shutdown();

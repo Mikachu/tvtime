@@ -422,7 +422,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             ct->mixerdev = strdup( curval );
         }
 
-	if( !xmlStrcasecmp( name, BAD_CAST "PalDKMode" ) ) {
+        if( !xmlStrcasecmp( name, BAD_CAST "PalDKMode" ) ) {
             ct->dkmode = atoi( curval );
         }
 
