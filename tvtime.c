@@ -262,7 +262,7 @@ int main( int argc, char **argv )
         if( verbose ) fprintf( stderr, "tvtime: Luma correction disabled.\n" );
     }
 
-    in = input_new( ct, vidin, vc );
+    in = input_new( ct, vidin, osd, vc );
     if( !in ) {
         fprintf( stderr, "tvtime: Can't create input handler.\n" );
         return 1;

@@ -34,100 +34,56 @@
 
 
 struct input_s {
-    config_t        *cfg;
-//    osd_t           *osd;
-    videoinput_t    *vidin;
+    config_t *cfg;
+    videoinput_t *vidin;
+    tvtime_osd_t *osd;
     video_correction_t *vc;
-    char *next_chan_buffer;
+    char next_chan_buffer[ 5 ];
     int frame_counter;
     int digit_counter;
     int videohold;
-/*
-    osd_string_t *channel_number, *volume_bar, *muted_osd;
-*/
 };
 
-input_t *input_new( config_t *cfg, 
-                    /*osd_t *osd,*/ 
-                    videoinput_t *vidin,
-                    video_correction_t *vc )
+input_t *input_new( config_t *cfg, videoinput_t *vidin,
+                    tvtime_osd_t *osd, video_correction_t *vc )
 {
-    input_t *in;
-/*    int width, height;  */
-
-    in = (input_t *)malloc(sizeof(input_t));
+    input_t *in = (input_t *) malloc( sizeof( input_t ) );
     if( !in ) {
         fprintf( stderr, "input: Could not create new input object.\n" );
         return NULL;
     }
 
     in->cfg = cfg;
-/*    in->osd = osd;  */
     in->vidin = vidin;
+    in->osd = osd;
     in->vc = vc;
     in->frame_counter = 0;
     in->digit_counter = 0;
     in->videohold = 0;
 
-    in->next_chan_buffer = (char*)malloc(5);
-
-    if( !in->next_chan_buffer ) {
-        fprintf( stderr, "input: Out of memory.\n" );
-        return NULL;
-    }
-
-    /* Setup OSD stuff. */
-/*
-    width = videoinput_get_width( in->vidin );
-    height = videoinput_get_height( in->vidin );
-    in->channel_number = osd_string_new( "helr.ttf", 80, width, height, 
-                                     4.0 / 3.0 );
-    in->volume_bar = osd_string_new( "helr.ttf", 15, width, height, 
-                                     4.0 / 3.0 );
-    in->muted_osd = osd_string_new( "helr.ttf", 15, width, height, 
-                                    4.0 / 3.0 );
-    osd_string_set_colour( in->channel_number, 220, 12, 155 );
-    osd_string_set_colour( in->volume_bar, 200, 128, 128 );
-    osd_string_set_colour( in->muted_osd, 200, 128, 128 );
-    osd_string_show_border( in->channel_number, 1 );
-*/
     return in;
 }
 
 void input_delete( input_t *in )
 {
-    if( in->next_chan_buffer ) free( in->next_chan_buffer );
+    free( in );
 }
-
-/*
-void show_osd_bar( input_t *in, char *label, char *bars, int num )
-{
-    memset( bars, 0, 108 );
-    strncpy( bars, label, 7 );
-    memset( bars+7, '|', num );
-    osd_string_show_text( in->volume_bar, bars, 80 );
-}
-*/
 
 void input_callback( input_t *in, InputEvent command, int arg )
 {
     int tvtime_cmd, verbose;
-    /* XXX: fix this so it's useful */
-    int printdebug=0, showtest=0;
     int volume;
-
 
     verbose = config_get_verbose( in->cfg );
 
     fprintf( stderr, "input: command = %o  arg = %d\n", command, arg );
     switch( command ) {
-
     case I_QUIT:
         break;
 
     case I_KEYDOWN:
-
          tvtime_cmd = config_key_to_command( in->cfg, arg );
+         fprintf( stderr, "input: command becomes %d\n", tvtime_cmd );
 
          switch( tvtime_cmd ) {
 
@@ -137,26 +93,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
              in->digit_counter++;
              in->digit_counter %= 4;
              in->frame_counter = CHANNEL_DELAY;
-             break;
-
-         case TVTIME_DEBUG:
-             printdebug = 1;
-             break;
-
-         case TVTIME_SHOW_BARS:
-             if( !showtest ) {
-                 showtest = 2;
-             } else {
-                 showtest = 0;
-             }
-             break;
-
-         case TVTIME_SHOW_TEST:
-             if( !showtest ) {
-                 showtest = 1;
-             } else {
-                 showtest = 0;
-             }
              break;
 
          case TVTIME_LUMA_UP:
@@ -180,8 +116,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                         "correction value: %.1f\n", 
                                         config_get_luma_correction( in->cfg ));
 
-                 video_correction_set_luma_power( 
-                     in->vc, 
+                 video_correction_set_luma_power( in->vc,
                      config_get_luma_correction( in->cfg ) );
              }
              break;
@@ -356,3 +291,4 @@ int input_get_videohold( input_t *in )
     if( in ) return in->videohold;
     return 0;
 }
+

@@ -20,7 +20,7 @@
 #ifndef INPUT_H_INCLUDED
 #define INPUT_H_INCLUDED
 
-#include "osd.h"
+#include "tvtimeosd.h"
 #include "videoinput.h"
 #include "config.h"
 #include "videotools.h"
@@ -74,10 +74,8 @@ typedef enum InputEvent_e {
 #define I_PRINT                 316
 #define I_MENU                  319
 
-input_t *input_new( config_t *cfg, 
-                    /* osd_t *osd, */
-                    videoinput_t *vidin, 
-                    video_correction_t *vc );
+input_t *input_new( config_t *cfg, videoinput_t *vidin, 
+                    tvtime_osd_t *osd, video_correction_t *vc );
 void    input_delete( input_t *in );
 void    input_callback( input_t *in, InputEvent command, int arg );
 void    input_next_frame( input_t *in );
@@ -86,4 +84,4 @@ void    input_next_frame( input_t *in );
 int     input_get_videohold( input_t *in );
 void    input_dec_videohold( input_t *in );
 
-#endif
+#endif /* INPUT_H_INCLUDED */
