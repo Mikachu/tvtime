@@ -168,6 +168,7 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
 {
     char *fontfile;
     char *logofile;
+    char *creditsfile;
     unsigned int channel_rgb, other_rgb;
 
     tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
@@ -189,9 +190,14 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
 
     fontfile = DATADIR "/FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
+    creditsfile = DATADIR "/credits.png";
 
-    osd->credits = credits_new( "./credits.png", height );
+    osd->credits = credits_new( creditsfile, height );
     osd->show_credits = 0;
+    if( !osd->credits ) {
+        creditsfile = "./credits.png";
+        osd->credits = credits_new( creditsfile, height );
+    }
 
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
     if( !osd->strings[ OSD_CHANNEL_NUM ].string ) {
