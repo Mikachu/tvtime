@@ -877,6 +877,50 @@ int main( int argc, char **argv )
         dlevel = 5;
     }
 
+    /* Steal system resources in the name of performance. */
+    if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
+        fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
+        use_vgasync = 1;
+    } else if( verbose ) {
+        fprintf( stderr, "tvtime: Disabling VGA port polling.\n" );
+    }
+    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
+        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
+    }
+
+    if( !set_realtime_priority( 0 ) && verbose ) {
+        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+    }
+    rtctimer = rtctimer_new( verbose );
+    if( !rtctimer ) {
+        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+                         "*** that you load the 'rtc' kernel module before starting tvtime.\n"
+                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
+    } else {
+        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
+            rtctimer_delete( rtctimer );
+            rtctimer = 0;
+        } else {
+            rtctimer_start_clock( rtctimer );
+
+            if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
+                fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  Support is available,\n"
+                         "*** but tvtime cannot get 1024hz resolution!  Please run tvtime as root,\n"
+                         "*** or, with linux kernel version 2.4.19 or later, run:\n"
+                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
+            }
+        }
+    }
+
+    /* We've now stolen all our root-requiring resources, drop to a user. */
+    if( setresuid( getuid(), getuid(), getuid() ) == -1 ) {
+        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", strerror( errno ) );
+        return 1;
+    }
+
+
+    /* Setup the speedy calls. */
     setup_speedy_calls( verbose );
 
     dscaler_greedyh_plugin_init();
@@ -1104,48 +1148,6 @@ int main( int argc, char **argv )
     }
     commands_set_menu( commands, menu );
     */
-
-    /* Steal system resources in the name of performance. */
-    if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
-        fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
-        use_vgasync = 1;
-    } else if( verbose ) {
-        fprintf( stderr, "tvtime: Disabling VGA port polling.\n" );
-    }
-    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
-        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
-    }
-
-    if( !set_realtime_priority( 0 ) && verbose ) {
-        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
-    }
-    rtctimer = rtctimer_new( verbose );
-    if( !rtctimer ) {
-        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
-                         "*** that you load the 'rtc' kernel module before starting tvtime.\n"
-                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
-    } else {
-        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
-            rtctimer_delete( rtctimer );
-            rtctimer = 0;
-        } else {
-            rtctimer_start_clock( rtctimer );
-
-            if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  Support is available,\n"
-                         "*** but tvtime cannot get 1024hz resolution!  Please run tvtime as root,\n"
-                         "*** or, with linux kernel version 2.4.19 or later, run:\n"
-                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
-            }
-        }
-    }
-
-    /* We've now stolen all our root-requiring resources, drop to a user. */
-    if( setresuid( getuid(), getuid(), getuid() ) == -1 ) {
-        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", strerror( errno ) );
-        return 1;
-    }
 
     /* Ensure the FIFO directory exists */
     fifodir = opendir( FIFODIR );
