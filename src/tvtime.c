@@ -1415,7 +1415,7 @@ int main( int argc, char **argv )
                                        width, height, width * 2 );
                     }
                     sprintf( message, "Screenshot saved: %s", basename );
-                    tvtime_osd_show_message( osd, message );
+                    if( osd ) tvtime_osd_show_message( osd, message );
                 }
                 output->unlock_output_buffer();
                 performance_checkpoint_constructed_top_field( perf );
