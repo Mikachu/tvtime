@@ -1,5 +1,6 @@
 
 0.9.8.3 -
+  * mrallen: Save overscan setting to the config file on exit.
   * vektor: Removed the vgasync code until we have something that
       can correctly use the vsync.h stuff (it was a bad hack anyway)
   * vektor: Added a command to automatically adjust window size to

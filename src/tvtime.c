@@ -1898,6 +1898,9 @@ int main( int argc, char **argv )
         snprintf( number, 4, "%d", framerate_mode );
         configsave( config_get_configsave( ct ), "FramerateMode", number );
 
+        snprintf( number, 4, "%2.1f", commands_get_overscan( commands ) * 2.0 * 100.0 );
+        configsave( config_get_configsave( ct ), "OverScan", number );
+
         if( vidin ) {
             snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
             configsave( config_get_configsave( ct ), "V4LInput", number );
