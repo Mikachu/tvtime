@@ -13,7 +13,11 @@
 #define DO_LINE 11
 static char outbuf[2048];
 static int pll = 0;
-static char *ccode = " !\"#$%&'()a+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[e]iouabcdefghijklmnopqrstuvwxyzc/Nn.";	/* this is NOT exactly right */
+
+/* this is NOT exactly right */
+static char *ccode = " !\"#$%&'()a+,-./0123456789:;<=>?@"
+                     "abcdefghijklmnopqrstuvwxyz"
+                     "[e]iouabcdefghijklmnopqrstuvwxyzc/Nn.";
 
 int parityok(int n)
 {				/* check parity for 2 bytes packed in n */
@@ -94,6 +98,9 @@ static void parse_xds_packet( const char *packet, int length )
 {
     int i;
 
+    /* Stick a null at the end. */
+    packet[ length - 1 ] = '\0';
+
     fprintf( stderr, "XDS packet, class " );
     switch( packet[ 0 ] ) {
     case 0x1: fprintf( stderr, "CURRENT start\n" ); break;
@@ -116,13 +123,18 @@ static void parse_xds_packet( const char *packet, int length )
 
     case 0xd: fprintf( stderr, "UNDEF start\n" ); break;
     case 0xe: fprintf( stderr, "UNDEF continue\n" ); break;
-
-    case 0xf: fprintf( stderr, "END\n" ); break;
     }
     for( i = 0; packet[ i ] != 0xf; i++ ) {
         fprintf( stderr, "0x%02x ", packet[ i ] );
     }
     fprintf( stderr, "\n" );
+
+    if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x03 ) {
+        fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
+    } else if( packet[ 0 ] < 0x05 && packet[ 1 ] == 0x03 ) {
+        fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
+    // } else if( packet[ 0 ] == 0x5
+    }
 }
 
 static int xds_decode( int b1, int b2 )
@@ -136,7 +148,7 @@ static int xds_decode( int b1, int b2 )
     }
 
     xds_packet[ xds_cursor ] = b1;
-    xds_packet[ xds_cursor + 1 ] = b1;
+    xds_packet[ xds_cursor + 1 ] = b2;
     xds_cursor += 2;
 
     if( b1 == 0xf ) {
