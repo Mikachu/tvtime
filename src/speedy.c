@@ -290,28 +290,28 @@ void testing_packed422_inplace_scanline_c( unsigned char *data, int width, int s
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
     int x, tmp1, tmp2;
+    int width2 = width*2;
 
     SPEEDY_START();
-    for( x = 0; x < width; x+=2 ) {
-        tmp1 = data[ x+0 ];
+    for( x = 0; x < width; x += 2 ) {
+        tmp1 = data[ x   ];
         tmp2 = data[ x+1 ];
-        data[ x+0 ] = data[ width*2 - x - 0 ];
-        data[ x+1 ] = data[ width*2 - x + 1 ];
-        data[ width*2 - x - 0 ] = tmp1;
-        data[ width*2 - x + 1 ] = tmp2;
+        data[ x   ] = data[ width2 - x     ];
+        data[ x+1 ] = data[ width2 - x + 1 ];
+        data[ width2 - x     ] = tmp1;
+        data[ width2 - x + 1 ] = tmp2;
     }
     SPEEDY_END();
 }
 
 void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width )
 {
-    int halfw = width / 2;
     int x;
 
     SPEEDY_START();
-    for( x = 0; x < halfw; x += 2 ) {
-        data[ width + (x*2)     ] = data[ width - ((x+1)*2) ];
-        data[ width + (x*2) + 1 ] = data[ width - ((x+1)*2) + 1 ];
+    for( x = 0; x < width; x += 2 ) {
+        data[ width + x     ] = data[ width - x     ];
+        data[ width + x + 1 ] = data[ width - x + 1 ];
     }
     SPEEDY_END();
 }
