@@ -53,6 +53,7 @@
 #include "station.h"
 #include "configsave.h"
 #include "config.h"
+#include "vgasync.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -548,6 +549,7 @@ int main( int argc, char **argv )
     int scanwait = scan_delay;
     int scanning = 0;
     int firstscan = 0;
+    int use_vgasync = 0;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -744,6 +746,12 @@ int main( int argc, char **argv )
     if( verbose ) {
         fprintf( stderr, "tvtime: Attempting to aquire "
                          "performance-enhancing features.\n" );
+    }
+    if( vgasync_init( verbose ) && verbose ) {
+        fprintf( stderr, "tvtime: Enabling VGA port polling.\n" );
+        use_vgasync = 1;
+    } else if( verbose ) {
+        fprintf( stderr, "tvtime: Disabling VGA port polling.\n" );
     }
     if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
         fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
@@ -1075,6 +1083,7 @@ int main( int argc, char **argv )
             performance_checkpoint_delayed_blit_top_field( perf );
 
             performance_checkpoint_blit_top_field_start( perf );
+            if( use_vgasync ) vgasync_spin_until_out_of_refresh();
             if( curmethod->doscalerbob && !showbars ) {
                 output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
@@ -1156,6 +1165,7 @@ int main( int argc, char **argv )
 
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
+            if( use_vgasync ) vgasync_spin_until_out_of_refresh();
             if( curmethod->doscalerbob && !showbars ) {
                 output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
@@ -1185,6 +1195,8 @@ int main( int argc, char **argv )
     config_delete( ct );
     input_delete( in );
     commands_delete( commands );
+    performance_delete( perf );
+    station_delete( stationmgr );
     if( fifo ) {
         fifo_delete( fifo );
     }
@@ -1206,8 +1218,17 @@ int main( int argc, char **argv )
     if( vs ) {
         vbiscreen_delete( vs );
     }
+    if( osd ) {
+        tvtime_osd_delete( osd );
+    }
 
     configsave_close();
+
+    /* Free temporary memory. */
+    free( colourbars );
+    free( saveframe );
+    free( fadeframe );
+    free( blueframe );
     return 0;
 }
 

@@ -1,6 +1,6 @@
 
 TVTIME_CFLAGS = -I$(top_srcdir)/src
-OPT_CFLAGS = -Wall -I. -O3 -rdynamic
+OPT_CFLAGS = -Wall -I. -pedantic
 
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 

@@ -18,8 +18,7 @@ PLUGINS_LIBS = -L$(top_builddir)/plugins -ltvtimeplugins
 # DIRECTFB_LIBS = 
 # endif
 
-OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic \
-	-DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\""
+OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(tvtimedatadir)\"" -DCONFDIR="\"$(tvtimesysconfdir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG)
@@ -40,7 +39,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	wm_state.h wm_state.c console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
 	station.h station.c bands.h configsave.h configsave.c x11tools.c \
-	x11tools.h debug_print.h tvtimeconf_xml.c
+	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c
 
 bin_PROGRAMS = tvtime tvscanner
 
