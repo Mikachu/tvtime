@@ -95,7 +95,7 @@ const char *get_tvtime_paths( void )
 #endif
 }
 
-const char *get_tvtime_fifodir( config_t *ct )
+const char *get_tvtime_fifodir( uid_t uid )
 {
     static char *fifodir = NULL;
 
@@ -106,7 +106,7 @@ const char *get_tvtime_fifodir( config_t *ct )
         DIR *dirhandle = NULL;
 
         /* Check for the user's existance. */
-        pwuid = getpwuid( config_get_uid( ct ) );
+        pwuid = getpwuid( uid );
         if( pwuid ) {
             if( asprintf( &user,
                           "%s",
@@ -115,9 +115,7 @@ const char *get_tvtime_fifodir( config_t *ct )
                 return NULL;
             }
         } else {
-            if( asprintf( &user,
-                          "%u",
-                          config_get_uid( ct ) ) < 0 ) {
+            if( asprintf( &user, "%u", uid ) < 0 ) {
                 fprintf( stderr, "utils: Out of memory.\n" );
                 return NULL;
             }
@@ -144,7 +142,7 @@ const char *get_tvtime_fifodir( config_t *ct )
                     struct stat dirstat;
                     closedir( dirhandle );
                     if( !stat( fifodir, &dirstat ) ) {
-                        if( dirstat.st_uid == config_get_uid( ct ) ) {
+                        if( dirstat.st_uid == uid ) {
                             return fifodir;
                         }
                     }
@@ -176,7 +174,7 @@ const char *get_tvtime_fifodir( config_t *ct )
                     struct stat dirstat;
                     closedir( dirhandle );
                     if( !stat( fifodir, &dirstat ) ) {
-                        if( dirstat.st_uid == config_get_uid( ct ) ) {
+                        if( dirstat.st_uid == uid ) {
                             return fifodir;
                         }
                     }
@@ -193,7 +191,7 @@ const char *get_tvtime_fifodir( config_t *ct )
     return fifodir;
 }
 
-const char *get_tvtime_fifo( config_t *ct )
+const char *get_tvtime_fifo( uid_t uid )
 {
     static char *fifo = NULL;
 
@@ -206,7 +204,7 @@ const char *get_tvtime_fifo( config_t *ct )
 	char *hostenv_realloc = NULL;
 
         /* Get the FIFO directory. */
-        fifodir = get_tvtime_fifodir( ct );
+        fifodir = get_tvtime_fifodir( uid );
         if( !fifodir ) {
             fprintf( stderr, "utils: No FIFO directory found.!\n" );
             return NULL;

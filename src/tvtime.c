@@ -1224,38 +1224,38 @@ int main( int argc, char **argv )
     }
 
     /* Create the user's FIFO directory */
-    if( !get_tvtime_fifodir( ct ) ) {
+    if( !get_tvtime_fifodir( config_get_uid( ct ) ) ) {
         fprintf( stderr, "tvtime: Cannot find FIFO directory.  "
                          "FIFO disabled.\n" );
     } else {
         int success = 0;
-        if( mkdir( get_tvtime_fifodir( ct ), S_IRWXU ) < 0 ) {
+        if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU ) < 0 ) {
             if( errno != EEXIST ) {
                 fprintf( stderr, "tvtime: Cannot create directory %s.  "
                                  "FIFO disabled.\n", 
-                         get_tvtime_fifodir( ct ) );
+                         get_tvtime_fifodir( config_get_uid( ct ) ) );
             } else {
-                fifodir = opendir( get_tvtime_fifodir( ct ) );
+                fifodir = opendir( get_tvtime_fifodir( config_get_uid( ct ) ) );
                 if( !fifodir ) {
                     fprintf( stderr, "tvtime: %s is not a directory.  "
                                      "FIFO disabled.\n", 
-                             get_tvtime_fifodir( ct ) );
+                             get_tvtime_fifodir( config_get_uid( ct ) ) );
                 } else {
                     struct stat dirstat;
                     closedir( fifodir );
                     /* Ensure the FIFO directory is owned by the user. */
-                    if( !stat( get_tvtime_fifodir( ct ), &dirstat ) ) {
+                    if( !stat( get_tvtime_fifodir( config_get_uid( ct ) ), &dirstat ) ) {
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             success = 1;
                         } else {
                             fprintf( stderr, "tvtime: You do not own %s.  "
                                              "FIFO disabled.\n",
-                                     get_tvtime_fifodir( ct ) );
+                                     get_tvtime_fifodir( config_get_uid( ct ) ) );
                         }
                     } else {
                         fprintf( stderr, "tvtime: Cannot stat %s.  "
                                          "FIFO disabled.\n",
-                                 get_tvtime_fifodir( ct ) );
+                                 get_tvtime_fifodir( config_get_uid( ct ) ) );
                     }
                 }
             }
@@ -1265,11 +1265,11 @@ int main( int argc, char **argv )
 
         if( success ) {
             /* Setup the FIFO */
-            if( !get_tvtime_fifo( ct ) ) {
+            if( !get_tvtime_fifo( config_get_uid( ct ) ) ) {
                 fprintf( stderr, "tvtime: Cannot find FIFO file.  "
                                  "Failed to create FIFO object.\n"  );
             } else {
-                fifo = fifo_new( get_tvtime_fifo( ct ) );
+                fifo = fifo_new( get_tvtime_fifo( config_get_uid( ct ) ) );
                 if( !fifo && verbose ) {
                     fprintf( stderr, "tvtime: Not reading input from FIFO."
                                      "  Failed to create FIFO object.\n" );

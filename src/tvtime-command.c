@@ -46,15 +46,16 @@ int main( int argc, char **argv )
     }
 
     /* check if fifo can be written (tvtime running) */
-    if( !get_tvtime_fifo( cfg ) ) {
+    if( !get_tvtime_fifo( config_get_uid( cfg ) ) ) {
         fprintf( stderr, "tvtime-command: fifo cannot be found. tvtime not running?\n" );
 	return 1;
     }
 
-    i = open( get_tvtime_fifo( cfg ), O_WRONLY | O_NONBLOCK);
+    i = open( get_tvtime_fifo( config_get_uid( cfg ) ), O_WRONLY | O_NONBLOCK);
     if (i < 0)
     {
-        fprintf( stderr, "tvtime-command: fifo %s unwritable. tvtime not running?\n", get_tvtime_fifo( cfg ) );
+        fprintf( stderr, "tvtime-command: fifo %s unwritable. tvtime not running?\n",
+                 get_tvtime_fifo( config_get_uid( cfg ) ) );
         config_delete( cfg );
         return 1;
     }
@@ -62,7 +63,7 @@ int main( int argc, char **argv )
     fifo = fdopen( i, "w" );
     if( !fifo ) {
         fprintf( stderr, "tvtime-command: Can't open fifo file %s.\n",
-                get_tvtime_fifo( cfg ) );
+                get_tvtime_fifo( config_get_uid( cfg ) ) );
         config_delete( cfg );
         return 1;
     }
