@@ -34,6 +34,15 @@ dnl if 0; then
 dnl   AC_DEFINE([HAVE_SDL],,[Define this to include SDL support])
 dnl fi
 
+dnl ---------------------------------------------
+dnl dynamic linker
+dnl ---------------------------------------------
+AC_CHECK_LIB(c, dlopen,
+	     DYNAMIC_LD_LIBS="",
+	     AC_CHECK_LIB(dl, dlopen,
+             	          DYNAMIC_LD_LIBS="-ldl",
+	                  AC_MSG_ERROR(dynamic linker needed)))
+AC_SUBST(DYNAMIC_LD_LIBS)
 
 dnl ---------------------------------------------
 dnl zlib
