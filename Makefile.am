@@ -16,6 +16,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 AUTOMAKE_OPTIONS = 1.6
-SUBDIRS = docs data plugins src
-EXTRA_DIST = BUGS README.UPGRADING
+SUBDIRS = intl m4 docs data plugins src po
+EXTRA_DIST = config.rpath  BUGS README.UPGRADING
 
+ACLOCAL_AMFLAGS = -I m4

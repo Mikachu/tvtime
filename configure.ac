@@ -32,6 +32,9 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday seteuid memset setreuid setpriority signal sigemptyset sigaction strerror vsscanf wordexp wordfree])
 
+# Check for gettext
+AM_GNU_GETTEXT
+
 # Let's set the group of the $(localstatedir)/run/tvtime directory
 # On most GNU/Linux systems, this should be `video', but most GNU/Linux
 # systems only have `users'.  We'll default to `users'.
@@ -305,5 +308,8 @@ AC_CONFIG_FILES([
 	plugins/Makefile
 	src/Makefile
 	src/wine/Makefile
+	intl/Makefile
+	po/Makefile.in
+	m4/Makefile 
 ])
 AC_OUTPUT
