@@ -982,7 +982,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
     menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
     menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    sprintf( string, "%c%c%c  Exit menu", 0xee, 0x80, 0xa0 );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_MENU_EXIT, 0 );
     menu_set_right_command( menu, 6, TVTIME_MENU_EXIT, 0 );
@@ -1011,7 +1011,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    sprintf( string, "%c%c%c  Exit menu", 0xee, 0x80, 0xa0 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
