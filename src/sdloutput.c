@@ -351,6 +351,11 @@ static void sdl_set_matte( int width, int height )
 {
 }
 
+static int sdl_toggle_alwaysontop( void )
+{
+    return 0;
+}
+
 static output_api_t sdloutput =
 {
     sdl_init,
@@ -374,6 +379,7 @@ static output_api_t sdloutput =
     sdl_show_frame,
 
     sdl_toggle_aspect,
+    sdl_toggle_alwaysontop,
     sdl_toggle_fullscreen,
     sdl_resize_window_fullscreen,
 
