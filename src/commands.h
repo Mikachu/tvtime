@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2002, 2003 Doug Bell <drbell@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ typedef struct commands_s commands_t;
 #include "console.h"
 #include "vbidata.h"
 #include "station.h"
+#include "menu.h"
 
 /**
  * Input commands for keymap
@@ -41,7 +42,6 @@ enum tvtime_commands
     TVTIME_QUIT,
     TVTIME_CHANNEL_INC,
     TVTIME_CHANNEL_DEC,
-    TVTIME_CHANNEL_FAVORITES,
     TVTIME_CHANNEL_PREV,
     TVTIME_TOGGLE_LUMA_CORRECTION,
     TVTIME_LUMA_UP,
@@ -146,14 +146,16 @@ const char *tvtime_command_to_string( int command );
 int tvtime_num_commands( void );
 const char *tvtime_get_command( int pos );
 int tvtime_get_command_id( int pos );
-
 int tvtime_is_menu_command( int command );
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime );
 void commands_delete( commands_t *in );
+
 void commands_handle( commands_t *in, int command, const char *arg );
+
+void commands_add_menu( commands_t *in, menu_t *menu );
 
 int commands_quit( commands_t *in );
 int commands_take_screenshot( commands_t *in );

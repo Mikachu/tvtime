@@ -30,6 +30,7 @@ struct menu_s
     char arguments[ MENU_MAX ][ 128 ];
     int commands[ MENU_MAX ];
     int numlines;
+    int cursor;
 };
 
 menu_t *menu_new( const char *name )
@@ -40,6 +41,7 @@ menu_t *menu_new( const char *name )
     }
 
     menu->numlines = 0;
+    menu->cursor = 0;
     menu->name = strdup( name );
     if( !menu->name ) {
         free( menu );
@@ -68,6 +70,11 @@ void menu_set_command( menu_t *menu, int line, int command,
               "%s", argument );
 }
 
+void menu_set_cursor( menu_t *menu, int cursor )
+{
+    menu->cursor = cursor;
+}
+
 const char *menu_get_name( menu_t *menu )
 {
     return menu->name;
@@ -91,5 +98,10 @@ int menu_get_command( menu_t *menu, int line )
 const char *menu_get_argument( menu_t *menu, int line )
 {
     return menu->arguments[ line ];
+}
+
+int menu_get_cursor( menu_t *menu )
+{
+    return menu->cursor;
 }
 

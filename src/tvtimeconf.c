@@ -703,7 +703,7 @@ config_t *config_new( void )
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
     ct->keymap[ 'y' ] = TVTIME_SHOW_DEINTERLACER_INFO;
-    ct->keymap[ 'u' ] = TVTIME_CHANNEL_FAVORITES;
+    ct->keymap[ 'u' ] = TVTIME_SHOW_MENU;
 
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

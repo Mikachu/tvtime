@@ -21,24 +21,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <ctype.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include <ctype.h>
 #include "station.h"
 #include "mixer.h"
 #include "input.h"
 #include "commands.h"
 #include "console.h"
 
-typedef struct {
+#define NUM_FAVORITES 9
+#define MAX_USER_MENUS 64
+
+typedef struct command_names_s {
     const char *name;
     int command;
-} Cmd_Names;
+} command_names_t;
 
-static Cmd_Names cmd_table[] = {
+static command_names_t command_table[] = {
 
     { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
     { "AUTO_ADJUST_WINDOW", TVTIME_AUTO_ADJUST_WINDOW },
@@ -60,7 +61,6 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_ACTIVATE_ALL", TVTIME_CHANNEL_ACTIVATE_ALL },
     { "CHANNEL_DEC", TVTIME_CHANNEL_DEC },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DEC },
-    { "CHANNEL_FAVORITES", TVTIME_CHANNEL_FAVORITES },
     { "CHANNEL_INC", TVTIME_CHANNEL_INC },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "CHANNEL_RENUMBER", TVTIME_CHANNEL_RENUMBER },
@@ -139,17 +139,17 @@ static Cmd_Names cmd_table[] = {
 
 int tvtime_num_commands( void )
 {
-    return ( sizeof( cmd_table ) / sizeof( Cmd_Names ) );
+    return ( sizeof( command_table ) / sizeof( command_names_t ) );
 }
 
 const char *tvtime_get_command( int pos )
 {
-    return cmd_table[ pos ].name;
+    return command_table[ pos ].name;
 }
 
 int tvtime_get_command_id( int pos )
 {
-    return cmd_table[ pos ].command;
+    return command_table[ pos ].command;
 }
 
 int tvtime_string_to_command( const char *str )
@@ -185,7 +185,12 @@ int tvtime_is_menu_command( int command )
     return (command >= TVTIME_MENU_UP);
 }
 
-#define NUM_FAVORITES 9
+enum menu_type
+{
+    MENU_FAVORITES,
+    MENU_DEINTERLACER,
+    MENU_USER
+};
 
 struct commands_s {
     config_t *cfg;
@@ -198,7 +203,6 @@ struct commands_s {
     int inputnum;
 
     int displayinfo;
-
     int screenshot;
     int printdebug;
     int showbars;
@@ -236,11 +240,16 @@ struct commands_s {
 
     station_mgr_t *stationmgr;
 
-    int showfavorites;
-    int numfavorites;
     int curfavorite;
-    int curfavpos;
+    int numfavorites;
     int favorites[ NUM_FAVORITES ];
+
+    int menuactive;
+    int curmenu;
+    int curmenupos;
+    int curmenusize;
+    menu_t *curusermenu;
+    menu_t *menus[ MAX_USER_MENUS ];
 };
 
 static void reinit_tuner( commands_t *in )
@@ -302,7 +311,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_t *in = malloc( sizeof( struct commands_s ) );
 
     if( !in ) {
-        return NULL;
+        return 0;
     }
 
     /* Number of frames to wait for next channel digit. */
@@ -359,14 +368,14 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->vbi = 0;
     in->capturemode = CAPTURE_OFF;
 
-    in->showfavorites = 0;
     in->numfavorites = 0;
     in->curfavorite = 0;
-    in->curfavpos = 0;
 
-    /**
-     * Set the current channel list.
-     */
+    in->menuactive = 0;
+    in->curmenu = MENU_FAVORITES;
+    in->curmenupos = 0;
+    in->curusermenu = 0;
+    memset( in->menus, 0, sizeof( in->menus ) );
 
     reinit_tuner( in );
 
@@ -375,6 +384,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
 void commands_delete( commands_t *in )
 {
+    int i;
+
+    for( i = 0; i < MAX_USER_MENUS; i++ ) {
+        if( in->menus[ i ] ) {
+            menu_delete( in->menus[ i ] );
+        }
+    }
     free( in );
 }
 
@@ -411,9 +427,6 @@ static void osd_list_favorites( commands_t *in )
     }
     tvtime_osd_list_set_text( in->osd, in->numfavorites + 1, "Add current station" );
     tvtime_osd_list_set_text( in->osd, in->numfavorites + 2, "Exit" );
-    tvtime_osd_list_set_hilight( in->osd, in->curfavpos + 1 );
-    tvtime_osd_list_hold( in->osd, 1 );
-    tvtime_osd_show_list( in->osd, 1 );
 }
 
 static void add_to_favorites( commands_t *in, int pos )
@@ -430,47 +443,188 @@ static void add_to_favorites( commands_t *in, int pos )
     }
 }
 
+static void display_current_menu( commands_t *in )
+{
+    if( in->curmenu == MENU_FAVORITES ) {
+        osd_list_favorites( in );
+    } else if( in->curmenu == MENU_DEINTERLACER ) {
+    } else if( in->curmenu == MENU_USER && in->curusermenu ) {
+        int i;
+
+        tvtime_osd_list_set_lines( in->osd, menu_get_num_lines( in->curusermenu ) );
+        for( i = 0; i < menu_get_num_lines( in->curusermenu ); i++ ) {
+            tvtime_osd_list_set_text( in->osd, i, menu_get_text( in->curusermenu, i ) );
+        }
+    }
+
+    tvtime_osd_list_set_hilight( in->osd, in->curmenupos + 1 );
+    tvtime_osd_list_hold( in->osd, 1 );
+    tvtime_osd_show_list( in->osd, 1 );
+}
+
+static void menu_enter( commands_t *in )
+{
+    if( in->curmenu == MENU_FAVORITES ) {
+        if( in->curmenupos == in->numfavorites ) {
+            add_to_favorites( in, station_get_current_id( in->stationmgr ) );
+        } else {
+            if( in->curmenupos < in->numfavorites ) {
+                station_set( in->stationmgr, in->favorites[ in->curmenupos ] );
+                in->change_channel = 1;
+            }
+        }
+        tvtime_osd_list_hold( in->osd, 0 );
+        tvtime_osd_show_list( in->osd, 0 );
+        in->menuactive = 0;
+    } else if( in->curmenu == MENU_USER ) {
+        int command = menu_get_command( in->curusermenu, in->curmenupos + 1 );
+        const char *argument = menu_get_argument( in->curusermenu, in->curmenupos + 1 );
+
+        /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
+        if( command != TVTIME_MENU_ENTER ) {
+            commands_handle( in, command, argument );
+        }
+    }
+}
+
+static menu_t *find_user_menu( commands_t *in, const char *menuname )
+{
+    menu_t *root = 0;
+    int i;
+
+    if( !menuname || !*menuname ) {
+        menuname = "root";
+    }
+
+    for( i = 0; i < MAX_USER_MENUS; i++ ) {
+        if( !in->menus[ i ] ) {
+            return root;
+        }
+
+        if( !strcasecmp( menu_get_name( in->menus[ i ] ), "root" ) ) {
+            root = in->menus[ i ];
+        }
+
+        if( !strcasecmp( menuname, menu_get_name( in->menus[ i ] ) ) ) {
+            return in->menus[ i ];
+        }
+    }
+
+    return root;
+}
+
+static int is_valid_menu( commands_t *in, const char *menuname )
+{
+    if( !menuname || !*menuname ) {
+        return 0;
+    } else if( !strcasecmp( menuname, "favorites" ) ) {
+        return 1;
+    } else if( !strcasecmp( menuname, "deinterlacer" ) ) {
+        return 1;
+    } else {
+        int i;
+
+        for( i = 0; i < MAX_USER_MENUS; i++ ) {
+            if( !in->menus[ i ] ) return 0;
+            if( !strcasecmp( menuname, menu_get_name( in->menus[ i ] ) ) ) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+static void set_menu( commands_t *in, const char *menuname )
+{
+    in->menuactive = 1;
+    in->curusermenu = 0;
+
+    if( !menuname || !*menuname ) {
+        menuname = "root";
+    }
+
+    if( !strcasecmp( menuname, "favorites" ) ) {
+        in->curmenu = MENU_FAVORITES;
+        in->curmenupos = 0;
+        in->curmenusize = in->numfavorites + 2;
+    } else if( !strcasecmp( menuname, "deinterlacer" ) ) {
+        in->curmenu = MENU_DEINTERLACER;
+    } else {
+        in->curmenu = MENU_USER;
+        in->curusermenu = find_user_menu( in, menuname );
+
+        if( in->curusermenu ) {
+            in->curmenupos = menu_get_cursor( in->curusermenu );
+            in->curmenusize = menu_get_num_lines( in->curusermenu ) - 1;
+        } else {
+            in->menuactive = 0;
+        }
+    }
+}
+
+void commands_add_menu( commands_t *in, menu_t *menu )
+{
+    int i;
+
+    for( i = 0; i < MAX_USER_MENUS; i++ ) {
+        if( !in->menus[ i ] ) {
+            in->menus[ i ] = menu;
+            return;
+        }
+    }
+}
+
 int commands_in_menu( commands_t *in )
 {
-    return in->showfavorites;
+    return in->menuactive;
 }
 
 void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
 {
     int volume;
 
-    if( in->showfavorites && !tvtime_is_menu_command( tvtime_cmd ) ) {
+    if( in->menuactive && !tvtime_is_menu_command( tvtime_cmd ) ) {
+        tvtime_osd_list_hold( in->osd, 0 );
         tvtime_osd_show_list( in->osd, 0 );
-        in->showfavorites = 0;
+        in->menuactive = 0;
     }
 
-    if( in->showfavorites ) {
+    if( in->menuactive ) {
         switch( tvtime_cmd ) {
         case TVTIME_MENU_EXIT:
             tvtime_osd_list_hold( in->osd, 0 );
             tvtime_osd_show_list( in->osd, 0 );
-            in->showfavorites = 0;
+            in->menuactive = 0;
             break;
         case TVTIME_MENU_UP:
-            in->curfavpos = (in->curfavpos + in->numfavorites + 2 - 1) % (in->numfavorites + 2);
-            osd_list_favorites( in );
+            in->curmenupos = (in->curmenupos + in->curmenusize - 1) % (in->curmenusize);
+            if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
+            display_current_menu( in );
             break;
         case TVTIME_MENU_DOWN:
-            in->curfavpos = (in->curfavpos + 1) % (in->numfavorites + 2);
-            osd_list_favorites( in );
+            in->curmenupos = (in->curmenupos + 1) % (in->curmenusize);
+            if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
+            display_current_menu( in );
             break;
         case TVTIME_MENU_ENTER:
-            if( in->curfavpos == in->numfavorites ) {
-                add_to_favorites( in, station_get_current_id( in->stationmgr ) );
+            menu_enter( in );
+            break;
+        case TVTIME_SHOW_MENU:
+            if( !is_valid_menu( in, arg ) ) {
+                tvtime_osd_list_hold( in->osd, 0 );
+                tvtime_osd_show_list( in->osd, 0 );
+                in->menuactive = 0;
             } else {
-                if( in->curfavpos < in->numfavorites ) {
-                    station_set( in->stationmgr, in->favorites[ in->curfavpos ] );
-                    in->change_channel = 1;
+                set_menu( in, arg );
+                if( in->menuactive ) {
+                    display_current_menu( in );
+                } else {
+                    tvtime_osd_list_hold( in->osd, 0 );
+                    tvtime_osd_show_list( in->osd, 0 );
+                    in->menuactive = 0;
                 }
             }
-            tvtime_osd_list_hold( in->osd, 0 );
-            tvtime_osd_show_list( in->osd, 0 );
-            in->showfavorites = 0;
             break;
         }
         return;
@@ -481,10 +635,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         in->quit = 1;
         break;
 
-    case TVTIME_CHANNEL_FAVORITES:
-        in->showfavorites = 1;
-        in->curfavpos = 0;
-        osd_list_favorites( in );
+    case TVTIME_SHOW_MENU:
+        set_menu( in, arg );
+        if( in->menuactive ) {
+            display_current_menu( in );
+        }
         break;
 
     case TVTIME_SHOW_DEINTERLACER_INFO:

@@ -36,6 +36,8 @@ int menu_get_num_lines( menu_t *menu );
 const char *menu_get_text( menu_t *menu, int line );
 int menu_get_command( menu_t *menu, int line );
 const char *menu_get_argument( menu_t *menu, int line );
+int menu_get_cursor( menu_t *menu );
+void menu_set_cursor( menu_t *menu, int cursor );
 
 #ifdef __cplusplus
 };
