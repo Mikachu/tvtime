@@ -22,6 +22,7 @@
 #include "videotools.h"
 #include "speedy.h"
 #include "credits.h"
+#include "utils.h"
 
 struct credits_s
 {
@@ -41,13 +42,23 @@ credits_t *credits_new( const char *filename, int output_height )
 {
     credits_t *credits = (credits_t *) malloc( sizeof( credits_t ) );
     pnginput_t *pngin;
+    char *fullfilename;
     int i;
 
     if( !credits ) {
         return 0;
     }
 
-    pngin = pnginput_new( filename );
+    fullfilename = get_tvtime_file( filename );
+    if( !fullfilename ) {
+        fprintf( stderr, "credits: Can't find '%s'.  Checked: %s\n",
+                 filename, get_tvtime_paths() );
+        free( credits );
+        return 0;
+    }
+    pngin = pnginput_new( fullfilename );
+    free( fullfilename );
+
     if( !pngin ) {
         fprintf( stderr, "credits: Can't open credit roll '%s'.\n", filename );
         free( credits );
