@@ -1183,7 +1183,7 @@ int main( int argc, char **argv )
 
     /* If we start fullscreen, go into fullscreen mode now. */
     if( config_get_fullscreen( ct ) ) {
-        output->toggle_fullscreen( 0, 0 );
+        commands_handle( commands, TVTIME_TOGGLE_FULLSCREEN, 0 );
     }
 
     /* Set the mixer volume. */
