@@ -434,13 +434,17 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_CC:
-        vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
-        if( in->capturemode ) {
-            if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Disabled." );
-            in->capturemode = CAPTURE_OFF;
+        if( in->vbi ) {
+            vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
+            if( in->capturemode ) {
+                if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Disabled." );
+                in->capturemode = CAPTURE_OFF;
+            } else {
+                if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Enabled." );
+                in->capturemode = CAPTURE_CC1;
+            }
         } else {
-            if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Enabled." );
-            in->capturemode = CAPTURE_CC1;
+            if( in->osd ) tvtime_osd_show_message( in->osd, "No VBI device available for CC decoding." );
         }
         break;
 
