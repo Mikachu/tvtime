@@ -30,6 +30,11 @@
 #include "speedy.h"
 #include "deinterlace.h"
 
+/**
+ * This is an implementation of the deinterlacer filter described in
+ * the MPEG2 specification for two-field aperature.
+ */
+
 /* filter parameters: [-1 4 2 4 -1] // 8 */
 static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
                               unsigned char *lum_m3, unsigned char *lum_m2,
@@ -95,11 +100,21 @@ static void deinterlace_line( unsigned char *dst, unsigned char *lum_m4,
     emms();
 }
 
+
+/**
+ * The commented-out method below that uses the bottom_field member is more
+ * like the filter as specified in the MPEG2 spec, but it doesn't seem to
+ * have the desired effect.
+ */
+
 static void deinterlace_scanline_vfir( unsigned char *output,
                                        deinterlace_scanline_data_t *data,
                                        int width )
 {
-    deinterlace_line( output, data->tt1, data->t0, data->m1, data->b0, data->bb1, width*4 );
+    deinterlace_line( output, data->tt1, data->t0, data->m1, data->b0, data->bb1, width*2 );
+/*
+    blit_packed422_scanline( output, data->m1, width );
+*/
 }
 
 static void copy_scanline( unsigned char *output,
@@ -107,13 +122,20 @@ static void copy_scanline( unsigned char *output,
                            int width )
 {
     blit_packed422_scanline( output, data->m0, width );
+/*
+    if( data->bottom_field ) {
+        deinterlace_line( output, data->tt2, data->t1, data->m2, data->b1, data->bb2, width*2 );
+    } else {
+        deinterlace_line( output, data->tt0, data->t1, data->m0, data->b1, data->bb0, width*2 );
+    }
+*/
 }
 
 
 static deinterlace_method_t vfirmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Vertical Filter",
+    "MPEG2 Spacial Scalability Filter",
     "Vertical FIR",
     1,
     0,

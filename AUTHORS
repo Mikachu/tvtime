@@ -111,8 +111,8 @@ Code we stole (well, used under the GPL)
     D Richard Felker III <dalias@aerifal.cx>, from his work on
     deinterlacer filters for mplayer
 
-  Vertical [-1 4 2 4 -1]/8 deinterlacer filter and MMX code from ffmpeg
-  by Fabrice Bellard:
+  MMX code for the MPEG2 vertical [-1 4 2 4 -1]/8 deinterlacer filter
+  from ffmpeg by Fabrice Bellard:
     http://ffmpeg.org/
 
   Taglines courtesy of
