@@ -1,5 +1,12 @@
 
 0.9.8.6 -
+  * vektor: Renamed, rearranged, and cleaned up the available
+      deinterlacers, making some of them unavailable.  This
+      should improve our usability.  Deinterlacers will be
+      re-added as appropriate: if you were using a deinterlacer
+      that is no longer available, please let me know.
+  * vektor: Added V4L2 support, tested with the bttv9 driver.
+  * vektor: Fixed our screensaver ping code.
 
 0.9.8.5 - Fri Jun 20 10:57:17 ADT 2003
   * vektor: tvtime now drops root access before reading any
