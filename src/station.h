@@ -89,6 +89,11 @@ int station_add_band( station_mgr_t *mgr, const char *band );
 int station_set_current_active( station_mgr_t *mgr, int active );
 
 /**
+ * Re-activates all channels.
+ */
+void station_activate_all_channels( station_mgr_t *mgr );
+
+/**
  * Remap the current channel to the new position.
  */
 int station_remap( station_mgr_t *mgr, int pos );

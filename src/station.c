@@ -572,6 +572,15 @@ int station_set_current_active( station_mgr_t *mgr, int active )
    
 }
 
+void station_activate_all_channels( station_mgr_t *mgr )
+{
+    station_info_t *rp = mgr->first;
+    while( rp ) {
+        rp->active = 1;
+        rp = rp->next;
+    }
+}
+
 int station_get_current_active( station_mgr_t *mgr )
 {
     if( mgr->current ) {
