@@ -1,3 +1,6 @@
+
+SUBDIRS = wine
+
 tvtimedatadir = $(datadir)/tvtime
 tvtimesysconfdir = $(sysconfdir)/tvtime
 pkgsysconfdir = $(sysconfdir)/tvtime

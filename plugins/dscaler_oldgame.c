@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_oldgame_plugin_init( void )
 #endif
 {
-    di_oldgame = load_dscaler_deinterlacer( "../data/DI_OldGame.dll" );
+    di_oldgame = load_dscaler_deinterlacer( "DI_OldGame.dll" );
     if( di_oldgame ) {
         register_deinterlace_method( &oldgamemethod );
     }

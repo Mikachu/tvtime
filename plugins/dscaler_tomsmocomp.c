@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_tomsmocomp_plugin_init( void )
 #endif
 {
-    di_tomsmocomp = load_dscaler_deinterlacer( "../data/DI_TomsMoComp.dll" );
+    di_tomsmocomp = load_dscaler_deinterlacer( "DI_TomsMoComp.dll" );
     if( di_tomsmocomp ) {
         register_deinterlace_method( &tomsmocompmethod );
     }

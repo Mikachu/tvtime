@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_videoweave_plugin_init( void )
 #endif
 {
-    di_videoweave = load_dscaler_deinterlacer( "../data/DI_VideoWeave.dll" );
+    di_videoweave = load_dscaler_deinterlacer( "DI_VideoWeave.dll" );
     if( di_videoweave ) {
         register_deinterlace_method( &videoweavemethod );
     }

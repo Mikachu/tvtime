@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <fcntl.h>
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>

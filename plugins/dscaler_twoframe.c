@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_twoframe_plugin_init( void )
 #endif
 {
-    di_twoframe = load_dscaler_deinterlacer( "../data/DI_TwoFrame.dll" );
+    di_twoframe = load_dscaler_deinterlacer( "DI_TwoFrame.dll" );
     if( di_twoframe ) {
         register_deinterlace_method( &greedymethod );
     }

@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_greedyh_plugin_init( void )
 #endif
 {
-    di_greedyh = load_dscaler_deinterlacer( "../data/DI_GreedyH.dll" );
+    di_greedyh = load_dscaler_deinterlacer( "DI_GreedyH.dll" );
     if( di_greedyh ) {
         register_deinterlace_method( &greedymethod );
     }

@@ -116,7 +116,7 @@ void deinterlace_plugin_init( void )
 void dscaler_videobob_plugin_init( void )
 #endif
 {
-    di_videobob = load_dscaler_deinterlacer( "../data/DI_VideoBob.dll" );
+    di_videobob = load_dscaler_deinterlacer( "DI_VideoBob.dll" );
     if( di_videobob ) {
         register_deinterlace_method( &videobobmethod );
     }
