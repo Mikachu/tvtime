@@ -238,26 +238,26 @@
       BRIGHTNESS_UP              HUE_UP                   
       CHANNEL_1                  LUMA_DOWN                
       CHANNEL_2                  LUMA_UP                  
-      CHANNEL_3                  MIXER_MUTE               
-      CHANNEL_4                  MIXER_DOWN               
-      CHANNEL_5                  MIXER_UP                 
-      CHANNEL_6                  OVERSCAN_DOWN            
-      CHANNEL_7                  OVERSCAN_UP              
-      CHANNEL_8                  SCREENSHOT               
-      CHANNEL_9                  SCROLL_CONSOLE_DOWN      
-      CHANNEL_0                  SCROLL_CONSOLE_UP        
-      CHANNEL_ACTIVATE_ALL       SHOW_STATS               
-      CHANNEL_DOWN               TOGGLE_ASPECT            
-      CHANNEL_PREV               TOGGLE_AUDIO_MODE        
-      CHANNEL_RENUMBER           TOGGLE_BARS              
-      CHANNEL_SAVE_TUNING        TOGGLE_CC                
-      CHANNEL_SCAN               TOGGLE_CONSOLE           
-      CHANNEL_SKIP               TOGGLE_DEINTERLACER      
-      CHANNEL_UP                 TOGGLE_FULLSCREEN        
-      COLOUR_DOWN                TOGGLE_FRAMERATE         
-      COLOUR_UP                  TOGGLE_INPUT             
-      COLOR_DOWN                 TOGGLE_LUMA_CORRECTION   
-      COLOR_UP                   TOGGLE_MODE              
+      CHANNEL_3                  MIXER_DOWN               
+      CHANNEL_4                  MIXER_UP                 
+      CHANNEL_5                  OVERSCAN_DOWN            
+      CHANNEL_6                  OVERSCAN_UP              
+      CHANNEL_7                  SCREENSHOT               
+      CHANNEL_8                  SCROLL_CONSOLE_DOWN      
+      CHANNEL_9                  SCROLL_CONSOLE_UP        
+      CHANNEL_0                  SHOW_STATS               
+      CHANNEL_ACTIVATE_ALL       TOGGLE_ASPECT            
+      CHANNEL_DOWN               TOGGLE_AUDIO_MODE        
+      CHANNEL_PREV               TOGGLE_BARS              
+      CHANNEL_RENUMBER           TOGGLE_CC                
+      CHANNEL_SAVE_TUNING        TOGGLE_CONSOLE           
+      CHANNEL_SCAN               TOGGLE_DEINTERLACER      
+      CHANNEL_SKIP               TOGGLE_FULLSCREEN        
+      CHANNEL_UP                 TOGGLE_FRAMERATE         
+      COLOUR_DOWN                TOGGLE_INPUT             
+      COLOUR_UP                  TOGGLE_LUMA_CORRECTION   
+      COLOR_DOWN                 TOGGLE_MODE              
+      COLOR_UP                   TOGGLE_MUTE              
       CONTRAST_DOWN              TOGGLE_NTSC_CABLE_MODE   
       CONTRAST_UP                TOGGLE_PAUSE             
       DISPLAY_INFO               TOGGLE_PULLDOWN_DETECTION
@@ -312,7 +312,7 @@
     <keyboard key="z"/>
   </bind>
 
-  <bind command="mixer_mute">
+  <bind command="toggle_mute">
     <keyboard key="m"/>
     <mouse button="2"/>
   </bind>

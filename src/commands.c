@@ -92,7 +92,6 @@ static Cmd_Names cmd_table[] = {
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
     { "LUMA_UP", TVTIME_LUMA_UP },
 
-    { "MIXER_MUTE", TVTIME_MIXER_MUTE },
     { "MIXER_DOWN", TVTIME_MIXER_DOWN },
     { "MIXER_UP", TVTIME_MIXER_UP },
 
@@ -117,6 +116,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_MODE", TVTIME_TOGGLE_MODE },
+    { "TOGGLE_MUTE", TVTIME_TOGGLE_MUTE },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
     { "TOGGLE_PAUSE", TVTIME_TOGGLE_PAUSE },
     { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
@@ -740,7 +740,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_MIXER_MUTE:
+    case TVTIME_TOGGLE_MUTE:
         if( in->vidin ) {
             videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
             if( in->osd ) {

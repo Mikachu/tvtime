@@ -69,7 +69,7 @@ configuration file and the default runtime keybindings.
     Previous channel                      Backspace
     Channel access                        Numbers + enter
     Display info                          Left Mouse Button
-    Mixer mute                            m and Middle Mouse Button
+    Mute capture card                     m and Middle Mouse Button
     Volume Control (Line input)           +/-
     Switch deinterlacer                   t
     Switch framerate                      =

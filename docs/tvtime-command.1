@@ -130,11 +130,6 @@ Decreases the luma correction value.
 Increases the luma correction value.
 
 .TP
-.B MIXER_MUTE
-This command will toggle the mute state in the capture card (and not in
-your soundcard).
-
-.TP
 .B MIXER_DOWN
 Decreases the volume setting for the Line In device from /dev/mixer.
 
@@ -234,6 +229,11 @@ Loads the next saved mode settings.  tvtime's default configuration file
 defines two modes: a small window mode with a low quality deinterlacer
 setting used, and a high quality large window mode, suitable for use at
 fullscreen.
+
+.TP
+.B TOGGLE_MUTE
+This command will toggle the mute state in the capture card (and not in
+your soundcard).
 
 .TP
 .B TOGGLE_NTSC_CABLE_MODE
