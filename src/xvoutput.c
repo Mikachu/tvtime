@@ -331,6 +331,12 @@ static void *create_shm( int size )
             }
 
             XSync( display, False );
+
+            /**
+             * We immediately delete the shared memory segment, protecting us for
+             * if we crash or whatever, to make sure we still clean up.
+             */
+            shmctl( shminfo.shmid, IPC_RMID, 0 );
             XSetErrorHandler( 0 );
         }
     }
