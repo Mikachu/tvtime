@@ -136,3 +136,20 @@ if state = HAVE_SIGNAL
 else
   show (current bars/save fade)
 
+
+/** Handling changes to frame size
+    (not overscan, norm changes though, and half-size mode?)
+
+   Need to update:
+  1. output layer
+  2. menu ?  yeah.
+  3. osd definitely
+
+*/
+
+
+Rendering
+  Foreach scanline
+    Filter input scanline to temporary memory
+
+
