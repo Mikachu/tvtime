@@ -1226,6 +1226,7 @@ int main( int argc, char **argv )
 
     /* Initialize our timestamps. */
     for(;;) {
+        const char *fifo_args;
         unsigned char *curframe = 0;
         int curframeid;
         int printdebug = 0;
@@ -1243,6 +1244,7 @@ int main( int argc, char **argv )
         if( fifo ) {
             int cmd;
             cmd = fifo_get_next_command( fifo );
+            fifo_args = fifo_get_arguments( fifo );
             if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, 0 );
         }
 
@@ -1408,17 +1410,23 @@ int main( int argc, char **argv )
 
                 /* For the screenshot, use the output after we build the top field. */
                 if( screenshot ) {
+                    const char *outfile;
                     char filename[ 256 ];
                     char timestamp[ 50 ];
                     time_t tm = time( 0 );
-                    strftime( timestamp, sizeof( timestamp ),
+                    if(strlen(fifo_args) > 0) {
+                        outfile = fifo_args;
+                    } else {
+                        strftime( timestamp, sizeof( timestamp ),
                               config_get_timeformat( ct ), localtime( &tm ) );
-                    sprintf( filename, "tvtime-output-%s.png", timestamp );
+                        sprintf( filename, "tvtime-output-%s.png", timestamp );
+                        outfile = filename;
+                    }
                     if( curmethod->doscalerbob ) {
-                        pngscreenshot( filename, output->get_output_buffer(),
+                        pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height/2, width * 2 );
                     } else {
-                        pngscreenshot( filename, output->get_output_buffer(),
+                        pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
                 }

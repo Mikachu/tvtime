@@ -34,7 +34,7 @@ struct fifo_s {
     char buf[ 256 ];
     int bufpos;
     char *filename;
-    const char *arg;
+    char arg[ 256 ];
 };
 
 fifo_t *fifo_new( const char *filename )
@@ -94,17 +94,16 @@ static char *fifo_next_line( fifo_t *fifo )
 int fifo_get_next_command( fifo_t *fifo )
 {
     char *str = fifo_next_line( fifo );
-
+    fifo->arg[0] = '\0';
     if( str ) {
         int cmd;
         int i;
 
-        fifo->arg = "";
         for( i = 0;; i++ ) {
             if( !str[ i ] ) break;
             if( isspace( str[ i ] ) ) {
                 str[ i ] = '\0';
-                fifo->arg = str + i + 1;
+                memcpy(fifo->arg, str + i + 1, 255-i);
             }
         }
 
