@@ -406,6 +406,8 @@ static void reset_xmltv_languages_menu( menu_t *menu, xmltv_t *xmltv )
     char string[ 128 ];
     int i;
 
+    if( !xmltv ) return;
+
     menu_reset_num_lines( menu );
     menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
     menu_set_text( menu, 1, _("Default language") );
@@ -1731,12 +1733,14 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                         TVTIME_ICON_HUE);
     }
 
-    menu = menu_new( "xmltv-language" );
-    snprintf( string, sizeof( string ), "%s",
-              _("Preferred XMLTV language") );
-    menu_set_text( menu, 0, string );
-    commands_add_menu( cmd, menu );
-    reset_xmltv_languages_menu( menu, cmd->xmltv );
+    if( cmd->xmltv ) {
+        menu = menu_new( "xmltv-language" );
+        snprintf( string, sizeof( string ), "%s",
+                  _("Preferred XMLTV language") );
+        menu_set_text( menu, 0, string );
+        commands_add_menu( cmd, menu );
+        reset_xmltv_languages_menu( menu, cmd->xmltv );
+    }
 
     reinit_tuner( cmd );
 
@@ -2011,6 +2015,8 @@ static void osd_list_xmltv_languages( tvtime_osd_t *osd, commands_t *cmd )
     const char *cur = xmltv_get_language( cmd->xmltv );
     char string[ 128 ];
     int i;
+
+    if( !cmd->xmltv ) return;
 
     tvtime_osd_list_set_hilight( osd, 1 );
     tvtime_osd_list_set_lines( osd, num + 2);
@@ -2408,7 +2414,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_SET_XMLTV_LANGUAGE:
-        if( arg ) {
+        if( cmd->xmltv && arg ) {
             if( isdigit( arg[ 0 ] ) ) {
                 xmltv_select_language( cmd->xmltv, atoi( arg ) );
             } else if( !strcasecmp( arg, "none" ) ) {
