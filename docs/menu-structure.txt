@@ -12,10 +12,17 @@ Setup
     Start scan
     Back
   Input configuration
-    Device setup
-      Television standard
-      Sharpness
+    Television standard
+      NTSC
+      PAL
+      SECAM
+      PAL-Nc
+      PAL-M
+      PAL-N
+      NTSC-JP
+      PAL-60
       Back
+    Sharpness
     Audio mode
     Data services
     Restart with new settings
@@ -43,17 +50,8 @@ Setup
       Half rate, deinterlace bottom field, %.2ffps
     Input filters
       BT8x8 luma correction
-        Enable
-        Disable
-        Back
       Colour invert
-        Enable
-        Disable
-        Back
       Mirror
-        Enable
-        Disable
-        Back
       Back
     Back
   Exit
