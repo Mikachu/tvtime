@@ -6,6 +6,13 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.11
 
+  *  Fixed gettext to initialize properly.
+  *  Improved our XMLTV on-screen-display.
+  *  Display the upcoming show name from XMLTV.
+  *  Changed fifodir back to /tmp.
+  *  Lots of documentation improvements.
+  *  Fixed lots of bugs.
+
 News for 0.9.10
 
   *  Added program listings using XMLTV.  Use with --xmltv=filename.
