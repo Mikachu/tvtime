@@ -37,7 +37,7 @@ extern "C" {
 
 typedef struct osd_string_s osd_string_t;
 typedef struct osd_font_s osd_font_t;
-typedef struct osd_databars_s osd_databars_t;
+typedef struct osd_rect_s osd_rect_t;
 typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_animation_s osd_animation_t;
 typedef struct osd_list_s osd_list_t;
@@ -92,21 +92,16 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               int width, int xpos,
                                               int scanline );
 
-/**
- * databars, values are out of 128.
- */
-osd_databars_t *osd_databars_new( int width );
-void osd_databars_delete( osd_databars_t *osdd );
-void osd_databars_set_colour( osd_databars_t *osdd, int alpha, int luma,
-                              int cb, int cr );
-void osd_databars_advance_frame( osd_databars_t *osdd );
-int osd_databars_get_frames_left( osd_databars_t *osdd );
-void osd_databars_prerender( osd_databars_t *osdd, int num_filled );
-void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames );
-void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
-                                                uint8_t *output,
-                                                uint8_t *background,
-                                                int width );
+osd_rect_t *osd_rect_new( void );
+void osd_rect_delete( osd_rect_t *osdr );
+void osd_rect_set_colour( osd_rect_t *osdr, int alpha, int luma, int cb, int cr );
+void osd_rect_set_colour_rgb( osd_rect_t *osdr, int alpha, int r, int g, int b );
+void osd_rect_set_timeout( osd_rect_t *osdr, int timeout );
+void osd_rect_advance_frame( osd_rect_t *osdr );
+void osd_rect_set_size( osd_rect_t *osdr, int width, int height );
+void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
+                                            uint8_t *background, int width, int xpos,
+                                            int scanline );
 
 osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int alpha );
 void osd_graphic_delete( osd_graphic_t *osdg );

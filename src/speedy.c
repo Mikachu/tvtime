@@ -129,10 +129,6 @@ void (*quarter_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *one,
                                                   uint8_t *three, int width );
 void (*subpix_blit_vertical_packed422_scanline)( uint8_t *output, uint8_t *top,
                                                  uint8_t *bot, int subpixpos, int width );
-void (*composite_bars_packed4444_scanline)( uint8_t *output,
-                                            uint8_t *background, int width,
-                                            int a, int luma, int cb, int cr,
-                                            int percentage );
 void (*packed444_to_nonpremultiplied_packed4444_scanline)( uint8_t *output, 
                                                            uint8_t *input,
                                                            int width, int alpha );
@@ -2527,52 +2523,6 @@ static void aspect_adjust_packed4444_scanline_c( uint8_t *output,
     }
 }
 
-/**
- * Sub-pixel data bar renderer.  There are 128 bars.
- */
-static void composite_bars_packed4444_scanline_c( uint8_t *output,
-                                                  uint8_t *background, int width,
-                                                  int a, int luma, int cb, int cr,
-                                                  int percentage )
-{
-    /**
-     * This is the size of both the bar and the spacing in between in subpixel
-     * units out of 256.  Yes, as it so happens, that puts it equal to 'width'.
-     */
-    int barsize = ( width * 256 ) / 256;
-    int i;
-
-    /* We only need to composite the bar on the pixels that matter. */
-    for( i = 0; i < percentage; i++ ) {
-        int barstart = i * barsize * 2;
-        int barend = barstart + barsize;
-        int pixstart = barstart / 256;
-        int pixend = barend / 256;
-        int j;
-
-        for( j = pixstart; j <= pixend; j++ ) {
-            uint8_t *curout = output + (j*4);
-            uint8_t *curin = background + (j*4);
-            int curstart = j * 256;
-            int curend = curstart + 256;
-            int alpha;
-
-            if( barstart > curstart ) curstart = barstart;
-            if( barend < curend ) curend = barend;
-            if( curend - curstart < 256 ) {
-                alpha = ( ( curend - curstart ) * a ) / 256;
-            } else {
-                alpha = a;
-            }
-
-            curout[ 0 ] = curin[ 0 ] + multiply_alpha( alpha - curin[ 0 ], alpha );
-            curout[ 1 ] = curin[ 1 ] + multiply_alpha( luma - curin[ 1 ], alpha );
-            curout[ 2 ] = curin[ 2 ] + multiply_alpha( cb - curin[ 2 ], alpha );
-            curout[ 3 ] = curin[ 3 ] + multiply_alpha( cr - curin[ 3 ], alpha );
-        }
-    }
-}
-
 /* horizontal 1:2 interpolation filter */
 static void chroma_422_to_444_mpeg2_plane_c( uint8_t *dst, uint8_t *src, int width, int height )
 {
@@ -2735,7 +2685,6 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
     quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
     subpix_blit_vertical_packed422_scanline = subpix_blit_vertical_packed422_scanline_c;
-    composite_bars_packed4444_scanline = composite_bars_packed4444_scanline_c;
     packed444_to_nonpremultiplied_packed4444_scanline = packed444_to_nonpremultiplied_packed4444_scanline_c;
     aspect_adjust_packed4444_scanline = aspect_adjust_packed4444_scanline_c;
     packed444_to_packed422_scanline = packed444_to_packed422_scanline_c;

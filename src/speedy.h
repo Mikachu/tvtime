@@ -126,15 +126,6 @@ extern void (*composite_alphamask_alpha_to_packed4444_scanline)( uint8_t *output
                                                                  int textcr, int alpha );
 
 /**
- * Sub-pixel data bar renderer.  There are 128 bars.
- */
-extern void (*composite_bars_packed4444_scanline)( uint8_t *output,
-                                                   uint8_t *background, int width,
-                                                   int a, int luma, int cb, int cr,
-                                                   int percentage );
-
-
-/**
  * Premultiplies the colour by the alpha channel in a packed 4:4:4:4
  * scanline.
  */

@@ -409,95 +409,6 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
     }
 }
 
-/* databars */
-struct osd_databars_s
-{
-    uint8_t *data;
-    int width;
-    int alpha;
-    int luma;
-    int cb;
-    int cr;
-    int frames_left;
-    int scanline;
-};
-
-osd_databars_t *osd_databars_new( int width )
-{
-    osd_databars_t *osdd = malloc( sizeof( osd_databars_t ) );
-    if( !osdd ) {
-        return 0;
-    }
-
-    osdd->data = malloc( width * 4 );
-    if( !osdd->data ) {
-        free( osdd );
-        return 0;
-    }
-    osdd->width = width;
-
-    return osdd;
-}
-
-void osd_databars_delete( osd_databars_t *osdd )
-{
-    free( osdd->data );
-    free( osdd );
-}
-
-void osd_databars_set_colour( osd_databars_t *osdd, int alpha, int luma,
-                              int cb, int cr )
-{
-    osdd->alpha = alpha;
-    osdd->luma = luma;
-    osdd->cb = cb;
-    osdd->cr = cr;
-}
-
-void osd_databars_advance_frame( osd_databars_t *osdd )
-{
-    if( osdd->frames_left > 0 ) {
-        osdd->frames_left--;
-    }
-}
-
-int osd_databars_get_frames_left( osd_databars_t *osdd )
-{
-    return osdd->frames_left;
-}
-
-void osd_databars_prerender( osd_databars_t *osdd, int num_filled )
-{
-    blit_colour_packed4444_scanline( osdd->data, osdd->width, 0, 0, 0, 0 );
-    composite_bars_packed4444_scanline( osdd->data, osdd->data, osdd->width,
-                                        osdd->alpha, osdd->luma, osdd->cb,
-                                        osdd->cr, num_filled );
-}
-
-void osd_databars_show_bar( osd_databars_t *osdd, int num_filled, int frames )
-{
-    osd_databars_prerender( osdd, num_filled );
-    osdd->frames_left = frames;
-}
-
-void osd_databars_composite_packed422_scanline( osd_databars_t *osdd,
-                                                uint8_t *output,
-                                                uint8_t *background,
-                                                int width )
-{
-    if( osdd->frames_left ) {
-        if( osdd->frames_left < OSD_FADEOUT_TIME ) {
-            int alpha;
-            alpha = (int) (((((double) osdd->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
-            composite_packed4444_alpha_to_packed422_scanline( output, background,
-                osdd->data, width, alpha );
-        } else {
-            composite_packed4444_to_packed422_scanline( output, background,
-                osdd->data, width );
-        }
-    }
-}
-
 /* Graphic functions */
 struct osd_graphic_s
 {
@@ -1013,6 +924,84 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                                                      width, xpos, scanline );
         }
         scanline -= osdl->height;
+    }
+}
+
+struct osd_rect_s
+{
+    int frames_left;
+    int width;
+    int height;
+    int a, l, cb, cr;
+};
+
+osd_rect_t *osd_rect_new( void )
+{
+    osd_rect_t *osdr = malloc( sizeof( osd_rect_t ) );
+
+    if( !osdr ) {
+        return 0;
+    }
+
+    osdr->frames_left = 0;
+    osdr->width = 0;
+    osdr->height = 0;
+    return osdr;
+}
+
+void osd_rect_delete( osd_rect_t *osdr )
+{
+    free( osdr );
+}
+
+void osd_rect_set_colour( osd_rect_t *osdr, int alpha, int luma, int cb, int cr )
+{
+    osdr->a = alpha;
+    osdr->l = luma;
+    osdr->cb = cb;
+    osdr->cr = cr;
+}
+
+void osd_rect_set_colour_rgb( osd_rect_t *osdr, int alpha, int r, int g, int b )
+{
+    uint8_t rgb[ 3 ];
+    uint8_t ycbcr[ 3 ];
+
+    rgb[ 0 ] = r; rgb[ 1 ] = g; rgb[ 2 ] = b;
+    rgb24_to_packed444_rec601_scanline( ycbcr, rgb, 1 );
+
+    osdr->a = alpha;
+    osdr->l = ycbcr[ 0 ];
+    osdr->cb = ycbcr[ 1 ];
+    osdr->cr = ycbcr[ 2 ];
+}
+
+void osd_rect_set_timeout( osd_rect_t *osdr, int timeout )
+{
+    osdr->frames_left = timeout;
+}
+
+void osd_rect_advance_frame( osd_rect_t *osdr )
+{
+    if( osdr->frames_left > 0 ) {
+        osdr->frames_left--;
+    }
+}
+
+void osd_rect_set_size( osd_rect_t *osdr, int width, int height )
+{
+    osdr->width = width;
+    osdr->height = height;
+}
+
+void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
+                                            uint8_t *background, int width, int xpos,
+                                            int scanline )
+{
+    if( scanline < osdr->height && xpos < osdr->width ) {
+        int alpha = (int) (((((double) osdr->frames_left) / ((double) OSD_FADEOUT_TIME)) * 256.0) + 0.5);
+        composite_colour4444_alpha_to_packed422_scanline( output, output, osdr->a, osdr->l,
+                                                          osdr->cb, osdr->cr, width - xpos, alpha );
     }
 }
 
