@@ -192,7 +192,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont );
 
     /* We create the logo, but it's ok if it fails to load. */
-    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 4 );
+    osd->channel_logo = osd_animation_new( logofile, pixel_aspect, 256, 1 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -297,7 +297,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SHOW_LENGTH ].ypos = osd->strings[ OSD_SHOW_START ].ypos;
 
     osd->channel_logo_xpos = osd->strings[ OSD_TIME_STRING ].xpos;
-    osd->channel_logo_ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string );
+    osd->channel_logo_ypos = osd->strings[ OSD_TIME_STRING ].ypos + osd_string_get_height( osd->strings[ OSD_TIME_STRING ].string ) + 2;
 
     osd_string_set_colour_rgb( osd->strings[ OSD_NETWORK_NAME ].string,
                                (other_rgb >> 16) & 0xff, 
@@ -578,7 +578,11 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 
 void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
 {
-    osd_list_set_timeout( osd->list, OSD_FADE_DELAY );
+    if( showlist ) {
+        osd_list_set_timeout( osd->list, OSD_FADE_DELAY );
+    } else {
+        osd_list_set_timeout( osd->list, 0 );
+    }
 }
 
 int tvtime_osd_list_get_hilight( tvtime_osd_t *osd )
