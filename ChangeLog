@@ -1,5 +1,7 @@
 
-0.9.8.4 -
+0.9.8.5 -
+
+0.9.8.4 - Tue Jun 10 22:26:11 ADT 2003
   * vektor: Fixed our metacity check by working around some bugs
       in older versions of metacity.
   * vektor: Updated the error message for when the XVIDEO port we
