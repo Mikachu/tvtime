@@ -16,7 +16,7 @@ computer monitor or projector.
       This gives smoothness of motion and high visual quality.
 
   o   Multiple deinterlacing algorithms for finding the optimal mode for
-      the video content and available processor speed.
+      your video content and available processor speed.
 
   o   16:9 aspect ratio mode for the highest available resolution when
       processing input from an external DVD player or digital satellite
@@ -29,13 +29,11 @@ computer monitor or projector.
       from NTSC sources.
 
 
-  See the file docs/default.tvtime.xml for a default configuration file
-(place as ~/.tvtime/tvtime.xml) and the default runtime keybindings.  The
-keybindings are also listed in detail on the help page of the tvtime
-website.
+  See docs/default.tvtime.xml for a default configuration file and the
+default runtime keybindings.
 
   Run 'tvtime -h' to get a list of command line arguments.
 
-  See the help page on the tvtime website for more information and
-documentation.
+  More detailed help, documentation, and known hardware issues can be
+found on the tvtime website.
 
