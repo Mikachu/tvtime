@@ -507,9 +507,9 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
         menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
         sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
         menu_set_text( menu, 4, string );
-        menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
+        menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
     } else if( norm == VIDEOINPUT_NTSC_JP ) {
         if( !strcasecmp( tablename, "japan-cable" ) ) {
             sprintf( string, "%c%c%c  Japan Cable", 0xee, 0x80, 0xa5 );
@@ -609,9 +609,9 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
         menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "stations" );
         sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
         menu_set_text( menu, 9, string );
-        menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "input" );
-        menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "input" );
-        menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "input" );
+        menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
+        menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
+        menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
     }
 }
 
