@@ -1299,6 +1299,8 @@ int main( int argc, char **argv )
         /* Setup the video correction tables. */
         videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
         videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
+        videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
+        videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
     }
 
     if( vidin && videoinput_is_uyvy( vidin ) ) {
@@ -1701,6 +1703,9 @@ int main( int argc, char **argv )
 
         /* Notice this because it's cheap. */
         videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
+        videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
+        videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
+
         if( osd ) {
             tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );
             if( tvtime->pulldown_alg == PULLDOWN_NONE ) {

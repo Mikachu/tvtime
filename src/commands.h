@@ -45,6 +45,8 @@ enum tvtime_commands
     TVTIME_CHANNEL_DEC,
     TVTIME_CHANNEL_PREV,
     TVTIME_TOGGLE_LUMA_CORRECTION,
+    TVTIME_TOGGLE_COLOUR_INVERT,
+    TVTIME_TOGGLE_MIRROR,
     TVTIME_LUMA_UP,
     TVTIME_LUMA_DOWN,
     TVTIME_TOGGLE_MUTE,
@@ -160,7 +162,6 @@ void commands_handle( commands_t *cmd, int command, const char *arg );
 
 void commands_add_menu( commands_t *cmd, menu_t *menu );
 
-int commands_apply_luma_correction( commands_t *cmd );
 double commands_get_luma_power( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
 double commands_get_overscan( commands_t *cmd );
@@ -194,6 +195,9 @@ int commands_scan_channels( commands_t *cmd );
 int commands_resize_window( commands_t *cmd );
 int commands_update_luma_power( commands_t *cmd );
 int commands_restart_tvtime( commands_t *cmd );
+int commands_apply_luma_correction( commands_t *cmd );
+int commands_apply_colour_invert( commands_t *cmd );
+int commands_apply_mirror( commands_t *cmd );
 
 #ifdef __cplusplus
 };

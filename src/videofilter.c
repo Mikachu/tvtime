@@ -28,6 +28,8 @@ struct videofilter_s
     video_correction_t *vc;
     int bt8x8_correction;
     int uyvy_conversion;
+    int colour_invert;
+    int mirror;
 
     uint8_t tempscanline[ 2048 ];
 };
@@ -40,6 +42,8 @@ videofilter_t *videofilter_new( void )
     vf->vc = video_correction_new( 1, 0 );
     vf->bt8x8_correction = 0;
     vf->uyvy_conversion = 0;
+    vf->colour_invert = 0;
+    vf->mirror = 0;
 
     return vf;
 }
@@ -53,6 +57,16 @@ void videofilter_delete( videofilter_t *vf )
 void videofilter_set_bt8x8_correction( videofilter_t *vf, int correct )
 {
     vf->bt8x8_correction = correct;
+}
+
+void videofilter_set_colour_invert( videofilter_t *vf, int invert )
+{
+    vf->colour_invert = invert;
+}
+
+void videofilter_set_mirror( videofilter_t *vf, int mirror )
+{
+    vf->mirror = mirror;
 }
 
 void videofilter_set_full_extent_correction( videofilter_t *vf, int correct )
@@ -71,7 +85,7 @@ void videofilter_enable_uyvy_conversion( videofilter_t *vf )
 
 int videofilter_active_on_scanline( videofilter_t *vf, int scanline )
 {
-    if( vf->uyvy_conversion || (vf->vc && vf->bt8x8_correction) ) {
+    if( vf->uyvy_conversion || vf->colour_invert || vf->mirror || (vf->vc && vf->bt8x8_correction) ) {
         return 1;
     } else {
         return 0;
@@ -89,11 +103,17 @@ void videofilter_packed422_scanline( videofilter_t *vf, uint8_t *data,
         video_correction_correct_packed422_scanline( vf->vc, data, data, width );
         // filter_luma_121_packed422_inplace_scanline( data, width );
         // filter_luma_14641_packed422_inplace_scanline( data, width );
-        // mirror_packed422_inplace_scanline( data, width );
         // halfmirror_packed422_inplace_scanline( data, width );
         // kill_chroma_packed422_inplace_scanline( data, width );
         // testing_packed422_inplace_scanline( data, width, scanline );
-        // invert_colour_packed422_inplace_scanline( data, width );
+    }
+
+    if( vf->colour_invert ) {
+        invert_colour_packed422_inplace_scanline( data, width );
+    }
+
+    if( vf->mirror ) {
+        mirror_packed422_inplace_scanline( data, width );
     }
 }
 
