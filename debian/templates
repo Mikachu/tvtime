@@ -1,6 +1,6 @@
 Template: tvtime/norm
 Type: select
-Choices: NTSC, NTSC-JP, SECAM, PAL, PAL-NC, PAL-M, PAL-N
+Choices: NTSC, NTSC-JP, SECAM, PAL, PAL-NC, PAL-M, PAL-N, PAL-60
 Description: Select the `Norm' of your television feed?
 
 Template: tvtime/frequencies-menu

@@ -2,7 +2,7 @@ Source: tvtime
 Section: x11
 Priority: optional
 Maintainer: Simon Law <sfllaw@debian.org>
-Build-Depends: debhelper (>> 3.0.0), libc6-dev, zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev, liblircclient-dev
+Build-Depends: debhelper (>> 3.0.0), libc6-dev, zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev
 Standards-Version: 3.5.9
 
 Package: tvtime
@@ -16,14 +16,15 @@ Description: A high quality television application
  it ideal for videophiles.
  .
  tvtime supports:
-  * Deinterlaced output at a full interlaced rate of 59.94 frames per second 
-    for NTSC source, or 50 frames per second for PAL sources.  This gives 
-    smoothness of motion and high visual quality.
-  * Multiple deinterlacing algoritms for finding the optimal mode for the 
-    video content and available processor speed.
+  * Deinterlaced output at a full interlaced rate of 59.94 frames per
+    second for NTSC source, or 50 frames per second for PAL sources.
+    This gives smoothness of motion and high visual quality.
+  * Multiple deinterlacing algoritms for finding the optimal mode for
+    your video content and available processor speed.
   * 16:9 aspect ratio mode for the highest available resolution when 
     processing input from an external DVD player or digital satellite 
     receiver.
-  * A super-slick on-screen-display for the complete television experience.
+  * A super-slick on-screen-display for the complete television
+    experience, with a featureful menu system.
   * 2-3 Pulldown detection for optimal quality viewing of film content
     from NTSC sources.
