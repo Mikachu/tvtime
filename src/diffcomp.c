@@ -214,13 +214,16 @@ static void generate_codes( void )
 /**
  * This is the table I use for decompression.  Basically, I just make a
  * table of every possible 16bit value I could see in the input and what
- * code word is first in those 16 bits.  Pretty fast.
+ * code word is first in those 16 bits.  Not very fast.
  */
 static mytuple_t decompressiontable[ 65536 ];
 static int table_generated = 0;
+static mytuple_t first_decompressiontable[ 256 ];
+static int first_cutoff = 0;
 
 static void generate_decompression_table( void )
 {
+    int num_hits_first[ 256 ];
     int i;
 
     if( !codesgenerated ) generate_codes();
@@ -235,6 +238,29 @@ static void generate_decompression_table( void )
         decompressiontable[ i ].value = -1;
     }
     */
+    for( i = 0; i < 256; i++ ) {
+        first_decompressiontable[ i ].numbits = -1;
+        num_hits_first[ i ] = 0;
+    }
+
+    /**
+     * We need to know the cut off point in our table where our first lookup table
+     * will fail.
+     */
+    for( i = 0; i < 256; i++ ) {
+        mytuple_t *codeword = &(codetable[ i ]);
+        int startword = codeword->value << ( 16 - codeword->numbits );
+        int firstbyte = (startword >> 8) & 0xff;
+        num_hits_first[ firstbyte ]++;
+    }
+
+    for( i = 0; i < 256; i++ ) {
+        if( num_hits_first[ i ] < 2 ) {
+            first_cutoff = i - 1;
+            break;
+        }
+    }
+    fprintf( stderr, "first cutoff: %d\n", first_cutoff );
 
     /**
      * So, for each codeword, we just fill up every entry which
@@ -245,10 +271,22 @@ static void generate_decompression_table( void )
         int startword = codeword->value << ( 16 - codeword->numbits );
         int nextword = startword;
         int mask = 0;
+        int firstbyte = (startword >> 8) & 0xff;
         int j;
 
         for( j = 0; j < codeword->numbits; j++ ) {
             mask = ( mask >> 1 ) | 0x8000;
+        }
+
+        if( firstbyte > first_cutoff ) {
+            int temp = firstbyte;
+            while( ( temp & (mask >> 8) ) == firstbyte ) {
+                first_decompressiontable[ temp & 0xff ].numbits = codeword->numbits;
+                first_decompressiontable[ temp & 0xff ].value = i;
+                temp++;
+            }
+            first_decompressiontable[ firstbyte ].numbits = codeword->numbits;
+            first_decompressiontable[ firstbyte ].value = i;
         }
 
         while( ( nextword & mask ) == startword ) {
@@ -268,6 +306,20 @@ static void generate_decompression_table( void )
     */
 
     table_generated = 1;
+}
+
+static inline __attribute__ ((always_inline,const)) mytuple_t *decompress_next_byte( const uint32_t curstuff )
+{
+    /**
+     * Since we have that ereet table, all we need do is look up
+     * which value we just read!
+     */
+    int firstbyte = (curstuff >> 24) & 0xff;
+    if( firstbyte > first_cutoff ) {
+        return &(first_decompressiontable[ firstbyte ]);
+    } else {
+        return &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+    }
 }
 
 
@@ -381,7 +433,6 @@ void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
     unsigned char lastvalue = 0;
     uint32_t curstuff = 0;
     int bitsused = 0;
-    int readdist = 0;
     int i;
 
     if( !table_generated ) generate_decompression_table();
@@ -397,7 +448,6 @@ void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
             unsigned int coolstuff = *src << 8 | *(src + 1);
             curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
             bitsused += 16;
-            readdist += 2;
             src += 2;
         }
 
@@ -405,7 +455,7 @@ void diffcomp_decompress_plane( unsigned char *dst, unsigned char *src,
          * Since we have that ereet table, all we need do is look up
          * which value we just read!
          */
-        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+        decodedword = decompress_next_byte( curstuff );
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue + decodedword->value ) & 0xff;
@@ -483,27 +533,6 @@ int diffcomp_compress_packed422( unsigned char *dst, unsigned char *src,
     return outsize;
 }
 
-mytuple_t *decompress_next_byte( unsigned char **src, uint32_t *curstuff, int *bitsused, int *readdist )
-{
-    /**
-     * Any time we have less than 16 bits, load up some more data
-     * from the compressed image.
-     */
-    if( *bitsused < 16 ) {
-        unsigned int coolstuff = (**src) << 8 | *((*src) + 1);
-        *curstuff = *curstuff | ( coolstuff << ( 16 - *bitsused ) );
-        *bitsused += 16;
-        *readdist += 2;
-        *src += 2;
-    }
-
-    /**
-     * Since we have that ereet table, all we need do is look up
-     * which value we just read!
-     */
-    return &(decompressiontable[ ( *curstuff >> 16 ) & 0xffff ]);
-}
-
 void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
                                     int width, int height )
 {
@@ -512,7 +541,6 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
     unsigned char lastvalue_cr = 0;
     uint32_t curstuff = 0;
     int bitsused = 0;
-    int readdist = 0;
     int i;
 
     if( !table_generated ) generate_decompression_table();
@@ -524,10 +552,9 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
             unsigned int coolstuff = (*src << 8) | *(src + 1);
             curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
             bitsused += 16;
-            readdist += 2;
             src += 2;
         }
-        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+        decodedword = decompress_next_byte( curstuff );
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_y + decodedword->value ) & 0xff;
@@ -538,10 +565,9 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
             unsigned int coolstuff = (*src << 8) | *(src + 1);
             curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
             bitsused += 16;
-            readdist += 2;
             src += 2;
         }
-        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+        decodedword = decompress_next_byte( curstuff );
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_cb + decodedword->value ) & 0xff;
@@ -552,10 +578,9 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
             unsigned int coolstuff = (*src << 8) | *(src + 1);
             curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
             bitsused += 16;
-            readdist += 2;
             src += 2;
         }
-        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+        decodedword = decompress_next_byte( curstuff );
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_y + decodedword->value ) & 0xff;
@@ -566,10 +591,9 @@ void diffcomp_decompress_packed422( unsigned char *dst, unsigned char *src,
             unsigned int coolstuff = (*src << 8) | *(src + 1);
             curstuff = curstuff | ( coolstuff << ( 16 - bitsused ) );
             bitsused += 16;
-            readdist += 2;
             src += 2;
         }
-        decodedword = &(decompressiontable[ ( curstuff >> 16 ) & 0xffff ]);
+        decodedword = decompress_next_byte( curstuff );
         curstuff = curstuff << decodedword->numbits;
         bitsused -= decodedword->numbits;
         *dst = ( lastvalue_cr + decodedword->value ) & 0xff;
