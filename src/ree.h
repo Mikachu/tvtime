@@ -15,6 +15,7 @@
 #define REE_VIDEO_YCBCR420 4
 #define REE_VIDEO_LZO      5
 #define REE_VIDEO_DIFFCOMP 6
+#define REE_VIDEO_YCBCR422 7
 
 /* File identification dword (LE). */
 #define REE_FILE_ID        ( ( 'r' << 24 ) | ( 'e' << 16 ) | ( 'e' << 8 ) | 't' )
