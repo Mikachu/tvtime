@@ -56,6 +56,7 @@ struct commands_s {
     int toggledeinterlacingmode;
     int halfrate;
     int scan_channels;
+    int detect_bias;
     
     int menu_on;
     menu_t *menu;
@@ -136,6 +137,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->console_on = 0;
     in->scrollconsole = 0;
     in->scan_channels = 0;
+    in->detect_bias = 0;
 
     in->console = 0;
     in->vbi = 0;
@@ -257,6 +259,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         in->toggleaspect = 1;
         break;
 
+    case TVTIME_DETECT_SCANLINE_BIAS:
+        in->detect_bias = 1;
+        break;
+
     case TVTIME_SCAN_CHANNELS:
         in->scan_channels = !in->scan_channels;
         if( in->osd ) {
@@ -311,6 +317,29 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 tvtime_osd_show_message( in->osd, "Luma correction disabled." );
                 configsave( "ApplyLumaCorrection", "0", 1 );
             }
+        }
+        break;
+
+    case TVTIME_HOVERSCAN_UP:
+    case TVTIME_HOVERSCAN_DOWN:
+        config_set_horizontal_overscan( in->cfg, config_get_horizontal_overscan( in->cfg ) +
+                  ( (tvtime_cmd == TVTIME_HOVERSCAN_UP) ? 0.0025 : -0.0025 ) );
+        if( in->osd ) {
+            char message[ 200 ];
+            sprintf( message, "Horizontal overscan: %.1f%%", 
+                     config_get_horizontal_overscan( in->cfg ) * 2.0 * 100.0 );
+            tvtime_osd_show_message( in->osd, message );
+        }
+        break;
+    case TVTIME_VOVERSCAN_UP:
+    case TVTIME_VOVERSCAN_DOWN:
+        config_set_vertical_overscan( in->cfg, config_get_vertical_overscan( in->cfg ) +
+                  ( (tvtime_cmd == TVTIME_VOVERSCAN_UP) ? 0.0025 : -0.0025 ) );
+        if( in->osd ) {
+            char message[ 200 ];
+            sprintf( message, "Vertical overscan: %.1f%%", 
+                     config_get_vertical_overscan( in->cfg ) * 2.0 * 100.0 );
+            tvtime_osd_show_message( in->osd, message );
         }
         break;
 
@@ -553,6 +582,7 @@ void commands_next_frame( commands_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->detect_bias = 0;
 }
 
 
@@ -579,5 +609,10 @@ int commands_menu_on( commands_t *in )
 int commands_scan_channels( commands_t *in )
 {
     return in->scan_channels;
+}
+
+int commands_detect_bias( commands_t *in )
+{
+    return in->detect_bias;
 }
 

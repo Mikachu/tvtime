@@ -88,6 +88,12 @@ enum tvtime_commands
     TVTIME_TOGGLE_HALF_FRAMERATE,
 
     TVTIME_SCAN_CHANNELS,
+    TVTIME_DETECT_SCANLINE_BIAS,
+
+    TVTIME_HOVERSCAN_UP,
+    TVTIME_HOVERSCAN_DOWN,
+    TVTIME_VOVERSCAN_UP,
+    TVTIME_VOVERSCAN_DOWN,
 
     TVTIME_LAST
 };
@@ -119,11 +125,18 @@ int config_get_priority( config_t *ct );
 char *config_get_command_pipe( config_t *ct );
 int config_get_preferred_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );
+int config_get_left_scanline_bias( config_t *ct );
+int config_get_right_scanline_bias( config_t *ct );
 
 parser_file_t *config_get_parsed_file( config_t *ct );
 
 void config_set_apply_luma_correction( config_t *ct, int apply_luma_correction );
 void config_set_luma_correction( config_t *ct, double luma_correction );
+
+double config_get_horizontal_overscan( config_t *ct );
+double config_get_vertical_overscan( config_t *ct );
+void config_set_horizontal_overscan( config_t *ct, double hoverscan );
+void config_set_vertical_overscan( config_t *ct, double voverscan );
 
 int config_get_check_freq_present( config_t *ct );
 

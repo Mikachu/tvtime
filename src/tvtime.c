@@ -76,6 +76,12 @@ const double fadespeed = 65.0;
  */
 const int scan_delay = 10;
 
+/**
+ * Left and right bias amounts.
+ */
+static int left_scanline_bias = 0;
+static int right_scanline_bias = 0;
+
 static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
@@ -168,6 +174,36 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 
     pngoutput_delete( pngout );
 }
+
+
+static int auto_detect_left_bias( unsigned char *scanline, int width )
+{
+    int i;
+    for( i = 0; i < width; i++ ) {
+        int cur = *scanline;
+        if( cur > 20 ) {
+            return (i > width/4) ? (width/4) : i;
+        }
+        scanline += 2;
+    }
+    return 0;
+}
+
+static int auto_detect_right_bias( unsigned char *scanline, int width )
+{
+    int i;
+    scanline = scanline + ((width-1)*2);
+    for( i = width - 1; i; i-- ) {
+        int cur = *scanline;
+        if( cur > 20 ) {
+            i = width - i;
+            return (i > width/4) ? (width/4) : i;
+        }
+        scanline -= 2;
+    }
+    return 0;
+}
+
 
 /**
  * Explination of the loop:
@@ -836,6 +872,13 @@ int main( int argc, char **argv )
         int aquired = 0;
         int tuner_state;
         int we_were_late = 0;
+        int detectbias = 0;
+        int output_x, output_y, output_w, output_h;
+
+        output_x = left_scanline_bias + (int) ((((double) (width - left_scanline_bias - right_scanline_bias)) * config_get_horizontal_overscan( ct )) + 0.5);
+        output_w = (int) ((((double) (width - left_scanline_bias - right_scanline_bias)) - (((double) (width - left_scanline_bias - right_scanline_bias)) * config_get_horizontal_overscan( ct ) * 2.0)) + 0.5);
+        output_y = (int) ((((double) height) * config_get_vertical_overscan( ct )) + 0.5);
+        output_h = (int) ((((double) height) - (((double) height) * config_get_vertical_overscan( ct ) * 2.0)) + 0.5);
 
         if( fifo ) {
             int cmd;
@@ -849,6 +892,7 @@ int main( int argc, char **argv )
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
+        detectbias = commands_detect_bias( commands );
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 configsave( "FullScreen", "1", 1 );
@@ -957,6 +1001,13 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
+        if( detectbias ) {
+            left_scanline_bias = auto_detect_left_bias( curframe + ((height/2)*(width*2)), width );
+            right_scanline_bias = auto_detect_right_bias( curframe + ((height/2)*(width*2)), width );
+            fprintf( stderr, "tvtime: Scanline length bias: (%d, %d)\n",
+                     left_scanline_bias, right_scanline_bias );
+        }
+
         if( output->is_interlaced() ) {
             /* Wait until we can draw the even field. */
             output->wait_for_sync( 0 );
@@ -1025,9 +1076,9 @@ int main( int argc, char **argv )
 
             performance_checkpoint_blit_top_field_start( perf );
             if( curmethod->doscalerbob && !showbars ) {
-                output->show_frame( 0, 0, width, height/2 );
+                output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
-                output->show_frame( 0, 0, width, height );
+                output->show_frame( output_x, output_y, output_w, output_h );
             }
             performance_checkpoint_blit_top_field_end( perf );
         }
@@ -1106,9 +1157,9 @@ int main( int argc, char **argv )
             /* Display the bottom field. */
             performance_checkpoint_blit_bot_field_start( perf );
             if( curmethod->doscalerbob && !showbars ) {
-                output->show_frame( 0, 0, width, height/2 );
+                output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
-                output->show_frame( 0, 0, width, height );
+                output->show_frame( output_x, output_y, output_w, output_h );
             }
             performance_checkpoint_blit_bot_field_end( perf );
         } else {

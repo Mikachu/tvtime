@@ -84,7 +84,12 @@ static Cmd_Names cmd_table[] = {
     { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL },
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
-    { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS }
+    { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
+    { "HOVERSCAN_UP", TVTIME_HOVERSCAN_UP },
+    { "HOVERSCAN_DOWN", TVTIME_HOVERSCAN_DOWN },
+    { "VOVERSCAN_UP", TVTIME_VOVERSCAN_UP },
+    { "VOVERSCAN_DOWN", TVTIME_VOVERSCAN_DOWN },
+    { "DETECT_SCANLINE_BIAS", TVTIME_DETECT_SCANLINE_BIAS },
 };
 
 
@@ -128,6 +133,12 @@ struct config_s
     char *vbidev;
 
     int start_channel;
+
+    double hoverscan;
+    double voverscan;
+
+    int left_scanline_bias;
+    int right_scanline_bias;
 };
 
 void config_init( config_t *ct );
@@ -209,6 +220,10 @@ config_t *config_new( int argc, char **argv )
     ct->check_freq_present = 1;
     ct->use_vbi = 0;
     ct->start_channel = 1;
+    ct->hoverscan = 0.0;
+    ct->voverscan = 0.0;
+    ct->left_scanline_bias = 0;
+    ct->right_scanline_bias = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -272,6 +287,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
     ct->keymap[ 'w' ] = TVTIME_TOGGLE_CC;
     ct->keymap[ '=' ] = TVTIME_TOGGLE_HALF_FRAMERATE;
+    ct->keymap[ 'b' ] = TVTIME_DETECT_SCANLINE_BIAS;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
@@ -290,7 +306,7 @@ config_t *config_new( int argc, char **argv )
         config_init( ct );
     } else {
         fprintf( stderr, "\n** Notice: tvtime user config file "
-                         "has changed to ~/.tvtime/tvtimerc **\n" );
+                         "has changed to ~/.tvtime/tvtimerc **\n\n" );
 
         strncpy( base, CONFDIR, 245 );
         strcat( base, "/tvtimerc" );
@@ -472,6 +488,19 @@ void config_init( config_t *ct )
 
     if( (tmp = parser_get( &(ct->pf), "CheckForSignal", 1 )) ) {
         ct->check_freq_present = atoi( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "LeftScanlineBias", 1 )) ) {
+        ct->left_scanline_bias = atoi( tmp );
+    }
+    if( (tmp = parser_get( &(ct->pf), "RightScanlineBias", 1 )) ) {
+        ct->right_scanline_bias = atoi( tmp );
+    }
+    if( (tmp = parser_get( &(ct->pf), "HorizontalOverscan", 1 )) ) {
+        ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
+    }
+    if( (tmp = parser_get( &(ct->pf), "VerticalOverscan", 1 )) ) {
+        ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
     }
 
     config_init_keymap( ct );
@@ -880,5 +909,47 @@ char *config_get_vbidev( config_t *ct )
 int config_get_check_freq_present( config_t *ct )
 {
     return ct->check_freq_present;
+}
+
+double config_get_horizontal_overscan( config_t *ct )
+{
+    return ct->hoverscan;
+}
+
+double config_get_vertical_overscan( config_t *ct )
+{
+    return ct->voverscan;
+}
+
+void config_set_horizontal_overscan( config_t *ct, double hoverscan )
+{
+    if( hoverscan > 0.4 ) {
+        ct->hoverscan = 0.4;
+    } else if( hoverscan < 0.0 ) {
+        ct->hoverscan = 0.0;
+    } else {
+        ct->hoverscan = hoverscan;
+    }
+}
+
+void config_set_vertical_overscan( config_t *ct, double voverscan )
+{
+    if( voverscan > 0.4 ) {
+        ct->voverscan = 0.4;
+    } else if( voverscan < 0.0 ) {
+        ct->voverscan = 0.0;
+    } else {
+        ct->voverscan = voverscan;
+    }
+}
+
+int config_get_left_scanline_bias( config_t *ct )
+{
+    return ct->left_scanline_bias;
+}
+
+int config_get_right_scanline_bias( config_t *ct )
+{
+    return ct->right_scanline_bias;
 }
 
