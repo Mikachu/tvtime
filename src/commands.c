@@ -514,9 +514,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_CREDITS:
-        if( in->osd ) {
-            tvtime_osd_toggle_show_credits( in->osd );
-        }
         break;
 
     case TVTIME_TOGGLE_AUDIO_MODE:

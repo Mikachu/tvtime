@@ -68,8 +68,6 @@ void tvtime_osd_set_framerate( tvtime_osd_t *osd, double framerate, int mode );
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 
-void tvtime_osd_toggle_show_credits( tvtime_osd_t *osd );
-
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage );
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd );

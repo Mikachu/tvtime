@@ -22,7 +22,6 @@
 #include <string.h>
 #include "osdtools.h"
 #include "tvtimeosd.h"
-#include "credits.h"
 #include "commands.h"
 #include "pulldown.h"
 
@@ -91,9 +90,6 @@ struct tvtime_osd_s
     int framerate_mode;
     int film_mode;
     int hold;
-
-    credits_t *credits;
-    int show_credits;
 };
 
 const int top_size = 7;
@@ -105,7 +101,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 {
     char *fontfile;
     char *logofile;
-    char *creditsfile;
 
     tvtime_osd_t *osd = (tvtime_osd_t *) malloc( sizeof( tvtime_osd_t ) );
     if( !osd ) {
@@ -130,10 +125,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 
     fontfile = "FreeSansBold.ttf";
     logofile = "testlogo.png";
-    creditsfile = "credits.png";
-
-    osd->credits = 0; // credits_new( creditsfile, height );
-    osd->show_credits = 0;
 
     osd->smallfont = osd_font_new( fontfile, 18, width, height, frameaspect );
     if( !osd->smallfont ) {
@@ -338,7 +329,6 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     }
     free( osd->strings );
     if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
-    if( osd->credits ) credits_delete( osd->credits );
     osd_font_delete( osd->smallfont );
     osd_font_delete( osd->medfont );
     osd_font_delete( osd->bigfont );
@@ -589,18 +579,6 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
     if( osd->channel_logo ) {
         osd_graphic_advance_frame( osd->channel_logo );
     }
-
-    if( osd->credits ) {
-        credits_advance_frame( osd->credits );
-    }
-}
-
-void tvtime_osd_toggle_show_credits( tvtime_osd_t *osd )
-{
-    osd->show_credits = !osd->show_credits;
-    if( osd->show_credits && osd->credits ) {
-        credits_restart( osd->credits, 3.0 );
-    }
 }
 
 void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
@@ -609,10 +587,6 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int scanline )
 {
     int i;
-
-    if( osd->show_credits && osd->credits ) {
-        credits_composite_packed422_scanline( osd->credits, output, width, xpos, scanline );
-    }
 
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
         if( osd_string_visible( osd->strings[ i ].string ) ) {
