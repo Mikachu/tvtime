@@ -18,12 +18,6 @@ struct band_s {
     int active;
 };
 
-struct freqtable_s
-{
-    const band_t **bands;
-    int numbands;
-};
-
 /**
  * Country specific VHF bands.
  */
