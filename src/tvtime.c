@@ -1848,12 +1848,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             if( output->toggle_alwaysontop() ) {
                 if( osd ) {
                     tvtime_osd_show_message( osd,
-                          _("Window set as always-on-top.") );
+                          _("Always-on-top enabled.") );
                 }
             } else {
                 if( osd ) {
                     tvtime_osd_show_message( osd,
-                          _("Window set to normal stacking.") );
+                          _("Always-on-top disabled.") );
                 }
             }
             build_output_menu( commands_get_menu( commands, "output" ),
