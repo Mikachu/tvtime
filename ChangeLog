@@ -1,5 +1,7 @@
 
 0.9.8.3 -
+  * vektor: We now switch out of mute mode if the user hits the
+      volume control.
   * mrallen: Save overscan setting to the config file on exit.
   * vektor: Removed the vgasync code until we have something that
       can correctly use the vsync.h stuff (it was a bad hack anyway)

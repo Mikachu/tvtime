@@ -698,8 +698,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     case TVTIME_MIXER_UP: 
     case TVTIME_MIXER_DOWN:
 
-        volume = mixer_set_volume( 
-            ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
+        /* If the user hits the volume control, drop us out of mute mode. */
+        if( in->vidin && videoinput_get_muted( in->vidin ) ) {
+            commands_handle( in, TVTIME_TOGGLE_MUTE, 0 );
+        }
+        volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
 
         if( verbose ) {
             fprintf( stderr, "input: volume %d\n", (volume & 0xFF) );
