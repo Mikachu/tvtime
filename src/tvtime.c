@@ -85,6 +85,19 @@ static void build_colourbars( unsigned char *output, int width, int height )
     free( cb444 );
 }
 
+static void build_blue_frame( unsigned char *output, int width, int height )
+{
+    unsigned char bluergb[ 3 ];
+    unsigned char blueycbcr[ 3 ];
+
+    bluergb[ 0 ] = 0;
+    bluergb[ 1 ] = 0;
+    bluergb[ 2 ] = 0xff;
+    rgb24_to_packed444_rec601_scanline( blueycbcr, bluergb, 1 );
+    blit_colour_packed422_scanline( output, width * height, blueycbcr[ 0 ],
+                                    blueycbcr[ 1 ], blueycbcr[ 2 ] );
+}
+
 static void save_last_frame( unsigned char *saveframe, unsigned char *curframe,
                              int width, int height, int savestride, int curstride )
 {
@@ -385,6 +398,7 @@ int main( int argc, char **argv )
     unsigned char *secondlastframe = 0;
     unsigned char *saveframe = 0;
     unsigned char *fadeframe = 0;
+    unsigned char *blueframe = 0;
     const char *tagline;
     int lastframeid;
     int secondlastframeid;
@@ -503,12 +517,14 @@ int main( int argc, char **argv )
     colourbars = (unsigned char *) malloc( width * height * 2 );
     saveframe = (unsigned char *) malloc( width * height * 2 );
     fadeframe = (unsigned char *) malloc( width * height * 2 );
-    if( !colourbars || !saveframe || !fadeframe ) {
+    blueframe = (unsigned char *) malloc( width * height * 2 );
+    if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
         fprintf( stderr, "tvtime: Can't allocate extra frame storage memory.\n" );
         return 1;
     }
     build_colourbars( colourbars, width, height );
-    blit_packed422_scanline( saveframe, colourbars, width*height );
+    build_blue_frame( blueframe, width, height );
+    blit_packed422_scanline( saveframe, blueframe, width * height );
 
 
     /* Setup OSD stuff. */
@@ -695,7 +711,7 @@ int main( int argc, char **argv )
                 }
             default:
                 if( fadepos < 256 ) {
-                    crossfade_frame( fadeframe, saveframe, colourbars, width,
+                    crossfade_frame( fadeframe, saveframe, blueframe, width,
                                      height, width*2, width*2, width*2, fadepos );
                     fadepos += fadespeed;
                 }
@@ -711,7 +727,7 @@ int main( int argc, char **argv )
             if( fadepos == 0 ) {
                 secondlastframe = lastframe = curframe = saveframe;
             } else if( fadepos >= 256 ) {
-                secondlastframe = lastframe = curframe = colourbars;
+                secondlastframe = lastframe = curframe = blueframe;
             } else {
                 secondlastframe = lastframe = curframe = fadeframe;
             }
