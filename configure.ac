@@ -36,7 +36,7 @@ AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday
 AM_GNU_GETTEXT
 
 dnl ---------------------------------------------
-dnl libsdl - Currently disabled
+dnl libsdl
 dnl ---------------------------------------------
 AC_ARG_WITH([sdl], 
             AC_HELP_STRING([--without-sdl], [Use this to disable our SDL output layer (enabled by default)]),
@@ -162,6 +162,31 @@ dnl   [AC_CHECK_LIB(lirc_client,lirc_init,,have_lirc=no)],have_lirc=no)
 dnl if test "$have_lirc" = "yes"; then
 dnl   AC_DEFINE(HAVE_LIRC,,[LIRC support])
 dnl fi
+
+dnl ---------------------------------------------
+dnl DScaler module loader
+dnl ---------------------------------------------
+AC_ARG_WITH([dscaler], 
+            AC_HELP_STRING([--without-dscaler],
+                           [Use this to disable our DScaler module loader (enabled by default)]),
+            [USE_DSCALER="$withval"], [USE_DSCALER="yes"])
+
+dnl Can someone clean this up to read better?  I want
+dnl the DScaler loader to be shut off on any non-x86
+dnl architecture.
+CAN_USE_DSCALER="no"
+case "$host_alias" in
+    i?86-* | k?-*)
+        CAN_USE_DSCALER="yes"
+esac
+if test "$CAN_USE_DSCALER" = "no"; then
+    USE_DSCALER="no"
+fi
+
+AM_CONDITIONAL(DISABLE_DSCALER_LOADER, [test x"$USE_DSCALER" != "xyes"])
+if test "$USE_DSCALER" != "yes" ; then
+    AC_DEFINE(DISABLE_DSCALER_LOADER,,[Disable the DScaler module loader])
+fi
 
 dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension

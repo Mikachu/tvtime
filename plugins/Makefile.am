@@ -20,9 +20,15 @@ OPT_CFLAGS = -Wall -I. -pedantic
 
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
+if DISABLE_DSCALER_LOADER
+DSCALER_SRCS = 
+else
+DSCALER_SRCS = dscaler_greedyh.c dscaler_tomsmocomp.c
+endif
+
 noinst_LTLIBRARIES = libtvtimeplugins.la
 libtvtimeplugins_la_SOURCES = plugins.h linear.c weavetff.c \
 	weavebff.c double.c linearblend.c scalerbob.c greedy.c \
-	dscaler_greedyh.c dscaler_tomsmocomp.c vfir.c
+	vfir.c $(DSCALER_SRCS)
 libtvtimeplugins_la_LDFLAGS = -static
 

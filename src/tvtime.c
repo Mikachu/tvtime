@@ -1272,8 +1272,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         linearblend_plugin_init();
         vfir_plugin_init();
 
+#ifndef DISABLE_DSCALER_LOADER
         dscaler_tomsmocomp_plugin_init();
         dscaler_greedyh_plugin_init();
+#endif
         greedy_plugin_init();
 
         weavetff_plugin_init();

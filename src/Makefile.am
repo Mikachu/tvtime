@@ -15,7 +15,11 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330 - Boston, MA 02111-1307, USA
 
+if DISABLE_DSCALER_LOADER
+SUBDIRS =
+else
 SUBDIRS = wine
+endif
 
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 tmpdir = /tmp
@@ -42,6 +46,13 @@ OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
+if DISABLE_DSCALER_LOADER
+DSCALER_SRCS =
+else
+DSCALER_SRCS = DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h dscalerplugin.h \
+	dscalerplugin.c
+endif
+
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
 	deinterlace.c videocorrection.c videotools.c attributes.h \
@@ -51,9 +62,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	performance.c vbidata.h vbidata.c credits.c credits.h console.h \
 	console.c speedtools.h vbiscreen.h vbiscreen.c fifo.h fifo.c \
 	commands.h commands.c videofilter.h videofilter.c station.h station.c \
-	bands.h vsync.h vsync.c dscalerplugin.h dscalerplugin.c \
-	DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h utils.h utils.c diffcomp.h \
-	diffcomp.c rvrreader.h rvrreader.c ree.h ree.c pulldown.h pulldown.c \
+	bands.h vsync.h vsync.c utils.h utils.c diffcomp.h diffcomp.c \
+	rvrreader.h rvrreader.c ree.h ree.c pulldown.h pulldown.c \
 	hashtable.h hashtable.c cpuinfo.h cpuinfo.c videodev.h videodev2.h \
 	menu.c menu.h outputfilter.h outputfilter.c dfbmatroxtv.c xmltv.h \
 	xmltv.c gettext.h tvtimeglyphs.h
@@ -65,15 +75,19 @@ OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 bin_PROGRAMS = tvtime tvtime-command tvtime-configure tvtime-scanner
 EXTRA_PROGRAMS = expandpng timingtest rvr
 
-tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
+tvtime_SOURCES = $(COMMON_SRCS) $(DSCALER_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
+if DISABLE_DSCALER_LOADER
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la -lpthread
+else
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread
+endif
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-command.c
@@ -96,8 +110,7 @@ timingtest_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 timingtest_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
-timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la \
-	wine/libwine.la -lpthread
+timingtest_LDADD = -lpthread
 
 rvr_SOURCES = reepktq.h reepktq.c rtctimer.h rtctimer.c utils.h utils.c \
 	videoinput.h videoinput.c tvtimeconf.h tvtimeconf.c rvrmain.c \
@@ -109,7 +122,11 @@ CLEANFILES = expandpng timingtest rvr
 
 # Satisfy extra-directory dependencies.  Unfortunately, this causes
 # libtool to re-link each and every time.  (Recursive make is evil!)
+if DISABLE_DSCALER_LOADER
+external_dependencies = ../plugins/libtvtimeplugins.la
+else
 external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
+endif
 .PHONY: $(external_dependencies)
 $(external_dependencies):
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
