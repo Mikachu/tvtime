@@ -30,11 +30,14 @@
 #include "speedy.h"
 
 /* stupid glibc bug i guess */
-int vfscanf(FILE *stream, const char *format, va_list ap);
+int vfscanf( FILE *stream, const char *format, va_list ap );
 
-struct console_line_coords
+typedef struct console_coords_s console_coords_t;
+
+struct console_coords_s
 {
-    int x, y;
+    int x;
+    int y;
 };
 
 struct console_s
@@ -42,7 +45,7 @@ struct console_s
     osd_font_t *font;
     char *text;
     osd_string_t **line;
-    struct console_line_coords *coords;
+    console_coords_t *coords;
 
     int timeout;  /* fade delay */
     
@@ -76,7 +79,6 @@ struct console_s
     int show_cursor;
 
     int maxrows;
-
 };
 
 console_t *console_new( int x, int y, int width, int height,
@@ -163,24 +165,25 @@ console_t *console_new( int x, int y, int width, int height,
     osd_string_delete( con->line[0] );
     
     free( con->line );
-    con->line = NULL;
+    con->line = 0;
 
-    con->coords = malloc( con->rows * sizeof( struct console_line_coords ) );
+    con->coords = malloc( con->rows * sizeof( console_coords_t ) );
     if( !con->coords ) {
         console_delete( con );
-        return NULL;
+        return 0;
     }
 
 
-    for( i=0; i < con->rows; i++ ) {
+    for( i = 0; i < con->rows; i++ ) {
         int tmp;
 
         con->coords[ i ].x = (con->x + video_width / 100) & ~1 ;
 
-        if( i == 0 ) 
+        if( i == 0 ) {
             tmp = con->y + ((double)height - (double)rowheight * (double)con->rows) / (double)2;
-        else 
+        } else {
             tmp = con->coords[ i-1 ].y + rowheight;
+        }
 
         con->coords[ i ].y = tmp;
     }
