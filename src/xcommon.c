@@ -1085,7 +1085,7 @@ static void x11_wait_unmapped( Display *dpy, Window win )
 
 int xcommon_toggle_alwaysontop( void )
 {
-    if( has_ewmh_state_above && !output_fullscreen ) {
+    if( has_ewmh_state_above ) {
         XEvent ev;
 
         alwaysontop = !alwaysontop;
