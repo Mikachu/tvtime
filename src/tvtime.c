@@ -2621,6 +2621,9 @@ int main( int argc, char **argv )
     */
 
     /* Steal system resources in the name of performance. */
+    /* Get maximum priority before dropping root privileges. We'll drop back */
+    /* to the value specified in the config file (or the default) later. */
+    setpriority( PRIO_PROCESS, 0, -19 );
     if( set_realtime_priority( 0 ) ) {
         realtime = 1;
     }
