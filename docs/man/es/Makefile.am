@@ -15,8 +15,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+LANGUAGE = es
+
 man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5 \
 	tvtime-configure.1 tvtime-scanner.1
 
 EXTRA_DIST = $(man_MANS)
+
+man1dir = $(mandir)/$(LANGUAGE)/man1
+man5dir = $(mandir)/$(LANGUAGE)/man5
 
