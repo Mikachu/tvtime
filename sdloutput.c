@@ -23,10 +23,12 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <SDL/SDL.h>
+#include <time.h>
 #include "frequencies.h"
 #include "videoinput.h"
 #include "sdloutput.h"
 #include "input.h"
+#include "taglines.h"
 
 static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;
@@ -43,7 +45,11 @@ unsigned char *sdl_get_output( void )
 int sdl_init( int width, int height, int outputwidth, int aspect )
 {
     SDL_Rect **modes;
+    const char *tagline;
     int ret, i;
+
+    srand( time( 0 ) );
+    tagline = taglines[ rand() % numtaglines ];
 
     aspect = sdlaspect;
     outwidth = outputwidth;
@@ -91,7 +97,7 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
     }
     SDL_LockYUVOverlay( frame );
 
-    SDL_WM_SetCaption( "tvtime: ... smooth like that ...", 0 );
+    SDL_WM_SetCaption( tagline, 0 );
     SDL_ShowCursor( 0 );
     SDL_EnableKeyRepeat( SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL );
     return 1;
