@@ -262,7 +262,9 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd->strings[ OSD_SHOW_LENGTH ].rightjustified = 0;
     osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont, width );
 
+    /* Logo disabled for now.
     osd->channel_logo = osd_graphic_new( logofile, width, height, frameaspect, 256 );
+    */
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
@@ -386,8 +388,10 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, "", 0 );
     osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, "", 0 );
 
-    osd->channel_logo_xpos = (( width * 60 ) / 100) & ~1;
-    osd->channel_logo_ypos = ( height * 14 ) / 100;
+    if( osd->channel_logo ) {
+        osd->channel_logo_xpos = (( width * 60 ) / 100) & ~1;
+        osd->channel_logo_ypos = ( height * 14 ) / 100;
+    }
 
     return osd;
 }
@@ -523,10 +527,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, delay );
     osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
 
-    /** Billy: What's up?  Are we ditching the logo for XDS?
-     *osd_graphic_show_graphic( osd->channel_logo, delay );
-     *osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
-     */
+    /* Billy: What's up?  Are we ditching the logo for XDS? */
+    if( osd->channel_logo ) {
+        osd_graphic_show_graphic( osd->channel_logo, delay );
+    }
 
     for( i = OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
         osd_string_set_timeout( osd->strings[ i ].string, delay );
