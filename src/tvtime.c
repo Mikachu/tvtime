@@ -1531,6 +1531,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         commands_handle( commands, TVTIME_TOGGLE_FULLSCREEN, 0 );
     }
 
+    /* If we start always-on-top, enter this state now. */
+    if( config_get_alwaysontop( ct ) ) {
+        commands_handle( commands, TVTIME_TOGGLE_ALWAYSONTOP, 0 );
+    }
+
     /* If we start half-framerate, toggle that now. */
     for( i = 0; i < config_get_framerate_mode( ct ); i++ ) {
         commands_handle( commands, TVTIME_TOGGLE_FRAMERATE, 0 );
@@ -2472,6 +2477,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     snprintf( number, 4, "%d", commands_get_audio_boost( commands ) );
     config_save( ct, "AudioBoost", number );
+
+    snprintf( number, 4, "%d", output->is_alwaysontop() );
+    config_save( ct, "AlwaysOnTop", number );
 
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );

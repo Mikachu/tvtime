@@ -56,6 +56,7 @@ struct config_s
     int aspect;
     int debug;
     int fullscreen;
+    int alwaysontop;
     int priority;
     int ntsc_mode;
     int send_fields;
@@ -292,6 +293,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "Fullscreen" ) ) {
             ct->fullscreen = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "AlwaysOnTop" ) ) {
+            ct->alwaysontop = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "FramerateMode" ) ) {
@@ -682,6 +687,7 @@ config_t *config_new( void )
     ct->aspect = 0;
     ct->debug = 0;
     ct->fullscreen = 0;
+    ct->alwaysontop = 0;
     ct->priority = -19;
     ct->ntsc_mode = 0;
     ct->send_fields = 0;
@@ -1456,6 +1462,11 @@ const char *config_get_v4l_norm( config_t *ct )
 int config_get_fullscreen( config_t *ct )
 {
     return ct->fullscreen;
+}
+
+int config_get_alwaysontop( config_t *ct )
+{
+    return ct->alwaysontop;
 }
 
 int config_get_priority( config_t *ct )

@@ -162,6 +162,14 @@
   <option name="FullscreenPosition" value="Centre"/>
 
   <!--
+    Set this to 1 to have tvtime start in always-on-top mode under
+    supporting window managers.  This setting is set at runtime so
+    that when you quit tvtime in always-on-top mode, starting it again
+    will start back in always-on-top mode.
+  -->
+  <option name="AlwaysOnTop" value="0"/>
+
+  <!--
     This sets the framerate of the output from tvtime.
 
     0 = Full framerate mode, every field is deinterlaced.

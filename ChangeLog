@@ -1,5 +1,6 @@
 
 0.9.13 -
+  * vektor: Save always-on-top state across shutdown of tvtime.
   * vektor: Replaced the OutputHeight configuration with window geometry
       support using the --geometry command line option.
   * vektor: Removed the tvtime console, it was not really useful and
