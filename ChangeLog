@@ -1,7 +1,8 @@
 
 0.9.8.1 -
+  * vektor: Removed some of the fonts we don't use from the dist
   * vektor: Redid the screensaver shutdown code to just use XTest
-      and send fake key events (but in a safe way)
+      and send fake key events (but in a safe way - fixes 731691)
   * vektor: Added a special hack for geometry calculations in
       the presence of Xinerama (fixes 726820)
   * vektor: Added code to save the network name and network call

@@ -16,9 +16,9 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 tvtimedatadir = $(pkgdatadir)
-dist_tvtimedata_DATA = FreeSansBold.ttf FreeMono.ttf FreeMonoBold.ttf \
-	FreeMonoOblique.ttf DI_GreedyH.dll DI_Greedy2Frame.dll \
-	DI_TwoFrame.dll DI_VideoWeave.dll DI_VideoBob.dll DI_TomsMoComp.dll
+dist_tvtimedata_DATA = FreeSansBold.ttf FreeMonoBold.ttf DI_GreedyH.dll \
+	DI_Greedy2Frame.dll DI_TwoFrame.dll DI_VideoWeave.dll \
+	DI_VideoBob.dll DI_TomsMoComp.dll
 
 EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip COPYING.DScaler
 
