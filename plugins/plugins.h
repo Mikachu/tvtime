@@ -38,6 +38,7 @@ void linearblend_plugin_init( void );
 void scalerbob_plugin_init( void );
 void simplemo_plugin_init( void );
 void gamedither_plugin_init( void );
+void vfir_plugin_init( void );
 
 void dscaler_greedy2frame_plugin_init( void );
 void dscaler_twoframe_plugin_init( void );
