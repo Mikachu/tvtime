@@ -200,9 +200,17 @@ static const char *eia608_program_type[ 96 ] =
 
 static void parse_xds_packet( const char *packet, int length )
 {
+    int sum = 0;
     int i;
 
     /* Stick a null at the end, and cut off the last two characters. */
+    for( i = 0; i < length - 1; i++ ) {
+        sum += packet[ i ];
+    }
+    if( (((~sum) & 0x7f) + 1) != packet[ length - 1 ] ) {
+        fprintf( stderr, "XDS checksum invalid, ignoring packet.\n" );
+        return;
+    }
     packet[ length - 2 ] = '\0';
     length -= 2;
 
