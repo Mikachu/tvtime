@@ -1,5 +1,7 @@
 
 0.9.8.3 -
+  * vektor: We now set the class hint, useful for window managers
+      like WindowMaker (fixes 733488)
   * rmj/vektor: Merged in the latest DirectFB code, and enabled
       the code to switch output drivers, but the DirectFB output
       driver itself is still disabled.

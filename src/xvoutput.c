@@ -375,6 +375,7 @@ static int open_display( void )
     int minor;
     Bool pixmaps;
     XSizeHints hint;
+    XClassHint classhint;
     XColor curs_col;
     XSetWindowAttributes xswa;
     const char *hello = "tvtime";
@@ -525,6 +526,13 @@ static int open_display( void )
     hint.flags = PSize;
 
     XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
+
+    /* The class hint is useful for window managers like WindowMaker. */
+    classhint.res_name = "tvtime";
+    classhint.res_class = "TVWindow";
+    XSetClassHint( display, wm_window, &classhint );
+    classhint.res_class = "TVFullscreen";
+    XSetClassHint( display, fs_window, &classhint );
 
     XMapWindow( display, output_window );
     XMapWindow( display, wm_window );
