@@ -116,14 +116,13 @@ int main( int argc, char **argv )
     int debug = 0;
     int muted = 0;
     osd_font_t *osdf;
-    osd_string_t *osds;
+    osd_string_t *channel_number;
     int c, i;
 
 
     osdf = osd_font_new( "helr.ttf" );
-    osds = osd_string_new( osdf );
-    osd_string_set_colour( osds, 235, 128, 128 );
-    osd_string_show_text( osds, "this sucks", -1 );
+    channel_number = osd_string_new( osdf );
+    osd_string_set_colour( channel_number, 200, 128, 128 );
 
 
     /* Default device. */
@@ -200,6 +199,7 @@ int main( int argc, char **argv )
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
             }
             if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s.\n", chanlist[ chanindex ].name );
+            osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
         }
     }
 
@@ -302,6 +302,7 @@ int main( int argc, char **argv )
                 last_chan_time = 0;
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
                 if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
+                osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
             }
         }
         if( commands & TVTIME_MIXER_UP || commands & TVTIME_MIXER_DOWN ) {
@@ -336,6 +337,7 @@ int main( int argc, char **argv )
                     videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
                     if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
+                    osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
 
                 }
             } else {
@@ -349,6 +351,7 @@ int main( int argc, char **argv )
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
                 if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
+                osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
             }
         }
 
@@ -407,7 +410,7 @@ int main( int argc, char **argv )
                                                     curcb422, curcr422, 0, width * 2,
                                                     width, width, height );
             }
-            osd_string_composite_packed422( osds, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
         }
 
 
@@ -460,7 +463,7 @@ int main( int argc, char **argv )
                                                     curcr422 + (width / 2),
                                                     1, width * 2, width, width, height );
             }
-            osd_string_composite_packed422( osds, sdl_get_output(), width, height, width*2, 50, 50, 0 );
+            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height, width*2, 50, 50, 0 );
         }
 
 
@@ -497,6 +500,8 @@ int main( int argc, char **argv )
         gettimeofday( &blitend, 0 );
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
+
+        osd_string_advance_frame( channel_number );
     }
 
     if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );
