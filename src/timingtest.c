@@ -47,16 +47,18 @@ const unsigned int seed = 2;
 const unsigned int width = 720;
 const unsigned int height = 480;
 
-/* Run for 1000 runs. */
-const unsigned int numruns = 4*60;
+/* Run for 512 runs. */
+const unsigned int numruns = 512;
 
 static const char *tests[] = {
    "blit_colour_packed422_scanline_c 720x480 frame",
+   "blit_colour_packed422_scanline_mmx 720x480 frame",
    "blit_colour_packed422_scanline_mmxext 720x480 frame",
    "blit_packed422_scanline_c 720x480 frame",
-   "blit_packed422_scanline_i386_linux 720x480 frame",
-   "blit_packed422_scanline_mmxext_billy 720x480 frame",
+   "blit_packed422_scanline_mmx 720x480 frame",
+   "blit_packed422_scanline_mmxext 720x480 frame",
    "interpolate_packed422_scanline_c 720x480 frame",
+   "interpolate_packed422_scanline_mmx 720x480 frame",
    "interpolate_packed422_scanline_mmxext 720x480 frame",
    "blend_packed422_scanline_c 720x480 120/256 frame",
    "blend_packed422_scanline_mmxext 720x480 120/256 frame",
@@ -162,6 +164,13 @@ int main( int argc, char **argv )
             }
             rdtscll( after );
             datasize += width * height * 2;
+        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                blit_colour_packed422_scanline_mmx( dest422packed + (stride422*j), width, 128, 128, 128 );
+            }
+            rdtscll( after );
+            datasize += width * height * 2;
         } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
@@ -176,17 +185,17 @@ int main( int argc, char **argv )
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_i386_linux 720x480 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmx 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_packed422_scanline_i386_linux( dest422packed + (stride422*j), source422packed + (stride422*j), width );
+                blit_packed422_scanline_mmx( dest422packed + (stride422*j), source422packed + (stride422*j), width );
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmxext_billy 720x480 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_packed422_scanline_mmxext_billy( dest422packed + (stride422*j), source422packed + (stride422*j), width );
+                blit_packed422_scanline_mmxext( dest422packed + (stride422*j), source422packed + (stride422*j), width );
             }
             rdtscll( after );
             datasize += width * height * 2;
@@ -196,6 +205,15 @@ int main( int argc, char **argv )
                 interpolate_packed422_scanline_c( dest422packed + (stride422*j),
                                                   source422packed + (stride422*j),
                                                   source422packed2 + (stride422*j), width );
+            }
+            rdtscll( after );
+            datasize += width * height * 2;
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmx 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                interpolate_packed422_scanline_mmx( dest422packed + (stride422*j),
+                                                    source422packed + (stride422*j),
+                                                    source422packed2 + (stride422*j), width );
             }
             rdtscll( after );
             datasize += width * height * 2;
