@@ -125,6 +125,7 @@ configsave_t *configsave_open( const char *filename )
             return 0;
         } else {
             xmlDocSetRootElement( cs->Doc, top );
+            xmlNewProp( top, BAD_CAST "xmlns", BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
         }
     }
 
