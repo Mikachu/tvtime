@@ -766,6 +766,25 @@ void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
     tvtime_osd_show_list( osd, 1 );
 }
 
+void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
+{
+    char text[ 200 ];
+
+    tvtime_osd_list_set_lines( osd, 3 );
+
+    sprintf( text, "Full framerate (%.2ffps)", maxrate );
+    tvtime_osd_list_set_text( osd, 0, text );
+
+    sprintf( text, "Half framerate, top field first (%.2ffps)", maxrate / 2 );
+    tvtime_osd_list_set_text( osd, 1, text );
+
+    sprintf( text, "Half framerate, bottom field first (%.2ffps)", maxrate / 2 );
+    tvtime_osd_list_set_text( osd, 2, text );
+
+    tvtime_osd_list_set_hilight( osd, mode );
+    tvtime_osd_show_list( osd, 1 );
+}
+
 int main( int argc, char **argv )
 {
     struct timeval startup_time;
@@ -1433,8 +1452,10 @@ int main( int argc, char **argv )
             }
         }
         if( framerate_mode < 0 || framerate_mode != commands_get_framerate( commands ) ) {
+            int showlist = !(framerate_mode < 0 );
             framerate_mode = commands_get_framerate( commands );
             if( osd ) {
+                if( showlist ) osd_list_framerates( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
                 if( framerate_mode ) {
                     tvtime_osd_set_framerate( osd, 1000000.0 / ((double) (fieldtime*2)), framerate_mode );
                 } else {
