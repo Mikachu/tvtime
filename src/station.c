@@ -53,6 +53,7 @@ struct station_mgr_s
     char band_and_frequency[ 1024 ];
     char stationrc[255];
     char *norm;
+    char *table;
 };
 
 static const band_t *get_band( const char *band )
@@ -159,17 +160,23 @@ static void station_dump( station_mgr_t *mgr )
     } while( rp != mgr->first );
 }
 
-static xmlNodePtr find_norm( xmlNodePtr node, const char *norm )
+static xmlNodePtr find_list( xmlNodePtr node, const char *normname, const char *tablename )
 {
     while( node ) {
-        if( !xmlStrcasecmp( node->name, BAD_CAST "norm" ) ) {
-            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+        if( !xmlStrcasecmp( node->name, BAD_CAST "list" ) ) {
+            xmlChar *norm = xmlGetProp( node, BAD_CAST "norm" );
 
-            if( name && !xmlStrcasecmp( name, BAD_CAST norm ) ) {
-                xmlFree( name );
-                return node;
+            if( norm && !xmlStrcasecmp( norm, BAD_CAST norm ) ) {
+                xmlChar *table = xmlGetProp( node, BAD_CAST "frequencies" );
+                if( table && !xmlStrcasecmp( table, BAD_CAST tablename ) ) {
+
+                    xmlFree( norm );
+                    xmlFree( table );
+                    return node;
+                }
+                if( table ) xmlFree( table );
             }
-            if( name ) xmlFree( name );
+            if( norm ) xmlFree( norm );
         }
 
         node = node->next;
@@ -183,7 +190,7 @@ int station_readconfig( station_mgr_t *mgr )
     xmlNodePtr cur;
     xmlDocPtr doc;
     xmlNodePtr station;
-    xmlNodePtr norm;
+    xmlNodePtr list;
 
     doc = xmlParseFile( mgr->stationrc );
     if( !doc ) {
@@ -203,15 +210,15 @@ int station_readconfig( station_mgr_t *mgr )
         return 0;
     }
 
-    norm = find_norm( cur->xmlChildrenNode, mgr->norm );
-    if( !norm ) {
+    list = find_list( cur->xmlChildrenNode, mgr->norm, mgr->table );
+    if( !list ) {
         fprintf( stderr, "station: %s: No station list for norm '%s'.\n",
                  mgr->stationrc, mgr->norm );
         xmlFreeDoc( doc );
         return 0;
     }
 
-    station = norm->xmlChildrenNode;
+    station = list->xmlChildrenNode;
     while( station ) {
         if( !xmlStrcasecmp( station->name, BAD_CAST "station" ) ) {
             xmlChar *name = xmlGetProp( station, BAD_CAST "name" );
@@ -266,7 +273,17 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
     mgr->last_channel = 0;
     mgr->new_install = 0;
     mgr->norm = strdup( norm );
-    if( !mgr->norm ) return 0;
+    if( !mgr->norm ) {
+        free( mgr );
+        return 0;
+    }
+
+    mgr->table = strdup( table );
+    if( !mgr->table ) {
+        free( mgr->norm );
+        free( mgr );
+        return 0;
+    }
 
     if( !station_readconfig( mgr ) ) {
         fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
@@ -650,7 +667,7 @@ int station_writeconfig( station_mgr_t *mgr )
 {
     xmlDocPtr doc;
     xmlNodePtr top;
-    xmlNodePtr norm;
+    xmlNodePtr list;
     char filename[ 255 ];
     station_info_t *rp = mgr->first;
 
@@ -689,19 +706,20 @@ int station_writeconfig( station_mgr_t *mgr )
         }
     }
 
-    norm = find_norm( top, mgr->norm );
-    if( !norm ) {
-        norm = xmlNewTextChild( top, 0, BAD_CAST "norm", 0 );
-        xmlNewProp( norm, BAD_CAST "name", BAD_CAST mgr->norm );
+    list = find_list( top, mgr->norm, mgr->table );
+    if( !list ) {
+        list = xmlNewTextChild( top, 0, BAD_CAST "list", 0 );
+        xmlNewProp( list, BAD_CAST "norm", BAD_CAST mgr->norm );
+        xmlNewProp( list, BAD_CAST "frequencies", BAD_CAST mgr->table );
     }
 
     do {
-        xmlNodePtr node = find_station( norm, rp->name );
+        xmlNodePtr node = find_station( list, rp->name );
         char buf[ 255 ];
 
         sprintf( buf, "%d", rp->pos );
         if( !node ) {
-            node = xmlNewTextChild( norm, 0, BAD_CAST "station", 0 );
+            node = xmlNewTextChild( list, 0, BAD_CAST "station", 0 );
         }
         xmlNewProp( node, BAD_CAST "name", BAD_CAST rp->name );
         xmlNewProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );
