@@ -26,9 +26,9 @@ extern "C" {
 /** 
  * NTSC cable modes.
  */
-#define NTSC_CABLE_MODE_NOMINAL 0
-#define NTSC_CABLE_MODE_IRC     1
-#define NTSC_CABLE_MODE_HRC     2
+#define NTSC_CABLE_MODE_STANDARD 0
+#define NTSC_CABLE_MODE_IRC      1
+#define NTSC_CABLE_MODE_HRC      2
 
 typedef struct station_mgr_s station_mgr_t;
 

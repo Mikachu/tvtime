@@ -272,7 +272,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             } else if( !xmlStrcasecmp( value, BAD_CAST "HRC" ) ) {
                 ct->ntsc_mode = NTSC_CABLE_MODE_HRC;
             } else {
-                ct->ntsc_mode = NTSC_CABLE_MODE_NOMINAL;
+                ct->ntsc_mode = NTSC_CABLE_MODE_STANDARD;
             }
         }
 
