@@ -38,7 +38,6 @@ typedef struct {
 
 static Cmd_Names cmd_table[] = {
 
-    { "ASPECT", TVTIME_ASPECT },
     { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
 
     { "BRIGHT_DOWN", TVTIME_BRIGHT_DOWN },
@@ -56,6 +55,8 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
     { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
+    { "CHANNEL_SCAN", TVTIME_CHANNEL_SCAN },
+    { "CHANNEL_SKIP", TVTIME_CHANNEL_SKIP },
     { "CHANNEL_UP", TVTIME_CHANNEL_UP },
 
     { "COLOUR_DOWN", TVTIME_COLOUR_DOWN },
@@ -76,12 +77,9 @@ static Cmd_Names cmd_table[] = {
     { "FREQLIST_DOWN", TVTIME_FREQLIST_DOWN },
     { "FREQLIST_UP", TVTIME_FREQLIST_UP },
 
-    { "FULLSCREEN", TVTIME_FULLSCREEN },
-
     { "HUE_DOWN", TVTIME_HUE_DOWN },
     { "HUE_UP", TVTIME_HUE_UP },
 
-    { "LUMA_CORRECTION_TOGGLE", TVTIME_LUMA_CORRECTION_TOGGLE },
     { "LUMA_UP", TVTIME_LUMA_UP },
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
 
@@ -89,20 +87,20 @@ static Cmd_Names cmd_table[] = {
     { "MIXER_UP", TVTIME_MIXER_UP },
     { "MIXER_DOWN", TVTIME_MIXER_DOWN },
 
-    { "SHOW_BARS", TVTIME_SHOW_BARS },
-
+    { "TOGGLE_ASPECT", TVTIME_TOGGLE_ASPECT },
+    { "TOGGLE_BARS", TVTIME_TOGGLE_BARS },
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
+    { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS },
+    { "TOGGLE_FULLSCREEN", TVTIME_TOGGLE_FULLSCREEN },
     { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
+    { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
+    { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
-    { "TV_VIDEO", TVTIME_TV_VIDEO },
 
-    { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
     { "SCREENSHOT", TVTIME_SCREENSHOT },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
-    { "SHOW_CREDITS", TVTIME_SHOW_CREDITS },
-    { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL },
 
     { "MENUMODE", TVTIME_MENUMODE },
 
@@ -333,11 +331,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         in->screenshot = 1;
         break;
 
-    case TVTIME_SHOW_BARS:
+    case TVTIME_TOGGLE_BARS:
         in->showbars = !in->showbars;
         break;
 
-    case TVTIME_FULLSCREEN:
+    case TVTIME_TOGGLE_FULLSCREEN:
         in->togglefullscreen = 1;
         break;
 
@@ -363,7 +361,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         console_toggle_console( in->console );
         break;
 
-    case TVTIME_SKIP_CHANNEL:
+    case TVTIME_CHANNEL_SKIP:
         station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
         if( in->osd ) {
             if( station_get_current_active( in->stationmgr ) ) {
@@ -375,11 +373,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         station_writeconfig( in->stationmgr );
 	break;
             
-    case TVTIME_ASPECT:
+    case TVTIME_TOGGLE_ASPECT:
         in->toggleaspect = 1;
         break;
 
-    case TVTIME_SCAN_CHANNELS:
+    case TVTIME_CHANNEL_SCAN:
         in->scan_channels = !in->scan_channels;
         if( in->osd ) {
             if( in->scan_channels ) {
@@ -409,7 +407,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_SHOW_CREDITS:
+    case TVTIME_TOGGLE_CREDITS:
         if( in->osd ) {
             tvtime_osd_toggle_show_credits( in->osd );
         }
@@ -430,7 +428,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_LUMA_CORRECTION_TOGGLE:
+    case TVTIME_TOGGLE_LUMA_CORRECTION:
         config_set_apply_luma_correction( in->cfg, !config_get_apply_luma_correction( in->cfg ) );
         if( in->osd ) {
             if( config_get_apply_luma_correction( in->cfg ) ) {
@@ -569,7 +567,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_TV_VIDEO:
+    case TVTIME_TOGGLE_INPUT:
         in->frame_counter = 0;
         videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
         if( in->osd ) {

@@ -526,7 +526,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
     ct->keymap[ '[' ] = TVTIME_FREQLIST_DOWN;
     ct->keymap[ ']' ] = TVTIME_FREQLIST_UP;
-    ct->keymap[ 'c' ] = TVTIME_LUMA_CORRECTION_TOGGLE;
+    ct->keymap[ 'c' ] = TVTIME_TOGGLE_LUMA_CORRECTION;
     ct->keymap[ 'z' ] = TVTIME_LUMA_DOWN;
     ct->keymap[ 'x' ] = TVTIME_LUMA_UP;
     ct->keymap[ 'm' ] = TVTIME_MIXER_MUTE;
@@ -541,18 +541,18 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F6 ] = TVTIME_CONT_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
-    ct->keymap[ I_F10 ] = TVTIME_SCAN_CHANNELS;
-    ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
-    ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
+    ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
+    ct->keymap[ I_F11 ] = TVTIME_TOGGLE_BARS;
+    ct->keymap[ I_F12 ] = TVTIME_TOGGLE_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;
-    ct->keymap[ 'f' ] = TVTIME_FULLSCREEN;
-    ct->keymap[ 'i' ] = TVTIME_TV_VIDEO;
-    ct->keymap[ 'a' ] = TVTIME_ASPECT;
+    ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
+    ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
+    ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
-    ct->keymap[ 'r' ] = TVTIME_SKIP_CHANNEL;
+    ct->keymap[ 'r' ] = TVTIME_CHANNEL_SKIP;
     ct->keymap[ '`' ] = TVTIME_TOGGLE_CONSOLE;
     ct->keymap[ I_PGUP ] = TVTIME_SCROLL_CONSOLE_UP;
     ct->keymap[ I_PGDN ] = TVTIME_SCROLL_CONSOLE_DOWN;
@@ -562,7 +562,7 @@ config_t *config_new( int argc, char **argv )
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
     ct->buttonmap[ 2 ] = TVTIME_MIXER_MUTE;
-    ct->buttonmap[ 3 ] = TVTIME_TV_VIDEO;
+    ct->buttonmap[ 3 ] = TVTIME_TOGGLE_INPUT;
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
 

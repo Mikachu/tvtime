@@ -1018,7 +1018,7 @@ int main( int argc, char **argv )
 
                 /* Stop when we loop around. */
                 if( station_get_current_id( stationmgr ) == firstscan ) {
-                    commands_handle( commands, TVTIME_SCAN_CHANNELS, 0 );
+                    commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
                 }
             }
         }
