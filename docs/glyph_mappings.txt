@@ -35,3 +35,31 @@ Attempted Framerate   0xEE 0x80 0xAC  U+E02C
 Television Standard   0xEE 0x80 0xAD  U+E02D
 Input Filters         0xEE 0x80 0xAE  U+E02E
 Renumber channel      0xEE 0x80 0xAF  U+E02F
+
+Setup -> Station management -> Finetune current channel
+Finetune channel      0xEE 0x80 0xB0  U+E030
+
+Setup -> Output configuration -> Overscan setting
+Overscan setting      0xEE 0x80 0xB1  U+E031
+
+Setup -> Output configuration -> Fullscreen
+Fullscreen is off     0xEE 0x80 0xB2  U+E032
+Fullscreen is on      0xEE 0x80 0xB3  U+E033
+
+Setup -> Output configuration -> 16:9 output
+16:9 output is off    0xEE 0x80 0xB4 U+E034
+16:9 output is on     0xEE 0x80 0xB5 U+E035
+
+TBD
+Setup
+  Station management
+    * Reset all channels as active
+    * Toggle NTSC cable mode
+  Input configuration
+    * Toggle closed captions
+  Picture
+    * Save current settings as global defaults
+    * Save current settings as channel defaults
+    * Reset to global defaults
+  Output configuration
+    * Always on top (desc: overlapping windows?)
