@@ -32,7 +32,6 @@
 #include "mixer.h"
 
 static char *mixer_device = "/dev/mixer";
-static int levelpercentage = 0;
 static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
 static int mixer_channel = SOUND_MIXER_LINE;
 static int mixer_dev_mask = 1 << SOUND_MIXER_LINE;
@@ -64,7 +63,9 @@ int mixer_get_volume( void )
 
 int mixer_set_volume( int percentdiff )
 {
-    int fd, v, cmd, devs;
+    int fd, v, cmd, devs, levelpercentage;
+
+    levelpercentage = mixer_get_volume();
 
     levelpercentage += percentdiff;
     if( levelpercentage > 100 ) levelpercentage = 100;

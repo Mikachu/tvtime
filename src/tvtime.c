@@ -982,7 +982,7 @@ int main( int argc, char **argv )
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
     if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+        fprintf( stderr, "tvtime: Can't get realtime priority for better performance, need root access.\n" );
     }
 
     rtctimer = rtctimer_new( 1 );
@@ -1470,9 +1470,6 @@ int main( int argc, char **argv )
 
     /* Set the mier device. */
     mixer_set_device( config_get_mixer_device( ct ) );
-
-    /* Set the mixer volume. */
-    mixer_set_volume( mixer_get_volume() );
 
     /* Begin capturing frames. */
     if( vidin ) {
