@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "parser.h"
 
 
@@ -107,8 +110,9 @@ const char *parser_get( parser_file_t *pf, const char *name, int k )
 
 int parser_readfile( parser_file_t *pf )
 {
-    long length=0;
+    long length = 0;
     size_t num_read = 0;
+    struct stat statbuf;
     char *file;
 
     if( !(pf->fh) ) {
@@ -116,25 +120,30 @@ int parser_readfile( parser_file_t *pf )
         return 0;
     }
 
-    fseek( pf->fh, 0L, SEEK_END );
-    length = ftell( pf->fh );
-    fseek( pf->fh, 0L, SEEK_SET );
-    file = (char *)malloc(length+2);
+    if( fstat( fileno( pf->fh ), &statbuf ) < 0 ) {
+        fprintf( stderr, "parser: Can't stat file %s: %s\n",
+                 pf->filename, strerror( errno ) );
+        return 0;
+    }
+
+    length = statbuf.st_size;
+
+    file = (char *) malloc( length + 1 );
     if( !file ) {
         fprintf( stderr, "parser: Insufficient memory to read file.\n" );
         return 0;
     }
-    num_read = fread( (void*)file, sizeof(char), length+1, pf->fh );
+    num_read = fread( file, sizeof( char ), length, pf->fh );
     if( num_read == 0 ) {
         if( ferror( pf->fh ) > 0 ) {
             fprintf( stderr, "parser: Could not read file.\n" );
             return 0;
-        }   
+        }
     }
 
-    file[length+1] = '\0';
+    file[ length ] = '\0';
     pf->file_contents = file;
-    pf->file_length = length+1;
+    pf->file_length = length;
 
     return 1;
 }
