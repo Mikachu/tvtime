@@ -1300,6 +1300,8 @@ int main( int argc, char **argv )
                 if( c == '\n' ) {
                     int cmd;
 
+                    kbd_cmd[ kbd_pos ] = '\0';
+
                     cmd = tvtime_string_to_command( kbd_cmd );
                     if( cmd != TVTIME_NOCOMMAND ) {
                         commands_handle( commands, cmd, 0 );
