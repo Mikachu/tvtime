@@ -427,7 +427,6 @@ ft_string_t *ft_string_new( ft_font_t *font )
 
 void ft_string_delete( ft_string_t *fts )
 {
-    free( fts->data );
     free( fts );
 }
 
