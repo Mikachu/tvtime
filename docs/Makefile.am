@@ -15,6 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-man_MANS = tvtime.1 tvtimerc.5
-EXTRA_DIST = DESIGN default.tvtime.xml quotes.txt $(man_MANS)
+man_MANS = tvtime.1
+EXTRA_DIST = default.tvtime.xml quotes.txt $(man_MANS)
 
