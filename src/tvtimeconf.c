@@ -483,7 +483,11 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     strncpy( ct->command_pipe, getenv( "HOME" ), 235 );
     strncat( ct->command_pipe, "/.tvtime/tvtimefifo", 255 );
-    ct->timeformat = strdup( nl_langinfo( T_FMT ) );
+    if( strlen( nl_langinfo( T_FMT ) ) ) {
+        ct->timeformat = strdup( nl_langinfo( T_FMT ) );
+    } else {
+        ct->timeformat = strdup( "%r" );
+    }
     ct->finetune = 0;
     ct->fullscreen = 0;
     ct->menu_bg_rgb = 4278190080U; /* opaque black */
