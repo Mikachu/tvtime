@@ -587,6 +587,7 @@ config_t *config_new( void )
     ct->keymap[ '>' ] = TVTIME_OVERSCAN_UP;
     ct->keymap[ 'b' ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
+    ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

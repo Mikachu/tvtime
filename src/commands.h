@@ -81,6 +81,7 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_NTSC_CABLE_MODE,
     TVTIME_AUTO_ADJUST_PICT,
+    TVTIME_AUTO_ADJUST_WINDOW,
     TVTIME_CHANNEL_SKIP,
     TVTIME_TOGGLE_CONSOLE,
     TVTIME_SCROLL_CONSOLE_UP,
@@ -145,6 +146,7 @@ int commands_toggle_deinterlacing_mode( commands_t *in );
 int commands_toggle_pulldown_detection( commands_t *in );
 int commands_toggle_mode( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );
+int commands_resize_window( commands_t *in );
 int commands_update_luma_power( commands_t *in );
 double commands_get_luma_power( commands_t *in );
 double commands_get_overscan( commands_t *in );

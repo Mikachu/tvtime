@@ -2,6 +2,8 @@
 0.9.8.3 -
   * vektor: Removed the vgasync code until we have something that
       can correctly use the vsync.h stuff (it was a bad hack anyway)
+  * vektor: Added a command to automatically adjust window size to
+      match the size of the video being displayed.
   * vektor: Screenshot now works even if the window is not currently
       exposed (fixes 731637)
   * vektor: New fullscreen code, based on SDL's fullscreen code with

@@ -1554,6 +1554,9 @@ int main( int argc, char **argv )
         if( commands_update_luma_power( commands ) ) {
             videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
         }
+        if( commands_resize_window( commands ) ) {
+            output->set_window_height( output->get_visible_height() );
+        }
         commands_next_frame( commands );
         input_next_frame( in );
 

@@ -481,4 +481,8 @@
     <keyboard key="*"/>
   </bind>
 
+  <bind command="auto_adjust_window">
+    <keyboard key="/"/>
+  </bind>
+
 </tvtime>

@@ -47,6 +47,7 @@ typedef struct {
 static Cmd_Names cmd_table[] = {
 
     { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT },
+    { "AUTO_ADJUST_WINDOW", TVTIME_AUTO_ADJUST_WINDOW },
 
     { "BRIGHTNESS_DOWN", TVTIME_BRIGHTNESS_DOWN },
     { "BRIGHTNESS_UP", TVTIME_BRIGHTNESS_UP },
@@ -191,6 +192,7 @@ struct commands_s {
     int framerate;
     int scan_channels;
     int pause;
+    int resizewindow;
 
     int change_channel;
 
@@ -299,6 +301,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->audio_counter = -1;
     in->change_channel = 0;
     in->renumbering = 0;
+    in->resizewindow = 0;
 
     in->apply_luma = config_get_apply_luma_correction( cfg );
     in->update_luma = 0;
@@ -613,6 +616,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 tvtime_osd_show_message( in->osd, "Picture settings reset to defaults." );
             }
         }
+        break;
+
+    case TVTIME_AUTO_ADJUST_WINDOW:
+        in->resizewindow = 1;
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
@@ -955,6 +962,7 @@ void commands_next_frame( commands_t *in )
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
     in->update_luma = 0;
+    in->resizewindow = 0;
 }
 
 int commands_quit( commands_t *in )
@@ -1050,6 +1058,11 @@ double commands_get_luma_power( commands_t *in )
 double commands_get_overscan( commands_t *in )
 {
     return in->overscan;
+}
+
+int commands_resize_window( commands_t *in )
+{
+    return in->resizewindow;
 }
 
 void commands_set_framerate( commands_t *in, int framerate )
