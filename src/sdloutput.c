@@ -34,6 +34,7 @@ static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;
 static int sdlaspect = 0;
 static int outwidth = 0;
+static int outheight = 0;
 static int fs = 0;
 static int sdlflags = SDL_HWSURFACE | SDL_RESIZABLE;
 
@@ -88,6 +89,7 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
         fprintf( stderr, "sdloutput: Can't open output!\n" );
         return 0;
     }
+    outheight = screen->h;
 
     /* Create overlay surface. */
     frame = SDL_CreateYUVOverlay( inputwidth, inputheight,
@@ -114,12 +116,7 @@ void sdl_toggle_fullscreen( void )
 static void sdl_reset_display( void )
 {
     SDL_UnlockYUVOverlay( frame );
-    if( sdlaspect ) {
-        /* Run in 16:9 mode. */
-        screen = SDL_SetVideoMode( outwidth, outwidth / 16 * 9, 0, sdlflags );
-    } else {
-        screen = SDL_SetVideoMode( outwidth, outwidth / 4 * 3, 0, sdlflags );
-    }
+    screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
     SDL_LockYUVOverlay( frame );
 }
 
@@ -134,11 +131,22 @@ int sdl_toggle_aspect( void )
 void sdl_show_frame( void )
 {
     SDL_Rect r;
+    int curwidth;
+    int curheight;
+    int widthratio = sdlaspect ? 16 : 4;
+    int heightratio = sdlaspect ? 9 : 3;
 
-    r.x = 0;
-    r.y = 0;
-    r.w = screen->w;
-    r.h = screen->h;
+    curwidth = screen->w;
+    curheight = ( screen->w / widthratio ) * heightratio;
+    if( curheight > screen->h ) {
+        curheight = screen->h;
+        curwidth = ( screen->h / heightratio ) * widthratio;
+    }
+
+    r.x = ( screen->w - curwidth ) / 2;
+    r.y = ( screen->h - curheight ) / 2;
+    r.w = curwidth;
+    r.h = curheight;
 
     SDL_UnlockYUVOverlay( frame );
     SDL_DisplayYUVOverlay( frame, &r );
@@ -160,6 +168,7 @@ void sdl_poll_events( input_t *in )
 
         if( event.type == SDL_VIDEORESIZE ) {
             outwidth = event.resize.w;
+            outheight = event.resize.h;
             sdl_reset_display();
         }
 
