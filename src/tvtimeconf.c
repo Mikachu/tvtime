@@ -1001,13 +1001,13 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "height", 1, 0, 'H' },
         { "inputwidth", 1, 0, 'I' },
         { "driver", 1, 0, 'D' },
-        { "input", 1, 0, 'i' },
+        { "input", 2, 0, 'i' },
         { "channel", 1, 0, 'c' },
         { "configfile", 1, 0, 'F' },
-        { "norm", 1, 0, 'n' },
-        { "frequencies", 1, 0, 'f' },
+        { "norm", 2, 0, 'n' },
+        { "frequencies", 2, 0, 'f' },
         { "vbidevice", 1, 0, 'b' },
-        { "device", 1, 0, 'd' },
+        { "device", 2, 0, 'd' },
         { "mixer", 1, 0, 'x' },
         { "fullscreen", 0, 0, 'm' },
         { "window", 0, 0, 'M' },
@@ -1036,12 +1036,29 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   }
                   break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
-        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+        case 'd': if( !optarg ) {
+                      fprintf( stdout, "V4LDevice:%s\n", config_get_v4l_device( ct ) );
+                  } else {
+                      free( ct->v4ldev );
+                      ct->v4ldev = strdup( optarg );
+                  }
+                  break;
         case 'b': ct->use_vbi = 1; free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
-        case 'i': ct->inputnum = atoi( optarg ); break;
+        case 'i': if( !optarg ) {
+                      fprintf( stdout, "V4LInput:%d\n", config_get_inputnum( ct ) );
+                  } else {
+                      ct->inputnum = atoi( optarg );
+                  }
+                  break;
         case 'c': ct->prev_channel = ct->start_channel;
                   ct->start_channel = atoi( optarg ); break;
-        case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+        case 'n': if( !optarg ) {
+                      fprintf( stdout, "Norm:%s\n", config_get_v4l_norm( ct ) );
+                  } else {
+                      free( ct->norm );
+                      ct->norm = strdup( optarg );
+                  }
+                  break;
         case 'D': if( ct->output_driver ) { free( ct->output_driver ); }
                   ct->output_driver = strdup( optarg ); break;
         case 'p': if( tolower( optarg[ 0 ] ) == 't' ) {
@@ -1052,7 +1069,13 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                       ct->fspos = 0;
                   }
                   break;
-        case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
+        case 'f': if( !optarg ) {
+                      fprintf( stdout, "Frequencies:%s\n", config_get_v4l_freq( ct ) );
+                  } else {
+                      free( ct->freq );
+                      ct->freq = strdup( optarg );
+                  }
+                  break;
         default:
             print_config_usage( argv );
             return 0;
@@ -1079,7 +1102,6 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
     if( ct->doc ) {
         char tempstring[ 32 ];
-        fprintf( stderr, "config: Saving command line options.\n" );
 
         /**
          * Options that aren't specified on the command line
@@ -1252,6 +1274,10 @@ int config_key_to_menu_command( config_t *ct, int key )
     if( key ) {
         if( ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
             return ct->keymapmenu[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
+        }
+
+        if( isalnum( key & 0x1ff ) ) {
+            return TVTIME_CHANNEL_CHAR;
         }
     }
         
