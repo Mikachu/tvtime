@@ -87,6 +87,8 @@ struct tvtime_osd_s
     int channel_logo_xpos;
     int channel_logo_ypos;
 
+    osd_graphic_t *backdrop;
+
     char channel_number_text[ 20 ];
     char channel_name_text[ 128 ];
     char tv_norm_text[ 20 ];
@@ -183,6 +185,12 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     fontfile = "tvtimeSansBold.ttf";
     logofile = "tvtimelogo";
+
+    if( height == 576 ) {
+        osd->backdrop = osd_graphic_new( "backdrop-576.png", pixel_aspect, 256 );
+    } else {
+        osd->backdrop = osd_graphic_new( "backdrop-480.png", pixel_aspect, 256 );
+    }
 
     osd->databar = osd_rect_new();
     if( !osd->databar ) {
@@ -486,6 +494,7 @@ void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
             osd_string_set_hold( osd->strings[ i ].string, hold );
         }
     }
+    if( osd->backdrop ) osd_graphic_set_hold( osd->backdrop, hold );
     if( osd->channel_logo ) osd_animation_set_hold( osd->channel_logo, hold );
     if( osd->film_logo ) osd_animation_set_hold( osd->film_logo, hold );
 }
@@ -497,6 +506,7 @@ void tvtime_osd_clear( tvtime_osd_t *osd )
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
         osd_string_set_timeout( osd->strings[ i ].string, 0 );
     }
+    if( osd->backdrop ) osd_graphic_set_timeout( osd->backdrop, 0 );
     if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, 0 );
     if( osd->film_logo ) osd_animation_set_timeout( osd->film_logo, 0 );
 }
@@ -622,6 +632,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
 
     gettimeofday( &tv, 0 );
     if( osd->channel_logo ) osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
+
+    if( osd->backdrop ) osd_graphic_set_timeout( osd->backdrop, osd->delay );
 
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, osd->delay );
     osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, osd->network_name, osd->delay );
@@ -823,6 +835,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
         osd_string_advance_frame( osd->strings[ i ].string );
     }
 
+    if( osd->backdrop ) osd_graphic_advance_frame( osd->backdrop );
     if( osd->channel_logo ) osd_animation_advance_frame( osd->channel_logo );
     if( osd->film_logo ) osd_animation_advance_frame( osd->film_logo );
     osd_list_advance_frame( osd->list );
@@ -836,6 +849,10 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int scanline )
 {
     int i;
+
+    if( osd->backdrop && osd_graphic_visible( osd->backdrop ) && osd_graphic_active_on_scanline( osd->backdrop, scanline ) ) {
+        osd_graphic_composite_packed422_scanline( osd->backdrop, output, output, width, xpos, scanline );
+    }
 
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
         if( osd_string_visible( osd->strings[ i ].string ) ) {
