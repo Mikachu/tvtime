@@ -27,9 +27,7 @@
 #include "mixer.h"
 #include "commands.h"
 #include "menu.h"
-#include "parser.h"
 #include "console.h"
-#include "vbidata.h"
 #include "configsave.h"
 
 /* Number of frames to wait for next channel digit. */
