@@ -397,7 +397,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
         case TVTIME_FREQLIST_DOWN:
         case TVTIME_FREQLIST_UP:
             if( videoinput_has_tuner( in->vidin ) ) {
-                cur_freq_table = ( cur_freq_table + ( tvtime_cmd == TVTIME_FREQLIST_UP ? 1 : -1 ) ) % NUM_FREQ_TABLES;
+                cur_freq_table = ( cur_freq_table + ( tvtime_cmd == TVTIME_FREQLIST_UP ? 1 : -1 ) + NUM_FREQ_TABLES ) % NUM_FREQ_TABLES;
                 reinit_tuner( in );
             }
             break;
