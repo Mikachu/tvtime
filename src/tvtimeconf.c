@@ -120,7 +120,7 @@ unsigned int parse_colour( const char *str );
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-vasb] [-w <width>] [-I <sampling>] "
+    fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n", argv[ 0 ] );
     fprintf( stderr, "\t-v\tShow verbose messages.\n" );
@@ -131,6 +131,8 @@ static void print_usage( char **argv )
 
     fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
     fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
+
+    fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
 
     fprintf( stderr, "\t-c\tApply luma correction.\n" );
     fprintf( stderr, "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n" );

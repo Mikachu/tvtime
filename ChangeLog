@@ -1,5 +1,7 @@
 
-0.9.6
+0.9.6 - Thu Nov 14 16:37:25 AST 2002
+  * (bitstream) Added the -m switch to start fullscreen (bug 636044)
+  * (bitstream) Added configurable OSD colours to the tvtimerc.
   * (vektor) We now drop root priviledges if tvtime is setuid root and run
     as a normal user (bug 630210)
   * (vektor) Redid a bunch of the default key bindings.

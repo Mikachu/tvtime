@@ -105,7 +105,7 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
     fontfile = DATADIR "/FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
 
-    osd->credits = credits_new( "credits.png", height );
+    osd->credits = credits_new( DATADIR "/credits.png", height );
     osd->show_credits = 0;
 
     osd->channel_number = osd_string_new( fontfile, 80, width, height, frameaspect );
