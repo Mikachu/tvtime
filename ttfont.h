@@ -17,9 +17,6 @@ class TTFFont
 
      void RenderString( unsigned char *output, const char *text, int *width, int *height, int maxx, int maxy );
 
-     void DrawString(unsigned char *yuvptr, int x, int y, const char *text,
-                     int maxx, int maxy, bool white = true, 
-                     bool rightjustify = false); 
      void CalcWidth(const char *text, int *width_return);
 
   private:
@@ -27,8 +24,8 @@ class TTFFont
      Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
      void clear_raster(Raster_Map *rmap);
      void destroy_font_raster(Raster_Map *rmap);
-     Raster_Map *calc_size(int *width, int *height, const char *text);
-     void render_text(Raster_Map *rmap, Raster_Map *rchr, const char *text, 
+     void calc_size(int *width, int *height, const char *text);
+     void render_text(Raster_Map *rmap, const char *text, 
                       int *xorblah, int *yor);
      void merge_text(unsigned char *yuv, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 

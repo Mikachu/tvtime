@@ -30,7 +30,6 @@
  * define this to enable kerning
  * #define USE_KERNING
  */
-#define SUPERSAMPLE 1
 
 static char         have_library = 0;
 static FT_Library   the_library;
@@ -107,10 +106,9 @@ void TTFFont::destroy_font_raster(Raster_Map * rmap)
    delete rmap;
 }
 
-Raster_Map *TTFFont::calc_size(int *width, int *height, const char *text)
+void TTFFont::calc_size(int *width, int *height, const char *text)
 {
    int                 i, pw, ph;
-   Raster_Map         *rtmp;
 
    pw = 0;
    ph = ((max_ascent) - max_descent) / 64;
@@ -137,13 +135,9 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, const char *text)
    }
    *width = pw;
    *height = ph;
-
-   rtmp = create_font_raster(face->size->metrics.x_ppem + 32, 
-                             face->size->metrics.y_ppem + 32);
-   return rtmp;
 }
 
-void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, const char *text,
+void TTFFont::render_text(Raster_Map *rmap, const char *text,
 	                  int *xorblah, int *yor)
 {
    FT_F26Dot6          x, y, xmin, ymin, xmax, ymax;
@@ -179,14 +173,9 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, const char *text,
        xmax = (bbox.xMax + 63) & -64;
        ymax = (bbox.yMax + 63) & -64;
 
-       if (glyphs_cached[j]) {
-           rtmp = glyphs_cached[j];
-       } else {
+       if( !glyphs_cached[j] ) {
            FT_Vector origin;
            FT_BitmapGlyph bmap;
-
-           rtmp = rchr;
-           clear_raster(rtmp);
 
            origin.x = -xmin;
            origin.y = -ymin;
@@ -195,9 +184,8 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, const char *text,
            bmap = (FT_BitmapGlyph)(glyphs[j]);
 
            glyphs_cached[j] = duplicate_raster(bmap);
-
-           rtmp = glyphs_cached[j];
        }
+       rtmp = glyphs_cached[j];
        // Blit-or the resulting small pixmap into the biggest one
        // We do that by hand, and provide also clipping.
 
@@ -344,84 +332,6 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
      }
 }
 
-void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
-                         const char *text, int maxx, int maxy, bool white, 
-                         bool rightjustify)
-{
-   int                  width, height, w, h, inx, iny, clipx, clipy;
-   Raster_Map          *rmap, *rtmp;
-   char                 is_pixmap = 0;
-
-   //if (text.length() < 1)
-   //     return;
-
-   int video_width = vid_width;
-   int video_height = vid_height;
-
-   inx = 0;
-   iny = 0;
-
-   rtmp = calc_size(&w, &h, text);
-   if (w <= 0 || h <= 0)
-   {
-       destroy_font_raster(rtmp);
-       return;
-   }
-   rmap = create_font_raster(w, h);
-
-   render_text(rmap, rtmp, text, &inx, &iny);
-
-   is_pixmap = 1;
-
-   y += fontsize;
-   
-   width = maxx;
-   height = maxy - fontsize;
-
-   clipx = 0;
-   clipy = 0;
-
-   x = x - inx;
-   y = y - iny;
-
-   width = width - x;
-   height = height - y;
-
-   if (width > w)
-      width = w;
-   if (height > h)
-      height = h;
-
-   if (x < 0)
-     {
-	clipx = -x;
-	width += x;
-	x = 0;
-     }
-   if (y < 0)
-     {
-	clipy = -y;
-	height += y;
-	y = 0;
-     }
-   if ((width <= 0) || (height <= 0))
-     {
-	destroy_font_raster(rmap);
-	destroy_font_raster(rtmp);
-	return;
-     }
-
-   if (rightjustify)
-   {
-   }
-
-   merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, video_height, white);
-
-   destroy_font_raster(rmap);
-   destroy_font_raster(rtmp);
-}
-
 TTFFont::~TTFFont()
 {
    int                 i;
@@ -455,8 +365,6 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
    FT_BBox             bbox;
    int                 xdpi = 96, ydpi = 96;
    unsigned short      i, n, code;
-
-   video_width *= SUPERSAMPLE;
 
    valid = false;
 
@@ -545,17 +453,15 @@ void TTFFont::RenderString( unsigned char *output, const char *text, int *width,
 {
    int w, h, inx, iny, i;
    Raster_Map *rmap;
-   Raster_Map *rtmp;
 
-   rtmp = calc_size( &w, &h, text );
+   calc_size( &w, &h, text );
    if( w <= 0 || h <= 0 ) {
-       destroy_font_raster( rtmp );
        *width = *height = 0;
        return;
    }
 
    *width = w;
-   if( *width > (maxx*SUPERSAMPLE) ) *width = (maxx*SUPERSAMPLE);
+   if( *width > maxx ) *width = maxx;
    *height = h;
    if( *height > maxy ) *height = maxy;
 
@@ -563,25 +469,15 @@ void TTFFont::RenderString( unsigned char *output, const char *text, int *width,
 
    inx = 0;
    iny = 0;
-   render_text( rmap, rtmp, text, &inx, &iny );
+   render_text( rmap, text, &inx, &iny );
 
    for( i = 0; i < *height; i++ ) {
        unsigned char *curin = ((unsigned char *) rmap->bitmap) + (i * rmap->cols);
-       unsigned char *curout = output + (i * ((*width)/SUPERSAMPLE));
-       int j;
-       if( SUPERSAMPLE != 1 ) {
-       for( j = 0; j < rmap->cols; j++ ) {
-           curout[ j/4 ] = (curin[ j ] + curin[ j + 1 ] + curin[ j + 2 ] + curin[ j + 3 ]) >> 2;
-       }
-       } else {
-           memcpy( curout, curin, *width );
-       }
+       unsigned char *curout = output + (i * (*width));
+       memcpy( curout, curin, *width );
    }
 
-   *width = (*width / SUPERSAMPLE);
-
    destroy_font_raster( rmap );
-   destroy_font_raster( rtmp );
 }
 
 void TTFFont::CalcWidth(const char *text, int *width_return)
