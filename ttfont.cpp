@@ -30,6 +30,7 @@
  * define this to enable kerning
  * #define USE_KERNING
  */
+#define SUPERSAMPLE 1
 
 static char         have_library = 0;
 static FT_Library   the_library;
@@ -456,6 +457,8 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
    int                 xdpi = 96, ydpi = 96;
    unsigned short      i, n, code;
 
+   video_width *= SUPERSAMPLE;
+
    valid = false;
 
    if (!have_library)
@@ -553,7 +556,7 @@ void TTFFont::RenderString( unsigned char *output, const char *text, int *width,
    }
 
    *width = w;
-   if( *width > maxx ) *width = maxx;
+   if( *width > (maxx*SUPERSAMPLE) ) *width = (maxx*SUPERSAMPLE);
    *height = h;
    if( *height > maxy ) *height = maxy;
 
@@ -564,9 +567,19 @@ void TTFFont::RenderString( unsigned char *output, const char *text, int *width,
    render_text( rmap, rtmp, text, &inx, &iny );
 
    for( i = 0; i < *height; i++ ) {
-       unsigned char *curout = output + (i * (*width));
-       memcpy( curout, ((unsigned char *) rmap->bitmap) + (i * rmap->cols), *width );
+       unsigned char *curin = ((unsigned char *) rmap->bitmap) + (i * rmap->cols);
+       unsigned char *curout = output + (i * ((*width)/SUPERSAMPLE));
+       int j;
+       if( SUPERSAMPLE != 1 ) {
+       for( j = 0; j < rmap->cols; j++ ) {
+           curout[ j/4 ] = (curin[ j ] + curin[ j + 1 ] + curin[ j + 2 ] + curin[ j + 3 ]) >> 2;
+       }
+       } else {
+           memcpy( curout, curin, *width );
+       }
    }
+
+   *width = (*width / SUPERSAMPLE);
 
    destroy_font_raster( rmap );
    destroy_font_raster( rtmp );
