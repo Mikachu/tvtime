@@ -32,25 +32,17 @@ static int timediff( struct timeval *large, struct timeval *small )
 
 struct performance_s
 {
-    struct timeval lastfieldtime;
     struct timeval lastframetime;
 
     struct timeval acquired_input;
-
+    struct timeval show_bot;
     struct timeval constructed_top;
-    struct timeval delay_blit_top;
-    struct timeval blit_top_start;
-    struct timeval blit_top_end;
-
+    struct timeval wait_for_bot;
+    struct timeval show_top;
     struct timeval constructed_bot;
-    struct timeval delay_blit_bot;
-    struct timeval blit_bot_start;
-    struct timeval blit_bot_end;
 
     int frames_dropped;
     int fieldtime;
-
-    int last_blit_time;
 
     int time_bot_to_top;
     int time_top_to_bot;
@@ -67,24 +59,22 @@ performance_t *performance_new( int fieldtimeus )
     if( !perf ) {
         return 0;
     }
+
     perf->fieldtime = fieldtimeus;
-    perf->last_blit_time = 0;
     perf->time_bot_to_top = 0;
     perf->time_top_to_bot = 0;
     perf->drop_reset = 0;
-    gettimeofday( &perf->lastfieldtime, 0 );
     gettimeofday( &perf->lastframetime, 0 );
     gettimeofday( &perf->acquired_input, 0 );
+    gettimeofday( &perf->show_bot, 0 );
     gettimeofday( &perf->constructed_top, 0 );
-    gettimeofday( &perf->delay_blit_top, 0 );
-    gettimeofday( &perf->blit_top_start, 0 );
-    gettimeofday( &perf->blit_top_end, 0 );
+    gettimeofday( &perf->wait_for_bot, 0 );
+    gettimeofday( &perf->show_top, 0 );
     gettimeofday( &perf->constructed_bot, 0 );
-    gettimeofday( &perf->delay_blit_bot, 0 );
-    gettimeofday( &perf->blit_bot_start, 0 );
-    gettimeofday( &perf->blit_bot_end, 0 );
+
     memset( perf->drop_history, 0, sizeof( perf->drop_history ) );
     perf->drop_pos = 0;
+
     return perf;
 }
 
@@ -109,50 +99,31 @@ void performance_checkpoint_acquired_input_frame( performance_t *perf )
     perf->drop_pos = ( perf->drop_pos + 1 ) % DROP_HISTORY_SIZE;
 }
 
+void performance_checkpoint_show_bot_field( performance_t *perf )
+{
+    gettimeofday( &perf->show_bot, 0 );
+    perf->time_top_to_bot = timediff( &perf->show_bot, &perf->show_top );
+}
+
 void performance_checkpoint_constructed_top_field( performance_t *perf )
 {
     gettimeofday( &perf->constructed_top, 0 );
 }
 
-void performance_checkpoint_delayed_blit_top_field( performance_t *perf )
+void performance_checkpoint_wait_for_bot_field( performance_t *perf )
 {
-    gettimeofday( &perf->delay_blit_top, 0 );
+    gettimeofday( &perf->wait_for_bot, 0 );
 }
 
-void performance_checkpoint_blit_top_field_start( performance_t *perf )
+void performance_checkpoint_show_top_field( performance_t *perf )
 {
-    gettimeofday( &perf->blit_top_start, 0 );
-}
-
-void performance_checkpoint_blit_top_field_end( performance_t *perf )
-{
-    gettimeofday( &perf->blit_top_end, 0 );
-    perf->lastfieldtime = perf->blit_top_end;
-    perf->last_blit_time = timediff( &perf->blit_top_end, &perf->blit_top_start );
-    perf->time_bot_to_top = timediff( &perf->blit_top_end, &perf->blit_bot_end );
+    gettimeofday( &perf->show_top, 0 );
+    perf->time_bot_to_top = timediff( &perf->show_top, &perf->show_bot );
 }
 
 void performance_checkpoint_constructed_bot_field( performance_t *perf )
 {
     gettimeofday( &perf->constructed_bot, 0 );
-}
-
-void performance_checkpoint_delayed_blit_bot_field( performance_t *perf )
-{
-    gettimeofday( &perf->delay_blit_bot, 0 );
-}
-
-void performance_checkpoint_blit_bot_field_start( performance_t *perf )
-{
-    gettimeofday( &perf->blit_bot_start, 0 );
-}
-
-void performance_checkpoint_blit_bot_field_end( performance_t *perf )
-{
-    gettimeofday( &perf->blit_bot_end, 0 );
-    perf->lastfieldtime = perf->blit_bot_end;
-    perf->last_blit_time = timediff( &perf->blit_bot_end, &perf->blit_bot_start );
-    perf->time_top_to_bot = timediff( &perf->blit_bot_end, &perf->blit_top_end );
 }
 
 int performance_get_usecs_since_frame_acquired( performance_t *perf )
@@ -162,37 +133,26 @@ int performance_get_usecs_since_frame_acquired( performance_t *perf )
     return timediff( &now, &perf->acquired_input );
 }
 
-int performance_get_usecs_since_last_field( performance_t *perf )
-{
-    struct timeval now;
-    gettimeofday( &now, 0 );
-    return timediff( &now, &perf->lastfieldtime );
-}
-
-int performance_get_usecs_of_last_blit( performance_t *perf )
-{
-    return perf->last_blit_time;
-}
-
 void performance_print_last_frame_stats( performance_t *perf, int framesize )
 {
-    double acquire = ((double) timediff( &perf->acquired_input, &perf->blit_bot_end )) / 1000.0;
-    double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
-    double wait_top = ((double) timediff( &perf->delay_blit_top, &perf->constructed_top )) / 1000.0;
-    double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
-    double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
-    double wait_bot = ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0;
-    double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
-    double blit_time = blit_top;
+    double acquire = ((double) timediff( &perf->acquired_input, &perf->constructed_bot )) / 1000.0;
+    double show_bot = ((double) timediff( &perf->show_bot, &perf->lastframetime )) / 1000.0;
+    double constructed_top = ((double) timediff( &perf->constructed_top, &perf->show_bot )) / 1000.0;
+    double wait_for_bot = ((double) timediff( &perf->wait_for_bot, &perf->constructed_top )) / 1000.0;
+    double show_top = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
+    double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
+    double cycle_time = ((double) timediff( &perf->acquired_input, &perf->lastframetime )) / 1000.0;
 
-    if( blit_bot > blit_top ) blit_time = blit_bot;
+    double blit_time = show_bot;
+    if( show_bot > show_top ) blit_time = show_top;
 
-    fprintf( stderr, "tvtime: acquire %5.2fms, build top %5.2fms, wait top %5.2fms, blit top %5.2fms\n"
-                     "tvtime:                  build bot %5.2fms, wait bot %5.2fms, blit bot %5.2fms\n",
-             acquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
-    fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, using %.2f%% CPU to deinterlace.\n",
+    fprintf( stderr, "tvtime: acquire %5.2fms, show bot %5.2fms, build top %5.2fms\n"
+                     "tvtime: waitbot %5.2fms, show top %5.2fms, build bot %5.2fms\n",
+             acquire, show_bot, constructed_top, wait_for_bot, show_top, constructed_bot );
+
+    fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, used %.2f%% CPU to deinterlace.\n",
              ( ( (double) framesize ) / blit_time ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
-             ( ( build_top + build_bot ) / (acquire+build_top+wait_top+blit_top+build_bot+wait_bot+blit_bot) ) * 100.0 );
+             ( ( constructed_top + constructed_bot ) / cycle_time ) * 100.0 );
     fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2f, bot-to-top: %5.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
              (double) perf->time_bot_to_top / 1000.0 );
@@ -207,31 +167,9 @@ void performance_print_frame_drops( performance_t *perf, int framesize )
     }
 
     if( timediff( &perf->acquired_input, &perf->lastframetime ) > (perf->fieldtime * 3) ) {
-        double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
-        double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
-        double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
-        double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
-
         fprintf( stderr, "tvtime: Frame drop detected (%2.2fms between consecutive frames.\n",
             ((double) timediff( &perf->acquired_input, &perf->lastframetime)) / 1000.0 );
         performance_print_last_frame_stats( perf, framesize );
-
-        if( build_top >= blit_top && build_top >= build_bot && build_top >= blit_bot ) {
-            fprintf( stderr, "tvtime: Took %2.2fms to build a field.\n",
-                     build_top );
-        }
-        if( blit_top >= build_top && blit_top >= build_bot && blit_top >= blit_bot ) {
-            fprintf( stderr, "tvtime: Took %2.2fms to blit a field.\n",
-                     blit_top );
-        }
-        if( build_bot >= build_top && build_bot >= blit_top && build_bot >= blit_bot ) {
-            fprintf( stderr, "tvtime: Took %2.2fms to build a field.\n",
-                     build_bot );
-        }
-        if( blit_bot >= build_top && blit_bot >= blit_top && blit_bot >= build_bot ) {
-            fprintf( stderr, "tvtime: Took %2.2fms to blit a field.\n",
-                     blit_bot );
-        }
     }
 }
 

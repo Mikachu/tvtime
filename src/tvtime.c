@@ -293,7 +293,6 @@ static int last_fieldcount = 0;
 static void tvtime_do_pulldown_action( uint8_t *output,
                                        uint8_t *curframe,
                                        uint8_t *lastframe,
-                                       uint8_t *secondlastframe,
                                        tvtime_osd_t *osd,
                                        console_t *con,
                                        vbiscreen_t *vs,
@@ -419,19 +418,19 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             }
             if( curoffset == PULLDOWN_OFFSET_2 ) {
                 // Drop.
-                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                tvtime_do_pulldown_action( output, curframe, lastframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_DROP2 );
             } else if( curoffset == PULLDOWN_OFFSET_3 ) {
                 // Merge.
-                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                tvtime_do_pulldown_action( output, curframe, lastframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_MRGE3 );
             } else if( curoffset == PULLDOWN_OFFSET_4 ) {
                 // Copy.
-                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                tvtime_do_pulldown_action( output, curframe, lastframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_COPY4 );
@@ -450,13 +449,13 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
 
         if( curoffset == PULLDOWN_OFFSET_1 || curoffset == PULLDOWN_OFFSET_5 ) {
             // Copy.
-            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+            tvtime_do_pulldown_action( output, curframe, lastframe,
                                        osd, con, vs, bottom_field, width,
                                        frame_height, instride, outstride,
                                        PULLDOWN_ACTION_COPY1 );
         } else if( curoffset == PULLDOWN_OFFSET_5 ) {
             // Copy.
-            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+            tvtime_do_pulldown_action( output, curframe, lastframe,
                                        osd, con, vs, bottom_field, width,
                                        frame_height, instride, outstride,
                                        PULLDOWN_ACTION_COPY5 );
@@ -485,7 +484,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             */
 
             if( drop_next ) {
-                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                tvtime_do_pulldown_action( output, curframe, lastframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_DROP2 );
@@ -506,7 +505,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             old_mean = new_mean;
             if( !drop_next && !drop_cur && pulldown_copy ) {
                 // Copy.
-                tvtime_do_pulldown_action( output, lastframe, curframe, secondlastframe,
+                tvtime_do_pulldown_action( output, lastframe, curframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_COPY1 );
@@ -516,7 +515,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             }
         } else if( pulldown_merge ) {
             // Merge.
-            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+            tvtime_do_pulldown_action( output, curframe, lastframe,
                                        osd, con, vs, bottom_field, width,
                                        frame_height, instride, outstride,
                                        PULLDOWN_ACTION_MRGE3 );
@@ -527,7 +526,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
             if( did_copy_top ) {
                 did_copy_top = 0;
             } else {
-                tvtime_do_pulldown_action( output, lastframe, curframe, secondlastframe,
+                tvtime_do_pulldown_action( output, lastframe, curframe,
                                            osd, con, vs, bottom_field, width,
                                            frame_height, instride, outstride,
                                            PULLDOWN_ACTION_COPY4 );
@@ -768,9 +767,7 @@ static void tvtime_build_interlaced_frame( uint8_t *output,
             scanline++;
         }
     }
-
 }
-
 
 static void tvtime_build_copied_field( uint8_t *output,
                                        uint8_t *curframe,
@@ -1179,7 +1176,7 @@ int main( int argc, char **argv )
      *                                 ^^^^^^^^^^^^^^^
      */
     if( rvrreader ) {
-        fieldsavailable = 5;
+        fieldsavailable = 4;
     } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
             fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
@@ -1193,19 +1190,19 @@ int main( int argc, char **argv )
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
             fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
-                     "tvtime: to those which only need 3 fields.\n",
+                     "tvtime: to those which only need 2 fields.\n",
                      videoinput_get_numframes( vidin ) );
-            fieldsavailable = 3;
+            fieldsavailable = 2;
         } else {
-            fieldsavailable = 5;
+            fieldsavailable = 4;
         }
-        if( fieldsavailable < 5 && videoinput_is_bttv( vidin ) ) {
+        if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
             fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
                                "*** See the support page at http://tvtime.sourceforge.net/ for information\n"
                                "*** on how to increase your gbuffers setting.\n\n" );
         }
     } else {
-        fieldsavailable = 5;
+        fieldsavailable = 4;
     }
 
     if( output->is_interlaced() ) {
@@ -1460,9 +1457,9 @@ int main( int argc, char **argv )
 
     /* Begin capturing frames. */
     if( vidin ) {
-        if( fieldsavailable == 3 ) {
+        if( fieldsavailable == 2 ) {
             lastframe = videoinput_next_frame( vidin, &lastframeid );
-        } else if( fieldsavailable == 5 ) {
+        } else if( fieldsavailable == 4 ) {
             secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
             lastframe = videoinput_next_frame( vidin, &lastframeid );
         }
@@ -1483,7 +1480,6 @@ int main( int argc, char **argv )
         int showbars, screenshot;
         int acquired = 0;
         int tuner_state;
-        int we_were_late = 0;
         int paused = 0;
         int output_x, output_y, output_w, output_h;
         int output_success = 1;
@@ -1530,6 +1526,10 @@ int main( int argc, char **argv )
                     break;
                 }
             }
+        }
+
+        if( osd ) {
+            tvtime_osd_advance_frame( osd );
         }
 
         output->poll_events( in );
@@ -1641,11 +1641,13 @@ int main( int argc, char **argv )
         commands_next_frame( commands );
         input_next_frame( in );
 
-
         /* Notice this because it's cheap. */
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
 
-        /* Acquire the next frame. */
+
+        /**
+         * Acquire the next frame.
+         */
         if( rvrreader ) {
             tuner_state = TUNER_STATE_HAS_SIGNAL;
         } else if( vidin ) {
@@ -1738,6 +1740,7 @@ int main( int argc, char **argv )
 
         performance_checkpoint_acquired_input_frame( perf );
 
+
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", 
@@ -1759,6 +1762,24 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
+
+        /**
+         * Show the bottom field.
+         */
+        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
+            if( curmethod->doscalerbob && !showbars ) {
+                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+            } else {
+                output_success = output->show_frame( output_x, output_y, output_w, output_h );
+            }
+        }
+        performance_checkpoint_show_bot_field( perf );
+        if( !output_success ) break;
+
+
+        /**
+         * Deinterlace the top field.
+         */
         if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
                 if( send_fields ) {
@@ -1769,12 +1790,8 @@ int main( int argc, char **argv )
                     tvtime_build_interlaced_frame( output->get_output_buffer(),
                                                    curframe, osd, con, vs, 0,
                                                    width, height, width * 2, 
-                                                   output->get_output_stride(),
-                                                   0);
+                                                   output->get_output_stride(), 0);
                     output->unlock_output_buffer();
-                    performance_checkpoint_constructed_top_field( perf );
-                    performance_checkpoint_delayed_blit_top_field( perf );
-                    performance_checkpoint_blit_top_field_start( perf );
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
                 } else {
@@ -1782,12 +1799,8 @@ int main( int argc, char **argv )
                     tvtime_build_interlaced_frame( output->get_output_buffer(),
                                                    curframe, osd, con, vs, 0,
                                                    width, height, width * 2, 
-                                                   output->get_output_stride(),
-                                                   1 );
+                                                   output->get_output_stride(), 1 );
                     output->unlock_output_buffer();
-                    performance_checkpoint_constructed_top_field( perf );
-                    performance_checkpoint_delayed_blit_top_field( perf );
-                    performance_checkpoint_blit_top_field_start( perf );
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
                 }
@@ -1795,8 +1808,10 @@ int main( int argc, char **argv )
                 /* Build the output from the top field. */
                 output->lock_output_buffer();
                 if( showbars ) {
-                    blit_packed422_scanline( output->get_output_buffer(),
-                                             colourbars, width*height );
+                    for( i = 0; i < height; i++ ) {
+                        blit_packed422_scanline( output->get_output_buffer() + i*output->get_output_stride(),
+                                                 colourbars + (i*width*2), width );
+                    }
                 } else {
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( output->get_output_buffer(),
@@ -1842,38 +1857,55 @@ int main( int argc, char **argv )
                     screenshot = 0;
                 }
                 output->unlock_output_buffer();
-                performance_checkpoint_constructed_top_field( perf );
-
-
-                /* Wait until it's time to blit the first field. */
-                if( rtctimer ) {
-
-                    we_were_late = 1;
-                    while( performance_get_usecs_since_frame_acquired( perf )
-                           < ( fieldtime - safetytime
-                               - performance_get_usecs_of_last_blit( perf )
-                               - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
-                        rtctimer_next_tick( rtctimer );
-                        we_were_late = 0;
-                    }
-
-                }
-                performance_checkpoint_delayed_blit_top_field( perf );
-
-                performance_checkpoint_blit_top_field_start( perf );
-                if( curmethod->doscalerbob && !showbars ) {
-                    output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
-                } else {
-                    output_success = output->show_frame( output_x, output_y, output_w, output_h );
-                }
             }
-        } else {
-            performance_checkpoint_constructed_top_field( perf );
-            performance_checkpoint_delayed_blit_top_field( perf );
-            performance_checkpoint_blit_top_field_start( perf );
         }
-        performance_checkpoint_blit_top_field_end( perf );
 
+        performance_checkpoint_constructed_top_field( perf );
+
+
+        /**
+         * We're done with the secondlastframe now.
+         */
+        if( vidin && acquired ) {
+            if( fieldsavailable == 4 ) {
+                videoinput_free_frame( vidin, secondlastframeid );
+            } else if( fieldsavailable == 2 ) {
+                videoinput_free_frame( vidin, lastframeid );
+            }
+        }
+
+
+        /**
+         * Wait for the next field time.
+         */
+        if( rtctimer ) {
+            while( performance_get_usecs_since_frame_acquired( perf )
+                   < ( fieldtime - (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
+                rtctimer_next_tick( rtctimer );
+            }
+        } else if( performance_get_usecs_since_frame_acquired( perf ) < fieldtime ) {
+            usleep( fieldtime - performance_get_usecs_since_frame_acquired( perf ) );
+        }
+        performance_checkpoint_wait_for_bot_field( perf );
+
+
+        /**
+         * Show the top field.
+         */
+        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) && !output->is_interlaced() ) {
+            if( curmethod->doscalerbob && !showbars ) {
+                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+            } else {
+                output_success = output->show_frame( output_x, output_y, output_w, output_h );
+            }
+        }
+        performance_checkpoint_show_top_field( perf );
+        if( !output_success ) break;
+
+
+        /**
+         * Deinterlace the bottom field.
+         */
         if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
                 if( send_fields ) {
@@ -1894,8 +1926,10 @@ int main( int argc, char **argv )
                 /* Build the output from the bottom field. */
                 output->lock_output_buffer();
                 if( showbars ) {
-                    blit_packed422_scanline( output->get_output_buffer(),
-                                             colourbars, width*height );
+                    for( i = 0; i < height; i++ ) {
+                        blit_packed422_scanline( output->get_output_buffer() + i*output->get_output_stride(),
+                                                 colourbars + (i*width*2), width );
+                    }
                 } else {
                     if( curmethod->doscalerbob ) {
                         tvtime_build_copied_field( output->get_output_buffer(),
@@ -1945,16 +1979,15 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_constructed_bot_field( perf );
 
+
         /* We're done with the input now. */
         if( vidin && acquired ) {
-            if( fieldsavailable == 5 ) {
-                videoinput_free_frame( vidin, secondlastframeid );
+            if( fieldsavailable == 4 ) {
                 secondlastframeid = lastframeid;
                 secondlastframe = lastframe;
                 lastframeid = curframeid;
                 lastframe = curframe;
-            } else if( fieldsavailable == 3 ) {
-                videoinput_free_frame( vidin, lastframeid );
+            } else if( fieldsavailable == 2 ) {
                 lastframeid = curframeid;
                 lastframe = curframe;
             } else {
@@ -1963,40 +1996,6 @@ int main( int argc, char **argv )
 
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
-
-        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
-            /* Wait for the next field time. */
-            if( rtctimer && !we_were_late ) {
-
-                while( performance_get_usecs_since_last_field( perf )
-                       < ( fieldtime
-                           - performance_get_usecs_of_last_blit( perf )
-                           - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
-                    rtctimer_next_tick( rtctimer );
-                }
-
-            }
-            performance_checkpoint_delayed_blit_bot_field( perf );
-
-            /* Display the bottom field. */
-            performance_checkpoint_blit_bot_field_start( perf );
-            if( curmethod->doscalerbob && !showbars ) {
-                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
-            } else {
-                output_success = output->show_frame( output_x, output_y, output_w, output_h );
-            }
-            performance_checkpoint_blit_bot_field_end( perf );
-        } else {
-            performance_checkpoint_delayed_blit_bot_field( perf );
-            performance_checkpoint_blit_bot_field_start( perf );
-            performance_checkpoint_blit_bot_field_end( perf );
-        }
-
-        if( osd ) {
-            tvtime_osd_advance_frame( osd );
-        }
-
-        if( !output_success ) break;
     }
 
     /* Return to normal scheduling. */
