@@ -748,7 +748,7 @@ int lfputs( const char *s, FILE *stream )
     iconv_close( cd );
     return nonreversible;
 #else /* no ENABLE_NLS */
-    return fputs( s, string );
+    return fputs( s, stream );
 #endif
 }
 
