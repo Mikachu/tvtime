@@ -47,7 +47,8 @@ extern void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
 /**
  * Blit from and to packed 4:2:2 scanline.
  */
-extern void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src, int width );
+extern void (*blit_packed422_scanline)( uint8_t *dest, const uint8_t *src,
+                                        int width );
 
 
 /**
