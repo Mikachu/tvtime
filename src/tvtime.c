@@ -973,9 +973,9 @@ static void build_fspos_menu( menu_t *menu, int fspos )
     char string[ 128 ];
 
     if( fspos == 0 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xb7 );
+        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xa5 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xb8 );
+        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xa4 );
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SET_FULLSCREEN_POSITION, "centre" );
@@ -983,9 +983,9 @@ static void build_fspos_menu( menu_t *menu, int fspos )
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
 
     if( fspos == 1 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xb7 );
+        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xa5 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xb8 );
+        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xa4 );
     }
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_FULLSCREEN_POSITION, "top" );
@@ -993,9 +993,9 @@ static void build_fspos_menu( menu_t *menu, int fspos )
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
 
     if( fspos == 2 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xb7 );
+        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xa5 );
     } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xb8 );
+        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xa4 );
     }
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SET_FULLSCREEN_POSITION, "bottom" );

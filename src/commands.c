@@ -2203,9 +2203,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_CHANNEL_SCAN:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
-            if( !config_get_check_freq_present( cmd->cfg ) ) {
+            if( !cmd->checkfreq ) {
                 if( cmd->osd ) {
-                    tvtime_osd_show_message( cmd->osd, _("Scanner unavailable: Signal checking disabled.") );
+                    tvtime_osd_show_message( cmd->osd, _("Scanner unavailable with signal checking disabled.") );
                 }
             } else {
                 cmd->scan_channels = !cmd->scan_channels;
