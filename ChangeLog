@@ -1,5 +1,7 @@
 
 0.9.8
+  * (vektor) We now depend on libxml2 in our configure script.
+  * (vektor) Enabled the console code.
   * (batchall) Stations are now saved in ~/.tvime/stationrc. Happy editing.
 
 0.9.7 - Wed Feb 26 21:58:13 AST 2003
