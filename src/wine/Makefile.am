@@ -19,10 +19,17 @@ EXTRA_DIST = stubs.s wrapper.S
 
 # WARNING: DO NOT USE AM_CFLAGS HERE UNLESS YOU UNDERSTAND THE PROBLEM WITH
 # DEFAULT XINE FLAGS AND KNOW HOW TO FIX IT.
-# CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer
+# Simon: I think I understand, and we don't use xine flags.
+# AM_CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer
 
-CFLAGS = -fno-omit-frame-pointer -Wmissing-prototypes -Wimplicit-function-declaration \
-	-D__WINE__ -Ddbg_printf=__vprintf -DTRACE=__vprintf -DWIN32_PATH="\"$(pkgdatadir)\""
+AM_CFLAGS = \
+            -fno-omit-frame-pointer \
+	    -Wmissing-prototypes \
+	    -Wimplicit-function-declaration \
+	    -D__WINE__ \
+	    -Ddbg_printf=__vprintf \
+	    -DTRACE=__vprintf \
+	    -DWIN32_PATH="\"$(pkgdatadir)\""
 
 wine_lib = libwine.la
 
