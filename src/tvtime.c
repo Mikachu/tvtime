@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
@@ -53,6 +54,11 @@
 #include "configsave.h"
 #include "config.h"
 #include "vgasync.h"
+
+/**
+ * Set this to 1 to enable the experimental pulldown detection code.
+ */
+const unsigned int detect_pulldown = 0;
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -175,6 +181,103 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
+/**
+ * This is how many frames to wait until deciding if the pulldown phase
+ * has changed or if we've really found a pulldown sequence.  This is
+ * currently set to about 1 second, that is, we won't go into film mode
+ * until we've seen a pulldown sequence successfully for 1 second.
+ */
+#define PULLDOWN_ERROR_WAIT     24
+
+/**
+ * This is how many predictions have to be incorrect before we fall back to
+ * video mode.  Right now, if we mess up, we jump to video mode immediately.
+ */
+#define PULLDOWN_ERROR_THRESHOLD 4
+
+/**
+ * Possible pulldown offsets.
+ */
+#define PULLDOWN_OFFSET_1 (1<<0)
+#define PULLDOWN_OFFSET_2 (1<<1)
+#define PULLDOWN_OFFSET_3 (1<<2)
+#define PULLDOWN_OFFSET_4 (1<<3)
+#define PULLDOWN_OFFSET_5 (1<<4)
+
+/* Offset                  1     2     3      4      5   */
+/* Field Pattern          [T B  T][B  T][B   T B]  [T B] */
+/* Action                 Copy  Save  Merge  Copy  Copy  */
+/*                              Bot   Top                */
+int tff_top_pattern[] = { 0,    1,    0,     0,    0     };
+int tff_bot_pattern[] = { 0,    0,    0,     1,    0     };
+
+
+static int tophistory[ 5 ];
+static int bothistory[ 5 ];
+static int histpos = 0;
+
+void fill_history( int tff )
+{
+    if( tff ) {
+        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
+        tophistory[ 1 ] =       0; bothistory[ 1 ] = INT_MAX;
+        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
+        tophistory[ 3 ] = INT_MAX; bothistory[ 3 ] =       0;
+        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
+    } else {
+        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
+        tophistory[ 1 ] = INT_MAX; bothistory[ 1 ] =       0;
+        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
+        tophistory[ 3 ] =       0; bothistory[ 3 ] = INT_MAX;
+        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
+    }
+
+    histpos = 0;
+}
+
+int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff )
+{
+    int best = 0;
+    int min = -1;
+    int minpos = 0;
+    int minbot = 0;
+    int j;
+    int ret;
+
+    histpos = histpos % 5;
+    tophistory[ histpos ] = top_repeat;
+    bothistory[ histpos ] = bot_repeat;
+
+    for( j = 0; j < 5; j++ ) {
+        int cur = tophistory[ j ];
+        if( cur < min || min < 0 ) {
+            min = cur;
+            minpos = j;
+        }
+    }
+
+    for( j = 0; j < 5; j++ ) {
+        int cur = bothistory[ j ];
+        if( cur < min || min < 0 ) {
+            min = cur;
+            minpos = j;
+            minbot = 1;
+        }
+    }
+
+    if( minbot ) {
+        best = tff ? ( minpos + 2 ) : ( minpos + 4 );
+    } else {
+        best = tff ? ( minpos + 4 ) : ( minpos + 2 );
+    }
+    best = best % 5;
+    ret = 1 << ( ( histpos + 5 - best ) % 5 );
+    histpos = (histpos + 1) % 5;
+    // fprintf( stderr, "top %10d bot %10d ret %d\n", top_repeat, bot_repeat, ret );
+    return ret;
+}
+
+
 
 /**
  * Explination of the loop:
@@ -235,6 +338,14 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  * frame, and in case 2, we only need the previous frame, since the
  * current frame contains both Field 3 and Field 4.
  */
+static int pdoffset = PULLDOWN_OFFSET_1;
+static int pderror = PULLDOWN_ERROR_WAIT;
+static int pdlastbusted = 0;
+static int filmmode = 0;
+
+static int last_topdiff = 0;
+static int last_botdiff = 0;
+
 static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              unsigned char *curframe,
                                              unsigned char *lastframe,
@@ -250,8 +361,158 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              int instride,
                                              int outstride )
 {
-    unsigned int comb = 0;
+    unsigned int topdiff = 0;
+    unsigned int botdiff = 0;
     int i;
+
+    /* Make pulldown decisions every top field. */
+    if( detect_pulldown && !bottom_field ) {
+        int predicted;
+
+        /*
+        predicted = pdoffset << 1;
+        if( predicted > PULLDOWN_OFFSET_5 ) predicted = PULLDOWN_OFFSET_1;
+        pdoffset = determine_pulldown_offset( topdiff, botdiff, 1 );
+        */
+
+        predicted = pdoffset << 1;
+        if( predicted > PULLDOWN_OFFSET_5 ) predicted = PULLDOWN_OFFSET_1;
+        pdoffset = determine_pulldown_offset( last_topdiff, last_botdiff, 1 );
+        if( pdoffset != predicted ) {
+            fprintf( stderr, "NO LUCK %d:%d\n", last_topdiff, last_botdiff );
+        } else {
+            fprintf( stderr, "   LUCK %d:%d\n", last_topdiff, last_botdiff );
+        }
+
+
+
+/*
+        for( i = 40; i < frame_height/2 - 40; i += 2 ) {
+            topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
+                                                       lastframe + (i*instride*2), width );
+        }
+        for( i = 40; i < frame_height/2 - 40; i += 2 ) {
+            botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
+                                                       lastframe + (i*instride*2) + instride, width );
+        }
+        last_topdiff = topdiff;
+        last_botdiff = botdiff;
+*/
+
+
+        /* 3:2 pulldown state machine. */
+        if( pdoffset != predicted ) {
+            if( pdlastbusted ) {
+                pdlastbusted--;
+                pdoffset = predicted;
+            } else {
+                pderror = PULLDOWN_ERROR_WAIT;
+            }
+        } else {
+            if( pderror ) {
+                pderror--;
+            } else {
+                pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
+            }
+        }
+
+
+        if( !pderror ) {
+            int curoffset = pdoffset << 1;
+            if( curoffset > PULLDOWN_OFFSET_5 ) curoffset = PULLDOWN_OFFSET_1;
+
+            // We're in pulldown, reverse it.
+            if( !filmmode ) {
+                fprintf( stderr, "Film mode enabled.\n" );
+                filmmode = 1;
+            }
+            if( curoffset == PULLDOWN_OFFSET_2 ) {
+                // Drop.
+                for( i = 0; i < frame_height; i++ ) {
+                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
+                                                                   lastframe + (i*instride*2), width );
+                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
+                                                                   lastframe + (i*instride*2) + instride,
+                                                                   width );
+                    }
+                }
+            } else if( curoffset == PULLDOWN_OFFSET_3 ) {
+                // Merge.
+                for( i = 0; i < frame_height; i++ ) {
+                    unsigned char *curoutput = output + (i * outstride);
+
+                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
+                                                                   lastframe + (i*instride*2), width );
+                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
+                                                                   lastframe + (i*instride*2) + instride,
+                                                                   width );
+                    }
+
+                    if( i & 1 ) {
+                        blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
+                    } else {
+                        blit_packed422_scanline( curoutput, curframe + (i * instride), width );
+                    }
+                    if( correct_input ) {
+                        video_correction_correct_packed422_scanline( vc, curoutput, curoutput, width );
+                    }
+                    if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+                    if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+                    if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+                }
+            } else {
+                // Copy.
+                for( i = 0; i < frame_height; i++ ) {
+                    unsigned char *curoutput = output + (i * outstride);
+
+                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
+                                                                   lastframe + (i*instride*2), width );
+                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
+                                                                   lastframe + (i*instride*2) + instride,
+                                                                   width );
+                    }
+
+                    blit_packed422_scanline( curoutput, curframe + (i * instride), width );
+                    if( correct_input ) {
+                        video_correction_correct_packed422_scanline( vc, curoutput, curoutput, width );
+                    }
+                    if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+                    if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+                    if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+                }
+            }
+            last_topdiff = topdiff;
+            last_botdiff = botdiff;
+            return;
+        } else {
+            if( filmmode ) {
+                fprintf( stderr, "Film mode disabled.\n" );
+                filmmode = 0;
+            }
+        }
+    } else if( detect_pulldown && !pderror ) {
+        return;
+    }
+
+
+
+    if( detect_pulldown ) {
+        for( i = 40; i < frame_height/2 - 40; i += 2 ) {
+            topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
+                                                       lastframe + (i*instride*2), width );
+        }
+        for( i = 40; i < frame_height/2 - 40; i += 2 ) {
+            botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
+                                                       lastframe + (i*instride*2) + instride, width );
+        }
+        last_topdiff = topdiff;
+        last_botdiff = botdiff;
+    }
+
+
 
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
@@ -333,8 +594,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             }
 
 
-            // comb += comb_factor_packed422_scanline( data.t0, data.m1, data.b0, width );
-
             curmethod->interpolate_scanline( output, &data, width );
             if( correct_input ) {
                 video_correction_correct_packed422_scanline( vc, output, output, width );
@@ -403,8 +662,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             scanline++;
         }
     }
-
-    // fprintf( stderr, "comb: %d\n", comb );
 }
 
 static void tvtime_build_interlaced_frame( unsigned char *output,

@@ -115,6 +115,7 @@ void premultiply_packed4444_scanline_mmxext( unsigned char *output, unsigned cha
 
 unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
                                              unsigned char *bot, int width );
+unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *old, int width );
 
 /**
  * Here are the function pointers which will be initialized to point at the

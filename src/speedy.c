@@ -92,6 +92,7 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
     return ((temp + (temp >> 8)) >> 8);
 }
 
+unsigned long CombJaggieThreshold = 73;
 
 unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
                                              unsigned char *bot, int width )
@@ -104,6 +105,11 @@ unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *
     SPEEDY_START();
 
     width /= 4;
+
+    qwThreshold.uw[ 0 ] = CombJaggieThreshold;
+    qwThreshold.uw[ 1 ] = CombJaggieThreshold;
+    qwThreshold.uw[ 2 ] = CombJaggieThreshold;
+    qwThreshold.uw[ 3 ] = CombJaggieThreshold;
 
     movq_m2r( qwThreshold, mm0 );
     movq_m2r( qwYMask, mm1 );
@@ -171,6 +177,53 @@ unsigned int comb_factor_packed422_scanline( unsigned char *top, unsigned char *
 
     return temp1;
 }
+
+static unsigned long BitShift = 6;
+
+unsigned int diff_factor_packed422_scanline( unsigned char *cur, unsigned char *old, int width )
+{
+    const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
+    unsigned int temp1, temp2;
+
+    SPEEDY_START();
+
+    width /= 4;
+
+    movq_m2r( qwYMask, mm1 );
+    movd_m2r( BitShift, mm7 );
+    pxor_r2r( mm0, mm0 );
+
+    while( width-- ) {
+        movq_m2r( *cur, mm4 );
+        movq_m2r( *old, mm5 );
+
+        pand_r2r( mm1, mm4 );
+        pand_r2r( mm1, mm5 );
+
+        psubw_r2r( mm5, mm4 );   /* mm4 = Y1 - Y2            */
+        pmaddwd_r2r( mm4, mm4 ); /* mm4 = (Y1 - Y2)^2        */
+        psrld_r2r( mm7, mm4 );   /* divide mm4 by 2^BitShift */
+        paddd_r2r( mm4, mm0 );   /* keep total in mm0        */
+
+        cur += 8;
+        old += 8;
+    }
+
+    movd_r2m( mm0, temp1 );
+    psrlq_i2r( 32, mm0 );
+    movd_r2m( mm0, temp2 );
+    temp1 += temp2;
+    temp2 = temp1;
+    temp1 >>= 16;
+    temp1 += temp2 & 0xffff;
+
+    emms();
+
+    SPEEDY_END();
+
+    return temp1;
+}
+
 
 /*
 void filter_luma_14641_packed422_scanline_c( unsigned char *output, unsigned char *input, int width )
