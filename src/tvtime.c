@@ -42,7 +42,7 @@
 #include "deinterlace.h"
 #include "menu.h"
 #include "videocorrection.h"
-#include "plugins/plugins.h"
+#include "plugins.h"
 
 /**
  * Warning tolerance, just for debugging.

@@ -1,1 +1,1 @@
-EXTRA_DIST = DESIGN TODO default.tvtime quotes.txt
+EXTRA_DIST = DESIGN TODO default.tvtimerc quotes.txt

@@ -1,4 +1,4 @@
 
 AUTOMAKE_OPTIONS = 1.6
-SUBDIRS = plugins src
+SUBDIRS = docs plugins src
 

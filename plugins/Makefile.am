@@ -1,10 +1,10 @@
 
-TVTIME_CFLAGS = -I../src
+TVTIME_CFLAGS = -I$(top_srcdir)/src
 OPT_CFLAGS = -Wall -I. -O3 -rdynamic -g
 
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
-libtvtimeplugins_a_SOURCES = greedy2frame.c twoframe.c linear.c weave.c \
-	videobob.c
+libtvtimeplugins_a_SOURCES = plugins.h greedy2frame.c twoframe.c linear.c \
+	weave.c videobob.c
 noinst_LIBRARIES = libtvtimeplugins.a
 
