@@ -577,12 +577,16 @@ static iconv_t cd = 0;
 void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
-    char *mycodeset;
-
     setlocale( LC_ALL, "" );
-    mycodeset = nl_langinfo( CODESET );
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
+#endif
+}
+
+void setup_utf8( void )
+{
+#ifdef ENABLE_NLS
+    char *mycodeset = nl_langinfo( CODESET );
 
     /**
      * Setup conversion descriptor if user's console is non-UTF-8. Otherwise

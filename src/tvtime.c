@@ -2680,6 +2680,11 @@ int main( int argc, char **argv )
      */
     setup_i18n();
 
+    /*
+     * Make gettext return UTF-8 strings, and setup lfprintf.
+     */
+    setup_utf8();
+
     lfprintf( stderr, _("Running %s.\n"), PACKAGE_STRING );
 
     /* Disable this code for a release. */

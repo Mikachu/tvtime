@@ -250,6 +250,7 @@ int tvtime_command_takes_arguments( int command );
 
 
 void setup_i18n( void );
+void setup_utf8( void );
 
 int lfputs( const char *s, FILE *stream );
 int lprintf( const char *format, ... );
