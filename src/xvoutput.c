@@ -59,7 +59,15 @@ static int HandleXError( Display *display, XErrorEvent *xevent )
     char str[ 1024 ];
 
     if( xevent->error_code == BadAlloc ) {
-        fprintf( stderr, "xvoutput: Out of video card memory.\n" );
+        fprintf( stderr, "\n"
+            "    Your video card is out of memory.  If you are using an\n"
+            "    on-board video card such as the Intel i8xx-based cards,\n"
+            "    you can configure how much video memory it gets in your\n"
+            "    XF86Config file.  See 'man i810' or the appropriate\n"
+            "    documentation for your driver.  This can also occur if\n"
+            "    you have an old video card, and are using too large\n"
+            "    a framebuffer.  Please lower your resolution before using\n"
+            "    tvtime.\n\n" );
     } else {
         XGetErrorText( display, xevent->error_code, str, 1024 );
         fprintf( stderr, "xvoutput: Received X error event: %s\n", str );
