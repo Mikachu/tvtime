@@ -39,12 +39,12 @@ const unsigned int width = 720;
 const unsigned int height = 480;
 
 /* Run for 1000 runs. */
-const unsigned int numruns = 1000;
+const unsigned int numruns = 2*60;
 
 static const char *tests[] = {
-   "blit_colour_packed422_scanline_c",
-   "blit_colour_packed422_scanline_mmx",
-   "blit_colour_packed422_scanline_mmxext",
+   "blit_colour_packed422_scanline_c 720x480 frame",
+   "blit_colour_packed422_scanline_mmx 720x480 frame",
+   "blit_colour_packed422_scanline_mmxext 720x480 frame",
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -56,14 +56,14 @@ int main( int argc, char **argv )
     uint64_t avg_count = 0;
     uint64_t before = 0;
     uint64_t after = 0;
+    int stride = width * 2;
     int testid = 0;
     int i;
 
-    for( i = 0; i < numtests; i++ ) {
-        fprintf( stderr, "timingtest: %2d: %s\n", i, tests[ i ] );
-    }
-
     if( argc < 2 ) {
+        for( i = 0; i < numtests; i++ ) {
+            fprintf( stderr, "timingtest: %2d: %s\n", i, tests[ i ] );
+        }
         fprintf( stderr, "usage: timingtest <testid>\n" );
         return 1;
     }
@@ -78,15 +78,12 @@ int main( int argc, char **argv )
   
     if( !set_realtime_priority( 0 ) ) {
         fprintf( stderr, "timingtest: Can't set realtime priority (need root).\n" );
-        fprintf( stderr, "timingtest: Results will be inaccurate.\n" );
+        fprintf( stderr, "timingtest: Results would be inaccurate, exiting.\n" );
+        return 1;
     }
 
     /* Always use the same random seed. */
-    fprintf( stderr, "timingtest: Random seed is %d.\n", seed );
     srandom( seed );
-
-    /* For the logs. */
-    fprintf( stderr, "timingtest: Resolution is %dx%d\n", width, height );
 
     source422planar = (unsigned char *) malloc( width * height * 2 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
@@ -96,33 +93,34 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    fprintf( stderr, "timingtest: Initializing source to random bytes...\n" );
     for( i = 0; i < width*height*2; i++ ) {
         //source422planar[ i ] = i % 256;
         source422planar[ i ] = random() % 256;
     }
-    fprintf( stderr, "timingtest: Initialization complete.\n" );
 
     /* Sleep to let the system cool off. */
     usleep( 10000 );
 
-    fprintf( stderr, "timingtest: Starting test:\n" );
     for( i = 0; i < numruns; i++ ) {
+        int j;
 
-        /* Pause to let the scheduler run. */
-        usleep( 20 );
-
-        if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_c" ) ) {
+        if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_c 720x480 frame" ) ) {
             rdtscll( before );
-            blit_colour_packed422_scanline_c( source422planar, width, 128, 128, 128 );
+            for( j = 0; j < height; j++ ) {
+                blit_colour_packed422_scanline_c( source422planar + (stride*j), width, 128, 128, 128 );
+            }
             rdtscll( after );
-        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx" ) ) {
+        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx 720x480 frame" ) ) {
             rdtscll( before );
-            blit_colour_packed422_scanline_mmx( source422planar, width, 128, 128, 128 );
+            for( j = 0; j < height; j++ ) {
+                blit_colour_packed422_scanline_mmx( source422planar + (stride*j), width, 128, 128, 128 );
+            }
             rdtscll( after );
-        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext" ) ) {
+        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
-            blit_colour_packed422_scanline_mmxext( source422planar, width, 128, 128, 128 );
+            for( j = 0; j < height; j++ ) {
+                blit_colour_packed422_scanline_mmxext( source422planar + (stride*j), width, 128, 128, 128 );
+            }
             rdtscll( after );
         }
 
@@ -131,7 +129,7 @@ int main( int argc, char **argv )
         avg_count++;
     }
 
-    fprintf( stderr, "\ntimingtest: %llu runs tested, average time was %llu cycles.\n",
+    fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles.\n",
              avg_count, (avg_sum/avg_count ) );
 
     free( source422planar );
