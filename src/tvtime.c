@@ -797,7 +797,7 @@ static void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
 
     if( nummethods ) {
         tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() + 1 );
-        tvtime_osd_list_set_text( osd, 0, "Deinterlacer mode" );
+        tvtime_osd_list_set_text( osd, 0, _("Deinterlacer configuration") );
         for( i = 0; i < nummethods; i++ ) {
             tvtime_osd_list_set_text( osd, i + 1, get_deinterlace_method( i )->name );
         }
