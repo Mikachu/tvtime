@@ -643,10 +643,14 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION);
 }
 
+static iconv_t cd = NULL;
+
 void setup_i18n( void )
 {
 #ifdef ENABLE_NLS
     char *codeset;
+    char *mycodeset = nl_langinfo( CODESET );
+    char *errfmt;
 
 #ifdef LC_MESSAGES
     setlocale( LC_MESSAGES, "" );
@@ -657,21 +661,49 @@ void setup_i18n( void )
     bindtextdomain( "tvtime", LOCALEDIR );
     textdomain( "tvtime" );
 
-    codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
-    if( !codeset || ( strcmp( codeset, "UTF-8" ) != 0 ) ) {
+    /**
+     * Setup conversion descriptor if user's console is non-UTF-8. Otherwise
+     * we can just leave cd as NULL and allow lprintf/lputs & co to short-
+     * circuit.
+     */
+    if( !strcmp ( mycodeset, "UTF-8" ) ) {
+        cd = iconv_open( mycodeset, "UTF-8" );
+        if( cd == (iconv_t)(-1) ) {
+            /**
+             * This error message is displayed using fprintf, NOT LFPRINTF, 
+             * since we have not yet called bind_textdomain_codeset, so
+             * gettext is still returning in the user's locale charset.
+             */
+            fprintf( stderr,
+                     _("Failed to initialize UTF-8 to %s converter: "
+                     "iconv_open failed (%s).\n"),
+                     mycodeset, strerror( errno ) );
+            cd = NULL; /* (iconv_t)(-1) is retarded. */
+        }
+
         /**
-         * This string is not translated, since gettext may now be in an
-         * undefined state! However, we do not die here, since if the
-         * user has an improperly set up locale but still wants to
-         * display messages in English, this will allow the program
-         * to function. If this happens, it's probably a bug, and we'll
-         * want to hear about it.
+         * We're calling gettext in advance here, in case
+         * bind_textdomain_codeset leaves gettext in an
+         * undefined state.
          */
-        fprintf( stderr,
-                 "Call to bind_textdomain_codeset() failed to set UTF-8 mode.\n"
-                 "This may cause GUI messages to be displayed incorrectly!\n"
-                 "Please report this as a bug at %s.\n",
-                 PACKAGE_BUGREPORT );
+        errfmt = _("\n"
+                   "*** Call to bind_textdomain_codeset() failed to set UTF-8 mode.\n"
+                   "*** This may cause GUI messages to be displayed incorrectly!\n"
+                   "*** Please report this as a bug at %s.\n\n");
+
+        codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
+        if( !codeset || !strcmp( codeset, "UTF-8" ) != 0 ) {
+            /**
+             * We do not die here, since if the user has an improperly set up
+             * locale but still wants to display messages in English, this will
+             * allow the program to function. If this happens, it's probably a
+             * bug, and we'll want to hear about it.
+             *
+             * Also, we're using fprintf() here and not lfprintf() since we
+             * called gettext() prior to bind_textdomain_codeset().
+             */
+            fprintf( stderr, errfmt, PACKAGE_BUGREPORT );
+        }
     }
 #endif
 }
@@ -679,30 +711,18 @@ void setup_i18n( void )
 int lfputs( const char *s, FILE *stream )
 {
 #ifdef ENABLE_NLS
-    char *mycodeset = nl_langinfo( CODESET );
     /* iconv wants a char ** even though the argument is not modified. */
     char *inbuf = (char *)s;
     size_t inbytesleft = strlen( s );
-    char *outbufstart = alloca( BUFSIZ );
+    static char outbufstart[BUFSIZ];
     char *outbuf = outbufstart;
     size_t outbytesleft = BUFSIZ;
-    iconv_t cd;
     int ret;
     int nonreversible = 0;
     
     /* conversion not neccecary. save our time. */
-    if( !strcmp( mycodeset, "UTF-8" ) )
+    if( !cd )
         return fputs( s, stream );
-    
-    cd = iconv_open( mycodeset, "UTF-8" );
-    if( cd == (iconv_t)(-1) ) {
-        fprintf( stream,
-                 "*** Failed to convert following string "
-                 "from UTF-8 to %s: iconv_open failed (%s)\n",
-                 mycodeset, strerror( errno ) );
-        fputs( s, stream );
-        return EOF;
-    }
     
     while( inbytesleft > 0 ) {
         ret = iconv( cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft );
@@ -733,7 +753,6 @@ int lfputs( const char *s, FILE *stream )
                 /* To my knowledge, we cannot recover here,
                    we must truncate the string. */
                 fputs( "[Truncated: Illegal sequence]\n", stream );
-                iconv_close( cd );
                 return EOF;
             }
         }
@@ -745,7 +764,6 @@ int lfputs( const char *s, FILE *stream )
     outbuf = outbufstart;
     outbytesleft = BUFSIZ;
     
-    iconv_close( cd );
     return nonreversible;
 #else /* no ENABLE_NLS */
     return fputs( s, stream );
@@ -755,29 +773,19 @@ int lfputs( const char *s, FILE *stream )
 static int lvfprintf( FILE *stream, const char *format, va_list ap )
 {
 #ifdef ENABLE_NLS
-    char *str;
+    static char str[4096];
     char *mycodeset = nl_langinfo( CODESET );
     int ret = -1;
     
     /* conversion not neccecary. save our time. */
-    if ( !strcmp( mycodeset, "UTF-8" ) )
+    if ( !cd )
         return vfprintf( stream, format, ap );
     
-    ret = vasprintf( &str, format, ap );
-    if( ret == -1 ) {
-        /* I am not convinced this is the best way to deal
-           with this situation. Suggestions? */
-        fprintf( stream,
-                 "*** Failed to convert following string "
-                 "from UTF-8 to %s: (Low memory?)\n",
-                 mycodeset );
-        vfprintf( stream, format, ap );
-        return -1;
-    }
+    ret = vsnprintf( str, sizeof str, format, ap );
     
     if( lfputs( str, stream ) == EOF)
         ret = -1;
-    /* else, ret remains as the return value from vasprintf () */
+    /* else, ret remains as the return value from vsnprintf () */
     free( str );
     return ret;
 #else /* no ENABLE_NLS */
