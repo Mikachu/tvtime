@@ -389,22 +389,27 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->grab_win.width = vidin->width;
     vidin->grab_win.height = vidin->height;
     if( ioctl( vidin->grab_fd, VIDIOCSWIN, &(vidin->grab_win) ) < 0 ) {
-        fprintf( stderr, "videoinput: Failed to set the window size (capture width and height): %s\n",
+        fprintf( stderr, "videoinput: Failed to set the V4L window size (capture width and height): %s\n",
                  strerror( errno ) );
         close( vidin->grab_fd );
         free( vidin );
         return 0;
     }
     if( ioctl( vidin->grab_fd, VIDIOCGWIN, &(vidin->grab_win) ) < 0 ) {
-        perror( "ioctl VIDIOCGWIN" );
-        return 0;
+        fprintf( stderr, "videoinput: Failed to get the V4L window size (capture width and height): %s\n",
+                 strerror( errno ) );
+        fprintf( stderr, "videoinput: Not important, but please send a bug report including what driver "
+                         "you're using and output of 'tvtime -v' to our bug report page off of "
+                         "http://tvtime.sourceforge.net/\n" );
+    } else {
+        if( !(vidin->grab_win.flags & 1) ) {
+            fprintf( stderr, "videoinput: Capture card claims the frames provided aren't "
+                             "interlaced.  Is that true?\n" );
+            fprintf( stderr, "videoinput: Please send a log of 'tvtime -v' along with what driver you're "
+                             "using to http://tvtime.sourceforge.net/ under 'report bugs'.\n" );
+        }
     }
-    if( !(vidin->grab_win.flags & 1) ) {
-        fprintf( stderr, "videoinput: Capture card claims the frames provided aren't "
-                         "interlaced.  Is that true?\n" );
-        fprintf( stderr, "videoinput: Please send a log of 'tvtime -v' along with what driver you're "
-                         "using to http://tvtime.sourceforge.net/ under 'report bugs'.\n" );
-    }
+
     if( vidin->verbose ) {
         fprintf( stderr, "videoinput: V4LWIN set to (%d,%d/%dx%d), chromakey %d, flags %d, clips %d.\n",
              vidin->grab_win.x, vidin->grab_win.y, vidin->grab_win.width,
