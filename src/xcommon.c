@@ -1121,6 +1121,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             XReparentWindow( display, output_window, fs_window, 0, 0);
             XMoveWindow( display, fs_window, x, y );
+            XSetInputFocus( display, fs_window, RevertToPointerRoot, CurrentTime );
             output_width = w;
             output_height = h;
         }
@@ -1167,13 +1168,16 @@ int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
         DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
         DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
 
-        windowed_output_window = output_window;
-        output_window = RootWindow( display, screen );
+        // windowed_output_window = output_window;
+        // fs_window = RootWindow( display, screen );
+        // fs_window = ScreenOfDisplay( display, screen )->root;
+        // XReparentWindow( display, output_window, fs_window, 0, 0 );
+        output_window = ScreenOfDisplay( display, screen )->root;
 
         /* Set up our satellite window. */
-        XResizeWindow( display, wm_window, 100, 100 );
+        // XResizeWindow( display, wm_window, 100, 100 );
         XSetForeground( display, gc, BlackPixel( display, screen ) );
-        XClearWindow( display, wm_window );
+        XClearWindow( display, output_window );
 
         output_on_root = 1;
         output_width = w;
@@ -1190,8 +1194,8 @@ int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
         output_width = attrs.width;
         output_height = attrs.height;
     }
-    XResizeWindow( display, output_window, output_width, output_height );
-    calculate_video_area();
+    // XResizeWindow( display, output_window, output_width, output_height );
+    // calculate_video_area();
     xcommon_clear_screen();
     XFlush( display );
     XSync( display, False );
@@ -1384,7 +1388,7 @@ void xcommon_poll_events( input_t *in )
 
         XGetInputFocus( display, &focus_win, &focus_revert );
         if( output_fullscreen ) {
-            if( reconfigure || !xcommon_exposed || focus_win != wm_window ) {
+            if( reconfigure || !xcommon_exposed || (focus_win != wm_window && focus_win != fs_window) ) {
                 /* Switch back to windowed mode if we've lost focus or visibility. */
                 xcommon_toggle_fullscreen( 0, 0 );
                 kicked_out_of_fullscreen = 1;
