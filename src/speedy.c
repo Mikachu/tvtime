@@ -80,6 +80,8 @@ void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
 void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
                                  unsigned char *new, int os, int ns );
+void (*a8_subpix_blit_scanline)( unsigned char *output, unsigned char *input,
+                                 int lasta, int startpos, int width );
 
 
 static uint64_t speedy_time = 0;
@@ -1544,6 +1546,19 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
     }
 }
 
+void a8_subpix_blit_scanline_c( unsigned char *output, unsigned char *input,
+                                int lasta, int startpos, int width )
+{
+    int pos = 0xffff - (startpos & 0xffff);
+    int prev = lasta;
+    int x;
+
+    for( x = 0; x < width; x++ ) {
+        output[ x ] = ( ( prev * pos ) + ( input[ x ] * ( 0xffff - pos ) ) ) >> 16;
+        prev = input[ x ];
+    }
+}
+
 
 static uint32_t speedy_accel;
 
@@ -1574,6 +1589,7 @@ void setup_speedy_calls( int verbose )
     halfmirror_packed422_inplace_scanline = halfmirror_packed422_inplace_scanline_c;
     speedy_memcpy = temp_memcpy;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
+    a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         if( verbose ) {

@@ -124,6 +124,8 @@ void kill_chroma_packed422_inplace_scanline_mmx( unsigned char *data, int width 
 void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width );
+void a8_subpix_blit_scanline_c( unsigned char *output, unsigned char *input,
+                                int lasta, int startpos, int width );
 
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );
@@ -195,6 +197,8 @@ extern void (*halfmirror_packed422_inplace_scanline)( unsigned char *data, int w
 extern void (*speedy_memcpy)( void *output, void *input, size_t size );
 extern void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
                                         unsigned char *new, int os, int ns );
+extern void (*a8_subpix_blit_scanline)( unsigned char *output, unsigned char *input,
+                                        int lasta, int startpos, int width );
 
 /**
  * Sets up the function pointers to point at the fastest function available.
