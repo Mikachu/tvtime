@@ -66,7 +66,7 @@ OUTPUT_SRCS = display.c display.h outputapi.h xvoutput.h xvoutput.c \
 	xcommon.h xcommon.c xmgaoutput.h xmgaoutput.c sdloutput.h \
 	sdloutput.c
 
-bin_PROGRAMS = tvtime tvtime-command
+bin_PROGRAMS = tvtime tvtime-command tvtime-configure
 EXTRA_PROGRAMS = expandpng timingtest rvr
 
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
@@ -74,6 +74,9 @@ tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpth
 
 tvtime_command_SOURCES = $(COMMON_SRCS) tvtime-command.c
 tvtime_command_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+
+tvtime_configure_SOURCES = $(COMMON_SRCS) tvtime-configure.c
+tvtime_configure_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la

@@ -1,5 +1,7 @@
 
 0.9.9 -
+  * vektor: Added a tvtime-configure command to reconfigure
+      tvtime's config file from the command line.
   * vektor: Display command now holds the information on
       the screen until you click a second time.
   * vektor: Added a logo for film mode, visible when pulldown
