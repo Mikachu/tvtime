@@ -221,7 +221,7 @@ struct videoinput_s
 
     int numinputs;
     int curinput;
-    char inputname[ 30 ];
+    char inputname[ 32 ];
 
     int width;
     int height;
@@ -417,6 +417,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curinput = 0;
     vidin->numtuners = 0;
     vidin->have_mmap = 0;
+    memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -1280,9 +1281,16 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
             struct v4l2_input input;
 
             if( ioctl( vidin->grab_fd, VIDIOC_G_INPUT, &input.index ) < 0 ) {
-                fprintf( stderr, "won't tell us its input\n" );
+                fprintf( stderr, "won't tell us its input: %s\n", strerror( errno ) );
             } else if( input.index != inputnum ) {
                 fprintf( stderr, "input is wrong\n" );
+            }
+            vidin->curinput = inputnum;
+
+            if( ioctl( vidin->grab_fd, VIDIOC_ENUMINPUT, &input ) < 0 ) {
+                fprintf( stderr, "won't tell us input info: %s\n", strerror( errno ) );
+            } else {
+                snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", input.name );
             }
         }
 
@@ -1319,8 +1327,14 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                              "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
                 }
 
-                // grab_chan.channel = inputnum;
-                // ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) );
+                vidin->curinput = inputnum;
+                if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &grab_chan ) < 0 ) {
+                    fprintf( stderr, "videoinput: Card refuses to give information on its current input.\n"
+                             "Please post a bug report to " PACKAGE_BUGREPORT "\n"
+                             "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
+                } else {
+                    snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", grab_chan.name );
+                }
             }
         }
 
