@@ -258,13 +258,35 @@ void xfullscreen_get_position( xfullscreen_t *xf, int window_x, int window_y,
     }
 }
 
+static int calculate_gcd( int x, int y )
+{
+    if( y > x ) return calculate_gcd( y, x );
+    if( y < 0 ) return calculate_gcd( -y, 0 );
+
+    while( y ) {
+        int tmp = y;
+        y = x % y;
+        x = tmp;
+    }
+
+    return x;
+}
+
 void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n, int *aspect_d )
 {
     if( xf->squarepixel ) {
         *aspect_n = *aspect_d = 1;
     } else {
+        int gcd;
+
         *aspect_n = xf->heightmm * xf->hdisplay;
         *aspect_d = xf->widthmm * xf->vdisplay;
+
+        gcd = calculate_gcd( *aspect_n, *aspect_d );
+        if( gcd ) {
+            *aspect_n /= gcd;
+            *aspect_d /= gcd;
+        }
     }
 }
 
