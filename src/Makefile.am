@@ -40,7 +40,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	wm_state.h wm_state.c console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
 	station.h station.c bands.h configsave.h configsave.c x11tools.c \
-	tvtimeconf_xml.c
+	x11tools.h debug_print.h tvtimeconf_xml.c
 
 bin_PROGRAMS = tvtime tvscanner
 

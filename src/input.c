@@ -81,16 +81,17 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
 
 #ifdef HAVE_LIRC
     in->lirc_fd = lirc_init( "tvtime", 1 ); /* Initialize lirc and let it be verbose. */
-    
+
     if( in->lirc_fd < 0 )
         fprintf( stderr, "tvtime: Can't connect to lircd. Lirc disabled.\n" );
     else {
         fcntl( in->lirc_fd, F_SETFL, O_NONBLOCK );
-        if ( lirc_readconfig( NULL, &in->lirc_conf, NULL ) == 0 )
+        if ( lirc_readconfig( NULL, &in->lirc_conf, NULL ) == 0 ) {
             in->lirc_used = 1;
-        else
+        } else {
             fprintf( stderr, "tvtime: Can't read lirc config file. "
                      "Lirc disabled.\n" );
+        }
     }
 #endif
 
@@ -174,22 +175,26 @@ static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
     char *string;
     int cmd;
     
-    if( lirc_nextcode( &code ) != 0 ) /* Can not connect to lircd. */
+    if( lirc_nextcode( &code ) != 0 ) {
+        /* Can not connect to lircd. */
         return;
+    }
 
-    if( code == NULL ) /* No remote control code available. */
+    if( !code ) {
+        /* No remote control code available. */
         return;
+    }
 
     lirc_code2char( lirc_conf, code, &string );
 
-    if( string == NULL ) {
+    if( !string ) {
         /* No tvtime action for this code. */
         free( code );
         return;
     }
 
     cmd = string_to_command( string );
-        
+
     if( cmd != -1 ) {
         input_callback( in, I_REMOTE, cmd );
     } else {
@@ -211,6 +216,6 @@ void input_next_frame( input_t *in )
 
 void input_delete( input_t *in )
 {
-    if( in ) free( in );
+    free( in );
 }
 
