@@ -320,25 +320,16 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         break;
 
-    case TVTIME_HOVERSCAN_UP:
-    case TVTIME_HOVERSCAN_DOWN:
+    case TVTIME_OVERSCAN_UP:
+    case TVTIME_OVERSCAN_DOWN:
         config_set_horizontal_overscan( in->cfg, config_get_horizontal_overscan( in->cfg ) +
-                  ( (tvtime_cmd == TVTIME_HOVERSCAN_UP) ? 0.0025 : -0.0025 ) );
-        if( in->osd ) {
-            char message[ 200 ];
-            sprintf( message, "Horizontal overscan: %.1f%%", 
-                     config_get_horizontal_overscan( in->cfg ) * 2.0 * 100.0 );
-            tvtime_osd_show_message( in->osd, message );
-        }
-        break;
-    case TVTIME_VOVERSCAN_UP:
-    case TVTIME_VOVERSCAN_DOWN:
+                  ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 ) );
         config_set_vertical_overscan( in->cfg, config_get_vertical_overscan( in->cfg ) +
-                  ( (tvtime_cmd == TVTIME_VOVERSCAN_UP) ? 0.0025 : -0.0025 ) );
+                  ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 ) );
         if( in->osd ) {
             char message[ 200 ];
-            sprintf( message, "Vertical overscan: %.1f%%", 
-                     config_get_vertical_overscan( in->cfg ) * 2.0 * 100.0 );
+            sprintf( message, "Overscan: %.1f%%", 
+                     config_get_horizontal_overscan( in->cfg ) * 2.0 * 100.0 );
             tvtime_osd_show_message( in->osd, message );
         }
         break;

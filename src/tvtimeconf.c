@@ -85,10 +85,8 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
     { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
     { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS },
-    { "HOVERSCAN_UP", TVTIME_HOVERSCAN_UP },
-    { "HOVERSCAN_DOWN", TVTIME_HOVERSCAN_DOWN },
-    { "VOVERSCAN_UP", TVTIME_VOVERSCAN_UP },
-    { "VOVERSCAN_DOWN", TVTIME_VOVERSCAN_DOWN },
+    { "OVERSCAN_UP", TVTIME_OVERSCAN_UP },
+    { "OVERSCAN_DOWN", TVTIME_OVERSCAN_DOWN },
     { "DETECT_SCANLINE_BIAS", TVTIME_DETECT_SCANLINE_BIAS },
 };
 
@@ -496,10 +494,8 @@ void config_init( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "RightScanlineBias", 1 )) ) {
         ct->right_scanline_bias = atoi( tmp );
     }
-    if( (tmp = parser_get( &(ct->pf), "HorizontalOverscan", 1 )) ) {
+    if( (tmp = parser_get( &(ct->pf), "Overscan", 1 )) ) {
         ct->hoverscan = ( atof( tmp ) / 2.0 ) / 100.0;
-    }
-    if( (tmp = parser_get( &(ct->pf), "VerticalOverscan", 1 )) ) {
         ct->voverscan = ( atof( tmp ) / 2.0 ) / 100.0;
     }
 

@@ -116,13 +116,12 @@ OtherTextFG = 0xFFF5DEB3
 LeftScanlineBias = 0
 RightScanlineBias = 0
 
-# This sets the percent of the sides to leave to the overscan, that is, don't
-# show them at all.  Safe action area on a television is 10% for both
-# horizontal and vertical, but that's a bit restrictive.  If you want to look
-# like a TV, a good value is about 8% in both directions.  Values are in
-# percent.
-HorizontalOverscan = 0.0
-VerticalOverscan = 0.0
+# This sets the percent of the sides to leave to the overscan, that is,
+# don't show them at all.  Safe action area on a television is 10% in
+# the overscan, but that's a bit restrictive.  If you want to look like
+# a TV, a good value is about 8%.  The value is in percent, so for 8%
+# use 8.0.
+Overscan = 0.0
 
 ########################################
 #
