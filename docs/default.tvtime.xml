@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<tvtime>
+  <option name="PrevChannel" value="9"/>
+  <option name="StartChannel" value="10"/>
+  <option name="FramerateMode" value="0"/>
+  <option name="CaptureSource" value="0"/>
+
+  <bind command="quit">
+    <keyboard key="escape"/>
+    <keyboard key="q"/>
+  </bind>
+
+  <bind command="channel_up">
+    <keyboard key="up"/>
+    <keyboard key="k"/>
+    <mouse button="4"/>
+  </bind>
+
+  <bind command="channel_down">
+    <keyboard key="down"/>
+    <keyboard key="j"/>
+    <mouse button="5"/>
+  </bind>
+
+  <bind command="channel_prev">
+    <keyboard key="backspace"/>
+  </bind>
+
+  <bind command="finetune_up">
+    <keyboard key="right"/>
+    <keyboard key="l"/>
+  </bind>
+  <bind command="finetune_down">
+    <keyboard key="left"/>
+    <keyboard key="h"/>
+  </bind>
+
+  <bind command="toggle_luma_correction">
+    <keyboard key="c"/>
+  </bind>
+  <bind command="luma_up">
+    <keyboard key="x"/>
+  </bind>
+  <bind command="luma_down">
+    <keyboard key="z"/>
+  </bind>
+
+  <bind command="mixer_mute">
+    <keyboard key="m"/>
+    <mouse button="2"/>
+  </bind>
+  <bind command="mixer_up">
+    <keyboard key="+"/>
+  </bind>
+  <bind command="mixer_down">
+    <keyboard key="-"/>
+  </bind>
+
+  <bind command="enter">
+    <keyboard key="enter"/>
+  </bind>
+
+  <bind command="hue_down">
+    <keyboard key="F1"/>
+  </bind>
+  <bind command="hue_up">
+    <keyboard key="F2"/>
+  </bind>
+
+  <bind command="bright_down">
+    <keyboard key="F3"/>
+  </bind>
+  <bind command="bright_up">
+    <keyboard key="F4"/>
+  </bind>
+
+  <bind command="cont_down">
+    <keyboard key="F5"/>
+  </bind>
+  <bind command="cont_up">
+    <keyboard key="F6"/>
+  </bind>
+
+  <bind command="colour_down">
+    <keyboard key="F7"/>
+  </bind>
+  <bind command="colour_up">
+    <keyboard key="F8"/>
+  </bind>
+
+  <bind command="channel_scan">
+    <keyboard key="F10"/>
+  </bind>
+
+  <bind command="toggle_bars">
+    <keyboard key="F11"/>
+  </bind>
+
+  <bind command="toggle_credits">
+    <keyboard key="F12"/>
+  </bind>
+
+  <bind command="debug">
+    <keyboard key="d"/>
+  </bind>
+
+  <bind command="toggle_fullscreen">
+    <keyboard key="f"/>
+  </bind>
+
+  <bind command="toggle_input">
+    <keyboard key="i"/>
+    <mouse button="3"/>
+  </bind>
+
+  <bind command="toggle_aspect">
+    <keyboard key="a"/>
+  </bind>
+
+  <bind command="toggle_aspect">
+    <keyboard key="a"/>
+  </bind>
+
+  <bind command="screenshot">
+    <keyboard key="s"/>
+  </bind>
+
+  <bind command="deinterlacingmode">
+    <keyboard key="t"/>
+  </bind>
+
+  <bind command="toggle_pulldown_detection">
+    <keyboard key="p"/>
+  </bind>
+
+  <bind command="toggle_ntsc_cable_mode">
+    <keyboard key="n"/>
+  </bind>
+
+  <bind command="auto_adjust_pict">
+    <keyboard key=" "/>
+  </bind>
+
+  <bind command="channel_skip">
+    <keyboard key="r"/>
+  </bind>
+
+  <bind command="toggle_console">
+    <keyboard key="`"/>
+  </bind>
+
+  <bind command="scroll_console_up">
+    <keyboard key="pgup"/>
+  </bind>
+
+  <bind command="scroll_console_down">
+    <keyboard key="pgdn"/>
+  </bind>
+
+  <bind command="toggle_cc">
+    <keyboard key="w"/>
+  </bind>
+
+  <bind command="toggle_half_framerate">
+    <keyboard key="="/>
+  </bind>
+
+  <bind command="toggle_pause">
+    <keyboard key="end"/>
+  </bind>
+
+  <bind command="toggle_audio_mode">
+    <keyboard key="e"/>
+  </bind>
+
+  <bind command="overscan_up">
+    <keyboard key=">"/>
+  </bind>
+  <bind command="overscan_down">
+    <keyboard key="<"/>
+  </bind>
+
+  <bind command="renumber_channel">
+    <keyboard key="b"/>
+  </bind>
+
+  <bind command="display_info">
+    <mouse button="1"/>
+  </bind>
+
+</tvtime>
