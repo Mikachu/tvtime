@@ -125,10 +125,14 @@ static void parse_xds_packet( const char *packet, int length )
     fprintf( stderr, "\n" );
 }
 
-static void xds_decode( int b1, int b2 )
+static int xds_decode( int b1, int b2 )
 {
     if( xds_cursor > 2046 ) {
         xds_cursor = 0;
+    }
+
+    if( !xds_cursor && b1 > 0xf ) {
+        return 0;
     }
 
     xds_packet[ xds_cursor ] = b1;
@@ -139,6 +143,8 @@ static void xds_decode( int b1, int b2 )
         parse_xds_packet( xds_packet, xds_cursor );
         xds_cursor = 0;
     }
+
+    return 1;
 }
 
 int ProcessLine( unsigned char *s, int bottom )
@@ -157,10 +163,7 @@ int ProcessLine( unsigned char *s, int bottom )
     b2 = (w1 >> 8) & 0x7f;
 
     if( !b1 && !b2 ) return 0;
-
-    if( bottom ) {
-        xds_decode( b1, b2 );
-    }
+    if( bottom && xds_decode( b1, b2 ) ) return 0;
 
 /*
     fprintf( stderr, "cc: 0x%0x 0x%0x, %d%d%d%d%d%d%d%d %d%d%d%d%d%d%d%d, '%c' '%c'\n",
