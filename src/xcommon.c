@@ -183,7 +183,7 @@ static int xv_get_width_for_height( int window_height )
     xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
 
     if( xcommon_verbose ) {
-        fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
+        fprintf( stderr, "xcommon: Pixel aspect ratio %d:%d.\n",
                  sar_frac_n, sar_frac_d );
     }
 
@@ -685,7 +685,7 @@ static void calculate_video_area( void )
     xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
 
     if( xcommon_verbose ) {
-        fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
+        fprintf( stderr, "xcommon: Pixel aspect ratio %d:%d.\n",
                  sar_frac_n, sar_frac_d );
     }
 
