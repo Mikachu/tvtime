@@ -170,7 +170,8 @@ void deinterlace_plugin_init( void )
 void greedy2frame_plugin_init( void )
 #endif
 {
-    fprintf( stderr, "greedy2frame: Registering Greedy 2-Frame deinterlacing algorithm (DScaler).\n" );
+    fprintf( stderr, "greedy2frame: Registering Greedy 2-Frame "
+             "deinterlacing algorithm (DScaler).\n" );
     register_deinterlace_method( &greedymethod );
 }
 

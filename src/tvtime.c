@@ -211,8 +211,8 @@ static void tvtime_build_frame( unsigned char *output,
         lastframe += instride;
         secondlastframe += instride;
 
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        /* Double the top scanline a scanline. */
+        blit_packed422_scanline( output, curframe, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
@@ -262,8 +262,8 @@ static void tvtime_build_frame( unsigned char *output,
     }
 
     if( !bottom_field ) {
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        /* Double the bottom scanline. */
+        blit_packed422_scanline( output, curframe, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;
@@ -302,14 +302,11 @@ int main( int argc, char **argv )
     menu_t *menu;
 
     setup_speedy_calls();
-    /*
-    register_deinterlace_plugin( "plugins/linear.so" );
-    register_deinterlace_plugin( "plugins/twoframe.so" );
-    register_deinterlace_plugin( "plugins/greedy2frame.so" );
-    */
     greedy2frame_plugin_init();
     twoframe_plugin_init();
     linear_plugin_init();
+    videobob_plugin_init();
+    weave_plugin_init();
 
     ct = config_new( argc, argv );
     if( !ct ) {

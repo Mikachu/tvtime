@@ -1,12 +1,11 @@
 
 #include <stdio.h>
-#include <inttypes.h>
-#include "config.h"
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline_linear( unsigned char *output, unsigned char *t1,
-                                         unsigned char *m1, unsigned char *b1,
+static void deinterlace_scanline_linear( unsigned char *output,
+                                         unsigned char *t1, unsigned char *m1,
+                                         unsigned char *b1,
                                          unsigned char *t0, unsigned char *m0,
                                          unsigned char *b0, int width )
 {

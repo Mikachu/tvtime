@@ -13,5 +13,7 @@
 void greedy2frame_plugin_init( void );
 void twoframe_plugin_init( void );
 void linear_plugin_init( void );
+void weave_plugin_init( void );
+void videobob_plugin_init( void );
 
 #endif /* TVTIME_PLUGINS_H_INCLUDED */

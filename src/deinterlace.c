@@ -101,7 +101,6 @@ void filter_deinterlace_methods( int accel, int fields_available )
         }
 
         if( drop ) {
-            methodlist_item_t *next = cur->next;
             if( prev ) {
                 prev->next = next;
             } else {
