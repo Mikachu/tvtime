@@ -12,7 +12,6 @@ typedef struct video_correction_s video_correction_t;
 video_correction_t *video_correction_new( void );
 void video_correction_delete( video_correction_t *vc );
 void video_correction_set_luma_power( video_correction_t *vc, double power );
-void video_correction_set_active( video_correction_t *vc, int active );
 void video_correction_correct_luma_plane( video_correction_t *vc, unsigned char *luma, int width, int height, int stride );
 void video_correction_correct_luma_scanline( video_correction_t *vc, unsigned char *output, unsigned char *luma, int width );
 void video_correction_correct_cb_plane( video_correction_t *vc, unsigned char *cb, int width, int height, int stride );

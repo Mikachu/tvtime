@@ -235,7 +235,6 @@ struct video_correction_s
     double luma_correction;
     unsigned char *luma_table;
     unsigned char *chroma_table;
-    int active;
 };
 
 static double intensity_to_voltage( video_correction_t *vc, double val )
@@ -279,7 +278,6 @@ video_correction_t *video_correction_new( void )
     vc->target_black_level = 16;
     vc->target_white_level = 235;
     vc->luma_correction = 1.0;
-    vc->active = 0;
     vc->luma_table = (unsigned char *) malloc( 256 );
     vc->chroma_table = (unsigned char *) malloc( 256 );
     if( !vc->luma_table || !vc->chroma_table ) {
@@ -306,16 +304,9 @@ void video_correction_set_luma_power( video_correction_t *vc, double power )
     video_correction_update_table( vc );
 }
 
-void video_correction_set_active( video_correction_t *vc, int active )
-{
-    vc->active = active;
-}
-
 void video_correction_correct_luma_plane( video_correction_t *vc, unsigned char *luma, int width, int height, int stride )
 {
     int y;
-
-    if( !vc->active ) return;
 
     for( y = 0; y < height; y++ ) {
         unsigned char *scanline = luma + (y * stride);
