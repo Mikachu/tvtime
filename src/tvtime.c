@@ -1182,7 +1182,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     ct = config_new();
     if( !ct ) {
-        lfputs( _("tvtime: Out of memory.\n"), stderr );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
 
@@ -1499,7 +1499,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
-        lfprintf( stderr, _("tvtime: Out of memory.\n") );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),
