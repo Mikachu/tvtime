@@ -1,5 +1,8 @@
 
 0.9.8.1 -
+  * vektor: Swapped name and number in the OSD (fixes 730281)
+  * vektor: Default to single pixel bordered text in the OSD
+  * vektor: OSD text position now sub-pixel correct (fixes 709500)
   * gygy: Fix for multiple lirc commands mapped to one key
   * silvaran: Fixed xscreensaver shutdown code
   * vektor: Show network name and network call letters in XDS
