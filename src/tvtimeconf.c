@@ -73,6 +73,9 @@ struct config_s
     int mirror;
     int boost;
     int quiet_screenshots;
+    int unmute_volume;
+    int muted;
+    int mute_on_exit;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -222,6 +225,18 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "QuietScreenshots" ) ) {
             ct->quiet_screenshots = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "UnmuteVolume" ) ) {
+            ct->unmute_volume = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Muted" ) ) {
+            ct->muted = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "MuteOnExit" ) ) {
+            ct->mute_on_exit = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
@@ -695,6 +710,9 @@ config_t *config_new( void )
     ct->mirror = 0;
     ct->boost = -1;
     ct->quiet_screenshots = 0;
+    ct->unmute_volume = -1;
+    ct->muted = 0;
+    ct->mute_on_exit = 1;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1569,5 +1587,20 @@ int config_get_audio_boost( config_t *ct )
 int config_get_quiet_screenshots( config_t *ct )
 {
     return ct->quiet_screenshots;
+}
+
+int config_get_unmute_volume( config_t *ct )
+{
+    return ct->unmute_volume;
+}
+
+int config_get_muted( config_t *ct )
+{
+    return ct->muted;
+}
+
+int config_get_mute_on_exit( config_t *ct )
+{
+    return ct->mute_on_exit;
 }
 

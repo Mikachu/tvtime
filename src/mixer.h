@@ -33,9 +33,19 @@ extern "C" {
 void mixer_set_device( const char *devname );
 
 /**
+ * Sets the initial state of the mixer device.
+ */
+void mixer_set_state( int ismuted, int unmute_volume );
+
+/**
  * Returns the current volume setting.
  */
 int mixer_get_volume( void );
+
+/**
+ * Returns the volume that would be used to restore the unmute state.
+ */
+int mixer_get_unmute_volume( void );
 
 /**
  * Tunes the relative volume.

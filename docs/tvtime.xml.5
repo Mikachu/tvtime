@@ -407,6 +407,23 @@ Examples:
 .RE
 
 .TP
+<option name="UnmuteVolume" value="-1"/>
+This setting saves the volume before muting across tvtime sessions.
+You should not ever need to set this yourself.
+
+.TP
+<option name="Muted" value="0"/>
+This setting saves whether or not tvtime was muted when it was last
+exited.  You should not ever need to set this yourself.
+
+.TP
+<option name="MuteOnExit" value="1"/>
+This setting controls whether tvtime should mute its mixer device on
+exit.  By default, tvtime mutes the mixer device to work around noisy
+capture cards.  Turn this off if this option has adverse affects on
+other applications.
+
+.TP
 <option name="PrevChannel" value="2"/>
 This setting is saved at runtime to remember the current channel.
 

@@ -1564,6 +1564,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     /* Set the mier device. */
     mixer_set_device( config_get_mixer_device( ct ) );
+    mixer_set_state( config_get_muted( ct ), config_get_unmute_volume( ct ) );
 
     /* Begin capturing frames. */
     if( vidin ) {
@@ -2533,6 +2534,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     snprintf( number, 4, "%d", quiet_screenshots );
     config_save( ct, "QuietScreenshots", number );
+
+    snprintf( number, 4, "%d", mixer_get_unmute_volume() );
+    config_save( ct, "UnmuteVolume", number );
+
+    snprintf( number, 4, "%d", mixer_ismute() );
+    config_save( ct, "Muted", number );
+
+    if( config_get_mute_on_exit( ct ) ) {
+        mixer_mute( 1 );
+    }
 
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );

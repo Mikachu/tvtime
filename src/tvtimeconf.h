@@ -189,6 +189,9 @@ int config_get_cc( config_t *ct );
 int config_get_mirror( config_t *ct );
 int config_get_audio_boost( config_t *ct );
 int config_get_quiet_screenshots( config_t *ct );
+int config_get_unmute_volume( config_t *ct );
+int config_get_muted( config_t *ct );
+int config_get_mute_on_exit( config_t *ct );
 
 #ifdef __cplusplus
 };

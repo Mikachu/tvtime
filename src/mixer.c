@@ -61,6 +61,31 @@ int mixer_get_volume( void )
     return curvol;
 }
 
+int mixer_get_unmute_volume( void )
+{
+    if( muted ) {
+        return saved_volume;
+    } else {
+        int v, cmd, devs;
+
+        if( fd < 0 ) fd = open( mixer_device, O_RDONLY );
+        if( fd != -1 ) {
+
+            ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
+            if( devs & mixer_dev_mask ) {
+                cmd = MIXER_READ( mixer_channel );
+            } else {
+                return -1;
+            }
+
+            ioctl( fd, cmd, &v );
+            return v;
+        }
+    }
+
+    return -1;
+}
+
 int mixer_set_volume( int percentdiff )
 {
     int v, cmd, devs, levelpercentage;
@@ -188,6 +213,25 @@ void mixer_set_device( const char *devname )
         fprintf( stderr, "mixer: No such mixer channel '%s', using channel 'line'.\n", channame );
     }
     mixer_dev_mask = 1 << mixer_channel;
+}
+
+void mixer_set_state( int ismuted, int unmute_volume )
+{
+    /**
+     * 1. we come back unmuted: Don't touch anything
+     * 2. we don't have a saved volume: Don't touch anything
+     * 3. we come back muted and we have a saved volume:
+     *    - if tvtime muted it, unmute to old volume
+     *    - if user did it, remember that we're muted and old volume
+     */
+    if( mixer_get_volume() == 0 && unmute_volume > 0 ) {
+        saved_volume = unmute_volume;
+        muted = 1;
+
+        if( !ismuted ) {
+            mixer_mute( 0 );
+        }
+    }
 }
 
 void mixer_close_device( void )
