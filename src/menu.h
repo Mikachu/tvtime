@@ -31,10 +31,7 @@ void menu_delete( menu_t *menu );
 void menu_set_text( menu_t *menu, int line, const char *text );
 void menu_set_enter_command( menu_t *menu, int line, int command,
                              const char *argument );
-void menu_set_left_command( menu_t *menu, int line, int command,
-                            const char *argument );
-void menu_set_right_command( menu_t *menu, int line, int command,
-                             const char *argument );
+void menu_set_back_command( menu_t *menu, int command, const char *argument );
 void menu_set_cursor( menu_t *menu, int cursor );
 void menu_set_default_cursor( menu_t *menu, int cursor );
 void menu_reset_num_lines( menu_t *menu );
@@ -48,10 +45,8 @@ const char *menu_get_text( menu_t *menu, int line );
 
 int menu_get_enter_command( menu_t *menu, int line );
 const char *menu_get_enter_argument( menu_t *menu, int line );
-int menu_get_left_command( menu_t *menu, int line );
-const char *menu_get_left_argument( menu_t *menu, int line );
-int menu_get_right_command( menu_t *menu, int line );
-const char *menu_get_right_argument( menu_t *menu, int line );
+int menu_get_back_command( menu_t *menu );
+const char *menu_get_back_argument( menu_t *menu );
 
 #ifdef __cplusplus
 };

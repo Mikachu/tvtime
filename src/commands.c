@@ -39,6 +39,7 @@
 #include "console.h"
 #include "utils.h"
 #include "xmltv.h"
+#include "tvtimeglyphs.h"
 
 #define NUM_FAVORITES 9
 #define MAX_USER_MENUS 64
@@ -178,10 +179,10 @@ struct commands_s {
     menu_t *menus[ MAX_USER_MENUS ];
 };
 
-static void menu_set_value( menu_t *menu, int newval, int a, int b, int c )
+static void menu_set_value( menu_t *menu, int newval, const char *icon )
 {
     char string[ 128 ];
-    sprintf( string, "%c%c%c  Current: %d", a, b, c, newval );
+    snprintf( string, 128, "%s  %s: %d", icon, _("Current"), newval );
     menu_set_text( menu, 1, string );
 }
 
@@ -244,10 +245,12 @@ static void update_xmltv_listings( commands_t *cmd )
             }
 
             if( xmltv_get_sub_title( cmd->xmltv ) ) {
-               sprintf( subtitle, "%s - %s", xmltv_get_times( cmd->xmltv ),
-                        xmltv_get_sub_title( cmd->xmltv ) );
+	       snprintf( subtitle, sizeof (subtitle), "%s - %s",
+			 xmltv_get_times( cmd->xmltv ),
+			 xmltv_get_sub_title( cmd->xmltv ) );
             } else {
-               sprintf( subtitle, "%s", xmltv_get_times( cmd->xmltv ) );
+               snprintf( subtitle, sizeof (subtitle), "%s",
+			 xmltv_get_times( cmd->xmltv ) );
             }
 
             if( xmltv_get_title( cmd->xmltv ) ) {
@@ -273,98 +276,88 @@ static void reset_stations_menu( menu_t *menu, int ntsc, int pal, int secam,
 
     /* Start over. */
     menu_reset_num_lines( menu );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
     cur = 1;
 
     if( !ntsc ) {
-        sprintf( string, "%c%c%c  Renumber current channel", 0xee, 0x80, 0xaf );
+        snprintf (string, sizeof (string), TVTIME_ICON_RENUMBERCHANNEL "  %s",
+		  _("Renumber current channel"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_CHANNEL_RENUMBER, "" );
-        menu_set_right_command( menu, cur, TVTIME_CHANNEL_RENUMBER, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
     if( active ) {
-        sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb7 );
+        snprintf (string, sizeof (string), TVTIME_ICON_GENERALTOGGLEON "  %s",
+		  _("Current channel active in list"));
     } else {
-        sprintf( string, "%c%c%c  Current channel active in list", 0xee, 0x80, 0xb8 );
+        snprintf (string, sizeof (string), TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+		  _("Current channel active in list"));
     }
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_CHANNEL_SKIP, "" );
-    menu_set_right_command( menu, cur, TVTIME_CHANNEL_SKIP, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
     if( signaldetect ) {
         if( scanning ) {
-            sprintf( string, "%c%c%c  Stop channel scan", 0xee, 0x80, 0xa3 );
+	    snprintf (string, sizeof (string),
+		      TVTIME_ICON_SCANFORSTATIONS "  %s",
+		      _("Stop channel scan"));
         } else {
-            sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
+            snprintf (string, sizeof (string),
+		      TVTIME_ICON_SCANFORSTATIONS "  %s",
+		      _("Scan channels for signal"));
         }
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_CHANNEL_SCAN, "" );
-        menu_set_right_command( menu, cur, TVTIME_CHANNEL_SCAN, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
-    sprintf( string, "%c%c%c  Reset all channels as active", 0xee, 0x80, 0xa7 );
+    snprintf (string, sizeof (string), TVTIME_ICON_ALLCHANNELSACTIVE "  %s",
+	      _("Reset all channels as active"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
-    menu_set_right_command( menu, cur, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
-    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0xb0 );
+    snprintf (string, sizeof (string), TVTIME_ICON_FINETUNECHANNEL "  %s",
+	      _("Finetune current channel"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "finetune" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "finetune" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
     if( ntsccable ) {
-        sprintf( string, "%c%c%c  Change NTSC cable mode", 0xee, 0x80, 0xbf );
+        snprintf (string, sizeof (string), TVTIME_ICON_CHANGENTSCMODE "  %s",
+		  _("Change NTSC cable mode"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     } else if( pal || secam ) {
-        if( pal ) {
-            sprintf( string, "%c%c%c  Set current channel as SECAM", 0xee, 0x80, 0x80 );
-        } else {
-            sprintf( string, "%c%c%c  Set current channel as PAL", 0xee, 0x80, 0x80 );
-        }
+        snprintf (string, sizeof (string), TVTIME_ICON_TVLOGO "  %s", pal?
+		  _("Set current channel as SECAM"):
+		  _("Set current channel as PAL"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_PAL_SECAM, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_PAL_SECAM, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
-    sprintf( string, "%c%c%c  Change frequency table", 0xee, 0x80, 0xba );
+    snprintf (string, sizeof (string), TVTIME_ICON_FREQUENCYTABLESEL "  %s",
+	      _("Change frequency table"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "frequencies" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "frequencies" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
-    if( signaldetect ) {
-        sprintf( string, "%c%c%c  Disable signal detection", 0xee, 0x80, 0x9d );
-    } else {
-        sprintf( string, "%c%c%c  Enable signal detection", 0xee, 0x80, 0x9d );
-    }
+    snprintf (string, sizeof (string), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+	      signaldetect?
+	      _("Disable signal detection"):
+	      _("Enable signal detection"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
-    menu_set_right_command( menu, cur, TVTIME_TOGGLE_SIGNAL_DETECTION, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
 }
 
 static void reinit_tuner( commands_t *cmd )
@@ -386,7 +379,7 @@ static void reinit_tuner( commands_t *cmd )
 
         videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr )
                                    + ((station_get_current_finetune( cmd->stationmgr ) * 1000)/16) );
-        menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), 0xee, 0x80, 0xb0 );
+        menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), TVTIME_ICON_FINETUNECHANNEL );
         commands_refresh_menu( cmd );
 
         norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
@@ -484,10 +477,18 @@ static void reinit_tuner( commands_t *cmd )
     }
 
     if( cmd->vidin ) {
-        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
-        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
-        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
-        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
+        menu_set_value (commands_get_menu (cmd, "brightness"),
+			videoinput_get_brightness (cmd->vidin),
+			TVTIME_ICON_BRIGHTNESS);
+        menu_set_value (commands_get_menu (cmd, "contrast"),
+			videoinput_get_contrast (cmd->vidin),
+			TVTIME_ICON_CONTRAST);
+        menu_set_value (commands_get_menu (cmd, "colour"),
+			videoinput_get_colour (cmd->vidin),
+			TVTIME_ICON_COLOUR);
+        menu_set_value (commands_get_menu (cmd, "hue"),
+			videoinput_get_hue (cmd->vidin),
+			TVTIME_ICON_HUE);
     }
 }
 
@@ -496,140 +497,114 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
     char string[ 128 ];
 
     if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_NC ) {
-        if( !strcasecmp( tablename, "us-cable" ) ) {
-            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "us-cable") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Cable"));
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
-        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
-        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "us-broadcast" ) ) {
-            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa4 );
-        }
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "us-broadcast") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Broadcast"));
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
-        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
-        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "us-cable100" ) ) {
-            sprintf( string, "%c%c%c  Cable with channels 100+", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Cable with channels 100+", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "us-cable100") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Cable with channels 100+"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "us-cable100" );
-        menu_set_right_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "us-cable100" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
-        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
     } else if( norm == VIDEOINPUT_NTSC_JP ) {
-        if( !strcasecmp( tablename, "japan-cable" ) ) {
-            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "japan-cable") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Cable"));
         menu_set_text( menu, 1, string );
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
         menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
-        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
-        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "japan-broadcast" ) ) {
-            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "japan-broadcast") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Broadcast"));
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "japan-broadcast" );
-        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "japan-broadcast" );
-        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-        menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
     } else {
-        if( !strcasecmp( tablename, "europe" ) ) {
-            sprintf( string, "%c%c%c  Europe", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Europe", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "europe") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Europe"));
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "europe" );
-        menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "europe" );
-        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "russia" ) ) {
-            sprintf( string, "%c%c%c  Russia", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Russia", 0xee, 0x80, 0xa4 );
-        }
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "russia") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Russia"));
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "russia" );
-        menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "russia" );
-        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "france" ) ) {
-            sprintf( string, "%c%c%c  France", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  France", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "france") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("France"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "france" );
-        menu_set_right_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "france" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "australia" ) ) {
-            sprintf( string, "%c%c%c  Australia", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Australia", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "australia") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Australia"));
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SET_FREQUENCY_TABLE, "australia" );
-        menu_set_right_command( menu, 4, TVTIME_SET_FREQUENCY_TABLE, "australia" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "australia-optus" ) ) {
-            sprintf( string, "%c%c%c  Australia (Optus)", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Australia (Optus)", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "australia-optus") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Australia (Optus)"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_SET_FREQUENCY_TABLE, "australia-optus" );
-        menu_set_right_command( menu, 5, TVTIME_SET_FREQUENCY_TABLE, "australia-optus" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "newzealand" ) ) {
-            sprintf( string, "%c%c%c  New Zealand", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  New Zealand", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "newzealand") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("New Zealand"));
         menu_set_text( menu, 6, string );
         menu_set_enter_command( menu, 6, TVTIME_SET_FREQUENCY_TABLE, "newzealand" );
-        menu_set_right_command( menu, 6, TVTIME_SET_FREQUENCY_TABLE, "newzealand" );
-        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "china-broadcast" ) ) {
-            sprintf( string, "%c%c%c  China Broadcast", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  China Broadcast", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "china-broadcast") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("China Broadcast"));
         menu_set_text( menu, 7, string );
         menu_set_enter_command( menu, 7, TVTIME_SET_FREQUENCY_TABLE, "china-broadcast" );
-        menu_set_right_command( menu, 7, TVTIME_SET_FREQUENCY_TABLE, "china-broadcast" );
-        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "stations" );
-        if( !strcasecmp( tablename, "custom" ) ) {
-            sprintf( string, "%c%c%c  Custom (first run tvtime-scanner)", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Custom (first run tvtime-scanner)", 0xee, 0x80, 0xa4 );
-        }
+
+        snprintf (string, sizeof (string),
+		  strcasecmp (tablename, "custom") == 0 ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Custom (first run tvtime-scanner)"));
         menu_set_text( menu, 8, string );
         menu_set_enter_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "custom" );
-        menu_set_right_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "custom" );
-        menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "stations" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 9, string );
         menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
-        menu_set_right_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
-        menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
     }
 }
 
@@ -637,213 +612,137 @@ static void reset_sharpness_menu( menu_t *menu, int sharpness )
 {
     char string[ 128 ];
 
-    sprintf( string, "%c%c%c  Current: %d pixels", 0xee, 0x80, 0xa7, sharpness );
+    snprintf (string, sizeof (string),
+	      _("%s  Current: %d pixels"), TVTIME_ICON_SHARPNESS, sharpness);
     menu_set_text( menu, 1, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness == 360 ) {
-        sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Low (360 pixels)", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (sharpness == 360) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Low (360 pixels)"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
-    menu_set_right_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness == 576 ) {
-        sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Moderate (576 pixels)", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (sharpness == 576) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Moderate (576 pixels)"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
-    menu_set_right_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness == 720 ) {
-        sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Standard (720 pixels)", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (sharpness == 720) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Standard (720 pixels)"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
-    menu_set_right_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
 
-    if( sharpness == 768 ) {
-        sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  High (768 pixels)", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (sharpness == 768) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("High (768 pixels)"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SET_SHARPNESS, "768" );
-    menu_set_right_command( menu, 5, TVTIME_SET_SHARPNESS, "768" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
 
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    snprintf (string, sizeof (string), TVTIME_ICON_RESTART "  %s",
+	      _("Restart with new settings"));
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 6, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 7, string );
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "input" );
 }
 
 static void reset_norm_menu( menu_t *menu, const char *norm )
 {
-    char string[ 128 ];
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "ntsc" ) ) {
-        sprintf( string, "%c%c%c  NTSC", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  NTSC", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 1, string );
+    menu_set_text (menu, 1, strcasecmp (norm, "ntsc") == 0 ?
+		   TVTIME_ICON_RADIOON "  NTSC" :
+		   TVTIME_ICON_RADIOOFF "  NTSC");
     menu_set_enter_command( menu, 1, TVTIME_SET_NORM, "ntsc" );
-    menu_set_right_command( menu, 1, TVTIME_SET_NORM, "ntsc" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "pal" ) ) {
-        sprintf( string, "%c%c%c  PAL", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  PAL", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 2, string );
+    menu_set_text (menu, 2, strcasecmp (norm, "pal") == 0 ?
+		   TVTIME_ICON_RADIOON "  PAL" :
+		   TVTIME_ICON_RADIOOFF "  PAL");
     menu_set_enter_command( menu, 2, TVTIME_SET_NORM, "pal" );
-    menu_set_right_command( menu, 2, TVTIME_SET_NORM, "pal" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "secam" ) ) {
-        sprintf( string, "%c%c%c  SECAM", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  SECAM", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 3, string );
+    menu_set_text (menu, 3, strcasecmp (norm, "secam") == 0 ?
+		   TVTIME_ICON_RADIOON "  SECAM" :
+		   TVTIME_ICON_RADIOOFF "  SECAM");
     menu_set_enter_command( menu, 3, TVTIME_SET_NORM, "secam" );
-    menu_set_right_command( menu, 3, TVTIME_SET_NORM, "secam" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "pal-nc" ) ) {
-        sprintf( string, "%c%c%c  PAL-Nc", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  PAL-Nc", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 4, string );
+    menu_set_text (menu, 4, strcasecmp (norm, "pal-nc") == 0 ?
+		   TVTIME_ICON_RADIOON "  PAL-NC" :
+		   TVTIME_ICON_RADIOOFF "  PAL-NC");
     menu_set_enter_command( menu, 4, TVTIME_SET_NORM, "pal-nc" );
-    menu_set_right_command( menu, 4, TVTIME_SET_NORM, "pal-nc" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "pal-m" ) ) {
-        sprintf( string, "%c%c%c  PAL-M", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  PAL-M", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 5, string );
+    menu_set_text (menu, 5, strcasecmp (norm, "pal-m") == 0 ?
+		   TVTIME_ICON_RADIOON "  PAL-M" :
+		   TVTIME_ICON_RADIOOFF "  PAL-M");
     menu_set_enter_command( menu, 5, TVTIME_SET_NORM, "pal-m" );
-    menu_set_right_command( menu, 5, TVTIME_SET_NORM, "pal-m" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "pal-n" ) ) {
-        sprintf( string, "%c%c%c  PAL-N", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  PAL-N", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 6, string );
+    menu_set_text (menu, 6, strcasecmp (norm, "pal-n") == 0 ?
+		   TVTIME_ICON_RADIOON "  PAL-N" :
+		   TVTIME_ICON_RADIOOFF "  PAL-N");
     menu_set_enter_command( menu, 6, TVTIME_SET_NORM, "pal-n" );
-    menu_set_right_command( menu, 6, TVTIME_SET_NORM, "pal-n" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "ntsc-jp" ) ) {
-        sprintf( string, "%c%c%c  NTSC-JP", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  NTSC-JP", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 7, string );
+    menu_set_text (menu, 7, strcasecmp (norm, "ntsc-jp") == 0 ?
+		   TVTIME_ICON_RADIOON "  NTSC-JP" :
+		   TVTIME_ICON_RADIOOFF "  NTSC-JP");
     menu_set_enter_command( menu, 7, TVTIME_SET_NORM, "ntsc-jp" );
-    menu_set_right_command( menu, 7, TVTIME_SET_NORM, "ntsc-jp" );
-    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "input" );
 
-    if( !strcasecmp( norm, "pal-60" ) ) {
-        sprintf( string, "%c%c%c  PAL-60", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  PAL-60", 0xee, 0x80, 0xa4 );
-    }
-    menu_set_text( menu, 8, string );
+    menu_set_text (menu, 8, strcasecmp (norm, "pal-60") == 0 ?
+		   TVTIME_ICON_RADIOON "  PAL-60" :
+		   TVTIME_ICON_RADIOOFF "  PAL-60");
     menu_set_enter_command( menu, 8, TVTIME_SET_NORM, "pal-60" );
-    menu_set_right_command( menu, 8, TVTIME_SET_NORM, "pal-60" );
-    menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "input" );
 }
 
 static void reset_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
 {
     char string[ 128 ];
 
-    if( curmode == VIDEOINPUT_MONO ) {
-        sprintf( string, "%c%c%c  Mono", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Mono", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), curmode == VIDEOINPUT_MONO ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Mono"));
     menu_set_text( menu, 1, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
     menu_set_enter_command( menu, 1, TVTIME_SET_AUDIO_MODE, "mono" );
-    menu_set_right_command( menu, 1, TVTIME_SET_AUDIO_MODE, "mono" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    if( curmode == VIDEOINPUT_STEREO ) {
-        sprintf( string, "%c%c%c  Stereo", 0xee, 0x80, 0xa5 );
-    } else {
-        sprintf( string, "%c%c%c  Stereo", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), curmode == VIDEOINPUT_STEREO ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Stereo"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_AUDIO_MODE, "stereo" );
-    menu_set_right_command( menu, 2, TVTIME_SET_AUDIO_MODE, "stereo" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
     if( ntsc ) {
-        if( curmode == VIDEOINPUT_LANG1 || curmode == VIDEOINPUT_LANG2 ) {
-            sprintf( string, "%c%c%c  SAP", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  SAP", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (curmode == VIDEOINPUT_LANG1 ||
+					    curmode == VIDEOINPUT_LANG2) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("SAP"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "sap" );
-        menu_set_right_command( menu, 3, TVTIME_SET_AUDIO_MODE, "sap" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
+
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-        menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
     } else {
-        if( curmode == VIDEOINPUT_LANG1 ) {
-            sprintf( string, "%c%c%c  Primary Language", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Primary Language", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (curmode == VIDEOINPUT_LANG1) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Primary Language"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "lang1" );
-        menu_set_right_command( menu, 3, TVTIME_SET_AUDIO_MODE, "lang1" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "input" );
-        if( curmode == VIDEOINPUT_LANG2 ) {
-            sprintf( string, "%c%c%c  Secondary Language", 0xee, 0x80, 0xa5 );
-        } else {
-            sprintf( string, "%c%c%c  Secondary Language", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (curmode == VIDEOINPUT_LANG2) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("Secondary Language"));
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SET_AUDIO_MODE, "lang2" );
-        menu_set_right_command( menu, 4, TVTIME_SET_AUDIO_MODE, "lang2" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "input" );
-        menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "input" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
     }
 }
 
@@ -851,26 +750,26 @@ static void reset_overscan_menu( menu_t *menu, double overscan )
 {
     char string[ 128 ];
 
-    sprintf( string, "%c%c%c  Current: %.1f%%", 0xee, 0x80, 0x80, overscan * 2.0 * 100.0 );
+    snprintf( string, sizeof (string), TVTIME_ICON_TVLOGO "  %s: %.1f%%",
+	      _("Current"), overscan * 2.0 * 100.0 );
     menu_set_text( menu, 1, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_PLUSBUTTON "  %s", _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_OVERSCAN_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_OVERSCAN_UP, "" );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_MINUSBUTTON "  %s", _("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_OVERSCAN_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_OVERSCAN_DOWN, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
 static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
@@ -882,70 +781,60 @@ static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
     int cur;
     cur = 1;
 
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
+
     if( isbttv ) {
-        if( apply_luma ) {
-            sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
-        } else {
-            sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
-        }
+        snprintf (string, sizeof (string), apply_luma ?
+		  TVTIME_ICON_GENERALTOGGLEON "  %s" :
+		  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+		  _("BT8x8 luma correction"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
         cur++;
     }
 
     if( isntsc ) {
-        if( apply_pulldown ) {
-            snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb7 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb8 );
-        }
+        snprintf (string, sizeof (string), apply_pulldown ?
+		  TVTIME_ICON_GENERALTOGGLEON "  %s" :
+		  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+		  _("2-3 pulldown inversion"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
         cur++;
     }
 
-    if( apply_invert ) {
-        sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb7 );
-    } else {
-        sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
-    }
+    snprintf (string, sizeof (string), apply_pulldown ?
+	      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+	      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+	      _("Colour invert"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_COLOUR_INVERT, "" );
-    menu_set_right_command( menu, cur, TVTIME_TOGGLE_COLOUR_INVERT, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
     cur++;
 
-    if( apply_mirror ) {
-        sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb7 );
-    } else {
-        sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
-    }
+    snprintf (string, sizeof (string), apply_pulldown ?
+	      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+	      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+	      _("Colour invert"));
+    snprintf (string, sizeof (string), apply_mirror ?
+	      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+	      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+	      _("Mirror"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_MIRROR, "" );
-    menu_set_right_command( menu, cur, TVTIME_TOGGLE_MIRROR, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
     cur++;
 
-    if( apply_chroma_kill ) {
-        sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb7 );
-    } else {
-        sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
-    }
+    snprintf (string, sizeof (string), apply_chroma_kill ?
+	      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+	      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+	      _("Chroma killer"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_CHROMA_KILL, "" );
-    menu_set_right_command( menu, cur, TVTIME_TOGGLE_CHROMA_KILL, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
     cur++;
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
 }
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
@@ -1083,71 +972,78 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
 
     menu = menu_new( "root-tuner" );
-    menu_set_text( menu, 0, "Setup" );
-    sprintf( string, "%c%c%c  Station management", 0xee, 0x80, 0x9d );
+    menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
+
+    menu_set_text( menu, 0, _("Setup") );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_STATIONMANAGEMENT "  %s", _("Station management"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-    menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Input configuration", 0xee, 0x80, 0x9b );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_INPUTCONF "  %s", _("Input configuration"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Picture settings", 0xee, 0x80, 0x9e );
+
+    snprintf (string, sizeof (string), 
+	     TVTIME_ICON_PICTURESETTINGS "  %s", _("Picture settings"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Video processing", 0xee, 0x80, 0x9f );
+
+    snprintf (string, sizeof (string),
+	     TVTIME_ICON_VIDEOPROCESSING "  %s", _("Video processing"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0xb9 );
+
+    snprintf (string, sizeof (string),
+	     TVTIME_ICON_OUTPUTCONF "  %s", _("Output configuration"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit menu", 0xee, 0x80, 0xa0 );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_EXIT "  %s", _("Exit menu"));
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_MENU_EXIT, 0 );
-    menu_set_right_command( menu, 6, TVTIME_MENU_EXIT, 0 );
-    menu_set_left_command( menu, 6, TVTIME_MENU_EXIT, 0 );
+
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "root-notuner" );
-    menu_set_text( menu, 0, "Setup" );
-    sprintf( string, "%c%c%c  Input configuration", 0xee, 0x80, 0x9b );
+    menu_set_text( menu, 0, _("Setup") );
+    menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_INPUTCONF "  %s", _("Input configuration"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 1, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Picture settings", 0xee, 0x80, 0x9e );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_PICTURESETTINGS "  %s", _("Picture settings"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 2, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Video processing", 0xee, 0x80, 0x9f );
+
+    snprintf (string, sizeof (string), 
+	      TVTIME_ICON_VIDEOPROCESSING "  %s", _("Video processing"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0xb9 );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_OUTPUTCONF "  %s", _("Output configuration"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit menu", 0xee, 0x80, 0xa0 );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_EXIT "  %s", _("Exit menu"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+
     commands_add_menu( cmd, menu );
 
-
     menu = menu_new( "stations" );
-    menu_set_text( menu, 0, "Setup - Station management" );
+    snprintf (string, sizeof (string), "%s - %s",
+	      _("Setup"), _("Station management"));
+    menu_set_text( menu, 0, string);
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "stations" );
     commands_add_menu( cmd, menu );
     if( vidin ) {
         reset_stations_menu( commands_get_menu( cmd, "stations" ),
@@ -1162,7 +1058,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     menu = menu_new( "frequencies" );
-    menu_set_text( menu, 0, "Setup - Station management - Frequency table" );
+    /* The below line reduces number of strings requiring translation. */
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Station management"), _("Frequency table"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     if( vidin ) {
         reset_frequency_menu( commands_get_menu( cmd, "frequencies" ),
@@ -1170,116 +1069,128 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     menu = menu_new( "finetune" );
-    menu_set_text( menu, 0, "Setup - Station management - Finetune" );
-    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    /* The below line reduces number of strings requiring translation. */
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Station management"), _("Finetune"));
+    menu_set_text( menu, 0, string );
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_TVLOGO "  %s: ---", _("Current"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+
     menu_set_default_cursor( menu, 1 );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_PLUSBUTTON "  %s", _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_FINETUNE_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_FINETUNE_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_FINETUNE_UP, "" );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_MINUSBUTTON "  %s",_("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_FINETUNE_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_FINETUNE_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_FINETUNE_DOWN, "" );
+
+    snprintf (string, sizeof (string),
+	      TVTIME_ICON_PLAINLEFTARROW "  %s", _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
-    menu_set_text( menu, 0, "Setup - Input configuration" );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
+    snprintf (string, sizeof (string), "%s - %s", _("Setup"),
+	      _("Input configuration"));
+    menu_set_text( menu, 0, string );
     if( vidin ) {
-        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
-                 videoinput_get_input_name( vidin ) );
+        snprintf (string, sizeof (string), TVTIME_ICON_VIDEOINPUT "  %s: %s",
+		  _("Change video source"), videoinput_get_input_name (vidin));
     } else {
-        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0xbb );
+        snprintf (string, sizeof (string), TVTIME_ICON_VIDEOINPUT "  %s",
+		  _("Change video source"));
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-    menu_set_right_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+	      _("Preferred audio mode"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
+	      _("Television standard"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_SHARPNESS "  %s",
+	      _("Sharpness"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0xb6 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_CLOSEDCAPTIONICON "  %s",
+	      _("Toggle closed captions"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
-    menu_set_right_command( menu, 5, TVTIME_TOGGLE_CC, "" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle XDS decoding", 0xee, 0x80, 0x9a );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_TVPGICON "  %s",
+	      _("Toggle XDS decoding"));
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
-    menu_set_right_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+ 
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 7, string );
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+ 
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );
-    menu_set_text( menu, 0, "Setup - Input configuration" );
+    snprintf (string, sizeof (string),
+	      "%s - %s", _("Setup"), _("Input configuration"));
+    menu_set_text (menu, 0, string);
     if( vidin ) {
-        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
-                 videoinput_get_input_name( vidin ) );
+        snprintf (string, sizeof (string), TVTIME_ICON_VIDEOINPUT "  %s: %s",
+		  _("Change video source"), videoinput_get_input_name (vidin));
     } else {
-        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0xbb );
+        snprintf (string, sizeof (string), TVTIME_ICON_VIDEOINPUT "  %s",
+		  _("Change video source"));
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-    menu_set_right_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
+ 
+    snprintf (string, sizeof (string), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+	      _("Preferred audio mode"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
+	      _("Television standard"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_SHARPNESS "  %s",
+	      _("Sharpness"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "sharpness" );
-    menu_set_text( menu, 0, "Setup - Input configuration - Sharpness" );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Input configuration"), _("Sharpness"));
+    menu_set_text( menu, 0, string );
     menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
     reset_sharpness_menu( commands_get_menu( cmd, "sharpness" ), config_get_inputwidth( cfg ) );
 
     menu = menu_new( "audiomode" );
-    menu_set_text( menu, 0, "Setup - Input configuration - Preferred audio mode" );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Input configuration"), _("Preferred audio mode"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     if( cmd->vidin ) {
         reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
@@ -1290,17 +1201,19 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     menu = menu_new( "norm" );
-    menu_set_text( menu, 0, "Setup - Input configuration - Television standard" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Input Configuration"), _("Television standard"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
+    snprintf (string, sizeof (string), TVTIME_ICON_RESTART "  %s",
+	      _("Restart with new settings"));
     menu_set_text( menu, 9, string );
     menu_set_enter_command( menu, 9, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 9, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 9, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 10, string );
     menu_set_enter_command( menu, 10, TVTIME_SHOW_MENU, "input" );
-    menu_set_right_command( menu, 10, TVTIME_SHOW_MENU, "input" );
-    menu_set_left_command( menu, 10, TVTIME_SHOW_MENU, "input" );
 
     if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {
         cmd->newnorm = "PAL";
@@ -1323,65 +1236,83 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "output" );
-    menu_set_text( menu, 0, "Setup - Output configuration" );
+    snprintf (string, sizeof (string), "%s - %s",
+	      _("Setup"), _("Output configuration"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "matte" );
-    menu_set_text( menu, 0, "Setup - Output configuration - Apply matte" );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Output configuration"), _("Apply matte"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "overscan" );
-    menu_set_text( menu, 0, "Setup - Output configuration - Overscan" );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Output configuration"), _("Overscan"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     reset_overscan_menu( commands_get_menu( cmd, "overscan" ), cmd->overscan );
 
     menu = menu_new( "fspos" );
-    menu_set_text( menu, 0, "Setup - Output configuration - Fullscreen position" );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Output configuration"), _("Fullscreen position"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
-    menu_set_text( menu, 0, "Setup - Video processing" );
-    sprintf( string, "%c%c%c  Deinterlacer configuration", 0xee, 0x80, 0xa1 );
+    snprintf (string, sizeof (string), "%s - %s",
+	      _("Setup"), _("Video processing"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
+    snprintf (string, sizeof (string), TVTIME_ICON_DEINTERLACERCONF "  %s",
+	      _("Deinterlacer configuration"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "deinterlacer" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "deinterlacer" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Current deinterlacer description", 0xee, 0x80, 0xab );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_DEINTERLACERDESC "  %s",
+	      _("Current deinterlacer description"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "deintdescription" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Attempted framerate", 0xee, 0x80, 0xac );
+    snprintf (string, sizeof (string), TVTIME_ICON_ATTEMPTEDFRAMERATE "  %s",
+	      _("Attempted framerate"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "framerate" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Input filters", 0xee, 0x80, 0xae );
+    snprintf (string, sizeof (string), TVTIME_ICON_INPUTFILTERS "  %s",
+	      _("Input filters"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "filters" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "filters" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "deinterlacer" );
-    menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer configuration" );
+
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Video processing"), _("Deinterlacer configuration"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "deintdescription" );
-    menu_set_text( menu, 0, "Setup - Video processing - Deinterlacer description" );
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Video processing"), _("Deinterlacer description"));
+    menu_set_text( menu, 0, string );
+
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "framerate" );
-    menu_set_text( menu, 0, "Setup - Video processing - Attempted framerate" );
+
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Video processing"), _("Attempted framerate"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "filters" );
-    menu_set_text( menu, 0, "Setup - Video processing - Input filters" );
+    snprintf (string, sizeof (string), "%s - %s - %s", _("Setup"),
+	      _("Video processing"), _("Input filters"));
+    menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
     reset_filters_menu( commands_get_menu( cmd, "filters" ),
                         cmd->vidin && videoinput_is_bttv( cmd->vidin ),
@@ -1391,227 +1322,245 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                         cmd->pulldown_alg );
 
     menu = menu_new( "picture-notuner" );
-    menu_set_text( menu, 0, "Setup - Picture" );
-    sprintf( string, "%c%c%c  Brightness", 0xe2, 0x98, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s", _("Setup"), _("Picture"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
+    snprintf (string, sizeof (string), TVTIME_ICON_BRIGHTNESS "  %s",
+	      _("Brightness"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Contrast", 0xe2, 0x97, 0x90 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_CONTRAST "  %s",
+	      _("Contrast"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Colour", 0xe2, 0x98, 0xB0 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_COLOUR "  %s", _("Colour"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Hue", 0xe2, 0x97, 0xaf );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_HUE "  %s", _("Hue"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    if( config_get_save_restore_picture( cfg ) ) {
-        sprintf( string, "%c%c%c  Save current settings as defaults", 0xee, 0x80, 0xbd );
+
+    if (config_get_save_restore_picture (cfg)) {
+        snprintf (string, sizeof (string),
+		  TVTIME_ICON_SAVEPICTUREGLOBAL "  %s",
+		  _("Save current settings as defaults"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
-        menu_set_right_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0xbe );
+        snprintf (string, sizeof (string), TVTIME_ICON_RESETTODEFAULTS "  %s",
+		  _("Reset to global defaults"));
         menu_set_text( menu, 6, string );
         menu_set_enter_command( menu, 6, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_right_command( menu, 6, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 7, string );
         menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-        menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
         commands_add_menu( cmd, menu );
     } else {
-        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0xbe );
+        snprintf (string, sizeof (string), TVTIME_ICON_RESETTODEFAULTS "  %s",
+		  _("Reset to global defaults"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_right_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 6, string );
         menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
         commands_add_menu( cmd, menu );
     }
 
     menu = menu_new( "picture-tuner" );
-    menu_set_text( menu, 0, "Setup - Picture" );
-    sprintf( string, "%c%c%c  Brightness", 0xe2, 0x98, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s", _("Setup"), _("Picture"));
+    menu_set_text( menu, 0, string);
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_BRIGHTNESS "  %s",
+	      _("Brightness"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Contrast", 0xe2, 0x97, 0x90 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_CONTRAST "  %s",
+	      _("Contrast"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Colour", 0xe2, 0x98, 0xB0 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_COLOUR "  %s", _("Colour"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Hue", 0xe2, 0x97, 0xaf );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_HUE "  %s", _("Hue"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+
     if( config_get_save_restore_picture( cfg ) ) {
-        sprintf( string, "%c%c%c  Save current settings as global defaults", 0xee, 0x80, 0xbd );
+        snprintf (string, sizeof (string),
+		  TVTIME_ICON_SAVEPICTUREGLOBAL "  %s",
+		  _("Save current settings as global defaults"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
-        menu_set_right_command( menu, 5, TVTIME_SAVE_PICTURE_GLOBAL, "" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Save current settings as channel defaults", 0xee, 0x80, 0xbc );
+
+        snprintf (string, sizeof (string),
+		  TVTIME_ICON_SAVEPICTURECHANNEL "  %s",
+		  _("Save current settings as channel defaults"));
         menu_set_text( menu, 6, string );
         menu_set_enter_command( menu, 6, TVTIME_SAVE_PICTURE_CHANNEL, "" );
-        menu_set_right_command( menu, 6, TVTIME_SAVE_PICTURE_CHANNEL, "" );
-        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0xbe );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_RESETTODEFAULTS " %s",
+		  _("Reset to global defaults"));
         menu_set_text( menu, 7, string );
         menu_set_enter_command( menu, 7, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_right_command( menu, 7, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 8, string );
         menu_set_enter_command( menu, 8, TVTIME_SHOW_MENU, "root" );
-        menu_set_right_command( menu, 8, TVTIME_SHOW_MENU, "root" );
-        menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "root" );
+
         commands_add_menu( cmd, menu );
     } else {
-        sprintf( string, "%c%c%c  Reset to global defaults", 0xee, 0x80, 0xbe );
+        snprintf (string, sizeof (string), TVTIME_ICON_RESETTODEFAULTS "  %s",
+		  _("Reset to global defaults"));
         menu_set_text( menu, 5, string );
         menu_set_enter_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_right_command( menu, 5, TVTIME_AUTO_ADJUST_PICT, "" );
-        menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-        sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+
+        snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+		  _("Back"));
         menu_set_text( menu, 6, string );
         menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-        menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+
         commands_add_menu( cmd, menu );
     }
 
 
     menu = menu_new( "brightness" );
-    menu_set_text( menu, 0, "Setup - Picture - Brightness" );
-    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Picture"), _("Brightness"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "picture" );
+    snprintf (string, sizeof (string), TVTIME_ICON_TVLOGO "  %s: ---",
+	      _("Current"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+
     menu_set_default_cursor( menu, 1 );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLUSBUTTON "  %s",
+	      _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_BRIGHTNESS_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_BRIGHTNESS_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_BRIGHTNESS_UP, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_MINUSBUTTON "  %s",
+	      _("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_BRIGHTNESS_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_BRIGHTNESS_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_BRIGHTNESS_DOWN, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
+
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
+        menu_set_value (commands_get_menu (cmd, "brightness"),
+			videoinput_get_brightness (cmd->vidin),
+			TVTIME_ICON_BRIGHTNESS);
     }
 
     menu = menu_new( "contrast" );
-    menu_set_text( menu, 0, "Setup - Picture - Contrast" );
-    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Picture"), _("Contrast"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "picture" );
+    snprintf (string, sizeof (string), TVTIME_ICON_TVLOGO "  %s: ---",
+	      _("Current"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_default_cursor( menu, 1 );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLUSBUTTON "  %s",
+	      _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_CONTRAST_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_CONTRAST_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_CONTRAST_UP, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_MINUSBUTTON "  %s",
+	      _("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_CONTRAST_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_CONTRAST_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_CONTRAST_DOWN, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
+
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
+        menu_set_value (commands_get_menu( cmd, "contrast" ),
+			videoinput_get_contrast( cmd->vidin ),
+			TVTIME_ICON_CONTRAST);
     }
 
     menu = menu_new( "colour" );
-    menu_set_text( menu, 0, "Setup - Picture - Colour" );
-    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Picture"), _("Colour"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "picture" );
+    snprintf (string, sizeof (string), TVTIME_ICON_TVLOGO "  %s: ---",
+	      _("Current"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+
     menu_set_default_cursor( menu, 1 );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLUSBUTTON "  %s",
+	      _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_COLOUR_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_COLOUR_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_COLOUR_UP, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_MINUSBUTTON "  %s",
+	      _("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_COLOUR_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_COLOUR_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_COLOUR_DOWN, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
+
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
+        menu_set_value (commands_get_menu (cmd, "colour" ),
+			videoinput_get_colour (cmd->vidin),
+			TVTIME_ICON_COLOUR);
     }
 
     menu = menu_new( "hue" );
-    menu_set_text( menu, 0, "Setup - Picture - Hue" );
-    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    snprintf (string, sizeof (string), "%s - %s - %s",
+	      _("Setup"), _("Picture"), _("Hue"));
+    menu_set_text( menu, 0, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "picture" );
+    snprintf (string, sizeof (string), TVTIME_ICON_TVLOGO "  %s: ---",
+	      _("Current"));
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_default_cursor( menu, 1 );
-    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLUSBUTTON "  %s",
+	      _("Increase"));
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_HUE_DOWN, "" );
-    menu_set_right_command( menu, 2, TVTIME_HUE_DOWN, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_enter_command( menu, 2, TVTIME_HUE_UP, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_MINUSBUTTON "  %s",
+	      _("Decrease"));
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_HUE_UP, "" );
-    menu_set_right_command( menu, 3, TVTIME_HUE_UP, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_enter_command( menu, 3, TVTIME_HUE_DOWN, "" );
+
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
+
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
+        menu_set_value (commands_get_menu (cmd, "hue"),
+			videoinput_get_hue (cmd->vidin),
+			TVTIME_ICON_HUE);
     }
 
     reinit_tuner( cmd );
@@ -1699,28 +1648,13 @@ static void menu_enter( commands_t *cmd )
     }
 }
 
-static void menu_left( commands_t *cmd )
+static void menu_back( commands_t *cmd )
 {
-    if( cmd->curmenu == MENU_FAVORITES ) {
+    if( cmd->curmenu == MENU_FAVORITES ) { /* FIXME oh no! a special case? */
         commands_handle( cmd, TVTIME_SHOW_MENU, "stations" );
     } else if( cmd->curmenu == MENU_USER ) {
-        int command = menu_get_left_command( cmd->curusermenu, cmd->curmenupos + 1 );
-        const char *argument = menu_get_left_argument( cmd->curusermenu, cmd->curmenupos + 1 );
-
-        /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
-        if( command != TVTIME_MENU_ENTER ) {
-            commands_handle( cmd, command, argument );
-        }
-    }
-}
-
-static void menu_right( commands_t *cmd )
-{
-    if( cmd->curmenu == MENU_FAVORITES ) {
-        menu_enter( cmd );
-    } else if( cmd->curmenu == MENU_USER ) {
-        int command = menu_get_right_command( cmd->curusermenu, cmd->curmenupos + 1 );
-        const char *argument = menu_get_right_argument( cmd->curusermenu, cmd->curmenupos + 1 );
+        int command = menu_get_back_command( cmd->curusermenu );
+        const char *argument = menu_get_back_argument( cmd->curusermenu );
 
         /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
         if( command != TVTIME_MENU_ENTER ) {
@@ -1739,12 +1673,13 @@ static void display_current_menu( commands_t *cmd )
         tvtime_osd_list_set_text( cmd->osd, 0, "Favorites" );
         for( i = 0; i < cmd->numfavorites; i++ ) {
             char text[ 32 ];
-            sprintf( text, "%d", cmd->favorites[ i ] );
+            snprintf( text, sizeof (text), "%d", cmd->favorites[ i ] );
             tvtime_osd_list_set_text( cmd->osd, i + 1, text );
         }
-        sprintf( string, "%c%c%c  Add current station", 0xee, 0x80, 0xa8 );
+        snprintf( string, sizeof (string), TVTIME_ICON_PLUSBUTTON "  %s",
+		  _("Add current station"));
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, string );
-        sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+        snprintf( string, sizeof (string), TVTIME_ICON_EXIT "  %s", _("Exit"));
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, string );
         cmd->curmenusize = cmd->numfavorites + 2;
     } else if( cmd->curmenu == MENU_USER && cmd->curusermenu ) {
@@ -1920,8 +1855,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->curusermenu ) menu_set_cursor( cmd->curusermenu, cmd->curmenupos );
             display_current_menu( cmd );
             break;
-        case TVTIME_MENU_LEFT: menu_left( cmd ); break;
-        case TVTIME_MENU_RIGHT: menu_right( cmd ); break;
+        case TVTIME_MENU_BACK: menu_back( cmd ); break;
         case TVTIME_MENU_ENTER: menu_enter( cmd ); break;
         case TVTIME_SHOW_MENU:
             if( set_menu( cmd, arg ) ) {
@@ -1988,10 +1922,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char message[ 25 ];
 
             if( cmd->sleeptimer ) {
-                sprintf( message, _("Sleep in %d minutes."),
-                         sleeptimer_function( cmd->sleeptimer ) );
+	        snprintf( message, sizeof (message), _("Sleep in %d minutes."),
+			  sleeptimer_function( cmd->sleeptimer ) );
             } else {
-                sprintf( message, _("Sleep off.") );
+                snprintf( message, sizeof (message), _("Sleep off.") );
             }
 
             tvtime_osd_show_message( cmd->osd, message );
@@ -2102,7 +2036,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char message[ 128 ];
             reset_sharpness_menu( sharpmenu, cmd->newsharpness );
             commands_refresh_menu( cmd );
-            sprintf( message, _("Sharpness will be %d on restart."), cmd->newsharpness );
+            snprintf( message, sizeof (message),
+		      _("Sharpness will be %d on restart."),
+		      cmd->newsharpness );
             tvtime_osd_show_message( cmd->osd, message );
         }
         break;
@@ -2146,7 +2082,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char message[ 128 ];
             reset_norm_menu( normmenu, cmd->newnorm );
             commands_refresh_menu( cmd );
-            sprintf( message, _("Television standard will be %s on restart."), cmd->newnorm );
+            snprintf( message, sizeof (message),
+		      _("Television standard will be %s on restart."),
+		      cmd->newnorm );
             tvtime_osd_show_message( cmd->osd, message );
         }
         break;
@@ -2273,10 +2211,24 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             char message[ 128 ];
             tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
             tvtime_osd_show_info( cmd->osd );
-            sprintf( message, _("Colour decoding for this channel set to %s."),
-                     videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            snprintf( message, sizeof (message),
+		      _("Colour decoding for this channel set to %s."),
+		      videoinput_get_norm_name
+		      (videoinput_get_norm (cmd->vidin)));
             tvtime_osd_show_message( cmd->osd, message );
+
+            reset_stations_menu( commands_get_menu( cmd, "stations" ),
+                                 (videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC ||
+                                  videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC_JP),
+                                 videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_PAL,
+                                 videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_SECAM,
+                                 (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
+                                  !strcasecmp( cmd->newfreqtable, "us-cable100" )),
+                                 station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
+                                 cmd->scan_channels );
+            commands_refresh_menu( cmd );
         }
+
         break;
 
     case TVTIME_DISPLAY_MESSAGE:
@@ -2299,10 +2251,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_RUN_COMMAND:
         if( arg ) {
             char commandline[ 256 ];
-            sprintf( commandline, "%s &", arg );
+            snprintf( commandline, sizeof (commandline), "%s &", arg );
             if( cmd->osd ) {
                 char message[ 256 ];
-                sprintf( message, _("Running: %s"), arg );
+                snprintf( message, sizeof (message), _("Running: %s"), arg );
                 tvtime_osd_show_message( cmd->osd, message );
             }
             system( commandline );
@@ -2579,10 +2531,18 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
             if( cmd->osd ) {
                 tvtime_osd_show_message( cmd->osd, _("Picture settings reset to defaults.") );
-                menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
-                menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
-                menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
-                menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
+                menu_set_value (commands_get_menu (cmd, "brightness"),
+				videoinput_get_brightness( cmd->vidin ),
+				TVTIME_ICON_BRIGHTNESS);
+                menu_set_value (commands_get_menu (cmd, "contrast"),
+				videoinput_get_brightness( cmd->vidin ),
+				TVTIME_ICON_CONTRAST);
+                menu_set_value (commands_get_menu (cmd, "colour"),
+				videoinput_get_brightness( cmd->vidin ),
+				TVTIME_ICON_COLOUR);
+                menu_set_value (commands_get_menu (cmd, "hue"),
+				videoinput_get_brightness( cmd->vidin ),
+				TVTIME_ICON_HUE);
             }
         }
         break;
@@ -2612,7 +2572,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
 
             if( cmd->osd ) {
-                menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), 0xee, 0x80, 0xb0 );
+                menu_set_value (commands_get_menu (cmd, "finetune"),
+				station_get_current_finetune (cmd->stationmgr),
+				TVTIME_ICON_FINETUNECHANNEL);
                 commands_refresh_menu( cmd );
                 tvtime_osd_show_data_bar_centered( cmd->osd, _("Finetune"),
                                                    station_get_current_finetune( cmd->stationmgr ) );
@@ -2718,8 +2680,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
             if( cmd->osd ) {
                 char string[ 128 ];
-                sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
-                         videoinput_get_input_name( cmd->vidin ) );
+                snprintf (string, sizeof (string),
+			  TVTIME_ICON_VIDEOINPUT "  %s: %s",
+			  _("Change video source"),
+			  videoinput_get_input_name (cmd->vidin));
                 menu_set_text( commands_get_menu( cmd, "input" ), 1, string );
                 commands_refresh_menu( cmd );
                 tvtime_osd_set_input( cmd->osd, videoinput_get_input_name( cmd->vidin ) );
@@ -2735,7 +2699,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int hue = videoinput_get_hue( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Hue"), hue );
-                menu_set_value( commands_get_menu( cmd, "hue" ), hue, 0xe2, 0x97, 0xaf );
+                menu_set_value (commands_get_menu (cmd, "hue"), hue,
+				TVTIME_ICON_HUE);
                 commands_refresh_menu( cmd );
             }
         }
@@ -2748,7 +2713,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int brightness = videoinput_get_brightness( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Brightness"), brightness );
-                menu_set_value( commands_get_menu( cmd, "brightness" ), brightness, 0xe2, 0x98, 0x80 );
+                menu_set_value (commands_get_menu (cmd, "brightness"),
+				brightness, TVTIME_ICON_BRIGHTNESS);
                 commands_refresh_menu( cmd );
             }
         }
@@ -2761,7 +2727,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int contrast = videoinput_get_contrast( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Contrast"), contrast );
-                menu_set_value( commands_get_menu( cmd, "contrast" ), contrast, 0xe2, 0x97, 0x90 );
+                menu_set_value (commands_get_menu (cmd, "contrast"),
+				contrast, TVTIME_ICON_CONTRAST);
                 commands_refresh_menu( cmd );
             }
         }
@@ -2774,7 +2741,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int colour = videoinput_get_colour( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, _("Colour"), colour );
-                menu_set_value( commands_get_menu( cmd, "colour" ), colour, 0xe2, 0x98, 0xb0 );
+                menu_set_value (commands_get_menu (cmd, "colour"),
+				colour, TVTIME_ICON_COLOUR);
                 commands_refresh_menu( cmd );
             }
         }
@@ -2842,7 +2810,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             station_set_current_hue( cmd->stationmgr, videoinput_get_hue( cmd->vidin ) );
             if( cmd->osd ) {
                 char message[ 128 ];
-                sprintf( message, _("Saved current picture settings on channel %d.\n"),
+                snprintf( message, sizeof (message),
+			  _("Saved current picture settings on channel %d.\n"),
                          station_get_current_id( cmd->stationmgr ) );
                 tvtime_osd_show_message( cmd->osd, message );
             }

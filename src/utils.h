@@ -215,8 +215,7 @@ enum tvtime_commands
     /* Everything below here is a menu-mode command. */
     TVTIME_MENU_UP,
     TVTIME_MENU_DOWN,
-    TVTIME_MENU_LEFT,
-    TVTIME_MENU_RIGHT,
+    TVTIME_MENU_BACK,
     TVTIME_MENU_ENTER,
     TVTIME_MENU_EXIT,
     TVTIME_SHOW_MENU,

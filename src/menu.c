@@ -29,10 +29,8 @@ struct menu_s
     char text[ MENU_MAX ][ 128 ];
     char arguments[ MENU_MAX ][ 128 ];
     int commands[ MENU_MAX ];
-    char left_arguments[ MENU_MAX ][ 128 ];
-    int left_commands[ MENU_MAX ];
-    char right_arguments[ MENU_MAX ][ 128 ];
-    int right_commands[ MENU_MAX ];
+    char back_argument[ 128 ];
+    int back_command;
     int numlines;
     int cursor;
     int defaultcursor;
@@ -82,19 +80,11 @@ void menu_set_enter_command( menu_t *menu, int line, int command,
               "%s", argument );
 }
 
-void menu_set_left_command( menu_t *menu, int line, int command,
+void menu_set_back_command( menu_t *menu, int command,
                             const char *argument )
 {
-    menu->left_commands[ line ] = command;
-    snprintf( menu->left_arguments[ line ], sizeof( menu->left_arguments[ 0 ] ),
-              "%s", argument );
-}
-
-void menu_set_right_command( menu_t *menu, int line, int command,
-                            const char *argument )
-{
-    menu->right_commands[ line ] = command;
-    snprintf( menu->right_arguments[ line ], sizeof( menu->right_arguments[ 0 ] ),
+    menu->back_command = command;
+    snprintf( menu->back_argument, sizeof( menu->back_argument ),
               "%s", argument );
 }
 
@@ -128,24 +118,14 @@ const char *menu_get_enter_argument( menu_t *menu, int line )
     return menu->arguments[ line ];
 }
 
-int menu_get_left_command( menu_t *menu, int line )
+int menu_get_back_command( menu_t *menu )
 {
-    return menu->left_commands[ line ];
+    return menu->back_command;
 }
 
-const char *menu_get_left_argument( menu_t *menu, int line )
+const char *menu_get_back_argument( menu_t *menu )
 {
-    return menu->left_arguments[ line ];
-}
-
-int menu_get_right_command( menu_t *menu, int line )
-{
-    return menu->right_commands[ line ];
-}
-
-const char *menu_get_right_argument( menu_t *menu, int line )
-{
-    return menu->right_arguments[ line ];
+    return menu->back_argument;
 }
 
 int menu_get_cursor( menu_t *menu )

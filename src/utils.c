@@ -514,8 +514,7 @@ static command_names_t command_table[] = {
     { "MENU_DOWN", TVTIME_MENU_DOWN },
     { "MENU_ENTER", TVTIME_MENU_ENTER },
     { "MENU_EXIT", TVTIME_MENU_EXIT },
-    { "MENU_LEFT", TVTIME_MENU_LEFT },
-    { "MENU_RIGHT", TVTIME_MENU_RIGHT },
+    { "MENU_BACK", TVTIME_MENU_BACK },
     { "MENU_UP", TVTIME_MENU_UP },
 
     { "MIXER_DOWN", TVTIME_MIXER_DOWN },

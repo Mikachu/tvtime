@@ -80,6 +80,7 @@
 #include "outputfilter.h"
 #include "mm_accel.h"
 #include "menu.h"
+#include "tvtimeglyphs.h"
 
 /**
  * This is how many frames to wait until deciding if the pulldown phase
@@ -805,6 +806,7 @@ static void build_deinterlacer_menu( menu_t *menu, int curmethod )
     char string[ 128 ];
     int i;
 
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     for( i = 0; i < nummethods; i++ ) {
         if( i == curmethod ) {
             snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5,
@@ -816,16 +818,13 @@ static void build_deinterlacer_menu( menu_t *menu, int curmethod )
         menu_set_text( menu, i + 1, string );
         menu_set_enter_command( menu, i + 1, TVTIME_SET_DEINTERLACER,
                                 get_deinterlace_method( i )->short_name );
-        menu_set_right_command( menu, i + 1, TVTIME_SET_DEINTERLACER,
-                                get_deinterlace_method( i )->short_name );
-        menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
     }
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s", 
+	      _("Back"));
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, nummethods + 1, string );
     menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
 }
 
 static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
@@ -834,18 +833,17 @@ static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
     int i;
 
     menu_set_text( menu, 0, get_deinterlace_method( curmethod )->name );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     for( i = 0; i < 10; i++ ) {
         menu_set_text( menu, i + 1, get_deinterlace_method( curmethod )->description[ i ] );
         menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-        menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-        menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
     }
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_default_cursor( menu, i );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, i + 1, string );
     menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
 }
 
 static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
@@ -853,44 +851,31 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
     char string[ 128 ];
     char text[ 128 ];
 
-    sprintf( text, "Full rate: %.2ffps", maxrate );
-    if( mode == 0 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
-    }
+    snprintf (text, sizeof (text), _("Full rate: %.2ffps"), maxrate);
+    snprintf (string, sizeof (string), mode == 0 ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text);
     menu_set_text( menu, 1, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     menu_set_enter_command( menu, 1, TVTIME_SET_FRAMERATE, "full" );
-    menu_set_right_command( menu, 1, TVTIME_SET_FRAMERATE, "full" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "processing" );
 
-    sprintf( text, "Half rate, deinterlace top fields: %.2ffps", maxrate / 2 );
-    if( mode == 1 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
-    }
+    snprintf (text, sizeof (text),
+	      _("Half rate, deinterlace top fields: %.2ffps"), maxrate / 2 );
+    snprintf (string, sizeof (string), mode == 1 ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text);
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_FRAMERATE, "top" );
-    menu_set_right_command( menu, 2, TVTIME_SET_FRAMERATE, "top" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "processing" );
 
-    sprintf( text, "Half rate, deinterlace bottom fields: %.2ffps", maxrate / 2 );
-    if( mode == 2 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa5, text );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  %s", 0xee, 0x80, 0xa4, text );
-    }
+    snprintf (text, sizeof (text),
+	      _("Half rate, deinterlace bottom fields: %.2ffps"), maxrate / 2);
+    snprintf (string, sizeof (string), mode == 2 ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s", text);
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SET_FRAMERATE, "bottom" );
-    menu_set_right_command( menu, 3, TVTIME_SET_FRAMERATE, "bottom" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf (string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
 }
 
 static void build_output_menu( menu_t *menu, int widescreen,
@@ -901,112 +886,88 @@ static void build_output_menu( menu_t *menu, int widescreen,
     char string[ 128 ];
     int cur = 1;
 
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "root" );
     if( overscan_supported ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Overscan setting", 0xee, 0x80, 0xb1 );
+        snprintf (string, sizeof (string), TVTIME_ICON_OVERSCANSETTING "  %s",
+		  _("Overscan setting"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "overscan" );
-        menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "overscan" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
-    snprintf( string, sizeof( string ), "%c%c%c  Apply matte", 0xee, 0x81, 0x80 );
+    snprintf( string, sizeof( string ), TVTIME_ICON_APPLYMATTE "  %s",
+	      _("Apply matte"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "matte" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
-    if( widescreen ) {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb7 );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xb8 );
-    }
+    snprintf (string, sizeof (string), widescreen ?
+	      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+	      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+	      _("16:9 output"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_right_command( menu, cur, TVTIME_TOGGLE_ASPECT, "" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
     cur++;
 
     if( fullscreen_supported ) {
-        if( fullscreen ) {
-            snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb7 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xb8 );
-        }
+	snprintf (string, sizeof (string), fullscreen ?
+		  TVTIME_ICON_GENERALTOGGLEON "  %s" :
+		  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+		  _("Fullscreen"));
+
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_FULLSCREEN, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_FULLSCREEN, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
 
-        snprintf( string, sizeof( string ), "%c%c%c  Set fullscreen position", 0xee, 0x81, 0x80 );
+        snprintf( string, sizeof( string ), TVTIME_ICON_SETFSPOS "  %s",
+		  _("Set fullscreen position"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "fspos" );
-        menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "fspos" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
     if( alwaysontop_supported ) {
-        if( alwaysontop ) {
-            snprintf( string, sizeof( string ), "%c%c%c  Always-on-top", 0xee, 0x80, 0xb7 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  Always-on-top", 0xee, 0x80, 0xb8 );
-        }
+	snprintf (string, sizeof (string), alwaysontop ?
+		  TVTIME_ICON_GENERALTOGGLEON "  %s" :
+		  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+		  _("Always-on-top"));
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_ALWAYSONTOP, "" );
-        menu_set_right_command( menu, cur, TVTIME_TOGGLE_ALWAYSONTOP, "" );
-        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
         cur++;
     }
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, cur, string );
     menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
 }
 
 static void build_fspos_menu( menu_t *menu, int fspos )
 {
     char string[ 128 ];
 
-    if( fspos == 0 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xa5 );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Centre", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (fspos == 0) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Centre"));
     menu_set_text( menu, 1, string );
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
     menu_set_enter_command( menu, 1, TVTIME_SET_FULLSCREEN_POSITION, "centre" );
-    menu_set_right_command( menu, 1, TVTIME_SET_FULLSCREEN_POSITION, "centre" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
 
-    if( fspos == 1 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xa5 );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Top", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (fspos == 1) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Top"));
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SET_FULLSCREEN_POSITION, "top" );
-    menu_set_right_command( menu, 2, TVTIME_SET_FULLSCREEN_POSITION, "top" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
 
-    if( fspos == 2 ) {
-        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xa5 );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  Bottom", 0xee, 0x80, 0xa4 );
-    }
+    snprintf (string, sizeof (string), (fspos == 2) ?
+	      TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+	      _("Bottom"));
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SET_FULLSCREEN_POSITION, "bottom" );
-    menu_set_right_command( menu, 3, TVTIME_SET_FULLSCREEN_POSITION, "bottom" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
-
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 4, string );
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
@@ -1014,15 +975,18 @@ static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     char text[ 200 ];
 
     tvtime_osd_list_set_lines( osd, 4 );
-    tvtime_osd_list_set_text( osd, 0, "Frame drop setting" );
+    tvtime_osd_list_set_text( osd, 0, _("Frame drop setting") );
 
-    sprintf( text, "Full rate: %.2ffps", maxrate );
+    snprintf( text, sizeof (text), _("Full rate: %.2ffps"), maxrate );
     tvtime_osd_list_set_text( osd, 1, text );
 
-    sprintf( text, "Half rate, deinterlace top fields: %.2ffps", maxrate / 2 );
+    snprintf( text, sizeof (text),
+	      _("Half rate, deinterlace top fields: %.2ffps"), maxrate / 2 );
     tvtime_osd_list_set_text( osd, 2, text );
 
-    sprintf( text, "Half rate, deinterlace bottom fields: %.2ffps", maxrate / 2 );
+    snprintf( text, sizeof (text),
+	      _("Half rate, deinterlace bottom fields: %.2ffps"),
+	      maxrate / 2 );
     tvtime_osd_list_set_text( osd, 3, text );
 
     tvtime_osd_list_set_hilight( osd, mode + 1 );
@@ -1038,35 +1002,37 @@ static void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     char text[ 200 ];
 
     tvtime_osd_list_set_lines( osd, frameratemode ? 7 : 8 );
-    tvtime_osd_list_set_text( osd, 0, "Performance estimates" );
+    tvtime_osd_list_set_text( osd, 0, _("Performance estimates") );
 
-    sprintf( text, "Deinterlacer: %s", deinterlacer );
+    snprintf( text, sizeof (text), "%s: %s", _("Deinterlacer"), deinterlacer );
     tvtime_osd_list_set_text( osd, 1, text );
 
-    sprintf( text, "Input: %s at %dx%d", videoinput_get_norm_name( norm ), width, height );
+    snprintf( text, sizeof (text), _("Input: %s at %dx%d"),
+	      videoinput_get_norm_name( norm ), width, height );
     tvtime_osd_list_set_text( osd, 2, text );
 
-    sprintf( text, "Attempted framerate: %.2ffps",
+    snprintf( text, sizeof (text), _("Attempted framerate: %.2ffps"),
              frameratemode ? 1000000.0 / ((double) (fieldtime*2)) : 1000000.0 / ((double) fieldtime) );
     tvtime_osd_list_set_text( osd, 3, text );
 
-    sprintf( text, "Average blit time: %.2fms (%.0fMB/sec)",
+    snprintf( text, sizeof (text), _("Average blit time: %.2fms (%.0fMB/sec)"),
              blit_time, (((double) framesize) * 0.00095367431640625000) / blit_time );
     tvtime_osd_list_set_text( osd, 4, text );
 
-    sprintf( text, "Average render time: %5.2fms",
-             performance_get_estimated_rendering_time( perf ) );
+    snprintf( text, sizeof (text), _("Average render time: %5.2fms"),
+	      performance_get_estimated_rendering_time( perf ) );
     tvtime_osd_list_set_text( osd, 5, text );
 
-    sprintf( text, "Dropped frames: %d",
+    snprintf( text, sizeof (text), _("Dropped frames: %d"),
              performance_get_dropped_frames( perf ) );
     tvtime_osd_list_set_text( osd, 6, text );
 
     if( !frameratemode ) {
-        sprintf( text, "Blit spacing: %4.1f/%4.1fms (want %4.1fms)",
-                 performance_get_time_top_to_bot( perf ),
-                 performance_get_time_bot_to_top( perf ),
-                 ((double) fieldtime) * 0.001 );
+        snprintf( text, sizeof (text), 
+		  _("Blit spacing: %4.1f/%4.1fms (want %4.1fms)"),
+		  performance_get_time_top_to_bot( perf ),
+		  performance_get_time_bot_to_top( perf ),
+		  ((double) fieldtime) * 0.001 );
         tvtime_osd_list_set_text( osd, 7, text );
     }
 
@@ -1078,98 +1044,67 @@ static void build_matte_menu( menu_t *menu, int mode, int sixteennine )
 {
     char string[ 128 ];
 
+    menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
     if( sixteennine ) {
-        if( mode == 0 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  16:9 + Overscan", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  16:9 + Overscan", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 0) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("16:9 + Overscan"));
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "16:9" );
-        menu_set_right_command( menu, 1, TVTIME_SET_MATTE, "16:9" );
-        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
-        if( mode == 1 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 1) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("1.85:1"));
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "1.85:1" );
-        menu_set_right_command( menu, 2, TVTIME_SET_MATTE, "1.85:1" );
-        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
-        if( mode == 2 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 2) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("2.35:1"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "2.35:1" );
-        menu_set_right_command( menu, 3, TVTIME_SET_MATTE, "2.35:1" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
-        if( mode == 3 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  4:3 centre", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  4:3 centre", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 3) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("4:3 centre"));
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
-        menu_set_right_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     } else {
-        if( mode == 0 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  4:3 + Overscan", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  4:3 + Overscan", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 0) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("4:3 + Overscan"));
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "4:3" );
-        menu_set_right_command( menu, 1, TVTIME_SET_MATTE, "4:3" );
-        menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "output" );
-        if( mode == 1 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  16:9", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  16:9", 0xee, 0x80, 0xa4 );
-        }
+        menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
+        snprintf (string, sizeof (string), (mode == 1) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("16:9"));
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "16:9" );
-        menu_set_right_command( menu, 2, TVTIME_SET_MATTE, "16:9" );
-        menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "output" );
-        if( mode == 2 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  1.85:1", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 2) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("1.85:1"));
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "1.85:1" );
-        menu_set_right_command( menu, 3, TVTIME_SET_MATTE, "1.85:1" );
-        menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "output" );
-        if( mode == 3 ) {
-            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa5 );
-        } else {
-            snprintf( string, sizeof( string ), "%c%c%c  2.35:1", 0xee, 0x80, 0xa4 );
-        }
+        snprintf (string, sizeof (string), (mode == 3) ?
+		  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+		  _("2.35:1"));
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "2.35:1" );
-        menu_set_right_command( menu, 4, TVTIME_SET_MATTE, "2.35:1" );
-        menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     }
 
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    snprintf( string, sizeof (string), TVTIME_ICON_PLAINLEFTARROW "  %s",
+	      _("Back"));
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "output" );
 }
 
 static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
 {
     tvtime_osd_list_set_lines( osd, 5 );
     if( sixteennine ) {
-        tvtime_osd_list_set_text( osd, 0, "Matte setting (Anamorphic input)" );
-        tvtime_osd_list_set_text( osd, 1, "16:9 + Overscan" );
-        tvtime_osd_list_set_text( osd, 2, "1.85:1" );
-        tvtime_osd_list_set_text( osd, 3, "2.35:1" );
-        tvtime_osd_list_set_text( osd, 4, "4:3 centre" );
+        tvtime_osd_list_set_text( osd, 0, _("Matte setting (Anamorphic input)") );
+        tvtime_osd_list_set_text( osd, 1, _("16:9 + Overscan") );
+        tvtime_osd_list_set_text( osd, 2, _("1.85:1") );
+        tvtime_osd_list_set_text( osd, 3, _("2.35:1") );
+        tvtime_osd_list_set_text( osd, 4, _("4:3 centre") );
     } else {
         tvtime_osd_list_set_text( osd, 0, "Matte setting (4:3 input)" );
         tvtime_osd_list_set_text( osd, 1, "4:3 + Overscan" );
@@ -1181,6 +1116,7 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
     tvtime_osd_show_list( osd, 1 );
 }
 
+/* FIXME Gettextize this function. */
 int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 {
     videoinput_t *vidin = 0;

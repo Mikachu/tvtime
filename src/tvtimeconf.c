@@ -871,8 +871,8 @@ config_t *config_new( void )
     /* Menu keys. */
     ct->keymapmenu[ I_UP ] = TVTIME_MENU_UP;
     ct->keymapmenu[ I_DOWN ] = TVTIME_MENU_DOWN;
-    ct->keymapmenu[ I_LEFT ] = TVTIME_MENU_LEFT;
-    ct->keymapmenu[ I_RIGHT ] = TVTIME_MENU_RIGHT;
+    ct->keymapmenu[ I_LEFT ] = TVTIME_MENU_BACK;
+    ct->keymapmenu[ I_RIGHT ] = TVTIME_MENU_ENTER;
     ct->keymapmenu[ I_ENTER ] = TVTIME_MENU_ENTER;
     ct->keymapmenu[ I_F1 ] = TVTIME_MENU_EXIT;
     ct->keymapmenu[ '	' ] = TVTIME_MENU_EXIT;
