@@ -371,7 +371,7 @@ static void get_window_manager_name( Display *dpy, Window wm_window, char **wm_n
                                     &bytes_after_return,
                                     &prop_return ) != Success ) {
                 fprintf( stderr, "wm_name: Can't get window "
-                                 "manager name propety "
+                                 "manager name property "
                                  "(WM not compliant).\n" );
                 *wm_name_return = strdup( "unknown" );
                 return;
