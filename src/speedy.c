@@ -25,6 +25,16 @@ void (*composite_packed4444_alpha_to_packed422_scanline)( unsigned char *output,
                                                           unsigned char *input,
                                                           unsigned char *foreground,
                                                           int width, int alpha );
+void (*composite_alphamask_to_packed4444_scanline)( unsigned char *output,
+                                                unsigned char *input,
+                                                unsigned char *mask, int width,
+                                                int textluma, int textcb,
+                                                int textcr );
+void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
+                                                       unsigned char *input,
+                                                       unsigned char *mask, int width,
+                                                       int textluma, int textcb,
+                                                       int textcr, int alpha );
 
 
 static unsigned int speedy_time = 0;
@@ -42,6 +52,16 @@ static struct timeval cur_end_time;
 #define PREFETCH_2048(x) \
     { int *pfetcha = (int *) x; \
         int pfetchtmp; \
+        prefetchnta( pfetcha ); \
+        prefetchnta( pfetcha + 64 ); \
+        prefetchnta( pfetcha + 128 ); \
+        prefetchnta( pfetcha + 192 ); \
+        pfetcha += 256; \
+        prefetchnta( pfetcha ); \
+        prefetchnta( pfetcha + 64 ); \
+        prefetchnta( pfetcha + 128 ); \
+        prefetchnta( pfetcha + 192 ); }
+/*
         pfetchtmp = pfetcha[ 0 ] + pfetcha[ 16 ] + pfetcha[ 32 ] + pfetcha[ 48 ] + \
             pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
             pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
@@ -51,6 +71,7 @@ static struct timeval cur_end_time;
             pfetcha[ 64 ] + pfetcha[ 80 ] + pfetcha[ 96 ] + pfetcha[ 112 ] + \
             pfetcha[ 128 ] + pfetcha[ 144 ] + pfetcha[ 160 ] + pfetcha[ 176 ] + \
             pfetcha[ 192 ] + pfetcha[ 208 ] + pfetcha[ 224 ] + pfetcha[ 240 ]; }
+*/
 
 static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
 {
@@ -63,9 +84,9 @@ static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, i
 void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
                                      unsigned char *bot, int width )
 {
-    const int64_t qwYMask = 0x00ff00ff00ff00ff;
-    const int64_t qwOnes = 0x0001000100010001;
-    int64_t qwThreshold;
+    const uint64_t qwYMask = 0x00ff00ff00ff00ff;
+    const uint64_t qwOnes = 0x0001000100010001;
+    uint64_t qwThreshold;
 
     SPEEDY_START();
 
@@ -157,7 +178,7 @@ void interpolate_packed422_scanline_mmxext( unsigned char *output,
         movq_m2r( *bot, mm2 );
         movq_m2r( *top, mm3 );
         pavgb_r2r( mm3, mm2 );
-        movntq_r2m( mm2, *output );
+        movq_r2m( mm2, *output );
         output += 8;
         top += 8;
         bot += 8;
@@ -225,7 +246,7 @@ void blit_colour_packed422_scanline_mmxext( unsigned char *output,
     por_r2r( mm1, mm2 );
 
     for( width /= 4; width; --width ) {
-        movntq_r2m( mm2, *output );
+        movq_r2m( mm2, *output );
         output += 8;
     }
 
@@ -383,6 +404,7 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
       "movq 40(%0), %%mm5\n"
       "movq 48(%0), %%mm6\n"
       "movq 56(%0), %%mm7\n"
+/*
       "movntq %%mm0, (%1)\n"
       "movntq %%mm1, 8(%1)\n"
       "movntq %%mm2, 16(%1)\n"
@@ -391,13 +413,22 @@ static void * mmx2_memcpy(void * to, const void * from, size_t len)
       "movntq %%mm5, 40(%1)\n"
       "movntq %%mm6, 48(%1)\n"
       "movntq %%mm7, 56(%1)\n"
+*/
+      "movq %%mm0, (%1)\n"
+      "movq %%mm1, 8(%1)\n"
+      "movq %%mm2, 16(%1)\n"
+      "movq %%mm3, 24(%1)\n"
+      "movq %%mm4, 32(%1)\n"
+      "movq %%mm5, 40(%1)\n"
+      "movq %%mm6, 48(%1)\n"
+      "movq %%mm7, 56(%1)\n"
       :: "r" (from), "r" (to) : "memory");
       ((const unsigned char *)from)+=64;
       ((unsigned char *)to)+=64;
     }
      /* since movntq is weakly-ordered, a "sfence"
      * is needed to become ordered again. */
-    __asm__ __volatile__ ("sfence":::"memory");
+    //__asm__ __volatile__ ("sfence":::"memory");
     __asm__ __volatile__ ("emms":::"memory");
   }
   /*
@@ -494,10 +525,20 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
                                                               unsigned char *foreground,
                                                               int width, int alpha )
 {
-    const int64_t alpha2 = 0x0000FFFF00000000;
-    const int64_t alpha1 = 0xFFFF0000FFFFFFFF;
-    const int64_t round  = 0x0080008000800080;
+    const uint64_t alpha2 = 0x0000FFFF00000000;
+    const uint64_t alpha1 = 0xFFFF0000FFFFFFFF;
+    const uint64_t round  = 0x0080008000800080;
     int i;
+
+    if( !alpha ) {
+        blit_packed422_scanline( output, input, width );
+        return;
+    }
+
+    if( alpha == 256 ) {
+        composite_packed4444_to_packed422_scanline( output, input, foreground, width );
+        return;
+    }
 
     SPEEDY_START();
     PREFETCH_2048( input );
@@ -508,64 +549,69 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
     pxor_r2r( mm7, mm7 );
 
     for( i = width/2; i; i-- ) {
-        // mm1 = [ cr ][ y ][ cb ][ y ]
-        movd_m2r( *input, mm1 );
-        punpcklbw_r2r( mm7, mm1 );
+        int fg1 = *((unsigned int *) foreground);
+        int fg2 = *(((unsigned int *) foreground)+1);
 
-        movq_m2r( *foreground, mm3 );
-        movq_r2r( mm3, mm4 );
-        punpcklbw_r2r( mm7, mm3 );
-        punpckhbw_r2r( mm7, mm4 );
-        // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
+        if( fg1 || fg2 ) {
+            // mm1 = [ cr ][ y ][ cb ][ y ]
+            movd_m2r( *input, mm1 );
+            punpcklbw_r2r( mm7, mm1 );
 
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
-        pshufw_r2r( mm3, mm5, 0 );
-        pshufw_r2r( mm4, mm6, 0 );
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
-        pshufw_r2r( mm3, mm3, 201 );
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16
-        pshufw_r2r( mm4, mm4, 16 );
+            movq_m2r( *foreground, mm3 );
+            movq_r2r( mm3, mm4 );
+            punpcklbw_r2r( mm7, mm3 );
+            punpckhbw_r2r( mm7, mm4 );
+            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
 
-        pand_m2r( alpha1, mm3 );
-        pand_m2r( alpha2, mm4 );
-        pand_m2r( alpha1, mm5 );
-        pand_m2r( alpha2, mm6 );
-        por_r2r( mm4, mm3 );
-        por_r2r( mm6, mm5 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
+            pshufw_r2r( mm3, mm5, 0 );
+            pshufw_r2r( mm4, mm6, 0 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            pshufw_r2r( mm3, mm3, 201 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16
+            pshufw_r2r( mm4, mm4, 16 );
 
-        // now, mm5 is af and mm1 is B.  Need to multiply them.
-        pmullw_r2r( mm1, mm5 );
+            pand_m2r( alpha1, mm3 );
+            pand_m2r( alpha2, mm4 );
+            pand_m2r( alpha1, mm5 );
+            pand_m2r( alpha2, mm6 );
+            por_r2r( mm4, mm3 );
+            por_r2r( mm6, mm5 );
 
-        // Multiply by appalpha.
-        pmullw_r2r( mm2, mm3 );
-        paddw_m2r( round, mm3 );
-        psrlw_i2r( 8, mm3 );
-        // Result is now B + F.
-        paddw_r2r( mm3, mm1 );
+            // now, mm5 is af and mm1 is B.  Need to multiply them.
+            pmullw_r2r( mm1, mm5 );
 
-        // Round up appropriately.
-        paddw_m2r( round, mm5 );
+            // Multiply by appalpha.
+            pmullw_r2r( mm2, mm3 );
+            paddw_m2r( round, mm3 );
+            psrlw_i2r( 8, mm3 );
+            // Result is now B + F.
+            paddw_r2r( mm3, mm1 );
 
-        // mm6 contains our i>>8;
-        movq_r2r( mm5, mm6 );
-        psrlw_i2r( 8, mm6 );
+            // Round up appropriately.
+            paddw_m2r( round, mm5 );
 
-        // Add mm6 back into mm5.  Now our result is in the high bytes.
-        paddw_r2r( mm6, mm5 );
+            // mm6 contains our i>>8;
+            movq_r2r( mm5, mm6 );
+            psrlw_i2r( 8, mm6 );
 
-        // Shift down.
-        psrlw_i2r( 8, mm5 );
+            // Add mm6 back into mm5.  Now our result is in the high bytes.
+            paddw_r2r( mm6, mm5 );
 
-        // Multiply by appalpha.
-        pmullw_r2r( mm2, mm5 );
-        paddw_m2r( round, mm5 );
-        psrlw_i2r( 8, mm5 );
+            // Shift down.
+            psrlw_i2r( 8, mm5 );
 
-        psubusw_r2r( mm5, mm1 );
+            // Multiply by appalpha.
+            pmullw_r2r( mm2, mm5 );
+            paddw_m2r( round, mm5 );
+            psrlw_i2r( 8, mm5 );
 
-        // mm1 = [ B + F - af*B ]
-        packuswb_r2r( mm1, mm1 );
-        movd_r2m( mm1, *output );
+            psubusw_r2r( mm5, mm1 );
+
+            // mm1 = [ B + F - af*B ]
+            packuswb_r2r( mm1, mm1 );
+            movd_r2m( mm1, *output );
+        }
 
         foreground += 8;
         output += 4;
@@ -623,9 +669,9 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
                                                         unsigned char *input,
                                                         unsigned char *foreground, int width )
 {
-    const int64_t alpha2 = 0x0000FFFF00000000;
-    const int64_t alpha1 = 0xFFFF0000FFFFFFFF;
-    const int64_t round  = 0x0080008000800080;
+    const uint64_t alpha2 = 0x0000FFFF00000000;
+    const uint64_t alpha1 = 0xFFFF0000FFFFFFFF;
+    const uint64_t round  = 0x0080008000800080;
     int i;
 
     SPEEDY_START();
@@ -634,55 +680,76 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
 
     pxor_r2r( mm7, mm7 );
     for( i = width/2; i; i-- ) {
-        // mm1 = [ cr ][ y ][ cb ][ y ]
-        movd_m2r( *input, mm1 );
-        punpcklbw_r2r( mm7, mm1 );
+        int fg1 = *((unsigned int *) foreground);
+        int fg2 = *(((unsigned int *) foreground)+1);
 
-        movq_m2r( *foreground, mm3 );
-        movq_r2r( mm3, mm4 );
-        punpcklbw_r2r( mm7, mm3 );
-        punpckhbw_r2r( mm7, mm4 );
-        // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
+        if( (fg1 & 0xff) == 0xff && (fg2 & 0xff) == 0xff ) {
+            movq_m2r( *foreground, mm3 );
+            movq_r2r( mm3, mm4 );
+            punpcklbw_r2r( mm7, mm3 );
+            punpckhbw_r2r( mm7, mm4 );
+            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            pshufw_r2r( mm3, mm3, 201 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16
+            pshufw_r2r( mm4, mm4, 16 );
+            pand_m2r( alpha1, mm3 );
+            pand_m2r( alpha2, mm4 );
+            por_r2r( mm4, mm3 );
+            // mm1 = [ B + F - af*B ]
+            packuswb_r2r( mm3, mm3 );
+            movd_r2m( mm3, *output );
+        } else if( fg1 || fg2 ) {
+            // mm1 = [ cr ][ y ][ cb ][ y ]
+            movd_m2r( *input, mm1 );
+            punpcklbw_r2r( mm7, mm1 );
 
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
-        pshufw_r2r( mm3, mm5, 0 );
-        pshufw_r2r( mm4, mm6, 0 );
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
-        pshufw_r2r( mm3, mm3, 201 );
-        // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 1 y ][ 0 a ][ 0 a ]  == 00010000 == 16
-        pshufw_r2r( mm4, mm4, 16 );
+            movq_m2r( *foreground, mm3 );
+            movq_r2r( mm3, mm4 );
+            punpcklbw_r2r( mm7, mm3 );
+            punpckhbw_r2r( mm7, mm4 );
+            // mm3 and mm4 will be the appropriate colours, mm5 and mm6 for alpha.
 
-        pand_m2r( alpha1, mm3 );
-        pand_m2r( alpha2, mm4 );
-        pand_m2r( alpha1, mm5 );
-        pand_m2r( alpha2, mm6 );
-        por_r2r( mm4, mm3 );
-        por_r2r( mm6, mm5 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0 a ][ 0 a ][ 0 a ][ 0 a ]
+            pshufw_r2r( mm3, mm5, 0 );
+            pshufw_r2r( mm4, mm6, 0 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 3 cr ][ 0 a ][ 2 cb ][ 1 y ]  == 11001000 == 201
+            pshufw_r2r( mm3, mm3, 201 );
+            // [ 3 cr ][ 2 cb ][ 1 y ][ 0 a ]  -> [ 0  a ][ 1 y ][ 0  a ][ 0 a ]  == 00010000 == 16
+            pshufw_r2r( mm4, mm4, 16 );
 
-        // now, mm5 is af and mm1 is B.  Need to multiply them.
-        pmullw_r2r( mm1, mm5 );
+            pand_m2r( alpha1, mm3 );
+            pand_m2r( alpha2, mm4 );
+            pand_m2r( alpha1, mm5 );
+            pand_m2r( alpha2, mm6 );
+            por_r2r( mm4, mm3 );
+            por_r2r( mm6, mm5 );
 
-        // Result is now B + F.
-        paddw_r2r( mm3, mm1 );
+            // now, mm5 is af and mm1 is B.  Need to multiply them.
+            pmullw_r2r( mm1, mm5 );
 
-        // Round up appropriately.
-        paddw_m2r( round, mm5 );
+            // Result is now B + F.
+            paddw_r2r( mm3, mm1 );
 
-        // mm6 contains our i>>8;
-        movq_r2r( mm5, mm6 );
-        psrlw_i2r( 8, mm6 );
+            // Round up appropriately.
+            paddw_m2r( round, mm5 );
 
-        // Add mm6 back into mm5.  Now our result is in the high bytes.
-        paddw_r2r( mm6, mm5 );
+            // mm6 contains our i>>8;
+            movq_r2r( mm5, mm6 );
+            psrlw_i2r( 8, mm6 );
 
-        // Shift down.
-        psrlw_i2r( 8, mm5 );
+            // Add mm6 back into mm5.  Now our result is in the high bytes.
+            paddw_r2r( mm6, mm5 );
 
-        psubusw_r2r( mm5, mm1 );
+            // Shift down.
+            psrlw_i2r( 8, mm5 );
 
-        // mm1 = [ B + F - af*B ]
-        packuswb_r2r( mm1, mm1 );
-        movd_r2m( mm1, *output );
+            psubusw_r2r( mm5, mm1 );
+
+            // mm1 = [ B + F - af*B ]
+            packuswb_r2r( mm1, mm1 );
+            movd_r2m( mm1, *output );
+        }
 
         foreground += 8;
         output += 4;
@@ -692,6 +759,162 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
 
     SPEEDY_END();
 }
+
+void composite_alphamask_to_packed4444_scanline_c( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *mask,
+                                                   int width,
+                                                   int textluma, int textcb,
+                                                   int textcr )
+{
+    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    int i;
+
+    SPEEDY_START();
+
+    for( i = 0; i < width; i++ ) {
+        int a = *mask;
+
+        if( a == 0xff ) {
+            *((unsigned int *) output) = opaque;
+        } else if( (input[ 0 ] == 0x00) ) {
+            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+                                       | (multiply_alpha( a, textcb ) << 16)
+                                       | (multiply_alpha( a, textluma ) << 8) | a;
+        } else if( a ) {
+            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
+                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
+                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+        }
+        mask++;
+        output += 4;
+        input += 4;
+    }
+    SPEEDY_END();
+}
+
+void composite_alphamask_to_packed4444_scanline_mmxext( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *mask,
+                                                   int width,
+                                                   int textluma, int textcb,
+                                                   int textcr )
+{
+    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    const uint64_t round  = 0x0080008000800080;
+    int i;
+
+    SPEEDY_START();
+
+    movd_m2r( textluma, mm1 );
+    movd_m2r( textcb, mm2 );
+    movd_m2r( textcr, mm3 );
+
+    // mm1 = [  0 ][  0 ][ y ][ 0 ] == 11110011 == 243
+    pshufw_r2r( mm1, mm1, 243 );
+    // mm2 = [  0 ][ cb ][ 0 ][ 0 ] == 11001111 == 207
+    pshufw_r2r( mm2, mm2, 207 );
+    // mm3 = [ cr ][  0 ][ 0 ][ 0 ] == 00111111 == 63
+    pshufw_r2r( mm3, mm3, 63 );
+
+    // mm1 = [ cr ][ cb ][ y ][ 0 ]
+    por_r2r( mm2, mm1 );
+    por_r2r( mm3, mm1 );
+
+    for( i = 0; i < width; i++ ) {
+        int a = *mask;
+
+        if( a == 0xff ) {
+            *((unsigned int *) output) = opaque;
+        } else if( (input[ 0 ] == 0x00) ) {
+            movd_m2r( a, mm0 );
+            movq_r2r( mm0, mm7 );
+            pshufw_r2r( mm0, mm0, 0 );
+            movq_r2r( mm1, mm5 );
+            pmullw_r2r( mm0, mm5 );
+            paddw_m2r( round, mm5 );
+            movq_r2r( mm5, mm6 );
+            psrlw_i2r( 8, mm6 );
+            paddw_r2r( mm6, mm5 );
+            psrlw_i2r( 8, mm5 );
+            por_r2r( mm7, mm5 );
+            packuswb_r2r( mm5, mm5 );
+            movd_r2m( mm5, *output );
+/*
+            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+                                       | (multiply_alpha( a, textcb ) << 16)
+                                       | (multiply_alpha( a, textluma ) << 8) | a;
+*/
+        } else if( a ) {
+/*
+            movd_m2r( a, mm0 );
+            movq_r2r( mm0, mm7 );
+            pshufw_r2r( mm0, mm0, 0 );
+            movq_r2r( mm1, mm5 );
+
+            pmullw_r2r( mm0, mm5 );
+            paddw_m2r( round, mm5 );
+            movq_r2r( mm5, mm6 );
+            psrlw_i2r( 8, mm6 );
+            paddw_r2r( mm6, mm5 );
+            psrlw_i2r( 8, mm5 );
+            por_r2r( mm7, mm5 );
+            packuswb_r2r( mm5, mm5 );
+            movd_r2m( mm5, *output );
+*/
+            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
+                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
+                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+        }
+        mask++;
+        output += 4;
+        input += 4;
+    }
+    emms();
+    SPEEDY_END();
+}
+
+void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
+                                                       unsigned char *input,
+                                                       unsigned char *mask, int width,
+                                                       int textluma, int textcb,
+                                                       int textcr, int alpha )
+{
+    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
+    int i;
+
+    SPEEDY_START();
+
+    for( i = 0; i < width; i++ ) {
+        int af = *mask;
+
+        if( af ) {
+           int a = ((af * alpha) + 0x80) >> 8;
+
+           if( a == 0xff ) {
+               *((unsigned int *) output) = opaque;
+           } else if( (input[ 0 ] == 0x00) ) {
+               *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
+                                          | (multiply_alpha( a, textcb ) << 16)
+                                          | (multiply_alpha( a, textluma ) << 8) | a;
+           } else if( a ) {
+               *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
+                                         | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
+                                         | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
+                                         | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
+           }
+        }
+        mask++;
+        output += 4;
+        input += 4;
+    }
+
+    SPEEDY_END();
+}
+
+
 
 static uint32_t speedy_accel;
 
@@ -705,6 +928,8 @@ void setup_speedy_calls( void )
     blit_packed422_scanline = blit_packed422_scanline_c;
     composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_c;
     composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_c;
+    composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_c;
+    composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
@@ -714,6 +939,7 @@ void setup_speedy_calls( void )
         blit_packed422_scanline = blit_packed422_scanline_mmxext_xine;
         composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_mmxext;
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
+        composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;

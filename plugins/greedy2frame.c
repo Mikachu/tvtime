@@ -120,7 +120,7 @@ static void deinterlace_greedytwoframe_packed422_scanline_mmxext( unsigned char 
         pandn_r2r( mm7, mm5 );
         por_r2r( mm5, mm4 );
 
-        movntq_r2m( mm4, *output );
+        movq_r2m( mm4, *output );
 
         // Advance to the next set of pixels.
         output += 8;

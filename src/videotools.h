@@ -56,20 +56,6 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *botcr,
                                                     int width );
 
-/**
- * These are the compositing routines we use in tvtime.
- */
-
-void composite_alphamask_packed4444_scanline( unsigned char *output,
-                                              unsigned char *background,
-                                              unsigned char *foreground, int width,
-                                              int textluma, int textcb,
-                                              int textcr );
-void composite_alphamask_alpha_to_packed4444_scanline( unsigned char *output,
-                                                       unsigned char *background,
-                                                       unsigned char *foreground, int width,
-                                                       int textluma, int textcb,
-                                                       int textcr, int alpha );
 
 void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width );
 
@@ -107,12 +93,12 @@ void rgba32_to_packed4444_rec601_scanline( unsigned char *output,
 /**
  * Frame functions.
  */
-void composite_alphamask_packed4444( unsigned char *output, int owidth,
-                                     int oheight, int ostride,
-                                     unsigned char *mask, int mwidth,
-                                     int mheight, int mstride,
-                                     int luma, int cb, int cr,
-                                     int xpos, int ypos );
+void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
+                                        int oheight, int ostride,
+                                        unsigned char *mask, int mwidth,
+                                        int mheight, int mstride,
+                                        int luma, int cb, int cr,
+                                        int xpos, int ypos );
 void composite_alphamask_alpha_to_packed4444( unsigned char *output, int owidth,
                                               int oheight, int ostride,
                                               unsigned char *mask, int mwidth,

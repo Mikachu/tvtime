@@ -163,74 +163,12 @@ void premultiply_packed4444_scanline( unsigned char *output, unsigned char *inpu
     }
 }
 
-void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned char *input,
-                                              unsigned char *mask, int width,
-                                              int textluma, int textcb, int textcr )
-{
-    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
-    int i;
-
-    for( i = 0; i < width; i++ ) {
-        int a = *mask;
-
-        if( a == 0xff ) {
-            *((unsigned int *) output) = opaque;
-        } else if( (input[ 0 ] == 0x00) ) {
-            *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
-                                       | (multiply_alpha( a, textcb ) << 16)
-                                       | (multiply_alpha( a, textluma ) << 8) | a;
-        } else if( a ) {
-            *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
-                                      | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
-                                      | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
-                                      | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
-        }
-        mask++;
-        output += 4;
-        input += 4;
-    }
-}
-
-void composite_alphamask_alpha_to_packed4444_scanline( unsigned char *output,
-                                                       unsigned char *input,
-                                                       unsigned char *mask, int width,
-                                                       int textluma, int textcb,
-                                                       int textcr, int alpha )
-{
-    unsigned int opaque = (textcr << 24) | (textcb << 16) | (textluma << 8) | 0xff;
-    int i;
-
-    for( i = 0; i < width; i++ ) {
-        int af = *mask;
-
-        if( af ) {
-           int a = ((af * alpha) + 0x80) >> 8;
-
-           if( a == 0xff ) {
-               *((unsigned int *) output) = opaque;
-           } else if( (input[ 0 ] == 0x00) ) {
-               *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
-                                          | (multiply_alpha( a, textcb ) << 16)
-                                          | (multiply_alpha( a, textluma ) << 8) | a;
-           } else if( a ) {
-               *((unsigned int *) output) = ((input[ 3 ] + multiply_alpha( a, textcr - input[ 3 ] )) << 24)
-                                         | ((input[ 2 ] + multiply_alpha( a, textcb - input[ 2 ] )) << 16)
-                                         | ((input[ 1 ] + multiply_alpha( a, textluma - input[ 1 ] )) << 8)
-                                         | (a + multiply_alpha( 0xff - a, input[ 0 ] ));
-           }
-        }
-        mask++;
-        output += 4;
-        input += 4;
-    }
-}
-
-void composite_alphamask_packed4444( unsigned char *output, int owidth,
-                                     int oheight, int ostride,
-                                     unsigned char *mask, int mwidth,
-                                     int mheight, int mstride,
-                                     int luma, int cb, int cr,
-                                     int xpos, int ypos )
+void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
+                                        int oheight, int ostride,
+                                        unsigned char *mask, int mwidth,
+                                        int mheight, int mstride,
+                                        int luma, int cb, int cr,
+                                        int xpos, int ypos )
 {
     int dest_x, dest_y, src_x, src_y, blit_w, blit_h;
 
@@ -263,10 +201,10 @@ void composite_alphamask_packed4444( unsigned char *output, int owidth,
 
         output += dest_y * ostride;
         for( i = 0; i < blit_h; i++ ) {
-            composite_alphamask_packed4444_scanline( output + ((dest_x) * 4),
-                                                     output + ((dest_x) * 4),
-                                                     mask + ((src_y + i)*mstride) + src_x,
-                                                     blit_w, luma, cb, cr );
+            composite_alphamask_to_packed4444_scanline( output + ((dest_x) * 4),
+                                                        output + ((dest_x) * 4),
+                                                        mask + ((src_y + i)*mstride) + src_x,
+                                                        blit_w, luma, cb, cr );
             output += ostride;
         }
     }
@@ -439,7 +377,6 @@ void composite_bars_packed4444_scanline( unsigned char *output,
             unsigned char *curin = background + (j*4);
             int curstart = j * 256;
             int curend = curstart + 256;
-            int tmp1, tmp2;
             int alpha;
 
             if( barstart > curstart ) curstart = barstart;
@@ -450,21 +387,10 @@ void composite_bars_packed4444_scanline( unsigned char *output,
                 alpha = a;
             }
 
-            tmp1 = ( alpha - curin[ 0 ] ) * alpha;
-            tmp2 = curin[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            curout[ 0 ] = tmp2 & 0xff;
-
-            tmp1 = ( luma - curin[ 1 ] ) * alpha;
-            tmp2 = curin[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            curout[ 1 ] = tmp2 & 0xff;
-
-            tmp1 = ( cb - curin[ 2 ] ) * alpha;
-            tmp2 = curin[ 2 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            curout[ 2 ] = tmp2 & 0xff;
-
-            tmp1 = ( cr - curin[ 3 ] ) * alpha;
-            tmp2 = curin[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            curout[ 3 ] = tmp2 & 0xff;
+            curout[ 0 ] = curin[ 0 ] + multiply_alpha( alpha - curin[ 0 ], alpha );
+            curout[ 1 ] = curin[ 1 ] + multiply_alpha( luma - curin[ 1 ], alpha );
+            curout[ 2 ] = curin[ 2 ] + multiply_alpha( cb - curin[ 2 ], alpha );
+            curout[ 3 ] = curin[ 3 ] + multiply_alpha( cr - curin[ 3 ], alpha );
         }
     }
 }

@@ -195,7 +195,7 @@ static void deinterlace_twoframe_packed422_scanline_mmxext( unsigned char *outpu
         por_r2r( mm2, mm3 );            // mm3 = finished pixels
 
         // Put the pixels in place.
-        movntq_r2m( mm3, *output );
+        movq_r2m( mm3, *output );
 
         // Advance to the next set of pixels.
         output += 8;
