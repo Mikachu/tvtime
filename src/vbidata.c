@@ -203,14 +203,15 @@ static void parse_xds_packet( const char *packet, int length )
     int sum = 0;
     int i;
 
-    /* Stick a null at the end, and cut off the last two characters. */
+    /* Check the checksum for validity of the packet. */
     for( i = 0; i < length - 1; i++ ) {
         sum += packet[ i ];
     }
     if( (((~sum) & 0x7f) + 1) != packet[ length - 1 ] ) {
-        fprintf( stderr, "XDS checksum invalid, ignoring packet.\n" );
         return;
     }
+
+    /* Stick a null at the end, and cut off the last two characters. */
     packet[ length - 2 ] = '\0';
     length -= 2;
 
