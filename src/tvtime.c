@@ -508,6 +508,7 @@ int main( int argc, char **argv )
     double_plugin_init();
     linearblend_plugin_init();
     scalerbob_plugin_init();
+    simplemo_plugin_init();
     
 
     ct = config_new( argc, argv );

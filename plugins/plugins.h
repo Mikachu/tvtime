@@ -36,5 +36,6 @@ void videobob_plugin_init( void );
 void double_plugin_init( void );
 void linearblend_plugin_init( void );
 void scalerbob_plugin_init( void );
+void simplemo_plugin_init( void );
 
 #endif /* TVTIME_PLUGINS_H_INCLUDED */
