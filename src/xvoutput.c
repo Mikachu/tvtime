@@ -404,6 +404,8 @@ void xv_poll_events( input_t *in )
     KeySym mykey;
     int arg = 0;
     char mykey_string;
+    int reconfigure = 0;
+    int reconfwidth, reconfheight;
 
     while (XPending(display)) {
         XNextEvent(display, &event);
@@ -411,16 +413,11 @@ void xv_poll_events( input_t *in )
         case Expose:
             break;
         case ConfigureNotify:
-            XTranslateCoordinates( display, window, DefaultRootWindow( display ), 0, 0,
-                                   &output_x, &output_y, &junk );
-
-            if( event.xconfigure.width != output_width || event.xconfigure.height != output_height ) {
-                output_width = event.xconfigure.width;
-                output_height = event.xconfigure.height;
-                calculate_video_area();
-                xv_clear_screen();
+            reconfwidth = event.xconfigure.width;
+            reconfheight = event.xconfigure.height;
+            if( reconfwidth != output_width || reconfheight != output_height ) {
+                reconfigure = 1;
             }
-            XSync( display, False );
             break;
         case KeyPress:
             mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
@@ -499,6 +496,14 @@ void xv_poll_events( input_t *in )
             break;
         default: break;
         }
+    }
+
+    if( reconfigure ) {
+        output_width = reconfwidth;
+        output_height = reconfheight;
+        calculate_video_area();
+        xv_clear_screen();
+        XSync( display, False );
     }
 }
 
