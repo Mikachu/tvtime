@@ -109,7 +109,10 @@ AC_C_ATTRIBUTE_ALIGNED
 
 dnl builtin([include],[libmpeg2/configure.incl])
 
-AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([plugins/Makefile])
-AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([
+	Makefile
+	docs/Makefile
+	plugins/Makefile
+	src/Makefile
+])
 AC_OUTPUT
