@@ -76,6 +76,7 @@ struct config_s
     int unmute_volume;
     int muted;
     int mute_on_exit;
+    int show_taglines;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     char *keymap_arg[ 8 * MAX_KEYSYMS ];
@@ -241,6 +242,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "MuteOnExit" ) ) {
             ct->mute_on_exit = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "ShowTaglines" ) ) {
+            ct->show_taglines = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ShowCC" ) ) {
@@ -718,6 +723,7 @@ config_t *config_new( void )
     ct->unmute_volume = -1;
     ct->muted = 0;
     ct->mute_on_exit = 1;
+    ct->show_taglines = 1;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
     memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
@@ -1628,5 +1634,10 @@ int config_get_muted( config_t *ct )
 int config_get_mute_on_exit( config_t *ct )
 {
     return ct->mute_on_exit;
+}
+
+int config_get_show_taglines( config_t *ct )
+{
+    return ct->show_taglines;
 }
 

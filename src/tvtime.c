@@ -1962,15 +1962,24 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( current_id != last_current_id || commands_xmltv_updated( commands ) ) {
             const char *curline = commands_get_xmltv_title( commands );
             char caption[ 256 ];
-            if( !curline ) {
+            if( !curline && config_get_show_taglines( ct ) ) {
                 curline = tagline;
             }
-            if( current_id ) {
-                snprintf( caption, sizeof( caption ), "tvtime [%d]: %s",
-                          current_id, curline );
+            if( curline ) {
+                if( current_id ) {
+                    snprintf( caption, sizeof( caption ), "tvtime [%d]: %s",
+                              current_id, curline );
+                } else {
+                    snprintf( caption, sizeof( caption ), "tvtime: %s",
+                              curline );
+                }
             } else {
-                snprintf( caption, sizeof( caption ), "tvtime: %s",
-                          curline );
+                if( current_id ) {
+                    snprintf( caption, sizeof( caption ), "tvtime [%d]",
+                              current_id );
+                } else {
+                    snprintf( caption, sizeof( caption ), "tvtime" );
+                }
             }
             output->set_window_caption( caption );
             last_current_id = current_id;
