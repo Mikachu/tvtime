@@ -73,6 +73,7 @@ void (*filter_luma_121_packed422_inplace_scanline)( unsigned char *data, int wid
 unsigned int (*diff_factor_packed422_scanline)( unsigned char *cur, unsigned char *old, int width );
 unsigned int (*comb_factor_packed422_scanline)( unsigned char *top, unsigned char *mid,
                                                 unsigned char *bot, int width );
+void (*kill_chroma_packed422_inplace_scanline)( unsigned char *data, int width );
 void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 
@@ -245,6 +246,16 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
     SPEEDY_END();
 
     return temp1;
+}
+
+void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width )
+{
+    SPEEDY_START();
+    while( width-- ) {
+        data[ 1 ] = 128;
+        data += 2;
+    }
+    SPEEDY_END();
 }
 
 void filter_luma_121_packed422_inplace_scanline_c( unsigned char *data, int width )
@@ -1161,6 +1172,7 @@ void setup_speedy_calls( int verbose )
     filter_luma_121_packed422_inplace_scanline = filter_luma_121_packed422_inplace_scanline_c;
     comb_factor_packed422_scanline = 0;
     diff_factor_packed422_scanline = diff_factor_packed422_scanline_c;
+    kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     speedy_memcpy = temp_memcpy;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
