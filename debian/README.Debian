@@ -3,7 +3,7 @@ tvtime
 
 This is the official Debian package for tvtime.
 
-   tvtime's source package is rather large, since it incorporates the 
+  tvtime's source package is rather large, since it incorporates the 
 Free UCS Outline Fonts [1], and also the DScaler [2] filters.  The 
 Debian package does not install the Free UCS Outline Fonts, but rather 
 depends on the ttf-freefont package.  As such, the debian/rules script 
@@ -15,7 +15,21 @@ built from source on this platform.  You will find the required
 copyright information in /usr/share/doc/tvtime/copyright.gz.
 These files are in contrib.
 
+  You will also want to enable the real-time clock module, if you don't
+already have it installed.  You should run `modconf` as root and install
+'kernel/drivers/char/rtc'.  This will load it on your next reboot.
+Alternatively, you can add the 'rtc' module to '/etc/modules'.
+
+  As well, you may also opt to let tvtime access high resolutions from
+the rtc device by executing:
+
+    sysctl -w dev.rtc.max-user-freq=1024
+
+To retain this setting, add the following line to your /etc/sysctl.conf
+
+    dev.rtc.max-user-freq = 1024
+
 [1]  http://savannah.nongnu.org/projects/freefont/
 [2]  http://deinterlace.sourceforge.net/
 
- -- Simon Law <sfllaw@debian.org>  Mon, 15 Sep 2003 12:21:25 -0400
+ -- Simon Law <sfllaw@debian.org>  Sun, 21 Sep 2003 17:47:51 -0400
