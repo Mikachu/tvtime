@@ -164,6 +164,7 @@ static void update_sar(dpy_info_t *info)
   int gcd;
   info->sar_frac_n = info->geometry.height*info->resolution.horizontal_pixels;
   info->sar_frac_d = info->geometry.width*info->resolution.vertical_pixels;
+  fprintf( stderr, "TELL ME WHAT THIS SAYS: %d / %d\n", info->sar_frac_n, info->sar_frac_d );
   gcd = calculate_gcd( info->sar_frac_n, info->sar_frac_d );
   if( gcd ) {
     info->sar_frac_n /= gcd;
