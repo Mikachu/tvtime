@@ -59,9 +59,7 @@
 #include "pulldown.h"
 
 /**
- * 0 == PULLDOWN_NONE
- * 1 == PULLDOWN_VEKTOR
- * 2 == PULLDOWN_DALIAS
+ * Which pulldown algorithm we're using.
  */
 enum {
     PULLDOWN_NONE = 0,
@@ -69,29 +67,7 @@ enum {
     PULLDOWN_DALIAS = 2,
     PULLDOWN_MAX = 3,
 };
-
 static unsigned int pulldown_alg = 0;
-
-/**
- * scratch paper:
- *
- *  A A  A  B  B  C  C C  D D
- * [T B  T][B  T][B  T B][T B]
- * [1 1][2  2][3  3][4 4][5 5]
- * [C C]      [M  M][C C][C C]
- *  D A  A  A  B  B  C C  C D
- *
- * Top 1 : Drop
- * Bot 1 : Show
- * Top 2 : Drop
- * Bot 2 : Drop
- * Top 3 : Merge
- * Bot 3 : Drop
- * Top 4 : Show 
- * Bot 4 : Drop
- * Top 5 : Drop
- * Bot 5 : Show
- */
 
 /**
  * This is ridiculous, but apparently I need to give my own
