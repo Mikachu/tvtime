@@ -19,7 +19,6 @@
 #ifndef RVRREADER_H_INCLUDED
 #define RVRREADER_H_INCLUDED
 
-#include <stdint.h>
 #include <ree.h>
 
 #ifdef __cplusplus

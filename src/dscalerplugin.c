@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
 #include "wine/driver.h"
@@ -30,8 +29,8 @@
 #include "DS_Filter.h"
 #include "DS_Deinterlace.h"
 
-#include "mm_accel.h"
 #include "speedy.h"
+#include "mm_accel.h"
 
 void __cdecl dscaler_memcpy( void *output, void *input, size_t size )
 {

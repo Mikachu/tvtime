@@ -19,7 +19,11 @@
 #ifndef PNGOUTPUT_H_INCLUDED
 #define PNGOUTPUT_H_INCLUDED
 
-#include <stdint.h>
+#if defined (__SVR4) && defined (__sun)
+# include <sys/int_types.h>
+#else
+# include <stdint.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

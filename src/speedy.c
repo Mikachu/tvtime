@@ -51,17 +51,16 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include "speedy.h"
+#include "speedtools.h"
 #include "attributes.h"
 #include "mmx.h"
 #include "mm_accel.h"
-#include "speedtools.h"
-#include "speedy.h"
 
 /* Function pointer definitions. */
 void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
