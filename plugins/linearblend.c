@@ -93,7 +93,6 @@ static void deinterlace_scanline_linear_blend( uint8_t *output,
     while( width-- ) {
         *output++ = (*t0++ + *b0++ + (*m1++ << 1)) >> 2;
     }
-    sfence();
     emms();
 #else
     width *= 2;
@@ -157,7 +156,6 @@ static void deinterlace_scanline_linear_blend2( uint8_t *output,
     while( width-- ) {
         *output++ = (*t1++ + *b1++ + (*m0++ << 1)) >> 2;
     }
-    sfence();
     emms();
 #else
     width *= 2;
