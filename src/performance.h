@@ -33,7 +33,7 @@ typedef struct performance_s performance_t;
 performance_t *performance_new( int fieldtimeus );
 void performance_delete( performance_t *perf );
 
-void performance_checkpoint_aquired_input_frame( performance_t *perf );
+void performance_checkpoint_acquired_input_frame( performance_t *perf );
 
 void performance_checkpoint_constructed_top_field( performance_t *perf );
 void performance_checkpoint_delayed_blit_top_field( performance_t *perf );
@@ -49,7 +49,7 @@ void performance_checkpoint_blit_bot_field_end( performance_t *perf );
 void performance_print_last_frame_stats( performance_t *perf, int framesize );
 void performance_print_frame_drops( performance_t *perf, int framesize );
 
-int performance_get_usecs_since_frame_aquired( performance_t *perf );
+int performance_get_usecs_since_frame_acquired( performance_t *perf );
 int performance_get_usecs_since_last_field( performance_t *perf );
 int performance_get_usecs_of_last_blit( performance_t *perf );
 

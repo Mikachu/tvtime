@@ -1098,7 +1098,7 @@ int main( int argc, char **argv )
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
-        fprintf( stderr, "tvtime: Attempting to aquire "
+        fprintf( stderr, "tvtime: Attempting to acquire "
                          "performance-enhancing features.\n" );
     }
     if( getenv( "TVTIME_USE_VGASYNC" ) && vgasync_init( verbose ) && verbose ) {
@@ -1233,7 +1233,7 @@ int main( int argc, char **argv )
         const char *fifo_args = 0;
         int printdebug = 0;
         int showbars, screenshot;
-        int aquired = 0;
+        int acquired = 0;
         int tuner_state;
         int we_were_late = 0;
         int paused = 0;
@@ -1341,7 +1341,7 @@ int main( int argc, char **argv )
             } else if( vidin ) {
                 curframe = videoinput_next_frame( vidin, &curframeid );
             }
-            aquired = 1;
+            acquired = 1;
             filtered_cur = 0;
         }
 
@@ -1385,7 +1385,7 @@ int main( int argc, char **argv )
             }
         }
 
-        performance_checkpoint_aquired_input_frame( perf );
+        performance_checkpoint_acquired_input_frame( perf );
 
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
@@ -1467,7 +1467,7 @@ int main( int argc, char **argv )
                 if( rtctimer ) {
 
                     we_were_late = 1;
-                    while( performance_get_usecs_since_frame_aquired( perf )
+                    while( performance_get_usecs_since_frame_acquired( perf )
                            < ( fieldtime - safetytime
                                - performance_get_usecs_of_last_blit( perf )
                                - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
@@ -1527,7 +1527,7 @@ int main( int argc, char **argv )
         performance_checkpoint_constructed_bot_field( perf );
 
         /* We're done with the input now. */
-        if( vidin && aquired ) {
+        if( vidin && acquired ) {
             if( fieldsavailable == 5 ) {
                 videoinput_free_frame( vidin, secondlastframeid );
                 secondlastframeid = lastframeid;

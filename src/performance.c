@@ -35,7 +35,7 @@ struct performance_s
     struct timeval lastfieldtime;
     struct timeval lastframetime;
 
-    struct timeval aquired_input;
+    struct timeval acquired_input;
 
     struct timeval constructed_top;
     struct timeval delay_blit_top;
@@ -74,7 +74,7 @@ performance_t *performance_new( int fieldtimeus )
     perf->drop_reset = 0;
     gettimeofday( &perf->lastfieldtime, 0 );
     gettimeofday( &perf->lastframetime, 0 );
-    gettimeofday( &perf->aquired_input, 0 );
+    gettimeofday( &perf->acquired_input, 0 );
     gettimeofday( &perf->constructed_top, 0 );
     gettimeofday( &perf->delay_blit_top, 0 );
     gettimeofday( &perf->blit_top_start, 0 );
@@ -93,14 +93,14 @@ void performance_delete( performance_t *perf )
     free( perf );
 }
 
-void performance_checkpoint_aquired_input_frame( performance_t *perf )
+void performance_checkpoint_acquired_input_frame( performance_t *perf )
 {
     int dropdiff;
 
-    perf->lastframetime = perf->aquired_input;
-    gettimeofday( &perf->aquired_input, 0 );
+    perf->lastframetime = perf->acquired_input;
+    gettimeofday( &perf->acquired_input, 0 );
 
-    dropdiff = timediff( &perf->aquired_input, &perf->lastframetime ) - (perf->fieldtime * 3);
+    dropdiff = timediff( &perf->acquired_input, &perf->lastframetime ) - (perf->fieldtime * 3);
     if( dropdiff >= 0 ) {
         perf->drop_history[ perf->drop_pos ] = ( dropdiff / (perf->fieldtime*2) ) + 2;
     } else {
@@ -155,11 +155,11 @@ void performance_checkpoint_blit_bot_field_end( performance_t *perf )
     perf->time_top_to_bot = timediff( &perf->blit_bot_end, &perf->blit_top_end );
 }
 
-int performance_get_usecs_since_frame_aquired( performance_t *perf )
+int performance_get_usecs_since_frame_acquired( performance_t *perf )
 {
     struct timeval now;
     gettimeofday( &now, 0 );
-    return timediff( &now, &perf->aquired_input );
+    return timediff( &now, &perf->acquired_input );
 }
 
 int performance_get_usecs_since_last_field( performance_t *perf )
@@ -176,7 +176,7 @@ int performance_get_usecs_of_last_blit( performance_t *perf )
 
 void performance_print_last_frame_stats( performance_t *perf, int framesize )
 {
-    double aquire = ((double) timediff( &perf->aquired_input, &perf->blit_bot_end )) / 1000.0;
+    double acquire = ((double) timediff( &perf->acquired_input, &perf->blit_bot_end )) / 1000.0;
     double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
     double wait_top = ((double) timediff( &perf->delay_blit_top, &perf->constructed_top )) / 1000.0;
     double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
@@ -184,9 +184,9 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
     double wait_bot = ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0;
     double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
 
-    fprintf( stderr, "tvtime: aquire % 2.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
-                     "tvtime:                 build bot % 2.2fms, wait bot % 2.2fms, blit bot % 2.2fms\n",
-             aquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
+    fprintf( stderr, "tvtime: acquire % 2.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
+                     "tvtime:                  build bot % 2.2fms, wait bot % 2.2fms, blit bot % 2.2fms\n",
+             acquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
     fprintf( stderr, "tvtime: system->video memory speed approximately %.2fMB/sec\n",
              ( ( (double) framesize ) / blit_top ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ) );
     fprintf( stderr, "tvtime: top-to-bot: % 2.2f, bot-to-top: % 2.2f\n",
@@ -202,14 +202,14 @@ void performance_print_frame_drops( performance_t *perf, int framesize )
         return;
     }
 
-    if( timediff( &perf->aquired_input, &perf->lastframetime ) > (perf->fieldtime * 3) ) {
+    if( timediff( &perf->acquired_input, &perf->lastframetime ) > (perf->fieldtime * 3) ) {
         double build_top = ((double) timediff( &perf->constructed_top, &perf->lastframetime )) / 1000.0;
         double blit_top = ((double) timediff( &perf->blit_top_end, &perf->blit_top_start )) / 1000.0;
         double build_bot = ((double) timediff( &perf->constructed_bot, &perf->blit_top_end )) / 1000.0;
         double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
 
         fprintf( stderr, "tvtime: Frame drop detected (%2.2fms between consecutive frames.\n",
-            ((double) timediff( &perf->aquired_input, &perf->lastframetime)) / 1000.0 );
+            ((double) timediff( &perf->acquired_input, &perf->lastframetime)) / 1000.0 );
         performance_print_last_frame_stats( perf, framesize );
 
         if( build_top >= blit_top && build_top >= build_bot && build_top >= blit_bot ) {
