@@ -408,6 +408,9 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
     free( osd->strings );
     if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
     if( osd->credits ) credits_delete( osd->credits );
+    osd_font_delete( osd->smallfont );
+    osd_font_delete( osd->medfont );
+    osd_font_delete( osd->bigfont );
     free( osd );
 }
 

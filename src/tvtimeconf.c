@@ -723,7 +723,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     return 1;
 }
 
-void config_delete( config_t *ct )
+void config_free_data( config_t *ct )
 {
     if( ct->v4ldev ) free( ct->v4ldev );
     if( ct->norm ) free( ct->norm );
@@ -739,7 +739,18 @@ void config_delete( config_t *ct )
     if( ct->config_filename ) free( ct->config_filename );
     if( ct->deinterlace_method ) free( ct->deinterlace_method );
     if( ct->configsave ) configsave_close( ct->configsave );
-    /* TODO: Free modelist. */
+}
+
+void config_delete( config_t *ct )
+{
+    while( ct->modelist ) {
+        tvtime_modelist_t *mode = ct->modelist;
+        ct->modelist = mode->next;
+        config_free_data( &(mode->settings) );
+        free( mode->name );
+        free( mode );
+    }
+    config_free_data( ct );
     free( ct );
 }
 

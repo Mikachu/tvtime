@@ -354,6 +354,7 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
 
 void station_delete( station_mgr_t *mgr )
 {
+    free( mgr->table );
     free( mgr->norm );
     free( mgr );
 }

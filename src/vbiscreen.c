@@ -264,6 +264,7 @@ void update_all_rows( vbiscreen_t *vs )
 
 void vbiscreen_delete( vbiscreen_t *vs )
 {
+    osd_font_delete( vs->font );
     free( vs );
 }
 

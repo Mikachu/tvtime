@@ -117,6 +117,7 @@ console_t *console_new( int x, int y, int width, int height,
     con->num_lines = 0;
     con->coords = NULL;
     con->show_cursor = 1;
+    con->drop_pos = 0;
 
 #if 0
     con->text = (char *)malloc( con->rows * con->cols ); 
@@ -129,7 +130,7 @@ console_t *console_new( int x, int y, int width, int height,
     con->line = (osd_string_t **)malloc( 1 * sizeof( osd_string_t * ) );
     if( !con->line ) {
         console_delete( con );
-        return NULL;
+        return 0;
     }
 
     con->fontfile = "FreeMonoBold.ttf";
@@ -229,6 +230,8 @@ void console_delete( console_t *con )
         }
         free( con->line );
     }
+
+    osd_font_delete( con->font );
 
     if( con->text ) free( con->text );
     if( con->coords ) free( con->coords );
