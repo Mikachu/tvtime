@@ -9,4 +9,6 @@ News for 0.9.6
      date with our naming.
   *  We added alot of keymaps, so we also changed some of the default
      keys!
+  *  tvtime now shows a blue screen if the tuner reports no signal.
+     Please let me know if this exposes any problems.
 
