@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-11-13 23:54-0400\n"
-"PO-Revision-Date: 2003-12-12 05:45+0200\n"
+"PO-Revision-Date: 2004-02-15 05:12+0200\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
 "MIME-Version: 1.0\n"
@@ -125,11 +125,11 @@ msgstr "16:9 + ylipyyhkäisy"
 
 #: src/tvtime.c:1064 src/tvtime.c:1091
 msgid "1.85:1"
-msgstr "1.85:1"
+msgstr "1,85:1"
 
 #: src/tvtime.c:1069 src/tvtime.c:1096
 msgid "2.35:1"
-msgstr "2.35:1"
+msgstr "2,35:1"
 
 #: src/tvtime.c:1074 src/tvtime.c:1115
 msgid "4:3 centre"
@@ -185,7 +185,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Videokaappauskorttisi ajuri, %s, ei näytä\n"
+"    Videokaappauskortin ajuri, %s, ei näytä\n"
 "    tukevan kaappausta täydellä kuvataajuudella. Tarkista, että ajuri\n"
 "    on oikein asennettu, ja että valittuna on oikea\n"
 "    videolaite (%s).\n"
@@ -223,10 +223,10 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Videokaappauskorttisi ajuri, %s, ei tarjoa tarpeeksi\n"
+"    Videokaappauskortin ajuri, %s, ei tarjoa tarpeeksi\n"
 "    puskurimuistia, jotta tvtime pystyisi käsittelemään videota. Tarkista\n"
 "    ajurin dokumentaation avulla, pystyykö ohjelmille tarkoitettujen\n"
-"    puskurien määrää lisäämään ja tee tästä vikailmoitus tvtimen\n"
+"    puskurien määrää lisäämään, ja tee tästä vikailmoitus tvtimen\n"
 "    virheidenseurantajärjestelmään osoitteessa: %s.\n"
 "\n"
 
@@ -277,7 +277,7 @@ msgstr "Käänteinen 2:3-filmisiirto ei mahdollista tällä TV-normilla."
 #: src/tvtime.c:2379 src/tvtime.c:2520
 #, c-format
 msgid "Screenshot: %s"
-msgstr "Ruutukaappaus: %s"
+msgstr "Kuvakaappaus: %s"
 
 #: src/tvtime.c:2653
 msgid "Restarting tvtime.\n"
@@ -290,7 +290,7 @@ msgstr "Kiitos ohjelman käytöstä.\n"
 #: src/tvtime.c:2679
 #, c-format
 msgid "Running %s.\n"
-msgstr "%s on käynnissä.\n"
+msgstr "Käynnistetään %s.\n"
 
 #: src/tvtime.c:2697
 #, c-format
@@ -306,7 +306,7 @@ msgstr ""
 "\n"
 "    Enhanced Real Time Clock -tuki kernelissä on välttämätön sulavaa\n"
 "    toistoa varten. Suosittelemme \"rtc\"-moduulin lataamista kerneliin\n"
-"    ennen tvtimen käynnistämistä sekä tarkistamaan, että käyttäjälläsi on\n"
+"    ennen tvtimen käynnistämistä, sekä tarkistamaan, että käyttäjälläsi on\n"
 "    oikeudet laitetiedostoon (/dev/rtc tai /dev/misc/rtc). Lisätietoja\n"
 "    saa tukisivultamme osoitteessa: %s.\n"
 "\n"
@@ -389,7 +389,7 @@ msgstr "Hienoviritys"
 
 #: src/commands.c:352
 msgid "Change NTSC cable mode"
-msgstr "Vaihda NTSC-kaapeli-TV-tilaa"
+msgstr "Vaihda NTSC CATV -taajuusjärjestelmää"
 
 #: src/commands.c:358
 msgid "Set current channel as SECAM"
@@ -466,7 +466,7 @@ msgstr "Matala (360 kuvapistettä)"
 
 #: src/commands.c:661
 msgid "Moderate (576 pixels)"
-msgstr "Keskiverto (576 kuvapistettä)"
+msgstr "Keskitaso (576 kuvapistettä)"
 
 #: src/commands.c:667
 msgid "Standard (720 pixels)"
@@ -738,7 +738,7 @@ msgstr "Kanavahaku vaatii signaalintunnistuksen toimiakseen."
 
 #: src/commands.c:2245
 msgid "Scanning for channels being broadcast."
-msgstr "Haetaan näkyviä kanavia."
+msgstr "Kanavien haku käynnissä."
 
 #: src/commands.c:2263
 msgid "Closed captions disabled."
@@ -750,7 +750,7 @@ msgstr "Closed captions käytössä."
 
 #: src/commands.c:2281
 msgid "No VBI device configured for CC decoding."
-msgstr "Ei VBI-laitetta määriteltynä CC-näyttöä varten."
+msgstr "Ei VBI-laitetta määriteltynä CC-purkua varten."
 
 #: src/commands.c:2297
 #, c-format
@@ -961,8 +961,8 @@ msgid ""
 "                                 custom (first run tvtime-scanner)\n"
 "\n"
 msgstr ""
-"  -f, --frequencies=NIMI     Käytettävä virittimen kanavataulukko.\n"
-"                             (oletuksena us-cable).\n"
+"  -f, --frequencies=NIMI     Käytettävä virittimen taajuus- ja\n"
+"                             kanavataulukko. (oletuksena us-cable).\n"
 "\n"
 "                             Hyväksytyt vaihtoehdot:\n"
 "                                 us-cable \n"
@@ -1102,7 +1102,7 @@ msgstr "  -X, --display=DISPLAY      Yhdistä annettuun X-palvelimeen.\n"
 #: src/tvtimeconf.c:1135 src/tvtimeconf.c:1298
 #, c-format
 msgid "Reading configuration from %s\n"
-msgstr "Luetaan asetuksia tiedostosta %s\n"
+msgstr "Luetaan asetukset tiedostosta %s\n"
 
 #: src/tvtimeconf.c:1045
 msgid "Saving command line options.\n"
@@ -1183,7 +1183,7 @@ msgstr "%s: Annetaan komento %s.\n"
 #: src/tvtime-scanner.c:91
 #, c-format
 msgid "Scanning using TV standard %s.\n"
-msgstr "Haetaan kanavia %s-standardilla.\n"
+msgstr "Haetaan kanavia TV-standardilla %s.\n"
 
 #: src/tvtime-scanner.c:114
 #, c-format
