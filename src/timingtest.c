@@ -45,12 +45,15 @@ static const char *tests[] = {
    "blit_colour_packed422_scanline_c 720x480 frame",
    "blit_colour_packed422_scanline_mmx 720x480 frame",
    "blit_colour_packed422_scanline_mmxext 720x480 frame",
+   "blit_packed422_scanline_c 720x480 frame",
+   "blit_packed422_scanline_i386_linux 720x480 frame",
+   "blit_packed422_scanline_mmxext_billy 720x480 frame",
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
 int main( int argc, char **argv )
 {
-    unsigned char *source422planar;
+    unsigned char *source422packed;
     unsigned char *dest422packed;
     uint64_t avg_sum = 0;
     uint64_t avg_count = 0;
@@ -85,17 +88,17 @@ int main( int argc, char **argv )
     /* Always use the same random seed. */
     srandom( seed );
 
-    source422planar = (unsigned char *) malloc( width * height * 2 );
+    source422packed = (unsigned char *) malloc( width * height * 2 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
 
-    if( !source422planar || !dest422packed ) {
+    if( !source422packed || !dest422packed ) {
         fprintf( stderr, "timingtest: Can't allocate memory.\n" );
         return 1;
     }
 
     for( i = 0; i < width*height*2; i++ ) {
-        //source422planar[ i ] = i % 256;
-        source422planar[ i ] = random() % 256;
+        //source422packed[ i ] = i % 256;
+        source422packed[ i ] = random() % 256;
     }
 
     /* Sleep to let the system cool off. */
@@ -107,19 +110,37 @@ int main( int argc, char **argv )
         if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_c 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_c( source422planar + (stride*j), width, 128, 128, 128 );
+                blit_colour_packed422_scanline_c( dest422packed + (stride*j), width, 128, 128, 128 );
             }
             rdtscll( after );
         } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_mmx( source422planar + (stride*j), width, 128, 128, 128 );
+                blit_colour_packed422_scanline_mmx( dest422packed + (stride*j), width, 128, 128, 128 );
             }
             rdtscll( after );
         } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_mmxext( source422planar + (stride*j), width, 128, 128, 128 );
+                blit_colour_packed422_scanline_mmxext( dest422packed + (stride*j), width, 128, 128, 128 );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_c 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                blit_packed422_scanline_c( dest422packed + (stride*j), source422packed + (stride*j), width );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_i386_linux 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                blit_packed422_scanline_i386_linux( dest422packed + (stride*j), source422packed + (stride*j), width );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmxext_billy 720x480 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height; j++ ) {
+                blit_packed422_scanline_mmxext_billy( dest422packed + (stride*j), source422packed + (stride*j), width );
             }
             rdtscll( after );
         }
@@ -132,7 +153,7 @@ int main( int argc, char **argv )
     fprintf( stderr, "timingtest: %llu runs tested, average time was %llu cycles.\n",
              avg_count, (avg_sum/avg_count ) );
 
-    free( source422planar );
+    free( source422packed );
     free( dest422packed );
     return 0;
 }

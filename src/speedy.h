@@ -67,8 +67,8 @@ void blit_colour_packed4444_scanline_c( unsigned char *output, int width,
  * Scanline blitter for packed 4:2:2 scanlines.  This implementation uses
  * the fast memcpy code from xine which got it from mplayer.
  */
-void blit_packed422_scanline_mmxext_xine( unsigned char *dest,
-                                          const unsigned char *src, int width );
+void blit_packed422_scanline_mmxext_billy( unsigned char *dest,
+                                           const unsigned char *src, int width );
 void blit_packed422_scanline_i386_linux( unsigned char *dest,
                                          const unsigned char *src, int width );
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src,
