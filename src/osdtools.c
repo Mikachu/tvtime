@@ -20,12 +20,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 #include "videotools.h"
 #include "speedy.h"
 #include "pnginput.h"
 #include "leetft.h"
 #include "osdtools.h"
 #include "utils.h"
+
 
 #define OSD_FADEOUT_TIME 15
 
@@ -1099,3 +1101,85 @@ void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
     }
 }
 
+int osd_list_set_multitext( osd_list_t *osdl, int cur, const char *textarg,
+                             int numlines, int maxwidth )
+{
+    static const char ellipsis[] = "...";
+    const size_t ellipsislen = strlen( ellipsis );
+    int textlen;
+    int lastline = cur + numlines;
+    char textbuf[4096];
+    char *text = textbuf;
+    int width;
+    int breakpos;
+    int maxwidthpos;
+    int pos;
+
+    /*
+     * We make a copy of the textarg, since we'll want to be able to do
+     * changes to our local copy.
+     */
+
+    snprintf( text, 4096, "%s", textarg );
+    
+    while( cur <= lastline ) {
+        /* Eat leading whitespace */
+        while( isspace( *text ) )
+            text++, textarg++;
+        
+        textlen = strlen( text );
+        if( textlen == 0 )
+            break;
+
+        /*
+         * Seek to the end of the line. This has to been done iteratively,
+         * since we have to decode the UTF-8 to skip over any tail bytes.
+         */
+        pos = 0;
+        width = 0;
+        while( width < maxwidth ) {
+            width++;
+            /* Skip tail bytes */
+            while( ( text[ ++pos ] & 0xc0 ) == 0x80 )
+                ;
+            if( text[pos] == '\0' ) {
+                breakpos = pos;
+                goto breaknow;
+            }
+        }
+        maxwidthpos = pos;
+
+        breakpos = -1;
+        for( pos = 0; pos <= maxwidthpos; pos++ ) {
+            if( isspace( text[ pos ] ) || text[ pos ] == '\0' ) {
+                breakpos = pos;
+                if( text[ pos ] == '\n' )
+                    break;
+            }
+        }
+        if( breakpos == -1 ) {
+            /* This place is as good as any to break... */
+            breakpos = maxwidthpos;
+        }
+
+        if( cur == lastline ) {
+            if( breakpos < textlen ) {
+                /* Seek back to fit the ellipsis. */
+                pos = breakpos;
+                pos -= ellipsislen;
+                /* Make sure to land at the start of a UTF-8 character. */
+                while( ( text[ pos ] & 0xc0 ) == 0x80 )
+                    pos--;
+                /* Write the ellipsis. Bounds have been checked. */
+                strcpy (text+pos, ellipsis);
+            }
+        }
+    breaknow:
+        text[ breakpos ] = '\0';
+        osd_list_set_text( osdl, cur++, text );
+        text[ breakpos ] = textarg[ breakpos ];
+        text = &text[ breakpos ];
+        textarg = &textarg[ breakpos ];
+    }
+    return cur;
+}

@@ -120,7 +120,8 @@ void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str );
 
 void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *title,
                                    const char *subtitle, const char *next );
-
+int tvtime_osd_list_set_multitext( tvtime_osd_t *osd, int cur,
+                                   const char *text, int numlines );
 #ifdef __cplusplus
 };
 #endif

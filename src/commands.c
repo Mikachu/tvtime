@@ -204,33 +204,34 @@ static void update_xmltv_channel( commands_t *cmd )
 
 static void display_xmltv_description( commands_t *cmd, const char *title,
                                        const char *subtitle,
-                                       const char *l1, const char *l2,
+                                       const char *description,
                                        const char *next_title )
 {
     int cur = 0;
 
     if( title ) {
-        tvtime_osd_list_set_text( cmd->osd, cur++, title );
+        /* Using set_multitext for one line only gives you the truncating. */
+        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, title, 1 );
     } else {
-        tvtime_osd_list_set_text( cmd->osd, cur++, "No information available" );
+        tvtime_osd_list_set_text( cmd->osd, cur++,
+                                  _("No program information available") );
     }
 
-    if( subtitle ) {
-        tvtime_osd_list_set_text( cmd->osd, cur++, subtitle );
+    if( subtitle && *subtitle ) {
+        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, subtitle, 1 );
     } else {
-        tvtime_osd_list_set_text( cmd->osd, cur++, "No information available" );
+        tvtime_osd_list_set_text( cmd->osd, cur++,
+                                  _("No program information available") );
     }
 
-    if( l1 || l2 ) {
+    if( description && *description ) {
         tvtime_osd_list_set_text( cmd->osd, cur++, "" );
-
-        if( l1 ) tvtime_osd_list_set_text( cmd->osd, cur++, l1 );
-        if( l2 ) tvtime_osd_list_set_text( cmd->osd, cur++, l2 );
+        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, description, 4 );
     }
 
-    if( next_title ) {
+    if( next_title && *next_title ) {
         tvtime_osd_list_set_text( cmd->osd, cur++, "" );
-        tvtime_osd_list_set_text( cmd->osd, cur++, next_title );
+        cur = tvtime_osd_list_set_multitext( cmd->osd, cur, next_title, 1 );
     }
     tvtime_osd_list_set_lines( cmd->osd, cur );
     tvtime_osd_list_set_hilight( cmd->osd, -1 );
@@ -240,32 +241,11 @@ static void display_xmltv_description( commands_t *cmd, const char *title,
 static void update_xmltv_display( commands_t *cmd )
 {
     if( cmd->xmltv && cmd->osd ) {
-        const int maxlinelen = 64;
         const char *desc;
-        char title[ 128 ];
-        char next_title_data[ 128 ];
+        const char *title;
+        char next_title[ 1024 ];
         char subtitle[ 1024 ];
-        char descdata[ 128 ];
-        char *line1 = 0;
-        char *line2 = 0;
-        char next_title[64];
         desc = xmltv_get_description( cmd->xmltv );
-        if( desc ) {
-            line1 = descdata;
-            line2 = 0;
-            if( truncate_string( descdata, desc, "...",
-                                 sizeof( descdata ) ) > maxlinelen ) {
-                /* truncate_string returns strlen(descdata) */
-                line2 = break_line( descdata, maxlinelen );
-                if( line2 == NULL ) {
-                    /*
-                     * FIXME
-                     * line breaking failed because no white space
-                     * was found. what should we do here?
-                     */
-                }
-            }
-        }
 
         if( xmltv_get_sub_title( cmd->xmltv ) ) {
            snprintf( subtitle, sizeof( subtitle ), "%s - %s",
@@ -276,33 +256,21 @@ static void update_xmltv_display( commands_t *cmd )
                      xmltv_get_times( cmd->xmltv ) );
         }
 
-        if( xmltv_get_title( cmd->xmltv ) ) {
-            truncate_string( title, xmltv_get_title( cmd->xmltv ), "...",
-                             sizeof( title ) );
-        } else {
-            *title = '\0';
-        }
+        title = xmltv_get_title( cmd->xmltv );
 
         if( xmltv_get_next_title( cmd->xmltv ) ) {
-            snprintf( next_title_data, sizeof( next_title_data ),
+            snprintf( next_title, sizeof( next_title ),
                       _("Next: %s"), xmltv_get_next_title( cmd->xmltv ) );
-            truncate_string( next_title, next_title_data,
-                             "...", sizeof( next_title ) );
         } else {
             *next_title = '\0';
         }
 
         if( !cmd->displayinfo || cmd->menuactive ) {
             tvtime_osd_show_program_info( cmd->osd, title, subtitle, next_title );
-            if( line1 || line2 ) {
-                tvtime_osd_set_info_available( cmd->osd, 1 );
-            } else {
-                tvtime_osd_set_info_available( cmd->osd, 0 );
-            }
+            tvtime_osd_set_info_available( cmd->osd, desc && *desc );
         } else {
             tvtime_osd_show_program_info( cmd->osd, 0, 0, 0 );
-            display_xmltv_description( cmd, title, subtitle, line1,
-                                       line2, next_title );
+            display_xmltv_description( cmd, title, subtitle, desc, next_title );
             tvtime_osd_set_info_available( cmd->osd, 0 );
         }
     }
@@ -1663,7 +1631,7 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
     tvtime_osd_list_set_text( osd, 1, _("Mono") );
     tvtime_osd_list_set_text( osd, 2, _("Stereo") );
     tvtime_osd_list_set_text( osd, 3, ntsc ?
-			      _("SAP") : _("Primary Language") );
+                              _("SAP") : _("Primary Language") );
     if( !ntsc ) tvtime_osd_list_set_text( osd, 4, _("Secondary Language") );
     if( curmode == VIDEOINPUT_MONO ) {
         tvtime_osd_list_set_hilight( osd, 1 );

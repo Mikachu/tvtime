@@ -1051,3 +1051,10 @@ void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *title,
     osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "", osd->delay );
 }
 
+int tvtime_osd_list_set_multitext( tvtime_osd_t *osd, int cur,
+                                   const char *text, int numlines )
+{
+    return osd_list_set_multitext( osd->list, cur, text, numlines,
+                                   /*osd->margin_right - osd->margin_left*/
+                                   80 );
+}

@@ -247,44 +247,6 @@ int lfputs( const char *s, FILE *stream );
 int lprintf( const char *format, ... );
 int lfprintf( FILE *stream, const char *format, ... );
 
-/**
- * This function copies src into dest, ensuring that dest does not overflow.
- *
- * If an overflow condition is prevented, the end part of dest is taken from
- * ellipsis.
- *
- * The function returns the length of the returned string. In the special case
- * that ellipsis is too large to fit into dest, the entire string is replaced
- * by a truncated version of said ellipsis if an overflow occurs.
- *
- * Examples of all cases:
- *
- * char dest [ 10 ];
- * truncate_string( dest, "01234", "...", 10 );         // Returns 5
- * puts (dest);                                         // Outputs "01234"
- *
- * truncate_string( dest, "012345678", "...", 10 );     // Returns 9
- * puts (dest);                                         // Outputs "012345678"
- *
- * truncate_string( dest, "0123456789012", "...", 10 ); // Returns 9
- * puts (dest);                                         // Outputs "0123456..."
- *
- * truncate_string( dest, "01234", ".............", 10; // Returns 5
- * puts (dest);                                         // Outputs "01234"
- *
- * truncate_string( dest, "012345678",
- *                  ".............", 10 );              // Returns 9
- * puts (dest);                                         // Outputs "012345678"
- *
- * truncate_string( dest, "0123456789012",
- *                  ".............", 10 );              // Returns 9
- * puts (dest);                                         // Outputs ".........."
- */
-int truncate_string( char *dest, const char *src,
-                     const char *ellipsis, size_t destsize );
-
-char *break_line( char *line, size_t maxlinelen );
-
 #ifdef __cplusplus
 };
 #endif

@@ -156,7 +156,8 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                                             uint8_t *background,
                                             int width, int xpos,
                                             int scanline );
-
+int osd_list_set_multitext( osd_list_t *odsl, int cur, const char *text,
+                            int numlines, int maxwidth );
 #ifdef __cplusplus
 };
 #endif
