@@ -56,10 +56,6 @@ General bugs
  * We should detect when your monitor's aspect ratio is not 4:3 and
    correct for that, and also check for non-square pixel sizes.
 
-636424 Xinerama support
- * We should enable the Xinerama support code from ogle that we have
-   in our source tree.
-
 
 Known incompatibility problems
 ------------------------------

@@ -96,6 +96,7 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_8", TVTIME_CHANNEL_8 },
     { "CHANNEL_9", TVTIME_CHANNEL_9 },
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
+    { "ENTER", TVTIME_ENTER },
 };
 
 int tvtime_num_commands( void )
