@@ -477,7 +477,7 @@ static int conf_xml_parse( config_t *ct, char *configFile )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-ahmsv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
+    fprintf( stderr, "usage: %s [-ahmsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
                      "\t\t[-n <norm>] [-f <frequencies>]\n", argv[ 0 ] );
 
@@ -485,6 +485,9 @@ static void print_usage( char **argv )
     fprintf( stderr, "\t-h\tShow this help message.\n" );
     fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
     fprintf( stderr, "\t-s\tPrint stats on frame drops (for debugging).\n" );
+
+    fprintf( stderr, "\t-S\tSave command line options to the config file.\n" );
+
     fprintf( stderr, "\t-v\tShow verbose messages.\n" );
 
     fprintf( stderr, "\t-F\tAdditional config file to load settings from.\n" );
@@ -523,6 +526,7 @@ config_t *config_new( int argc, char **argv )
     char *configFile = 0;
     char c;
     struct passwd *pwuid = 0;
+    int saveoptions = 0;
 
     config_t *ct = (config_t *) malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -702,11 +706,12 @@ config_t *config_new( int argc, char **argv )
         conf_xml_parse(ct, configFile);
     }
 
-    while( (c = getopt( argc, argv, "ahmsvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahmsSvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'm': ct->fullscreen = 1; break;
         case 's': ct->debug = 1; break;
+        case 'S': saveoptions = 1; break;
         case 'v': ct->verbose = 1; break;
         case 'F': configFile = strdup( optarg ); break;
         case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
@@ -746,6 +751,40 @@ config_t *config_new( int argc, char **argv )
     }
 
     ct->configsave = configsave_open( ct->config_filename );
+
+    if( ct->configsave && saveoptions ) {
+        char tempstring[ 32 ];
+        fprintf( stderr, "config: Saving command line options.\n" );
+
+        /**
+         * Options that aren't specified on the command line
+         * will match the config file anyway, so save everything that
+         * you can save on the command line.
+         */
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->aspect );
+        configsave( ct->configsave, "StartupWidescreen", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
+        configsave( ct->configsave, "StartupFullscreen", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
+        configsave( ct->configsave, "Verbose", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
+        configsave( ct->configsave, "OutputHeight", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputwidth );
+        configsave( ct->configsave, "InputWidth", tempstring );
+
+        configsave( ct->configsave, "V4LDevice", ct->v4ldev );
+        configsave( ct->configsave, "VBIDevice", ct->vbidev );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputnum );
+        configsave( ct->configsave, "V4LInput", tempstring );
+
+        configsave( ct->configsave, "Norm", ct->norm );
+        configsave( ct->configsave, "Frequencies", ct->freq );
+    }
 
     return ct;
 }
