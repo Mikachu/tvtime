@@ -27,22 +27,131 @@
   -->
   <option name="V4LInput" value="0"/>
 
+  <!--
+    This sets the default TV norm.  Valid options are "ntsc", "pal",
+    "secam", "pal-nc", "pal-m", "pal-n", and "ntsc-jp".
+  -->
+  <option name="Norm" value="NTSC"/>
+
+  <!--
+    This sets the default frequency table to use for any tuners found.
+    Possibilities are:
+       us-cable
+       us-broadcast
+       japan-cable
+       japan-broadcast
+       europe
+       australia
+       newzealand
+       france
+       russia
+  -->
+  <option name="Frequencies" value="US-Cable"/>
+
+  <!--
+    There are two special NTSC cable standards in the US: IRC and HRC.
+    In IRC, channels 5 and 6 are on different frequencies, and HRC mode
+    shifts all frequencies up by 1.25MHz (and is also weird on channels
+    5 and 6).
+  -->
+  <option name="NTSCCableMode" value="Nominal"/>
+
+  <!--
+    Toggle whether tvtime should check if there is a signal present when
+    changing channels etc.  If your card doesn't suck, you shouldn't need
+    to shut this off.  Disabling this feature will also disable the
+    channel scanner.
+  -->
+  <option name="CheckForSignal" value="1"/>
+
+  <!--
+    This sets how many pixels per scanline to request from the capture card.
+    A higher setting gives better quality, while a lower setting means we do
+    less work, and so tvtime will run faster.  If you have a slower CPU (like,
+    less than 500Mhz or so), maybe values of 480 or 400 might suit you best.
+    For best quality, choose a high value like 720 or 768.  Most capture
+    cards cannot sample higher than 768 pixels per scanline.
+  -->
+  <option name="InputWidth" value="720"/>
+
+
+  <!--
+    Set this to 1 to enable VBI decoding.  tvtime supports decoding of closed
+    captions and XDS channel information data.  Both of these standards are
+    specific to NTSC regions, since that's what the tvtime authors use. :)
+  -->
+  <option name="UseVBI" value="0"/>
+
+  <!--
+    This sets which device to use for VBI decoding.
+  -->
+  <option name="VBIDevice" value="/dev/vbi0"/>
+
+
+  <!-- This option enables 16:9 aspect ratio mode by default on startup. -->
+  <option name="Widescreen" value="0"/>
 
   <!-- Default to an 800x600 window. -->
   <option name="OutputWidth" value="800"/>
 
-  <option name="InputWidth" value="720"/>
-  <option name="Widescreen" value="0"/>
-  <option name="DebugMode" value="0"/>
-  <option name="ApplyLumaCorrection" value="0"/>
-  <option name="LumaCorrection" value="1.0"/>
-  <option name="VBIDevice" value="/dev/vbi0"/>
-  <option name="UseVBI" value="0"/>
-  <option name="ProcessPriority" value="-19"/>
+  <!--
+    This sets the percent of the sides to leave to the overscan, that is,
+    don't show them at all.  Safe action area on a television is 10% in
+    the overscan, but that's a bit restrictive.  If you want to look like
+    a TV, a good value would be about 6-8%.  The value is in percent,
+    so for 8% use 8.0.
+  -->
+  <option name="Overscan" value="0.0"/>
+
+  <!--
+    Set this to 1 to have tvtime start in fullscreen mode.  This setting is
+    set at runtime so that when you quit tvtime in fullscreen, starting it
+    again will start back in fullscreen mode.
+  -->
   <option name="StartFullscreen" value="0"/>
+
+  <!--
+    This sets the framerate of the output from tvtime.
+
+    0 = Full framerate mode, every field is deinterlaced.
+        59.94fps for NTSC, 50fps for PAL.
+    1 = Half framerate mode, deinterlace every top field to a frame (TFF).
+        29.97fps for NTSC, 25fps for PAL.
+    2 = Half framerate mode, deinterlace every bottom field to a frame (BFF).
+        29.97fps for NTSC, 25fps for PAL.
+
+    The two half framerate modes are useful for progressive content from
+    video game consoles.  Use weave and select either TFF or BFF, whichever
+    does not exhibit interlace effects.
+  -->
   <option name="FramerateMode" value="0"/>
-  <option name="Norm" value="NTSC"/>
-  <option name="Frequencies" value="US-Cable"/>
+
+
+  <!--
+    This indicates whether the luma correction option should be enabled by
+    default when starting the application.  Luma correction can be turned
+    on or off within the application using the 'c' key.
+  -->
+  <option name="ApplyLumaCorrection" value="0"/>
+
+  <!--
+    This indicates the power for correction.  A value of 1.0 does nothing
+    except apply Bt8x8 correction, if you have a Bt8x8-based capture card.
+    Values less than one make the output darker, and values greater than
+    one make the output brighter.  The valid range is 0.1 to 10.0 in
+    increments of 0.1.
+  -->
+  <option name="LumaCorrection" value="1.0"/>
+
+
+  <!--
+    Sets the default process priority.  By default, tvtime tries to be
+    a real hog and get -19 priority, which is insane, but hey, if a
+    frame comes in we need to process it right away or it gets dropped,
+    right? :)    Acceptable values are from -20 to 20, with lower values
+    meaning higher priority (blame UNIX for that).
+  -->
+  <option name="ProcessPriority" value="-19"/>
   <option name="TimeFormat" value="%X"/>
   <option name="ScreenShotDir" value="~"/>
   <option name="MenuBG" value="0"/>
@@ -51,14 +160,32 @@
 
   <option name="PrevChannel" value="9"/>
   <option name="StartChannel" value="10"/>
-  <option name="NTSCCableMode" value="Nominal"/>
   <option name="PreferredDeinterlaceMethod" value="0"/>
-  <option name="CheckForSignal" value="1"/>
-  <option name="Overscan" value="0.0"/>
+  <option name="DebugMode" value="0"/>
+
+
+  <!--
+    Supported deinterlacers:
+
+    LineDoubler    Line Doubler
+    Greedy         Dscaler: Greedy - Low Motion
+    Greedy2Frame   DScaler: Greedy - 2-frame
+    GreedyH        DScaler: Greedy - High Motion
+    TomsMoComp     DScaler: TomsMoComp
+    TwoFrame       DScaler: TwoFrame
+    VideoBob       DScaler: Video Bob
+    VideoWeave     DScaler: Video Weave
+    Linear         Linear Interpolation
+    LinearBlend    mplayer: Linear Blend
+    OverlayBob     Overlay Bob
+    Vertical       ffmpeg: Vertical Deinterlace Filter
+    Weave          Weave Last Field
+  -->
 
   <mode name="Fullscreen" deinterlacer="GreedyH" fullscreen="1" framerate_mode="0"/>
   <mode name="Window" deinterlacer="Vertical" fullscreen="0" window_height="600" framerate_mode="0"/>
   <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
+
 
   <bind command="quit">
     <keyboard key="escape"/>
