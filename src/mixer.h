@@ -52,6 +52,11 @@ void mixer_mute( int mute );
  */
 int mixer_ismute( void );
 
+/**
+ * Closes the mixer device if it is open.
+ */
+void mixer_close_device( void );
+
 #ifdef __cplusplus
 };
 #endif

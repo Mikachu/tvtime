@@ -1,5 +1,8 @@
 
 0.9.13 -
+  * vektor: Always keep the mixer device open to work around a weird
+      problem with the ALSA emulation where it only maintains volume state
+      during an open and not across sessions.
   * bitstream: Add PalDKMode setting for forcing the use of PAL_DK norm when
       a) in PAL mode and b) using v4l2. This resolves an issue for some cx88
       users.

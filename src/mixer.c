@@ -37,26 +37,25 @@ static int mixer_channel = SOUND_MIXER_LINE;
 static int mixer_dev_mask = 1 << SOUND_MIXER_LINE;
 static int muted = 0;
 static int mutecount = 0;
+static int fd = -1;
 
 int mixer_get_volume( void )
 {
-    int fd, v, cmd, devs;
+    int v, cmd, devs;
     int curvol = 0;
 
-    fd = open( mixer_device, O_RDONLY );
+    if( fd < 0 ) fd = open( mixer_device, O_RDONLY );
     if( fd != -1 ) {
 
         ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
         if( devs & mixer_dev_mask ) {
             cmd = MIXER_READ( mixer_channel );
         } else {
-            close( fd );
             return curvol;
         }
 
         ioctl( fd, cmd, &v );
         curvol = ( v & 0xFF00 ) >> 8;
-        close( fd );
     }
 
     return curvol;
@@ -64,7 +63,7 @@ int mixer_get_volume( void )
 
 int mixer_set_volume( int percentdiff )
 {
-    int fd, v, cmd, devs, levelpercentage;
+    int v, cmd, devs, levelpercentage;
 
     levelpercentage = mixer_get_volume();
 
@@ -72,19 +71,17 @@ int mixer_set_volume( int percentdiff )
     if( levelpercentage > 100 ) levelpercentage = 100;
     if( levelpercentage < 0 ) levelpercentage = 0;
 
-    fd = open( mixer_device, O_RDONLY );
+    if( fd < 0 ) fd = open( mixer_device, O_RDONLY );
     if( fd != -1 ) {
         ioctl( fd, SOUND_MIXER_READ_DEVMASK, &devs );
         if( devs & mixer_dev_mask ) {
             cmd = MIXER_WRITE( mixer_channel );
         } else {
-            close( fd );
             return 0;
         }
 
         v = ( levelpercentage << 8 ) | levelpercentage;
         ioctl( fd, cmd, &v );
-        close( fd );
         muted = 0;
         return v;
     }
@@ -94,7 +91,7 @@ int mixer_set_volume( int percentdiff )
 
 void mixer_mute( int mute )
 {
-    int fd, v, cmd, devs;
+    int v, cmd, devs;
 
     /**
      * Make sure that if multiple users mute the card,
@@ -103,7 +100,7 @@ void mixer_mute( int mute )
     if( !mute ) mutecount--;
     if( mutecount ) return;
 
-    fd = open( mixer_device, O_RDONLY );
+    if( fd < 0 ) fd = open( mixer_device, O_RDONLY );
 
     if( mute ) {
         mutecount++;
@@ -114,7 +111,6 @@ void mixer_mute( int mute )
             if( devs & mixer_dev_mask ) {
                 cmd = MIXER_READ( mixer_channel );
             } else {
-                close( fd );
                 return;
             }
 
@@ -126,7 +122,6 @@ void mixer_mute( int mute )
             if( devs & mixer_dev_mask ) {
                 cmd = MIXER_WRITE( mixer_channel );
             } else {
-                close( fd );
                 return;
             }
 
@@ -134,7 +129,6 @@ void mixer_mute( int mute )
             ioctl( fd, cmd, &v );
 
             muted = 1;
-            close( fd );
             return;
         }
     } else {
@@ -143,14 +137,12 @@ void mixer_mute( int mute )
             if( devs & mixer_dev_mask ) {
                 cmd = MIXER_WRITE( mixer_channel );
             } else {
-                close( fd );
                 return;
             }
 
             v = saved_volume;
             ioctl( fd, cmd, &v );
             muted = 0;
-            close( fd );
             return;
         }
     }
@@ -196,5 +188,10 @@ void mixer_set_device( const char *devname )
         fprintf( stderr, "mixer: No such mixer channel '%s', using channel 'line'.\n", channame );
     }
     mixer_dev_mask = 1 << mixer_channel;
+}
+
+void mixer_close_device( void )
+{
+    if( fd >= 0 ) close( fd );
 }
 

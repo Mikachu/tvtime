@@ -2572,6 +2572,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( osd ) {
         tvtime_osd_delete( osd );
     }
+    mixer_close_device();
 
     /* Free temporary memory. */
     free( colourbars );
