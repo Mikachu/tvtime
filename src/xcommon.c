@@ -169,15 +169,56 @@ static int have_xtestextention( void )
     return 0;
 }
 
-static int xv_get_width_for_height( int window_height )
+static int calculate_gcd( int x, int y )
 {
-    int widthratio = output_aspect ? 16 : 4;
-    int heightratio = output_aspect ? 9 : 3;
+    if( y > x ) return calculate_gcd( y, x );
+    if( y < 0 ) return calculate_gcd( -y, 0 );
+
+    while( y ) {
+        int tmp = y;
+        y = x % y;
+        x = tmp;
+    }
+
+    return x;
+}
+
+static void simplify_fraction( int *n, int *d )
+{
+    int gcd = calculate_gcd( *n, *d );
+    *n /= gcd;
+    *d /= gcd;
+}
+
+/*
+ * Integer division always truncates in C -- it rounds down.
+ *
+ * To compensate for this, we round up if
+ *   n mod d > d/2
+ * To avoid adding another truncation error, I multiply
+ * this condition by two:
+ *   2 * (n mod d) > d
+ * And use the property that this evaluates to 1 if true to round up.
+ */
+static int rounded_int_division( int n, int d ) 
+{
+    simplify_fraction( &n, &d );
+    return ( n/d + (2 * (n%d) > d) );
+}
+
+/*
+ * Returns the aspect ratio (4:3 or 16:9) for our output,
+ * and corrected for rectangular pixels.
+ */
+static void xv_get_output_aspect( int *px_widthratio, int *px_heightratio )
+{
+    int metric_widthratio = output_aspect ? 16 : 4;
+    int metric_heightratio = output_aspect ? 9 : 3;
     int sar_frac_n, sar_frac_d;
 
     if( matte_height ) {
-        heightratio = matte_height;
-        widthratio = matte_width;
+        metric_heightratio = matte_height;
+        metric_widthratio = matte_width;
     }
 
     xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
@@ -187,8 +228,25 @@ static int xv_get_width_for_height( int window_height )
                  sar_frac_n, sar_frac_d );
     }
 
-    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
-    return ( window_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
+    *px_widthratio = sar_frac_n * metric_widthratio;
+    *px_heightratio = sar_frac_d * metric_heightratio;
+    simplify_fraction( px_widthratio, px_heightratio );
+}
+
+static int xv_get_width_for_height( int window_height )
+{
+    int n, d;
+
+    xv_get_output_aspect( &n, &d );
+    return rounded_int_division( window_height * n, d );
+}
+
+static int xv_get_height_for_width( int window_width )
+{
+    int n, d;
+
+    xv_get_output_aspect( &d, &n );
+    return rounded_int_division( window_width * n, d );
 }
 
 static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int aspect_height )
@@ -673,28 +731,12 @@ static int check_for_state_below( Display *dpy )
 static void calculate_video_area( void )
 {
     int curwidth, curheight;
-    int widthratio = output_aspect ? 16 : 4;
-    int heightratio = output_aspect ? 9 : 3;
-    int sar_frac_n, sar_frac_d;
 
-    if( matte_height ) {
-        heightratio = matte_height;
-        widthratio = matte_width;
-    }
-
-    xfullscreen_get_pixel_aspect( xf, &sar_frac_n, &sar_frac_d );
-
-    if( xcommon_verbose ) {
-        fprintf( stderr, "xcommon: Pixel aspect ratio %d:%d.\n",
-                 sar_frac_n, sar_frac_d );
-    }
-
-    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
     curwidth = output_width;
-    curheight = ( output_width * sar_frac_d * heightratio ) / ( sar_frac_n * widthratio );
+    curheight = xv_get_height_for_width( curwidth );
     if( curheight > output_height ) {
         curheight = output_height;
-        curwidth = ( output_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
+        curwidth = xv_get_width_for_height( curheight );
     }
 
     video_area.x = ( output_width - curwidth ) / 2;
