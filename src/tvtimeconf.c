@@ -118,6 +118,7 @@ static void copy_config( config_t *dest, config_t *src )
     dest->config_filename = 0;
     dest->modelist = 0;
     dest->nummodes = 0;
+    dest->doc = 0;
 
     /* Useful strings must be copied. */
     dest->norm = strdup( src->norm );
