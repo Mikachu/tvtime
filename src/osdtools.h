@@ -84,8 +84,12 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
                                     unsigned char *output,
                                     int width, int height, int stride,
                                     int xpos, int ypos );
-void osd_shape_composite_packed422_scanline( osd_shape_t *osd, unsigned char *output,
-                                             int width, int xpos, int scanline );
+void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
+                                             unsigned char *output,
+                                             unsigned char *background,
+                                             int width, int xpos,
+                                             int scanline );
+
 
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int video_height, double aspect, int alpha );

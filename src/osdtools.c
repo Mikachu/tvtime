@@ -402,6 +402,36 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
                                              xpos, ypos, alpha );
 }
 
+void osd_shape_composite_packed422_scanline( osd_shape_t *osds,
+                                             unsigned char *output,
+                                             unsigned char *background,
+                                             int width, int xpos,
+                                             int scanline )
+{
+    if( !osds ) return;
+    if( !osds->frames_left ) return;
+
+    if( scanline < osds->shape_height && xpos < osds->shape_adjusted_width ) {
+
+        if( (xpos+width) > osds->shape_adjusted_width ) {
+            width = osds->shape_adjusted_width - xpos;
+        }
+
+        if( osds->frames_left < 50 ) {
+            int alpha;
+            alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
+            composite_packed4444_alpha_to_packed422_scanline( output, background,
+                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                width, alpha );
+        } else {
+            composite_packed4444_to_packed422_scanline( output, background,
+                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                width );
+        }
+    }
+}
+
+
 /* Graphic functions */
 struct osd_graphic_s
 {

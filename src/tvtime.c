@@ -176,6 +176,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         /* Double the top scanline a scanline. */
         blit_packed422_scanline( output, curframe, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+
         output += outstride;
         scanline++;
     }
@@ -188,6 +190,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     }
 
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+    if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+
     output += outstride;
     scanline++;
 
@@ -216,6 +220,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
         curmethod->interpolate_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+
         output += outstride;
         scanline++;
 
@@ -229,6 +235,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+
         output += outstride;
         scanline++;
     }
@@ -241,13 +249,14 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+        if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+
         output += outstride;
         scanline++;
     }
 
-    /* Billy- Disabled the menu for now.
-    if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
-    */
+    /* Billy- Disabled the menu for now.    */
+
 }
 
 
@@ -530,16 +539,13 @@ int main( int argc, char **argv )
         return 1;
     }
 
-/* Billy - menu code disabled for now.
+/* Billy - menu code disabled for now. */
     menu = menu_new( in, ct, width, height, 
                      config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !menu ) {
         fprintf( stderr, "tvtime: Can't create menu.\n" );
     }
     if( menu ) input_set_menu( in, menu );
-*/
-    menu = 0;
-
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
