@@ -101,39 +101,44 @@ static void parse_xds_packet( const char *packet, int length )
     /* Stick a null at the end. */
     packet[ length - 1 ] = '\0';
 
-    fprintf( stderr, "XDS packet, class " );
-    switch( packet[ 0 ] ) {
-    case 0x1: fprintf( stderr, "CURRENT start\n" ); break;
-    case 0x2: fprintf( stderr, "CURRENT continue\n" ); break;
-
-    case 0x3: fprintf( stderr, "FUTURE start\n" ); break;
-    case 0x4: fprintf( stderr, "FUTURE continue\n" ); break;
-
-    case 0x5: fprintf( stderr, "CHANNEL start\n" ); break;
-    case 0x6: fprintf( stderr, "CHANNEL continue\n" ); break;
-
-    case 0x7: fprintf( stderr, "MISC start\n" ); break;
-    case 0x8: fprintf( stderr, "MISC continue\n" ); break;
-
-    case 0x9: fprintf( stderr, "PUB start\n" ); break;
-    case 0xa: fprintf( stderr, "PUB continue\n" ); break;
-
-    case 0xb: fprintf( stderr, "RES start\n" ); break;
-    case 0xc: fprintf( stderr, "RES continue\n" ); break;
-
-    case 0xd: fprintf( stderr, "UNDEF start\n" ); break;
-    case 0xe: fprintf( stderr, "UNDEF continue\n" ); break;
-    }
-    for( i = 0; packet[ i ] != 0xf; i++ ) {
-        fprintf( stderr, "0x%02x ", packet[ i ] );
-    }
-    fprintf( stderr, "\n" );
-
     if( packet[ 0 ] < 0x03 && packet[ 1 ] == 0x03 ) {
         fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] < 0x05 && packet[ 1 ] == 0x03 ) {
         fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
-    // } else if( packet[ 0 ] == 0x5
+    } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
+        fprintf( stderr, "Network name: '%s'\n", packet + 2 );
+    } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
+        fprintf( stderr, "Show rating: 0x%02x 0x%02x\n", packet[ 3 ], packet[ 4 ] );
+    } else {
+        /* unknown */
+
+        fprintf( stderr, "Unknown XDS packet, class " );
+        switch( packet[ 0 ] ) {
+        case 0x1: fprintf( stderr, "CURRENT start\n" ); break;
+        case 0x2: fprintf( stderr, "CURRENT continue\n" ); break;
+
+        case 0x3: fprintf( stderr, "FUTURE start\n" ); break;
+        case 0x4: fprintf( stderr, "FUTURE continue\n" ); break;
+
+        case 0x5: fprintf( stderr, "CHANNEL start\n" ); break;
+        case 0x6: fprintf( stderr, "CHANNEL continue\n" ); break;
+
+        case 0x7: fprintf( stderr, "MISC start\n" ); break;
+        case 0x8: fprintf( stderr, "MISC continue\n" ); break;
+
+        case 0x9: fprintf( stderr, "PUB start\n" ); break;
+        case 0xa: fprintf( stderr, "PUB continue\n" ); break;
+
+        case 0xb: fprintf( stderr, "RES start\n" ); break;
+        case 0xc: fprintf( stderr, "RES continue\n" ); break;
+
+        case 0xd: fprintf( stderr, "UNDEF start\n" ); break;
+        case 0xe: fprintf( stderr, "UNDEF continue\n" ); break;
+        }
+        for( i = 0; packet[ i ] != 0xf; i++ ) {
+            fprintf( stderr, "0x%02x ", packet[ i ] );
+        }
+        fprintf( stderr, "\n" );
     }
 }
 
