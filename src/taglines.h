@@ -87,6 +87,7 @@ static const char *taglines[] = {
 "tvtime: an army of one",
 "tvtime: recommended by Dr. Mom",
 "tvtime: blame canada!",
+"tvtime: luke, i am your television",
 "tvtime: sometimes you need a little tvtime, sometimes you need alot",
 "tvtime: explicit content, parental advisory",
 "tvtime: stays cruncy in milk",
