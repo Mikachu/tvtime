@@ -26,6 +26,7 @@
  */
 
 typedef struct osd_string_s osd_string_t;
+typedef struct osd_font_s osd_font_t;
 typedef struct osd_databars_s osd_databars_t;
 typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_shape_s osd_shape_t;
@@ -45,9 +46,12 @@ typedef enum OSD_Shapes_e {
  * Eventually I'll just take one parameter: pixel aspect, which would
  * make more sense.
  */
-osd_string_t *osd_string_new( const char *fontfile, int fontsize,
-                              int video_width, int video_height,
-                              double video_aspect );
+osd_font_t *osd_font_new( const char *fontfile, int fontsize,
+                          int video_width, int video_height,
+                          double video_aspect );
+void osd_font_delete( osd_font_t *font );
+
+osd_string_t *osd_string_new( osd_font_t *font, int video_width );
 void osd_string_delete( osd_string_t *osds );
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );

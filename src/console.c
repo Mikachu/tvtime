@@ -39,6 +39,7 @@ struct console_line_coords
 
 struct console_s
 {
+    osd_font_t *font;
     char *text;
     osd_string_t **line;
     struct console_line_coords *coords;
@@ -134,6 +135,12 @@ console_t *console_new( int x, int y, int width, int height,
     con->fontfile = "FreeMonoBold.ttf";
     con->fontsize = fontsize;
 
+    con->font = osd_font_new( con->fontfile, fontsize, video_width, video_height, video_aspect );
+    if( !con->font ) {
+        console_delete( con );
+        return 0;
+    }
+
 #if 0
     memset( con->text, 0, con->cols * con->rows );
 #endif
@@ -141,14 +148,12 @@ console_t *console_new( int x, int y, int width, int height,
     con->width = width;
     con->height = height;
 
-    con->line[0] = osd_string_new( con->fontfile, fontsize, video_width, 
-                                   video_height,
-                                   video_aspect );
+    con->line[0] = osd_string_new( con->font, video_width );
     if( !con->line[0] ) {
         fprintf( stderr, "console: Could not find my font (%s)!\n", 
                  con->fontfile );
         console_delete( con );
-        return NULL;
+        return 0;
     }
 
     osd_string_show_text( con->line[0], "H", 0 );
@@ -190,11 +195,7 @@ console_t *console_new( int x, int y, int width, int height,
             console_delete( con );
             return NULL;
         }
-        con->line[0] = osd_string_new( con->fontfile, 
-                                       con->fontsize, 
-                                       con->frame_width, 
-                                       con->frame_height,
-                                       con->frame_aspect );
+        con->line[0] = osd_string_new( con->font, con->frame_width );
         if( !con->line[ 0 ] ) {
             fprintf( stderr, 
                      "console: Could not create new string.\n" );
@@ -222,8 +223,9 @@ void console_delete( console_t *con )
 
     if( con->line ) {
         for( i=0; i < con->num_lines; i++ ) {
-            if( con->line[ i ] )
+            if( con->line[ i ] ) {
                 osd_string_delete( con->line[ i ] );
+            }
         }
         free( con->line );
     }
@@ -260,11 +262,7 @@ void update_osd_strings( console_t *con )
 
             return;
         }
-        con->line[0] = osd_string_new( con->fontfile, 
-                                       con->fontsize, 
-                                       con->frame_width, 
-                                       con->frame_height,
-                                       con->frame_aspect );
+        con->line[0] = osd_string_new( con->font, con->frame_width );
         if( !con->line[ 0 ] ) {
             fprintf( stderr, 
                      "console: Could not create new string.\n" );
@@ -362,11 +360,7 @@ void update_osd_strings( console_t *con )
             con->cury++;
             tmpstr[0] = '\0';
 
-            con->line[ con->cury ] = osd_string_new( con->fontfile, 
-                                                     con->fontsize, 
-                                                     con->frame_width, 
-                                                     con->frame_height,
-                                                     con->frame_aspect );
+            con->line[ con->cury ] = osd_string_new( con->font, con->frame_width );
             if( !con->line[ con->cury ] ) {
                 fprintf( stderr, 
                          "console: Could not create new string.\n" );

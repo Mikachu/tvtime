@@ -33,9 +33,58 @@ int aspect_adjust_packed4444_scanline( unsigned char *output,
                                        int width,
                                        double aspectratio );
 
-struct osd_string_s
+struct osd_font_s
 {
     ft_font_t *font;
+};
+
+osd_font_t *osd_font_new( const char *fontfile, int fontsize,
+                          int video_width, int video_height,
+                          double video_aspect )
+{
+    osd_font_t *font = (osd_font_t *) malloc( sizeof( osd_font_t ) );
+    double pixel_aspect;
+    char *fontfilename;
+
+    if( !font ) {
+        return 0;
+    }
+
+    fontfilename = get_tvtime_file( fontfile );
+    if( !fontfilename ) {
+        fprintf( stderr, "osd_font: Can't find font '%s'.  Checked: %s\n",
+                 fontfile, get_tvtime_paths() );
+        free( font );
+        return 0;
+    }
+
+    pixel_aspect = ( (double) video_width ) / ( ( (double) video_height ) * video_aspect );
+    font->font = ft_font_new( fontfilename, fontsize, pixel_aspect );
+    free( fontfilename );
+
+    if( !font->font ) {
+        fprintf( stderr, "osd_font: Can't open font '%s'\n", fontfile );
+        free( font );
+        return 0;
+    }
+
+    return font;
+}
+
+void osd_font_delete( osd_font_t *font )
+{
+    ft_font_delete( font->font );
+    free( font );
+}
+
+static ft_font_t *osd_font_get_font( osd_font_t *font )
+{
+    return font->font;
+}
+
+struct osd_string_s
+{
+    osd_font_t *font;
     ft_string_t *fts;
     int frames_left;
     int hold;
@@ -56,46 +105,25 @@ struct osd_string_s
     int image_textheight;
 };
 
-osd_string_t *osd_string_new( const char *fontfile, int fontsize,
-                              int video_width, int video_height, double video_aspect )
+osd_string_t *osd_string_new( osd_font_t *font, int video_width )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
-    double pixel_aspect;
-    char *fontfilename;
+    int fontsize = ft_font_get_size( osd_font_get_font( font ) );
 
     if( !osds ) {
         return 0;
     }
 
-    osds->image4444 = (unsigned char *) malloc( video_width * video_height * 4 );
+    osds->font = font;
+    osds->image4444 = (unsigned char *) malloc( video_width * (fontsize + 10) * 4 );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
     }
 
-    fontfilename = get_tvtime_file( fontfile );
-    if( !fontfilename ) {
-        fprintf( stderr, "osd_string: Can't find font '%s'.  Checked: %s\n",
-                 fontfile, get_tvtime_paths() );
-        free( osds->image4444 );
-        free( osds );
-        return 0;
-    }
-
-    pixel_aspect = ( (double) video_width ) / ( ( (double) video_height ) * video_aspect );
-    osds->font = ft_font_new( fontfilename, fontsize, pixel_aspect );
-    free( fontfilename );
-
-    if( !osds->font ) {
-        fprintf( stderr, "osd_string: Can't open font '%s'\n", fontfile );
-        free( osds );
-        return 0;
-    }
-
-    osds->fts = ft_string_new( osds->font );
+    osds->fts = ft_string_new( osd_font_get_font( osds->font ) );
     if( !osds->fts ) {
         fprintf( stderr, "osd_string: Can't create string.\n" );
-        ft_font_delete( osds->font );
         free( osds );
         return 0;
     }
@@ -113,7 +141,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
     osds->border_cr = 128;
 
     osds->image_width = video_width;
-    osds->image_height = video_height;
+    osds->image_height = fontsize + 10;
     osds->image_textwidth = 0;
     osds->image_textheight = 0;
 
@@ -123,7 +151,6 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 void osd_string_delete( osd_string_t *osds )
 {
     ft_string_delete( osds->fts );
-    ft_font_delete( osds->font );
     free( osds->image4444 );
     free( osds );
 }
@@ -170,6 +197,7 @@ void osd_string_render_image4444( osd_string_t *osds )
     osds->image_textwidth = ft_string_get_width( osds->fts ) + 4;
     osds->image_textheight = ft_string_get_height( osds->fts ) + 6;
 
+    /* TODO: Only blit size of data if < full text size. */
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
                             osds->image_textheight, osds->image_width * 4,
                             0, 0, 0, 0 );

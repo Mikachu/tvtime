@@ -60,6 +60,9 @@ enum osd_objects
 
 struct tvtime_osd_s
 {
+    osd_font_t *smallfont;
+    osd_font_t *medfont;
+    osd_font_t *bigfont;
     string_object_t *strings;
 
     osd_graphic_t *channel_logo;
@@ -178,8 +181,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
         return 0;
     }
 
-    osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
-
     osd->channel_logo = 0;
     strcpy( osd->hold_message, "" );
     osd->framerate = 0.0;
@@ -200,38 +201,66 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     logofile = "testlogo.png";
     creditsfile = "credits.png";
 
-    osd->credits = credits_new( creditsfile, height );
+    osd->credits = 0; // credits_new( creditsfile, height );
     osd->show_credits = 0;
 
+    osd->smallfont = osd_font_new( fontfile, 18, width, height, frameaspect );
+    if( !osd->smallfont ) {
+        free( osd );
+        return 0;
+    }
+    osd->medfont = osd_font_new( fontfile, 30, width, height, frameaspect );
+    if( !osd->medfont ) {
+        osd_font_delete( osd->smallfont );
+        free( osd );
+        return 0;
+    }
+    osd->bigfont = osd_font_new( fontfile, 80, width, height, frameaspect );
+    if( !osd->bigfont ) {
+        osd_font_delete( osd->smallfont );
+        osd_font_delete( osd->medfont );
+        free( osd );
+        return 0;
+    }
+
+    osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
+    if( !osd->strings ) {
+        osd_font_delete( osd->smallfont );
+        osd_font_delete( osd->medfont );
+        osd_font_delete( osd->bigfont );
+        free( osd );
+        return 0;
+    }
+
     osd->strings[ OSD_CHANNEL_NUM ].rightjustified = 0;
-    osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 30, width, height, frameaspect );
+    osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( osd->medfont, width );
     osd->strings[ OSD_CHANNEL_NAME ].rightjustified = 0;
-    osd->strings[ OSD_CHANNEL_NAME ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
+    osd->strings[ OSD_CHANNEL_NAME ].string = osd_string_new( osd->bigfont, width );
     osd->strings[ OSD_TIME_STRING ].rightjustified = 1;
-    osd->strings[ OSD_TIME_STRING ].string = osd_string_new( fontfile, 30, width, height, frameaspect );
+    osd->strings[ OSD_TIME_STRING ].string = osd_string_new( osd->medfont, width );
     osd->strings[ OSD_TUNER_INFO ].rightjustified = 0;
-    osd->strings[ OSD_TUNER_INFO ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_TUNER_INFO ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_SIGNAL_INFO ].rightjustified = 0;
-    osd->strings[ OSD_SIGNAL_INFO ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_SIGNAL_INFO ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_VOLUME_BAR ].rightjustified = 0;
-    osd->strings[ OSD_VOLUME_BAR ].string = osd_string_new( fontfile, 17, width, height, frameaspect );
+    osd->strings[ OSD_VOLUME_BAR ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_DATA_BAR ].rightjustified = 0;
-    osd->strings[ OSD_DATA_BAR ].string = osd_string_new( fontfile, 17, width, height, frameaspect );
+    osd->strings[ OSD_DATA_BAR ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_MUTED ].rightjustified = 0;
-    osd->strings[ OSD_MUTED ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_MUTED ].string = osd_string_new( osd->smallfont, width );
 
     osd->strings[ OSD_NETWORK_NAME ].rightjustified = 1;
-    osd->strings[ OSD_NETWORK_NAME ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_NETWORK_NAME ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_NETWORK_CALL ].rightjustified = 1;
-    osd->strings[ OSD_NETWORK_CALL ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_NETWORK_CALL ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_SHOW_NAME ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_NAME ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_SHOW_NAME ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_SHOW_RATING ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_RATING ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_SHOW_RATING ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_SHOW_START ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_START ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_SHOW_START ].string = osd_string_new( osd->smallfont, width );
     osd->strings[ OSD_SHOW_LENGTH ].rightjustified = 0;
-    osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( fontfile, 18, width, height, frameaspect );
+    osd->strings[ OSD_SHOW_LENGTH ].string = osd_string_new( osd->smallfont, width );
 
     osd->channel_logo = osd_graphic_new( logofile, width, height, frameaspect, 256 );
 

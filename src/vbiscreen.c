@@ -39,8 +39,9 @@
 #define COLS       32
 #define FONT_SIZE  20
 
-struct vbiscreen_s {
-
+struct vbiscreen_s
+{
+    osd_font_t *font;
     osd_string_t *line[ ROWS ];
 
     char buffers[ ROWS * COLS * 2 ];
@@ -115,9 +116,13 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     memset( vs->paintbuf, 0, ROWS * COLS );
     vs->scroll = 0;
 
-    vs->line[0] = osd_string_new( vs->fontfile, fontsize, video_width, 
-                                  video_height,
-                                  video_aspect );
+    vs->font = osd_font_new( vs->fontfile, fontsize, video_width, video_height, video_aspect );
+    if( !vs->font ) {
+        vbiscreen_delete( vs );
+        return 0;
+    }
+
+    vs->line[0] = osd_string_new( vs->font, video_width );
     if( !vs->line[0] ) {
         fprintf( stderr, "vbiscreen: Could not find my font (%s)!\n", 
                  vs->fontfile );
@@ -131,9 +136,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     osd_string_delete( vs->line[ 0 ] );
 
     for( i = 0; i < ROWS; i++ ) {
-        vs->line[ i ] = osd_string_new( vs->fontfile, fontsize,
-                                        video_width, video_height,
-                                        video_aspect );
+        vs->line[ i ] = osd_string_new( vs->font, video_width );
         if( !vs->line[ i ] ) {
             fprintf( stderr, "vbiscreen: Could not allocate a line.\n" );
             vbiscreen_delete( vs );
