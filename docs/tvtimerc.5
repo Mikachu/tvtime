@@ -28,6 +28,12 @@ This sets the default capture source to be opened by tvtime.  Cards commonly hav
 .B V4LDevice = /dev/video<n>
 This sets the default capture device to use.
 .TP
+.B VBIDevice = /dev/vbi<n>
+This sets the default vbi device to use.
+.TP
+.B UseVBI = 1 | 0
+This enables the usage of VBI data (XDS, Closed Captioning).
+.TP
 .B Norm = ntsc | pal | secam | pal-nc | pal-m| pal-n | ntsc-jp
 This sets the default TV norm. Default: ntsc.
 .TP
@@ -58,9 +64,26 @@ This option enables a special debug mode.  In debug mode, frame drop information
 .B PreferredDeinterlaceMethod = n
 Sets the deinterlace method that will be used by default when tvtime starts up. Default: 0.
 .TP
+.B ProcessPriority = n
+Sets the default process priority.  Acceptable values are from -20 to 20, with lower values meaning higher priority. Default: -19.
+.TP
+.B CommandPipe = <path to file>
+Tvtime can be controlled by issuing commands (the same as used in the console) to a file.  This option sets the location of the file you wish to use as this 'command queue'.  Default: $HOME/.tvtime/tvtimefifo
+.TP
+.B LeftScanlineBias = n
+Drop n pixels from the left side of every scanline, where n is a positive integer. Default: 0.
+.TP
+.B RightScanlineBias = n
+Drop n pixels from the right side of every scanline, where n is a positive integer. Default: 0.
+.TP
+.B CheckForSignal = 1 | 0
+Toggle whether tvtime should check if there is a signal present when changing channels.  Owners of quality cards will likely not need to set this. Default: 0.
+.TP
+.B NTSCCableMode = Nominal
+There are two special NTSC cable standards in the US: IRC and HRC.  In IRC, channels 5 and 6 are on different frequencies, and HRC mode shifts all frequencies up by 1.25 MHz (and is also weird on channels 5 and 6). Default: null value/not set.
+.TP
 .B ChannelTextFG = colour
 This option is the ARGB colour used for the Channel Number in the OSD. The default is 0xFFFFFF00 (yellow). The colour format can be hex or decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If the alpha channel is not specified the default is 255 (opaque).
-
 .TP
 .B OtherTextFG = colour
 This option is the ARGB colour used for all other text in the OSD. The default is 0xFFF5DEB3 (wheat). The colour format can be hex or decimal. examples: 0xffaadd, 0xff0000ff, 0xff, 0xffff, 255 255 0, 0, 16777215. If the alpha channel is not specified the default is 255 (opaque).
@@ -90,58 +113,132 @@ key_quit = C+M+S+q
 To set the volume up key to Right Arrow (RIGHT):
 key_mixer_up = \\0423
 .P
-.B Defaults
+.B List of key bindings.
 .TP
-key_quit                   = \\0033
+.B key_quit                   = q
+Quit tvtime.
 .TP
-key_channel_up             = \\0421
+.B key_fullscreen             = f
+Toggle fullscreen mode.
 .TP
-key_channel_down           = \\0422
+.B key_deinterlacing_mode     = t
+Toggle available deinterlacing modes.
 .TP
-key_luma_correction_toggle = c
+.B key_aspect                 = a
+Toggle aspect ratio between 4:3 and 16:9 mode.
 .TP
-key_luma_up                = j
+.B key_screenshot             = s
+Take a screenshot.
 .TP
-key_luma_down              = h
+.B key_debug                  = d
+Print debug statistics to stderr.
 .TP
-key_mixer_mute             = m
+.B key_scan_channels          = F10
+Scan through all channels.
 .TP
-key_mixer_up               = +
+.B key_show_bars              = F11
+Show Colour Bars.
 .TP
-key_mixer_down             = -
+.B key_show_credits           = F12
+Show TVTime Credits.
 .TP
-key_hue_down               = F1
+.B key_channel_up             = Up arrow key or k
+Increase the channel setting of the tuner.
 .TP
-key_hue_up                 = F2
+.B key_channel_down           = Down arrow key or j
+Decrease the channel setting of the tuner.
 .TP
-key_bright_down            = F3
+.B key_finetune_down          = Left arrow key or h
+Fine-tune channel down by .06 MHz.
 .TP
-key_bright_up              = F4
+.B key_finetune_up            = Right arrow key or l
+Fine-tune channel up by .06 MHz.
 .TP
-key_cont_down              = F5
+.B key_freqlist_down          = [
+Previous frequency table.
 .TP
-key_cont_up                = F6
+.B key_freqlist_up            = ]
+Next frequency table.
 .TP
-key_colour_down            = F7
+.B key_toggle_ntsc_cable_mode = n
+Cycle through NTSC cable modes ( normal, IRC, HRC ).
 .TP
-key_colour_up              = F8
+.B key_hue_down               = F1
+Decreases the hue setting of the capture card input.
 .TP
-key_tv_video               = F9
+.B key_hue_up                 = F2
+Increases the hue setting of the capture card input.
 .TP
-key_show_bars              = F11
+.B key_bright_down            = F3
+Decreases the brightness setting of the capture card input.
 .TP
-key_debug                  = d
+.B key_bright_up              = F4
+Increases the brightness setting of the capture card input.
 .TP
-key_fullscreen             = f
+.B key_cont_down              = F5
+Decreases the contrast setting of the capture card input.
 .TP
-key_aspect                 = a
+.B key_cont_up                = F6
+Increases the contrast setting of the capture card input.
 .TP
-key_screenshot             = s
+.B key_colour_down            = F7
+Decreases the colour setting of the capture card input.
 .TP
-key_deinterlacing_mode     = t
+.B key_colour_up              = F8
+Increases the colour setting of the capture card input.
 .TP
-key_finetune_down          = ,
+.B key_tv_video               = i
+Switch between the inputs on your card, usually between the tuner, composite input, or S-Video input.
 .TP
-key_finetune_up            = .
+.B key_mixer_mute             = m
+Toggle soundcard line-in mute.
+.TP
+.B key_mixer_up               = +
+Increase volume of tuner audio by 1%.
+.TP
+.B key_mixer_down             = -
+Decrease volume of tuner audio by 1%.
+.TP
+.B key_luma_correction_toggle = c
+Toggle luma correction on/off.
+.TP
+.B key_luma_up                = j
+Decrease correction value by 0.1.
+.TP
+.B key_luma_down              = h
+Increase correction value by 0.1.
+.TP
+.B key_toggle_console         = `
+Activates/Deactivates the tvtime console.
+.TP
+.B key_toggle_cc              = w
+Activates/Deactivates closed-captioning.
+.TP
+.B key_skip_channel           = r
+Makes tvtime skip over the current channel during the current session when channel-surfing.
+.TP
+.B key_auto_adjust_pict       = \\0040
+Tvtime will auto-adjust picture quality settings.
+.TP
+.B key_toggle_half_framerate  = =
+Activates/Deactivates half-framerate mode.
+.P
+.B Tvtime supports up to 9 mouse button bindings.
+.TP
+.B mouse_button_1             = display_info
+Tvtime will show the information screen (i.e. channel number, time, VBI text).
+.TP
+.B mouse_button_2             = mixer_mute
+Toggle soundcard line-in mute.
+.TP
+.B mouse_button_3             = tv_video
+Switch between the inputs on your card, usually between the tuner, composite input, or S-Video input.
+.TP
+.B mouse_button_4             = channel_up
+Increase the channel setting of the tuner.
+.TP
+.B mouse_button_5             = channel_down
+Decrease the channel setting of the tuner.
+
 .SH SEE ALSO
 tvtime(1)
