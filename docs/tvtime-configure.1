@@ -15,7 +15,7 @@
 .\" along with this program; if not, write to the Free Software
 .\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 .\"
-.TH tvtime-configure 1 "July 2003" "tvtime 0.9.9"
+.TH tvtime-configure 1 "August 2003" "tvtime 0.9.9"
 
 .SH NAME
 tvtime\-configure \- change settings in the
@@ -29,318 +29,200 @@ configuration file
 
 .SH DESCRIPTION
 
-.B tvtime\-command
-allows a user to control a running
+.B tvtime\-configure
+allows a user to set configuration settings for
 .B tvtime
-process by sending it commands.  It communicates with
+without starting the application.  This is useful for installation
+programs such as debconf to let them configure tvtime without having
+to write a parser for the configuration file.  The command line options
+are a subset of those for
 .B tvtime
-through a FIFO, otherwise known as a named pipe.  Commands are 
-case\-insensitive, and are executed in order.
+itself.
 
-.SH COMMANDS
-
-.TP
-.B AUTO_ADJUST_PICT
-Restores the picture settings (brightness, contrast, hue, colour) to
-their default values.
+.SH OPTIONS
 
 .TP
-.B AUTO_ADJUST_WINDOW
-Automatically resize the window to match the content inside it.  This
-is for when you resize tvtime into, say, a long rectangle, and want it
-to jump back to being a perfect 4:3 box around the content.
-
-.TP
-.B BRIGHTNESS_DOWN
-Lowers the brightness setting on the input.
-
-.TP
-.B BRIGHTNESS_UP
-Increases the brightness setting on the input.
-
-.TP
-.B CHANNEL_[0\-9]
-Simulates a keypad number press.
-
-.TP
-.B CHANNEL_ACTIVATE_ALL
-Re-activates all channels in the list.  Use this to re-initialize the
-channel list before running the scanner if you believe some channels are
-missing, or if new channels have become available.
-
-.TP
-.B CHANNEL_DEC / CHANNEL_DOWN
-Move one channel down in the channel list.
-
-.TP
-.B CHANNEL_PREV
-Changes to the last channel you were at.  Useful for jumping back and
-forth between two programs on distant channels.
-
-.TP
-.B CHANNEL_RENUMBER
-Renumbers the current channel.  This will swap the current channel with
-the number you type in.  Use this to configure your station list to suit
-preference or locality.
-
-.TP
-.B CHANNEL_SAVE_TUNING
-Saves the current fine tuning settings as a custom channel in the
-station list.
-
-.TP
-.B CHANNEL_SCAN
-Walks from the current position through the channel list, disabling any
-channels for which no signal is detected.  This command is only
-available if signal checking is enabled.
-
-.TP
-.B CHANNEL_SKIP
-Toggles the current channel as being active or disabled in the station
-list.  You can use this to manually scan your channels and enable those
-with signal or disable duplicate stations.
-
-.TP
-.B CHANNEL_INC / CHANNEL_UP
-Move one channel up in the channel list.
-
-.TP
-.B COLOUR_DOWN / COLOR_DOWN
-Decreases the input colour picture setting.  This will make the image
-less colourful until it is black-and-white.
-
-.TP
-.B COLOUR_UP / COLOR_UP
-Increases the input colour picture setting.  This will give the image
-more colour.
-
-.TP
-.B CONTRAST_DOWN
-Decreases the contrast setting of the input.
-
-.TP
-.B CONTRAST_UP
-Increases the contrast setting of the input.
-
-.TP
-.B DISPLAY_INFO
-This will re-display the OSD for the current channel, showing the
-channel information, current deinterlacer and framerate, the time, and
-input settings.
-
-.TP
-.B ENTER
-Sends a virtual enter command.  Use this when changing the channel:
-.br
-\h'4n'tvtime-command channel_1 channel_5 enter
-.br
-will change to channel 15.
-
-.TP
-.B FINETUNE_DOWN
-Decreases the fine tuning for the current channel.  Fine tuning can be
-saved as a new channel using the
-.B CHANNEL_SAVE_TUNING
-command.
-
-.TP
-.B FINETUNE_UP
-Increases the fine tuning for the current channel.
-
-.TP
-.B HUE_DOWN
-Decreases the hue setting of the input.
-
-.TP
-.B HUE_UP
-Increases the hue setting of the input.
-
-.TP
-.B LUMA_DOWN
-Decreases the luma correction value.
-
-.TP
-.B LUMA_UP
-Increases the luma correction value.
-
-.TP
-.B MIXER_DOWN
-Decreases the volume setting for the Line In device from 
-.IR /dev/mixer .
-
-.TP
-.B MIXER_TOGGLE_MUTE
-Toggles the mute status with the mixer, and not with the capture card
-like
-.B TOGGLE_MUTE
-does.
-
-.TP
-.B MIXER_UP
-Increases the volume setting for the Line In device from 
-.IR /dev/mixer .
-
-.TP
-.B OVERSCAN_DOWN
-Decreases the overscan compensation amount.  This will show more of the
-captured input.
-
-.TP
-.B OVERSCAN_UP
-Increases the overscan compensation amount.  This will show less of the
-captured input.
-
-.TP
-.B SCREENSHOT
-Asks
+.B \-a, \-\-widescreen
+This option starts
 .B tvtime
-to take a screenshot.  Screenshots are saved to the directory listed as
-the screenshot directory in the
-.I tvtime.xml
-configuration file.  The default is the
-running user's home directory.
+in 16:9 aspect ratio mode.
 
 .TP
-.B SCROLL_CONSOLE_DOWN
-Scrolls down in the console's history buffer.
+.B \-D, \-\-driver=NAME
+This option selects which output driver will be used.  tvtime currently
+supports two output drivers, one is the standard XVIDEO output,
+the other is an experimental DirectFB output driver specific to the
+Matrox G400/G450/G550 TV output on the 2nd head.  Finally, we offer an
+SDL output layer for helping porting work to other output layers.
+Valid options here are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@Xv
+\(bu@DirectFB
+\(bu@mga
+\(bu@xmga
+\(bu@SDL
+.TE
 
 .TP
-.B SCROLL_CONSOLE_UP
-Scrolls up in the console's history buffer.
+.B \-h, \-\-help
+Show usage information.
 
 .TP
-.B SHOW_STATS
-Asks
+.B \-m, \-\-fullscreen
+Start
 .B tvtime
-to output debugging statistics to standard error.
+in fullscreen mode.
 
 .TP
-.B TOGGLE_ALWAYSONTOP
-If supported by your window manager, this command will ask to have the
-window be put into an "always on top" state, where no other window can
-be stacked above it.
-
-.TP
-.B TOGGLE_ASPECT
-Toggles the display between 4:3 and 16:9 mode.  Use 16:9 mode if you
-have configured an external DVD player or satellite receiver to output
-anamorphic 16:9 content.
-
-.TP
-.B TOGGLE_AUDIO_MODE
-Toggles between the available audio modes on this channel.  It can take
-some time before the driver discovers that modes are available.
-
-.TP
-.B TOGGLE_BARS
-Asks
+.B \-M, \-\-window
+Start
 .B tvtime
-to display colourbars.  The colourbars are generated by
+in windowed mode.
+
+.TP
+.B \-p, \-\-fspos=POS
+Set the fullscreen window position.  Use this if you
+have a projector to help
 .B tvtime
-and are not related to the capture card, but simply to help
-configure your video card and display device.  Once your settings are
-correct with these colourbars, try colourbars from an input source like
-an external DVD player and make sure they match up.
+fit properly onto your screen.
+.TS
+nokeep tab (@);
+l l.
+\(bu@top
+\(bu@bottom
+\(bu@centre (default)
+.TE
 
 .TP
-.B TOGGLE_CC
-Enables closed caption information to be displayed in the
+.B \-F, \-\-configfile=FILE
+Additional config file to load settings from.
+
+.TP
+.B \-H, \-\-height=HEIGHT
+Sets the height of the output window to start up at in scanlines.  The
+default output window size is
+.I 576
+scanlines.
+
+.TP
+.B -I, \-\-inputwidth=SAMPLING
+V4L input scanline sampling (defaults to
+.IR 720 .
+This sets how many pixels per scanline to request from the capture card.
+A higher setting gives better quality, while a lower setting means we do
+less work, and so
 .B tvtime
-window.
-Closed captioning is only available if you have enabled VBI reading in
-your
-.I tvtime.xml
-configuration file.
+will run faster.  If you have a slower CPU
+(like, less than 500Mhz or so), maybe values of
+.IR 480 \ or\  400
+might suit you best.  For best quality, choose a high value like
+.IR 720 \ or\  768 .
+Many capture cards cannot sample higher than
+.I 768
+pixels per scanline.
 
 .TP
-.B TOGGLE_COMPATIBLE_NORM
-Toggles between norms which are compatible with the selected norm in
-terms of framerate and frame size.  If the input selected has a tuner,
-the setting is saved as the default norm for that channel only.  This
-feature is useful for regions which receive both PAL and SECAM channels,
-such that tvtime can be configured on a per-channel basis for the
-correct norm.
+.B \-d, \-\-device=NAME
+video4linux device to use (defaults to
+.IR /dev/video0 ).
 
 .TP
-.B TOGGLE_CONSOLE
-Shows or hides the
+.B \-b, \-\-vbidevice=DEVICE
+VBI device to use (defaults to
+.IR /dev/vbi0 ).
+
+.TP
+.B \-i, \-\-input=INPUTNUM
+video4linux input number (defaults to
+.IR 0 ).
+Cards commonly have a bunch
+of sources, for example, on my WinTV card,
+.I source 0
+is my tuner and
+.I source 1
+is the composite input.
+
+.TP
+.B \-c, \-\-channel=CHANNEL
+On startup,
 .B tvtime
-console window.  Using the
-.B tvtime
-console, you can type in any of the commands in this document and have
-them executed.
+will tune to the given channel.  Otherwise, the
+channels from the config file will be used.
 
 .TP
-.B TOGGLE_DEINTERLACER
-This toggles between the available deinterlacing methods.
+.B \-n, \-\-norm=NORM
+The mode to set the tuner to (defaults to
+.IR NTSC ).
+Valid modes are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@NTSC
+\(bu@PAL
+\(bu@SECAM
+\(bu@PAL\-NC
+\(bu@PAL\-M
+\(bu@PAL\-N
+\(bu@NTSC\-JP
+.TE
 
 .TP
-.B TOGGLE_FULLSCREEN
-This toggles between fullscreen and windowed mode.
+.B \-f, \-\-frequencies=NAME
+The channels you are receiving with the tuner (defaults to
+.IR us\-cable ).
+Valid values are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@us\-cable
+\(bu@us\-broadcast
+\(bu@japan\-cable
+\(bu@japan\-broadcast
+\(bu@europe
+\(bu@australia
+\(bu@australia\-optus
+\(bu@newzealand
+\(bu@france
+\(bu@russia
+.TE
 
 .TP
-.B TOGGLE_FRAMERATE
-Toggles the framerate at which
-.B tvtime
-will output.  Options are full frame
-rate (every field deinterlaced to a frame), half frame rate TFF (every
-top field deinterlaced to a frame) and half frame rate BFF (every bottom
-field deinterlaced to a frame).
+.B \-x, \-\-mixer=DEVICE[:CH]
+The mixer device and channel for the volume controls. (defaults to
+.IR /dev/mixer:line ).
+Valid channels are:
+.TS
+nokeep tab (@);
+l l.
+\(bu@vol
+\(bu@bass
+\(bu@treble
+\(bu@synth
+\(bu@pcm
+\(bu@speaker
+\(bu@line
+\(bu@mic
+\(bu@cd
+\(bu@mix
+\(bu@pcm2
+\(bu@rec
+\(bu@igain
+\(bu@ogain
+\(bu@line1
+\(bu@line2
+\(bu@line3
+\(bu@dig1
+\(bu@dig2
+\(bu@dig3
+\(bu@phin
+\(bu@phout
+\(bu@video
+\(bu@radio
+\(bu@monitor
+.TE
 
-.TP
-.B TOGGLE_INPUT
-Switches the capture card input used.  Among the Inputs are: the
-tuner, composite, or S-Video connectors on the capture card.
-
-.TP
-.B TOGGLE_LUMA_CORRECTION
-This command enables or disables the luma correction feature.
-When enabled, this will try to correct for the incorrect colour space
-provided by bt848 and bt878 based capture cards.
-
-.TP
-.B TOGGLE_MATTE
-Switches between the available mattes.  This cuts off the top and
-bottom of the input picture to help fit the window to the image
-content.
-
-.TP
-.B TOGGLE_MODE
-Loads the next saved mode settings.  The default configuration file
-defines two modes: a small window mode with a low quality deinterlacer
-setting used, and a high quality large window mode, suitable for use at
-fullscreen.
-
-.TP
-.B TOGGLE_MUTE
-Toggles the mute state in the capture card (and not in
-your soundcard).
-
-.TP
-.B TOGGLE_NTSC_CABLE_MODE
-Toggles the NTSC cable mode settings: 
-.IR Standard ,
-.IR IRC ", and "
-.I HRC
-are available.
-
-.TP
-.B TOGGLE_PAUSE
-Enters pause mode.  Pause mode is a debugging feature used to
-test deinterlacer filters by allowing to see the output of a single set
-of frames with various deinterlacers.
-
-.TP
-.B TOGGLE_PULLDOWN_DETECTION
-Toggles between the available 2\[en]3 pulldown detection modes.  Modes
-currently available are vektor's adaptive pulldown detection, and
-dalias's pulldown detection.
-
-.TP
-.B QUIT
-Asks the running
-.B tvtime
-process to exit.
 
 .SH AUTHORS
 
