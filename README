@@ -97,6 +97,7 @@ Entries in a list are in the following form:
     VHF Italy           A - H, H1, H2
     VHF Ireland         I1 - I9
     UHF                 U21 - U69
+    Australia Optus     01 - 058
 
   Custom frequencies can be included manually as follows:
 

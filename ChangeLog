@@ -1,5 +1,7 @@
 
 0.9.8
+  * vektor: Added Australia Optus cable frequencies, for users who want
+      to avoid using their set-top box.
   * vektor: Channel now switches after timeout if you're typing in
       a new position number (fixes 721289)
   * vektor: Added support for custom frequencies in the staitonlist.xml

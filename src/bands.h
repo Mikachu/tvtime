@@ -269,6 +269,28 @@ const band_entry_t band_data_japan_catv[] = {
     { "61", 451250 }, { "62", 457250 }, { "63", 463250 }
 };
 
+/**
+ * Australian Optus Cable.  They provide set-top boxen, but some users want
+ * to tune directly.
+ */
+const band_entry_t band_data_australia_optus[] = {
+    { "O1",  224250 }, { "O2",  175250 }, { "O3",  259250 }, { "O4",  266250 },
+    { "O5",  280250 }, { "O6",  252250 }, { "O7",  168250 }, { "O8",  154250 },
+    { "O9",  287250 }, { "O10", 394250 }, { "O11", 457250 }, { "O12", 338250 },
+    { "O13", 216250 }, { "O14", 231250 }, { "O15", 478250 }, { "O16", 464250 },
+    { "O17", 443250 }, { "O18", 352250 }, { "O19", 450250 }, { "O20", 499250 },
+    { "O21", 534250 }, { "O22", 189250 }, { "O23", 110250 }, { "O24", 117250 },
+    { "O25", 408250 }, { "O26", 366250 }, { "O27", 359250 }, { "O28", 294250 },
+    { "O29", 147250 }, { "O30", 520250 }, { "O31", 527250 }, { "O32", 506250 },
+    { "O33", 492250 }, { "O34", 513250 }, { "O35", 317250 }, { "O36", 245250 },
+    { "O37", 380250 }, { "O38", 161250 }, { "O39", 310250 }, { "O40", 485250 },
+    { "O41", 345250 }, { "O42", 238250 }, { "O43", 436250 }, { "O44", 401250 },
+    { "O45", 138250 }, { "O46", 429250 }, { "O47", 471250 }, { "O48", 303250 },
+    { "O49", 387250 }, { "O50", 324250 }, { "O51", 373250 }, { "O52", 182250 },
+    { "O53", 422250 }, { "O54", 415250 }, { "O55", 273250 }, { "O56", 196250 },
+    { "O57", 209250 }, { "O58", 124250 }
+};
+
 const band_t bands[] = {
     { "US Cable", band_data_us_catv, sizeof( band_data_us_catv ) / sizeof( band_entry_t ) },
     { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
@@ -281,6 +303,7 @@ const band_t bands[] = {
     { "VHF France", band_data_vhf_france, sizeof( band_data_vhf_france ) / sizeof( band_entry_t ) },
     { "VHF Russia", band_data_vhf_russia, sizeof( band_data_vhf_russia ) / sizeof( band_entry_t ) },
     { "VHF Australia", band_data_vhf_australia, sizeof( band_data_vhf_australia ) / sizeof( band_entry_t ) },
+    { "Australia Optus", band_data_australia_optus, sizeof( band_data_australia_optus ) / sizeof( band_entry_t ) },
     { "VHF Italy", band_data_vhf_italy, sizeof( band_data_vhf_italy ) / sizeof( band_entry_t ) },
     { "VHF Ireland", band_data_vhf_ireland, sizeof( band_data_vhf_ireland ) / sizeof( band_entry_t ) },
     { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) }
