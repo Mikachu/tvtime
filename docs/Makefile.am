@@ -25,9 +25,15 @@ docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/sun-linear.png html/toshiba-16x9-screenshot.jpg \
 	html/tvtime-logo-banner.png html/tvtime.css \
 	html/usage.html html/why.html html/wsshot-small.jpg
-EXTRA_DIST = default.tvtime.xml example.lircrc tvtime.desktop \
+EXTRA_DIST = default.tvtime.xml example.lircrc \
 	tvtime-icon-100x100.png tvtime-icon-50x50.png tvtime-icon-48x48.png \
 	$(man_MANS) $(docs_html)
+
+desktopdatadir = $(datadir)/applications
+dist_desktopdata_DATA = net-tvtime.desktop
+
+icondatadir = $(datadir)/icons/hicolor/48x48/apps
+dist_icondata_DATA = tvtime.png
 
 .PHONY: install-exec-hook
 install-exec-hook:
