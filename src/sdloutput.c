@@ -42,7 +42,7 @@ unsigned char *sdl_get_output( void )
     return frame->pixels[ 0 ];
 }
 
-int sdl_init( int width, int height, int outputwidth, int aspect )
+int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
 {
     SDL_Rect **modes;
     const char *tagline;
@@ -90,7 +90,8 @@ int sdl_init( int width, int height, int outputwidth, int aspect )
     }
 
     /* Create overlay surface. */
-    frame = SDL_CreateYUVOverlay( width, height, SDL_YUY2_OVERLAY, screen );
+    frame = SDL_CreateYUVOverlay( inputwidth, inputheight,
+                                  SDL_YUY2_OVERLAY, screen );
     if( !frame ) {
         fprintf( stderr, "sdloutput: Couldn't create overlay surface.\n" );
         return 0;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2001, 2002 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ extern "C" {
  * Function gets the width to scale to.
  * If aspect is 1 we run in 16:9 mode.
  */
-int sdl_init( int width, int height, int outputwidth, int aspect );
+int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect );
 
 /**
  * Returns a pointer to the next frame to be drawn.
