@@ -163,30 +163,7 @@ dnl if test "$have_lirc" = "yes"; then
 dnl   AC_DEFINE(HAVE_LIRC,,[LIRC support])
 dnl fi
 
-dnl ---------------------------------------------
-dnl DScaler module loader
-dnl ---------------------------------------------
-AC_ARG_WITH([dscaler], 
-            AC_HELP_STRING([--without-dscaler],
-                           [Use this to disable our DScaler module loader (enabled by default)]),
-            [USE_DSCALER="$withval"], [USE_DSCALER="yes"])
-
-dnl Can someone clean this up to read better?  I want
-dnl the DScaler loader to be shut off on any non-x86
-dnl architecture.
-CAN_USE_DSCALER="no"
-case "$host_alias" in
-    i?86-* | k?-*)
-        CAN_USE_DSCALER="yes"
-esac
-if test "$CAN_USE_DSCALER" = "no"; then
-    USE_DSCALER="no"
-fi
-
 AM_CONDITIONAL(DISABLE_DSCALER_LOADER, [test x"$USE_DSCALER" != "xyes"])
-if test "$USE_DSCALER" != "yes" ; then
-    AC_DEFINE(DISABLE_DSCALER_LOADER,,[Disable the DScaler module loader])
-fi
 
 dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension
@@ -264,6 +241,7 @@ if test x"$GCC" = x"yes"; then
     case "$host_alias" in
     i?86-* | k?-*)
 	AC_DEFINE([ARCH_X86],,[x86 architecture])
+        ARCH_X86=yes
 	case "$host_alias" in
 	i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
 	i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
@@ -300,6 +278,7 @@ else
 	AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
     esac
 fi
+AM_CONDITIONAL(ARCH_X86, [test "$ARCH_X86" = "yes"])
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([memalign])

@@ -1,8 +1,8 @@
 
 0.9.11 -
-  * vektor: Add an option for disabling the DScaler module loader that
-      uses wine.  This should let tvtime compile on some other
-      architectures.  Thanks to Helge Kreutzmann.
+  * vektor: Disabling the wine DScaler module loader on non-x86 architectures.
+      This should let tvtime compile for some users.  Thanks to Helge
+      Kreutzmann.
   * vektor: Fixed the XMLTV code to handle entries where the timezone
       does not match the local timezone.
   * vektor: Changed fifodir to /tmp.  This is both easier for packaging,

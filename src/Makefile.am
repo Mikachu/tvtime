@@ -15,10 +15,10 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330 - Boston, MA 02111-1307, USA
 
-if DISABLE_DSCALER_LOADER
-SUBDIRS =
-else
+if ARCH_X86
 SUBDIRS = wine
+else
+SUBDIRS =
 endif
 
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
@@ -46,11 +46,11 @@ OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
-if DISABLE_DSCALER_LOADER
-DSCALER_SRCS =
-else
+if ARCH_X86
 DSCALER_SRCS = DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h dscalerplugin.h \
 	dscalerplugin.c
+else
+DSCALER_SRCS =
 endif
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
@@ -82,11 +82,11 @@ tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) -lm
-if DISABLE_DSCALER_LOADER
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la -lpthread
-else
+if ARCH_X86
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread
+else
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la -lpthread
 endif
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
@@ -122,10 +122,10 @@ CLEANFILES = expandpng timingtest rvr
 
 # Satisfy extra-directory dependencies.  Unfortunately, this causes
 # libtool to re-link each and every time.  (Recursive make is evil!)
-if DISABLE_DSCALER_LOADER
-external_dependencies = ../plugins/libtvtimeplugins.la
-else
+if ARCH_X86
 external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
+else
+external_dependencies = ../plugins/libtvtimeplugins.la
 endif
 .PHONY: $(external_dependencies)
 $(external_dependencies):
