@@ -152,6 +152,7 @@ struct commands_s {
     int change_channel;
     int renumbering;
     int xmltvupdated;
+    int tunerreset;
 
     int apply_invert;
     int apply_mirror;
@@ -395,6 +396,8 @@ static void reinit_tuner( commands_t *cmd )
 
         set_redirect( "root", "root-tuner" );
         set_redirect( "picture", "picture-tuner" );
+
+        cmd->tunerreset = 1;
 
         videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr )
                                    + ((station_get_current_finetune( cmd->stationmgr ) * 1000)/16) );
@@ -1019,6 +1022,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->change_channel = 0;
     cmd->renumbering = 0;
     cmd->xmltvupdated = 0;
+    cmd->tunerreset = 0;
 
     cmd->apply_invert = config_get_invert( cfg );
     cmd->apply_mirror = config_get_mirror( cfg );
@@ -3126,6 +3130,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
 void commands_next_frame( commands_t *cmd )
 {
+    cmd->tunerreset = 0;
+
     /* Decrement the frame counter if user is typing digits */
     if( cmd->frame_counter > 0 ) {
         cmd->frame_counter--;
@@ -3471,6 +3477,11 @@ int commands_get_audio_boost( commands_t *cmd )
 int commands_xmltv_updated( commands_t *cmd )
 {
     return cmd->xmltvupdated;
+}
+
+int commands_tuner_reset( commands_t *cmd )
+{
+    return cmd->tunerreset;
 }
 
 const char *commands_get_xmltv_title( commands_t *cmd )

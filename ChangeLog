@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Added support for the _XAWTV_STATION window property, which
+      announces which channel we are set to.
   * vektor: Save always-on-top state across shutdown of tvtime.
   * vektor: Replaced the OutputHeight configuration with window geometry
       support using the --geometry command line option.

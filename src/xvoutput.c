@@ -433,6 +433,7 @@ static output_api_t xvoutput =
     xcommon_toggle_alwaysontop,
     xcommon_toggle_fullscreen,
     xcommon_set_window_caption,
+    xcommon_update_xawtv_station,
 
     xcommon_set_window_position,
     xcommon_set_window_height,

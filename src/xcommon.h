@@ -64,6 +64,8 @@ void xcommon_set_fullscreen_position( int pos );
 void xcommon_set_matte( int ystart, int height );
 int xcommon_is_fullscreen_supported( void );
 int xcommon_is_alwaysontop_supported( void );
+void xcommon_update_xawtv_station( int frequency, int channel_id,
+                                   const char *channel_name );
 
 #ifdef __cplusplus
 };

@@ -1953,6 +1953,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             output->set_window_caption( caption );
             last_current_id = current_id;
         }
+        if( commands_tuner_reset( commands ) && vidin ) {
+            output->update_xawtv_station( videoinput_get_tuner_freq( vidin ),
+                                          station_get_current_id( stationmgr ),
+                                          station_get_current_channel_name( stationmgr ) );
+        }
 
         commands_next_frame( commands );
 

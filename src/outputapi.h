@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2004 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,8 @@ typedef struct output_api_s
     int (* toggle_alwaysontop)( void );
     int (* toggle_fullscreen)( int fullscreen_width, int fullscreen_height );
     void (* set_window_caption)( const char *caption );
+    void (* update_xawtv_station)( int frequency, int channel_id,
+                                   const char *channel_name );
 
     void (* set_window_position)( int x, int y );
     void (* set_window_height)( int window_height );

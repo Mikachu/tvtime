@@ -99,6 +99,8 @@ static Atom utf8_string;
 static Atom kwm_keep_on_top;
 static Atom wm_protocols;
 static Atom wm_delete_window;
+static Atom xawtv_station;
+static Atom xawtv_remote;
 
 #ifdef HAVE_XTESTEXTENSION
 static KeyCode kc_shift_l; /* Fake key to send. */
@@ -136,11 +138,13 @@ static void load_atoms( Display *dpy )
         "UTF8_STRING",
         "KWM_KEEP_ON_TOP",
         "WM_PROTOCOLS",
-        "WM_DELETE_WINDOW"
+        "WM_DELETE_WINDOW",
+        "_XAWTV_STATION",
+        "_XAWTV_REMOTE"
     };
-    Atom atoms_return[ 11 ];
+    Atom atoms_return[ 13 ];
 
-    XInternAtoms( display, atom_names, 11, False, atoms_return );
+    XInternAtoms( display, atom_names, 13, False, atoms_return );
     net_supporting_wm_check = atoms_return[ 0 ];
     net_supported = atoms_return[ 1 ];
     net_wm_name = atoms_return[ 2 ];
@@ -152,6 +156,8 @@ static void load_atoms( Display *dpy )
     kwm_keep_on_top = atoms_return[ 8 ];
     wm_protocols = atoms_return[ 9 ];
     wm_delete_window = atoms_return[ 10 ];
+    xawtv_station = atoms_return[ 11 ];
+    xawtv_remote = atoms_return[ 12 ];
 }
 
 
@@ -1661,4 +1667,20 @@ void xcommon_set_video_scale( area_t scalearea )
 {
     scale_area = scalearea;
 }
+
+void xcommon_update_xawtv_station( int frequency, int channel_id,
+                                   const char *channel_name )
+{
+    char data[ 1024 ];
+    int length;
+
+    length  = sprintf( data, "%.3f", ((float) frequency) / 1000.0 ) + 1;
+    length += sprintf( data + length, "%d", channel_id ) + 1;
+    length += sprintf( data + length, "%s", channel_name ) + 1;
+
+    XChangeProperty( display, wm_window, xawtv_station,
+                     XA_STRING, 8, PropModeReplace,
+                     (unsigned char *) data, length );
+}
+
 

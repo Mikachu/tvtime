@@ -98,6 +98,7 @@ const char *commands_get_matte_mode( commands_t *cmd );
 const char *commands_get_fs_pos( commands_t *cmd );
 int commands_get_audio_boost( commands_t *cmd );
 int commands_xmltv_updated( commands_t *cmd );
+int commands_tuner_reset( commands_t *cmd );
 const char *commands_get_xmltv_title( commands_t *cmd );
 
 #ifdef __cplusplus
