@@ -134,6 +134,102 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
+
+/**
+ *  Top field:      Bot field:
+ *     Copy            Blank
+ *     Interp          Copy
+ *     Copy            Interp
+ *     Interp          Copy
+ *     Copy            --
+ *     --              --
+ *     --              Interp
+ *     Blank           Copy
+ *
+ *  So, say a frame is n high.
+ *  For the bottom field, the first scanline is blank (special case).
+ *  Each of top and bottom handles the first line of their field as a special case.
+ *  For the top field, the final scanline is a special case.
+ *  The top field therefore handles n-2 scanlines in the loop.
+ *  The bot field handles n-2 scanlines in the loop.
+ */
+void tvtime_build_frame( unsigned char *output,
+                         unsigned char *curframe,
+                         unsigned char *lastframe,
+                         video_correction_t *vc,
+                         tvtime_osd_t *osd,
+                         menu_t *menu,
+                         int copy_to_lastframe,
+                         int bottom_field,
+                         int correct_input,
+                         int width,
+                         int frame_height,
+                         int instride,
+                         int outstride )
+{
+    unsigned char *out = output;
+    int i;
+
+    if( bottom_field ) {
+        /* Advance frame pointers to the next input line. */
+        if( copy_to_lastframe ) {
+            blit_packed422_scanline( lastframe, curframe, instride );
+        }
+        curframe += instride;
+        lastframe += instride;
+
+        /* Clear a scanline. */
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        output += outstride;
+    }
+
+    /* Copy a scanline. */
+    if( correct_input ) {
+        video_correction_correct_packed422_scanline( vc, output, curframe, width );
+    } else {
+        blit_packed422_scanline( output, curframe, width );
+    }
+    output += outstride;
+
+    for( i = (frame_height - 2) / 2; i; --i ) {
+        unsigned char *top1 = curframe;
+        unsigned char *mid1 = curframe + instride;
+        unsigned char *bot1 = curframe + (instride*2);
+        unsigned char *top0 = lastframe;
+        unsigned char *mid0 = lastframe + instride;
+        unsigned char *bot0 = lastframe + (instride*2);
+
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
+        output += outstride;
+
+        blit_packed422_scanline( lastframe, curframe, instride*2 );
+        curframe += (instride*2);
+        lastframe += (instride*2);
+
+        /* Copy a scanline. */
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, output, curframe, width );
+        } else {
+            blit_packed422_scanline( output, curframe, width );
+        }
+        output += outstride;
+    }
+
+
+    if( !bottom_field ) {
+        /* Clear a scanline. */
+        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        output += outstride;
+    }
+
+    tvtime_osd_composite_packed422( osd, out, width, frame_height, outstride );
+    menu_composite_packed422( menu, out, width, frame_height, outstride );
+}
+
+
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -207,6 +303,7 @@ int main( int argc, char **argv )
     height = videoinput_get_height( vidin );
     if( videoinput_get_numframes( vidin ) > 2 ) {
         copymode = 0;
+        fprintf( stderr, "tvtime: Not in copy mode.\n" );
     } else {
         fprintf( stderr, "tvtime: Can't get 3 buffers from V4L: forced to "
                 "keep our own copy of previous frames.\n"
@@ -402,7 +499,7 @@ int main( int argc, char **argv )
             const char *mode = speedy_next_deinterlacing_mode();
             tvtime_osd_show_message( osd, mode );
         }
-
+        tvtime_osd_volume_muted( osd, mixer_ismute() );
         input_next_frame( in );
 
         /* CHECKPOINT1 : Blit the second field */
@@ -451,24 +548,10 @@ int main( int argc, char **argv )
         } else if( showtest ) {
             blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
         } else {
-            if( config_get_apply_luma_correction( ct ) ) {
-                video_correction_packed422_field_to_frame_top_twoframe( vc, sdl_get_output(),
-                                                       width*2, curframe,
-                                                       lastframe, width,
-                                                       height, width*2 );
-            } else {
-                packed422_field_to_frame_top_twoframe( sdl_get_output(),
-                                                       width*2, curframe,
-                                                       lastframe, width,
-                                                       height, width*2 );
-            }
-
-            tvtime_osd_volume_muted( osd, mixer_ismute() );
-            tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
-                                            height, width*2 );
-            menu_composite_packed422( menu, sdl_get_output(), width,
-                                      height, width*2 );
-
+            tvtime_build_frame( sdl_get_output(), curframe, lastframe, vc,
+                                osd, menu, copymode, 0,
+                                config_get_apply_luma_correction( ct ),
+                                width, height, width * 2, width * 2 );
         }
         if( screenshot ) {
             char filename[ 256 ];
@@ -517,37 +600,10 @@ int main( int argc, char **argv )
         } else if( showtest ) {
             blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
         } else {
-            if( config_get_apply_luma_correction( ct ) ) {
-                if( copymode ) {
-                    video_correction_packed422_field_to_frame_bot_twoframe_copy( vc, sdl_get_output(),
-                                                           width*2, curframe,
-                                                           lastframe, width,
-                                                           height, width*2 );
-                } else {
-                    video_correction_packed422_field_to_frame_bot_twoframe( vc, sdl_get_output(),
-                                                           width*2, curframe,
-                                                           lastframe, width,
-                                                           height, width*2 );
-                }
-            } else {
-                if( copymode ) {
-                    packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
-                                                           width*2, curframe,
-                                                           lastframe, width,
-                                                           height, width*2 );
-                } else {
-                    packed422_field_to_frame_bot_twoframe( sdl_get_output(),
-                                                           width*2, curframe,
-                                                           lastframe, width,
-                                                           height, width*2 );
-                }
-            }
-            tvtime_osd_volume_muted( osd, mixer_ismute() );
-            tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
-                                            height, width*2 );
-            menu_composite_packed422( menu, sdl_get_output(), width,
-                                      height, width*2 );
-
+            tvtime_build_frame( sdl_get_output(), curframe, lastframe, vc,
+                                osd, menu, copymode, 1,
+                                config_get_apply_luma_correction( ct ),
+                                width, height, width * 2, width * 2 );
         }
         if( screenshot ) {
             char filename[ 256 ];
