@@ -45,6 +45,8 @@
 #include "performance.h"
 #include "taglines.h"
 #include "xvoutput.h"
+#include "console.h"
+#include "vbidata.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -119,7 +121,7 @@ static void crossfade_frame( unsigned char *output,
                              int src1stride, int src2stride, int pos )
 {
     while( height-- ) {
-        crossfade_packed422_scanline( output, src1, src2, width, pos );
+        blend_packed422_scanline( output, src1, src2, width, pos );
         output += outstride;
         src1 += src1stride;
         src2 += src2stride;
@@ -219,6 +221,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              video_correction_t *vc,
                                              tvtime_osd_t *osd,
                                              menu_t *menu,
+                                             console_t *con,
                                              int bottom_field,
                                              int correct_input,
                                              int width,
@@ -239,6 +242,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         blit_packed422_scanline( output, curframe, width );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
         scanline++;
@@ -253,6 +257,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+    if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
     output += outstride;
     scanline++;
@@ -286,6 +291,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
 
         output += outstride;
         scanline++;
@@ -301,6 +308,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
         output += outstride;
         scanline++;
@@ -315,6 +323,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
+        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
 
         output += outstride;
         scanline++;
@@ -327,6 +337,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            video_correction_t *vc,
                                            tvtime_osd_t *osd,
                                            menu_t *menu,
+                                           console_t *con,
                                            int bottom_field,
                                            int correct_input,
                                            int width,
@@ -406,7 +417,9 @@ int main( int argc, char **argv )
     menu_t *menu;
     output_api_t *output;
     performance_t *perf;
+    console_t *con;
     int has_signal = 0;
+    vbidata_t *vbidata;
 
     setup_speedy_calls();
 
@@ -510,13 +523,7 @@ int main( int argc, char **argv )
                          "available, exiting.\n" );
         return 1;
     }
-    curmethodid = config_get_preferred_deinterlace_method( ct );
-	if( curmethodid >= get_num_deinterlace_methods() ||
-		curmethodid < 0) {
-		fprintf( stderr, "tvtime: Invalid preferred deinterlace method, "
-				         "exiting.\n" );
-		return 1;
-	}
+    curmethodid = 0;
     curmethod = get_deinterlace_method( curmethodid );
 
     /* Build colourbars. */
@@ -591,8 +598,8 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Attempting to aquire "
                          "performance-enhancing features.\n" );
     }
-    if( setpriority( 0, 0, -19 ) < 0 && verbose ) {
-        fprintf( stderr, "tvtime: Can't renice to -19.\n" );
+    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
+        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
     }
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) && verbose ) {
         fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
@@ -627,6 +634,22 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    /* Setup the console */
+    con = console_new( ct, (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 10,
+                       width, height, 
+                       config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+    if( !con ) {
+        fprintf( stderr, "tvtime: Could not setup console.\n" );
+    }
+
+
+    if( con ) {
+        console_setup_pipe( con, config_get_command_pipe( ct ) );
+        input_set_console( in, con );
+    }
+
+    /* Open the VBI device. */
+    vbidata = vbidata_new( "/dev/vbi0" );
 
     /* Setup the output. */
     output = get_xv_output();
@@ -664,6 +687,7 @@ int main( int argc, char **argv )
         int showbars, screenshot;
         int aquired = 0;
         int tuner_state;
+        int we_were_late = 0;
 
         output->poll_events( in );
 
@@ -690,7 +714,6 @@ int main( int argc, char **argv )
             }
         }
         input_next_frame( in );
-
 
         /* Aquire the next frame. */
         tuner_state = videoinput_check_for_signal( vidin );
@@ -732,10 +755,12 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
+            fprintf( stderr, "Speedy time last frame: %dus\n", speedy_get_usecs() );
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );
         }
+        speedy_reset_timer();
 
         if( output->is_interlaced() ) {
             /* Wait until we can draw the even field. */
@@ -743,7 +768,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, 0,
+                       curframe, vc, osd, menu, con, 0,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -756,7 +781,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                    curframe, lastframe, secondlastframe,
-                                   vc, osd, menu, 0,
+                                   vc, osd, menu, con, 0,
                                    vc && config_get_apply_luma_correction( ct ),
                                    width, height, width * 2, output->get_output_stride() );
             }
@@ -778,12 +803,16 @@ int main( int argc, char **argv )
 
             /* Wait until it's time to blit the first field. */
             if( rtctimer ) {
+
+                we_were_late = 1;
                 while( performance_get_usecs_since_frame_aquired( perf )
                        < ( fieldtime - safetytime
                            - performance_get_usecs_of_last_blit( perf )
                            - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
+                    we_were_late = 0;
                 }
+
             }
             performance_checkpoint_delayed_blit_top_field( perf );
 
@@ -799,7 +828,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, 1,
+                       curframe, vc, osd, menu, con, 1,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -812,7 +841,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                   curframe, lastframe,
-                                  secondlastframe, vc, osd, menu, 1,
+                                  secondlastframe, vc, osd, menu, con, 1,
                                   vc && config_get_apply_luma_correction( ct ),
                                   width, height, width * 2, output->get_output_stride() );
             }
@@ -835,18 +864,21 @@ int main( int argc, char **argv )
             } else {
                 videoinput_free_frame( vidin, curframeid );
             }
+            if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
 
         if( !output->is_interlaced() ) {
             /* Wait for the next field time. */
-            if( rtctimer ) {
+            if( rtctimer && !we_were_late ) {
+
                 while( performance_get_usecs_since_last_field( perf )
                        < ( fieldtime
                            - performance_get_usecs_of_last_blit( perf )
                            - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
+
             }
             performance_checkpoint_delayed_blit_bot_field( perf );
 
@@ -870,6 +902,9 @@ int main( int argc, char **argv )
     videoinput_delete( vidin );
     config_delete( ct );
     input_delete( in );
+    if( vbidata ) {
+        vbidata_delete( vbidata );
+    }
     if( vc ) {
         video_correction_delete( vc );
     }
@@ -878,6 +913,9 @@ int main( int argc, char **argv )
     }
     if( menu ) {
         menu_delete( menu );
+    }
+    if( con ) {
+        console_delete( con );
     }
     return 0;
 }
