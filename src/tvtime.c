@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/mman.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -605,6 +606,9 @@ int main( int argc, char **argv )
     if( verbose ) {
         fprintf( stderr, "tvtime: Done stealing resources.\n" );
     }
+
+    /* We've now stolen all our root-requiring resources, drop to a user. */
+    setuid( getuid() );
 
     /* Setup the output. */
     output = get_xv_output();
