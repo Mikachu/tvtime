@@ -189,6 +189,7 @@ static void update_xmltv_listings( commands_t *cmd )
 
         if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
             const char *desc;
+            char subtitle[ 1024 ];
             char descdata[ 1024 ];
             char *line1 = 0;
             char *line2 = 0;
@@ -215,8 +216,14 @@ static void update_xmltv_listings( commands_t *cmd )
                 }
             }
 
-            tvtime_osd_show_program_info( cmd->osd, xmltv_get_title( cmd->xmltv ),
-                                          xmltv_get_sub_title( cmd->xmltv ), line1, line2 );
+            if( xmltv_get_sub_title( cmd->xmltv ) ) {
+               sprintf( subtitle, "%s - %s", xmltv_get_times( cmd->xmltv ),
+                        xmltv_get_sub_title( cmd->xmltv ) );
+            } else {
+               sprintf( subtitle, "%s", xmltv_get_times( cmd->xmltv ) );
+            }
+
+            tvtime_osd_show_program_info( cmd->osd, xmltv_get_title( cmd->xmltv ), subtitle, line1, line2 );
         }
     }
 }

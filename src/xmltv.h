@@ -62,6 +62,11 @@ const char *xmltv_get_sub_title( xmltv_t *xmltv );
 const char *xmltv_get_description( xmltv_t *xmltv );
 
 /**
+ * Returns a pretty string version of the start and end times.
+ */
+const char *xmltv_get_times( xmltv_t *xmltv );
+
+/**
  * Returns true if the show information must be updated (the current
  * program has ended.
  */

@@ -30,6 +30,7 @@ struct xmltv_s
     xmlChar *title;
     xmlChar *subtitle;
     xmlChar *description;
+    char times[ 256 ];
     int refresh;
     int end_year;
     int end_month;
@@ -79,6 +80,8 @@ static int date_compare( int year1, int month1, int day1, int hour1, int min1,
 static xmlNodePtr get_program( xmltv_t *xmltv, xmlDocPtr doc, xmlNodePtr cur, const char *channelid,
                                int year, int month, int day, int hour, int min )
 {
+    *xmltv->times = 0;
+
     cur = cur->xmlChildrenNode;
     while( cur ) {
         if( !xmlStrcasecmp( cur->name, BAD_CAST "programme" ) ) {
@@ -103,6 +106,8 @@ static xmlNodePtr get_program( xmltv_t *xmltv, xmlDocPtr doc, xmlNodePtr cur, co
                             if( date_compare( xmltv->end_year, xmltv->end_month, xmltv->end_day,
                                               xmltv->end_hour, xmltv->end_min, year, month,
                                               day, hour, min ) > 0 ) {
+                                sprintf( xmltv->times, "%2d:%02d - %2d:%02d",
+                                         start_hour, start_min, xmltv->end_hour, xmltv->end_min  );
                                 xmlFree( start );
                                 xmlFree( channel );
                                 xmlFree( stop );
@@ -118,6 +123,8 @@ static xmlNodePtr get_program( xmltv_t *xmltv, xmlDocPtr doc, xmlNodePtr cur, co
                             if( date_compare( xmltv->end_year, xmltv->end_month, xmltv->end_day,
                                               xmltv->end_hour, xmltv->end_min, year, month,
                                               day, hour, min ) > 0 ) {
+                                sprintf( xmltv->times, "%2d:%02d - %2d:%02d",
+                                         start_hour, start_min, xmltv->end_hour, xmltv->end_min  );
                                 xmlFree( start );
                                 xmlFree( channel );
                                 return cur;
@@ -182,6 +189,7 @@ xmltv_t *xmltv_new( const char *filename )
     }
 
     xmltv->title = xmltv->subtitle = xmltv->description = xmltv->curchan = 0;
+    *xmltv->times = 0;
     xmltv->refresh = 1;
 
     return xmltv;
@@ -240,6 +248,11 @@ const char *xmltv_get_sub_title( xmltv_t *xmltv )
 const char *xmltv_get_description( xmltv_t *xmltv )
 {
     return (char *) xmltv->description;
+}
+
+const char *xmltv_get_times( xmltv_t *xmltv )
+{
+    return xmltv->times;
 }
 
 int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
