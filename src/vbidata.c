@@ -94,6 +94,110 @@ int ccdecode(unsigned char *vbiline)
 static char xds_packet[ 2048 ];
 static int xds_cursor = 0;
 
+const char *months[] = { 0, "Jan", "Feb", "Mar", "Apr", "May",
+    "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+static const char *eia608_program_type[ 96 ] =
+{
+	"education",
+	"entertainment",
+	"movie",
+	"news",
+	"religious",
+	"sports",
+	"other",
+	"action",
+	"advertisement",
+	"animated",
+	"anthology",
+	"automobile",
+	"awards",
+	"baseball",
+	"basketball",
+	"bulletin",
+	"business",
+	"classical",
+	"college",
+	"combat",
+	"comedy",
+	"commentary",
+	"concert",
+	"consumer",
+	"contemporary",
+	"crime",
+	"dance",
+	"documentary",
+	"drama",
+	"elementary",
+	"erotica",
+	"exercise",
+	"fantasy",
+	"farm",
+	"fashion",
+	"fiction",
+	"food",
+	"football",
+	"foreign",
+	"fund raiser",
+	"game/quiz",
+	"garden",
+	"golf",
+	"government",
+	"health",
+	"high school",
+	"history",
+	"hobby",
+	"hockey",
+	"home",
+	"horror",
+	"information",
+	"instruction",
+	"international",
+	"interview",
+	"language",
+	"legal",
+	"live",
+	"local",
+	"math",
+	"medical",
+	"meeting",
+	"military",
+	"miniseries",
+	"music",
+	"mystery",
+	"national",
+	"nature",
+	"police",
+	"politics",
+	"premiere",
+	"prerecorded",
+	"product",
+	"professional",
+	"public",
+	"racing",
+	"reading",
+	"repair",
+	"repeat",
+	"review",
+	"romance",
+	"science",
+	"series",
+	"service",
+	"shopping",
+	"soap opera",
+	"special",
+	"suspense",
+	"talk",
+	"technical",
+	"tennis",
+	"travel",
+	"variety",
+	"video",
+	"weather",
+	"western"
+};
+
+
 static void parse_xds_packet( const char *packet, int length )
 {
     int i;
@@ -111,6 +215,24 @@ static void parse_xds_packet( const char *packet, int length )
         fprintf( stderr, "Show rating: 0x%02x 0x%02x\n", packet[ 3 ], packet[ 4 ] );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
         fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
+    } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
+                        int month = packet[6];// & 15;
+                        int day = packet[5];// & 31;
+                        int hour = packet[4];// & 31;
+                        int min = packet[3];// & 63;
+
+        fprintf( stderr, "PIN: %d %d %d %d\n", min, hour, day, month );
+                 // packet[ 3 ], packet[ 4 ], packet[ 5 ], packet[ 6 ] );
+                 //packet[ 5 ] & 31, packet[ 6 ], packet[ 4 ] & 31, packet[ 3 ] & 63 );
+    } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
+        fprintf( stderr, "Program type: " );
+        for( i = 0; i < length - 2; i++ ) {
+            int cur = packet[ 2 + i ] - 0x20;
+            if( cur >= 0 && cur < 96 ) {
+                fprintf( stderr, "%s%s", i ? ", " : "", eia608_program_type[ cur ] );
+            }
+        }
+        fprintf( stderr, "\n" );
     } else {
         /* unknown */
 
