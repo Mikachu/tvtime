@@ -42,8 +42,8 @@ install-data-local:
 	$(INSTALL) -d '$(DESTDIR)$(datadir)/pixmaps'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.16x16.png' '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.png' '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
-	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.xpm' '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.xpm'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
+	$(INSTALL_DATA) '$(srcdir)/tvtime.32x32.xpm' '$(DESTDIR)$(datadir)/pixmaps/tvtime.xpm'
 	$(INSTALL_DATA) '$(srcdir)/tvtime.48x48.png' '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
 
 .PHONY: install-exec-hook
@@ -70,6 +70,6 @@ uninstall-hook:
 	-rmdir -p '$(DESTDIR)$(pkgsysconfdir)'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/16x16/apps/tvtime.png'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.png'
-	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/32x32/apps/tvtime.xpm'
 	-rm -f '$(DESTDIR)$(datadir)/icons/hicolor/48x48/apps/tvtime.png'
+	-rm -f '$(DESTDIR)$(datadir)/pixmaps/tvtime.xpm'
 	-rm -f '$(DESTDIR)$(datadir)/pixmaps/tvtime.png'
