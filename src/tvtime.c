@@ -643,22 +643,8 @@ int main( int argc, char **argv )
 
 
     if( con ) {
-console_printf( con, "You should also get your employer (if you work as a programmer) or your
-school, if any, to sign a copyright disclaimer for the program, if
-necessary.  Here is a sample; alter the names:
-
-  Yoyodyne, Inc., hereby disclaims all copyright interest in the program
-  `Gnomovision' (which makes passes at compilers) written by James Hacker.
-
-  <signature of Ty Coon>, 1 April 1989
-  Ty Coon, President of Vice
-
-This General Public License does not permit incorporating your program into
-proprietary programs.  If your program is a subroutine library, you may
-consider it more useful to permit linking proprietary applications with the
-library.  If this is what you want to do, use the GNU Library General
-Public License instead of this License.
-" );
+        console_setup_pipe( con, config_get_command_pipe( ct ) );
+        input_set_console( in, con );
     }
 
 
@@ -724,11 +710,6 @@ Public License instead of this License.
                 tvtime_osd_show_info( osd );
             }
         }
-        if( input_toggle_console( in ) ) {
-            if( con ) console_toggle_console( con );
-        }
-        if( con ) console_scroll_n( con, input_scroll_console( in ) );
-
         input_next_frame( in );
 
 /*

@@ -3,9 +3,16 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/select.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include "osdtools.h"
 #include "console.h"
 #include "speedy.h"
+
+/* stupid glibc bug i guess */
+int vfscanf(FILE *stream, const char *format, va_list ap);
 
 struct console_line_coords {
     int x, y;
@@ -39,7 +46,7 @@ struct console_s {
     int curx, cury; /* cursor position */
     int rows, cols;
 
-    int stdin, stdout, stderr;
+    FILE *in, *out, *err;
 
     int visible;
     char *fontfile;
@@ -48,6 +55,8 @@ struct console_s {
     int first_line;
     int dropdown;
     int drop_pos;
+
+    int show_cursor;
 
 };
 
@@ -77,9 +86,9 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
     con->bg_cb = 128;
     con->bg_cr = 128;
     con->bgpic = NULL;
-    con->stdin = 0;
-    con->stdout = 1;
-    con->stderr = 2;
+    con->in = stdin;
+    con->out = stdout;
+    con->err = stderr;
     con->visible = 0;
     con->rows = 0;
     con->cols = 0;
@@ -88,6 +97,7 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
     con->first_line = 0;
     con->num_lines = 0;
     con->coords = NULL;
+    con->show_cursor = 1;
 
 #if 0
     con->text = (char *)malloc( con->rows * con->cols ); 
@@ -163,6 +173,36 @@ console_t *console_new( config_t *cfg, int x, int y, int width, int height,
         con->coords[ i ].y = tmp;
     }
 
+    if( !con->line ) {
+        con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
+        if( !con->line ) {
+            fprintf(stderr, 
+                    "console: Couldn't add a line.\n" );
+
+            console_delete( con );
+            return NULL;
+        }
+        con->line[0] = osd_string_new( con->fontfile, 
+                                       con->fontsize, 
+                                       con->frame_width, 
+                                       con->frame_height,
+                                       con->frame_aspect );
+        if( !con->line[ 0 ] ) {
+            fprintf( stderr, 
+                     "console: Could not create new string.\n" );
+            console_delete( con );
+            return NULL;
+        }
+        osd_string_set_colour_rgb( con->line[ 0 ], 
+                                   (con->fgcolour >> 16) & 0xff, 
+                                   (con->fgcolour >> 8) & 0xff, 
+                                   (con->fgcolour & 0xff) );
+
+        osd_string_show_text( con->line[ 0 ], "_", 51 );
+        con->num_lines++;
+    }
+
+
     return con;
 }
 
@@ -182,6 +222,9 @@ void console_delete( console_t *con )
     if( con->text ) free( con->text );
     if( con->coords ) free( con->coords );
 
+    if( con->in != stdin ) fclose( con->in );
+    if( con->out != stdout ) fclose( con->out );
+
     free( con );
 }
 
@@ -190,8 +233,13 @@ void update_osd_strings( console_t *con )
     char *ptr;
     char tmpstr[1024];
     int maxwidth = con->width - ( ( con->frame_width * 1 ) / 100 );
-    
+    int needtoscroll = 0;
+
     if( !con ) return;
+
+    if( con->cury <= con->first_line + con->rows )
+        needtoscroll = 1;
+
     ptr = con->text + con->curx;
     tmpstr[0] = '\0';
 
@@ -222,10 +270,34 @@ void update_osd_strings( console_t *con )
         con->num_lines++;
     }
 
-
     for(;;) {
 
         if( !*ptr ) break;
+
+        if( *ptr == '\b' ) {
+            if( con->curx == ptr - con->text  && ptr != con->text ) {
+                /* can't delete past current line */
+                *ptr = '\0';
+                strcat( con->text, ptr+1 );
+                con->cols--;
+                continue;
+            } else if( ptr == con->text ) {
+                con->text[0] = '\0';
+                strcat( con->text, ptr+1 );
+                con->cols--;
+                continue;
+            }
+            tmpstr[0] = '\0';
+            snprintf( tmpstr, ptr - con->text - con->curx, 
+                      con->text + con->curx );
+            tmpstr[ ptr - con->text - con->curx ] = '\0';
+            osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
+            *ptr = '\0';
+            *(ptr-1) = '\0';
+            strcat( con->text + con->curx, ptr );
+            con->cols -= 2;
+            continue;
+        }
 
         if( *ptr != '\n' ) {
             char blah[2];
@@ -271,6 +343,7 @@ void update_osd_strings( console_t *con )
             osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
             con->cury++;
             tmpstr[0] = '\0';
+
             con->line[ con->cury ] = osd_string_new( con->fontfile, 
                                                      con->fontsize, 
                                                      con->frame_width, 
@@ -291,6 +364,17 @@ void update_osd_strings( console_t *con )
         }
         ptr++;
     }
+
+    if( con->show_cursor ) { 
+        strcat( tmpstr, "_" );
+        osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
+    }
+    if( needtoscroll && con->cury >= con->first_line + con->rows ) {
+        con->first_line = con->cury - con->rows + 1;
+        if( con->first_line < 0 ) {
+            con->first_line = 0;
+        }
+    }
 }
 
 
@@ -299,7 +383,6 @@ void console_printf( console_t *con, char *format, ... )
     va_list ap;
     int n=0, size;
     char *str = NULL;
-    char *ptr;
     
     if( !con ) return;
     if( !format ) return;
@@ -456,6 +539,72 @@ void console_toggle_console( console_t *con )
     if( con->visible ) {
         con->dropdown = 1;
         con->drop_pos = con->y;
+    }
+}
+
+void console_pipe_printf( console_t *con, char * format, ... )
+{
+    va_list ap;
+    int ret;
+    
+    if( !con ) return;
+    if( !format ) return;
+
+    va_start( ap, format );
+    ret = vfprintf( con->out, format, ap );
+    va_end( ap );
+    return;
+}
+
+int console_scanf( console_t *con, char *format, ... )
+{
+    va_list ap;
+    fd_set rfds;
+    struct timeval tv;
+    int ret = 0;
+
+    if( !con ) return 0;
+    if( !format ) return 0;
+
+    FD_ZERO( &rfds );
+    FD_SET( fileno( con->in ), &rfds );
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    va_start( ap, format );
+    if( select( fileno( con->in ) + 1, &rfds, NULL, NULL, &tv ) > 0 ) {
+        ret = vfscanf( con->in, format, ap );
+    }
+    va_end( ap );
+
+    return ret;
+}
+
+void console_setup_pipe( console_t *con, char *pipename )
+{
+    int fd[2];
+
+    if( !con ) return;
+
+    if( pipe( fd ) ) {
+        perror("console: Error opening pipe");
+        return;
+    }
+
+    if( fcntl( fd[0], F_SETFL, O_NONBLOCK ) == -1 ) {
+        perror("console: Error setting O_NONBLOCK" );
+    }
+    if( fcntl( fd[1], F_SETFL, O_NONBLOCK ) == -1 ) {
+        perror("console: Error setting O_NONBLOCK" );
+    }
+    con->in = fdopen(fd[0], "r");
+    con->out = fdopen(fd[1], "a");
+    if( con->in == NULL || con->out == NULL ) {
+        perror("console: Error fdopen'ing pipe");
+        con->in = stdin;
+        con->out = stdout;
+        close( fd[0] );
+        close( fd[1] );
     }
 }
 

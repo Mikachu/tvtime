@@ -28,12 +28,14 @@
 #endif
 
 #include "config.h"
+#include <ctype.h>
 #include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
 #include "input.h"
 #include "menu.h"
 #include "parser.h"
+#include "console.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -56,17 +58,20 @@ struct input_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
-    int toggleconsole;
-    int scrollconsole;
     
     int togglemenumode;
     menu_t *menu;
+
+    int toggleconsole;
+    int scrollconsole;
+    console_t *console;
 
     int lirc_used;
 #ifdef HAVE_LIRC
     int lirc_fd;
     struct lirc_config *lirc_conf;
 #endif
+
 };
 
 /**
@@ -323,6 +328,9 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->togglemenumode = 0;
     in->toggleconsole = 0;
     in->scrollconsole = 0;
+
+    in->console = 0;
+
     in->lirc_used = 0;
 
 #ifdef HAVE_LIRC
@@ -363,6 +371,11 @@ void input_set_menu( input_t *in, menu_t *m )
     in->menu = m;
 }
 
+void input_set_console( input_t *in, console_t *con )
+{
+    in->console = con;
+}
+
 static void input_channel_change_relative( input_t *in, int offset )
 {
     int verbose = config_get_verbose( in->cfg );
@@ -401,7 +414,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
     verbose = config_get_verbose( in->cfg );
 
-    if( in->togglemenumode ) {
+    if( in->togglemenumode && in->menu ) {
         if( menu_callback( in->menu, command, arg ) ) {
             return;
         }
@@ -421,6 +434,39 @@ void input_callback( input_t *in, InputEvent command, int arg )
             tvtime_cmd = config_button_to_command( in->cfg, arg );
         } else {
             tvtime_cmd = config_key_to_command( in->cfg, arg );
+        }
+
+        if( command == I_KEYDOWN && in->toggleconsole && in->console ) {
+            char blah[2];
+            blah[1] = '\0';
+            if( tvtime_cmd == TVTIME_TOGGLE_CONSOLE ) {
+                in->toggleconsole = 0;
+                console_toggle_console( in->console );
+                break;
+            }
+
+            if( tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP ||
+                tvtime_cmd == TVTIME_SCROLL_CONSOLE_DOWN ) {
+                console_scroll_n( in->console, 
+                                  (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1);
+                break;
+            }
+
+            blah[0] = arg & 0xFF;
+            switch( blah[0] ) {
+            case I_ENTER:
+                blah[0] = '\n';
+                break;
+                
+            default:
+                if( arg & I_SHIFT && isalpha(blah[0]) ) {
+                    blah[0] ^= 0x20;
+                }
+                break;
+            }
+            console_pipe_printf( in->console, blah );
+            console_printf( in->console, blah );
+            break;
         }
 
         switch( tvtime_cmd ) {
@@ -457,7 +503,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
             
 
         case TVTIME_TOGGLE_CONSOLE:
-            in->toggleconsole = 1;
+            in->toggleconsole = !in->toggleconsole;
+            console_toggle_console( in->console );
             break;
 
         case TVTIME_SKIP_CHANNEL:
@@ -722,17 +769,6 @@ int input_toggle_deinterlacing_mode( input_t *in )
     return in->toggledeinterlacingmode;
 }
 
-int input_toggle_console( input_t *in )
-{
-    return in->toggleconsole;
-}
-
-int input_scroll_console( input_t *in )
-{
-    return in->scrollconsole;
-}
-
-
 int input_toggle_menu( input_t *in )
 {
     in->togglemenumode = !in->togglemenumode;
@@ -799,8 +835,6 @@ void input_next_frame( input_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
-    in->toggleconsole = 0;
-    in->scrollconsole = 0;
     
     if( in->togglemenumode ) menu_refresh( in->menu );
 }

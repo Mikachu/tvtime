@@ -115,6 +115,7 @@ struct config_s
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
+    char *command_pipe;
 };
 
 void config_init( config_t *ct );
@@ -184,6 +185,7 @@ config_t *config_new( int argc, char **argv )
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
+    ct->command_pipe = strdup( "tvtime.fifo" );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
     ct->fullscreen = 0;
@@ -381,6 +383,11 @@ void config_init( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "Frequencies", 1 )) ) {
         free( ct->freq );
         ct->freq = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "CommandPipe", 1 )) ) {
+        free( ct->command_pipe );
+        ct->command_pipe = strdup( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "TimeFormat", 1 )) ) {
@@ -789,4 +796,9 @@ void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *c
 parser_file_t *config_get_parsed_file( config_t *ct )
 {
     return &(ct->pf);
+}
+
+char *config_get_command_pipe( config_t *ct )
+{
+    return ct->command_pipe;
 }

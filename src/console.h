@@ -16,6 +16,9 @@ void console_setfg( console_t *con, unsigned int fg );
 void console_setbg( console_t *con, unsigned int bg );
 void console_toggle_console( console_t *con );
 void console_scroll_n( console_t *con, int n );
+void console_setup_pipe( console_t *con, char *pipename );
+int console_scanf( console_t *con, char *format, ... );
+void console_pipe_printf( console_t *con, char * format, ... );
 void console_composite_packed422_scanline( console_t *con, 
                                            unsigned char *output,
                                            int width, int xpos, int scanline );
