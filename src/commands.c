@@ -1196,10 +1196,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu = menu_new( "input-ntsc" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
     if( vidin ) {
-        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
                  videoinput_get_input_name( vidin ) );
     } else {
-        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0x9d );
+        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0xbb );
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
@@ -1240,10 +1240,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu = menu_new( "input-pal" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
     if( vidin ) {
-        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
                  videoinput_get_input_name( vidin ) );
     } else {
-        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0x9d );
+        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0xbb );
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
@@ -2584,7 +2584,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
             if( cmd->osd ) {
                 char string[ 128 ];
-                sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+                sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0xbb,
                          videoinput_get_input_name( cmd->vidin ) );
                 menu_set_text( commands_get_menu( cmd, "input" ), 1, string );
                 commands_refresh_menu( cmd );
