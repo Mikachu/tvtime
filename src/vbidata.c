@@ -350,9 +350,9 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
                      packet[ 4 ] & 63 );
         vbi->length_elapsed_hour = packet[ 5 ] & 63;
         vbi->length_elapsed_min = packet[ 4 ] & 63;
-        snprintf( str, 32, "%02d:%02d %02d:%02d", 
-                  packet[ 3 ] & 63, packet[ 2 ] & 63, packet[ 5 ] & 63, 
-                  packet[ 4 ] & 63 );
+        snprintf( str, 32, "%02d:%02d/%02d:%02d", 
+                  packet[ 5 ] & 63, packet[ 4 ] & 63,
+                  packet[ 3 ] & 63, packet[ 2 ] & 63 );
         } else {
             vbi->length_elapsed_hour = 0;
             vbi->length_elapsed_min = 0;
@@ -361,9 +361,9 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( length > 6 ) {
             if( vbi->verbose ) fprintf( stderr, ".%02d", packet[ 6 ] & 63 );
             vbi->length_elapsed_hour = packet[ 6 ] & 63;
-            snprintf( str, 32, "%02d:%02d %02d:%02d.%02d", 
-                      packet[ 3 ] & 63, packet[ 2 ] & 63, packet[ 5 ] & 63, 
-                      packet[ 4 ] & 63, packet[ 6 ] & 63 );
+            snprintf( str, 32, "%02d:%02d.%02d/%02d:%02d", 
+                      packet[ 5 ] & 63, packet[ 4 ] & 63, packet[ 6 ] & 63, 
+                      packet[ 3 ] & 63, packet[ 2 ] & 63 );
         } else {
             vbi->length_elapsed_hour = 0;
         }

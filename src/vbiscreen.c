@@ -24,7 +24,7 @@ struct vbiscreen_s {
 
     osd_string_t *line[ ROWS ];
 
-    char buffers[ COLS ];
+    char buffers[ COLS * 2 ];
     char text[ 2 * ROWS * COLS ];
     char *disp_buf;
 
@@ -220,17 +220,30 @@ void vbiscreen_delete( vbiscreen_t *vs )
 
 void scroll_screen( vbiscreen_t *vs )
 {
-    int start_row;
+    int start_row, base, i, j;
 
-    if( !vs || !vs->captions || !vs->style || vs->style > ROLL_4 )
+    if( !vs || !vs->captions || !vs->style || vs->style > ROLL_4 ) {
+        if( vs->style > ROLL_4 ) {
+            base = ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
+            for( j = 0, i = base + vs->curx + vs->indent;
+                 i < base + COLS;
+                 j++, i++ ) {
+                vs->text[ i ] = vs->buffers[ vs->curbuffer * COLS + j ];
+            }
+            vs->disp_buf = vs->text + base;
+
+            update_row( vs );
+            memset( (char *)(vs->buffers + vs->curbuffer * COLS), 0, COLS );
+
+            vs->curbuffer = (vs->curbuffer + 1) % 2;
+        }
         return;
-
+    }
     start_row = ( vs->first_line + vs->top_of_screen ) % ( 2 * ROWS );
     if( vs->verbose )
         fprintf ( stderr, "start row : %d first line %d\n ", start_row, vs->first_line );
     /* zero out top row */
     memset( (char *)( vs->text + start_row * COLS ), 0, COLS );
-
     vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
     vs->curx = 0;
     update_all_rows( vs );
@@ -251,12 +264,13 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
         for( j = 0, i = base + vs->curx + vs->indent;
              i < base + COLS;
              j++, i++ ) {
-            vs->text[ i ] = vs->buffers[ j ];
+            vs->text[ i ] = vs->buffers[ vs->curbuffer * COLS + j ];
         }
         vs->disp_buf = vs->text + base;
 
         update_row( vs );
-        memset( vs->buffers, 0, COLS );
+        memset( (char *)(vs->buffers + vs->curbuffer * COLS), 0, COLS );
+        vs->curbuffer = ( vs->curbuffer + 1 ) % 2;
     }
 
     vs->fgcolour = colour;
@@ -290,12 +304,12 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
         for( j = 0, i = base + vs->curx + vs->indent;
              i < base + COLS;
              j++, i++ ) {
-            vs->text[ i ] = vs->buffers[ j ];
+            vs->text[ i ] = vs->buffers[ vs->curbuffer * COLS + j ];
         }
         vs->disp_buf = vs->text + base;
 
         update_row( vs );
-        memset( vs->buffers, 0, COLS );
+        memset( (char *)(vs->buffers + vs->curbuffer * COLS), 0, COLS );
     }
 
 
@@ -448,7 +462,7 @@ void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
     if( !vs ) return;
     if( vs->verbose ) fprintf( stderr, "in erase non disp\n");
     if( !vs->captions || !vs->style ) return;
-    memset( vs->buffers, 0, COLS );
+    memset( (char *)(vs->buffers + vs->curbuffer * COLS), 0, COLS );
     memset( vs->text + ( ( ( vs->top_of_screen + ROWS ) % ( 2 * ROWS ) ) * COLS ), 0, COLS );
 }
 
@@ -488,12 +502,13 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs )
     for( j = 0, i = base + vs->curx + vs->indent;
          i < base + COLS;
          j++, i++ ) {
-        vs->text[ i ] = vs->buffers[ j ];
+        vs->text[ i ] = vs->buffers[ vs->curbuffer * COLS + j ];
     }
     vs->disp_buf = vs->text + base;
 
     update_row( vs );
-    memset( vs->buffers, 0, COLS );
+    memset( (char *)( vs->buffers + vs->curbuffer * COLS ), 0, COLS );
+    vs->curbuffer = (vs->curbuffer + 1) % 2;
     vs->style = 0;
     vs->indent = 0;
 }
@@ -506,18 +521,18 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
         for( i = 0; i < COLS; i++ ) {
-            if( !vs->buffers[ i ] ) {
+            if( !vs->buffers[ vs->curbuffer * COLS + i ] ) {
                 if( i == COLS-1 ) {
-                    vs->buffers[ i ] = c2;
+                    vs->buffers[ vs->curbuffer * COLS + i ] = c2;
                 } else {
-                    vs->buffers[ i ] = c1;
-                    vs->buffers[ i+1 ] = c2;
+                    vs->buffers[ vs->curbuffer * COLS + i ] = c1;
+                    vs->buffers[ vs->curbuffer * COLS + i+1 ] = c2;
                 }
                 return;
             }
         }
         /* buffer is full so c2 will be at the end */
-        vs->buffers[ COLS-1 ] = c2;
+        vs->buffers[ vs->curbuffer * COLS + COLS-1 ] = c2;
         return;
 
     }
