@@ -55,6 +55,9 @@ Authors and contributors
   Adrian Minta <gygy@rdslink.ro>
     - Bugfixes
 
+  Per von Zweigbergk <pvz@e.kth.se>
+    - Work on making tvtime fully UTF-8 aware.
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
