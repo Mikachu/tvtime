@@ -109,7 +109,6 @@ enum tvtime_commands
 
 config_t *config_new( int argc, char **argv );
 void config_delete( config_t *ct );
-int config_dump( config_t *ct );
 int config_key_to_command( config_t *ct, int key );
 int config_button_to_command( config_t *ct, int button );
 

@@ -150,7 +150,6 @@ struct config_s
     int right_scanline_bias;
 
     char config_filename[ 1024 ];
-    int config_open;
 };
 
 void config_init( config_t *ct );
@@ -254,7 +253,6 @@ config_t *config_new( int argc, char **argv )
     ct->voverscan = 0.0;
     ct->left_scanline_bias = 0;
     ct->right_scanline_bias = 0;
-    ct->config_open = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -348,7 +346,7 @@ config_t *config_new( int argc, char **argv )
         configFile = base;
         if( parser_new( &(ct->pf), configFile ) ) {
             config_init( ct );
-            ct->config_open = 1;
+            parser_delete( &(ct->pf) );
         }
     }
 
@@ -358,11 +356,10 @@ config_t *config_new( int argc, char **argv )
     sprintf( ct->config_filename, "%s", base );
     if( file_is_openable_for_read( base ) ) {
         fprintf( stderr, "config: Reading configuration from %s\n", base );
-        if( configFile ) parser_delete( &(ct->pf) );
         configFile = base;
         if( parser_new( &(ct->pf), configFile ) ) {
             config_init( ct );
-            ct->config_open = 1;
+            parser_delete( &(ct->pf) );
         }
     }
 
@@ -394,13 +391,12 @@ config_t *config_new( int argc, char **argv )
     if( configFile && configFile != base ) {
         sprintf( ct->config_filename, "%s", configFile );
         fprintf( stderr, "config: Reading configuration from %s\n", configFile );
-        parser_delete( &(ct->pf) );
-        
+
         if( !parser_new( &(ct->pf), configFile ) ) {
             fprintf( stderr, "config: Could not read configuration from %s\n", configFile );
         } else {
             config_init( ct );
-            ct->config_open = 1;
+            parser_delete( &(ct->pf) );
         }
         free( configFile );
     }
@@ -417,7 +413,6 @@ config_t *config_new( int argc, char **argv )
 
 void config_delete( config_t *ct )
 {
-    if( ct->config_open ) parser_delete( &(ct->pf) );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
     free( ct->timeformat );
@@ -766,13 +761,6 @@ int config_button_to_command( config_t *ct, int button )
     if( !ct || !ct->buttonmap ) return 0;
     if( button < 0 || button >= MAX_BUTTONS ) return 0;
     return ct->buttonmap[button];
-}
-
-int config_dump( config_t *ct )
-{
-    if( !ct ) return 0;
-
-    return parser_dump( &(ct->pf) );
 }
 
 int config_get_verbose( config_t *ct )
