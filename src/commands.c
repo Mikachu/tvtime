@@ -628,10 +628,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->vidin ) {
             in->frame_counter = 0;
             videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
+            reinit_tuner( in );
+
             if( in->osd ) {
                 tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
+                tvtime_osd_show_info( in->osd );
             }
-            reinit_tuner( in );
         }
         break;
 
