@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+     "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>tvtime: documentation and help</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link href="tvtime.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<table border="0" width="100%">
+<tr><td rowspan="2"><img src="tvtime_logo_vertical.png" alt="tvtime logo">
+    <td class="center"><h1>tvtime: tv worth watching</h1>
+<tr><td class="center">
+<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/">tvtime homepage</a> ]</span>
+<span class="nowrap">[ <a href="http://sourceforge.net/project/showfiles.php?group_id=64301">download tvtime</a> ]</span>
+<span class="nowrap">[ <a href="http://www.sourceforge.net/projects/tvtime/">development page</a> ]</span>
+<span class="nowrap">[ <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a> ]</span>
+<span class="nowrap">[ <a href="help.html">help and faq</a> ]</span>
+<span class="nowrap">[ <a href="usage.html">using tvtime</a> ]</span>
+<span class="nowrap">[ <a href="hardware.html">hardware and driver support</a> ]</span>
+<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/screenshots.html">fancy screenshot page</a> ]</span>
+<span class="nowrap">[ <a href="http://tvtime.sourceforge.net/links.html">related websites</a> ]</span>
+</table>
+<hr>
+
+<h1>Help and FAQ</h1>
+
+<h3>Contents</h3>
+<table width="100%" border="0">
+<tr><td align=left valign="top">
+    <a href="#resources">1. Support resources</a><br>
+    <a href="#summary">2. Summary of new features by release</a><br>
+    <a href="#bugs">3. Summary of known bugs by release</a><br>
+    <a href="#performance">4. Performance: run as root, use the real-time clock</a><br>
+    <a href="#fullscreen">5.  Window manager issues with fullscreen mode</a><br>
+    <a href="#nodeint">6. FAQ: How do I disable deinterlacing?</a><br>
+    <td align="left" valign="top">
+    <a href="#recording">7. FAQ: Does tvtime support recording?</a><br>
+    <a href="#screenshots">8. FAQ: Why is the tvtime window appear blue or black in screenshots?</a><br>
+    <a href="#macrovision">9. FAQ: Purple lines in video?  How do I avoid macrovision?</a><br>
+    <a href="#noise">10. FAQ: Interference problems with soundcards</a><br>
+    <a href="#tvout">11. FAQ: Optimal settings for tvtime on TV output</a><br>
+</table>
+
+<hr>
+<h3><a name="resources">1. Support resources</a></h3>
+
+<p>Interested in <b>tvtime</b>?  Having trouble?  Have suggestions?  Why not hang
+out with us on <b>IRC</b> at
+<a href="http://www.freenode.net">irc.freenode.net</a>, channel
+<b>#livid</b>.  Hope to see you there!</p>
+
+<p>There is also a
+<a href="http://sourceforge.net/mail/?group_id=64301">tvtime mailing list</a>
+which you can subscribe to, or read on the web.</p>
+
+<hr>
+<h3><a name="summary">2. Summary of new features by release</a></h3>
+
+<table border="0" width="100%">
+<tr><th class="version"><b>tvtime 0.9.8.1</b>
+<td>
+<ol>
+<li>Fixed all of the known crashes and many minor bugs from the 0.9.8
+release.
+<li>Updated the look-and-feel of the user interface.
+<li>Partial EXPERIMENTAL UTF-8 support. Only works with UTF-8
+characters that are also in ISO-8859-1 (Latin-1).
+</ol>
+<tr><th class="version"><b>tvtime 0.9.8</b>
+<td>
+<ol>
+<li>New XML config file format for both the tvtime configuration, and
+the station list.
+<li>tvtime now has two distinct half-framerate modes: top-field-first
+frames, and bottom-field-first frames.  This helps with manually
+deinterlacing 2-2 pulldown or progressive content.
+<li>Added support for preset 'modes', which can set the deinterlacer,
+window size, fullscreen setting and framerate mode.
+<li>Added support for custom frequencies in the stationlist.xml file,
+and a runtime command to add a new station from the current fine-tuning
+settings.
+<li>Added some DScaler DLLs and a wine layer to load these deinterlacer
+plugins directly without porting to Linux.  This gives us the following
+new deinterlacers:
+<ol>
+<li>DScaler: Greedy - High Motion
+<li>DScaler: Greedy - 2-frame
+<li>DScaler: TwoFrame
+<li>DScaler: TomsMoComp
+<li>DScaler: Video Bob
+<li>DScaler: Video Weave
+</ol>
+We had our own ports of videobob, twoframe, and greedy2frame, but they
+were found to be buggy.  Our ports are currently disabled.
+<li>Added the ffmpeg vertical deinterlacer filter.
+<li>Support for multiple audio channels (stereo, mono, lang1, lang2).
+<li>Included a bunch of fixes for PAL-M support.
+<li>Added a slave mode for freevo integration.
+<li>Various speedups, quality improvements, and bugfixes.
+</ol>
+<tr><th class="version"><b>tvtime 0.9.7</b>
+<td>
+<ol>
+<li>Moved config files into a new config file directory ~/.tvtime
+<li>Reworked the frequency tables, merging europe-cable, europe-west,
+europe-east all into 'europe'.  Added the 'russia' frequency table.
+<li>Added a channel scanner.  <b>F10</b> walks through the channel list and
+disables inactive channels.
+<li>Added the 'XVideo Bob' deinterlacer filter.
+<li>Added lirc support.
+<li>Added the overscan feature.
+<li>Added hardware support webpage.
+<li>Added a half-framerate mode ('=' to activate it).
+<li>Fixed alot of bug reports.
+</ol>
+</table><p>
+
+<hr>
+<h3><a name="bugs">3. Summary of known bugs by release</a></h3>
+
+<p>The following is a list of known bugs in the tvtime code itself.  For
+detailed information on known capture driver, X driver, and hardware
+bugs, please see
+<a href="http://tvtime.sourceforge.net/hardware.html">the tvtime
+hardware and driver support page</a>.</p>
+
+<table border="0" width="100%">
+<tr><th class="version"><b>tvtime 0.9.8.1</b>
+<td>
+<ol>
+<li>Compile is broken for pre-gcc3
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=731932&amp;group_id=64301&amp;atid=506987">bug 731932</a>).
+<li>Toggling fullscreen nukes AlwaysOnTop setting in kwin
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720300&amp;group_id=64301&amp;atid=506987">bug 720300</a>).
+<li>Luma correction broken if using Dalias' pulldown detection
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726822&amp;group_id=64301&amp;atid=506987">bug 726822</a>).
+<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
+    change channels
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
+<li>font aspect ratio is not updated if you toggle the aspect ratio at
+    runtime
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
+<li>We have not written MMX versions of many functions that we do have
+    MMXEXT versions of, as such, performance is much worse than it
+    should be on older CPUs
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
+<li>tvtime does not notify the user when frames are being dropped
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
+</ol>
+<tr><th class="version"><b>tvtime 0.9.8</b>
+<td>
+<ol>
+<li>README incorrectly lists 'b' as channel_renumber key when it is really 'r'
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729675&amp;group_id=64301&amp;atid=506987">bug 729675</a>).
+<li>xscreensaver shutdown code does not work
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729718&amp;group_id=64301&amp;atid=506987">bug 729718</a>).
+<li>kscreensaver code is disabled as it is too slow
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727990&amp;group_id=64301&amp;atid=506987">bug 727990</a>).
+<li>Fullscreen the wrong size if using Xinerama
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726820&amp;group_id=64301&amp;atid=506987">bug 726820</a>).
+<li>Toggling fullscreen nukes AlwaysOnTop setting in kwin
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720300&amp;group_id=64301&amp;atid=506987">bug 720300</a>).
+<li>Luma correction broken if using Dalias' pulldown detection
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726822&amp;group_id=64301&amp;atid=506987">bug 726822</a>).
+<li>Network name and call letters from XDS not displayed
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729588&amp;group_id=64301&amp;atid=506987">bug 729588</a>).
+<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
+    change channels
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
+<li>font aspect ratio is not updated if you toggle the aspect ratio at
+    runtime
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
+<li>We have not written MMX versions of many functions that we do have
+    MMXEXT versions of, as such, performance is much worse than it
+    should be on older CPUs
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
+<li>tvtime does not notify the user when frames are being dropped
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
+</ol>
+<tr><th class="version"><b>tvtime 0.9.7</b>
+<td>
+<ol>
+<li>greedy2frame and twoframe deinterlacer ports are buggy and show
+    splotchy pixels all over the place and should not be used
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=704780&amp;group_id=64301&amp;atid=506987">bug 704780</a>).
+<li>The <b>FineTuneOffset</b> configuration file parameter is completely ignored
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=707278&amp;group_id=64301&amp;atid=506987">bug 707278</a>).
+<li>configure does not fail if gcc, g++, or X libraries/development
+    headers are not found
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=696067&amp;group_id=64301&amp;atid=506987">bug 696067</a>).
+<li>"enter" mistakenly missing from command list, can't be sent using
+    the fifo
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=708596&amp;group_id=64301&amp;atid=506987">bug 708596</a>).
+<li>There are many known issues with fullscreen support under various
+    (buggy) window managers.  See <a href="#fullscreen">section 5, <b>Window manager issues with fullscreen mode</b></a>.
+<li>tvtime does not resize properly to compensate for of
+    non-square-pixel displays
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690428&amp;group_id=64301&amp;atid=506987">bug 690428</a>).
+<li>tvtime does not resize properly to compensate for 16:9 aspect ratio
+    monitors
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=636423&amp;group_id=64301&amp;atid=506987">bug 636423</a>).
+<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
+    change channels
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
+<li>font aspect ratio is not updated if you toggle the aspect ratio at
+    runtime
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
+<li>We have not written MMX versions of many functions that we do have
+    MMXEXT versions of, as such, performance is much worse than it
+    should be on older CPUs
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
+<li>If not using 720 pixels/scanline input sampling, tvtime does not
+    render volume/data bars correctly
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=632781&amp;group_id=64301&amp;atid=506987">bug 632781</a>).
+<li>tvtime does not notify the user when frames are being dropped
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
+<li>tvtime renders the output even when the window isn't visible, keeping the CPU usage
+high even if it's on another desktop or minimized
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=705989&amp;group_id=64301&amp;atid=506987">bug 705989</a>).
+<li>Rendered strings in the OSD seem to have some pixels missing from the right
+hand size
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693642&amp;group_id=64301&amp;atid=506987">bug 693642</a>).
+<li>No way to set the audio mode (mono, stereo, SAP, etc)
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=709505&amp;group_id=64301&amp;atid=506987">bug 709505</a>).
+<li>tvtime ignores locale information for time format
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=710875&amp;group_id=64301&amp;atid=506987">bug 710875</a>).
+<li>tvtime does not support frequencies used by the UPC cable provider
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711434&amp;group_id=64301&amp;atid=506987">bug 711434</a>).
+<li>tvtime cannot renumber channels
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711431&amp;group_id=64301&amp;atid=506987">bug 711431</a>).
+<li><b>tvtime does not clean up its shared memory segments, eating memory</b>
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711470&amp;group_id=64301&amp;atid=506987">bug 711470</a>).
+<li>XDS information remains on-screen when you switch to an input with no tuner
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=699810&amp;group_id=64301&amp;atid=506987">bug 699810</a>).
+<li>Time and network information is not right justified
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711654&amp;group_id=64301&amp;atid=506987">bug 711654</a>).
+<li>tvtime prints errors on change of deinterlacer
+(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715997&amp;group_id=64301&amp;atid=506987">bug 715997</a>).
+</ol>
+</table>
+
+<hr>
+<h3><a name="performance">4. Performance: run as root, use the real-time clock</a></h3>
+
+<p>For optimal performance, tvtime should run as root, either by logging in
+or using <b>su</b> to become root, or setting the executable setuid
+root.  As root, tvtime can:</p>
+
+<ol>
+<li>Reset the process priority to one which gives highest priority to the
+    tvtime process, the specific value can be set in the <b>tvtime.xml</b> file.
+    Many high priorities are only available to processes with root access.
+<li>Aquire <b>realtime</b> priority by entering into the
+    <b>SCHED_FIFO</b> scheduling queue, where tvtime will be allowed to
+    processes video uninterrupted by other processes.  This is
+    most important when using deinterlacers that eat up alot of
+    CPU to make sure that tvtime does not drop frames.
+<li>Running as root automatically gives you access to 1024hz resolution
+    from the real-time clock device.
+</ol><p>
+
+Note that if tvtime is setuid root, we will <b>drop root priviledges
+after aquiring all of the performance enhancements we need</b>, making
+it slightly more polite.<p>
+
+Support for the <b>real-time clock</b> device is needed for smooth
+video.  We STRONGLY recommend that you load the <b>rtc</b> kernel module
+before starting tvtime.  The following command will tell you if rtc
+support is available:<p>
+
+<pre>
+    cat /proc/driver/rtc
+</pre><p>
+
+If this file exists, then the real time clock driver is loaded.
+Otherwise, please load it by typing:<p>
+
+<pre>
+    modprobe rtc
+</pre><p>
+
+Or add it to your /etc/modules file to have it loaded on every reboot.
+For smooth video, make sure you run as root, but if you are
+uncomfortable with this, you can let tvtime access high resolutions from
+the rtc device by executing the following command:<p>
+
+<pre>
+    sysctl -w dev.rtc.max-user-freq=1024
+</pre><p>
+
+Note that this setting is lost on reboot, so this should be added into
+your system startup scripts.  Consult your Linux distribution
+documentation for how to do this correctly on your system.<p>
+
+<hr>
+<h3><a name="fullscreen">5. Window manager issues with fullscreen mode</a></h3>
+
+<p>Like many other video applications, we have been plagued with problems
+due to fullscreen support in various window managers, and would be
+anxious to hear about any problems or suggestions.  Known problems at
+this time are:</p>
+
+<ol>
+<li>
+<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=692137&amp;group_id=64301&amp;atid=506987">
+kwin from KDE 3.1</a>: kwin has a nasty bug, we have a workaround, but
+the workaround is failing sometimes when running as root at high
+priority.
+<li>
+<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=683283&amp;group_id=64301&amp;atid=506987">
+FS broken with metacity in RH 8.0</a>: The metacity shipped with RH 8.0
+had bugs which have been fixed in later versions of metacity.
+<li>
+<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=691892&amp;group_id=64301&amp;atid=506987">
+FS goes off centre when mouse moves</a>: If you're fullscreen at a lower
+resolution than your root window, moving the mouse causes the virtual to
+scroll, leaving the window off-centered.
+<li>
+<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693337&amp;group_id=64301&amp;atid=506987">
+FS problems with icewm</a>: We still seem to have some minor problems with
+current versions of icewm.
+<li>
+<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693329&amp;group_id=64301&amp;atid=506987">
+Problems with fvwm 2.4.0</a>:  A user has reported some weird X errors
+using fvwm 2.4.0, I have not reproduced them using fvwm 2.4.10.
+</ol><p>
+
+<hr>
+<h3><a name="nodeint">6. FAQ: How do I disable deinterlacing?</a></h3>
+
+<p>I think there is a misconception about what the deinterlacing plugins do
+and what it means to disable them.  The signal output from almost any
+video source, be it a Gamecube or cable TV, is an interlaced video
+signal.  Implicitly when you display this on a computer screen, you are
+deinterlacing: you're taking interlaced content and sending it out to a
+non-interlaced display.</p>
+                                                                                                                
+<p>The simplest way to do this, and the default if you use xawtv in overlay
+mode, is to buffer every two consecutive fields together and show them
+as a single frame.  You can do this in tvtime by using the Weave plugin,
+and hitting the 'half framerate' button.  That's about as close to "not
+deinterlacing" as you can get, but it's still deinterlacing.</p>
+                                                                                                                
+<p>However it's worthy to mention that detecting progressive content sent
+over an interlaced channel, as will happen with some video games, or DV
+cameras in progressive modes, is still deinterlacing and is something we
+don't really do right now, except by manually using Weave and half
+framerate mode (which won't work for pulldown sources).  This feature is
+being improved.</p>
+
+<hr>
+<h3><a name="recording">7. FAQ: Does tvtime support recording?</a></h3>
+
+<p>tvtime does not yet support recording or playback of recorded streams.
+If you are interested in helping with coding this feature, please
+contact the authors.</p>
+
+<hr>
+<h3><a name="screenshots">8. FAQ: Why does tvtime appear blue in screenshots?</a></h3>
+
+<p>tvtime outputs video into a <b>video overlay surface</b>, an area of memory
+outside of the framebuffer, using the <b>XVIDEO</b> X extension.  As such,
+applications which take screenshots such as <b>ksnapshot</b>, <b>gimp</b> or
+<b>xwd</b> only see the colourkeyed window, and not output of tvtime.</p>
+
+<p>We believe it is a design flaw or driver limitation on the X or video card
+hardware that one or the other cannot provide the image to screenshot
+applications.  For this reason, the only known workaround for taking
+screenshots of tvtime along with the desktop is to use the <b>screenshot</b>
+feature inside tvtime, and cut-and-paste the output into a full desktop screen
+capture.</p>
+
+<hr>
+<h3><a name="macrovision">9. FAQ: Purple lines in video?  How do I avoid macrovision?</a></h3>
+
+<p>If you are seeing purple lines or having problems with video signal
+quality from an external DVD player, VCR, or Laserdisc player, try
+disabling Macrovision in your bttv driver (if you have a bttv card). See
+<a href="http://www.colby.edu/personal/k/kjseptor/bttv.html">
+http://www.colby.edu/personal/k/kjseptor/bttv.html</a> for information
+on how to do that.</p>
+
+<hr>
+<h3><a name="noise">10. FAQ: Interference problems with soundcards</a></h3>
+
+<p>If you are experiencing a generally fuzzy picture, try moving your tv
+card one or two slots away from your soundcard (inside your pc).
+Interference from the soundcard can mess up some channels.</p>
+
+<hr>
+<h3><a name="tvout">11. FAQ: Optimal settings for tvtime on TV output</a></h3>
+
+<p>Some people are interested in using tvtime even when their output
+itself a television.  Usually this is in the context of setting up a
+home theatre PC system as in a PVR.  Ideally for television output, no
+deinterlacing is required;  the interlaced signal is sent to the output
+such that every top field in the input is mapped to a top field in the
+output.</p>
+
+<p>Unfortunately, there is no standard TV output API under linux.  The
+vesa framebuffer setup for TV output cannot tell us which field is
+currently being output.  Similarily, some TV output setups under linux
+have it as a second head in X, but again, with no field information we
+cannot know how to supply it with interlaced content to ensure that
+fields are shown in the right order.</p>
+
+<p>There are two possible solutions.  I have been told that with the
+NVIDIA TV output drivers, when using XVIDEO, if you supply them with
+<b>top-field-first</b> frames, they will display the fields correctly.
+To experiment, try tvtime using the <b>Weave</b> deinterlacer, and
+select half framerate in <b>TFF</b> mode.  This may give good
+results.  The second option would be using a card with a TV output
+driver that gives field information.  An example is the Matrox
+G400/G450/G550 driver in <b>DirectFB</b>.  We are working on native
+support for TV output in this setting.</p>
+
+<hr>
+<table border="0" width="100%">
+<tr>
+<td>
+Bugs in this page?<br/>
+<a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>
+<td align="right">
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=64301"
+ width="88" height="31" alt="SourceForge Logo"></a>
+<a href="http://www.libpng.org/pub/png/"><img src="pngnow.png" width="88"
+ height="31" alt="libpng Logo"></a>
+<a href="http://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html401"
+   alt="Valid HTML 4.01!" height="31" width="88"></a>
+<a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+    height="31px" width="88px"
+    src="http://jigsaw.w3.org/css-validator/images/vcss" 
+    alt="Valid CSS!" /></a>
+</table>
+</body>
+</html>

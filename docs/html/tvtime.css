@@ -1,0 +1,18 @@
+body { background: white }
+span.nowrap { white-space: nowrap }
+th.version {
+  background: #7777aa;
+  color: #ffffff;
+  vertical-align: top;
+}
+th.doctable {
+  background: #7777aa;
+  color: #ffffff;
+}
+.center { text-align: center }
+img { border: 0 }
+A:link { text-decoration: none }
+A:visited { text-decoration: none }
+A:hover { text-decoration: underline }
+table.centered { margin-left: auto; margin-right: auto; }
+.box { margin-left: auto; margin-right: auto; border: solid 1px }

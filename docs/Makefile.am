@@ -18,7 +18,14 @@
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 
 man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5
-EXTRA_DIST = default.tvtime.xml example.lircrc quotes.txt $(man_MANS)
+docs_html = html/tvtime_logo_vertical.png \
+            html/tvtime.css               \
+            html/index.html               \
+            html/hardware.html            \
+            html/help.html                \
+            html/usage.html
+EXTRA_DIST = default.tvtime.xml example.lircrc quotes.txt \
+             $(man_MANS) $(docs_html)
 
 .PHONY: install-exec-hook
 install-exec-hook:
