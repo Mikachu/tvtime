@@ -1193,25 +1193,74 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "input-ntsc" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
+    if( vidin ) {
+        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+                 videoinput_get_input_name( vidin ) );
+    } else {
+        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0x9d );
+    }
     menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
+    menu_set_right_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0xb6 );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_CC, "" );
-    menu_set_right_command( menu, 4, TVTIME_TOGGLE_CC, "" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0xb6 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_TOGGLE_CC, "" );
+    menu_set_right_command( menu, 5, TVTIME_TOGGLE_CC, "" );
+    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 6, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "input-pal" );
+    menu_set_text( menu, 0, "Setup - Input configuration" );
+    if( vidin ) {
+        sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+                 videoinput_get_input_name( vidin ) );
+    } else {
+        sprintf( string, "%c%c%c  Change video source", 0xee, 0x80, 0x9d );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
+    menu_set_right_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 5, string );
@@ -1223,35 +1272,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
-
-    menu = menu_new( "input-pal" );
-    menu_set_text( menu, 0, "Setup - Input configuration" );
-    sprintf( string, "%c%c%c  Preferred audio mode", 0xee, 0x80, 0x9d );
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "audiomode" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "norm" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "sharpness" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
-    menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "sharpness" );
@@ -2561,6 +2581,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             reinit_tuner( cmd );
 
             if( cmd->osd ) {
+                char string[ 128 ];
+                sprintf( string, "%c%c%c  Change video source: %s", 0xee, 0x80, 0x9d,
+                         videoinput_get_input_name( cmd->vidin ) );
+                menu_set_text( commands_get_menu( cmd, "input" ), 1, string );
+                commands_refresh_menu( cmd );
                 tvtime_osd_set_input( cmd->osd, videoinput_get_input_name( cmd->vidin ) );
                 tvtime_osd_show_info( cmd->osd );
             }
