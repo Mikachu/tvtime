@@ -78,6 +78,7 @@ static int xcommon_exposed = 0;
 static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
 static int kicked_out_of_fullscreen = 0;
+static int going_fullscreen = 0;
 
 static Atom wmProtocolsAtom;
 static Atom wmDeleteAtom;
@@ -1121,9 +1122,11 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             XReparentWindow( display, output_window, fs_window, 0, 0);
             XMoveWindow( display, fs_window, x, y );
-            XSetInputFocus( display, fs_window, RevertToPointerRoot, CurrentTime );
             output_width = w;
             output_height = h;
+
+            /* Note that we are going fullscreen. */
+            going_fullscreen = 1;
         }
     } else {
         if( has_ewmh_state_fullscreen ) {
@@ -1382,7 +1385,13 @@ void xcommon_poll_events( input_t *in )
         }
     }
 
-    if( !has_ewmh_state_fullscreen ) {
+    if( going_fullscreen ) {
+        /* We're entering fullscreen mode, make sure we get focus. */
+        XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
+        XFlush( display );
+        XSync( display, False );
+        going_fullscreen = 0;
+    } else if( !has_ewmh_state_fullscreen ) {
         Window focus_win;
         int focus_revert;
 
@@ -1393,7 +1402,7 @@ void xcommon_poll_events( input_t *in )
                 xcommon_toggle_fullscreen( 0, 0 );
                 kicked_out_of_fullscreen = 1;
             }
-        } else if( kicked_out_of_fullscreen && ( xcommon_exposed && focus_win == wm_window ) ) {
+        } else if( kicked_out_of_fullscreen && ( xcommon_exposed && (focus_win == wm_window || focus_win == fs_window)) ) {
             /* Switch back to fullscreen mode if we regain visibility
              * after being kicked out of fullscreen mode. */
             xcommon_toggle_fullscreen( 0, 0 );
