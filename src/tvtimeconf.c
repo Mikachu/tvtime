@@ -63,6 +63,8 @@ struct config_s
     unsigned int other_text_rgb;
     char command_pipe[ 256 ];
 
+    char *rvr_filename;
+
     int preferred_deinterlace_method;
     int check_freq_present;
 
@@ -411,7 +413,7 @@ static void print_usage( char **argv )
     fprintf( stderr, "usage: %s [-vamsb] [-w <width>] [-I <sampling>] "
                      "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>] "
-                     "[-D <deinterlace method>]\n", argv[ 0 ] );
+                     "[-D <deinterlace method>] [-r rvrfile]\n", argv[ 0 ] );
     fprintf( stderr, "\t-v\tShow verbose messages.\n" );
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-s\tPrint frame skip information (for debugging).\n" );
@@ -425,6 +427,8 @@ static void print_usage( char **argv )
 
     fprintf( stderr, "\t-c\tApply luma correction.\n" );
     fprintf( stderr, "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n" );
+
+    fprintf( stderr, "\t-r\tRVR recorded file to play.\n" );
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
@@ -506,6 +510,7 @@ config_t *config_new( int argc, char **argv )
     ct->start_channel = 1;
     ct->hoverscan = 0.0;
     ct->voverscan = 0.0;
+    ct->rvr_filename = 0;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -621,7 +626,7 @@ config_t *config_new( int argc, char **argv )
         }
     }
 
-    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:Ib:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:I:avcsmd:i:l:n:f:t:F:D:Ib:r:" )) != -1 ) {
         switch( c ) {
         case 'w': ct->outputwidth = atoi( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
@@ -631,6 +636,8 @@ config_t *config_new( int argc, char **argv )
         case 'c': ct->apply_luma_correction = 1; break;
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
         case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
+        case 'r': if( ct->rvr_filename ) { free( ct->rvr_filename ); }
+                  ct->rvr_filename = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'l': ct->luma_correction = atof( optarg );
                   ct->apply_luma_correction = 1; break;
@@ -858,5 +865,10 @@ int config_get_ntsc_cable_mode( config_t *ct )
 const char *config_get_screenshot_dir( config_t *ct )
 {
     return ct->ssdir;
+}
+
+const char *config_get_rvr_filename( config_t *ct )
+{
+    return ct->rvr_filename;
 }
 
