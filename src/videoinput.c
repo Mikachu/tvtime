@@ -105,6 +105,8 @@ struct videoinput_s
 
     int verbose;
 
+    int has_audio;
+
     int cur_tuner_state;
     int signal_recover_wait;
     int signal_aquire_wait;
@@ -258,6 +260,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->signal_aquire_wait = 0;
     vidin->muted = 1;
     vidin->user_muted = 0;
+    vidin->has_audio = 0;
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -592,6 +595,8 @@ int videoinput_has_tuner( videoinput_t *vidin )
 
 void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
+    if( !vidin->has_audio ) return;
+
     if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
         fprintf( stderr, "videoinput: Please post a bug report on "
@@ -841,6 +846,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
             } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
                 vidin->grab_chan.norm = 6;
             }
+            vidin->has_audio = (vidin->grab_chan.flags & VIDEO_VC_AUDIO) ? 1 : 0;
 
             if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
                 fprintf( stderr, "videoinput: Card refuses to set the channel.\n"
@@ -909,16 +915,18 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
 
 void videoinput_delete( videoinput_t *vidin )
 {
-    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
-                 strerror( errno ) );
-        fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-    } else {
-        vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
+    if( vidin->has_audio ) {
+        if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't get audio settings from V4L driver: %s\n",
                      strerror( errno ) );
             fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+        } else {
+            vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+                fprintf( stderr, "videoinput: Can't mute audio, V4L driver failure: %s\n",
+                         strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+            }
         }
     }
 
