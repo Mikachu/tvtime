@@ -25,7 +25,8 @@ docs_html = html/cctext.png html/hardware.html html/help.html \
 	html/sun-linear.png html/toshiba-16x9-screenshot.jpg \
 	html/tvtime-logo-banner.png html/tvtime.css \
 	html/usage.html html/why.html html/wsshot-small.jpg
-EXTRA_DIST = default.tvtime.xml example.lircrc $(man_MANS) $(docs_html)
+EXTRA_DIST = default.tvtime.xml example.lircrc $(man_MANS) $(docs_html) \
+	tvtime.16x16.png tvtime.32x32.png tvtime.48x48.png
 
 # We use $(datadir)/applications from the freedesktop spec
 # http://www.freedesktop.org/standards/desktop-entry-spec/
