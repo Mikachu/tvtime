@@ -541,7 +541,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "input" );
-    sprintf( string, "%c%c%c  Sharpness", 0xe2, 0x80, 0xa7 );
+    sprintf( string, "%c%c%c  Sharpness", 0xee, 0x80, 0xa7 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
     menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "sharpness" );
@@ -1142,24 +1142,25 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 }
 
                 if( cmd->osd ) {
-                    if( cmd->scan_channels ) {
-                        int keycode = config_command_to_key( cmd->cfg, TVTIME_CHANNEL_SCAN );
-                        if( keycode ) {
-                            const char *special = input_special_key_to_string( keycode );
-                            char message[ 256 ];
+                    menu_t *stationmenu = find_menu( cmd, "stations" );
+                    char string[ 128 ];
 
-                            if( special ) {
-                                snprintf( message, sizeof( message ), "Scanning (hit %s to stop).", special );
-                            } else {
-                                snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
-                            }
-                            tvtime_osd_set_hold_message( cmd->osd, message );
-                            tvtime_osd_show_info( cmd->osd );
-                        }
+                    if( cmd->scan_channels ) {
+                        sprintf( string, "%c%c%c  Stop channel scan", 0xee, 0x80, 0xa3 );
                     } else {
-                        tvtime_osd_set_hold_message( cmd->osd, "" );
-                        tvtime_osd_show_info( cmd->osd );
+                        sprintf( string, "%c%c%c  Scan channels for signal", 0xee, 0x80, 0xa3 );
                     }
+                    menu_set_text( stationmenu, 4, string );
+                    if( cmd->menuactive ) {
+                        display_current_menu( cmd );
+                    }
+
+                    if( cmd->scan_channels ) {
+                        tvtime_osd_set_hold_message( cmd->osd, "Scanning for active channels." );
+                    } else {
+                        tvtime_osd_set_hold_message( cmd->osd, " " );
+                    }
+                    tvtime_osd_show_info( cmd->osd );
                 }
             }
         }
