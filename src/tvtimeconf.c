@@ -812,7 +812,6 @@ config_t *config_new( void )
     ct->keymap[ '<' ] = TVTIME_OVERSCAN_DOWN;
     ct->keymap[ '>' ] = TVTIME_OVERSCAN_UP;
     ct->keymap[ 'b' ] = TVTIME_TOGGLE_BARS;
-    ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
     ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
     ct->keymap[ 'v' ] = TVTIME_TOGGLE_ALWAYSONTOP;
