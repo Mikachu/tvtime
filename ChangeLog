@@ -1,5 +1,6 @@
 
 0.9.8
+  * (vektor) Rewrote the text rendering code (fixes bug 693642).
   * (vektor) tvtime now doesn't render output when the window is obscured or
     hidden.
   * (vektor) Added console app 'tvtime-command' to send commands to a running
