@@ -28,6 +28,7 @@
 #include <errno.h>
 #include "videoinput.h"
 #include "frequencies.h"
+#include "mixer.h"
 
 struct videoinput_s
 {
@@ -349,6 +350,8 @@ void videoinput_set_tuner_freq( int freqKHz )
 
     if (frequency < 0) return;
 
+    videoinput_mute(1);
+
     if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
         frequency /= 1000; // switch to MHz
     }
@@ -357,7 +360,18 @@ void videoinput_set_tuner_freq( int freqKHz )
 
     if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
         perror( "ioctl VIDIOCSFREQ" );
+        videoinput_mute(0);
         return;
+    }
+    videoinput_mute(0);
+}
+
+void videoinput_mute( int mute ) 
+{
+    if( mute ) {
+        mixer_set_volume( -100 );
+    } else {
+        mixer_set_volume( 100 );
     }
 }
 

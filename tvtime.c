@@ -25,11 +25,13 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "frequencies.h"
 #include "videoinput.h"
 #include "rtctimer.h"
 #include "sdloutput.h"
 #include "videotools.h"
+#include "mixer.h"
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -94,6 +96,9 @@ int main( int argc, char **argv )
     int tuner_number = 0;
     int secam = 0;
     int c;
+    long last_chan_time = 0;
+    int volume;
+    int muted = 0;
 
     /* Default device. */
     strcpy( v4ldev, "/dev/video0" );
@@ -253,17 +258,89 @@ int main( int argc, char **argv )
         if( commands & TVTIME_CHANNEL_UP ) {
             chanindex++;
             chanindex %= chancount;
+            last_chan_time = 0;
             videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
-            fprintf( stderr, "sdloutput: Changing to channel %s\n", 
+            fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
         }
         if( commands & TVTIME_CHANNEL_DOWN ) {
             chanindex--;
             chanindex %= chancount;
+            last_chan_time = 0;
             videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
-            fprintf( stderr, "sdloutput: Changing to channel %s\n", 
+            fprintf( stderr, "tvtime: Changing to channel %s\n", 
                      chanlist[ chanindex ].name );
         }
+        if( commands & TVTIME_MIXER_UP ) {
+            mixer_set_volume(1);
+            volume = mixer_get_volume();
+        }
+        if( commands & TVTIME_MIXER_DOWN ) {
+            mixer_set_volume(-1);
+            volume = mixer_get_volume();
+        }
+        if( commands & TVTIME_MIXER_MUTE ) {
+            muted = ~muted;
+            videoinput_mute(muted);
+        }
+        if( commands & TVTIME_DIGIT ) {
+            int digit = 0;
+            if( commands & TVTIME_KP0 ) {
+                digit = 0;
+            }
+            if( commands & TVTIME_KP1 ) {
+                digit = 1;
+            }
+            if( commands & TVTIME_KP2 ) {
+                digit = 2;
+            }
+            if( commands & TVTIME_KP3 ) {
+                digit = 3;
+            }
+            if( commands & TVTIME_KP4 ) {
+                digit = 4;
+            }
+            if( commands & TVTIME_KP5 ) {
+                digit = 5;
+            }
+            if( commands & TVTIME_KP6 ) {
+                digit = 6;
+            }
+            if( commands & TVTIME_KP7 ) {
+                digit = 7;
+            }
+            if( commands & TVTIME_KP8 ) {
+                digit = 8;
+            }
+            if( commands & TVTIME_KP9 ) {
+                digit = 9;
+            }
+
+            if( (long)time(NULL) - last_chan_time > 500 ) {
+                if( digit == 0 ) {
+                    last_chan_time = 0;
+                    chanindex = 0;
+                } else {
+                    last_chan_time = time(NULL);
+                    chanindex = digit - 1;
+                    videoinput_set_tuner_freq( chanlist[ chanindex ].freq);
+                    fprintf( stderr, "tvtime: Changing to channel %s\n",
+                             chanlist[ chanindex ].name );
+
+                }
+            } else {
+                last_chan_time = time(NULL);
+                if( ((chanindex+1)*10 + digit - 1) >= chancount ) {
+                    chanindex = digit - 1;
+                } else {
+                    chanindex = (chanindex+1)*10 + digit - 1;
+                }
+                videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
+                fprintf( stderr, "tvtime: Changing to channel %s\n", 
+                         chanlist[ chanindex ].name );                    
+            }
+        }
+
 
         /* Aquire the next frame. */
         curluma  = videoinput_next_image( vidin );

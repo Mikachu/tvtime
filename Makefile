@@ -9,7 +9,7 @@ SDLLIBS = `sdl-config --libs`
 CFLAGS = -Wall -I. $(SDLFLAGS)
 LDFLAGS = $(SDLLIBS)
 
-OBJS = frequencies.o videoinput.o sdloutput.o rtctimer.o videotools.o
+OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o videotools.o
 
 all: tvtime
 

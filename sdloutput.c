@@ -162,7 +162,74 @@ int sdl_poll_events( void )
                 curcommand |= TVTIME_CHANNEL_UP;
                 break;
 
+            case SDLK_m:
+                curcommand |= TVTIME_MIXER_MUTE;
+                break;
+
+            case SDLK_KP_PLUS:
+                curcommand |= TVTIME_MIXER_UP;
+                break;
+
+            case SDLK_KP_MINUS:
+                curcommand |= TVTIME_MIXER_DOWN;
+                break;
+
+            case SDLK_KP0:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP0;
+                break;
+
+            case SDLK_KP1:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP1;
+                break;
+
+            case SDLK_KP2:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP2;
+                break;
+
+            case SDLK_KP3:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP3;
+                break;
+
+            case SDLK_KP4:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP4;
+                break;
+
+            case SDLK_KP5:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP5;
+                break;
+
+            case SDLK_KP6:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP6;
+                break;
+
+            case SDLK_KP7:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP7;
+                break;
+
+            case SDLK_KP8:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP8;
+                break;
+
+            case SDLK_KP9:
+                curcommand |= TVTIME_DIGIT;
+                curcommand |= TVTIME_KP9;
+                break;
+
             default:
+                break;
+            }
+            
+            /* just handle one digit at a time */
+            if( curcommand & TVTIME_DIGIT ) {
                 break;
             }
         }
