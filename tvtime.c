@@ -374,7 +374,7 @@ int main( int argc, char **argv )
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
     colourbars = (unsigned char *) malloc( width * height * 2 );
-    if( !testframe_odd || !testframe_even || !colourbars || !lastframe ) {
+    if( !testframe_odd || !testframe_even || !colourbars ) {
         fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
         return 1;
     }
