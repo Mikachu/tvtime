@@ -195,7 +195,7 @@ int videoinput_get_norm_number( const char *name )
 
 static int videoinput_get_norm_height( int norm )
 {
-    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_60 ) {
         return 480;
     } else {
         return 576;
