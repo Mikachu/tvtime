@@ -195,7 +195,7 @@ void frequencies_disable_freqs( config_t *ct )
     char *acopy = NULL, *str;
     parser_file_t *pf = config_get_parsed_file( ct );
     int i=1, j=0, k=0;
-    char *table_name, *chan_name;
+    char table_name[255], chan_name[6];
     int enabled, ret, the_freq_table, the_channel;
 
     for(;;) {
@@ -204,15 +204,15 @@ void frequencies_disable_freqs( config_t *ct )
         if( acopy ) free( acopy );
         acopy = strdup( tmp );
 
-        ret = sscanf( acopy, "%a %a %d", table_name, chan_name, &enabled );
+        ret = sscanf( acopy, " %s %s %d ", table_name, chan_name, &enabled );
         if( ret != 3 ) {
-            fprintf( stderr, "Ignoring: channel = %s\n", acopy);
+            fprintf( stderr, "Ignoring: ret = %d, channel = %s\n", ret, acopy);
             continue;
         }
 
         for( j = 0; j < NUM_FREQ_TABLES; j++ ) {
-            if( !strcasecmp( freq_table_names[ i ].short_name, table_name ) ) {
-                the_freq_table = i;
+            if( !strcasecmp( freq_table_names[ j ].short_name, table_name ) ) {
+                the_freq_table = j;
                 break;
             }
         }
@@ -237,8 +237,6 @@ void frequencies_disable_freqs( config_t *ct )
         }
 
         tvtuner[ the_channel ].freq[ the_freq_table ].enabled = enabled;
-        free( table_name );
-        free( chan_name );
     }
 }
 
@@ -315,6 +313,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
 
     reinit_tuner( in );
 
+    frequencies_disable_freqs( cfg );
     frequencies_list_freqs();
 
     return in;
