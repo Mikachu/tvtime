@@ -127,7 +127,7 @@ static int xv_check_extension( void )
                             &dummy, &dummy, &dummy) != Success ) ||
          ( version < 2 ) || ( ( version == 2 ) && ( release < 2 ) ) ) {
 
-        fprintf( stderr, "xvoutput: xv extension not found.\n");
+        fprintf( stderr, "xvoutput: XVIDEO extension not found, X server too old?\n");
         return 0;
     }
 
@@ -148,7 +148,7 @@ static int xv_check_extension( void )
     }
 
     XvFreeAdaptorInfo( adaptorInfo );
-    fprintf( stderr, "xvoutput: Cannot find xv port.\n" );
+    fprintf( stderr, "xvoutput: No XVIDEO port found which supports YUY2 images.\n" );
     return 0;
 }
 
@@ -462,7 +462,6 @@ void xv_show_frame( int x, int y, int width, int height )
 {
     XLockDisplay( display );
     XvShmPutImage( display, xv_port, window, gc, image,
-                   /*0, 0, input_width, input_height,*/
                    x, y, width, height,
                    video_area.x, video_area.y,
                    video_area.width, video_area.height, False );
