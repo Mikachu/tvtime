@@ -49,6 +49,28 @@
  *
  */
 
+/**
+ * Code for the UYVY to YUYV routine comes from rivatv:
+ *
+ *   rivatv-convert.c video image conversion routines
+ *
+ *   Copyright (C) 2002 Stefan Jahn <stefan@lkcc.org>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *   
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *   
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -145,6 +167,7 @@ void (*vfilter_chroma_121_packed422_scanline)( uint8_t *output, int width,
                                                uint8_t *m, uint8_t *t, uint8_t *b );
 void (*vfilter_chroma_332_packed422_scanline)( uint8_t *output, int width,
                                                uint8_t *m, uint8_t *t, uint8_t *b );
+void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width );
 
 
 /**
@@ -879,6 +902,68 @@ static void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
         *output++ = ((*top++) + (*bot++)) >> 1;
     }
 }
+
+#ifdef ARCH_X86
+static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width )
+{
+    __asm__ __volatile__(
+        "   movl      %0, %%esi         \n"
+        "   movl      %1, %%edi         \n"
+        "   movl      %2, %%edx         \n"
+        "   shrl      $3, %%edx         \n"
+
+        /* Process 8 pixels at once */
+        "1: movq      (%%esi), %%mm0    \n" /* mm0 = Y3V2Y2U2Y1V0Y0U0 */
+        "   movq      8(%%esi), %%mm2   \n" /* mm2 = Y7V6Y6U6Y5V4Y4U4 */
+        "   movq      %%mm0, %%mm1      \n" /* mm1 = Y3V2Y2U2Y1V0Y0U0 */
+        "   movq      %%mm2, %%mm3      \n" /* mm3 = Y7V6Y6U6Y5V4Y4U4 */
+        "   psllw     $8, %%mm0         \n" /* mm0 = V2__U2__V0__U0__ */
+        "   psrlw     $8, %%mm1         \n" /* mm1 = __Y3__Y2__Y1__Y0 */
+        "   psllw     $8, %%mm2         \n" /* mm2 = V6__U6__V4__U4__ */
+        "   psrlw     $8, %%mm3         \n" /* mm3 = __Y7__Y6__Y5__Y4 */
+        "   por       %%mm1, %%mm0      \n" /* mm0 = V2Y3U2Y2V0Y1U0Y0 */
+        "   por       %%mm3, %%mm2      \n" /* mm2 = V6Y7U6Y6V4Y5U4Y4 */
+        "   movq      %%mm0, (%%edi)    \n"
+        "   movq      %%mm2, 8(%%edi)   \n"
+        "   addl      $16, %%esi        \n"
+        "   addl      $16, %%edi        \n"
+        "   decl      %%edx             \n"
+        "   jnz       1b                \n"
+        "   emms                        \n"
+        /* output */            :
+        /* input */             : "g" (uyvy_buf), "g" (yuyv_buf), "g" (width)
+        /* clobber registers */ : "cc", "edx", "esi", "edi" );
+
+    if( width & 7 ) {
+        uint32_t *uyvy = (uint32_t *) uyvy_buf;
+        uint32_t *yuyv = (uint32_t *) yuyv_buf;
+        uint32_t val;
+
+        width &= 7;
+        width >>= 1;
+        while( width-- ) {
+            val = *uyvy++;
+            val = ((val << 8) & ~0x00FF0000) | ((val >> 8) & ~0x0000FF00);
+            *yuyv++ = val;
+        }
+    }
+}
+#endif
+
+static void convert_uyvy_to_yuyv_scanline_c( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width )
+{
+    uint32_t *uyvy = (uint32_t *) uyvy_buf;
+    uint32_t *yuyv = (uint32_t *) yuyv_buf;
+    uint32_t val;
+
+    width >>= 1;
+    while( width-- ) {
+        val = *uyvy++;
+        val = ((val << 8) & ~0x00FF0000) | ((val >> 8) & ~0x0000FF00);
+        *yuyv++ = val;
+    }
+}
+
 
 #ifdef ARCH_X86
 static void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
@@ -2524,6 +2609,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
     invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_c;
     vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_c;
     vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_c;
+    convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_c;
 
 #ifdef ARCH_X86
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
@@ -2547,6 +2633,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
         vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
+        convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
@@ -2563,6 +2650,7 @@ void setup_speedy_calls( uint32_t accel, int verbose )
         invert_colour_packed422_inplace_scanline = invert_colour_packed422_inplace_scanline_mmx;
         vfilter_chroma_121_packed422_scanline = vfilter_chroma_121_packed422_scanline_mmx;
         vfilter_chroma_332_packed422_scanline = vfilter_chroma_332_packed422_scanline_mmx;
+        convert_uyvy_to_yuyv_scanline = convert_uyvy_to_yuyv_scanline_mmx;
         speedy_memcpy = speedy_memcpy_mmx;
     } else {
         if( verbose ) {

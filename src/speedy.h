@@ -310,6 +310,12 @@ extern void (*chroma_420_to_422_mpeg2_plane)( uint8_t *dst, uint8_t *src,
                                               int width, int height, int progressive );
 
 /**
+ * Convert from 4:2:2 with UYVY ordering to 4:2:2 with YUYV ordering.
+ */
+extern void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf,
+                                              uint8_t *yuyv_buf, int width );
+
+/**
  * Sets up the function pointers to point at the fastest function
  * available.  Requires accelleration settings (see mm_accel.h).
  */
