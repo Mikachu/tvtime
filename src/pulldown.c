@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <string.h>
 #include "pulldown.h"
 
 /**
@@ -241,7 +242,9 @@ int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int t
 
     for( i = 0; i < 5; i++ ) { if( (1<<i) == predicted ) { predicted_pos = i; break; } }
 
+    /*
     fprintf( stderr, "top: %8d bot: %8d\ttop-avg: %8d bot-avg: %8d (%d)\n", top_repeat, bot_repeat, top_repeat - avgtop, bot_repeat - avgbot, (5 + predicted_pos - reference) % 5 );
+    */
 
     for( j = 0; j < HISTORY_SIZE; j++ ) {
         int cur = tophistory[ j ];
@@ -431,5 +434,112 @@ int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat,
      * The predicted phase is still valid.
      */
     return predicted;
+}
+
+int determine_pulldown_offset_dalias( pulldown_metrics_t *peak, pulldown_metrics_t *relative,
+                                      pulldown_metrics_t *mean )
+{
+/*
+    int laced = 0;
+
+    if (f[0].p.d > 360) {
+        if (3*f[0].r.e < f[0].r.o) laced=1;
+        if ((2*f[0].r.d < f[0].r.s) && (f[0].r.s > 600))
+            laced=1;
+    }
+    if (f[1].p.d > 360) {
+        //if (4*f[1].r.o < f[1].r.e) laced=1;
+        if ((2*f[1].r.t < f[1].r.p) && (f[1].r.p > 600))
+            laced=1;
+    }
+    if (!laced) return F_SHOW;
+    //if (4*f[1].r.s < f[1].r.d) return F_DROP;
+    if ((f[1].r.t < 2*f[1].r.p) || (f[1].r.t < 2*p->nl)) {
+        if ((3*f[0].r.e < f[0].r.o) || (2*f[1].r.t < f[1].r.p)) {
+            p->nl = f[1].r.t;
+            p->sync = 1;
+            return F_MERGE;
+        }
+    }
+    return F_DROP;
+*/
+    return 0;
+}
+
+#define ABS(a) (((a) < 0)?-(a):(a))
+
+void diff_packed422_block8x8( pulldown_metrics_t *m, unsigned char *old,
+                              unsigned char *new, int os, int ns )
+{
+    int x, y, e=0, o=0, s=0, p=0, t=0;
+    unsigned char *oldp, *newp;
+    unsigned char old0, old1, new0, new1;
+    m->s = m->p = m->t = 0;
+    for (x = 8; x; x--) {
+        oldp = old; old += 2;
+        newp = new; new += 2;
+        s = p = t = 0;
+        for (y = 4; y; y--) {
+            old0 = *(oldp);
+            old1 = *(oldp+os);
+            new0 = *(newp);
+            new1 = *(newp+ns);
+            e += ABS(new0-old0);
+            o += ABS(new1-old1);
+            s += new1-new0;
+            p += old1-old0;
+            t += old1-new0;
+            oldp += os<<1;
+            newp += ns<<1;
+        }
+        m->s += ABS(s);
+        m->p += ABS(p);
+        m->t += ABS(t);
+    }
+    m->e = e;
+    m->o = o;
+    m->d = e+o;
+}
+
+#define MAXUP(a,b) ((a) = ((a)>(b)) ? (a) : (b))
+
+void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
+                                  unsigned char *old, unsigned char *new, int w, int h, int os, int ns )
+{
+    int x, y;
+    pulldown_metrics_t l;
+    memset(peak, 0, sizeof(pulldown_metrics_t));
+    memset(rel, 0, sizeof(pulldown_metrics_t));
+    memset(mean, 0, sizeof(pulldown_metrics_t));
+    for (y = 0; y < h-7; y += 8) {
+        for (x = 8; x < w-8-7; x += 8) {
+            diff_packed422_block8x8(&l, old+x+y*os, new+x+y*ns, os, ns);
+            mean->d += l.d;
+            mean->e += l.e;
+            mean->o += l.o;
+            mean->s += l.s;
+            mean->p += l.p;
+            mean->t += l.t;
+            MAXUP(peak->d, l.d);
+            MAXUP(peak->e, l.e);
+            MAXUP(peak->o, l.o);
+            MAXUP(peak->s, l.s);
+            MAXUP(peak->p, l.p);
+            MAXUP(peak->t, l.t);
+            MAXUP(rel->e, l.e-l.o);
+            MAXUP(rel->o, l.o-l.e);
+            MAXUP(rel->s, l.s-l.t);
+            MAXUP(rel->p, l.p-l.t);
+            MAXUP(rel->t, l.t-l.p);
+            MAXUP(rel->d, l.t-l.s); /* hack */
+        }
+    }
+    x = (w/8-2)*(h/8);
+    mean->d /= x;
+    mean->e /= x;
+    mean->o /= x;
+    mean->s /= x;
+    mean->p /= x;
+    mean->t /= x;
 }
 
