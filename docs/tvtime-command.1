@@ -73,6 +73,10 @@ missing, or if new channels have become available.
 Move one channel down in the channel list.
 
 .TP
+.B CHANNEL_INC / CHANNEL_UP
+Move one channel up in the channel list.
+
+.TP
 .B CHANNEL_PREV
 Changes to the last channel you were at.  Useful for jumping back and
 forth between two programs on distant channels.
@@ -99,10 +103,6 @@ available if signal checking is enabled.
 Toggles the current channel as being active or disabled in the station
 list.  You can use this to manually scan your channels and enable those
 with signal or disable duplicate stations.
-
-.TP
-.B CHANNEL_INC / CHANNEL_UP
-Move one channel up in the channel list.
 
 .TP
 .B COLOUR_DOWN / COLOR_DOWN
@@ -164,6 +164,32 @@ Decreases the luma correction value.
 Increases the luma correction value.
 
 .TP
+.B MENU_DOWN
+In menu mode, this command moves the cursor down one entry in the menu.
+
+.TP
+.B MENU_ENTER
+In menu mode, this command selects the current entry or moves forward
+one level in the menu.
+
+.TP
+.B MENU_EXIT
+In menu mode, this command shuts off the menu.
+
+.TP
+.B MENU_LEFT
+In menu mode, this command moves back one level in the menu.
+
+.TP
+.B MENU_RIGHT
+In menu mode, this command selects the current entry or moves forward
+one level in the menu.
+
+.TP
+.B MENU_UP
+In menu mode, this command moves the cursor up one entry in the menu.
+
+.TP
 .B MIXER_DOWN
 Decreases the volume setting for the Line In device from 
 .IR /dev/mixer .
@@ -191,6 +217,33 @@ Increases the overscan compensation amount.  This will show less of the
 captured input.
 
 .TP
+.B PICTURE
+Selects which picture setting (brightness/contrast/colour/hue) to change
+using the PICTURE_UP and PICTURE_DOWN commands.
+
+.TP
+.B PICTURE_UP
+Increases the current picture setting value (brightness/contrast/colour/hue).
+
+.TP
+.B PICTURE_DOWN
+Decreases the current picture setting value (brightness/contrast/colour/hue).
+
+.TP
+.B RESTART
+Asks tvtime to restart itself.  This is used in the menu when we have changed
+a value that we can't yet change at runtime.
+
+.TP
+.B SAVE_PICTURE_GLOBAL
+Saves the current picture settings as the global defaults.
+
+.TP
+.B SAVE_PICTURE_CHANNEL
+Saves the current picture settings as the defaults for the current channel
+on the tuner.
+
+.TP
 .B SCREENSHOT
 Asks
 .B tvtime
@@ -207,6 +260,35 @@ Scrolls down in the console's history buffer.
 .TP
 .B SCROLL_CONSOLE_UP
 Scrolls up in the console's history buffer.
+
+.TP
+.B SET_AUDIO_MODE
+This command takes a parameter and sets the current audio mode.  Valid
+options are "mono", "stereo", "sap", "lang1" or "lang2".
+
+.TP
+.B SET_DEINTERLACER
+This command takes a parameter and sets the current deinterlacer.  Valid
+options are the short name of any of the deinterlacers available in tvtime.
+
+.TP
+.B SET_FRAMERATE
+This command takes a parameter and sets the current framerate.  Valid
+options are "full", "top" and "bottom".
+
+.TP
+.B SET_FREQUENCY_TABLE
+This command takes a parameter and sets the current frequency table.
+
+.TP
+.B SET_NORM
+This command takes a parameter and sets the current television standard.
+It will be used in tvtime after a restart.
+
+.TP
+.B SET_SHARPNESS
+This command takes a parameter and sets the current sharpness in pixels.
+It will be used in tvtime after a restart.
 
 .TP
 .B SHOW_STATS
@@ -253,13 +335,10 @@ your
 configuration file.
 
 .TP
-.B TOGGLE_COMPATIBLE_NORM
-Toggles between norms which are compatible with the selected norm in
-terms of framerate and frame size.  If the input selected has a tuner,
-the setting is saved as the default norm for that channel only.  This
-feature is useful for regions which receive both PAL and SECAM channels,
-such that tvtime can be configured on a per-channel basis for the
-correct norm.
+.B TOGGLE_COLOR_INVERT / TOGGLE_COLOUR_INVERT
+Turns on or off the colour invert filter.  This is (apparently) useful
+for users of the Australian cable company Optus who want to avoid using
+the decryption boxes and tune using their capture card directly.
 
 .TP
 .B TOGGLE_CONSOLE
@@ -305,6 +384,13 @@ bottom of the input picture to help fit the window to the image
 content.
 
 .TP
+.B TOGGLE_MIRROR
+Turns on or off the mirror filter, which flips the input.  This is
+useful for using tvtime with mirroring projectors, although I don't
+think it will actually work as intended yet since we don't mirror
+the OSD output.  :)  Comments appreciated.
+
+.TP
 .B TOGGLE_MODE
 Loads the next saved mode settings.  The default configuration file
 defines two modes: a small window mode with a low quality deinterlacer
@@ -323,6 +409,12 @@ Toggles the NTSC cable mode settings:
 .IR IRC ", and "
 .I HRC
 are available.
+
+.TP
+.B TOGGLE_PAL_SECAM
+Toggles between PAL and SECAM on the current channel.  This feature is
+useful for regions which receive both PAL and SECAM channels, such that
+tvtime can be configured on a per-channel basis for the correct norm.
 
 .TP
 .B TOGGLE_PAUSE
