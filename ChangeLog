@@ -1,5 +1,6 @@
 
 0.9.9.1
+  * vektor: Key binding commands can now take arguments.
   * vektor: Added a menu entry and command to toggle signal detection.
   * vektor: Save the last used audio mode to the config file.
   * vektor: Let commands fall back to their default bindings even

@@ -36,13 +36,17 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **argv );
 
 int config_key_to_command( config_t *ct, int key );
+const char *config_key_to_command_argument( config_t *ct, int key );
 int config_command_to_key( config_t *ct, int command );
 
 int config_key_to_menu_command( config_t *ct, int key );
+const char *config_key_to_menu_command_argument( config_t *ct, int key );
 int config_menu_command_to_key( config_t *ct, int command );
 
 int config_button_to_command( config_t *ct, int button );
+const char *config_button_to_command_argument( config_t *ct, int button );
 int config_button_to_menu_command( config_t *ct, int button );
+const char *config_button_to_menu_command_argument( config_t *ct, int button );
 
 int config_get_verbose( config_t *ct );
 int config_get_send_fields( config_t *ct );

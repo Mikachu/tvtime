@@ -145,6 +145,7 @@ void input_callback( input_t *in, int command, int arg )
 {
     char temp[ 128 ];
     char argument[ 2 ];
+    const char *curarg = argument;
     int tvtime_cmd = 0;
 
     /* Once we've been told to quit, ignore all commands. */
@@ -170,14 +171,26 @@ void input_callback( input_t *in, int command, int arg )
         } else if( command == I_BUTTONPRESS ) {
             if( commands_in_menu( in->com ) ) {
                 tvtime_cmd = config_button_to_menu_command( in->cfg, arg );
+                if( config_button_to_menu_command_argument( in->cfg, arg ) ) {
+                    curarg = config_button_to_menu_command_argument( in->cfg, arg );
+                }
             } else {
                 tvtime_cmd = config_button_to_command( in->cfg, arg );
+                if( config_button_to_command_argument( in->cfg, arg ) ) {
+                    curarg = config_button_to_command_argument( in->cfg, arg );
+                }
             }
         } else {
             if( commands_in_menu( in->com ) ) {
                 tvtime_cmd = config_key_to_menu_command( in->cfg, arg );
+                if( config_key_to_menu_command_argument( in->cfg, arg ) ) {
+                    curarg = config_key_to_menu_command_argument( in->cfg, arg );
+                }
             } else {
                 tvtime_cmd = config_key_to_command( in->cfg, arg );
+                if( config_key_to_command_argument( in->cfg, arg ) ) {
+                    curarg = config_key_to_command_argument( in->cfg, arg );
+                }
             }
         }
 
@@ -227,6 +240,6 @@ void input_callback( input_t *in, int command, int arg )
 
     argument[ 1 ] = '\0';
     argument[ 0 ] = arg;
-    commands_handle( in->com, tvtime_cmd, argument );
+    commands_handle( in->com, tvtime_cmd, curarg );
 }
 

@@ -68,9 +68,13 @@ struct config_s
     int hue;
 
     int keymap[ 8 * MAX_KEYSYMS ];
+    char *keymap_arg[ 8 * MAX_KEYSYMS ];
     int keymapmenu[ 8 * MAX_KEYSYMS ];
+    char *keymapmenu_arg[ 8 * MAX_KEYSYMS ];
     int buttonmap[ MAX_BUTTONS ];
+    char *buttonmap_arg[ MAX_BUTTONS ];
     int buttonmapmenu[ MAX_BUTTONS ];
+    char *buttonmapmenu_arg[ MAX_BUTTONS ];
 
     int inputwidth;
     int inputnum;
@@ -139,6 +143,11 @@ static void copy_config( config_t *dest, config_t *src )
     dest->ssdir = strdup( src->ssdir );
     dest->timeformat = strdup( src->timeformat );
     dest->deinterlace_method = strdup( src->timeformat );
+
+    memset( dest->keymap_arg, 0, sizeof( dest->keymap_arg ) );
+    memset( dest->keymapmenu_arg, 0, sizeof( dest->keymapmenu_arg ) );
+    memset( dest->buttonmap_arg, 0, sizeof( dest->buttonmap_arg ) );
+    memset( dest->buttonmapmenu_arg, 0, sizeof( dest->buttonmapmenu_arg ) );
 }
 
 static unsigned int parse_colour( const char *str )
@@ -389,6 +398,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 static void parse_bind( config_t *ct, xmlNodePtr node )
 {
     xmlChar *command = xmlGetProp( node, BAD_CAST "command" );
+    xmlChar *arg = xmlGetProp( node, BAD_CAST "argument" );
 
     if( command ) {
         xmlNodePtr binding = node->xmlChildrenNode;
@@ -396,6 +406,7 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
         while( binding ) {
             if( !xmlStrcasecmp( binding->name, BAD_CAST "keyboard" ) ) {
                 xmlChar *key = xmlGetProp( binding, BAD_CAST "key" );
+
                 if( key ) {
                     int keycode, command_id;
 
@@ -407,11 +418,11 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
                     command_id = tvtime_string_to_command( (const char *) command );
                     if( tvtime_is_menu_command( command_id ) ) {
                         ct->keymapmenu[ keycode ] = command_id;
+                        if( arg ) ct->keymapmenu_arg[ keycode ] = strdup( (const char *) arg );
                     } else if( command_id != TVTIME_NOCOMMAND ) {
                         ct->keymap[ keycode ] = command_id;
+                        if( arg ) ct->keymap_arg[ keycode ] = strdup( (const char *) arg );
                     }
-
-                    xmlFree( key );
                 }
             } else if( !xmlStrcasecmp( binding->name, BAD_CAST "mouse" ) ) {
                 xmlChar *button = xmlGetProp( binding, BAD_CAST "button" );
@@ -421,8 +432,10 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
                         int command_id = tvtime_string_to_command( (const char *) command );
                         if( tvtime_is_menu_command( command_id ) ) {
                             ct->buttonmapmenu[ id ] = command_id;
+                            if( arg ) ct->buttonmapmenu_arg[ id ] = strdup( (const char *) arg );
                         } else {
                             ct->buttonmap[ id ] = command_id;
+                            if( arg ) ct->buttonmap_arg[ id ] = strdup( (const char *) arg );
                         }
                     }
                     xmlFree( button );
@@ -433,6 +446,7 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
 
         xmlFree( command );
     }
+    if( arg ) xmlFree( arg );
 }
 
 static void parse_mode( config_t *ct, xmlNodePtr node )
@@ -724,9 +738,13 @@ config_t *config_new( void )
     ct->hue = -1;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
+    memset( ct->keymap_arg, 0, sizeof( ct->keymap_arg ) );
     memset( ct->keymapmenu, 0, sizeof( ct->keymapmenu ) );
+    memset( ct->keymapmenu_arg, 0, sizeof( ct->keymapmenu_arg ) );
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
+    memset( ct->buttonmap_arg, 0, sizeof( ct->buttonmap_arg ) );
     memset( ct->buttonmapmenu, 0, sizeof( ct->buttonmapmenu ) );
+    memset( ct->buttonmapmenu_arg, 0, sizeof( ct->buttonmapmenu_arg ) );
 
     ct->inputwidth = 720;
     ct->inputnum = 0;
@@ -1252,6 +1270,8 @@ void config_free_data( config_t *ct )
 
 void config_delete( config_t *ct )
 {
+    int i;
+
     while( ct->modelist ) {
         tvtime_modelist_t *mode = ct->modelist;
         ct->modelist = mode->next;
@@ -1259,6 +1279,17 @@ void config_delete( config_t *ct )
         free( mode->name );
         free( mode );
     }
+
+    for( i = 0; i < 8 * MAX_KEYSYMS; i++ ) {
+        if( ct->keymap_arg[ i ] ) free( ct->keymap_arg[ i ] );
+        if( ct->keymapmenu_arg[ i ] ) free( ct->keymapmenu_arg[ i ] );
+    }
+
+    for( i = 0; i < MAX_BUTTONS; i++ ) {
+        if( ct->buttonmap_arg[ i ] ) free( ct->buttonmap_arg[ i ] );
+        if( ct->buttonmapmenu_arg[ i ] ) free( ct->buttonmapmenu_arg[ i ] );
+    }
+
     config_free_data( ct );
     free( ct );
 }
@@ -1302,6 +1333,16 @@ int config_key_to_command( config_t *ct, int key )
     return TVTIME_NOCOMMAND;
 }
 
+const char *config_key_to_command_argument( config_t *ct, int key )
+{
+    if( key ) {
+        if( ct->keymap_arg[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
+            return ct->keymap_arg[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
+        }
+    }
+    return 0;
+}
+
 int config_key_to_menu_command( config_t *ct, int key )
 {
     if( key ) {
@@ -1325,6 +1366,19 @@ int config_key_to_menu_command( config_t *ct, int key )
     return TVTIME_NOCOMMAND;
 }
 
+const char *config_key_to_menu_command_argument( config_t *ct, int key )
+{
+    if( key ) {
+        if( ct->keymapmenu_arg[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
+            return ct->keymapmenu_arg[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
+        }
+
+        return config_key_to_command_argument( ct, key );
+    }
+
+    return 0;
+}
+
 int config_command_to_key( config_t *ct, int command )
 {
     int i;
@@ -1345,6 +1399,15 @@ int config_button_to_command( config_t *ct, int button )
     }
 }
 
+const char *config_button_to_command_argument( config_t *ct, int button )
+{
+    if( button < 0 || button >= MAX_BUTTONS ) {
+        return 0;
+    } else {
+        return ct->buttonmap_arg[ button ];
+    }
+}
+
 int config_button_to_menu_command( config_t *ct, int button )
 {
     if( button < 0 || button >= MAX_BUTTONS ) {
@@ -1354,6 +1417,19 @@ int config_button_to_menu_command( config_t *ct, int button )
             return ct->buttonmapmenu[ button ];
         } else {
             return ct->buttonmap[ button ];
+        }
+    }
+}
+
+const char *config_button_to_menu_command_argument( config_t *ct, int button )
+{
+    if( button < 0 || button >= MAX_BUTTONS ) {
+        return 0;
+    } else {
+        if( ct->buttonmapmenu_arg[ button ] ) {
+            return ct->buttonmapmenu_arg[ button ];
+        } else {
+            return ct->buttonmap_arg[ button ];
         }
     }
 }
