@@ -109,6 +109,8 @@ static void parse_xds_packet( const char *packet, int length )
         fprintf( stderr, "Network name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
         fprintf( stderr, "Show rating: 0x%02x 0x%02x\n", packet[ 3 ], packet[ 4 ] );
+    } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
+        fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
     } else {
         /* unknown */
 
