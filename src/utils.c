@@ -629,3 +629,18 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND);
 }
 
+void setup_i18n( void )
+{
+#ifdef ENABLE_NLS
+#ifdef LC_MESSAGES
+    setlocale( LC_MESSAGES, "" );
+    setlocale( LC_CTYPE, "" );
+#else
+    setlocale( LC_ALL, "" );
+#endif
+    bindtextdomain( "tvtime", LOCALEDIR );
+    textdomain( "tvtime" );
+#endif
+}
+
+

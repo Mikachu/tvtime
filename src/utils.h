@@ -239,6 +239,9 @@ int tvtime_get_command_id( int pos );
 int tvtime_is_menu_command( int command );
 int tvtime_command_takes_arguments( int command );
 
+
+void setup_i18n( void );
+
 #ifdef __cplusplus
 };
 #endif
