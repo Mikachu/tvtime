@@ -142,7 +142,7 @@
     to look like a TV, a good value would be about 6-8%.  The value is
     in percent, so for 8%, use 8.0.
   -->
-  <option name="Overscan" value="0.0"/>
+  <option name="Overscan" value="3.5"/>
 
   <!--
     Set this to 1 to have tvtime start in fullscreen mode.  This setting is
