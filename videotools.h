@@ -37,23 +37,14 @@ void video_correction_correct_luma_scanline( video_correction_t *vc,
                                              unsigned char *luma, int width );
 void video_correction_correct_packed422_scanline( video_correction_t *vc,
                                                   unsigned char *output,
-                                                  unsigned char *input, int width );
+                                                  unsigned char *input,
+                                                  int width );
 
 /**
- * Builds a packed 4:2:2 frame from a field interpolating to frame size by
+ * Builds a packed 4:2:2 frame from a field, interpolating to frame size by
  * linear interpolation.  This version applies the video correction transform
  * as it interpolates.
  */
-void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
-                                                          unsigned char *output,
-                                                          unsigned char *fieldluma,
-                                                          unsigned char *fieldcb,
-                                                          unsigned char *fieldcr,
-                                                          int bottom_field,
-                                                          int lstride, int cstride,
-                                                          int width, int height );
-
-
 void video_correction_packed422_field_to_frame_top( video_correction_t *vc,
                                                     unsigned char *output,
                                                     int outstride,
@@ -70,16 +61,9 @@ void video_correction_packed422_field_to_frame_bot( video_correction_t *vc,
                                                     int fieldstride );
 
 /**
- * Builds a packed 4:2:2 frame from a field interpolating to frame size by
+ * Builds a packed 4:2:2 frame from a field, interpolating to frame size by
  * linear interpolation.
  */
-void planar422_field_to_packed422_frame( unsigned char *output,
-                                         unsigned char *fieldluma,
-                                         unsigned char *fieldcb,
-                                         unsigned char *fieldcr,
-                                         int bottom_field,
-                                         int lstride, int cstride,
-                                         int width, int height );
 void packed422_field_to_frame_top( unsigned char *output, int outstride,
                                    unsigned char *field, int fieldwidth,
                                    int fieldheight, int fieldstride );
@@ -87,13 +71,17 @@ void packed422_field_to_frame_bot( unsigned char *output, int outstride,
                                    unsigned char *field, int fieldwidth,
                                    int fieldheight, int fieldstride );
 
-void blit_colour_4444_scanline( unsigned char *output, int width, int alpha, int luma, int cb, int cr );
-void blit_colour_packed422_scanline( unsigned char *output, int width, int luma, int cb, int cr );
-void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr );
-void blit_colour_packed422( unsigned char *output, int width, int height, int stride, int luma, int cb, int cr );
-
-void create_packed422_from_planar422_scanline( unsigned char *output, unsigned char *luma,
-                                               unsigned char *cb, unsigned char *cr, int width );
+/**
+ * Useful scanline functions.
+ */
+void blit_colour_packed4444_scanline( unsigned char *output, int width,
+                                      int alpha, int luma, int cb, int cr );
+void blit_colour_packed422_scanline( unsigned char *output, int width,
+                                     int luma, int cb, int cr );
+void create_packed422_from_planar422_scanline( unsigned char *output,
+                                               unsigned char *luma,
+                                               unsigned char *cb,
+                                               unsigned char *cr, int width );
 void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,
@@ -102,55 +90,61 @@ void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *botcb,
                                                     unsigned char *botcr,
                                                     int width );
-
-/**
- * Builds a plane from a field interpolating to frame size by linear
- * interpolation.
- */
-void luma_plane_field_to_frame( unsigned char *output, unsigned char *input,
-                                int width, int height, int stride, int bottom_field );
-void chroma_plane_field_to_frame( unsigned char *output, unsigned char *input,
-                                  int width, int height, int stride, int bottom_field );
-
-/**
- * Text masks are arrays of unsigned chars with values 0-4 for
- * transparent to full alpha.  This will probably change when I can do
- * a better renderer from ttfs.
- */
-void composite_textmask_packed422_scanline( unsigned char *output, unsigned char *input,
-                                            unsigned char *textmask, int width,
-                                            int textluma, int textcb, int textcr, double textalpha );
-
-void composite_alphamask_packed422_scanline( unsigned char *output, unsigned char *input,
-                                             unsigned char *textmask, int width,
-                                             int textluma, int textcb, int textcr, double textalpha );
-void composite_alphamask_packed4444_scanline( unsigned char *output, unsigned char *input,
+void interpolate_packed422_scanline( unsigned char *output, unsigned char *top,
+                                     unsigned char *bot, int width );
+void composite_alphamask_packed422_scanline( unsigned char *output,
+                                             unsigned char *input,
+                                             unsigned char *mask, int width,
+                                             int textluma, int textcb,
+                                             int textcr, double textalpha );
+void composite_alphamask_packed4444_scanline( unsigned char *output,
+                                              unsigned char *input,
                                               unsigned char *mask, int width,
-                                              int textluma, int textcb, int textcr );
-void composite_packed4444_to_packed422_scanline( unsigned char *output, unsigned char *input,
-                                                 unsigned char *foreground, int width );
+                                              int textluma, int textcb,
+                                              int textcr );
+void composite_packed4444_to_packed422_scanline( unsigned char *output,
+                                                 unsigned char *input,
+                                                 unsigned char *foreground,
+                                                 int width );
 
-void composite_alphamask_packed4444( unsigned char *output, int owidth, int oheight, int ostride,
-                                     unsigned char *mask, int mwidth, int mheight, int mstride,
-                                     int luma, int cb, int cr, int xpos, int ypos );
-void composite_packed4444_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
-                                        unsigned char *foreground, int fwidth, int fheight, int fstride,
+void composite_alphamask_packed4444( unsigned char *output, int owidth,
+                                     int oheight, int ostride,
+                                     unsigned char *mask, int mwidth,
+                                     int mheight, int mstride,
+                                     int luma, int cb, int cr,
+                                     int xpos, int ypos );
+void composite_packed4444_to_packed422( unsigned char *output, int owidth,
+                                        int oheight, int ostride,
+                                        unsigned char *foreground, int fwidth,
+                                        int fheight, int fstride,
                                         int xpos, int ypos );
 
 /**
  * Alpha provided is from 0-256 not 0-255.
  */
-void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, unsigned char *input,
-                                                       unsigned char *foreground, int width, int alpha );
-void composite_packed4444_alpha_to_packed422( unsigned char *output, int owidth, int oheight, int ostride,
-                                              unsigned char *foreground, int fwidth, int fheight, int fstride,
+void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
+                                                       unsigned char *input,
+                                                       unsigned char *fg,
+                                                       int width, int alpha );
+void composite_packed4444_alpha_to_packed422( unsigned char *output,
+                                              int owidth, int oheight,
+                                              int ostride,
+                                              unsigned char *foreground,
+                                              int fwidth, int fheight,
+                                              int fstride,
                                               int xpos, int ypos, int alpha );
 
 /**
  * This filter actually does not meet the spec so I'm not
  * sure what to call it.  I got it from Poynton's site.
  */
-void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src, int srcwidth );
+void chroma422_to_chroma444_rec601_scanline( unsigned char *dest,
+                                             unsigned char *src, int srcwidth );
+
+void blit_colour_packed4444( unsigned char *output, int width, int height,
+                             int stride, int alpha, int luma, int cb, int cr );
+void blit_colour_packed422( unsigned char *output, int width, int height,
+                            int stride, int luma, int cb, int cr );
 
 #ifdef __cplusplus
 };

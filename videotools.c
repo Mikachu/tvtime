@@ -32,92 +32,6 @@ struct video_correction_s
     unsigned char *temp_scanline_data;
 };
 
-void luma_plane_field_to_frame( unsigned char *output, unsigned char *input,
-                                int width, int height, int stride, int bottom_field )
-{
-    int i, j;
-
-    if( bottom_field ) {
-        memset( output, 16, width );
-        output += width;
-
-        memcpy( output, input, width );
-        output += width;
-    }
-
-    for( i = 0; i < (height / 2) - 1; i++ ) {
-        unsigned char *c;
-
-        if( !bottom_field ) {
-            memcpy( output, input, width );
-            output += width;
-        }
-
-        c = input;
-        for( j = 0; j < width; j++ ) {
-            *output = (*c + *(c+stride)) >> 1;
-            output++;
-            c++;
-        }
-        input += stride;
-
-        if( bottom_field ) {
-            memcpy( output, input, width );
-            output += width;
-        }
-    }
-
-    if( !bottom_field ) {
-        memcpy( output, input, width );
-        output += width;
-
-        memset( output, 16, width );
-    }
-}
-
-void chroma_plane_field_to_frame( unsigned char *output, unsigned char *input,
-                                  int width, int height, int stride, int bottom_field )
-{
-    int i, j;
-
-    if( bottom_field ) {
-        memset( output, 128, width );
-        output += width;
-
-        memcpy( output, input, width );
-        output += width;
-    }
-
-    for( i = 0; i < (height / 2) - 1; i++ ) {
-        unsigned char *c;
-
-        if( !bottom_field ) {
-            memcpy( output, input, width );
-            output += width;
-        }
-
-        c = input;
-        for( j = 0; j < width; j++ ) {
-            *output = ((*c + *(c+stride) - 256) >> 1) + 128;
-            output++;
-            c++;
-        }
-        input += stride;
-
-        if( bottom_field ) {
-            memcpy( output, input, width );
-            output += width;
-        }
-    }
-
-    if( !bottom_field ) {
-        memcpy( output, input, width );
-        output += width;
-
-        memset( output, 128, width );
-    }
-}
-
 void create_packed422_from_planar422_scanline( unsigned char *output, unsigned char *luma,
                                                unsigned char *cb, unsigned char *cr, int width )
 {
@@ -132,7 +46,8 @@ void create_packed422_from_planar422_scanline( unsigned char *output, unsigned c
     }
 }
 
-void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int luma, int cb, int cr )
+void blit_colour_packed4444_scanline( unsigned char *output, int width,
+                                      int alpha, int luma, int cb, int cr )
 {
     int j;
 
@@ -144,12 +59,14 @@ void blit_colour_scanline_4444( unsigned char *output, int width, int alpha, int
     }
 }
 
-void blit_colour_4444( unsigned char *output, int width, int height, int stride, int alpha, int luma, int cb, int cr )
+void blit_colour_packed4444( unsigned char *output, int width, int height,
+                             int stride, int alpha, int luma, int cb, int cr )
 {
     int i;
 
     for( i = 0; i < height; i++ ) {
-        blit_colour_scanline_4444( output + (i * stride), width, alpha, luma, cb, cr );
+        blit_colour_packed4444_scanline( output + (i * stride), width,
+                                         alpha, luma, cb, cr );
     }
 }
 
@@ -327,124 +244,6 @@ void packed422_field_to_frame_top( unsigned char *output, int outstride,
     blit_colour_packed422_scanline( output, fieldwidth, 16, 128, 128 );
 }
 
-
-
-
-void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
-                                                          unsigned char *output,
-                                                          unsigned char *fieldluma,
-                                                          unsigned char *fieldcb,
-                                                          unsigned char *fieldcr,
-                                                          int bottom_field,
-                                                          int lstride, int cstride,
-                                                          int width, int height )
-{
-    int i;
-
-    if( bottom_field ) {
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-        output += width * 2;
-
-        /* Copy a scanline. */
-        video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
-        create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
-        output += width * 2;
-    }
-
-    for( i = 0; i < (height / 2) - 1; i++ ) {
-        /* Correct top scanline. */
-        video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
-
-        if( !bottom_field ) {
-            /* Copy a scanline. */
-            create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
-            output += width * 2;
-        }
-
-        /* Interpolate a scanline. */
-        video_correction_correct_luma_scanline( vc, vc->temp_scanline_data + width, fieldluma + lstride, width );
-        interpolate_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr,
-                                         vc->temp_scanline_data + width, fieldcb + cstride, fieldcr + cstride,
-                                         width );
-        output += width * 2;
-
-        fieldluma += lstride;
-        fieldcb += cstride;
-        fieldcr += cstride;
-
-        if( bottom_field ) {
-            /* Copy a scanline. */
-            create_packed422_from_planar422_scanline( output, vc->temp_scanline_data + width, fieldcb, fieldcr, width );
-            output += width * 2;
-        }
-    }
-
-    if( !bottom_field ) {
-        /* Copy a scanline. */
-        video_correction_correct_luma_scanline( vc, vc->temp_scanline_data, fieldluma, width );
-        create_packed422_from_planar422_scanline( output, vc->temp_scanline_data, fieldcb, fieldcr, width );
-        output += width * 2;
-
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-    }
-}
-
-void planar422_field_to_packed422_frame( unsigned char *output,
-                                         unsigned char *fieldluma,
-                                         unsigned char *fieldcb,
-                                         unsigned char *fieldcr,
-                                         int bottom_field,
-                                         int lstride, int cstride,
-                                         int width, int height )
-{
-    int i;
-
-    if( bottom_field ) {
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-        output += width * 2;
-
-        /* Copy a scanline. */
-        create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
-        output += width * 2;
-    }
-
-    for( i = 0; i < (height / 2) - 1; i++ ) {
-        if( !bottom_field ) {
-            /* Copy a scanline. */
-            create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
-            output += width * 2;
-        }
-
-        /* Interpolate a scanline. */
-        interpolate_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr,
-                                         fieldluma + lstride, fieldcb + cstride, fieldcr + cstride,
-                                         width );
-        output += width * 2;
-
-        fieldluma += lstride;
-        fieldcb += cstride;
-        fieldcr += cstride;
-
-        if( bottom_field ) {
-            /* Copy a scanline. */
-            create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
-            output += width * 2;
-        }
-    }
-
-    if( !bottom_field ) {
-        /* Copy a scanline. */
-        create_packed422_from_planar422_scanline( output, fieldluma, fieldcb, fieldcr, width );
-        output += width * 2;
-
-        /* Clear a scanline. */
-        blit_colour_packed422_scanline( output, width, 16, 128, 128 );
-    }
-}
-
 static double intensity_to_voltage( video_correction_t *vc, double val )
 {   
     /* Handle invalid values before doing a gamma transform. */
@@ -528,45 +327,6 @@ void video_correction_correct_packed422_scanline( video_correction_t *vc,
     while( width-- ) {
         *output++ = vc->luma_table[ *input++ ];
         *output++ = *input++;
-    }
-}
-
-void composite_textmask_packed422_scanline( unsigned char *output, unsigned char *input,
-                                            unsigned char *textmask, int width,
-                                            int textluma, int textcb, int textcr, double textalpha )
-{
-    int alpha_table[ 9 ];
-    int i;
-
-    if( textalpha > 1.0 ) textalpha = 1.0;
-    if( textalpha < 0.0 ) textalpha = 0.0;
-    for( i = 0; i < 9; i++ ) {
-        alpha_table[ i ] = (int) ( ( ( ( ( (double) i ) * textalpha ) / 5.0 ) * 255.0 ) + 0.5 );
-        if( alpha_table[ i ] > 255 ) alpha_table[ i ] = 255;
-    }
-
-    for( i = 0; i < width; i++ ) {
-        if( textmask[ 0 ] ) {
-            int a = alpha_table[ textmask[ 0 ] ];
-            int tmp1, tmp2;
-
-            tmp1 = (textluma - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *output = tmp2 & 0xff;
-
-            if( ( i & 1 ) == 0 ) {
-                tmp1 = (textcb - input[ 1 ]) * a;
-                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 1 ] = tmp2 & 0xff;
-
-                tmp1 = (textcr - input[ 3 ]) * a;
-                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 3 ] = tmp2 & 0xff;
-            }
-        }
-        textmask++;
-        output += 2;
-        input += 2;
     }
 }
 

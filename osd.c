@@ -103,8 +103,9 @@ void osd_string_render_image4444( osd_string_t *osds )
     osds->image_textwidth = efs_get_width( osds->efs ) + 4;
     osds->image_textheight = efs_get_height( osds->efs ) + 4;
 
-    blit_colour_4444( osds->image4444, osds->image_textwidth, osds->image_textheight, osds->image_width * 4,
-                      0, 16, 128, 128 );
+    blit_colour_packed4444( osds->image4444, osds->image_textwidth,
+                            osds->image_textheight, osds->image_width * 4,
+                            0, 16, 128, 128 );
 
     if( osds->show_border ) {
         composite_alphamask_packed4444( osds->image4444, osds->image_width, osds->image_height, osds->image_width * 4,
@@ -217,7 +218,7 @@ osd_shape_t *osd_shape_new( OSD_Shape shape_type, int shape_width, int shape_hei
         for( x = 0; x < shape_width; x++ ) {
             for( y = 0; y < shape_width; y++ ) {
                 if( (pow((x-x0),(double)2) + pow((double)(y-x0),(double)2)) <= radius_sqrd ) {
-                    osds->shape_mask[y*shape_width+x] = (char)5;
+                    osds->shape_mask[y*shape_width+x] = 255;
                 }
             }
         }
@@ -322,7 +323,7 @@ void osd_shape_composite_packed422( osd_shape_t *osds, unsigned char *output,
             scanline = osd_shape_get_scanline( osds, i );
 
             if( scanline )
-            composite_textmask_packed422_scanline( output + ((dest_x) * 2),
+            composite_alphamask_packed422_scanline( output + ((dest_x) * 2),
                                                    output + ((dest_x) * 2),
                                                    scanline,
                                                    blit_w, osds->shape_luma, 

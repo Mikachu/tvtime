@@ -320,9 +320,7 @@ int main( int argc, char **argv )
     gettimeofday( &lastframetime, 0 );
     gettimeofday( &lastfieldtime, 0 );
     for(;;) {
-        unsigned char *curluma;
-        unsigned char *curcb422;
-        unsigned char *curcr422;
+        unsigned char *curframe;
         struct timeval curframetime;
         struct timeval curfieldtime;
         struct timeval blitstart;
@@ -491,9 +489,7 @@ int main( int argc, char **argv )
         gettimeofday( &(checkpoint[ 0 ]), 0 );
 
         /* Aquire the next frame. */
-        curluma  = videoinput_next_image( vidin );
-        curcb422 = curluma  + ( width   * height );
-        curcr422 = curcb422 + ( width/2 * height );
+        curframe = videoinput_next_image( vidin );
 
 
         /* CHECKPOINT2 : Got the frame */
@@ -526,10 +522,10 @@ int main( int argc, char **argv )
             memcpy( sdl_get_output(), testframe_even, width*height*2 );
         } else {
             if( apply_luma_correction ) {
-                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(), width*2, curluma,
+                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(), width*2, curframe,
                                                                width, height/2, width*4 );
             } else {
-                packed422_field_to_frame_top( sdl_get_output(), width*2, curluma,
+                packed422_field_to_frame_top( sdl_get_output(), width*2, curframe,
                                               width, height/2, width*4 );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
@@ -578,10 +574,10 @@ int main( int argc, char **argv )
         } else {
             if( apply_luma_correction ) {
                 video_correction_packed422_field_to_frame_bot( vc, sdl_get_output(), width*2,
-                                                               curluma + (width*2),
+                                                               curframe + (width*2),
                                                                width, height/2, width*4 );
             } else {
-                packed422_field_to_frame_bot( sdl_get_output(), width*2, curluma,
+                packed422_field_to_frame_bot( sdl_get_output(), width*2, curframe,
                                               width, height/2, width*4 );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
