@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.14\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2004-10-30 10:59-0400\n"
-"PO-Revision-Date: 2004-12-07 HO:MI+ZONE\n"
+"PO-Revision-Date: 2005-02-13 16:41+0100\n"
 "Last-Translator: Iván Eixarch <ivan@bonacamp.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr "Desentrelazador"
 #: src/tvtime.c:1017
 #, c-format
 msgid "Input: %s at %dx%d pixels"
-msgstr "Entrada: %s en %dx&d pixels"
+msgstr "Entrada: %s en %dx%d pixels"
 
 #: src/tvtime.c:1021
 #, c-format
@@ -235,7 +235,7 @@ msgstr ""
 
 #: src/tvtime.c:1430
 msgid "On screen display failed to initialize, disabled.\n"
-msgstr "Imposible inicializar sobreimpresión, OSD deshabilitado."
+msgstr "Imposible inicializar sobreimpresión, OSD deshabilitado.\n"
 
 #: src/tvtime.c:1443
 msgid "No video source"
