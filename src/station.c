@@ -49,7 +49,6 @@ struct station_mgr_s
     int num_stations;
     int verbose;
     int us_cable_mode;
-    int is_us_cable;
     int last_channel;
     int new_install;
     char band_and_frequency[ 1024 ];
@@ -272,7 +271,6 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
     mgr->verbose = verbose;
     mgr->first = 0;
     mgr->current = 0;
-    mgr->is_us_cable = 0;
     mgr->us_cable_mode = us_cable_mode;
     mgr->last_channel = 0;
     mgr->new_install = 0;
@@ -307,7 +305,6 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
 
         if( !strcasecmp( frequencies, "us-cable" ) ) {
             station_add_band( mgr, "us cable" );
-            mgr->is_us_cable = 1;
         } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
             station_add_band( mgr, "us broadcast" );
         } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
@@ -464,7 +461,7 @@ const char *station_get_current_band( station_mgr_t *mgr )
     if( !mgr->current ) {
         return "No Band";
     } else {
-        if( mgr->is_us_cable && mgr->us_cable_mode ) {
+        if( !strcasecmp( mgr->current->band->name, "US Cable" ) && mgr->us_cable_mode ) {
             sprintf( mgr->band_and_frequency, "%s [%s]: %s",
                      mgr->current->band->name,
                      mgr->us_cable_mode == NTSC_CABLE_MODE_HRC ? "HRC" : "IRC",
