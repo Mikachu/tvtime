@@ -50,7 +50,6 @@
 #include "fifo.h"
 #include "commands.h"
 #include "station.h"
-#include "configsave.h"
 #include "config.h"
 #include "vgasync.h"
 #include "rvrreader.h"
@@ -897,10 +896,6 @@ int main( int argc, char **argv )
 
     scalerbob_plugin_init();
 
-    if( !configsave_open( config_get_config_filename( ct ) ) ) {
-        fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
-    }
-
     stationmgr = station_new( config_get_v4l_freq( ct ), config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
         fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
@@ -1276,20 +1271,28 @@ int main( int argc, char **argv )
         }
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
-                configsave( "FullScreen", "1", 1 );
+                if( config_get_configsave( ct ) ) {
+                    configsave( config_get_configsave( ct ), "FullScreen", "1", 1 );
+                }
                 if( osd ) tvtime_osd_show_message( osd, "Fullscreen mode active." );
             } else {
-                configsave( "FullScreen", "0", 1 );
+                if( config_get_configsave( ct ) ) {
+                    configsave( config_get_configsave( ct ), "FullScreen", "0", 1 );
+                }
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
         }
         if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
                 if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
-                configsave( "WideScreen", "1", 1 );
+                if( config_get_configsave( ct ) ) {
+                    configsave( config_get_configsave( ct ), "WideScreen", "1", 1 );
+                }
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
-                configsave( "WideScreen", "0", 1 );
+                if( config_get_configsave( ct ) ) {
+                    configsave( config_get_configsave( ct ), "WideScreen", "0", 1 );
+                }
             }
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
@@ -1311,9 +1314,11 @@ int main( int argc, char **argv )
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
-            snprintf( number, 3, "%d", curmethodid );
-            number[3] = '\0';
-            configsave( "PreferredDeinterlaceMethod", number, 1 );
+            if( config_get_configsave( ct ) ) {
+                snprintf( number, 3, "%d", curmethodid );
+                number[3] = '\0';
+                configsave( config_get_configsave( ct ), "PreferredDeinterlaceMethod", number, 1 );
+            }
         }
         if( commands_update_luma_power( commands ) ) {
             videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
@@ -1633,19 +1638,22 @@ int main( int argc, char **argv )
         }
     }
 
-    snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
-    configsave( "PrevChannel", number, 1 );
+    if( config_get_configsave( ct ) ) {
+        snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
+        configsave( config_get_configsave( ct ), "PrevChannel", number, 1 );
 
-    snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
-    configsave( "StartChannel", number, 1 );
+        snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
+        configsave( config_get_configsave( ct ), "StartChannel", number, 1 );
 
-    snprintf( number, 3, "%d", framerate_mode );
-    configsave( "FramerateMode", number, 1 );
+        snprintf( number, 3, "%d", framerate_mode );
+        configsave( config_get_configsave( ct ), "FramerateMode", number, 1 );
 
-    if( vidin ) {
-        snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
-        configsave( "CaptureSource", number, 1 );
+        if( vidin ) {
+            snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
+            configsave( config_get_configsave( ct ), "CaptureSource", number, 1 );
+        }
     }
+
     output->shutdown();
 
     if( verbose ) {
@@ -1680,8 +1688,6 @@ int main( int argc, char **argv )
     if( osd ) {
         tvtime_osd_delete( osd );
     }
-
-    configsave_close();
 
     /* Free temporary memory. */
     free( colourbars );

@@ -27,7 +27,6 @@
 #include "mixer.h"
 #include "commands.h"
 #include "console.h"
-#include "configsave.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -537,10 +536,14 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         if( in->osd ) {
             if( in->apply_luma ) {
                 tvtime_osd_show_message( in->osd, "Luma correction enabled." );
-                configsave( "ApplyLumaCorrection", "1", 1 );
+                if( config_get_configsave( in->cfg ) ) {
+                    configsave( config_get_configsave( in->cfg ), "ApplyLumaCorrection", "1", 1 );
+                }
             } else {
                 tvtime_osd_show_message( in->osd, "Luma correction disabled." );
-                configsave( "ApplyLumaCorrection", "0", 1 );
+                if( config_get_configsave( in->cfg ) ) {
+                    configsave( config_get_configsave( in->cfg ), "ApplyLumaCorrection", "0", 1 );
+                }
             }
         }
         break;
@@ -578,7 +581,9 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             }
 
             sprintf( message, "%.1f", in->luma_power );
-            configsave( "LumaCorrection", message, 1 );
+            if( config_get_configsave( in->cfg ) ) {
+                configsave( config_get_configsave( in->cfg ), "LumaCorrection", message, 1 );
+            }
             if( in->osd ) {
                 sprintf( message, "Luma correction value: %.1f", in->luma_power );
                 tvtime_osd_show_message( in->osd, message );

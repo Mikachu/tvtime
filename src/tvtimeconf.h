@@ -19,7 +19,7 @@
 #ifndef TVTIMECONF_H_INCLUDED
 #define TVTIMECONF_H_INCLUDED
 
-#include "parser.h"
+#include "configsave.h"
 
 typedef struct config_s config_t;
 
@@ -67,5 +67,7 @@ int tvtime_string_to_command( const char *str );
 
 int config_get_usevbi( config_t *ct );
 char *config_get_vbidev( config_t *ct );
+
+configsave_t *config_get_configsave( config_t *ct );
 
 #endif /* TVTIMECONF_H_INCLUDED */

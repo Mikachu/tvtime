@@ -23,9 +23,11 @@
 extern "C" {
 #endif
 
-int configsave(const char *INIT_name, const char *INIT_val, const int INIT_num);
-void configsave_close(void);
-int configsave_open(const char *filename);
+typedef struct configsave_s configsave_t;
+
+configsave_t *configsave_open( const char *filename );
+void configsave_close( configsave_t *cs );
+int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num );
 
 #ifdef __cplusplus
 };

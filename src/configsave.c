@@ -30,122 +30,166 @@
 
 #include <string.h>
 #include <libxml/parser.h>
+#include "configsave.h"
 
-char *configFile;
-xmlDocPtr Doc;
-
-xmlNodePtr find_node( const char *str, xmlNodePtr node)
+struct configsave_s
 {
-    while(node != NULL) {
-        if(!xmlStrcasecmp(node->name, (const xmlChar *)str)) return node;
-        node=node->next;
+    char *configFile;
+    xmlDocPtr Doc;
+};
+
+static xmlNodePtr find_node( const char *str, xmlNodePtr node)
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST str ) ) {
+            return node;
+        }
+
+        node = node->next;
     }
 
-    return NULL;
+    return 0;
 }
 
 /* Attempt to parse the file for key elements and create them if they don't exist */
-int configsave_open(const char *filename)
+configsave_t *configsave_open( const char *filename )
 {
+    configsave_t *cs = (configsave_t *) malloc( sizeof( configsave_t ) );
     xmlNodePtr top, node;
 
-    if( filename == NULL) return 0;
-    free(configFile);
-    configFile = strdup(filename);
-
-    if( (Doc=xmlParseFile(configFile)) == NULL)
-        if( (Doc=xmlNewDoc((const xmlChar *)"1.0")) == NULL) {
-            fprintf(stderr,"configsave: Could not create new Doc element.\n");
-            free(configFile);
-            return 0;
-         }
-
-    if( (top=xmlDocGetRootElement(Doc)) == NULL) {
-        if( (top=xmlNewDocNode(Doc, NULL, (const xmlChar *) "Conf", NULL)) == NULL) {
-            fprintf(stderr,"configsave: Could not create toplevel element 'Conf'.\n");
-            xmlFreeDoc(Doc);
-            free(configFile);
-            return 0;
-        } else {
-            xmlDocSetRootElement(Doc, top);
-        }
-    }
-
-    if( xmlStrcasecmp(top->name, (const xmlChar *) "Conf")) {
-        fprintf(stderr, "configsave: Root node in file %s should be 'Conf'.\n", configFile);
-        xmlFreeDoc(Doc);
-        free(configFile);
+    if( !cs ) {
         return 0;
     }
 
-    if( (node=find_node("global", top->xmlChildrenNode)) == NULL)
-        if( (node=xmlNewTextChild(top, NULL, (const xmlChar *) "global", NULL)) == NULL) {
-            fprintf(stderr,"configsave: Could not create element 'global'.\n");
-            xmlFreeDoc(Doc);
-            free(configFile);
+    cs->configFile = strdup( filename );
+    if( !cs->configFile ) {
+        free( cs );
+        return 0;
+    }
+
+    cs->Doc = xmlParseFile( cs->configFile );
+    if( !cs->Doc ) {
+        /* Config file doesn't exist, create a new one. */
+        cs->Doc = xmlNewDoc( BAD_CAST "1.0" );
+        if( !cs->Doc ) {
+            fprintf( stderr, "configsave: Could not create new config file.\n" );
+            free( cs->configFile );
+            free( cs );
             return 0;
         }
+    }
 
-    if( (node=find_node("mousebindings", top->xmlChildrenNode)) == NULL)
-        if( (node=xmlNewTextChild(top, NULL, (const xmlChar *) "mousebindings", NULL)) == NULL) {
-            fprintf(stderr,"configsave: Could not create element 'mousebindings'.\n");
-            xmlFreeDoc(Doc);
-            free(configFile);
+    top = xmlDocGetRootElement( cs->Doc );
+    if( !top ) {
+        top = xmlNewDocNode( cs->Doc, 0, BAD_CAST "tvtime", 0 );
+        if( !top ) {
+            fprintf( stderr, "configsave: Could not create toplevel element 'tvtime'.\n" );
+            xmlFreeDoc( cs->Doc );
+            free( cs->configFile );
+            free( cs );
+            return 0;
+        } else {
+            xmlDocSetRootElement( cs->Doc, top );
+        }
+    }
+
+    if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
+        fprintf( stderr, "configsave: Root node in file %s should be 'tvtime'.\n", cs->configFile );
+        xmlFreeDoc( cs->Doc );
+        free( cs->configFile );
+        free( cs );
+        return 0;
+    }
+
+    node = find_node( "global", top->xmlChildrenNode );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "global", 0 );
+        if( !node ) {
+            fprintf( stderr, "configsave: Could not create element 'global'.\n" );
+            xmlFreeDoc( cs->Doc );
+            free( cs->configFile );
+            free( cs );
             return 0;
         }
+    }
 
-    if( (node=find_node("keybindings", top->xmlChildrenNode)) == NULL)
-        if( (node=xmlNewTextChild(top, NULL, (const xmlChar *) "keybindings", NULL)) == NULL) {
-            fprintf(stderr,"configsave: Could not create element 'keybindings'.\n");
-            xmlFreeDoc(Doc);
-            free(configFile);
+    node = find_node( "mousebindings", top->xmlChildrenNode );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "mousebindings", 0 );
+        if( !node ) {
+            fprintf( stderr, "configsave: Could not create element 'mousebindings'.\n" );
+            xmlFreeDoc( cs->Doc );
+            free( cs->configFile );
+            free( cs );
             return 0;
         }
+    }
 
-    xmlKeepBlanksDefault(0);
-    xmlSaveFormatFile(configFile, Doc, 1);
-    return 1;
+    node = find_node( "keybindings", top->xmlChildrenNode );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "keybindings", 0 );
+        if( !node ) {
+            fprintf( stderr, "configsave: Could not create element 'keybindings'.\n" );
+            xmlFreeDoc( cs->Doc );
+            free( cs->configFile );
+            free( cs );
+            return 0;
+        }
+    }
+
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( cs->configFile, cs->Doc, 1 );
+    return cs;
 }
 
-void configsave_close(void)
+void configsave_close( configsave_t *cs )
 {
-xmlFreeDoc(Doc);
+    xmlFreeDoc( cs->Doc );
+    free( cs->configFile );
+    free( cs );
 }
 
-int configsave(const char *INIT_name, const char *INIT_val, const int INIT_num)
+int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num )
 {
     xmlNodePtr top, section, node;
     xmlAttrPtr attr;
 
-    if((configFile == NULL) || (Doc == NULL)) return 0;
-    top=xmlDocGetRootElement(Doc);
+    top = xmlDocGetRootElement( cs->Doc );
 
-    if( !xmlStrcasecmp((const xmlChar *)INIT_name, (const xmlChar *)"keybindings") ) {
-        if( (section=find_node("keybindings", top->xmlChildrenNode)) == NULL) {
-            fprintf(stderr, "configsave: No 'keybindings' section in %s. KeyBindings not saved.\n",configFile);
+    if( !xmlStrcasecmp( BAD_CAST INIT_name, BAD_CAST "keybindings" ) ) {
+        section = find_node( "keybindings", top->xmlChildrenNode );
+        if( !section ) {
+            fprintf( stderr, "configsave: No 'keybindings' section in %s. KeyBindings not saved.\n",
+                     cs->configFile );
             return 0;
         }
 
-    } else if (!xmlStrcasecmp((const xmlChar *)INIT_name, (const xmlChar *)"mousebindings")) {
-        if( (section=find_node("mousebindings", top->xmlChildrenNode)) == NULL) {
-            fprintf(stderr, "configsave: No 'mousebindings' section in %s. MouseBindings not saved.\n",configFile);
+    } else if( !xmlStrcasecmp( BAD_CAST INIT_name, BAD_CAST "mousebindings" ) ) {
+        section = find_node( "mousebindings", top->xmlChildrenNode );
+        if( !section ) {
+            fprintf( stderr, "configsave: No 'mousebindings' section in %s. MouseBindings not saved.\n",
+                     cs->configFile );
             return 0;
         }
 
     } else {
-        if( (section=find_node("global", top->xmlChildrenNode)) == NULL) {
-            fprintf(stderr, "configsave: No 'global' section in %s. Global option not saved.\n",configFile);
+        section = find_node( "global", top->xmlChildrenNode );
+        if( !section ) {
+            fprintf( stderr, "configsave: No 'global' section in %s. Global option not saved.\n",
+                     cs->configFile );
             return 0;
         }
-        if( (node=find_node(INIT_name, section->xmlChildrenNode)) == NULL) {
-            node=xmlNewTextChild(section,NULL, (const xmlChar *)INIT_name, NULL);
-            attr=xmlNewProp(node, (const xmlChar *) "value", (const xmlChar *)INIT_val);
+        node = find_node( INIT_name, section->xmlChildrenNode );
+        if( !node ) {
+            node = xmlNewTextChild( section, 0, BAD_CAST INIT_name, 0);
+            attr = xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
         } else {
-            xmlSetProp(node, (const xmlChar *) "value", (const xmlChar *)INIT_val);
+            xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );
         }
     }
 
-    xmlKeepBlanksDefault(0);
-    xmlSaveFormatFile(configFile, Doc, 1);
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( cs->configFile, cs->Doc, 1 );
     return 1;
 }
+

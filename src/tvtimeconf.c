@@ -120,6 +120,8 @@ struct config_s
     double voverscan;
 
     char config_filename[ 1024 ];
+
+    configsave_t *configsave;
 };
 
 static unsigned int parse_colour( const char *str )
@@ -248,15 +250,18 @@ int parse_keys(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *buf;
     int key;
-    while(node != NULL) {
-        if(!xmlIsBlankNode(node) && ((buf=xmlGetProp(node, BAD_CAST"value")) != NULL)) {
-            if( (key=match_special_key((const char *)buf)) )
-                ct->keymap[key]=tvtime_string_to_command((const char *)node->name);
-            else
-                ct->keymap[*buf]=tvtime_string_to_command((const char *)node->name);
+
+    while( node ) {
+        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
+            if( ( key = match_special_key( (const char *) buf ) ) ) {
+                ct->keymap[ key ] = tvtime_string_to_command( (const char *) node->name );
+            } else {
+                ct->keymap[ *buf ] = tvtime_string_to_command( (const char *) node->name );
+            }
         }
-       node=node->next;
+        node = node->next;
     }
+
     return 1;
 }
 
@@ -264,14 +269,19 @@ int parse_mouse(config_t *ct, xmlDocPtr doc, xmlNodePtr node)
 {
     xmlChar *buf;
     int button;
-    while(node != NULL) {
-        if(!xmlIsBlankNode(node) && ((buf=xmlGetProp(node, BAD_CAST"value")) != NULL)) {
-            if( sscanf((const char *)buf, "button_%d", &button))
-                if( (button > 0) && (button < MAX_BUTTONS))
-                    ct->buttonmap[button] = tvtime_string_to_command((const char *)node->name);
+
+    while( node ) {
+        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
+            if( sscanf( (const char *) buf, "button_%d", &button ) ) {
+                if( (button > 0) && (button < MAX_BUTTONS) ) {
+                    ct->buttonmap[ button ] = tvtime_string_to_command( (const char *) node->name );
+                }
+            }
         }
-        node=node->next;
+
+        node = node->next;
     }
+
     return 1;
 }
 
@@ -280,31 +290,37 @@ int conf_xml_parse( config_t *ct, char *configFile)
     xmlDocPtr doc;
     xmlNodePtr top, node;
 
-    if( (doc=xmlParseFile(configFile)) == NULL) {
-        fprintf(stderr, "config: Error parsing configuration file %s.\n", configFile);
-        return 0;
-    }
-    if( (top=xmlDocGetRootElement(doc)) == NULL) {
-        fprintf(stderr, "config: No XML root element found in %s.\n",configFile);
-        xmlFreeDoc(doc);
-        return 0;
-    }
-    if( xmlStrcasecmp(top->name, BAD_CAST "Conf")) {
-        fprintf(stderr, "config: Root node in configuration file %s should be 'Conf'.\n", configFile);
-        xmlFreeDoc(doc);
+    doc = xmlParseFile( configFile );
+    if( !doc ) {
+        fprintf( stderr, "config: Error parsing configuration file %s.\n", configFile );
         return 0;
     }
 
-    node=top->xmlChildrenNode;
-    while(node != NULL) {
-        if(xmlIsBlankNode(top));
-        else if(!xmlStrcasecmp(node->name, BAD_CAST "global"))
-            parse_global(ct, doc, node->xmlChildrenNode);
-        else if(!xmlStrcasecmp(node->name, BAD_CAST "keybindings"))
-            parse_keys(ct, doc, node->xmlChildrenNode);
-        else if(!xmlStrcasecmp(node->name, BAD_CAST "mousebindings"))
-            parse_mouse(ct, doc,node->xmlChildrenNode);
-        node=node->next;
+    top = xmlDocGetRootElement( doc );
+    if( !top ) {
+        fprintf( stderr, "config: No XML root element found in %s.\n", configFile );
+        xmlFreeDoc( doc );
+        return 0;
+    }
+
+    if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
+        fprintf( stderr, "config: Root node in configuration file %s should be 'tvtime'.\n", configFile );
+        xmlFreeDoc( doc );
+        return 0;
+    }
+
+    node = top->xmlChildrenNode;
+    while( node ) {
+        if( !xmlIsBlankNode( node ) ) {
+            if( !xmlStrcasecmp(node->name, BAD_CAST "global" ) ) {
+                parse_global( ct, doc, node->xmlChildrenNode );
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "keybindings" ) ) {
+                parse_keys( ct, doc, node->xmlChildrenNode );
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "mousebindings" ) ) {
+                parse_mouse(ct, doc,node->xmlChildrenNode);
+            }
+        }
+        node = node->next;
     }
 
     return 1;
@@ -560,11 +576,14 @@ config_t *config_new( int argc, char **argv )
         fprintf( stderr, "config: Screenshots saved to %s\n", ct->ssdir );
     }
 
+    ct->configsave = configsave_open( ct->config_filename );
+
     return ct;
 }
 
 void config_delete( config_t *ct )
 {
+    if( ct->configsave ) configsave_close( ct->configsave );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
     free( ct->ssdir );
@@ -757,5 +776,10 @@ const char *config_get_rvr_filename( config_t *ct )
 int config_get_framerate_mode( config_t *ct )
 {
     return ct->framerate;
+}
+
+configsave_t *config_get_configsave( config_t *ct )
+{
+    return ct->configsave;
 }
 
