@@ -63,7 +63,7 @@ struct program_s {
     xmlChar *subtitle_local;
     xmlChar *description;
     xmlChar *description_local;
-    char times[ 256 ];
+    time_t start_time;
     time_t end_time;
 };
 
@@ -289,8 +289,6 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
         xmlChar *lang;
         time_t start_time = 0;
         time_t end_time = 0;
-        struct tm start_tm;
-        struct tm end_tm;
 
         if( start ) {
             start_time = parse_xmltv_date( (char *) start );
@@ -302,21 +300,8 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
         } else {
             end_time = start_time + 1800;
         }
+        pro->start_time = start_time;
         pro->end_time = end_time;
-
-        localtime_r( &start_time, &start_tm );
-        localtime_r( &end_time, &end_tm );
-
-        /* FIXME: This needs i18n-approval. In French, for example, times
-           are written as 18h30, and in Swedish, we write 18.30. Not to
-           mention different leading-zero rules. */
-        /* Printing the string here was a hack to begin with.  There
-           should be functions to return the start/end time from the
-           xmltv object so that formatting can be handled by the
-           application.  -Billy */
-        sprintf( pro->times, "%2d:%02d - %2d:%02d",
-                 start_tm.tm_hour, start_tm.tm_min,
-                 end_tm.tm_hour, end_tm.tm_min );
 
         cur = cur->xmlChildrenNode;
         while( cur ) {
@@ -360,8 +345,8 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
     } else {
          pro->title = pro->subtitle = pro->description = 0;
          pro->title_local = pro->subtitle_local = pro->description_local = 0;
+         pro->start_time = 0;
          pro->end_time = 0;
-         *pro->times = 0;
     }
 }
 
@@ -640,9 +625,14 @@ const char *xmltv_get_description( xmltv_t *xmltv )
     return (char *) xmltv->pro->description;
 }
 
-const char *xmltv_get_times( xmltv_t *xmltv )
+time_t xmltv_get_start_time( xmltv_t *xmltv )
 {
-    return xmltv->pro->times;
+    return xmltv->pro->start_time;
+}
+
+time_t xmltv_get_end_time( xmltv_t *xmltv )
+{
+    return xmltv->pro->end_time;
 }
 
 const char *xmltv_get_next_title( xmltv_t *xmltv )

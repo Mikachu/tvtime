@@ -63,9 +63,14 @@ const char *xmltv_get_sub_title( xmltv_t *xmltv );
 const char *xmltv_get_description( xmltv_t *xmltv );
 
 /**
- * Returns a pretty string version of the start and end times.
+ * Returns the current show's start time if one is set, 0 otherwise.
  */
-const char *xmltv_get_times( xmltv_t *xmltv );
+time_t xmltv_get_start_time( xmltv_t *xmltv );
+
+/**
+ * Returns the current show's end time if one is set, 0 otherwise.
+ */
+time_t xmltv_get_end_time( xmltv_t *xmltv );
 
 /**
  * Returns the title of the next show (preview)
