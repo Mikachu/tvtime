@@ -71,6 +71,11 @@ static int curmethodid;
  */
 const double fadespeed = 65.0;
 
+/**
+ * Number of frames to wait before detecting a signal.
+ */
+const int scan_delay = 10;
+
 static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
@@ -504,6 +509,9 @@ int main( int argc, char **argv )
     int usevbi = 1;
     int fadepos = 0;
     char number[4];
+    int scanwait = scan_delay;
+    int scanning = 0;
+    int firstscan = 0;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -786,6 +794,7 @@ int main( int argc, char **argv )
         } else {
             vbidata_capture_mode( vbidata, CAPTURE_OFF );
         }
+        commands_set_vbidata( commands, vbidata );
     }
 
     /* Setup the output. */
@@ -797,12 +806,12 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    commands_set_vbidata( commands, vbidata );
-
+    /* Randomly assign a tagline as the window caption. */
     srand( time( 0 ) );
     tagline = taglines[ rand() % numtaglines ];
     output->set_window_caption( tagline );
 
+    /* If we start fullscreen, go into fullscreen mode now. */
     if( config_get_fullscreen( ct ) ) {
         output->toggle_fullscreen( 0, 0 );
     }
@@ -905,6 +914,37 @@ int main( int argc, char **argv )
                 secondlastframe = lastframe = curframe = fadeframe;
             }
         }
+
+        if( !commands_scan_channels( commands ) && scanning ) {
+            station_writeconfig( stationmgr );
+            scanning = 0;
+        }
+
+        if( commands_scan_channels( commands ) && !scanning ) {
+            scanning = 1;
+            firstscan = station_get_current_id( stationmgr );
+            scanwait = scan_delay;
+        }
+
+        if( scanning ) {
+            scanwait--;
+
+            if( !scanwait ) {
+                scanwait = scan_delay;
+                if( tuner_state == TUNER_STATE_HAS_SIGNAL ) {
+                    station_set_current_active( stationmgr, 1 );
+                } else {
+                    station_set_current_active( stationmgr, 0 );
+                }
+                commands_handle( commands, TVTIME_CHANNEL_UP, 0 );
+
+                /* Stop when we loop around. */
+                if( station_get_current_id( stationmgr ) == firstscan ) {
+                    commands_handle( commands, TVTIME_SCAN_CHANNELS, 0 );
+                }
+            }
+        }
+
         performance_checkpoint_aquired_input_frame( perf );
 
         /* Print statistics and check for missed frames. */

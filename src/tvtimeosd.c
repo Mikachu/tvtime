@@ -78,10 +78,17 @@ struct tvtime_osd_s
     const char *show_length;
     const char *show_name;
 
+    const char *scan_channels;
+
     credits_t *credits;
     int show_credits;
     config_t *cfg;
 };
+
+void tvtime_osd_set_scan_channels( tvtime_osd_t* osd, const char *str )
+{
+    osd->scan_channels = str;
+}
 
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
 {
@@ -180,6 +187,7 @@ tvtime_osd_t *tvtime_osd_new( config_t *cfg, int width, int height, double frame
 
     osd->channel_logo = 0;
     osd->cfg = cfg;
+    osd->scan_channels = "";
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
@@ -423,7 +431,11 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
              strlen( osd->freqtable_text ) ? ": " : "", osd->freqtable_text );
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, OSD_FADE_DELAY );
 
-    sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
+    if( *(osd->scan_channels) ) {
+        sprintf( text, "%s", osd->scan_channels );
+    } else {
+        sprintf( text, "%s - %s", osd->input_text, osd->deinterlace_text );
+    }
     osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, text, OSD_FADE_DELAY );
 
     /** Billy: What's up?  Are we ditching the logo for XDS?

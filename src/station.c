@@ -165,7 +165,7 @@ static void station_readconfig( station_mgr_t *mgr )
     } else {
         while ( EOF != fscanf( f, "%d\n", &pos ) ) {
             station_set( mgr, pos );
-            station_toggle_curr( mgr );
+            station_set_current_active( mgr, 0 );
         }
     }
 }
@@ -358,15 +358,10 @@ int station_add_band( station_mgr_t *mgr, const char *bandname )
     return 1;
 }
 
-int station_scan_band( station_mgr_t *mgr, const char *band )
-{
-    return 0;
-}
-
-int station_toggle_curr( station_mgr_t *mgr ) 
+int station_set_current_active( station_mgr_t *mgr, int active )
 {
     if( mgr->current ) {
-        mgr->current->active = !mgr->current->active;
+        mgr->current->active = active;
 	return 1;
     }
     return 0;
@@ -378,11 +373,6 @@ int station_get_current_active( station_mgr_t *mgr )
     if( mgr->current ) {
         return mgr->current->active;
     }
-    return 0;
-}
-
-int station_scan( station_mgr_t *mgr ) 
-{
     return 0;
 }
 

@@ -58,16 +58,20 @@ int station_get_current_active( station_mgr_t *mgr );
  * Add or update the channel list.
  */
 int station_add( station_mgr_t *mgr, int pos, const char *band, const char *channel, const char *name );
-// adds a whole band
+
+/**
+ * Add a whole band to the channel list.
+ */
 int station_add_band( station_mgr_t *mgr, const char *band );
-// adds all channels with signal 
-int station_scan_band( station_mgr_t *mgr, const char *band );
-// (de)activates current station
-int station_toggle_curr( station_mgr_t *mgr );
-// scans all stations and (de)activates
-int station_scan( station_mgr_t *mgr );
 
+/**
+ * Activates or deactivates the current station from the list.
+ */
+int station_set_current_active( station_mgr_t *mgr, int active );
 
+/**
+ * Writes out the current station config.
+ */
 int station_writeconfig( station_mgr_t *mgr );
 
 #ifdef __cplusplus

@@ -87,6 +87,8 @@ enum tvtime_commands
 
     TVTIME_TOGGLE_HALF_FRAMERATE,
 
+    TVTIME_SCAN_CHANNELS,
+
     TVTIME_LAST
 };
 

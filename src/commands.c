@@ -55,6 +55,7 @@ struct commands_s {
     int toggleaspect;
     int toggledeinterlacingmode;
     int halfrate;
+    int scan_channels;
     
     int menu_on;
     menu_t *menu;
@@ -134,6 +135,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->menu_on = 0;
     in->console_on = 0;
     in->scrollconsole = 0;
+    in->scan_channels = 0;
 
     in->console = 0;
     in->vbi = 0;
@@ -158,7 +160,6 @@ void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
 {
     in->vbi = vbi;
 }
-
 
 static void commands_station_change( commands_t *in )
 {
@@ -243,7 +244,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_SKIP_CHANNEL:
-        station_toggle_curr( in->stationmgr );
+        station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
         if( station_get_current_active( in->stationmgr ) ) {
             tvtime_osd_show_message( in->osd, "Channel active in list." );
         } else {
@@ -254,6 +255,19 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             
     case TVTIME_ASPECT:
         in->toggleaspect = 1;
+        break;
+
+    case TVTIME_SCAN_CHANNELS:
+        in->scan_channels = !in->scan_channels;
+        if( in->osd ) {
+            if( in->scan_channels ) {
+                tvtime_osd_set_scan_channels( in->osd, "Scanning (hit scan again to stop)." );
+                tvtime_osd_show_info( in->osd );
+            } else {
+                tvtime_osd_set_scan_channels( in->osd, "" );
+                tvtime_osd_show_info( in->osd );
+            }
+        }
         break;
 
     case TVTIME_TOGGLE_CC:
@@ -540,25 +554,28 @@ void commands_next_frame( commands_t *in )
 }
 
 
-void commands_set_console( commands_t *in, console_t *con ) {
-    if( !in ) return;
+void commands_set_console( commands_t *in, console_t *con )
+{
     in->console = con;
 }
 
-void commands_set_menu( commands_t *in, menu_t *m ) {
-    if( !in ) return;
+void commands_set_menu( commands_t *in, menu_t *m )
+{
     in->menu = m;
 }
 
 int commands_console_on( commands_t *in )
 {
-    if( !in ) return 0;
     return in->console_on;
 }
 
 int commands_menu_on( commands_t *in )
 {
-    if( !in ) return 0;
     return in->menu_on;
+}
+
+int commands_scan_channels( commands_t *in )
+{
+    return in->scan_channels;
 }
 

@@ -83,7 +83,8 @@ static Cmd_Names cmd_table[] = {
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SKIP_CHANNEL", TVTIME_SKIP_CHANNEL },
     { "TOGGLE_CC", TVTIME_TOGGLE_CC },
-    { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE }
+    { "TOGGLE_HALF_FRAMERATE", TVTIME_TOGGLE_HALF_FRAMERATE },
+    { "SCAN_CHANNELS", TVTIME_SCAN_CHANNELS }
 };
 
 
@@ -165,7 +166,8 @@ static void print_usage( char **argv )
                      "\t  \t\tjapan-broadcast\n"
                      "\t  \t\teurope\n"
                      "\t  \t\taustralia\n"
-                     "\t  \t\tfrance\n" );
+                     "\t  \t\tfrance\n"
+                     "\t  \t\trussia\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
                      "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
 }
@@ -253,6 +255,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F6 ] = TVTIME_CONT_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
+    ct->keymap[ I_F10 ] = TVTIME_SCAN_CHANNELS;
     ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
     ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;

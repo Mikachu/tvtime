@@ -32,15 +32,10 @@ Norm = ntsc
 #    us-broadcast
 #    japan-cable
 #    japan-broadcast
-#    europe-cable
-#    europe-west
-#    europe-east
-#    newzealand
+#    europe
 #    australia
 #    france
 #    russia
-#    italy
-#    argentina
 Frequencies = us-cable
 
 # There are two special NTSC cable standards in the US: IRC and HRC.
@@ -170,6 +165,7 @@ OtherTextFG = 0xFFF5DEB3
 # key_cont_up                = F6
 # key_colour_down            = F7
 # key_colour_up              = F8
+# key_scan_channels          = F10
 # key_show_bars              = F11
 # key_show_credits           = F12
 # key_debug                  = d
@@ -214,6 +210,7 @@ key_cont_down              = F5
 key_cont_up                = F6
 key_colour_down            = F7
 key_colour_up              = F8
+key_scan_channels          = F10
 key_show_bars              = F11
 key_show_credits           = F12
 key_debug                  = d
