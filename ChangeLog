@@ -1,5 +1,7 @@
 
 0.9.8.3 -
+  * vektor: Added mga_vid support and an X output driver that uses
+      the mga_vid driver.
   * psykax: Fixed UHF for Australia.
   * vektor: Added a command to mute the mixer volume (fixes 731817)
   * vektor: Added a config file option and command line parameter

@@ -37,6 +37,7 @@ Contents
 2. How to configure your tvtime
 3. An introduction to using tvtime
 4. Setting up your channel list in tvtime
+5. Using tvtime in areas that receive both PAL and SECAM stations
 
 
 1 Where to find help with tvtime
@@ -81,6 +82,7 @@ configuration file and the default runtime keybindings.
     Take a screenshot                     s
     Change overscan compensation          < and >
     Load next preset settings mode        *
+    Toggle channel norm (if compatible)   n
 
   Video input keys
     Switch input (Tuner, S-Video, ...)    i and Right Mouse Button
@@ -180,4 +182,17 @@ Entries in a list are in the following form:
 tvtime still needs a method of editing channel names at runtime
 (should not be hard), a full frequency band scanner, native support for
 the weird frequencies used by some cable providers such as UPC.
+
+
+5 Using tvtime in areas that receive both PAL and SECAM stations
+  --------------------------------------------------------------
+
+If you live in an area which receives stations in both PAL and SECAM
+formats, no worries, tvtime can switch between norms on a per-channel
+basis.  Use the 'n' key in tvtime to toggle the norm of the current
+channel.  Your changes will be saved to the stationlist.xml file.
+
+  tvtime cannot currently remember norms per input, that is, you cannot
+yet tell tvtime that your composite in is SECAM but your tuner input is
+PAL.  This feature will be added in a future version of tvtime.
 

@@ -5,6 +5,16 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.8.3
 
+  *  Support for norm switching between "compatible" norms
+     for areas which receive both SECAM and PAL format
+     stations.
+  *  Added support for the mga_vid driver for the Matrox
+     G200/G400 series cards from mplayer.
+  *  Semi-experimental of the X code for better fullscreen
+     support under many window managers.  Testing
+     appreciated.
+  *  Support for changing the mixer device and channel
+     (see 'man tvtime' and the config file documentation).
   *  Slightly less partial experimental UTF-8 support. Now
      works with any simple left-to-right scripts which are
      in FreeSansBold.ttf
