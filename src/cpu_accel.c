@@ -58,6 +58,7 @@ static inline uint32_t arch_accel (void)
 	     : "cc")
 #endif
 
+#ifdef ARCH_386
     __asm__ ("pushfl\n\t"
 	     "pushfl\n\t"
 	     "popl %0\n\t"
@@ -75,6 +76,7 @@ static inline uint32_t arch_accel (void)
 
     if (eax == ebx)		/* no cpuid */
 	return 0;
+#endif
 
     cpuid (0x00000000, eax, ebx, ecx, edx);
     if (!eax)			/* vendor string only */

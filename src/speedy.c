@@ -907,6 +907,7 @@ static void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
 #ifdef ARCH_X86
 static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_buf, int width )
 {
+#ifdef ARCH_368
     __asm__ __volatile__(
         "   movl      %0, %%esi         \n"
         "   movl      %1, %%edi         \n"
@@ -934,7 +935,37 @@ static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_
         /* output */            :
         /* input */             : "g" (uyvy_buf), "g" (yuyv_buf), "g" (width)
         /* clobber registers */ : "cc", "edx", "esi", "edi" );
+#endif
+#ifdef ARCH_AMD64
+    __asm__ __volatile__(
+        "   movq      %0, %%rsi         \n"
+        "   movq      %1, %%rdi         \n"
+		"   xorq      %%rdx, %%rdx      \n"
+        "   movl      %2, %%edx         \n"
+        "   shrq      $3, %%rdx         \n"
 
+        /* Process 8 pixels at once */
+        "1: movq      (%%rsi), %%mm0    \n" /* mm0 = Y3V2Y2U2Y1V0Y0U0 */
+        "   movq      8(%%rsi), %%mm2   \n" /* mm2 = Y7V6Y6U6Y5V4Y4U4 */
+        "   movq      %%mm0, %%mm1      \n" /* mm1 = Y3V2Y2U2Y1V0Y0U0 */
+        "   movq      %%mm2, %%mm3      \n" /* mm3 = Y7V6Y6U6Y5V4Y4U4 */
+        "   psllw     $8, %%mm0         \n" /* mm0 = V2__U2__V0__U0__ */
+        "   psrlw     $8, %%mm1         \n" /* mm1 = __Y3__Y2__Y1__Y0 */
+        "   psllw     $8, %%mm2         \n" /* mm2 = V6__U6__V4__U4__ */
+        "   psrlw     $8, %%mm3         \n" /* mm3 = __Y7__Y6__Y5__Y4 */
+        "   por       %%mm1, %%mm0      \n" /* mm0 = V2Y3U2Y2V0Y1U0Y0 */
+        "   por       %%mm3, %%mm2      \n" /* mm2 = V6Y7U6Y6V4Y5U4Y4 */
+        "   movq      %%mm0, (%%rdi)    \n"
+        "   movq      %%mm2, 8(%%rdi)   \n"
+        "   addq      $16, %%rsi        \n"
+        "   addq      $16, %%rdi        \n"
+        "   decq      %%rdx             \n"
+        "   jnz       1b                \n"
+        "   emms                        \n"
+        /* output */            :
+        /* input */             : "g" (uyvy_buf), "g" (yuyv_buf), "g" (width)
+        /* clobber registers */ : "cc", "rdx", "rsi", "rdi" );
+#endif
     if( width & 7 ) {
         uint32_t *uyvy = (uint32_t *) uyvy_buf;
         uint32_t *yuyv = (uint32_t *) yuyv_buf;

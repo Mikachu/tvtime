@@ -1275,7 +1275,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         linearblend_plugin_init();
         vfir_plugin_init();
 
-#ifdef ARCH_X86
+#ifdef ARCH_386
         dscaler_tomsmocomp_plugin_init();
         dscaler_greedyh_plugin_init();
 #endif

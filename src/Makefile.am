@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330 - Boston, MA 02111-1307, USA
 
-if ARCH_X86
+if ARCH_386
 SUBDIRS = wine
 else
 SUBDIRS =
@@ -54,7 +54,7 @@ OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
-if ARCH_X86
+if ARCH_386
 DSCALER_SRCS = DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h dscalerplugin.h \
 	dscalerplugin.c
 else
@@ -90,7 +90,7 @@ tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
 	$(DYNAMIC_LD_LIBS) $(MPEG2_LIBS) -lm
-if ARCH_X86
+if ARCH_386
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
 	-lpthread
 else
@@ -130,7 +130,7 @@ CLEANFILES = expandpng timingtest rvr
 
 # Satisfy extra-directory dependencies.  Unfortunately, this causes
 # libtool to re-link each and every time.  (Recursive make is evil!)
-if ARCH_X86
+if ARCH_386
 external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
 else
 external_dependencies = ../plugins/libtvtimeplugins.la

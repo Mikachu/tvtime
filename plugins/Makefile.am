@@ -20,7 +20,7 @@ OPT_CFLAGS = -Wall -I. -pedantic
 
 AM_CFLAGS = $(TVTIME_CFLAGS) $(OPT_CFLAGS)
 
-if ARCH_X86
+if ARCH_386
 DSCALER_SRCS = dscaler_greedyh.c dscaler_tomsmocomp.c
 else
 DSCALER_SRCS = 

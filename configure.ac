@@ -238,26 +238,34 @@ if test x"$GCC" = x"yes"; then
     dnl arch-specific flags
     case "$host_alias" in
     i?86-* | k?-*)
-	AC_DEFINE([ARCH_X86],,[x86 architecture])
+	    AC_DEFINE([ARCH_X86],,[x86 architecture])
+	    AC_DEFINE([ARCH_386],,[386 architecture])
         ARCH_X86=yes
-	case "$host_alias" in
-	i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
-	i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
-	i586-*) OPT_CFLAGS="$CFLAGS -mcpu=pentium";;
-	i686-*) OPT_CFLAGS="$CFLAGS -mcpu=pentiumpro";;
-	k6-*)   OPT_CFLAGS="$CFLAGS -mcpu=k6";;
-	esac
-	AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
+        ARCH_386=yes
+	    
+        case "$host_alias" in
+	        i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
+	        i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
+	        i586-*) OPT_CFLAGS="$CFLAGS -mcpu=pentium";;
+	        i686-*) OPT_CFLAGS="$CFLAGS -mcpu=pentiumpro";;
+	        k6-*)   OPT_CFLAGS="$CFLAGS -mcpu=k6";;
+	    esac
+	    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
+    x86_64-*)
+            AC_DEFINE([ARCH_X86],,[x86 architecture])
+            AC_DEFINE([ARCH_AMD64],,[amd64 architecture])
+            ARCH_X86=yes
+            ARCH_AMD64=yes;;
     ppc-* | powerpc-*)
-	OPT_CFLAGS="$CFLAGS -Wa,-m7400"
-	AC_TRY_CFLAGS([$OPT_CFLAGS],
+	    OPT_CFLAGS="$CFLAGS -Wa,-m7400"
+	    AC_TRY_CFLAGS([$OPT_CFLAGS],
 	    [CFLAGS=$OPT_CFLAGS; AC_DEFINE([ARCH_PPC],,[ppc architecture])]);;
     sparc-* | sparc64-*)
-	OPT_CFLAGS="$CFLAGS -mcpu=ultrasparc -mvis -Wa,-Av9"
-	AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
+	    OPT_CFLAGS="$CFLAGS -mcpu=ultrasparc -mvis -Wa,-Av9"
+	    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
     mips-sgi-irix6.*)	dnl do we need to be that specific ?
-	OPT_CFLAGS="$CFLAGS -mabi=64"
-	AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
+	    OPT_CFLAGS="$CFLAGS -mabi=64"
+	    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
     esac
 elif test x"$CC" = x"tcc"; then
     dnl TenDRA portability checking compiler
@@ -277,6 +285,8 @@ else
     esac
 fi
 AM_CONDITIONAL(ARCH_X86, [test "$ARCH_X86" = "yes"])
+AM_CONDITIONAL(ARCH_386, [test "$ARCH_386" = "yes"])
+AM_CONDITIONAL(ARCH_AMD64, [test "$ARCH_AMD64" = "yes"])
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([memalign])
