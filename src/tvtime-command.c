@@ -25,12 +25,6 @@
 #include "commands.h"
 #include "tvtimeconf.h"
 
-/**
- * These are for the ogle code.
- */
-char *program_name = "tvtimecommand";
-int dlevel = 3;
-
 int main( int argc, char **argv )
 {
     config_t *cfg = config_new( 0, 0 );

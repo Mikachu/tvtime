@@ -32,10 +32,6 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-/* Include these because I'm lazy and don't want to disturb other code. */
-char *program_name = "tvtime";
-int dlevel = 5;
-
 /* What font to test text rendering with. */
 static const char *leeft_font = "../data/FreeSansBold.ttf";
 const unsigned int leeft_size = 30;

@@ -16,12 +16,6 @@
 #include "diffcomp.h"
 #include "ree.h"
 
-/**
- * These are for the ogle code.
- */
-char *program_name = "tvtime";
-int dlevel = 3;
-
 static inline void get_time( int64_t *const ptime )
 {
    asm volatile ( "rdtsc" : "=A" (*ptime) );
