@@ -698,7 +698,7 @@ void osd_animation_pause( osd_animation_t *osda, int pause )
 
 void osd_animation_seek( osd_animation_t *osda, double pos )
 {
-    osda->curtime = osda->frametime * ((int) ((pos * (double) osda->numframes) + 0.5));
+    osda->curtime = osda->frametime * ((int) ((pos * (double) (osda->numframes - 1)) + 0.5));
     osda->curframe = osda->frames4444 + ((osda->curtime / osda->frametime) * osda->image_size);
 }
 
