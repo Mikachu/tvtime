@@ -508,47 +508,47 @@ int station_remove( station_mgr_t *mgr )
     return 1;
 }
 
-int station_remap( station_mgr_t *mgr, int pos ) 
-{ // untested, hope it works
+int station_remap( station_mgr_t *mgr, int pos )
+{
     if( !mgr->current ) return 0;
     if( pos == mgr->current->pos ) return 1;
-    
+
     if( isFreePos( mgr, pos ) ) {
-        station_info_t *i= mgr->current;
-        i->next->prev= i->prev;
-        i->prev->next= i->next;
-        i->pos= pos;
+        station_info_t *i = mgr->current;
+        i->next->prev = i->prev;
+        i->prev->next = i->next;
+        i->pos = pos;
         return insert( mgr, i );
-    
+
     } else {
-        station_info_t *i= mgr->current;
-        station_info_t *rp= mgr->first;
+        station_info_t *i = mgr->current;
+        station_info_t *rp = mgr->first;
         station_info_t *t0, *t1;
 
         do {
-            if ( pos == rp->pos ) break;
-            rp= rp->next;
-        } while ( rp != mgr->first );
+            if( pos == rp->pos ) break;
+            rp = rp->next;
+        } while( rp != mgr->first );
 
-        rp->next->prev= i;
-        rp->prev->next= i;
+        rp->next->prev = i;
+        rp->prev->next = i;
 
-        i->next->prev= rp;
-        i->prev->next= rp;
+        i->next->prev = rp;
+        i->prev->next = rp;
 
-        t0= rp->next;
-        t1= rp->prev;
+        t0 = rp->next;
+        t1 = rp->prev;
 
-        rp->next= i->next;
-        rp->prev= i->prev;
+        rp->next = i->next;
+        rp->prev = i->prev;
 
-        i->next= t0;
-        i->prev= t1;
+        i->next = t0;
+        i->prev = t1;
 
-        rp->pos= i->pos;
-        i->pos= pos;
+        rp->pos = i->pos;
+        i->pos = pos;
 
-        if ( rp == mgr->first ) mgr->first= i;
+        if( rp == mgr->first ) mgr->first = i;
         return 1;
     }
 }

@@ -83,6 +83,11 @@ int station_add_band( station_mgr_t *mgr, const char *band );
 int station_set_current_active( station_mgr_t *mgr, int active );
 
 /**
+ * Remap the current channel to the new position.
+ */
+int station_remap( station_mgr_t *mgr, int pos );
+
+/**
  * Writes out the current station config.
  */
 int station_writeconfig( station_mgr_t *mgr );

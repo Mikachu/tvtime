@@ -585,6 +585,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'e' ] = TVTIME_TOGGLE_AUDIO_MODE;
     ct->keymap[ '<' ] = TVTIME_OVERSCAN_DOWN;
     ct->keymap[ '>' ] = TVTIME_OVERSCAN_UP;
+    ct->keymap[ 'b' ] = TVTIME_RENUMBER_CHANNEL;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

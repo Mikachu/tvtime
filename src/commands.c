@@ -1,5 +1,6 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>.
+ * Copyright (C) 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,6 +185,8 @@ struct commands_s {
 
     int change_channel;
 
+    int renumbering;
+
     int apply_luma;
     int update_luma;
     double luma_power;
@@ -230,9 +233,11 @@ static void reinit_tuner( commands_t *in )
         }
 
         if( in->osd ) {
+            char channel_display[ 20 ];
+            sprintf( channel_display, "%d", station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
-            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
+            tvtime_osd_set_channel_number( in->osd, channel_display );
         }
     } else if( in->osd ) {
         tvtime_osd_set_audio_mode( in->osd, "" );
@@ -280,6 +285,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->pause = 0;
     in->audio_counter = -1;
     in->change_channel = 0;
+    in->renumbering = 0;
 
     in->apply_luma = config_get_apply_luma_correction( cfg );
     in->update_luma = 0;
@@ -349,9 +355,10 @@ static void commands_station_change( commands_t *in )
         videoinput_set_audio_mode( in->vidin, 1 );
         in->audio_counter = CHANNEL_STEREO_DELAY;
         if( in->osd ) {
-            //tvtime_osd_set_station_name( in->osd, i->name );
+            char channel_display[ 20 ];
+            sprintf( channel_display, "%d", station_get_current_id( in->stationmgr ) );
             tvtime_osd_set_audio_mode( in->osd, videoinput_audio_mode_name( videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
+            tvtime_osd_set_channel_number( in->osd, channel_display );
             tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
             tvtime_osd_show_info( in->osd );
         }
@@ -423,16 +430,40 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_RENUMBER_CHANNEL:
+        /* If we're scanning and suddenly want to renumber, stop scanning. */
+        if( in->scan_channels ) {
+            commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+        }
+
+        /* Accept input of the destination channel. */
+        if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
+        in->frame_counter = CHANNEL_DELAY;
+        in->renumbering = 1;
+        if( in->osd ) {
+            char message[ 256 ];
+            sprintf( message, "Remapping %d.  Enter new channel number.",
+                     station_get_current_id( in->stationmgr ) );
+            tvtime_osd_set_hold_message( in->osd, message );
+        }
         break;
 
     case TVTIME_CHANNEL_SCAN:
         in->scan_channels = !in->scan_channels;
+
+        if( in->scan_channels && in->renumbering ) {
+            memset( in->next_chan_buffer, 0, 5 );
+            in->digit_counter = 0;
+            in->frame_counter = 0;
+            if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+            in->renumbering = 0;
+        }
+
         if( in->osd ) {
             if( in->scan_channels ) {
-                tvtime_osd_set_scan_channels( in->osd, "Scanning (hit F10 to stop)." );
+                tvtime_osd_set_hold_message( in->osd, "Scanning (hit F10 to stop)." );
                 tvtime_osd_show_info( in->osd );
             } else {
-                tvtime_osd_set_scan_channels( in->osd, "" );
+                tvtime_osd_set_hold_message( in->osd, "" );
                 tvtime_osd_show_info( in->osd );
             }
         }
@@ -718,10 +749,19 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_ENTER:
         if( in->next_chan_buffer[ 0 ] ) {
+            if( in->renumbering ) {
+                station_remap( in->stationmgr, atoi( in->next_chan_buffer ) );
+                station_writeconfig( in->stationmgr );
+                in->renumbering = 0;
+                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+            }
             station_set( in->stationmgr, atoi( in->next_chan_buffer ) );
             in->change_channel = 1;
+            in->frame_counter = 0;
+        } else {
+            sprintf( in->next_chan_buffer, "%d", station_get_current_id( in->stationmgr ) );
+            in->frame_counter = 6;
         }
-        in->frame_counter = 0;
         break;
 
     case TVTIME_CHANNEL_1:
@@ -831,6 +871,10 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter == 0 ) {
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
+        if( in->renumbering ) {
+            if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+            in->renumbering = 0;
+        }
     }
 
     /* Decrement the stereo wait counter. */

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ struct tvtime_osd_s
     const char *show_length;
     const char *show_name;
 
-    const char *scan_channels;
+    char hold_message[ 255 ];
 
     double framerate;
     int framerate_mode;
@@ -88,9 +88,9 @@ struct tvtime_osd_s
     int show_credits;
 };
 
-void tvtime_osd_set_scan_channels( tvtime_osd_t* osd, const char *str )
+void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
 {
-    osd->scan_channels = str;
+    sprintf( osd->hold_message, "%s", str );
 }
 
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
@@ -176,7 +176,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     osd->strings = (string_object_t *) malloc( sizeof( string_object_t ) * OSD_MAX_STRING_OBJECTS );
 
     osd->channel_logo = 0;
-    osd->scan_channels = "";
+    sprintf( osd->hold_message, "" );
     osd->framerate = 0.0;
     osd->framerate_mode = FRAMERATE_FULL;
 
@@ -435,8 +435,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     }
     osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, OSD_FADE_DELAY );
 
-    if( *(osd->scan_channels) ) {
-        sprintf( text, "%s", osd->scan_channels );
+    if( *(osd->hold_message) ) {
+        sprintf( text, "%s", osd->hold_message );
     } else {
         const char *mode = "";
         if( osd->framerate_mode == FRAMERATE_HALF_TFF ) {
