@@ -821,7 +821,7 @@ static void build_deinterlacer_menu( menu_t *menu, int curmethod )
     }
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s", 
-              _("Back"));
+              _("Back") );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, nummethods + 1, string );
     menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
@@ -839,7 +839,7 @@ static void build_deinterlacer_description_menu( menu_t *menu, int curmethod )
         menu_set_enter_command( menu, i + 1, TVTIME_SHOW_MENU, "processing" );
     }
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
-              _("Back"));
+              _("Back") );
     menu_set_default_cursor( menu, i );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, i + 1, string );
@@ -1102,12 +1102,12 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
     if( sixteennine ) {
         tvtime_osd_list_set_text( osd, 0, _("Matte setting (Anamorphic input)") );
         tvtime_osd_list_set_text( osd, 1, _("16:9 + Overscan") );
-        tvtime_osd_list_set_text( osd, 2, _("1.85:1") );
-        tvtime_osd_list_set_text( osd, 3, _("2.35:1") );
+        tvtime_osd_list_set_text( osd, 2, "1.85:1" );
+        tvtime_osd_list_set_text( osd, 3, "2.35:1" );
         tvtime_osd_list_set_text( osd, 4, _("4:3 centre") );
     } else {
-        tvtime_osd_list_set_text( osd, 0, "Matte setting (4:3 input)" );
-        tvtime_osd_list_set_text( osd, 1, "4:3 + Overscan" );
+        tvtime_osd_list_set_text( osd, 0, _("Matte setting (4:3 input)") );
+        tvtime_osd_list_set_text( osd, 1, _("4:3 + Overscan") );
         tvtime_osd_list_set_text( osd, 2, "16:9" );
         tvtime_osd_list_set_text( osd, 3, "1.85:1" );
         tvtime_osd_list_set_text( osd, 4, "2.35:1" );
