@@ -57,6 +57,10 @@
 /* Every 30 seconds, ping the screensaver. */
 #define SCREENSAVER_PING_TIME (30 * 1000 * 1000)
 
+/* Useful. */
+#define MIN(x,y)((x)<(y)?(x):(y))
+#define MAX(x,y)((x)>(y)?(x):(y))
+
 static Display *display;
 static int screen;
 static Window wm_window;
@@ -1114,8 +1118,24 @@ void xcommon_clear_screen( void )
 
 void xcommon_clear_area( int x, int y, int w, int h )
 {
-    XSetForeground( display, gc, xcommon_colourkey );
+    int dx, dy, dw, dh;
+
+    /* First fill the new area to black. */
+    XSetForeground( display, gc, BlackPixel( display, screen ) );
     XFillRectangle( display, output_window, gc, x, y, w, h );
+
+    /**
+     * Only fill the intersection of the video area and the exposed
+     * area with the colour key.
+     */
+    dx = MAX( x, video_area.x );
+    dy = MAX( y, video_area.y );
+    dw = MIN( x + w, video_area.x + video_area.width ) - dx;
+    dh = MIN( y + h, video_area.y + video_area.height ) - dy;
+    if( dx >= 0 && dy >= 0 && dw >= 0 && dh >= 0 ) {
+        XSetForeground( display, gc, xcommon_colourkey );
+        XFillRectangle( display, output_window, gc, dx, dy, dw, dh );
+    }
 }
 
 /**
@@ -1298,8 +1318,6 @@ void xcommon_poll_events( input_t *in )
                 bw = event.xexpose.width;
                 bh = event.xexpose.height;
             } else {
-#define MIN(x,y)((x)<(y)?(x):(y))
-#define MAX(x,y)((x)>(y)?(x):(y))
                 int dx, dy, dw, dh;
                 int cx, cy, cw, ch;
                 cx = event.xexpose.x;
@@ -1310,8 +1328,6 @@ void xcommon_poll_events( input_t *in )
                 dy = MIN(by, cy);
                 dw = MAX(bx + bw, cx + cw) - dx;
                 dh = MAX(by + bh, cy + ch) - dy;
-#undef MAX
-#undef MIN
                 bx = dx;
                 by = dy;
                 bw = dw;
