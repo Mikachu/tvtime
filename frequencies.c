@@ -1329,9 +1329,8 @@ int frequencies_find_current_index( videoinput_t *vidin )
 {
     int curfreq = videoinput_get_tuner_freq( vidin );
     int i;
-    fprintf( stderr, "frequencies: current frequency %d\n", curfreq);
 
-    if( curfreq == 0 ) return -1; /* Probably no tuner present */
+    if( curfreq == 0 ) return 0; /* Probably no tuner present */
 
     for( i=0; i < chancount; i++ ) {
         if( curfreq < chanlist[i].freq+500 && 

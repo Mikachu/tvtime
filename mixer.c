@@ -83,11 +83,11 @@ int mixer_set_volume( int percentdiff )
         v = ( levelpercentage << 8 ) | levelpercentage;
         ioctl( fd, cmd, &v );
         close( fd );
+        muted = 0;
         return v;
     }
 
     return 0;
-    //if( percentdiff ) osd_volume( movietime.osd, levelpercentage );
 }
 
 void mixer_mute( int mute )

@@ -99,6 +99,7 @@ int sdl_init( int width, int height, int use420, int outputwidth, int aspect )
 
     SDL_WM_SetCaption( "tvtime: ... smooth like that ...", 0 );
     SDL_ShowCursor( 0 );
+    SDL_EnableKeyRepeat( SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL );
     return 1;
 }
 
@@ -127,7 +128,7 @@ int sdl_poll_events( void )
             SDL_PollEvent( &event );
             curcommand |= TVTIME_CHANNEL_CHAR;
 
-            curcommand = (curcommand & 0xFFFF0000) | (event.key.keysym.sym & 0x000000FF);            
+            curcommand = (curcommand & 0xFFFF0000) | (event.key.keysym.sym & 0xFF);            
             return curcommand;
         }
     }
