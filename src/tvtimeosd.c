@@ -837,6 +837,14 @@ int tvtime_osd_list_get_line_pos( tvtime_osd_t *osd, int y )
     return osd_list_get_line_pos( osd->list, ypos );
 }
 
+void tvtime_osd_list_get_bounding_box( tvtime_osd_t *osd, int *x, int *y,
+                                       int *width, int *height )
+{
+    osd_list_get_bounding_box( osd->list, x, y, width, height );
+    *x += osd->listpos_x - (osd_list_get_width( osd->list ) / 2);
+    *y += osd->listpos_y;
+}
+
 int tvtime_osd_list_get_hilight( tvtime_osd_t *osd )
 {
     return osd_list_get_hilight( osd->list );

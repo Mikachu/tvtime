@@ -61,10 +61,12 @@ void input_delete( input_t *in )
 
 void input_callback( input_t *in, int command, int arg )
 {
-    char temp[ 128 ];
     char argument[ 2 ];
     const char *curarg = argument;
+    static int lastx = 0;
+    static int lasty = 0;
     int tvtime_cmd = 0;
+    int x, y, w, h;
 
     /* Once we've been told to quit, ignore all commands. */
     if( in->quit ) return;
@@ -77,8 +79,15 @@ void input_callback( input_t *in, int command, int arg )
         break;
 
     case I_MOUSEMOVE:
-        sprintf( temp, "%d %d", arg >> 16, arg & 0xffff );
-        commands_handle( in->com, TVTIME_MOUSE_MOVE, temp );
+        lastx = arg >> 16;
+        lasty = arg & 0xffff;
+        commands_get_menu_bounding_box( in->com, &x, &y, &w, &h );
+        if( lastx >= x && lastx < (x + w) &&
+            lasty >= y && lasty < (y + h) ) {
+            char temp[ 128 ];
+            sprintf( temp, "%d %d", lastx, lasty );
+            commands_handle( in->com, TVTIME_MOUSE_MOVE, temp );
+        }
         return;
 
     case I_BUTTONRELEASE:
@@ -89,6 +98,15 @@ void input_callback( input_t *in, int command, int arg )
         } else if( command == I_BUTTONRELEASE ) {
             if( commands_in_menu( in->com ) ) {
                 tvtime_cmd = config_button_to_menu_command( in->cfg, arg );
+
+                if( tvtime_cmd == TVTIME_MENU_ENTER ) {
+                    commands_get_menu_bounding_box( in->com, &x, &y, &w, &h );
+                    if( lastx < x || lastx >= (x + w) ||
+                        lasty < y || lasty >= (y + h) ) {
+                        tvtime_cmd = TVTIME_MENU_EXIT;
+                    }
+                }
+
                 if( config_button_to_menu_command_argument( in->cfg, arg ) ) {
                     curarg = config_button_to_menu_command_argument( in->cfg, arg );
                 }

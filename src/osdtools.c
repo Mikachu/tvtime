@@ -903,6 +903,15 @@ int osd_list_get_line_pos( osd_list_t *osdl, int y )
     return osdl->numlines - 1;
 }
 
+void osd_list_get_bounding_box( osd_list_t *osdl, int *x, int *y,
+                                int *width, int *height )
+{
+    *x = 0;
+    *y = 0;
+    *width = osdl->width;
+    *height = osdl->numlines * osdl->height;
+}
+
 int osd_list_visible( osd_list_t *osdl )
 {
     return (osdl->numlines > 0 && osd_string_visible( osdl->lines[ 0 ] ));

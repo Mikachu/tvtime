@@ -93,6 +93,8 @@ int tvtime_osd_list_get_line_pos( tvtime_osd_t *osd, int y );
 void tvtime_osd_list_set_hilight( tvtime_osd_t *osd, int pos );
 void tvtime_osd_list_set_text( tvtime_osd_t *osd, int line, const char *text );
 void tvtime_osd_list_set_lines( tvtime_osd_t *osd, int numlines );
+void tvtime_osd_list_get_bounding_box( tvtime_osd_t *osd, int *x, int *y,
+                                       int *width, int *height );
 void tvtime_osd_list_hold( tvtime_osd_t *osd, int hold );
 
 /**

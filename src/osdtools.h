@@ -152,6 +152,8 @@ int osd_list_visible( osd_list_t *osdl );
 int osd_list_get_line_pos( osd_list_t *osdl, int y );
 void osd_list_advance_frame( osd_list_t *osdl );
 void osd_list_rerender( osd_list_t *osdl );
+void osd_list_get_bounding_box( osd_list_t *osdl, int *x, int *y,
+                                int *width, int *height );
 void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                                             uint8_t *output,
                                             uint8_t *background,

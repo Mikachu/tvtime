@@ -3689,3 +3689,17 @@ const char *commands_get_xmltv_title( commands_t *cmd )
     }
 }
 
+void commands_get_menu_bounding_box( commands_t *cmd, int *x, int *y,
+                                     int *width, int *height )
+{
+    if( cmd->osd ) {
+        tvtime_osd_list_get_bounding_box( cmd->osd, x, y, width, height );
+        if( cmd->halfsize ) {
+            *y /= 2;
+            *height /= 2;
+        }
+    } else {
+        *x = *y = *width = *height = 0;
+    }
+}
+

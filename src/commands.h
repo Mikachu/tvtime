@@ -98,6 +98,8 @@ int commands_get_audio_boost( commands_t *cmd );
 int commands_xmltv_updated( commands_t *cmd );
 int commands_tuner_reset( commands_t *cmd );
 const char *commands_get_xmltv_title( commands_t *cmd );
+void commands_get_menu_bounding_box( commands_t *cmd, int *x, int *y,
+                                     int *width, int *height );
 
 #ifdef __cplusplus
 };
