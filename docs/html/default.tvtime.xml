@@ -301,6 +301,12 @@
   <option name="MuteOnExit" value="1"/>
 
   <!--
+    This setting controls whether tvtime should show the silly taglines
+    in the window title bar.  Set to 0 to shut them off.
+  -->
+  <option name="ShowTaglines" value="1"/>
+
+  <!--
     This setting is saved at runtime to remember the current channel.
   -->
   <option name="PrevChannel" value="2"/>

@@ -1,5 +1,6 @@
 
 1.0RC1 -
+  * vektor: Added a config file option to shut off the taglines.
   * vektor: Relicensed deinterlacer code written by me under the LGPL.
   * vektor: Stop setting the window caption so often.  This should be
       a significant performance improvement for some users.
