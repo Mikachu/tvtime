@@ -334,10 +334,10 @@ struct commands_s {
     menu_t *root_notuner;
 };
 
-static void menu_set_value( menu_t *menu, int newval )
+static void menu_set_value( menu_t *menu, int newval, int a, int b, int c )
 {
     char string[ 128 ];
-    sprintf( string, "%c%c%c  Current: %d", 0xee, 0x80, 0x80, newval );
+    sprintf( string, "%c%c%c  Current: %d", a, b, c, newval );
     menu_set_text( menu, 1, string );
 }
 
@@ -360,7 +360,7 @@ static void reinit_tuner( commands_t *cmd )
 
         videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr )
                                    + ((station_get_current_finetune( cmd->stationmgr ) * 1000)/16) );
-        menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ) );
+        menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), 0xee, 0x80, 0xb0 );
         commands_refresh_menu( cmd );
 
         norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
@@ -455,10 +455,10 @@ static void reinit_tuner( commands_t *cmd )
     }
 
     if( cmd->vidin ) {
-        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
-        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
-        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
-        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
+        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
+        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
+        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
     }
 }
 
@@ -1176,6 +1176,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_default_cursor( menu, 1 );
     sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_FINETUNE_DOWN, "" );
@@ -1278,6 +1279,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "sharpness" );
     menu_set_text( menu, 0, "Setup - Input configuration - Sharpness" );
+    menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
     reset_sharpness_menu( commands_get_menu( cmd, "sharpness" ), config_get_inputwidth( cfg ) );
 
@@ -1517,6 +1519,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+    menu_set_default_cursor( menu, 1 );
     sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_BRIGHTNESS_DOWN, "" );
@@ -1534,7 +1537,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
     }
 
     menu = menu_new( "contrast" );
@@ -1544,6 +1547,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+    menu_set_default_cursor( menu, 1 );
     sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_CONTRAST_DOWN, "" );
@@ -1561,7 +1565,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
     }
 
     menu = menu_new( "colour" );
@@ -1571,6 +1575,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+    menu_set_default_cursor( menu, 1 );
     sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_COLOUR_DOWN, "" );
@@ -1588,7 +1593,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
     }
 
     menu = menu_new( "hue" );
@@ -1598,6 +1603,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "picture" );
+    menu_set_default_cursor( menu, 1 );
     sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_HUE_DOWN, "" );
@@ -1615,7 +1621,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
     commands_add_menu( cmd, menu );
     if( vidin ) {
-        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+        menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
     }
 
     reinit_tuner( cmd );
@@ -2447,10 +2453,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
             if( cmd->osd ) {
                 tvtime_osd_show_message( cmd->osd, "Picture settings reset to defaults." );
-                menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ) );
-                menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ) );
-                menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ) );
-                menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ) );
+                menu_set_value( commands_get_menu( cmd, "brightness" ), videoinput_get_brightness( cmd->vidin ), 0xe2, 0x98, 0x80 );
+                menu_set_value( commands_get_menu( cmd, "contrast" ), videoinput_get_contrast( cmd->vidin ), 0xe2, 0x97, 0x90 );
+                menu_set_value( commands_get_menu( cmd, "colour" ), videoinput_get_colour( cmd->vidin ), 0xe2, 0x98, 0xb0 );
+                menu_set_value( commands_get_menu( cmd, "hue" ), videoinput_get_hue( cmd->vidin ), 0xe2, 0x97, 0xaf );
             }
         }
         break;
@@ -2480,7 +2486,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
 
             if( cmd->osd ) {
-                menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ) );
+                menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ), 0xee, 0x80, 0xb0 );
                 commands_refresh_menu( cmd );
                 tvtime_osd_show_data_bar_centered( cmd->osd, "Finetune",
                                                    station_get_current_finetune( cmd->stationmgr ) );
@@ -2603,7 +2609,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int hue = videoinput_get_hue( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, "Hue", hue );
-                menu_set_value( commands_get_menu( cmd, "hue" ), hue );
+                menu_set_value( commands_get_menu( cmd, "hue" ), hue, 0xe2, 0x97, 0xaf );
                 commands_refresh_menu( cmd );
             }
         }
@@ -2616,7 +2622,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int brightness = videoinput_get_brightness( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, "Brightness", brightness );
-                menu_set_value( commands_get_menu( cmd, "brightness" ), brightness );
+                menu_set_value( commands_get_menu( cmd, "brightness" ), brightness, 0xe2, 0x98, 0x80 );
                 commands_refresh_menu( cmd );
             }
         }
@@ -2629,7 +2635,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int contrast = videoinput_get_contrast( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, "Contrast", contrast );
-                menu_set_value( commands_get_menu( cmd, "contrast" ), contrast );
+                menu_set_value( commands_get_menu( cmd, "contrast" ), contrast, 0xe2, 0x97, 0x90 );
                 commands_refresh_menu( cmd );
             }
         }
@@ -2642,7 +2648,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->osd ) {
                 int colour = videoinput_get_colour( cmd->vidin );
                 tvtime_osd_show_data_bar( cmd->osd, "Colour", colour );
-                menu_set_value( commands_get_menu( cmd, "colour" ),colour );
+                menu_set_value( commands_get_menu( cmd, "colour" ), colour, 0xe2, 0x98, 0xb0 );
                 commands_refresh_menu( cmd );
             }
         }
