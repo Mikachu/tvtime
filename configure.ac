@@ -86,8 +86,7 @@ dnl Test for libxml2
 
 AC_PATH_PROG(LIBXML2_CONFIG,xml2-config,no)
 if test "$LIBXML2_CONFIG" = "no" ; then
-	XML2_FLAG=""
-	XML2_LIBS=""
+	AC_MSG_ERROR(libxml2 needed and xml2-config not found)
 else
 	LIBXML_VERSION=`$LIBXML2_CONFIG --version`
 	export MAJOR=0 ; export MINOR=0 ; export MICRO=0
