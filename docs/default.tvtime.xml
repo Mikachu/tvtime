@@ -476,10 +476,6 @@
     <keyboard key="t"/>
   </bind>
 
-  <bind command="toggle_deinterlacer_mode">
-    <keyboard key="y"/>
-  </bind>
-
   <bind command="toggle_pulldown_detection">
     <keyboard key="p"/>
   </bind>

@@ -74,7 +74,6 @@ enum tvtime_commands
     TVTIME_TOGGLE_ASPECT,
     TVTIME_SCREENSHOT,
     TVTIME_TOGGLE_DEINTERLACER,
-    TVTIME_TOGGLE_DEINTERLACER_MODE,
     TVTIME_TOGGLE_PULLDOWN_DETECTION,
 
     TVTIME_MENUMODE,
@@ -146,7 +145,6 @@ int commands_show_bars( commands_t *in );
 int commands_toggle_fullscreen( commands_t *in );
 int commands_toggle_aspect( commands_t *in );
 int commands_toggle_deinterlacer( commands_t *in );
-int commands_toggle_deinterlacer_mode( commands_t *in );
 int commands_toggle_pulldown_detection( commands_t *in );
 int commands_toggle_mode( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );

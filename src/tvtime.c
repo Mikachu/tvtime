@@ -753,6 +753,19 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     tvtime->filtered_curframe = 1;
 }
 
+void osd_list_deinterlacers( tvtime_osd_t *osd, int curmethod )
+{
+    int nummethods = get_num_deinterlace_methods();
+    int i;
+
+    tvtime_osd_list_set_lines( osd, get_num_deinterlace_methods() );
+    for( i = 0; i < nummethods; i++ ) {
+        tvtime_osd_list_set_text( osd, i, get_deinterlace_method( i )->name );
+    }
+    tvtime_osd_list_set_hilight( osd, curmethod );
+    tvtime_osd_show_list( osd, 1 );
+}
+
 int main( int argc, char **argv )
 {
     struct timeval startup_time;
@@ -1463,15 +1476,12 @@ int main( int argc, char **argv )
                 }
             }
         }
-        if( !output->is_interlaced() && (commands_toggle_deinterlacer( commands ) || commands_toggle_deinterlacer_mode( commands ) ) ) {
-            if( commands_toggle_deinterlacer( commands ) ) {
-                curmethodid = (curmethodid + 2) % get_num_deinterlace_methods();
-            } else {
-                curmethodid = (curmethodid & ~1) + (((curmethodid & 1) + 1) % 2);
-            }
+        if( !output->is_interlaced() && commands_toggle_deinterlacer( commands ) ) {
+            curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
+                osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
