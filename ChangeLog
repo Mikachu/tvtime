@@ -1,4 +1,8 @@
 
+0.9.15 -
+  * vektor: It seems that some systems need #include <locale.h>
+  * vektor: Use ARCH_X86_64 instead of ARCH_AMD64 to follow kdetv.
+
 0.9.14 - Thu Oct 28 22:20:47 EDT 2004
   * vektor: Don't show the hue control for non-NTSC-like norms.
   * vektor: Improve usability of the menu system when using a mouse.

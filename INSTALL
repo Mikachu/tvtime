@@ -22,7 +22,7 @@ tvtime install itself and all required files under /usr/local.  To
 instead use paths according to the Filesystem Hierarchy Standard, we
 recommend you run configure with these options:
 
-  ~/tvtime-0.9.14$ ./configure --prefix=/usr --sysconfdir=/etc
+  ~/tvtime-0.9.15$ ./configure --prefix=/usr --sysconfdir=/etc
 
   This will have tvtime use /usr/bin for its executables,
 /usr/share/tvtime for its data files, /etc/tvtime for its global
@@ -30,13 +30,13 @@ configuration files, and /usr/share/... for icons and menu entries.
 
   Next, compile tvtime using make.
 
-  ~/tvtime-0.9.14$ make
+  ~/tvtime-0.9.15$ make
 
   And then, install it as root.
 
-  ~/tvtime-0.9.14$ su
+  ~/tvtime-0.9.15$ su
   <enter password>
-  /home/user/tvtime-0.9.14# make install
+  /home/user/tvtime-0.9.15# make install
 
 Compiling with optimized CFLAGS
 ===============================

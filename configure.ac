@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.52)
-AC_INIT(tvtime, 0.9.14, http://tvtime.net/)
+AC_INIT(tvtime, 0.9.15, http://tvtime.net/)
 AC_CONFIG_SRCDIR([src/tvtime.c])
-AM_INIT_AUTOMAKE(tvtime,0.9.14)
+AM_INIT_AUTOMAKE(tvtime,0.9.15)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
@@ -22,7 +22,7 @@ AC_PROG_LIBTOOL
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([ctype.h dirent.h errno.h fcntl.h getopt.h langinfo.h math.h netinet/in.h pwd.h signal.h stdint.h stdio.h stdlib.h string.h sys/ioctl.h sys/mman.h sys/resource.h sys/stat.h sys/time.h sys/wait.h sys/types.h unistd.h wordexp.h])
+AC_CHECK_HEADERS([ctype.h dirent.h errno.h fcntl.h getopt.h langinfo.h math.h netinet/in.h pwd.h signal.h stdint.h stdio.h stdlib.h string.h sys/ioctl.h sys/mman.h sys/resource.h sys/stat.h sys/time.h sys/wait.h sys/types.h unistd.h wordexp.h locale.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
@@ -79,20 +79,6 @@ AC_PATH_PROG(LIBXML2_CONFIG,xml2-config,no)
 if test "$LIBXML2_CONFIG" = "no" ; then
 	AC_MSG_ERROR(libxml2 needed and xml2-config not found)
 else
-	LIBXML_VERSION=`$LIBXML2_CONFIG --version`
-	export MAJOR=0 ; export MINOR=0 ; export MICRO=0
-	MAJOR=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $1}'`
-	MINOR=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $2}'`
-	MICRO=`echo $LIBXML_VERSION | awk 'BEGIN {FS = "."} {print $3}'`
-dnl	if test $MAJOR -lt 2 ; then
-dnl		AC_MSG_ERROR([Found libxml2 with major version number = $MAJOR < 2])
-dnl	fi
-dnl	if test $MINOR -lt 4 ; then
-dnl		AC_MSG_ERROR([Found libxml2 with minor version number = $MINOR < 4])
-dnl	fi
-dnl	if test $MICRO -lt 4 ; then
-dnl		AC_MSG_ERROR([Found libxml2 with micro version number = $MICRO < 26])
-dnl	fi
 	XML2_LIBS="`$LIBXML2_CONFIG --libs`"
 	XML2_FLAG="`$LIBXML2_CONFIG --cflags`"
 	AC_DEFINE(HAVE_LIBXML2,,[LIBXML2 support])	
@@ -190,9 +176,9 @@ if test x"$GCC" = x"yes"; then
 	    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
     x86_64-*)
             AC_DEFINE([ARCH_X86],,[x86 architecture])
-            AC_DEFINE([ARCH_AMD64],,[amd64 architecture])
+            AC_DEFINE([ARCH_X86_64],,[x86_64 architecture])
             ARCH_X86=yes
-            ARCH_AMD64=yes;;
+            ARCH_X86_64=yes;;
     ppc-* | powerpc-*)
 	    OPT_CFLAGS="$CFLAGS -Wa,-m7400"
 	    AC_TRY_CFLAGS([$OPT_CFLAGS],
@@ -223,7 +209,7 @@ else
 fi
 AM_CONDITIONAL(ARCH_X86, [test "$ARCH_X86" = "yes"])
 AM_CONDITIONAL(ARCH_386, [test "$ARCH_386" = "yes"])
-AM_CONDITIONAL(ARCH_AMD64, [test "$ARCH_AMD64" = "yes"])
+AM_CONDITIONAL(ARCH_X86_64, [test "$ARCH_X86_64" = "yes"])
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([memalign])

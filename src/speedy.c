@@ -856,7 +856,7 @@ static void convert_uyvy_to_yuyv_scanline_mmx( uint8_t *uyvy_buf, uint8_t *yuyv_
         /* input */             : "g" (uyvy_buf), "g" (yuyv_buf), "g" (width)
         /* clobber registers */ : "cc", "edx", "esi", "edi" );
 #endif
-#ifdef ARCH_AMD64
+#ifdef ARCH_X86_64
     __asm__ __volatile__(
         "   movq      %0, %%rsi         \n"
         "   movq      %1, %%rdi         \n"
