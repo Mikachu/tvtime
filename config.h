@@ -21,7 +21,7 @@
 
 typedef struct config_s config_t;
 
-config_t *config_new( const char *filename );
+config_t *config_new( int argc, char **argv );
 int config_dump( config_t *ct );
 
 int config_get_verbose( config_t *ct );

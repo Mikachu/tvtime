@@ -22,7 +22,6 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <string.h>
-#include <getopt.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
@@ -34,6 +33,7 @@
 #include "videotools.h"
 #include "mixer.h"
 #include "osd.h"
+#include "config.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
@@ -52,46 +52,6 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-static void print_usage( char **argv )
-{
-    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-I <sampling>] "
-                     "[-d <device> [-i <input>] [-n <norm>] "
-                     "[-f <frequencies>] [-t <tuner>]\n"
-                     "\t-v\tShow verbose messages.\n"
-                     "\t-a\t16:9 mode.\n"
-                     "\t-s\tPrint frame skip information (for debugging).\n"
-                     "\t-I\tV4L input scanline sampling, defaults to 720.\n"
-                     "\t-w\tOutput window width, defaults to 800.\n"
-                     "\t-d\tvideo4linux device (defaults to /dev/video0).\n"
-                     "\t-i\tvideo4linux input number (defaults to 0).\n"
-                     "\t-c\tApply luma correction.\n"
-                     "\t-l\tLuma correction value (defaults to 1.0, use of this implies -c).\n"
-                     "\t-n\tThe mode to set the tuner to: PAL, NTSC or SECAM.\n"
-                     "\t  \t(defaults to NTSC)\n"
-                     "\t-f\tThe channels you are receiving with the tuner\n"
-                     "\t  \t(defaults to us-cable).\n"
-                     "\t  \tValid values are:\n"
-                     "\t  \t\tus-bcast\n"
-                     "\t  \t\tus-cable\n"
-                     "\t  \t\tus-cable-hrc\n"
-                     "\t  \t\tjapan-bcast\n"
-                     "\t  \t\tjapan-cable\n"
-                     "\t  \t\teurope-west\n"
-                     "\t  \t\teurope-east\n"
-                     "\t  \t\titaly\n"
-                     "\t  \t\tnewzealand\n"
-                     "\t  \t\taustralia\n"
-                     "\t  \t\tireland\n"
-                     "\t  \t\tfrance\n"
-                     "\t  \t\tchina-bcast\n"
-                     "\t  \t\tsouthafrica\n"
-                     "\t  \t\targentina\n"
-                     "\t  \t\tcanada-cable\n"
-                     "\t  \t\taustralia-optus\n"
-                     "\t-t\tThe tuner number for this input (defaults to 0).\n"
-                     "\n\tSee the README for more details.\n",
-                     argv[ 0 ] );
-}
 
 static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
 {
@@ -155,72 +115,40 @@ int main( int argc, char **argv )
     struct timeval lastfieldtime;
     struct timeval lastframetime;
     struct timeval checkpoint[ 7 ];
-    double luma_correction = 1.0;
-    int apply_luma_correction = 0;
     video_correction_t *vc = 0;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
-    char v4ldev[ 256 ];
-    char norm[ 7 ];
-    char freq[ 20 ];
     int width, height;
     int palmode = 0;
     int secam = 0;
-    int inputnum = 0;
-    int aspect = 0;
-    int outputwidth = 800;
-    int inputwidth = 720;
     int fieldtime;
-    int tuner_number = 0;
     int blittime = 0;
     int skipped = 0;
-    int verbose = 0;
     int volume;
-    int debug = 0;
+    int verbose;
     int videohold = CHANNEL_HOLD;
     osd_string_t *channel_number, *volume_bar, *muted_osd;
-    int c, i, frame_counter = 0, digit_counter = 0;
+    int i, frame_counter = 0, digit_counter = 0;
     char next_chan_buffer[5];
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
     unsigned char *colourbars;
     int showtest = 0;
+    config_t *ct;
 
+    ct = config_new( argc, argv );
+    if( !ct ) {
+        fprintf( stderr, "tvtime: Can't set configuration options.\n" );
+        return 0;
+    }
+    verbose = config_get_verbose( ct );
 
-    /* Default device. */
-    strcpy( v4ldev, "/dev/video0" );
-    
-    /* Default norm */
-    strcpy( norm, "ntsc" );
-
-    /* Default freq */
-    strcpy( freq, "us-cable" );
-    
     memset( next_chan_buffer, 0, 5 );
 
-    while( (c = getopt( argc, argv, "hw:I:avcs:d:i:l:n:f:t:" )) != -1 ) {
-        switch( c ) {
-        case 'w': outputwidth = atoi( optarg ); break;
-        case 'I': inputwidth = atoi( optarg ); break;
-        case 'v': verbose = 1; break;
-        case 'a': aspect = 1; break;
-        case 's': debug = 1; break;
-        case 'c': apply_luma_correction = 1; break;
-        case 'd': strncpy( v4ldev, optarg, 250 ); break;
-        case 'i': inputnum = atoi( optarg ); break;
-        case 'l': luma_correction = atof( optarg ); apply_luma_correction = 1; break;
-        case 'n': strncpy( norm, optarg, 6 ); break;
-        case 'f': strncpy( freq, optarg, 17 ); break;
-        case 't': tuner_number = atoi( optarg ); break;
-        default:
-            print_usage( argv );
-            return 1;
-        }
-    }
 
-    if( norm && !strcasecmp( norm, "pal" ) ) {
+    if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         palmode = 1;
-    } else if( norm && !strcasecmp( norm, "secam" ) ) {
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {
         palmode = 1;
         secam = 1;
     } else {
@@ -235,10 +163,15 @@ int main( int argc, char **argv )
         fieldtime = 16683;
     }
 
-    if( inputwidth != 720 && verbose ) {
-        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", inputwidth );
+    if( config_get_inputwidth( ct ) != 720 && verbose ) {
+        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", 
+                 config_get_inputwidth( ct ) );
     }
-    vidin = videoinput_new( v4ldev, inputnum, inputwidth, palmode ? 576 : 480, palmode, verbose );
+    vidin = videoinput_new( config_get_v4l_device( ct ), 
+                            config_get_inputnum( ct ), 
+                            config_get_inputwidth( ct ), 
+                            palmode ? 576 : 480, palmode, 
+                            verbose );
     if( !vidin ) {
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
@@ -270,16 +203,20 @@ int main( int argc, char **argv )
     if( videoinput_has_tuner( vidin ) ) {
         if( palmode ) {
             if( secam ) {
-                videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_SECAM );
+                videoinput_set_tuner( vidin, config_get_tuner_number( ct ), 
+                                      VIDEOINPUT_SECAM );
             } else {
-                videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_PAL );
+                videoinput_set_tuner( vidin, config_get_tuner_number( ct ),
+                                      VIDEOINPUT_PAL );
             }
         } else {
-            videoinput_set_tuner( vidin, tuner_number, VIDEOINPUT_NTSC );
+            videoinput_set_tuner( vidin, config_get_tuner_number( ct ),
+                                  VIDEOINPUT_NTSC );
         }
         /* Set to the current channel, or the first channel in our frequency list. */
-        if( !frequencies_set_chanlist( freq ? freq : "us-cable" ) ) {
-            fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", freq ? freq : "us-cable" );
+        if( !frequencies_set_chanlist( (char*)config_get_v4l_freq( ct ) ) ) {
+            fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", 
+                     config_get_v4l_freq( ct ) );
             /* XXX: Print valid frequency regions here. */
             return 1;
         } else {
@@ -289,49 +226,65 @@ int main( int argc, char **argv )
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
                 videohold = CHANNEL_HOLD;
 
-                if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s.\n", chanlist[ chanindex ].name );
-                osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
+                if( verbose ) fprintf( stderr, 
+                                       "tvtime: Changing to channel %s.\n", 
+                                       chanlist[ chanindex ].name );
+                osd_string_show_text( channel_number, 
+                                      chanlist[ chanindex ].name, 80 );
             } else if( rc > 0 ) {
-                if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s.\n", chanlist[ chanindex ].name );
-                osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
+                if( verbose ) fprintf( stderr, 
+                                       "tvtime: Changing to channel %s.\n",
+                                       chanlist[ chanindex ].name );
+                osd_string_show_text( channel_number, 
+                                      chanlist[ chanindex ].name, 80 );
             }
         }
     }
 
     /* Setup the video correction tables. */
-    if( apply_luma_correction ) {
+    if( config_get_apply_luma_correction( ct ) ) {
         vc = video_correction_new();
         if( !vc ) {
-            fprintf( stderr, "tvtime: Can't initialize luma and chroma correction tables.\n" );
+            fprintf( stderr, "tvtime: Can't initialize luma "
+                             "and chroma correction tables.\n" );
             return 1;
         }
-        if( luma_correction < 0.0 || luma_correction > 10.0 ) {
-            fprintf( stderr, "tvtime: Luma correction value out of range. Using 1.0.\n" );
-            luma_correction = 1.0;
+        if( config_get_luma_correction( ct ) < 0.0 || 
+            config_get_luma_correction( ct ) > 10.0 ) {
+            fprintf( stderr, "tvtime: Luma correction value out of range. "
+                             "Using 1.0.\n" );
+            config_set_luma_correction( ct, 1.0 );
         }
-        if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n", luma_correction );
-        video_correction_set_luma_power( vc, luma_correction );
+        if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
+                               config_get_luma_correction( ct ) );
+        video_correction_set_luma_power( vc, 
+                                         config_get_luma_correction( ct ) );
     } else {
         if( verbose ) fprintf( stderr, "tvtime: Luma correction disabled.\n" );
     }
 
     /* Steal system resources in the name of performance. */
-    if( verbose ) fprintf( stderr, "tvtime: Attempting to aquire performance-enhancing features.\n" );
+    if( verbose ) fprintf( stderr, "tvtime: Attempting to aquire "
+                                   "performance-enhancing features.\n" );
     if( setpriority( 0, 0, -19 ) < 0 ) {
         if( verbose ) fprintf( stderr, "tvtime: Can't renice to -19.\n" );
     }
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't use mlockall() to "
+                                       "lock memory.\n" );
     }
     if( !set_realtime_priority( 0 ) ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't set realtime "
+                                       "priority (need root).\n" );
     }
     rtctimer = rtctimer_new();
     if( !rtctimer ) {
-        if( verbose ) fprintf( stderr, "tvtime: Can't open /dev/rtc (for my wakeup call).\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't open /dev/rtc "
+                                       "(for my wakeup call).\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
-            if( verbose ) fprintf( stderr, "tvtime: Can't set 1024hz from /dev/rtc (need root).\n" );
+            if( verbose ) fprintf( stderr, "tvtime: Can't set 1024hz "
+                                           "from /dev/rtc (need root).\n" );
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
@@ -341,8 +294,10 @@ int main( int argc, char **argv )
     if( verbose ) fprintf( stderr, "tvtime: Done stealing resources.\n" );
 
     /* Setup the output. */
-    if( !sdl_init( width, height, outputwidth, aspect ) ) {
-        fprintf( stderr, "tvtime: SDL failed to initialize: no video output available.\n" );
+    if( !sdl_init( width, height, config_get_outputwidth( ct ), 
+                   config_get_aspect( ct ) ) ) {
+        fprintf( stderr, "tvtime: SDL failed to initialize: "
+                         "no video output available.\n" );
         return 1;
     }
 
@@ -394,20 +349,27 @@ int main( int argc, char **argv )
                 }
             }
             if( commands & TVTIME_LUMA_UP || commands & TVTIME_LUMA_DOWN ) {
-                if( !apply_luma_correction ) {
-                    fprintf( stderr, "tvtime: Luma correction disabled.  Run with -c to use it.\n" );
+                if( !config_get_apply_luma_correction( ct ) ) {
+                    fprintf( stderr, "tvtime: Luma correction disabled.  "
+                                     "Run with -c to use it.\n" );
                 } else {
-                    luma_correction += ( (commands & TVTIME_LUMA_UP) ? 0.1 : -0.1 );
-                    if( luma_correction > 10.0 ) luma_correction = 10.0;
-                    if( luma_correction <  0.0 ) luma_correction =  0.0;
-                    if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n", luma_correction );
-                    video_correction_set_luma_power( vc, luma_correction );
+                    config_set_luma_correction( ct, config_get_luma_correction(ct) + ( (commands & TVTIME_LUMA_UP) ? 0.1 : -0.1 ));
+                    if( config_get_luma_correction( ct ) > 10.0 ) 
+                        config_set_luma_correction( ct , 10.0);
+                    if( config_get_luma_correction( ct ) <  0.0 ) 
+                        config_set_luma_correction( ct, 0.0 );
+                    if( verbose ) fprintf( stderr, "tvtime: Luma "
+                                           "correction value: %.1f\n", 
+                                           config_get_luma_correction( ct ) );
+                    video_correction_set_luma_power( vc, 
+                                                     config_get_luma_correction( ct ) );
                 }
             }
             if( commands & TVTIME_CHANNEL_UP || commands & TVTIME_CHANNEL_DOWN ) {
                 if( !videoinput_has_tuner( vidin ) ) {
                     if( verbose )
-                        fprintf( stderr, "tvtime: Can't change channel, no tuner present!\n" );
+                        fprintf( stderr, "tvtime: Can't change channel, "
+                                 "no tuner present!\n" );
                 } else {
                     int start_index = chanindex;
                     do {
@@ -418,16 +380,19 @@ int main( int argc, char **argv )
                         videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
                         videohold = CHANNEL_HOLD;
                     } while( !videoinput_freq_present( vidin ) );
-                    if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
-                    osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
+                    if( verbose ) fprintf( stderr, "tvtime: Changing to "
+                                           "channel %s\n", 
+                                           chanlist[ chanindex ].name );
+                    osd_string_show_text( channel_number, 
+                                          chanlist[ chanindex ].name, 80 );
                 }
             }
             if( commands & TVTIME_MIXER_UP || commands & TVTIME_MIXER_DOWN ) {
                 char bar[108];
                 volume = mixer_set_volume( ( (commands & TVTIME_MIXER_UP) ? 1 : -1 ) );
-                if( verbose ) {
+                if( verbose )
                     fprintf( stderr, "tvtime: volume %d\n", (volume & 0xFF) );
-                }
+
                 memset( bar, 0, 108 );
                 strcpy( bar, "Volume " );
                 memset( bar+7, '|', volume & 0xFF );
@@ -558,7 +523,7 @@ int main( int argc, char **argv )
                      timediff( &(checkpoint[ 0 ]), &(checkpoint[ 6 ]) ) );
             pngscreenshot( "testshot.png", curframe, width, height, width*2 );
         }
-        if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
+        if( config_get_debug( ct ) && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
                      skipped++,
                      timediff( &curframetime, &lastframetime ), (fieldtime*2) );
@@ -572,22 +537,29 @@ int main( int argc, char **argv )
         } else if( showtest == 2 ) {
             memcpy( sdl_get_output(), colourbars, width*height*2 );
         } else {
-            if( apply_luma_correction ) {
-                video_correction_packed422_field_to_frame_top( vc, sdl_get_output(),
-                                                               width*2, curframe,
-                                                               width, height/2, width*4 );
+            if( config_get_apply_luma_correction( ct ) ) {
+                video_correction_packed422_field_to_frame_top( vc, 
+                                                               sdl_get_output(),
+                                                               width*2, 
+                                                               curframe,
+                                                               width, height/2,
+                                                               width*4 );
             } else {
-                packed422_field_to_frame_top( sdl_get_output(), width*2, curframe,
+                packed422_field_to_frame_top( sdl_get_output(), width*2, 
+                                              curframe,
                                               width, height/2, width*4 );
             }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
+            osd_string_composite_packed422( channel_number, sdl_get_output(), 
+                                            width, height,
                                             width*2, 50, 50, 0 );
             if( mixer_ismute() ) {
                 osd_string_show_text( muted_osd, "Mute", 100 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height,
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), 
+                                                width, height,
                                                 width*2, 20, height-40, 0 );
             } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height,
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), 
+                                                width, height,
                                                 width*2, 20, height-40, 0 );
             }
         }
@@ -626,23 +598,30 @@ int main( int argc, char **argv )
         } else if( showtest == 2 ) {
             memcpy( sdl_get_output(), colourbars, width*height*2 );
         } else {
-            if( apply_luma_correction ) {
-                video_correction_packed422_field_to_frame_bot( vc, sdl_get_output(), width*2,
+            if( config_get_apply_luma_correction( ct ) ) {
+                video_correction_packed422_field_to_frame_bot( vc, 
+                                                               sdl_get_output(),
+                                                               width*2,
                                                                curframe + (width*2),
-                                                               width, height/2, width*4 );
+                                                               width, height/2,
+                                                               width*4 );
             } else {
-                packed422_field_to_frame_bot( sdl_get_output(), width*2, curframe + (width*2),
+                packed422_field_to_frame_bot( sdl_get_output(), width*2, 
+                                              curframe + (width*2),
                                               width, height/2, width*4 );
             }
-            osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
+            osd_string_composite_packed422( channel_number, sdl_get_output(), 
+                                            width, height,
                                             width*2, 50, 50, 0 );
 
             if( mixer_ismute() ) {
                 osd_string_show_text( muted_osd, "Mute", 51 );
-                osd_string_composite_packed422( muted_osd, sdl_get_output(), width, height,
+                osd_string_composite_packed422( muted_osd, sdl_get_output(), 
+                                                width, height,
                                                 width*2, 20, height-40, 0 );
             } else {
-                osd_string_composite_packed422( volume_bar, sdl_get_output(), width, height,
+                osd_string_composite_packed422( volume_bar, sdl_get_output(), 
+                                                width, height,
                                                 width*2, 20, height-40, 0 );
             }
         }
