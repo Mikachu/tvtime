@@ -1856,13 +1856,6 @@ static void display_current_menu( commands_t *cmd )
     tvtime_osd_show_list( cmd->osd, 1 );
 }
 
-void commands_refresh_menu( commands_t *cmd )
-{
-    if( cmd->menuactive ) {
-        display_current_menu( cmd );
-    }
-}
-
 menu_t *commands_get_menu( commands_t *cmd, const char *menuname )
 {
     int i;
@@ -1937,6 +1930,26 @@ static int set_menu( commands_t *cmd, const char *menuname )
 
     cmd->menuactive = 0;
     return 0;
+}
+
+void commands_refresh_menu( commands_t *cmd )
+{
+    if( cmd->menuactive ) {
+        if( cmd->curmenu == MENU_USER ) {
+            const char *curname = menu_get_name( cmd->curusermenu );
+            int i;
+
+            for( i = 0; i < tvtime_num_builtin_menus(); i++ ) {
+                if( !strncasecmp( menu_table[ i ].name, curname, strlen( menu_table[ i ].name ) ) ) {
+                    if( menu_table[ i ].menutype == MENU_REDIRECT ) {
+                        set_menu( cmd, menu_table[ i ].name );
+                        break;
+                    }
+                }
+            }
+        }
+        display_current_menu( cmd );
+    }
 }
 
 void commands_add_menu( commands_t *cmd, menu_t *menu )
