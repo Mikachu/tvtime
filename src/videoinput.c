@@ -1122,34 +1122,28 @@ int videoinput_get_tuner_freq( videoinput_t *vidin )
 
 int videoinput_freq_present( videoinput_t *vidin )
 {
-    if( vidin->isv4l2 ) {
-        struct v4l2_tuner tuner;
+    if( videoinput_has_tuner( vidin ) ) {
+        if( vidin->isv4l2 ) {
+            struct v4l2_tuner tuner;
 
-        tuner.index = vidin->tunerid;
-        if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
-            fprintf( stderr, "can't get tuner info: %s\n", strerror( errno ) );
-        } else {
-            if( tuner.signal ) {
-                return 1;
-            } else {
+            tuner.index = vidin->tunerid;
+            if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
+                if( vidin->verbose ) {
+                    fprintf( stderr, "videoinput: Can't detect signal from tuner: %s\n",
+                             strerror( errno ) );
+                }
+            } else if( !tuner.signal ) {
                 return 0;
             }
-        }
-
-    } else {
-        if( videoinput_has_tuner( vidin ) ) {
+        } else {
             struct video_tuner tuner;
 
             if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
                 if( vidin->verbose ) {
-                    fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
+                    fprintf( stderr, "videoinput: Can't detect signal from tuner: %s\n",
                              strerror( errno ) );
                 }
-                return 1;
-            }
-            if( tuner.signal ) {
-                return 1;
-            } else {
+            } else if( !tuner.signal ) {
                 return 0;
             }
         }
