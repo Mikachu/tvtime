@@ -100,7 +100,6 @@ enum {
     PULLDOWN_VEKTOR = 1,
     PULLDOWN_MAX = 2
 };
-static unsigned int pulldown_alg = 0;
 
 /**
  * Which output driver we're using.
@@ -112,13 +111,6 @@ enum {
     OUTPUT_XMGA,
     OUTPUT_SDL
 };
-static unsigned int output_driver = 0;
-
-/**
- * Current deinterlacing method.
- */
-static deinterlace_method_t *curmethod;
-static int curmethodid;
 
 /**
  * Speed at which to fade to blue on channel changes.
@@ -146,6 +138,7 @@ typedef struct tvtime_s
     int last_botdiff;
 
     /* 2-3 pulldown detection. */
+    int pulldown_alg;
     int pdoffset;
     int pderror;
     int pdlastbusted;
@@ -163,6 +156,7 @@ tvtime_t *tvtime_new( videofilter_t *filter )
     tvtime->last_topdiff = 0;
     tvtime->last_botdiff = 0;
 
+    tvtime->pulldown_alg = PULLDOWN_NONE;
     tvtime->pdoffset = PULLDOWN_SEQ_AA;
     tvtime->pderror = PULLDOWN_ERROR_WAIT;
     tvtime->pdlastbusted = 0;
@@ -383,16 +377,16 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
 {
     int i;
 
-    if( pulldown_alg == PULLDOWN_NONE ) {
+    if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
         if( osd ) tvtime_osd_set_film_mode( osd, -1 );
     }
 
-    if( pulldown_alg != PULLDOWN_VEKTOR ) {
+    if( tvtime->pulldown_alg != PULLDOWN_VEKTOR ) {
         /* If we leave vektor pulldown mode, lose our state. */
         tvtime->filmmode = 0;
     }
 
-    if( pulldown_alg == PULLDOWN_VEKTOR ) {
+    if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
         /* Make pulldown phase decisions every top field. */
         if( !bottom_field ) {
             int predicted;
@@ -472,7 +466,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
         }
     }
 
-    if( !curmethod->scanlinemode ) {
+    if( !tvtime->curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
         if( tvtime->filter && !tvtime->filtered_curframe ) {
@@ -487,7 +481,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
         data.f1 = lastframe;
         data.f2 = secondlastframe;
 
-        curmethod->deinterlace_frame( output, outstride, &data, bottom_field, width, frame_height );
+        tvtime->curmethod->deinterlace_frame( output, outstride, &data, bottom_field, width, frame_height );
 
         for( i = 0; i < frame_height; i++ ) {
             uint8_t *curoutput = output + (i * outstride);
@@ -565,7 +559,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                 data.bb3 = (i > 1) ? (secondlastframe + (instride*3)) : (secondlastframe + instride);
             }
 
-            curmethod->interpolate_scanline( output, &data, width );
+            tvtime->curmethod->interpolate_scanline( output, &data, width );
             if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
             if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
             if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -598,7 +592,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             }
 
             /* Copy a scanline. */
-            curmethod->copy_scanline( output, &data, width );
+            tvtime->curmethod->copy_scanline( output, &data, width );
             curframe += instride * 2;
             lastframe += instride * 2;
             secondlastframe += instride * 2;
@@ -815,6 +809,9 @@ int main( int argc, char **argv )
     double pixel_aspect;
     char number[ 4 ];
     tvtime_t *tvtime;
+    unsigned int output_driver = 0;
+    deinterlace_method_t *curmethod;
+    int curmethodid;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1455,11 +1452,11 @@ int main( int argc, char **argv )
             }
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
-            pulldown_alg = (pulldown_alg + 1) % PULLDOWN_MAX;
+            tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
             if( osd ) {
-                if( pulldown_alg == PULLDOWN_NONE ) {
+                if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
                     tvtime_osd_show_message( osd, "Pulldown detection disabled." );
-                } else if( pulldown_alg == PULLDOWN_VEKTOR ) {
+                } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
                     tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
                 }
             }
