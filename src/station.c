@@ -189,19 +189,6 @@ static int insert( station_mgr_t *mgr, station_info_t *i, int allowdup )
     return 1;
 }
 
-static void station_dump( station_mgr_t *mgr )
-{
-    station_info_t *rp = mgr->first;
-    if( !rp ) return;
-
-    fprintf( stderr, "station: #\tBand\t\tChannel\tFreq\tActive\tName\n" );
-    do {
-        fprintf( stderr, "station: %d\t%s\t%s\t%d\t%s\t%s\n",rp->pos, rp->band->name,
-            rp->channel->name, rp->channel->freq, rp->active ? "true" : "false", rp->name);
-        rp = rp->next;
-    } while( rp != mgr->first );
-}
-
 static xmlNodePtr find_list( xmlNodePtr node, const char *normname, const char *tablename )
 {
     while( node ) {
@@ -426,10 +413,6 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
         mgr->current = mgr->first;
     }
     
-    if( mgr->verbose ) {
-        station_dump( mgr );
-    }
-
     return mgr;
 }
 
@@ -901,9 +884,6 @@ int station_remap( station_mgr_t *mgr, int pos )
         old->pos= i->pos;
         i->pos = pos;
         res = insert( mgr, old, 1 ) && insert( mgr, i, 1 );
-    }
-    if ( mgr->verbose ) {
-        station_dump( mgr );
     }
     return res;
 }

@@ -123,7 +123,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
 
     vs->line[0] = osd_string_new( vs->font );
     if( !vs->line[0] ) {
-        fprintf( stderr, "vbiscreen: Could not find my font (%s)!\n", 
+        fprintf( stderr, "vbiscreen: Could not find my font: %s\n", 
                  vs->fontfile );
         vbiscreen_delete( vs );
         return NULL;
@@ -157,7 +157,7 @@ void blank_screen( vbiscreen_t *vs )
 {
     int i;
 
-    if( vs->verbose ) fprintf( stderr, "vbiscreen: In blank.\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Blanking screen.\n" );
     for( i = 0; i < ROWS; i++ ) {
         osd_string_show_text( vs->line[ i ], " ", 0 );
     }
@@ -291,9 +291,10 @@ void scroll_screen( vbiscreen_t *vs )
         return;
     
     start_row = ( vs->first_line + vs->top_of_screen ) % ( 2 * ROWS );
-    if( vs->verbose )
-        fprintf ( stderr, "start row : %d first line %d\n ", start_row, 
-                  vs->first_line );
+    if( vs->verbose ) {
+        fprintf( stderr, "vbiscreen: Start row: %d, first line %d.\n ",
+                 start_row, vs->first_line );
+    }
 
     /* zero out top row */
     memset( (char *)( vs->text + start_row * COLS ), 0, COLS );
@@ -309,7 +310,8 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
                             unsigned int colour, int row )
 {
     if( vs->verbose ) {
-        fprintf( stderr, "indent: %d, ital: %d, colour: 0x%x, row: %d\n", indent, ital, colour, row );
+        fprintf( stderr, "vbiscreen: Indent: %d, ital: %d, colour: 0x%x, row: %d\n",
+                 indent, ital, colour, row );
     }
 
     if( 0 && vs->captions && vs->style <= ROLL_4 && vs->style ) {
@@ -333,11 +335,7 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
 void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
 {
     if( vs->verbose ) {
-        fprintf( stderr, "in set mode\n");
-    }
-
-    if( vs->verbose ) {
-        fprintf( stderr, "Caption: %d ", caption );
+        fprintf( stderr, "vbiscreen: Caption: %d ", caption );
         switch( style ) {
         case ROLL_2:
             fprintf( stderr, "ROLL 2\n");
@@ -379,8 +377,9 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
             }
             vs->first_line = ROWS - (style - 4);
 
-            if( vs->verbose ) 
-                fprintf( stderr, "first_line %d\n", vs->first_line );
+            if( vs->verbose ) {
+                fprintf( stderr, "vbiscreen: first_line %d\n", vs->first_line );
+            }
 
             vs->cury = ROWS - 1;
             break;
@@ -427,7 +426,7 @@ void vbiscreen_set_current_cell( vbiscreen_t *vs, char text )
 void vbiscreen_delete_to_end( vbiscreen_t *vs )
 {
     int i;
-    if( vs->verbose ) fprintf( stderr, "in del to end\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Delete to end.\n");
     for( i = vs->curx; i < COLS; i++ ) {
         vbiscreen_clear_current_cell( vs );
         vs->curx++;
@@ -439,7 +438,7 @@ void vbiscreen_delete_to_end( vbiscreen_t *vs )
 
 void vbiscreen_backspace( vbiscreen_t *vs )
 {
-    if( vs->verbose ) fprintf( stderr, "in backspace\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Backspace.\n");
     if( !vs->curx ) return;
     vs->curx--;
     vbiscreen_clear_current_cell( vs );
@@ -448,7 +447,7 @@ void vbiscreen_backspace( vbiscreen_t *vs )
 
 void vbiscreen_erase_displayed( vbiscreen_t *vs )
 {
-    if( vs->verbose ) fprintf( stderr, "in erase disp\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Erase displayed.\n");
 
     if( vs->captions && vs->style && vs->style <= ROLL_4 ) {
         clear_hidden_roll( vs );
@@ -460,7 +459,7 @@ void vbiscreen_erase_displayed( vbiscreen_t *vs )
 
 void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 {
-    if( vs->verbose ) fprintf( stderr, "in erase non disp\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Erase non-displayed.\n");
 
     if( vs->captions && vs->style == POP_UP ) {
         memset( vs->buffers + vs->curbuffer * COLS * ROWS + vs->cury * COLS, 0, COLS );
@@ -472,7 +471,7 @@ void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 
 void vbiscreen_carriage_return( vbiscreen_t *vs )
 {
-    if( vs->verbose ) fprintf( stderr, "in CR\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Carriage return.\n");
     if( vs->style != POP_UP) {
         /* not sure if this is right for text mode */
         /* in text mode, perhaps a CR on last row clears screen and goes
@@ -503,7 +502,7 @@ void copy_buf_to_screen( vbiscreen_t *vs, char *buf )
 
 void vbiscreen_end_of_caption( vbiscreen_t *vs )
 {
-    if( vs->verbose ) fprintf( stderr, "in end of caption\n");
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: End of caption.\n");
 
     if( vs->style == PAINT_ON ) {
         copy_buf_to_screen( vs, vs->paintbuf );
@@ -521,7 +520,7 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs )
 
 void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
 {
-    if( vs->verbose ) fprintf( stderr, "in print (%d, %d)[%c %c]\n", vs->curx, vs->cury, c1, c2);
+    if( vs->verbose ) fprintf( stderr, "vbiscreen: Print (%d, %d)[%c %c]\n", vs->curx, vs->cury, c1, c2);
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
         if( vs->curx != COLS-1 ) {

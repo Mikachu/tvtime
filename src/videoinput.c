@@ -1407,14 +1407,18 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
             }
 
             if( vidin->verbose ) {
-                fprintf( stderr, "videoinput: tuner.tuner = %d\n"
-                                 "videoinput: tuner.name = %s\n"
-                                 "videoinput: tuner.rangelow = %ld\n"
-                                 "videoinput: tuner.rangehigh = %ld\n"
-                                 "videoinput: tuner.signal = %d\n"
-                                 "videoinput: tuner.flags = ",
-                         tuner.tuner, tuner.name, tuner.rangelow,
-                         tuner.rangehigh, tuner.signal );
+                fprintf( stderr, "videoinput: Tuner %s (",
+                          tuner.name );
+
+                switch (tuner.mode) {
+                case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
+                case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
+                case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
+                case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
+                default: fprintf( stderr, "UNDEFINED" ); break;
+                }
+
+                fprintf( stderr, "), flags: " );
 
                 if( tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
                 if( tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
@@ -1424,16 +1428,7 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
                 if( tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
                 if( tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
                 if( tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
-
-                fprintf( stderr, "\nvideoinput: tuner.mode = " );
-                switch (tuner.mode) {
-                case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
-                case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
-                case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
-                case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
-                default: fprintf( stderr, "UNDEFINED" ); break;
-                }
-                fprintf( stderr, "\n");
+                fprintf( stderr, "\n" );
             }
 
             vidin->tunerlow = (tuner.flags & VIDEO_TUNER_LOW) ? 1 : 0;
