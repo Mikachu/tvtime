@@ -97,6 +97,7 @@ struct config_s
     int *keymap;
     char *timeformat;
     int *buttonmap;
+    char *menu_bg_rgb;
 };
 
 void config_init( config_t *ct );
@@ -169,6 +170,7 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
+    ct->menu_bg_rgb = strdup( "000000" );
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -343,6 +345,11 @@ void config_init( config_t *ct )
     if( (tmp = parser_get( &(ct->pf), "TimeFormat", 1 )) ) {
         free( ct->timeformat );
         ct->timeformat = strdup( tmp );
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "MenuBG", 1 )) ) {
+        free( ct->menu_bg_rgb );
+        ct->menu_bg_rgb = strdup( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "FineTuneOffset", 1 )) ) {
@@ -641,6 +648,12 @@ int config_get_finetune( config_t *ct )
 int config_get_mutetvcard( config_t *ct )
 {
     return ct->mutetvcard;
+}
+
+
+const char *config_get_menu_bg_rgb( config_t *ct )
+{
+    return ct->menu_bg_rgb;
 }
 
 #ifdef TESTHARNESS
