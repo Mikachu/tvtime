@@ -241,13 +241,11 @@ static void blit_stuff_subpix( unsigned char *dst, int dst_width, int dst_height
                 tmp = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
                 tmp += curdst[ x ];
                 curdst[ x ] = (tmp > 255) ? 255 : tmp;
-                // curdst[ x ] = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
                 prev = cursrc[ x ];
             }
             tmp = ( prev * pos ) / 65535;
             tmp += curdst[ blit_width ];
             curdst[ x ] = (tmp > 255) ? 255 : tmp;
-            // curdst[ blit_width ] = ( prev * pos ) / 65535;
         }
     }
 }
@@ -295,10 +293,10 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
         FT_Error error;
         int cur = text[ i ];
 
-        // create a copy of the original glyph
+        /* Create a copy of the original glyph. */
         error = FT_Glyph_Copy( font->glyphs[ cur ], &image );
         if( !error ) {
-            // convert glyph image to bitmap (destroy the glyph copy !!)
+            /* Convert glyph image to bitmap, overwriting the glyph copy. */
             error = FT_Glyph_To_Bitmap( &image, ft_render_mode_normal, 0, 1 );
             if( !error ) {
                 FT_BitmapGlyph bit = (FT_BitmapGlyph) image;
