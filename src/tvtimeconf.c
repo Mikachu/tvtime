@@ -1,5 +1,6 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2002, 2003 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (c) 2003 Aleander Belov <asbel@mail.ru>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -757,14 +758,14 @@ void config_delete( config_t *ct )
 
 int config_key_to_command( config_t *ct, int key )
 {
-    if( !key ) return TVTIME_NOCOMMAND;
+    if( key ) {
+        if( ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
+            return ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
+        }
 
-    if( ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ] ) {
-        return ct->keymap[ MAX_KEYSYMS*((key & 0x70000)>>16) + (key & 0x1ff) ];
-    }
-
-    if( isalnum( key & 0x1ff ) ) {
-        return TVTIME_CHANNEL_CHAR;
+        if( isalnum( key & 0x1ff ) ) {
+            return TVTIME_CHANNEL_CHAR;
+        }
     }
         
     return TVTIME_NOCOMMAND;
@@ -783,8 +784,33 @@ int config_command_to_key( config_t *ct, int command )
 
 int config_button_to_command( config_t *ct, int button )
 {
-    if( button < 0 || button >= MAX_BUTTONS ) return 0;
-    return ct->buttonmap[ button ];
+    if( button < 0 || button >= MAX_BUTTONS ) {
+        return 0;
+    } else {
+        return ct->buttonmap[ button ];
+    }
+}
+
+int config_get_num_modes( config_t *ct )
+{
+    return ct->nummodes;
+}
+
+config_t *config_get_mode_info( config_t *ct, int mode )
+{
+    tvtime_modelist_t *cur = ct->modelist;
+
+    if( !cur ) {
+        /* No modes. */
+        return 0;
+    }
+
+    while( mode && cur->next ) {
+        cur = cur->next;
+        mode--;
+    }
+
+    return &(cur->settings);
 }
 
 int config_get_verbose( config_t *ct )
@@ -957,25 +983,140 @@ configsave_t *config_get_configsave( config_t *ct )
     return ct->configsave;
 }
 
-int config_get_num_modes( config_t *ct )
+struct configsave_s
 {
-    return ct->nummodes;
+    char *configFile;
+    xmlDocPtr doc;
+};
+
+static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
+            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+            if( name && !xmlStrcasecmp( name, BAD_CAST optname ) ) {
+                xmlFree( name );
+                return node;
+            }
+            if( name ) xmlFree( name );
+        }
+
+        node = node->next;
+    }
+
+    return 0;
 }
 
-config_t *config_get_mode_info( config_t *ct, int mode )
+/* Attempt to parse the file for key elements and create them if they don't exist */
+configsave_t *configsave_open( const char *filename )
 {
-    tvtime_modelist_t *cur = ct->modelist;
+    configsave_t *cs = malloc( sizeof( configsave_t ) );
+    xmlNodePtr top;
 
-    if( !cur ) {
-        /* No modes. */
+    if( !cs ) {
         return 0;
     }
 
-    while( mode && cur->next ) {
-        cur = cur->next;
-        mode--;
+    cs->configFile = strdup( filename );
+    if( !cs->configFile ) {
+        free( cs );
+        return 0;
     }
 
-    return &(cur->settings);
+    cs->doc = xmlParseFile( cs->configFile );
+    if( !cs->doc ) {
+        if( file_is_openable_for_read( cs->configFile ) ) {
+            fprintf( stderr, "configsave: Config file exists, but cannot be parsed.\n" );
+            fprintf( stderr, "configsave: Settings will NOT be saved.\n" );
+            free( cs->configFile );
+            free( cs );
+            return 0;
+        } else {
+            /* Config file doesn't exist, create a new one. */
+            fprintf( stderr, "configsave: No config file found, creating a new one.\n" );
+            cs->doc = xmlNewDoc( BAD_CAST "1.0" );
+            if( !cs->doc ) {
+                fprintf( stderr, "configsave: Could not create new config file.\n" );
+                free( cs->configFile );
+                free( cs );
+                return 0;
+            }
+        }
+    }
+
+    top = xmlDocGetRootElement( cs->doc );
+    if( !top ) {
+        /* Set the DTD */
+        xmlDtdPtr dtd;
+        dtd = xmlNewDtd( cs->doc,
+                         BAD_CAST "tvtime",
+                         BAD_CAST "-//tvtime//DTD tvtime 1.0//EN",
+                         BAD_CAST "http://tvtime.sourceforge.net/DTD/tvtime1.dtd" );
+        cs->doc->intSubset = dtd;
+        if( !cs->doc->children ) {
+            xmlAddChild( (xmlNodePtr) cs->doc, (xmlNodePtr) dtd );
+        } else {
+            xmlAddPrevSibling( cs->doc->children, (xmlNodePtr) dtd );
+        }
+
+        /* Create the root node */
+        top = xmlNewDocNode( cs->doc, 0, BAD_CAST "tvtime", 0 );
+        if( !top ) {
+            fprintf( stderr, "configsave: Could not create toplevel element 'tvtime'.\n" );
+            xmlFreeDoc( cs->doc );
+            free( cs->configFile );
+            free( cs );
+            return 0;
+        } else {
+            xmlDocSetRootElement( cs->doc, top );
+            xmlNewProp( top,
+                        BAD_CAST "xmlns",
+                        BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
+        }
+    }
+
+    if( xmlStrcasecmp( top->name, BAD_CAST "tvtime" ) ) {
+        fprintf( stderr, "configsave: Root node in file %s should be 'tvtime'.\n", cs->configFile );
+        xmlFreeDoc( cs->doc );
+        free( cs->configFile );
+        free( cs );
+        return 0;
+    }
+
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
+    return cs;
+}
+
+void configsave_close( configsave_t *cs )
+{
+    xmlFreeDoc( cs->doc );
+    free( cs->configFile );
+    free( cs );
+}
+
+int configsave( configsave_t *cs, const char *name, const char *value )
+{
+    xmlNodePtr top, node;
+
+    top = xmlDocGetRootElement( cs->doc );
+    if( !top ) {
+        fprintf( stderr, "configsave: Error, can't get document root.\n" );
+        return 0;
+    }
+
+    node = find_option( top->xmlChildrenNode, name );
+    if( !node ) {
+        node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
+        xmlNewProp( node, BAD_CAST "name", BAD_CAST name );
+        xmlNewProp( node, BAD_CAST "value", BAD_CAST value );
+    } else {
+        xmlSetProp( node, BAD_CAST "value", BAD_CAST value );
+    }
+
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( cs->configFile, cs->doc, 1 );
+    return 1;
 }
 

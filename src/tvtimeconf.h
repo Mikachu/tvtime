@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (c) 2003 Alexander Belov <asbel@mail.ru>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,17 @@
 
 #include <sys/types.h>
 #include <unistd.h>
-#include "configsave.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct configsave_s configsave_t;
+
+configsave_t *configsave_open( const char *filename );
+void configsave_close( configsave_t *cs );
+int configsave( configsave_t *cs, const char *name, const char *value );
+
 
 typedef struct config_s config_t;
 
@@ -74,4 +85,7 @@ configsave_t *config_get_configsave( config_t *ct );
 int config_get_num_modes( config_t *ct );
 config_t *config_get_mode_info( config_t *ct, int mode );
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* TVTIMECONF_H_INCLUDED */
