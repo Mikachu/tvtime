@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) Fixed a bunch of OSD crap relating to inputs with no tuner, and
+    some unnecessary error messages will be avoided.
   * (batchall) Added a more flexible station subsystem. Deactivated channels
     are saved now, more to come.
   * (vektor) Moved fonts and graphics into the data directory.
