@@ -497,6 +497,46 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         commands_station_change( in );
         in->frame_counter = 0;
         break;
+
+    case TVTIME_CHANNEL_1:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 49);
+        break;
+
+    case TVTIME_CHANNEL_2:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 50);
+        break;
+
+    case TVTIME_CHANNEL_3:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 51);
+        break;
+
+    case TVTIME_CHANNEL_4:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 52);
+        break;
+
+    case TVTIME_CHANNEL_5:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 53);
+        break;
+
+    case TVTIME_CHANNEL_6:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 54);
+        break;
+
+    case TVTIME_CHANNEL_7:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 55);
+        break;
+
+    case TVTIME_CHANNEL_8:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 56);
+        break;
+
+    case TVTIME_CHANNEL_9:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 57);
+        break;
+
+    case TVTIME_CHANNEL_0:
+        commands_handle(in, TVTIME_CHANNEL_CHAR, 48);
+        break;
     }
 }
 

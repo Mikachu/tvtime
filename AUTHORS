@@ -32,6 +32,9 @@ Authors and contributors
   Achim Schneider <batchall@mordor.ch>
     - frequency table conversion script from xawtv's file format
 
+  Mark Trolley <mtrolley@scs.carleton.ca>
+    - Added the numeric channel commands for better lirc support
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler

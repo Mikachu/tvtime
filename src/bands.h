@@ -271,7 +271,7 @@ const band_t *us_cable_band = &(bands[ 0 ]);
 
 /*
  UK         VHF Ireland, VHF Misc, UHF
- Europe     VHF Italy, VHF E1-E12, VHF S1-S41, UHF
+ Europe     VHF Italy, VHF E1-E12, VHF S1-S41, VHF Russia, UHF
  France     VHF France, UHF
  East       VHF Russia, UHF
  Australia  VHF Australia, UHF

@@ -1,5 +1,6 @@
 
 0.9.7
+  * (PunkeR) Added numeric channel commands for better lirc support.
   * (vektor) Added commands for scanline length bias and overscan.
   * (vektor) Added a channel scanner that rocks sooo much.
   * (vektor) We now set the window and palette with V4L before using mmap
