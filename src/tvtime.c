@@ -58,7 +58,7 @@
 /**
  * Set this to 1 to enable the experimental pulldown detection code.
  */
-static unsigned int detect_pulldown = 1;
+static unsigned int detect_pulldown = 0;
 
 /**
  * scratch paper:
@@ -232,6 +232,7 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 int tff_top_pattern[] = { 0,    1,    0,     0,    0     };
 int tff_bot_pattern[] = { 0,    0,    0,     1,    0     };
 
+#define HISTORY_SIZE 5
 
 static int tophistory[ 5 ];
 static int bothistory[ 5 ];
@@ -256,33 +257,55 @@ void fill_history( int tff )
     histpos = 0;
 }
 
-int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff )
+int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff, int *realbest )
 {
+    int avgbot = 0;
+    int avgtop = 0;
     int best = 0;
     int min = -1;
     int minpos = 0;
     int minbot = 0;
     int j;
     int ret;
+    int mintopval = -1;
+    int mintoppos = -1;
+    int minbotval = -1;
+    int minbotpos = -1;
 
-    histpos = histpos % 5;
     tophistory[ histpos ] = top_repeat;
     bothistory[ histpos ] = bot_repeat;
 
-    for( j = 0; j < 5; j++ ) {
+    for( j = 0; j < HISTORY_SIZE; j++ ) {
+        avgtop += tophistory[ j ];
+        avgbot += bothistory[ j ];
+    }
+    avgtop /= 5;
+    avgbot /= 5;
+
+    for( j = 0; j < HISTORY_SIZE; j++ ) {
+        // int cur = (tophistory[ j ] - avgtop);
         int cur = tophistory[ j ];
         if( cur < min || min < 0 ) {
             min = cur;
             minpos = j;
         }
+        if( cur < mintopval || mintopval < 0 ) {
+            mintopval = cur;
+            mintoppos = j;
+        }
     }
 
-    for( j = 0; j < 5; j++ ) {
+    for( j = 0; j < HISTORY_SIZE; j++ ) {
+        // int cur = (bothistory[ j ] - avgbot);
         int cur = bothistory[ j ];
         if( cur < min || min < 0 ) {
             min = cur;
             minpos = j;
             minbot = 1;
+        }
+        if( cur < minbotval || minbotval < 0 ) {
+            minbotval = cur;
+            minbotpos = j;
         }
     }
 
@@ -291,10 +314,15 @@ int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff )
     } else {
         best = tff ? ( minpos + 4 ) : ( minpos + 2 );
     }
-    best = best % 5;
-    ret = 1 << ( ( histpos + 5 - best ) % 5 );
-    histpos = (histpos + 1) % 5;
-    // fprintf( stderr, "top %10d bot %10d ret %d\n", top_repeat, bot_repeat, ret );
+    best = best % HISTORY_SIZE;
+    *realbest = 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
+
+    best = (minbotpos + 2) % 5;
+    ret  = 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
+    best = (mintoppos + 4) % 5;
+    ret |= 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
+
+    histpos = (histpos + 1) % HISTORY_SIZE;
     return ret;
 }
 
@@ -388,18 +416,19 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
     /* Make pulldown decisions every top field. */
     if( detect_pulldown && !bottom_field ) {
+        int realbest;
         int predicted;
 
         predicted = pdoffset << 1;
         if( predicted > PULLDOWN_OFFSET_5 ) predicted = PULLDOWN_OFFSET_1;
-        pdoffset = determine_pulldown_offset( last_topdiff, last_botdiff, 1 );
-        /*
-        if( pdoffset != predicted ) {
-            fprintf( stderr, "NO LUCK %d:%d\n", last_topdiff, last_botdiff );
+        pdoffset = determine_pulldown_offset( last_topdiff, last_botdiff, 1, &realbest );
+        if( pdoffset & predicted ) {
+            pdoffset = predicted;
+            // fprintf( stderr, "   LUCK %d:%d\n", last_topdiff, last_botdiff );
         } else {
-            fprintf( stderr, "   LUCK %d:%d\n", last_topdiff, last_botdiff );
+            pdoffset = realbest;
+            // fprintf( stderr, "NO LUCK %d:%d\n", last_topdiff, last_botdiff );
         }
-        */
 
         /* 3:2 pulldown state machine. */
         if( pdoffset != predicted ) {
@@ -412,7 +441,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         } else {
             if( pderror ) {
                 pderror--;
-            } else {
+            }
+
+            if( !pderror ) {
                 pdlastbusted = PULLDOWN_ERROR_THRESHOLD;
             }
         }
