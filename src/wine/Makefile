@@ -24,10 +24,11 @@ WINOBJ = module.o \
 
 
 all: $(WINOBJ)
+	ar r libwine.a *.o
 
 
 clean:
-	rm -f *~ *.o  marvin
+	rm -f *~ *.o *.a
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c

@@ -37,13 +37,14 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	display.c wm_state.h wm_state.c console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c \
 	station.h station.c bands.h configsave.h configsave.c x11tools.c \
-	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c
+	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
+	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h
 
 bin_PROGRAMS = tvtime 
 EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.a -lpthread
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la

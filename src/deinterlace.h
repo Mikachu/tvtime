@@ -110,7 +110,7 @@ struct deinterlace_frame_data_s
 
 typedef void (*deinterlace_frame_t)( unsigned char *output,
                                      deinterlace_frame_data_t *data,
-                                     int width );
+                                     int bottom_field, int width, int height );
 
 
 /**

@@ -56,8 +56,8 @@ printf("History %d\n",pMethod->HistoryRequired);
             // read in settings
             for(i = 0; i < pMethod->nSettings; i++)
             {
-//                Setting_ReadFromIni(&(pMethod->pSettings[i]));
-//		  printf("Parameter %s: %ld\n",pMethod->pSettings[i].szDisplayName,*(pMethod->pSettings[i].pValue));
+// Setting_ReadFromIni(&(pMethod->pSettings[i]));
+// printf("Parameter %s: %ld\n",pMethod->pSettings[i].szDisplayName,*(pMethod->pSettings[i].pValue));
             }
 
             if(pMethod->pfnPluginStart != NULL)
@@ -85,7 +85,7 @@ DEINTERLACE_METHOD *LoadDeintPlugin( char *filename )
     GETDEINTERLACEPLUGININFO *pfnGetDeinterlacePluginInfo;
     DEINTERLACE_METHOD *pMethod;
     HMODULE hPlugInMod;
-	int i;
+    int i;
 
     hPlugInMod = LoadLibrary( filename );
     if(hPlugInMod == NULL)
@@ -103,21 +103,32 @@ DEINTERLACE_METHOD *LoadDeintPlugin( char *filename )
     if(pMethod != NULL)
     {
         if(pMethod->SizeOfStructure == sizeof(DEINTERLACE_METHOD) &&
-            pMethod->DeinterlaceStructureVersion >= DEINTERLACE_VERSION_3)
-        {
-fprintf( stderr, "Name: %s\n",pMethod->szName );
-fprintf( stderr, "nSettings %ld\n",pMethod->nSettings );
-printf( stderr, "History %ld\n",pMethod->nFieldsRequired );
+            pMethod->DeinterlaceStructureVersion >= DEINTERLACE_VERSION_3) {
+
             pMethod->hModule = hPlugInMod;
 
-            // read in settings
-            for( i = 0; i < pMethod->nSettings; i++)
-            {
-          //      Setting_ReadFromIni(&(pMethod->pSettings[i]));
-	//	  printf("Parameter %s: %ld\n",pMethod->pSettings[i].szDisplayName,*(pMethod->pSettings[i].pValue));
+            fprintf( stderr, "\n======\n" );
+            fprintf( stderr, "Name:       %s\n", pMethod->szName );
+            fprintf( stderr, "ShortName:  %s\n", pMethod->szShortName );
+            fprintf( stderr, "History:    %ld\n", pMethod->nFieldsRequired );
+            fprintf( stderr, "Halfheight: %d\n", pMethod->bIsHalfHeight );
+            fprintf( stderr, "FieldDiff:  %d\n", pMethod->bNeedFieldDiff );
+            fprintf( stderr, "CombFactor: %d\n", pMethod->bNeedCombFactor );
+
+            fprintf( stderr, "Settings:   %ld\n", pMethod->nSettings );
+
+            /* Read in settings. */
+            for( i = 0; i < pMethod->nSettings; i++) {
+                fprintf( stderr, "[%d] %s\n", i, pMethod->pSettings[i].szDisplayName );
+                /*
+                Setting_ReadFromIni(&(pMethod->pSettings[i]));
+                printf("Parameter %s: %ld\n",
+                       pMethod->pSettings[i].szDisplayName,
+                       *(pMethod->pSettings[i].pValue));
+                */
             }
-            if(pMethod->pfnPluginInit != NULL)
-            {
+
+            if( pMethod->pfnPluginInit ) {
                 pMethod->pfnPluginInit();
             }
 

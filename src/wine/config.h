@@ -1,3 +1,4 @@
+
 #define WIN32_PATH "./"
 
 #ifndef TRACE
