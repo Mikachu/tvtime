@@ -187,9 +187,8 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
     fprintf( stderr, "tvtime: acquire %5.2fms, build top %5.2fms, wait top %5.2fms, blit top %5.2fms\n"
                      "tvtime:                  build bot %5.2fms, wait bot %5.2fms, blit bot %5.2fms\n",
              acquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
-    fprintf( stderr, "tvtime: system->video memory speed approximately %.2fMB/sec\n",
-             ( ( (double) framesize ) / blit_top ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ) );
-    fprintf( stderr, "tvtime: Using approximately %.2f%% CPU to deinterlace.\n",
+    fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, using %.2f%% CPU to deinterlace.\n",
+             ( ( (double) framesize ) / blit_top ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
              ( ( build_top + build_bot ) / (acquire+build_top+wait_top+blit_top+build_bot+wait_bot+blit_bot) ) * 100.0 );
     fprintf( stderr, "tvtime: top-to-bot: %5.2f, bot-to-top: %5.2f\n",
              (double) perf->time_top_to_bot / 1000.0,
