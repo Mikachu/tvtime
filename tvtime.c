@@ -41,7 +41,6 @@
 /* Number of frames to pause during channel change. */
 #define CHANNEL_HOLD 2
 
-
 /**
  * Warning tolerance, just for debugging.
  */
@@ -630,7 +629,7 @@ int main( int argc, char **argv )
                                                                curframe + (width*2),
                                                                width, height/2, width*4 );
             } else {
-                packed422_field_to_frame_bot( sdl_get_output(), width*2, curframe,
+                packed422_field_to_frame_bot( sdl_get_output(), width*2, curframe + (width*2),
                                               width, height/2, width*4 );
             }
             osd_string_composite_packed422( channel_number, sdl_get_output(), width, height,
