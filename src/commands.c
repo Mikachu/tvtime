@@ -353,7 +353,10 @@ static void reinit_tuner( commands_t *cmd )
         set_redirect( "root", "root-tuner" );
         set_redirect( "picture", "picture-tuner" );
 
-        videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr ) );
+        videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr )
+                                   + ((station_get_current_finetune( cmd->stationmgr ) * 1000)/16) );
+        menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ) );
+        commands_refresh_menu( cmd );
 
         norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
         if( norm >= 0 ) {
@@ -894,11 +897,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_right_command( menu, 5, TVTIME_TOGGLE_NTSC_CABLE_MODE, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-general" );
@@ -930,11 +938,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 4, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations-palsecam" );
@@ -971,11 +984,40 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_right_command( menu, 5, TVTIME_CHANNEL_ACTIVATE_ALL, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    sprintf( string, "%c%c%c  Finetune current channel", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
+    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "finetune" );
     menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 7, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "finetune" );
+    menu_set_text( menu, 0, "Setup - Station management - Finetune" );
+    sprintf( string, "%c%c%c  Current: ---", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    sprintf( string, "%c%c%c  Decrease", 0xee, 0x80, 0xa9 );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_FINETUNE_DOWN, "" );
+    menu_set_right_command( menu, 2, TVTIME_FINETUNE_DOWN, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
+    sprintf( string, "%c%c%c  Increase", 0xee, 0x80, 0xa8 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_FINETUNE_UP, "" );
+    menu_set_right_command( menu, 3, TVTIME_FINETUNE_UP, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "stations" );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-ntsc" );
@@ -2214,8 +2256,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_FINETUNE_DOWN:
     case TVTIME_FINETUNE_UP:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
-            videoinput_set_tuner_freq( cmd->vidin, videoinput_get_tuner_freq( cmd->vidin ) +
-                                       ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
+            station_set_current_finetune( cmd->stationmgr, station_get_current_finetune( cmd->stationmgr )
+                                          + (tvtime_cmd == TVTIME_FINETUNE_UP ? 1 : -1) );
+            videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr )
+                                       + ((station_get_current_finetune( cmd->stationmgr ) * 1000)/16) );
 
             if( cmd->vbi ) {
                 vbidata_reset( cmd->vbi );
@@ -2223,10 +2267,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             }
 
             if( cmd->osd ) {
-                char message[ 200 ];
-                snprintf( message, sizeof( message ), "Tuning: %4.2fMhz.",
-                          ((double) videoinput_get_tuner_freq( cmd->vidin )) / 1000.0 );
-                tvtime_osd_show_message( cmd->osd, message );
+                menu_set_value( commands_get_menu( cmd, "finetune" ), station_get_current_finetune( cmd->stationmgr ) );
+                commands_refresh_menu( cmd );
+                tvtime_osd_show_data_bar_centered( cmd->osd, "Finetune",
+                                                   station_get_current_finetune( cmd->stationmgr ) );
             }
         } else if( cmd->osd ) {
             tvtime_osd_show_info( cmd->osd );

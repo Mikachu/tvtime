@@ -80,6 +80,8 @@ void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd );
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                                int percentage );
+void tvtime_osd_show_data_bar_centered( tvtime_osd_t *osd, const char *barname,
+                                        int percentage );
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message );
 
 

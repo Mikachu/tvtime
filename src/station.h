@@ -148,6 +148,11 @@ int station_get_current_colour( station_mgr_t *mgr );
 int station_get_current_hue( station_mgr_t *mgr );
 
 /**
+ * Returns the current finetune setting.
+ */
+int station_get_current_finetune( station_mgr_t *mgr );
+
+/**
  * The last channel we were at, before the current one.
  */
 int station_get_prev_id( station_mgr_t *mgr );
@@ -209,6 +214,11 @@ void station_set_current_brightness( station_mgr_t *mgr, int val );
 void station_set_current_contrast( station_mgr_t *mgr, int val );
 void station_set_current_colour( station_mgr_t *mgr, int val );
 void station_set_current_hue( station_mgr_t *mgr, int val );
+
+/**
+ * Sets the finetune setting for this channel.
+ */
+void station_set_current_finetune( station_mgr_t *mgr, int finetune );
 
 /**
  * Writes out the current station config.

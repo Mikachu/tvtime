@@ -702,6 +702,33 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
     }
 }
 
+void tvtime_osd_show_data_bar_centered( tvtime_osd_t *osd, const char *barname,
+                                        int percentage )
+{
+    if( !*(osd->hold_message ) ) {
+        char bar[ 108 ];
+        int maxwidth;
+
+        sprintf( bar, "%s", barname );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, osd->delay );
+        osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
+   
+        sprintf( bar, " %d", percentage );
+        osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, osd->delay );
+
+        osd->databar_xstart = osd->strings[ OSD_MESSAGE2_BAR ].xpos;
+        osd->databar_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos + 4;
+        maxwidth = osd->databar_xend
+                 - osd_string_get_width( osd->strings[ OSD_DATA_VALUE ].string ) - osd->databar_xstart;
+        osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
+        osd_rect_set_size( osd->databar, (maxwidth * (percentage + 50)) / 100, 18 );
+        osd_rect_set_timeout( osd->databar, osd->delay );
+        osd_rect_set_colour( osd->databarbg, 80, 80, 40, 40 );
+        osd_rect_set_size( osd->databarbg, maxwidth, 18 );
+        osd_rect_set_timeout( osd->databarbg, osd->delay );
+    }
+}
+
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 {
     if( !*(osd->hold_message) ) {

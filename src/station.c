@@ -45,6 +45,7 @@ struct station_info_s
     int contrast;
     int colour;
     int hue;
+    int finetune;
 
     station_info_t *next;
     station_info_t *prev;
@@ -116,6 +117,7 @@ static station_info_t *station_info_new( int pos, const char *name, const band_t
         i->contrast = -1;
         i->colour = -1;
         i->hue = -1;
+        i->finetune = 0;
 
         if( name ) {
             snprintf( i->name, sizeof( i->name ), "%s", name );
@@ -275,6 +277,7 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *contrast = xmlGetProp( station, BAD_CAST "contrast" );
             xmlChar *colour = xmlGetProp( station, BAD_CAST "colour" );
             xmlChar *hue = xmlGetProp( station, BAD_CAST "hue" );
+            xmlChar *finetune = xmlGetProp( station, BAD_CAST "finetune" );
 
             /* Only band and channel are required. */
             if( band && channel ) {
@@ -302,8 +305,10 @@ int station_readconfig( station_mgr_t *mgr )
                 if( contrast ) station_set_current_contrast( mgr, atoi( (char *) contrast ) );
                 if( colour ) station_set_current_colour( mgr, atoi( (char *) colour ) );
                 if( hue ) station_set_current_hue( mgr, atoi( (char *) hue ) );
+                if( finetune ) station_set_current_finetune( mgr, atoi( (char *) finetune ) );
             }
 
+            if( finetune ) xmlFree( finetune );
             if( brightness ) xmlFree( brightness );
             if( contrast ) xmlFree( contrast );
             if( colour ) xmlFree( colour );
@@ -767,6 +772,23 @@ int station_get_current_hue( station_mgr_t *mgr )
     }
 }
 
+int station_get_current_finetune( station_mgr_t *mgr )
+{
+    if( mgr->current ) {
+        return mgr->current->finetune;
+    } else {
+        return 0;
+    }
+}
+
+void station_set_current_finetune( station_mgr_t *mgr, int finetune )
+{
+    if( finetune >  50 ) finetune = 50;
+    if( finetune < -49 ) finetune = -49;
+    if( mgr->current ) {
+        mgr->current->finetune = finetune;
+    }
+}
 
 void station_activate_all_channels( station_mgr_t *mgr )
 {
@@ -961,6 +983,9 @@ int station_writeconfig( station_mgr_t *mgr )
         xmlSetProp( node, BAD_CAST "position", BAD_CAST buf );
         xmlSetProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
         xmlSetProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
+
+        snprintf( buf, sizeof( buf ), "%d", rp->finetune );
+        xmlSetProp( node, BAD_CAST "finetune", BAD_CAST buf );
 
         if( *(rp->network_name) ) {
             xmlSetProp( node, BAD_CAST "network", BAD_CAST rp->network_name );
