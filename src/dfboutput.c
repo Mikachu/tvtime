@@ -42,8 +42,9 @@ static DFBColor colorkey;
 static int input_width, input_height;
 static int output_aspect = 0;
 static int output_fullscreen = 0;
-static int deinterlacing = 0;
+static int deinterlacing = 1;
 static int alwaysontop = 0;
+static int fullscreen_pos = 0;
 
 static DFBRectangle *current_rect;
 static DFBRectangle fullscreen_rect;
@@ -86,15 +87,42 @@ static void window_alwaysontop( void )
      }
 }
 
-static void calc_size( DFBRectangle *rect, int height, int aspect )
+static void calc_size( DFBRectangle *rect,
+                       int width, int height, int aspect )
 {
      int widthratio = aspect ? 16 : 4;
      int heightratio = aspect ? 9 : 3;
-     int width = height * widthratio / heightratio;
+     if (width < 0 || width * heightratio / widthratio > height)
+          width = height * widthratio / heightratio;
+     else
+          height = width * heightratio / widthratio;
+
      output_aspect = aspect;
 
      rect->w = width;
      rect->h = height;
+}
+
+static void
+calc_fullscreen_size( void )
+{
+     DFBDisplayLayerConfig dlc;
+
+     primary->GetConfiguration( primary, &dlc );
+
+     calc_size( &fullscreen_rect, dlc.width, dlc.height, output_aspect );
+     fullscreen_rect.x = (dlc.width - fullscreen_rect.w) / 2;
+     switch (fullscreen_pos) {
+          case 0:
+               fullscreen_rect.y = (dlc.height - fullscreen_rect.h) / 2;
+               break;
+          case 1:
+               fullscreen_rect.y = 0;
+               break;
+          case 2:
+               fullscreen_rect.y = dlc.height - fullscreen_rect.h;
+               break;
+     }
 }
 
 /* public */
@@ -104,36 +132,56 @@ static int dfb_init( int outputheight, int aspect, int verbose )
      DFBDisplayLayerConfig dlc;
      DFBWindowDescription wd;
 
+     current_rect = &window_rect;
+
+     calc_size( current_rect, -1, outputheight, aspect );
+
      DirectFBInit( NULL, NULL );
      DirectFBCreate( &dfb );
 
-     current_rect = &window_rect;
-
-     calc_size( current_rect, outputheight, aspect );
+     /* Get the video layer */
+     if (dfb->GetDisplayLayer( dfb, 1, &video )) {
+          dfb->Release( dfb );
+          return 0;
+     }
+     if (video->SetCooperativeLevel( video, DLSCL_EXCLUSIVE )) {
+          video->Release( video );
+          dfb->Release( dfb );
+          return 0;
+     }
 
      /* Get the primary layer */
-     if (dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &primary ))
+     if (dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &primary )) {
+          video->Release( video );
+          dfb->Release( dfb );
           return 0;
-     if (primary->SetCooperativeLevel( primary, DLSCL_SHARED ))
+     }
+     if (primary->SetCooperativeLevel( primary, DLSCL_SHARED )) {
+          primary->Release( primary );
+          video->Release( video );
+          dfb->Release( dfb );
           return 0;
+     }
+
      primary->GetConfiguration( primary, &dlc );
      colorkey.r = 0x01;
      colorkey.g = 0x01;
      colorkey.b = 0xfe;
      switch (dlc.pixelformat) {
-     case DSPF_ARGB1555:
-          colorkey.r <<= 3;
-          colorkey.g <<= 3;
-          colorkey.b <<= 3;
-          break;
-     case DSPF_RGB16:
-          colorkey.r <<= 3;
-          colorkey.g <<= 2;
-          colorkey.b <<= 3;
-          break;
-     default:
-          ;
+          case DSPF_ARGB1555:
+               colorkey.r <<= 3;
+               colorkey.g <<= 3;
+               colorkey.b <<= 3;
+               break;
+          case DSPF_RGB16:
+               colorkey.r <<= 3;
+               colorkey.g <<= 2;
+               colorkey.b <<= 3;
+               break;
+          default:
+               ;
      }
+     video->SetDstColorKey( video, colorkey.r, colorkey.g, colorkey.b );
 
      /* Create a window to house the video layer */
      wd.flags = DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
@@ -150,16 +198,9 @@ static int dfb_init( int outputheight, int aspect, int verbose )
 
      /* Select events */
      window->DisableEvents( window, DWET_ALL );
-     window->EnableEvents( window, DWET_BUTTONDOWN | DWET_KEYDOWN | DWET_WHEEL  | DWET_POSITION | DWET_SIZE );
+     window->EnableEvents( window, DWET_BUTTONDOWN | DWET_KEYDOWN |
+                           DWET_WHEEL  | DWET_POSITION | DWET_SIZE );
      window->CreateEventBuffer( window, &buffer );
-
-     /* Get the video layer */
-     if (dfb->GetDisplayLayer( dfb, 1, &video ))
-          return 0;
-     if (video->SetCooperativeLevel( video, DLSCL_EXCLUSIVE ))
-          return 0;
-
-     video->SetDstColorKey( video, colorkey.r, colorkey.g, colorkey.b );
 
      return 1;
 }
@@ -176,26 +217,25 @@ static int dfb_set_input_size( int inputwidth, int inputheight )
 
      /* Set configuration accroding to input data */
      dlc.flags = DLCONF_BUFFERMODE | DLCONF_WIDTH | DLCONF_HEIGHT | DLCONF_PIXELFORMAT | DLCONF_OPTIONS;
+     dlc.buffermode = DLBM_TRIPLE;
      dlc.width = input_width;
      dlc.height = input_height;
      dlc.pixelformat = DSPF_YUY2;
      dlc.options = DLOP_DST_COLORKEY;
-     if (deinterlacing) {
-          dlc.buffermode = DLBM_TRIPLE;
+     if (deinterlacing)
           dlc.options |= DLOP_DEINTERLACING;
-     } else {
-          dlc.buffermode = DLBM_BACKVIDEO;
-     }
      if (video->TestConfiguration( video, &dlc, &failed ))
           return 0;
      if (video->SetConfiguration( video, &dlc ))
           return 0;
+
      video->GetSurface( video, &surface );
      surface->Clear( surface, 0, 0, 0, 0xff );
      surface->Flip( surface, NULL, 0 );
      surface->Clear( surface, 0, 0, 0, 0xff );
      surface->Flip( surface, NULL, 0 );
      surface->Clear( surface, 0, 0, 0, 0xff );
+
      video->SetOpacity( video, 0xff );
 
      resize_video();
@@ -231,6 +271,8 @@ static void dfb_unlock_output_buffer( void )
      surface->Unlock( surface );
 }
 
+
+
 static int dfb_is_exposed( void )
 {
      return 1;
@@ -251,6 +293,8 @@ static int dfb_is_fullscreen( void )
      return output_fullscreen;
 }
 
+
+
 static int dfb_is_interlaced( void )
 {
      return deinterlacing;
@@ -258,10 +302,11 @@ static int dfb_is_interlaced( void )
 
 static void dfb_wait_for_sync( int field )
 {
-    if( deinterlacing ) {
-        surface->SetField( surface, field );
-    }
+     if (deinterlacing)
+          surface->SetField( surface, field );
 }
+
+
 
 static int dfb_show_frame( int x, int y, int width, int height )
 {
@@ -273,8 +318,12 @@ static int dfb_show_frame( int x, int y, int width, int height )
 
 static int dfb_toggle_aspect( void )
 {
-     calc_size( &window_rect, window_rect.h, !output_aspect );
-     calc_size( &fullscreen_rect, fullscreen_rect.h, output_aspect );
+     DFBDisplayLayerConfig dlc;
+
+     primary->GetConfiguration( primary, &dlc );
+
+     calc_size( &window_rect, -1, window_rect.h, !output_aspect );
+     calc_fullscreen_size();
 
      move_window();
      resize_window();
@@ -310,11 +359,10 @@ static int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
      } else {
           current_rect = &window_rect;
 
-          window->SetOptions( window, DWOP_NONE );
-          window->SetStackingClass( window, DWSC_MIDDLE );
-
           window->UngrabPointer( window );
           window->UngrabKeyboard( window );
+
+          window_alwaysontop();
      }
 
      move_window();
@@ -347,7 +395,7 @@ static void dfb_set_window_position( int x, int y )
 
 static void dfb_set_window_height( int window_height )
 {
-     calc_size( &window_rect, window_height, output_aspect );
+     calc_size( &window_rect, -1, window_height, output_aspect );
 
      if (!output_fullscreen) {
           resize_window();
@@ -357,25 +405,10 @@ static void dfb_set_window_height( int window_height )
 
 static void dfb_set_fullscreen_position( int pos )
 {
-     DFBDisplayLayerConfig dlc;
+     fullscreen_pos = pos;
 
-     primary->GetConfiguration( primary, &dlc );
+     calc_fullscreen_size();
 
-     calc_size( &fullscreen_rect, dlc.height, output_aspect );
-     switch (pos) {
-          case 0:
-               fullscreen_rect.x = 0;
-               fullscreen_rect.y = (dlc.height - fullscreen_rect.h) / 2;
-               break;
-          case 1:
-               fullscreen_rect.x = 0;
-               fullscreen_rect.y = 0;
-               break;
-          case 2:
-               fullscreen_rect.x = 0;
-               fullscreen_rect.y = dlc.height - fullscreen_rect.h;
-               break;
-     }
      if (output_fullscreen) {
           move_window();
           resize_video();
