@@ -371,7 +371,6 @@ static void *create_shm( int size )
              * if we crash or whatever, to make sure we still clean up.
              */
             shmctl( shminfo.shmid, IPC_RMID, 0 );
-            XSetErrorHandler( 0 );
         }
     }
 
@@ -503,7 +502,6 @@ int xv_init( int outputheight, int aspect, int verbose )
 
     calculate_video_area();
     saver_off( display );
-    x11_InstallXErrorHandler();
     return 1;
 }
 
