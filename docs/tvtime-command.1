@@ -77,7 +77,7 @@ Move one channel down in the channel list.
 Move one channel up in the channel list.
 
 .TP
-.B CHANNEL_PREV
+.B CHANNEL_JUMP / CHANNEL_PREV
 Changes to the last channel you were at.  Useful for jumping back and
 forth between two programs on distant channels.
 
@@ -144,10 +144,7 @@ will change to channel 15.
 
 .TP
 .B FINETUNE_DOWN
-Decreases the fine tuning for the current channel.  Fine tuning can be
-saved as a new channel using the
-.B CHANNEL_SAVE_TUNING
-command.
+Decreases the fine tuning setting for the current channel.
 
 .TP
 .B FINETUNE_UP
@@ -231,7 +228,11 @@ captured input.
 .TP
 .B PICTURE
 Selects which picture setting (brightness/contrast/colour/hue) to change
-using the PICTURE_UP and PICTURE_DOWN commands.
+using the
+.B PICTURE_UP
+and
+.B PICTURE_DOWN
+commands.
 
 .TP
 .B PICTURE_UP
@@ -381,7 +382,7 @@ Shows or hides the
 .B tvtime
 console window.  Using the
 .B tvtime
-console, you can type in any of the commands in this document and have
+console, you can type in any of the commands listed here and have
 them executed.
 
 .TP
@@ -459,9 +460,7 @@ of frames with various deinterlacers.
 
 .TP
 .B TOGGLE_PULLDOWN_DETECTION
-Toggles between the available 2\[en]3 pulldown detection modes.  Modes
-currently available are vektor's adaptive pulldown detection, and
-dalias's pulldown detection.
+Enables or disables the 2\[en]3 pulldown detection feature for NTSC input.
 
 .TP
 .B TOGGLE_SIGNAL_DETECTION
