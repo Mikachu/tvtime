@@ -1,4 +1,9 @@
 
+0.9.8.1 -
+  * vektor: Show network name and network call letters in XDS
+      information (fixes 729588)
+  * vektor: Fixed documentation for channel_renumber (fixes 729675)
+
 0.9.8 - Mon Apr 28 23:55:41 ADT 2003
   * vektor: Used dalias' new quater-scanline interpolation method for
       overlay bob (improves quality).
