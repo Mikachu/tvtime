@@ -353,18 +353,14 @@ and don't want the text to interrupt your TV watching or appear in other
 screenshots.
 
 .TP
-<option name="ProcessPriority" value="-19"/>
+<option name="ProcessPriority" value="-10"/>
 Sets the default process priority.  By default,
 .B tvtime
-tries to be a real hog and get
-.I \[en]19
-priority, which is insane, but hey, if a frame comes in we need to
-process it right away or it gets dropped, right? :)    Acceptable
-values are from
+tries to set itself at a priority of
+.I \[en]10
+which higher than normal applications.  Acceptable values are from
 .IR \[en]20 " to " 20 ,
-with lower values meaning higher priority (blame
-.SM UNIX
-for that).
+with lower values meaning higher priority.
 
 .TP
 <option name="TimeFormat" value="%X"/>

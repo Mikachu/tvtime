@@ -263,13 +263,12 @@
 
 
   <!--
-    Sets the default process priority.  By default, tvtime tries to be
-    a real hog and get -19 priority, which is insane, but hey, if a
-    frame comes in we need to process it right away or it gets dropped,
-    right? :)    Acceptable values are from -20 to 20, with lower values
-    meaning higher priority (blame UNIX for that).
+    Sets the default process priority.  By default, tvtime tries to
+    set itself at a priority of -10 which is higher than normal
+    applications.  Acceptable values are from -20 to 20, with lower
+    values meaning higher priority.
   -->
-  <option name="ProcessPriority" value="-19"/>
+  <option name="ProcessPriority" value="-10"/>
 
   <!--
     Sets the time format to be used in the tvtime on-screen display.

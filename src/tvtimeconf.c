@@ -705,7 +705,7 @@ config_t *config_new( void )
     ct->debug = 0;
     ct->fullscreen = 0;
     ct->alwaysontop = 0;
-    ct->priority = -19;
+    ct->priority = -10;
     ct->ntsc_mode = 0;
     ct->send_fields = 0;
     ct->apply_luma_correction = 0;

@@ -4,6 +4,12 @@ For news and updates on tvtime, please visit our website at:
   http://tvtime.net/
 
 
+News for 0.9.14
+
+  *  Fixed colour problems for DVB driver users.
+  *  Changed the default process priority to -10 instead of -19.
+  *  Fixed compile problems with new gcc versions.
+
 News for 0.9.13
 
   *  Added support for changing the default language read from XMLTV.

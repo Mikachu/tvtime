@@ -1,5 +1,10 @@
 
 0.9.14 -
+  * vektor: Fixed colour problems for DVB driver users.
+  * vektor: Change the default process priority to -10 instead of -19,
+      since using -19 seems just a little excessive.
+  * vektor: Fixed compile problems by not compiling the C++ code into
+      a library.
   * vektor: Increase the max number of mouse buttons to 15 (Mikachu has
       a mouse with 11 buttons).
 
