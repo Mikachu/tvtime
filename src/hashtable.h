@@ -78,7 +78,7 @@ hashtable_iterator_t *hashtable_iterator_init (hashtable_t *ht);
  */
 
 void *hashtable_iterator_go (hashtable_iterator_t *iter,
-			     int preinc, int postinc, int *index);
+                             int preinc, int postinc, int *index);
 
 /**
  * Destroys an iterator.

@@ -20,109 +20,109 @@
 #include "hashtable.h"
 
 struct hashtable_s {
-	size_t size;
-	struct hashtable_object *table;
+    size_t size;
+    struct hashtable_object *table;
 };
 
 struct hashtable_iterator_s {
-	hashtable_t *ht;
-	int index;
+    hashtable_t *ht;
+    int index;
 };
 
 struct hashtable_object {
-	enum { NEVER_USED, CLEARED, IN_USE } status;
-	int index;
-	void *data;
+    enum { NEVER_USED, CLEARED, IN_USE } status;
+    int index;
+    void *data;
 };
 
 hashtable_t *hashtable_init( size_t size )
 {
-	hashtable_t *ht;
-	int i;
+    hashtable_t *ht;
+    int i;
 
-	ht = malloc (sizeof (*ht));
-	if (ht == NULL)
-		return NULL;
-	
-	ht->table = malloc (sizeof (*(ht->table)) * size);
-	if (ht->table == NULL) {
+    ht = malloc (sizeof (*ht));
+    if (ht == NULL)
+        return NULL;
+    
+    ht->table = malloc (sizeof (*(ht->table)) * size);
+    if (ht->table == NULL) {
                 free (ht);
                 return NULL;
         }
-	 
-	ht->size = size;
-	for (i = 0; i < size; i++) {
-		ht->table [i].status = NEVER_USED;
-		ht->table [i].index = 0;
-		ht->table [i].data = NULL;
-	}
-	return ht;
+     
+    ht->size = size;
+    for (i = 0; i < size; i++) {
+        ht->table [i].status = NEVER_USED;
+        ht->table [i].index = 0;
+        ht->table [i].data = NULL;
+    }
+    return ht;
 }
 
 static struct hashtable_object * hashtable_probe( hashtable_t *ht, int index, int probe )
 {
-	// Quadratic probing
-	return &ht->table[(index + probe*probe) % ht->size];
+    // Quadratic probing
+    return &ht->table[(index + probe*probe) % ht->size];
 }    
 
 static struct hashtable_object *hashtable_find( hashtable_t *ht, int index )
 {
-	struct hashtable_object *obj;
-	int probe;
+    struct hashtable_object *obj;
+    int probe;
 
-	for (probe = 0; probe < ht->size; probe++) {
-		obj = hashtable_probe (ht, index, probe);
-		switch (obj->status) {
-		case NEVER_USED:
-			// Object does not exist.
-			return NULL;
-		case CLEARED:
-			if (obj->index == index) {
-				// Object used to exist, but doesn't any more.
-				return NULL;
-			} else {
-				// An object used to be here, but not this one.
-				// Continue probing.
-				break;
-			}
-		case IN_USE:
-			if (obj->index == index) {
-				// Eureka!
-				return obj;
-			} else {
-				// An object is here, but not the one we're
-				// looking for. Continue probing.
-				break;
-			}
-		default:
-			// Hash table is broken. What now?
-			return NULL;
-		}
-	}
-	// If we broke out of the loop, it means the hash table is full, and
-	// that we didn't find the object. What now?
-	return NULL;
+    for (probe = 0; probe < ht->size; probe++) {
+        obj = hashtable_probe (ht, index, probe);
+        switch (obj->status) {
+        case NEVER_USED:
+            // Object does not exist.
+            return NULL;
+        case CLEARED:
+            if (obj->index == index) {
+                // Object used to exist, but doesn't any more.
+                return NULL;
+            } else {
+                // An object used to be here, but not this one.
+                // Continue probing.
+                break;
+            }
+        case IN_USE:
+            if (obj->index == index) {
+                // Eureka!
+                return obj;
+            } else {
+                // An object is here, but not the one we're
+                // looking for. Continue probing.
+                break;
+            }
+        default:
+            // Hash table is broken. What now?
+            return NULL;
+        }
+    }
+    // If we broke out of the loop, it means the hash table is full, and
+    // that we didn't find the object. What now?
+    return NULL;
 }
 
 void *hashtable_lookup( hashtable_t *ht, int index )
 {
-	struct hashtable_object *obj = hashtable_find (ht, index);
+    struct hashtable_object *obj = hashtable_find (ht, index);
 
-	if (obj == NULL)
-		return NULL;
-	else
-		return obj->data;
+    if (obj == NULL)
+        return NULL;
+    else
+        return obj->data;
 }
 
 // BEWARE. Untested code. (pvz)
 int hashtable_resize( hashtable_t *htold )
 {
         // Resizes the hash table to be 5 times bigger than before.
-	// Better by 5 than by 4, since 4 == 2*2. The fewer factors
-	// in a hash table size the better. (Optimally, the number
-	// is prime, but calculating prime numbers runtime is expensive.)
+    // Better by 5 than by 4, since 4 == 2*2. The fewer factors
+    // in a hash table size the better. (Optimally, the number
+    // is prime, but calculating prime numbers runtime is expensive.)
         hashtable_t *htnew = hashtable_init (htold->size * 5);
-	struct hashtable_object *p;
+    struct hashtable_object *p;
 
         if (htnew == NULL)
                 return 0;
@@ -139,15 +139,15 @@ int hashtable_resize( hashtable_t *htold )
 
 int hashtable_insert( hashtable_t *ht, int index, void *data )
 {
-	int probe = 0;
-	struct hashtable_object *obj;
+    int probe = 0;
+    struct hashtable_object *obj;
 
-	while ((obj = hashtable_probe (ht, index, probe))->status == IN_USE)
-		if (obj->index == index) // object already existed. overwrite.
-			break;
-		else if (probe < ht->size)
-			probe++;
-		else {
+    while ((obj = hashtable_probe (ht, index, probe))->status == IN_USE)
+        if (obj->index == index) // object already existed. overwrite.
+            break;
+        else if (probe < ht->size)
+            probe++;
+        else {
                         // The hash table is full. Resize it.
                         // BEWARE, untested code. (pvz)
                         if (!hashtable_resize (ht)) {
@@ -159,72 +159,73 @@ int hashtable_insert( hashtable_t *ht, int index, void *data )
                                 continue;
                         }
                 }
-	obj->status = IN_USE;
-	obj->index = index;
-	obj->data = data;
-	return 1;
+    obj->status = IN_USE;
+    obj->index = index;
+    obj->data = data;
+    return 1;
 }
 
 int hashtable_delete( hashtable_t *ht, int index )
 {
-	struct hashtable_object *obj = hashtable_find (ht, index);
+    struct hashtable_object *obj = hashtable_find (ht, index);
 
-	if (obj == NULL)
-		return 0;
-	else {
-		obj->status = CLEARED;
-		return 1;
-	}
+    if (obj == NULL)
+        return 0;
+    else {
+        obj->status = CLEARED;
+        return 1;
+    }
 }
 
 void hashtable_destroy( hashtable_t *ht )
 {
-	free (ht->table);
-	free (ht);
+    free (ht->table);
+    free (ht);
 }
 
 hashtable_iterator_t *hashtable_iterator_init (hashtable_t *ht)
 {
-	hashtable_iterator_t *iter = malloc (sizeof *iter);
+    hashtable_iterator_t *iter = malloc (sizeof *iter);
 
-	if (iter == NULL)
-		return NULL;
-	iter->ht = ht;
-	iter->index = 0;
-	return iter;
+    if (iter == NULL)
+        return NULL;
+    iter->ht = ht;
+    iter->index = 0;
+    return iter;
 }
 
 void *hashtable_iterator_go (hashtable_iterator_t *iter,
-			     int preinc, int postinc, int *index)
+                 int preinc, int postinc, int *index)
 {
-	// TODO: Support decrementation
-	int i;
-	void *ret = NULL;
+    // TODO: Support decrementation
+    int i;
+    void *ret = NULL;
 
-	*index = -1;
-	// First, check if the iterator is on an object in the hash table
-	if (iter->ht->table[iter->index].status != IN_USE)
-		preinc++;
-	for (i = 0; i < preinc; i++) {	
-		while (iter->ht->table[iter->index].status != IN_USE) {
-			iter->index++;
-			if (iter->index >= iter->ht->size)
-				return NULL;
-		}
-	}
-	*index = iter->ht->table[iter->index].index;
-	ret = iter->ht->table[iter->index++].data;
-	for (i = 0; i < postinc; i++) {
-		while (iter->ht->table[iter->index].status != IN_USE) {
-			iter->index++;
-			if (iter->index >= iter->ht->size)
-				return ret;
-		}
-	}
-	return ret;
+    *index = -1;
+    // First, check if the iterator is on an object in the hash table
+    if (iter->ht->table[iter->index].status != IN_USE)
+        preinc++;
+    for (i = 0; i < preinc; i++) {    
+        while (iter->ht->table[iter->index].status != IN_USE) {
+            iter->index++;
+            if (iter->index >= iter->ht->size)
+                return NULL;
+        }
+    }
+    *index = iter->ht->table[iter->index].index;
+    ret = iter->ht->table[iter->index++].data;
+    for (i = 0; i < postinc; i++) {
+        while (iter->ht->table[iter->index].status != IN_USE) {
+            iter->index++;
+            if (iter->index >= iter->ht->size)
+                return ret;
+        }
+    }
+    return ret;
 }
 
 void hashtable_iterator_destroy (hashtable_iterator_t *iter)
 {
-	free (iter);
+    free (iter);
 }
+

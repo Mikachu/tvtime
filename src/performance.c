@@ -22,7 +22,7 @@
 #include <sys/time.h>
 #include "performance.h"
 
-#define DROP_HISTORY_SIZE	10
+#define DROP_HISTORY_SIZE        10
 
 static int timediff( struct timeval *large, struct timeval *small )
 {

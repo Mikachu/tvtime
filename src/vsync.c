@@ -90,57 +90,57 @@ void vgasync_spin_until_out_of_refresh( void )
 
 
 typedef enum {
-    _DRM_VBLANK_ABSOLUTE = 0x0,		/* Wait for specific vblank sequence number */
-    _DRM_VBLANK_RELATIVE = 0x1,		/* Wait for given number of vblanks */
-    _DRM_VBLANK_SIGNAL   = 0x40000000	/* Send signal instead of blocking */
+    _DRM_VBLANK_ABSOLUTE = 0x0,         /* Wait for specific vblank sequence number */
+    _DRM_VBLANK_RELATIVE = 0x1,         /* Wait for given number of vblanks */
+    _DRM_VBLANK_SIGNAL   = 0x40000000   /* Send signal instead of blocking */
 } drm_vblank_seq_type_t;
 
-#define DRM_IOCTL_BASE			'd'
-#define DRM_IOWR(nr,type)		_IOWR(DRM_IOCTL_BASE,nr,type)
+#define DRM_IOCTL_BASE                  'd'
+#define DRM_IOWR(nr,type)               _IOWR(DRM_IOCTL_BASE,nr,type)
 #define _DRM_VBLANK_FLAGS_MASK _DRM_VBLANK_SIGNAL
 
 struct drm_wait_vblank_request {
-	drm_vblank_seq_type_t type;
-	unsigned int sequence;
-	unsigned long signal;
+    drm_vblank_seq_type_t type;
+    unsigned int sequence;
+    unsigned long signal;
 };
 
 struct drm_wait_vblank_reply {
-	drm_vblank_seq_type_t type;
-	unsigned int sequence;
-	long tval_sec;
-	long tval_usec;
+    drm_vblank_seq_type_t type;
+    unsigned int sequence;
+    long tval_sec;
+    long tval_usec;
 };
 
 typedef union drm_wait_vblank {
-	struct drm_wait_vblank_request request;
-	struct drm_wait_vblank_reply reply;
+    struct drm_wait_vblank_request request;
+    struct drm_wait_vblank_reply reply;
 } drm_wait_vblank_t;
 
-#define DRM_IOCTL_WAIT_VBLANK		DRM_IOWR(0x3a, drm_wait_vblank_t)
+#define DRM_IOCTL_WAIT_VBLANK           DRM_IOWR(0x3a, drm_wait_vblank_t)
 
 typedef enum {
-    DRM_VBLANK_ABSOLUTE = 0x0,		/* Wait for specific vblank sequence number */
-    DRM_VBLANK_RELATIVE = 0x1,		/* Wait for given number of vblanks */
-    DRM_VBLANK_SIGNAL   = 0x40000000	/* Send signal instead of blocking */
+    DRM_VBLANK_ABSOLUTE = 0x0,          /* Wait for specific vblank sequence number */
+    DRM_VBLANK_RELATIVE = 0x1,          /* Wait for given number of vblanks */
+    DRM_VBLANK_SIGNAL   = 0x40000000    /* Send signal instead of blocking */
 } drmVBlankSeqType;
 
 typedef struct _drmVBlankReq {
-	drmVBlankSeqType type;
-	unsigned int sequence;
-	unsigned long signal;
+    drmVBlankSeqType type;
+    unsigned int sequence;
+    unsigned long signal;
 } drmVBlankReq, *drmVBlankReqPtr;
 
 typedef struct _drmVBlankReply {
-	drmVBlankSeqType type;
-	unsigned int sequence;
-	long tval_sec;
-	long tval_usec;
+    drmVBlankSeqType type;
+    unsigned int sequence;
+    long tval_sec;
+    long tval_usec;
 } drmVBlankReply, *drmVBlankReplyPtr;
 
 typedef union _drmVBlank {
-	drmVBlankReq request;
-	drmVBlankReply reply;
+    drmVBlankReq request;
+    drmVBlankReply reply;
 } drmVBlank, *drmVBlankPtr;
 
 static int dri_fd = -1;

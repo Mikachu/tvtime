@@ -63,7 +63,7 @@ static int screen_pitch = 0;
 void dfb_lock_output_buffer( void )
 {
     current_frame->Lock( current_frame, DSLF_WRITE|DSLF_READ, 
-			 &screen_framebuffer, &screen_pitch );
+                         &screen_framebuffer, &screen_pitch );
 }
 
 void dfb_unlock_output_buffer( void )
@@ -97,8 +97,9 @@ void dfb_shutdown( void )
         keyboard->Release( keyboard );
     }
 
-    if (current_frame)
-	current_frame->Release( current_frame );
+    if( current_frame ) {
+        current_frame->Release( current_frame );
+    }
     
     if( c2frame ) {
         c2frame->Release( c2frame );
@@ -128,7 +129,7 @@ int dfb_setup_temp_buffer()
   
   if ((res = dfb->CreateSurface( dfb, &dsc, &current_frame )) != DFB_OK) {
       fprintf(stderr,"dgboutput: Can't create surfaces - %s!\n",
-	      DirectFBErrorString( res ) );
+              DirectFBErrorString( res ) );
       return -1;
   }
 
@@ -146,8 +147,7 @@ int dfb_init( int outputheight, int aspect, int verbose )
     DirectFBSetOption( "no-cursor", "" );
     DirectFBSetOption( "bg-color", "00000000" );
     DirectFBSetOption( "matrox-crtc2", "" );
-    DirectFBSetOption( "matrox-tv-standard", 
-		       (outputheight == 576) ? "pal" : "ntsc" );
+    DirectFBSetOption( "matrox-tv-standard", (outputheight == 576) ? "pal" : "ntsc" );
 
     DirectFBCreate( &dfb );
     dfb->GetDisplayLayer( dfb, 2, &crtc2 );
@@ -187,7 +187,7 @@ int dfb_init( int outputheight, int aspect, int verbose )
     c2frame->GetSize( c2frame, &output_width, &output_height );
    
     fprintf( stderr, "DirectFB: Screen is %d x %d\n", 
-	     output_width, output_height );
+             output_width, output_height );
 
     /* Make sure we clear all buffers */
     c2frame->Clear( c2frame, 0, 0, 0, 0xff );
@@ -335,12 +335,9 @@ void dfb_poll_events( input_t *in )
 
 
                 case DIKI_INSERT: 
-		  if (parity == 0)
-		    parity = 1;
-		  else
-		    parity = 0;
-		  crtc2->SetFieldParity( crtc2, parity );
-                break;
+                    if (parity == 0) parity = 1; else parity = 0;
+                    crtc2->SetFieldParity( crtc2, parity );
+                    break;
                 default:
                     cur = 'a' + ( event.key_id - DIKI_A );
                     arg |= cur;
@@ -383,15 +380,15 @@ int dfb_get_visible_height( void )
 
 void dfb_set_input_size( int inputwidth, int inputheight )
 {
-    int need_input_resize = (current_frame == NULL || 
-			     (input_width != inputwidth) || 
-			     (input_height != inputheight));
+    int need_input_resize = (current_frame == NULL ||
+                            (input_width != inputwidth) || (input_height != inputheight));
 
     input_width = inputwidth;
     input_height = inputheight;
     fprintf(stderr,"Set input size: %dx%d\n",inputwidth,inputheight);
-    if (need_input_resize)
-	dfb_setup_temp_buffer();
+    if( need_input_resize ) {
+        dfb_setup_temp_buffer();
+    }
 }
 
 int dfb_is_fullscreen( void )
