@@ -49,11 +49,11 @@ Code we stole (well, used under the GPL)
     Being a reasonable 'port' of much of the DScaler code is definitely
     one of our goals.
 
-  Freetype2 code and compositing ideas from mythtv
+  Original Freetype2 code and compositing ideas from mythtv
     http://mythtv.sourceforge.net/
-    The ttfont.[h,c] is from mythtv, original code from Carsten Haitzler,
-    citing Copyright (C) 1999 Carsten Haitzler and various contributors.
-    Hopefully this will be cleaned up/merged to be common with mythtv.
+    We since rewrote our font renderer, but originally we borrowed from
+    this great project.  It would be nice to re-sync some of our rendering
+    code.
 
   Some great colourbar generation and Y'CbCr<->R'G'B' code
     Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>
