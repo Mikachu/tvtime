@@ -170,6 +170,10 @@ static void mga_set_window_caption( const char *caption )
 {
 }
 
+static void mga_set_window_position( int x, int y )
+{
+}
+
 static void mga_set_window_height( int window_height )
 {
 }
@@ -214,6 +218,7 @@ static output_api_t mgaoutput =
     mga_toggle_fullscreen,
     mga_set_window_caption,
 
+    mga_set_window_position,
     mga_set_window_height,
 
     mga_poll_events,

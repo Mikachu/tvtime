@@ -439,6 +439,11 @@ int dfb_is_fullscreen( void )
     return 1;
 }
 
+void dfb_set_window_position( int x, int y )
+{
+    /* This has no meaning since we're always fullscreen */
+}
+
 void dfb_set_window_height( int window_height )
 {
     /* Dfb Tv-out does not support height modifications */
@@ -474,6 +479,7 @@ output_api_t dfboutput =
     dfb_toggle_fullscreen,
     dfb_set_window_caption,
 
+    dfb_set_window_position,
     dfb_set_window_height,
 
     dfb_poll_events,

@@ -51,6 +51,7 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height );
 int xcommon_toggle_aspect( void );
 void xcommon_poll_events( input_t *in );
 void xcommon_set_window_caption( const char *caption );
+void xcommon_set_window_position( int x, int y );
 void xcommon_set_window_height( int window_height );
 int xcommon_is_exposed( void );
 void xcommon_set_colourkey( int colourkey );

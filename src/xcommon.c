@@ -942,6 +942,19 @@ void xcommon_frame_drawn( void )
     }
 }
 
+void xcommon_set_window_position( int x, int y )
+{
+    if( output_fullscreen ) {
+        xcommon_toggle_fullscreen( 0, 0 );
+    }
+
+    if( xcommon_verbose ) {
+        fprintf( stderr, "xcommon: Target window position %d,%d.\n", x, y );
+    }
+
+    XMoveWindow( display, wm_window, x, y );
+}
+
 void xcommon_set_window_height( int window_height )
 {
     XWindowChanges win_changes;

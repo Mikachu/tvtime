@@ -378,6 +378,7 @@ static output_api_t xvoutput =
     xcommon_toggle_fullscreen,
     xcommon_set_window_caption,
 
+    xcommon_set_window_position,
     xcommon_set_window_height,
 
     xcommon_poll_events,
