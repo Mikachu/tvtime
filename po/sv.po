@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-10-31 01:22+0100\n"
-"PO-Revision-Date: 2003-10-31 02:17+0100\n"
+"PO-Revision-Date: 2003-10-31 02:44+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -209,7 +209,7 @@ msgstr ""
 "    ska fungera optimalt. Ifall du kör en version av Linux äldre\n"
 "    än 2.4.21, är de förvalda inställningarna för låga. För att\n"
 "    lösa problemet, specifiera inställningen gbuffers=4 när du\n"
-"    laddar bttv-modulen. För mer information, se vår supportsida:\n"
+"    laddar bttv-modulen. För mer information, se vår hjälpsida:\n"
 "    %s\n"
 "\n"
 
@@ -234,7 +234,7 @@ msgstr ""
 
 #: src/tvtime.c:1488
 msgid "On screen display failed to initialize, disabled.\n"
-msgstr "Kunde inte initiera menysystemet -- avstängt.\n"
+msgstr "Kunde inte initiera menysystemet, menysystemet inaktiverat.\n"
 
 #: src/tvtime.c:1507
 msgid "No video source"
@@ -242,11 +242,11 @@ msgstr "Ingen videokälla"
 
 #: src/tvtime.c:1553
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
-msgstr "Kan inte skapa FIFO -- fjärrstyrning av tvtime avstängt.\n"
+msgstr "Kan inte skapa FIFO -- fjärrstyrning av tvtime inaktiverat.\n"
 
 #: src/tvtime.c:1594
 msgid "Closed caption display failed to initialize, disabled.\n"
-msgstr "Kunde inte initiera visning av closed captions -- avstängda.\n"
+msgstr "Kunde inte initiera visning av closed captions, visning inaktiverad.\n"
 
 #: src/tvtime.c:1851
 msgid "Always-on-top enabled."
@@ -254,7 +254,7 @@ msgstr "Alltid-överst aktiverat."
 
 #: src/tvtime.c:1856
 msgid "Always-on-top disabled."
-msgstr "Alltid-överst avstängt."
+msgstr "Alltid-överst inaktiverat."
 
 #: src/tvtime.c:1875
 msgid "16:9 display mode active."
@@ -266,7 +266,7 @@ msgstr "4:3-visning aktivt."
 
 #: src/tvtime.c:1991
 msgid "2-3 pulldown inversion disabled."
-msgstr "2:3-matnings-kompensering avstängd."
+msgstr "2:3-matnings-kompensering inaktiverad."
 
 #: src/tvtime.c:1994
 msgid "2-3 pulldown inversion enabled."
@@ -307,10 +307,10 @@ msgid ""
 msgstr ""
 "\n"
 "    Utökat stöd för realtidsklocka (RTC) i din kärna krävs för mjuk\n"
-"    videospelning. Vi rekommenderar starkt att du laddar modulen 'rtc'\n"
+"    videospelning. Vi rekommenderar starkt att du laddar modulen \"rtc\"\n"
 "    innan tvtime startas, och att du ser till att din användare har\n"
 "    tillgång till enhetsfilen (/dev/rtc eller /dev/misc/rtc). Se vår\n"
-"    supportsida: %s för mer information.\n"
+"    hjälpsida: %s för mer information.\n"
 "\n"
 
 #: src/tvtime.c:2714
@@ -333,7 +333,7 @@ msgstr ""
 "    tillåtna RTC-upplösningen för användar-processer genom att köra\n"
 "    följande kommando som root:\n"
 "        sysctl -w dev.rtc.max-user-freq=1024\n"
-"    Se vår supportsida: %s för mer information.\n"
+"    Se vår hjälpsida: %s för mer information.\n"
 "\n"
 
 #: src/tvtime.c:2734
@@ -697,7 +697,7 @@ msgstr "Sleeptimer: %d minuter."
 
 #: src/commands.c:1983
 msgid "Sleep off."
-msgstr "Sleeptimer avstängd."
+msgstr "Sleeptimer inaktiverad."
 
 #: src/commands.c:2041
 msgid "Channel marked as active in the browse list."
@@ -748,7 +748,7 @@ msgstr "Söker kanaler som sänder."
 
 #: src/commands.c:2263
 msgid "Closed captions disabled."
-msgstr "Closed captions avstängda."
+msgstr "Closed captions inaktiverade."
 
 #: src/commands.c:2269
 msgid "Closed captions enabled."
@@ -774,7 +774,7 @@ msgstr "Signalavkänning aktiverad."
 
 #: src/commands.c:2419
 msgid "Signal detection disabled."
-msgstr "Signalavkänning avstängd."
+msgstr "Signalavkänning inaktiverad."
 
 #: src/commands.c:2432
 msgid "XDS decoding enabled."
@@ -782,7 +782,7 @@ msgstr "XDS-avkodning aktiverad."
 
 #: src/commands.c:2435
 msgid "XDS decoding disabled."
-msgstr "XDS-avkodning avstängd."
+msgstr "XDS-avkodning inaktiverad."
 
 #: src/commands.c:2481
 msgid "Colour invert enabled."
@@ -790,7 +790,7 @@ msgstr "Färginvertering aktiverat."
 
 #: src/commands.c:2483
 msgid "Colour invert disabled."
-msgstr "Färginvertering avstängt."
+msgstr "Färginvertering inaktiverad."
 
 #: src/commands.c:2505
 msgid "Mirror enabled."
@@ -798,7 +798,7 @@ msgstr "Spegling aktiverat."
 
 #: src/commands.c:2507
 msgid "Mirror disabled."
-msgstr "Spegling avstängt."
+msgstr "Spegling inaktiverat."
 
 #: src/commands.c:2529
 msgid "Chroma kill enabled."
@@ -806,7 +806,7 @@ msgstr "Färgspärr aktiverad."
 
 #: src/commands.c:2531
 msgid "Chroma kill disabled."
-msgstr "Färgspärr avstängd."
+msgstr "Färgspärr inaktiverad."
 
 #: src/commands.c:2548
 msgid "Luma correction enabled."
@@ -814,7 +814,7 @@ msgstr "Luma-korrigering aktiverat."
 
 #: src/commands.c:2550
 msgid "Luma correction disabled."
-msgstr "Luma-korrigering avstängt."
+msgstr "Luma-korrigering inaktiverad."
 
 #: src/commands.c:2567
 #, c-format
@@ -1181,7 +1181,7 @@ msgstr "%s: Kan inte öppna %s: %s\n"
 #: src/tvtime-command.c:103
 #, c-format
 msgid "%s: Invalid command '%s'\n"
-msgstr "%s: Ogiltigt kommando '%s'\n"
+msgstr "%s: Ogiltigt kommando \"%s\"\n"
 
 #: src/tvtime-command.c:108
 #, c-format
