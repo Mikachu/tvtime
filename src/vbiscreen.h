@@ -4,7 +4,7 @@
 typedef struct vbiscreen_s vbiscreen_t;
 
 vbiscreen_t *vbiscreen_new( int video_width, int video_height, 
-                            double video_aspect );
+                            double video_aspect, int verbose );
 void vbiscreen_delete( vbiscreen_t *vs );
 void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style);
 void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
@@ -22,5 +22,6 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                                              int width, int xpos, 
                                              int scanline );
 void vbiscreen_dump_screen_text( vbiscreen_t *vs );
+void vbiscreen_reset( vbiscreen_t *vs );
 
 #endif

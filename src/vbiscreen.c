@@ -48,12 +48,15 @@ struct vbiscreen_s {
     int top_of_screen; /* a pointer into line[] */
     int indent;
 
+    int scroll;
+
     char *fontfile;
     int fontsize;
+    int verbose;
 };
 
 vbiscreen_t *vbiscreen_new( int video_width, int video_height, 
-                            double video_aspect )
+                            double video_aspect, int verbose )
 {
     int i=0, fontsize = FONT_SIZE;
     vbiscreen_t *vs = (vbiscreen_t *)malloc(sizeof(struct vbiscreen_s));
@@ -62,6 +65,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
         return NULL;
     }
 
+    vs->verbose = verbose;
     vs->x = 0;
     vs->y = 0;
     vs->frame_width = video_width;
@@ -88,6 +92,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->indent = 0;
     vs->disp_buf = 0;
     memset( vs->buffers, 0, 2 * COLS );
+    vs->scroll = 0;
 
     vs->line[0] = osd_string_new( vs->fontfile, fontsize, video_width, 
                                   video_height,
@@ -221,14 +226,15 @@ void scroll_screen( vbiscreen_t *vs )
         return;
 
     start_row = ( vs->first_line + vs->top_of_screen ) % ( 2 * ROWS );
-    fprintf ( stderr, "start row : %d first line %d\n ", start_row, vs->first_line );
+    if( vs->verbose )
+        fprintf ( stderr, "start row : %d first line %d\n ", start_row, vs->first_line );
     /* zero out top row */
     memset( (char *)( vs->text + start_row * COLS ), 0, COLS );
 
     vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
     vs->curx = 0;
     update_all_rows( vs );
-
+    vs->scroll = 26;
 }
 
 void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital, 
@@ -237,10 +243,8 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
     int i, j, base;
     if( !vs ) return;
 
-    vs->fgcolour = colour;
-    vs->indent = indent;
-    vs->cury = row ? row - 1 : vs->cury;
-    vs->curx = 0;
+    if( vs->captions && vs->style <= ROLL_4 && vs->style )
+        scroll_screen( vs );
 
     if( vs->captions && vs->style == POP_UP ) {
         base = ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
@@ -248,18 +252,18 @@ void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital,
              i < base + COLS;
              j++, i++ ) {
             vs->text[ i ] = vs->buffers[ j ];
-            fprintf( stderr, "%c", vs->buffers[ j ] );
         }
-        fprintf( stderr, "\n" );
         vs->disp_buf = vs->text + base;
 
         update_row( vs );
         memset( vs->buffers, 0, COLS );
     }
 
-    if( vs->captions && vs->style <= ROLL_4 && vs->style )
-        scroll_screen( vs );
-
+    vs->fgcolour = colour;
+    vs->indent = indent;
+    if( vs->style > ROLL_4 )
+        vs->cury = row ? row - 1 : vs->cury;
+    vs->curx = 0;
 
 
 }
@@ -268,9 +272,10 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
 {
     int base, i, j;
     if( !vs ) return;
-    fprintf( stderr, "in set mode\n");
+    if( vs->verbose )
+        fprintf( stderr, "in set mode\n");
 
-    if( vs->style != style ) {
+    if( 0 && vs->style != style ) {
         base = vs->top_of_screen * COLS;
         for( i = 0; i < ROWS * COLS; i++ ) {
             vs->text[ base ] = 0;
@@ -286,9 +291,7 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
              i < base + COLS;
              j++, i++ ) {
             vs->text[ i ] = vs->buffers[ j ];
-            fprintf( stderr, "%c", vs->buffers[ j ] );
         }
-        fprintf( stderr, "\n" );
         vs->disp_buf = vs->text + base;
 
         update_row( vs );
@@ -296,22 +299,23 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
     }
 
 
-    fprintf( stderr, "Caption: %d ", caption );
+    if( vs->verbose )
+        fprintf( stderr, "Caption: %d ", caption );
     switch( style ) {
     case ROLL_2:
-        fprintf( stderr, "ROLL 2\n");
+        if( vs->verbose ) fprintf( stderr, "ROLL 2\n");
         break;
     case ROLL_3:
-        fprintf( stderr, "ROLL 3\n" );
+        if( vs->verbose ) fprintf( stderr, "ROLL 3\n" );
         break;
     case ROLL_4:
-        fprintf( stderr, "ROLL 4\n" );
+        if( vs->verbose ) fprintf( stderr, "ROLL 4\n" );
         break;
     case POP_UP:
-        fprintf( stderr, "POP UP\n" );
+        if( vs->verbose ) fprintf( stderr, "POP UP\n" );
         break;
     case PAINT_ON:
-        fprintf( stderr, "PAINT ON\n" );
+        if( vs->verbose ) fprintf( stderr, "PAINT ON\n" );
         break;
     default:
         break;
@@ -337,11 +341,11 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
             */
 
             /* scroll */
-            if( vs->captions && vs->style <= ROLL_4 && vs->style )
+            if( 0 && vs->captions && vs->style <= ROLL_4 && vs->style )
                 scroll_screen( vs );
 
             vs->first_line = ROWS - (style - 4);
-            fprintf( stderr, "first_line %d\n", vs->first_line );
+            if( vs->verbose ) fprintf( stderr, "first_line %d\n", vs->first_line );
             vs->cury = ROWS; /* this is offscreen */
             break;
         case POP_UP:
@@ -362,6 +366,7 @@ void vbiscreen_tab( vbiscreen_t *vs, int cols )
     if( !vs ) return;
     if( cols < 0 || cols > 3 ) return;
     vs->curx += cols;
+    if( vs->curx > 31 ) vs->curx = 31;
 }
 
 void vbiscreen_set_colour( vbiscreen_t *vs, unsigned int col )
@@ -393,8 +398,8 @@ void vbiscreen_set_current_cell( vbiscreen_t *vs, char text )
 void vbiscreen_delete_to_end( vbiscreen_t *vs )
 {
     int i;
-    fprintf( stderr, "in del to end\n");
     if( !vs ) return;
+    if( vs->verbose ) fprintf( stderr, "in del to end\n");
     for( i = vs->curx; i < COLS; i++ ) {
         vbiscreen_clear_current_cell( vs );
         vs->curx++;
@@ -405,8 +410,8 @@ void vbiscreen_delete_to_end( vbiscreen_t *vs )
 
 void vbiscreen_backspace( vbiscreen_t *vs )
 {
-    fprintf( stderr, "in backspace\n");
     if( !vs ) return;
+    if( vs->verbose ) fprintf( stderr, "in backspace\n");
     if( !vs->curx ) return;
     vs->curx--;
     vbiscreen_clear_current_cell( vs );
@@ -416,28 +421,23 @@ void vbiscreen_backspace( vbiscreen_t *vs )
 void blank_screen( vbiscreen_t *vs )
 {
     int i;
-    fprintf( stderr, "in blank\n");
+    if( vs->verbose ) fprintf( stderr, "in blank\n");
     for( i = 0; i < ROWS; i++ ) {
-        osd_string_show_text( vs->line[ i ], "", 0 );
+        osd_string_show_text( vs->line[ i ], " ", 0 );
     }
 }
 
 void vbiscreen_erase_displayed( vbiscreen_t *vs )
 {
     int base , i;
-    fprintf( stderr, "in erase disp\n");
     if( !vs ) return;
+    if( vs->verbose ) fprintf( stderr, "in erase disp\n");
 
-    if( vs->disp_buf && vs->style == POP_UP )
-        memset( vs->disp_buf, 0, COLS );
-    else if( vs->style && vs->style <= ROLL_4 ) {
-        base = vs->top_of_screen * COLS;
-        for( i = 0; i < ROWS * COLS; i++ ) {
-            vs->text[ base ] = 0;
-            base++;
-            base %= 2 * ROWS * COLS;
-        }
-        
+    base = vs->top_of_screen * COLS;
+    for( i = 0; i < ROWS * COLS; i++ ) {
+        vs->text[ base ] = 0;
+        base++;
+        base %= 2 * ROWS * COLS;
     }
 
     update_all_rows( vs );
@@ -445,16 +445,17 @@ void vbiscreen_erase_displayed( vbiscreen_t *vs )
 
 void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 {
-    fprintf( stderr, "in erase non disp\n");
     if( !vs ) return;
-    if( !vs->captions || vs->style < POP_UP ) return;
+    if( vs->verbose ) fprintf( stderr, "in erase non disp\n");
+    if( !vs->captions || !vs->style ) return;
     memset( vs->buffers, 0, COLS );
+    memset( vs->text + ( ( ( vs->top_of_screen + ROWS ) % ( 2 * ROWS ) ) * COLS ), 0, COLS );
 }
 
 void vbiscreen_carriage_return( vbiscreen_t *vs )
 {
     if( !vs ) return;
-    fprintf( stderr, "in CR\n");
+    if( vs->verbose ) fprintf( stderr, "in CR\n");
     if( vs->cury == ROWS ) {
         /* not sure if this is right for text mode */
         /* in text mode, perhaps a CR on last row clears screen and goes
@@ -475,15 +476,11 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs )
     int i, j, base;
 
     if( !vs ) return;
-    fprintf( stderr, "in end of caption\n");
+    if( vs->verbose ) fprintf( stderr, "in end of caption\n");
+    if( !vs->style ) return;
+
     /* draw it now */
     if( vs->captions && vs->style && vs->style <= ROLL_4 ) {
-        base = vs->top_of_screen * COLS;
-        for( i = 0; i < ROWS * COLS; i++ ) {
-            vs->text[ base ] = 0;
-            base++;
-            base %= 2 * ROWS * COLS;
-        }
         return;
     }
 
@@ -492,9 +489,7 @@ void vbiscreen_end_of_caption( vbiscreen_t *vs )
          i < base + COLS;
          j++, i++ ) {
         vs->text[ i ] = vs->buffers[ j ];
-        fprintf( stderr, "%c", vs->buffers[ j ] );
     }
-    fprintf( stderr, "\n" );
     vs->disp_buf = vs->text + base;
 
     update_row( vs );
@@ -507,10 +502,10 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
 {
     int i;
     if( !vs ) return;
-    fprintf( stderr, "in print\n");
+    if( vs->verbose ) fprintf( stderr, "in print [%c %c]\n", c1, c2);
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
-        for( i = 0; i < COLS; i+=2 ) {
+        for( i = 0; i < COLS; i++ ) {
             if( !vs->buffers[ i ] ) {
                 if( i == COLS-1 ) {
                     vs->buffers[ i ] = c2;
@@ -520,10 +515,11 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
                 }
                 return;
             }
-            /* buffer is full so c2 will be at the end */
-            vs->buffers[ COLS-1 ] = c2;
-            return;
         }
+        /* buffer is full so c2 will be at the end */
+        vs->buffers[ COLS-1 ] = c2;
+        return;
+
     }
 
     if( vs->captions && vs->style && vs->style != POP_UP ) {
@@ -560,17 +556,25 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
     }
 }
 
+void vbiscreen_reset( vbiscreen_t *vs )
+{
+    if( !vs ) return;
+    vbiscreen_erase_displayed( vs );
+    vbiscreen_erase_non_displayed( vs );
+    blank_screen( vs );
+    vs->captions = 0;
+    vs->style = 0;
+}
 
 void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                                              unsigned char *output,
                                              int width, int xpos, 
                                              int scanline )
 {
-    int x=0, y=0, row=0, col=0, index=0;
+    int x=0, y=0, row=0, col=0, index=0, rowlen=0;
 
     if( !vs ) return;
     if( !output ) return;
-
     if( scanline >= vs->y && scanline < vs->y + vs->height ) {
 
         if( 0 && !vs->captions )
@@ -581,22 +585,13 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
         index = vs->top_of_screen * COLS;
         x = ( vs->x + vs->charwidth) & ~1;
         for( row = 0; row < ROWS; row++ ) {
-            y = vs->y + row * vs->rowheight + vs->rowheight;                
-
+            y = vs->y + row * vs->rowheight + vs->rowheight;
             if( osd_string_visible( vs->line[ row ] ) ) {
                 if( scanline >= y &&
                     scanline < y + vs->rowheight ) {
 
                     int startx;
                     int strx;
-
-                    if( 0 && vs->captions )
-                        blit_colour_packed422_scanline( 
-                            output + (x*2), 
-                            vs->charwidth,
-                            vs->bg_luma, 
-                            vs->bg_cb, 
-                            vs->bg_cr );
 
                     startx = x - xpos;
                     strx = 0;                       
@@ -605,7 +600,18 @@ void vbiscreen_composite_packed422_scanline( vbiscreen_t *vs,
                         strx = -startx;
                         startx = 0;
                     }
+
+
                     if( startx < width ) {
+
+                        if( vs->captions )
+                            blit_colour_packed422_scanline( 
+                                output + (startx*2), 
+                                osd_string_get_width( vs->line[ row ] ),
+                                vs->bg_luma, 
+                                vs->bg_cb, 
+                                vs->bg_cr );
+
                         osd_string_composite_packed422_scanline( 
                             vs->line[ row ],
                             output + (startx*2),

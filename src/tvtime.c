@@ -665,7 +665,8 @@ int main( int argc, char **argv )
     }
 
     vs = vbiscreen_new( width, height, 
-                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
+                        verbose );
     if( !vs ) {
         fprintf( stderr, "tvtime: Could not create vbiscreen.\n" );
         return 1;

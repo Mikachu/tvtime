@@ -74,7 +74,7 @@ struct input_s {
 #endif
 
     vbidata_t *vbi;
-
+    int capturemode;
 };
 
 /**
@@ -280,7 +280,7 @@ static void reinit_tuner( input_t *in )
             videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
             if( in->vbi ) {
                 vbidata_reset( in->vbi );
-                vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+                vbidata_capture_mode( in->vbi, in->capturemode );
             }
         }
 
@@ -339,6 +339,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
 
     in->console = 0;
     in->vbi = 0;
+    in->capturemode = CAPTURE_OFF;
 
     in->lirc_used = 0;
 
@@ -416,7 +417,7 @@ static void input_channel_change_relative( input_t *in, int offset )
         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
         if( in->vbi ) {
             vbidata_reset( in->vbi );
-            vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+            vbidata_capture_mode( in->vbi, in->capturemode );
         }
 
         if( verbose ) {
@@ -544,6 +545,14 @@ void input_callback( input_t *in, InputEvent command, int arg )
             in->toggleaspect = 1;
             break;
 
+        case TVTIME_TOGGLE_CC:
+            vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
+            if( in->capturemode )
+                in->capturemode = CAPTURE_OFF;
+            else
+                in->capturemode = CAPTURE_CC1;
+            break;
+
         case TVTIME_DISPLAY_INFO:
             tvtime_osd_show_info( in->osd );
             break;
@@ -639,7 +648,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
                 if( in->vbi ) {
                     vbidata_reset( in->vbi );
-                    vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+                    vbidata_capture_mode( in->vbi, in->capturemode );
                 }
 
                 if( in->osd ) {
@@ -739,7 +748,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
                         if( in->vbi ) {
                             vbidata_reset( in->vbi );
-                            vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+                            vbidata_capture_mode( in->vbi, in->capturemode );
                         }
 
 

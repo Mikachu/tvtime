@@ -900,6 +900,7 @@ void vbidata_reset( vbidata_t *vbi )
     vbi->lastcount = 0;
     vbi->xds_packet[ 0 ] = 0;
     vbi->xds_cursor = 0;
+    vbiscreen_reset( vbi->vs );
 }
 
 void vbidata_capture_mode( vbidata_t *vbi, int mode )
