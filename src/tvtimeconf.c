@@ -952,7 +952,7 @@ config_t *config_new( void )
     /* First read in global settings. */
     asprintf( &base, "%s/tvtime.xml", CONFDIR );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, _("config: Reading configuration from %s\n"), base );
+        fprintf( stderr, _("Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
@@ -961,7 +961,7 @@ config_t *config_new( void )
     asprintf( &base, "%s/.tvtime/tvtime.xml", getenv( "HOME" ) );
     ct->config_filename = strdup( base );
     if( file_is_openable_for_read( base ) ) {
-        fprintf( stderr, _("config: Reading configuration from %s\n"), base );
+        fprintf( stderr, _("Reading configuration from %s\n"), base );
         conf_xml_parse( ct, base );
     }
     free( base );
@@ -1021,7 +1021,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
                       if( ct->config_filename ) {
                           lfprintf
                               ( stderr,
-                                _("config: Reading configuration from %s\n"),
+                                _("Reading configuration from %s\n"),
                                 ct->config_filename );
                           conf_xml_parse( ct, ct->config_filename );
                       }
@@ -1069,7 +1069,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
 
     if( ct->doc && saveoptions ) {
         char tempstring[ 32 ];
-        lfputs( _("config: Saving command line options.\n"), stderr );
+        lfputs( _("Saving command line options.\n"), stderr );
 
         /**
          * Options that aren't specified on the command line
@@ -1159,7 +1159,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   ct->config_filename = expand_user_path( optarg );
                   if( ct->config_filename ) {
                       lfprintf( stderr,
-                                _("config: Reading configuration from %s\n"),
+                                _("Reading configuration from %s\n"),
                                 ct->config_filename );
                       conf_xml_parse( ct, ct->config_filename );
                   }
@@ -1322,7 +1322,7 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc,
                   ct->config_filename = expand_user_path( optarg );
                   if( ct->config_filename ) {
                       lfprintf( stderr,
-                                _("config: Reading configuration from %s\n"),
+                                _("Reading configuration from %s\n"),
                                 ct->config_filename );
                       conf_xml_parse( ct, ct->config_filename );
                   }

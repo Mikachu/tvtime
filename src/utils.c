@@ -687,9 +687,10 @@ void setup_i18n( void )
          * undefined state.
          */
         errfmt = _("\n"
-                   "*** Call to bind_textdomain_codeset() failed to set UTF-8 mode. (Returned %s.)\n"
-                   "*** This may cause GUI messages to be displayed incorrectly!\n"
-                   "*** Please report this as a bug at %s.\n\n");
+        "    Failed to enter UTF-8 mode using bind_textdomain_codeset()\n"
+        "    (returned %s.)  This may cause messages\n"
+        "    to be displayed incorrectly!  Please report this bug at\n"
+        "    %s.\n\n");
 
         codeset = bind_textdomain_codeset( "tvtime", "UTF-8" );
         if( !codeset || strcmp( codeset, "UTF-8" ) ) {
@@ -820,3 +821,4 @@ int lfprintf( FILE *stream, const char *format, ... )
     va_end( ap );
     return ret;
 }
+

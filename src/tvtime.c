@@ -165,7 +165,16 @@ tvtime_t *tvtime_new( void )
 
     tvtime->curmethod = 0;
     tvtime->inputfilter = videofilter_new();
+    if( !tvtime->inputfilter ) {
+        free( tvtime );
+        return 0;
+    }
     tvtime->outputfilter = outputfilter_new();
+    if( !tvtime->outputfilter ) {
+        videofilter_delete( tvtime->inputfilter );
+        free( tvtime );
+        return 0;
+    }
     tvtime->filtered_curframe = 0;
     tvtime->last_topdiff = 0;
     tvtime->last_botdiff = 0;
@@ -181,12 +190,8 @@ tvtime_t *tvtime_new( void )
 
 void tvtime_delete( tvtime_t *tvtime )
 {
-    if( tvtime->inputfilter ) {
-        videofilter_delete( tvtime->inputfilter );
-    }
-    if( tvtime->outputfilter ) {
-        outputfilter_delete( tvtime->outputfilter );
-    }
+    videofilter_delete( tvtime->inputfilter );
+    outputfilter_delete( tvtime->outputfilter );
     free( tvtime );
 }
 
@@ -379,7 +384,7 @@ static void calculate_pulldown_score_vektor( tvtime_t *tvtime,
     tvtime->last_botdiff = 0;
 
     for( i = 0; i < frame_height; i++ ) {
-        if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, i ) ) {
+        if( !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, i ) ) {
             videofilter_packed422_scanline( tvtime->inputfilter, curframe + (i*instride), width, 0, i );
         }
 
@@ -486,7 +491,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
     if( !tvtime->curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( tvtime->inputfilter && !tvtime->filtered_curframe ) {
+        if( !tvtime->filtered_curframe ) {
             for( i = 0; i < frame_height; i++ ) {
                 if( videofilter_active_on_scanline( tvtime->inputfilter, i ) ) {
                     videofilter_packed422_scanline( tvtime->inputfilter, curframe + (i*instride), width, 0, i );
@@ -527,7 +532,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
         }
 
         /* Copy a scanline. */
-        if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline ) ) {
+        if( !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline ) ) {
             videofilter_packed422_scanline( tvtime->inputfilter, curframe, width, 0, scanline );
         }
         blit_packed422_scanline( output, curframe, width );
@@ -548,7 +553,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             data.t0 = curframe;
             data.b0 = curframe + (instride*2);
 
-            if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + 1 ) ) {
+            if( !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + 1 ) ) {
                 videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, scanline );
                 videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, scanline + 1 );
             }
@@ -722,7 +727,7 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
     }
 
     /* Interpolate the top scanline as a special case. */
-    if( tvtime->inputfilter && !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + bottom_field ) ) {
+    if( !tvtime->filtered_curframe && videofilter_active_on_scanline( tvtime->inputfilter, scanline + bottom_field ) ) {
         videofilter_packed422_scanline( tvtime->inputfilter, curframe, width, 0, 0 );
         videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, 1 );
         videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, 2 );
@@ -739,7 +744,7 @@ static void tvtime_build_copied_field( tvtime_t *tvtime,
 
     for( i = ((frame_height - 2) / 2); i; --i ) {
 
-        if( tvtime->inputfilter && !tvtime->filtered_curframe && 
+        if( !tvtime->filtered_curframe && 
                 (videofilter_active_on_scanline( tvtime->inputfilter, scanline + 1 ) ||
                  videofilter_active_on_scanline( tvtime->inputfilter, scanline + 2 )) ) {
             videofilter_packed422_scanline( tvtime->inputfilter, curframe + instride, width, 0, scanline + 1 );
@@ -1262,11 +1267,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     /* Setup the tvtime object. */
     tvtime = tvtime_new();
-    if( !tvtime->inputfilter ) {
-        fputs( _("tvtime: Can't initialize input filters.\n"), stderr );
-    }
-    if( !tvtime->outputfilter ) {
-        fputs( _("tvtime: Can't initialize output filters.\n"), stderr );
+    if( !tvtime ) {
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
     }
 
     if( !output->is_interlaced() ) {
@@ -1310,8 +1312,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
     if( !perf ) {
-        fputs( _("tvtime: Can't initialize performance monitor, exiting.\n"),
-               stderr );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
 
@@ -1319,8 +1320,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                               config_get_v4l_freq( ct ),
                               config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
-        fputs( _("tvtime: Can't create station"
-                 "manager (no memory?), exiting.\n"), stderr );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
     station_set( stationmgr, config_get_prev_channel( ct ) );
@@ -1362,7 +1362,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }
-        } else {
+        } else if( videoinput_get_numframes( vidin ) < 2 ) {
+            lfprintf( stderr, _("\n"
+    "    Your capture card driver, %s, does not seem\n"
+    "    to support full framerate capture.  Please check to see if it is\n"
+    "    misconfigured, or if you have selected the wrong capture\n"
+    "    device (%s).\n\n"), videoinput_get_driver_name( vidin ),
+                             config_get_v4l_device( ct ) );
+            videoinput_delete( vidin );
+            vidin = 0;
+         } else {
             const char *audiomode = config_get_audio_mode( ct );
             videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
 
@@ -1407,34 +1416,32 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     } else if( mpegin ) {
         fieldsavailable = 4;
     } else if( vidin ) {
-        if( videoinput_get_numframes( vidin ) < 2 ) {
-            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                                "V4L.  Not enough to continue.  Exiting.\n"),
-                     videoinput_get_numframes( vidin ) );
-            return 1;
-        } else if( videoinput_get_numframes( vidin ) == 2 ) {
-            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                                "V4L.  Limiting deinterlace plugins\n"
-                                "tvtime: to those which only need 1 field.\n"),
-                     videoinput_get_numframes( vidin ) );
+        if( videoinput_get_numframes( vidin ) == 2 ) {
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
-            lfprintf( stderr, _("tvtime: Can only get %d frame buffers from "
-                                "V4L.  Limiting deinterlace plugins\n"
-                                "tvtime: to those which only need 2 fields.\n"),
-                     videoinput_get_numframes( vidin ) );
             fieldsavailable = 2;
         } else {
             fieldsavailable = 4;
         }
-        if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
-            lfprintf( stderr,
-                      _("\n*** You are using the bttv driver, but without "
-                        "enough gbuffers available.\n"
-                        "*** See the support page at %s "
-                        "for information\n"
-                        "*** on how to increase your gbuffers setting.\n\n"),
-                        PACKAGE_BUGREPORT );
+
+        if( fieldsavailable < 4 ) {
+            if( videoinput_is_bttv( vidin ) ) {
+                lfprintf( stderr,
+                      _("\n"
+        "    You are using the bttv driver, but have not configured enough\n"
+        "    buffers for tvtime to process the video optimally.  This is\n"
+        "    true by default with bttv in kernels before 2.4.21.  Please\n"
+        "    set the option gbuffers=4 when loading bttv.  For more\n"
+        "    information see our support page at %s\n\n"), PACKAGE_BUGREPORT );
+            } else {
+                lfprintf( stderr, _("\n"
+     "    Your capture card driver, %s, is not providing\n"
+     "    enough buffers for tvtime to process the video.  Please check with\n"
+     "    your driver documentation to see if you can increase the number\n"
+     "    of buffers provided to applications, and report this to the tvtime\n"
+     "    bug tracker at %s\n\n"), videoinput_get_driver_name( vidin ),
+                                   PACKAGE_BUGREPORT );
+            }
         }
     } else {
         fieldsavailable = 4;
@@ -1446,8 +1453,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     } else {
         filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
         if( !output->is_interlaced() && !get_num_deinterlace_methods() ) {
-            lfprintf( stderr, _("tvtime: No deinterlacing methods "
-                                "available, exiting.\n") );
+            fprintf( stderr, "tvtime: No deinterlacing methods available, "
+                             "exiting.\n" );
             return 1;
         }
         curmethodid = 0;
@@ -1467,8 +1474,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     fadeframe = malloc( width * height * 2 );
     blueframe = malloc( width * height * 2 );
     if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
-        fputs( _("tvtime: Can't allocate extra frame storage memory.\n"),
-               stderr );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
     build_colourbars( colourbars, width, height );
@@ -1485,8 +1491,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                           config_get_channel_text_rgb( ct ),
                           config_get_other_text_rgb( ct ) );
     if( !osd ) {
-        fputs( _("tvtime: OSD initialization failed, OSD disabled.\n"),
-               stderr );
+        lfputs( _("tvtime: OSD failed to initialize, disabled.\n"), stderr );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         if( curmethod ) {
@@ -1526,38 +1531,28 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),
                              curmethodid );
-    build_deinterlacer_description_menu
-        (commands_get_menu( commands, "deintdescription" ), curmethodid );
+    build_deinterlacer_description_menu( commands_get_menu( commands,
+                                         "deintdescription" ), curmethodid );
 
-    if( tvtime->inputfilter ) {
-        /* Setup the video correction tables. */
-        videofilter_set_bt8x8_correction
-            ( tvtime->inputfilter,
-              commands_apply_luma_correction( commands ) );
-        videofilter_set_luma_power
-            ( tvtime->inputfilter, commands_get_luma_power( commands ) );
-        videofilter_set_colour_invert
-            ( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
-        videofilter_set_mirror
-            ( tvtime->inputfilter, commands_apply_mirror( commands ) );
-        videofilter_set_chroma_kill
-            ( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
-    }
-
+    /* Setup the video correction tables. */
+    videofilter_set_bt8x8_correction( tvtime->inputfilter,
+                                   commands_apply_luma_correction( commands ) );
+    videofilter_set_luma_power( tvtime->inputfilter,
+                                commands_get_luma_power( commands ) );
+    videofilter_set_colour_invert( tvtime->inputfilter,
+                                   commands_apply_colour_invert( commands ) );
+    videofilter_set_mirror( tvtime->inputfilter,
+                            commands_apply_mirror( commands ) );
+    videofilter_set_chroma_kill( tvtime->inputfilter,
+                                 commands_apply_chroma_kill( commands ) );
     if( vidin && videoinput_is_uyvy( vidin ) ) {
-        if( tvtime->inputfilter ) {
-            videofilter_enable_uyvy_conversion( tvtime->inputfilter );
-        } else {
-            fputs( _("tvtime: Card requires conversion from UYVY, but "
-                     "we failed to initialize our converter!\n"), stderr );
-            return 1;
-        }
+        videofilter_enable_uyvy_conversion( tvtime->inputfilter );
     }
 
     /* Create the user's FIFO directory */
     if( !get_tvtime_fifodir( config_get_uid( ct ) ) ) {
-        fputs( _("tvtime: Cannot find FIFO directory.  FIFO disabled.\n"),
-               stderr );
+        lfputs( _("tvtime: Cannot find FIFO directory.  FIFO disabled.\n"),
+                stderr );
     } else {
         int success = 0;
         if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU )
@@ -1620,7 +1615,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                        width, height, pixel_aspect,
                        config_get_other_text_rgb( ct ) );
     if( !con ) {
-        fputs( _("tvtime: Could not setup console.\n"), stderr );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: Could not setup console.\n" );
+        }
     } else {
         if( fifo ) {
             console_setup_pipe( con, fifo_get_filename( fifo ) );
@@ -1634,7 +1631,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     in = input_new( ct, commands, con, verbose );
     if( !in ) {
-        fputs( _("tvtime: Can't create input handler.\n"), stderr );
+        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         return 1;
     }
 
@@ -1645,13 +1642,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
-            fputs( _("tvtime: Could not create vbiscreen, "
-                     "closed captions unavailable.\n"), stderr );
+            lfputs( _("tvtime: Could not create vbiscreen, "
+                      "closed captions unavailable.\n"), stderr );
         }
 
         vbidata = vbidata_new( config_get_vbi_device( ct ), vs, verbose );
         if( !vbidata ) {
-            fputs( _("tvtime: Could not create vbidata.\n"), stderr );
+            lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
         } else {
             vbidata_capture_mode( vbidata, config_get_cc( ct )
                                   ? CAPTURE_CC1 : CAPTURE_OFF );
@@ -2656,7 +2653,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     output->shutdown();
 
     if( verbose ) {
-        fputs( _("tvtime: Cleaning up.\n"), stderr );
+        fprintf( stderr, "tvtime: Cleaning up.\n" );
     }
     if( mpegin ) {
         mpeg2input_delete( mpegin );
@@ -2704,11 +2701,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     xmlCleanupParser();
 
     if( restarttvtime ) {
-        lfprintf( stderr, _("tvtime: Restarting.\n") );
+        lfprintf( stderr, _("Restarting tvtime.\n") );
         return 2;
     }
 
-    lfprintf( stderr, _("tvtime: Thank you for using tvtime.\n") );
+    lfprintf( stderr, _("Thank you for using tvtime.\n") );
     return 0;
 }
 
@@ -2725,7 +2722,7 @@ int main( int argc, char **argv )
      */
     setup_i18n();
 
-    lfprintf( stderr, _("tvtime: Running %s.\n"), PACKAGE_STRING );
+    lfprintf( stderr, _("Running %s.\n"), PACKAGE_STRING );
 
     /* Disable this code for a release. */
     lfputs( _("\n"
@@ -2780,9 +2777,11 @@ int main( int argc, char **argv )
          * This used to say "Unknown problems", but we're printing an
          * error string, so that didn't really make sense, did it?
          */
-        lfprintf( stderr, _("tvtime: Failed to drop root access: %s.\n"
-                            "tvtime: Exiting to avoid security problems.\n"),
-                  strerror( errno ) );
+        lfprintf( stderr, _("\n"
+       "    Failed to drop root privileges: %s.\n"
+       "    tvtime will exit now to avoid security problems resulting from\n"
+       "    an application running as root when it might not be allowed to.\n"),
+            strerror( errno ) );
         return 1;
     }
 
