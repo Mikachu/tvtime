@@ -4,7 +4,7 @@
 
 #include <X11/Xlib.h>
 
-void saver_on(Display *mDisplay);
-void saver_off(Display *mDisplay);
+void saver_on( Display *mDisplay );
+void saver_off( Display *mDisplay );
 
 #endif /* X11TOOLS_H_INCLUDED */

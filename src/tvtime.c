@@ -509,7 +509,6 @@ static void tvtime_build_copied_field( unsigned char *output,
 }
 
 
-
 int main( int argc, char **argv )
 {
     video_correction_t *vc = 0;
@@ -887,10 +886,6 @@ int main( int argc, char **argv )
         output_w = (int) ((((double) (width - left_scanline_bias - right_scanline_bias)) - (((double) (width - left_scanline_bias - right_scanline_bias)) * config_get_horizontal_overscan( ct ) * 2.0)) + 0.5);
         output_y = (int) ((((double) height) * config_get_vertical_overscan( ct )) + 0.5);
         output_h = (int) ((((double) height) - (((double) height) * config_get_vertical_overscan( ct ) * 2.0)) + 0.5);
-
-        output_x = output_x & ~1;
-        output_y = output_y & ~1;
-        output_h = output_h & ~1;
 
         if( fifo ) {
             int cmd;
