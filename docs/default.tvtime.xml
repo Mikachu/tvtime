@@ -62,9 +62,11 @@
     There are two special NTSC cable standards in the US: IRC and HRC.
     In IRC, channels 5 and 6 are on different frequencies, and HRC mode
     shifts all frequencies up by 1.25MHz (and is also weird on channels
-    5 and 6).
+    5 and 6).  Use this option to set the cable mode to "Standard",
+    "IRC" or "HRC".  It is very rare that you will see cable systems
+    that use IRC or HRC cable.
   -->
-  <option name="NTSCCableMode" value="Nominal"/>
+  <option name="NTSCCableMode" value="Standard"/>
 
   <!--
     Toggle whether tvtime should check if there is a signal present
