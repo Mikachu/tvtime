@@ -222,8 +222,16 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 {
+    char timestamp[ 50 ];
+    time_t tm = time( 0 );
+
     osd_string_advance_frame( osd->channel_number );
     osd_string_advance_frame( osd->channel_info );
+
+    strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
+    osd_string_show_text( osd->channel_info, timestamp, osd_string_get_frames_left( osd->channel_info) );
+
+
     osd_string_advance_frame( osd->volume_bar );
     osd_string_advance_frame( osd->data_bar );
     osd_graphic_advance_frame( osd->channel_logo );

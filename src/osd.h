@@ -57,6 +57,7 @@ void osd_string_show_border( osd_string_t *osds, int show_border );
 void osd_string_set_border_colour( osd_string_t *osds, int luma,
                                    int cb, int cr );
 void osd_string_advance_frame( osd_string_t *osds );
+int osd_string_get_frames_left( osd_string_t *osds );
 
 /**
  * Composites a scanline of the string on top of the background and writes to

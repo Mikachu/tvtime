@@ -212,6 +212,11 @@ void osd_string_advance_frame( osd_string_t *osds )
     }
 }
 
+int osd_string_get_frames_left( osd_string_t *osds )
+{
+    return osds->frames_left;
+}
+
 void osd_string_composite_packed422_scanline( osd_string_t *osds,
                                               unsigned char *output,
                                               unsigned char *background,
