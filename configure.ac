@@ -55,7 +55,7 @@ AC_ARG_WITH([libmpeg2],
 if test "$USE_MPEG2" != "no" ; then
     AC_DEFINE([HAVE_LIBMPEG2],,[Define this to enable MPEG2 input])
 fi
-AM_CONDITIONAL(HAVE_LIBMPEG2, [test x"USE_MPEG2" != "xno"])
+AM_CONDITIONAL(HAVE_LIBMPEG2, [test x"$USE_MPEG2" != "xno"])
 
 dnl ---------------------------------------------
 dnl dynamic linker
