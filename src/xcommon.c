@@ -166,7 +166,7 @@ static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
     if( ev->serial == req_serial ) {
         /* this is an error to the XGetWindowProperty request
          * most probable the window specified by the property
-         * _WIN_SUPPORTING_WM_CHECK on the root window no longer exists
+         * _NET_SUPPORTING_WM_CHECK on the root window no longer exists
          */
         fprintf( stderr, "xprop_errhandler: error in XGetWindowProperty\n" );
         return 0;
@@ -329,7 +329,15 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
             return 0;
         }
 
-        if( type_return != XA_WINDOW ) {
+        if( type_return == XA_CARDINAL ) {
+            /* Hack for old and busted metacity. */
+            /* Allow this atom to be a CARDINAL. */
+            XGetWindowProperty( dpy, win_id, atom, 0,
+                                1, False, XA_CARDINAL,
+                                &type_return, &format_return, &nitems_return,
+                                &bytes_after_return, &prop_return );
+        } else if( type_return != XA_WINDOW ) {
+            fprintf( stderr, "didn't return XA_WINDOW?\n" );
             fprintf( stderr, "xcommon: EWMH check failed on child window, "
                              "stale window manager property on root?\n" );
             if( prop_return ) {
