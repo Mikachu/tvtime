@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "menu.h"
 
@@ -24,16 +25,27 @@
 
 struct menu_s
 {
+    char *name;
     char text[ MENU_MAX ][ 128 ];
     char arguments[ MENU_MAX ][ 128 ];
     int commands[ MENU_MAX ];
     int numlines;
 };
 
-menu_t *menu_new( void )
+menu_t *menu_new( const char *name )
 {
     menu_t *menu = malloc( sizeof( menu_t ) );
+    if( !menu ) {
+        return 0;
+    }
+
     menu->numlines = 0;
+    menu->name = strdup( name );
+    if( !menu->name ) {
+        free( menu );
+        return 0;
+    }
+
     return menu;
 }
 
@@ -54,6 +66,11 @@ void menu_set_command( menu_t *menu, int line, int command,
     menu->commands[ line ] = command;
     snprintf( menu->arguments[ line ], sizeof( menu->arguments[ 0 ] ),
               "%s", argument );
+}
+
+const char *menu_get_name( menu_t *menu )
+{
+    return menu->name;
 }
 
 int menu_get_num_lines( menu_t *menu )

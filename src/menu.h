@@ -25,12 +25,13 @@ extern "C" {
 
 typedef struct menu_s menu_t;
 
-menu_t *menu_new( void );
+menu_t *menu_new( const char *name );
 void menu_delete( menu_t *menu );
 void menu_set_text( menu_t *menu, int line, const char *text );
 void menu_set_command( menu_t *menu, int line, int command,
                        const char *argument );
 
+const char *menu_get_name( menu_t *menu );
 int menu_get_num_lines( menu_t *menu );
 const char *menu_get_text( menu_t *menu, int line );
 int menu_get_command( menu_t *menu, int line );
