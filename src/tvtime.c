@@ -1116,7 +1116,10 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
     tvtime_osd_show_list( osd, 1 );
 }
 
-/* FIXME Gettextize this function. */
+/*
+ * setup_i18n() is run by main() before tvtime_main(),
+ * so using gettext here is safe.
+ */
 int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 {
     videoinput_t *vidin = 0;
@@ -1180,7 +1183,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     ct = config_new();
     if( !ct ) {
-        fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
+        fputs( _("tvtime: Can't set configuration options, exiting.\n"),
+               stderr );
         return 1;
     }
 
@@ -1195,23 +1199,28 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         cpuinfo_print_info();
     }
 
-    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 && verbose ) {
-        fprintf( stderr, "tvtime: Can't renice to %d.\n", config_get_priority( ct ) );
+    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0
+        && verbose ) {
+        fprintf( stderr, _("tvtime: Can't renice to %d.\n"),
+                 config_get_priority( ct ) );
     }
 
     send_fields = config_get_send_fields( ct );
     if( verbose ) {
         if( send_fields ) {
-            fprintf( stderr, "tvtime: Sending fields to interlaced output devices.\n" );
+            fputs( _("tvtime: Sending fields to interlaced output devices.\n"),
+                   stderr );
         } else {
-            fprintf( stderr, "tvtime: Sending frames to interlaced output devices.\n" );
+            fputs( _("tvtime: Sending frames to interlaced output devices.\n"),
+                   stderr );
         }
     }
 
     if( config_get_output_driver( ct ) ) {
         if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
             output_driver = OUTPUT_DIRECTFB;
-        } else if( !strcasecmp( config_get_output_driver( ct ), "matroxtv" ) ) {
+        } else if( !strcasecmp
+                   ( config_get_output_driver( ct ), "matroxtv" ) ) {
             output_driver = OUTPUT_DIRECTFB_MATROXTV;
         } else if( !strcasecmp( config_get_output_driver( ct ), "mga" ) ) {
             output_driver = OUTPUT_MGA;
@@ -1243,14 +1252,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     sixteennine = config_get_aspect( ct );
 
-    if( !output || !output->init( config_get_outputheight( ct ), sixteennine, verbose ) ) {
-        fprintf( stderr, "tvtime: Output driver failed to initialize: "
-                         "no video output available.\n" );
+    if( !output || !output->init( config_get_outputheight( ct ),
+                                  sixteennine, verbose ) ) {
+        fputs( _("tvtime: Output driver failed to initialize:"
+                 "no video output available.\n"), stderr );
         /* FIXME: Delete everything here! */
         return 1;
     }
     if( config_get_useposition( ct ) ) {
-        output->set_window_position( config_get_output_x( ct ), config_get_output_y( ct ) );
+        output->set_window_position( config_get_output_x( ct ),
+                                     config_get_output_y( ct ) );
     }
 
     /* Setup the speedy calls. */
@@ -1259,10 +1270,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     /* Setup the tvtime object. */
     tvtime = tvtime_new();
     if( !tvtime->inputfilter ) {
-        fprintf( stderr, "tvtime: Can't initialize input filters.\n" );
+        fputs( _("tvtime: Can't initialize input filters.\n"), stderr );
     }
     if( !tvtime->outputfilter ) {
-        fprintf( stderr, "tvtime: Can't initialize output filters.\n" );
+        fputs( _("tvtime: Can't initialize output filters.\n"), stderr );
     }
 
     if( !output->is_interlaced() ) {
@@ -1304,14 +1315,17 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
     if( !perf ) {
-        fprintf( stderr, "tvtime: Can't initialize performance monitor, exiting.\n" );
+        fputs( _("tvtime: Can't initialize performance monitor, exiting.\n"),
+               stderr );
         return 1;
     }
 
-    stationmgr = station_new( videoinput_get_norm_name( norm ), config_get_v4l_freq( ct ),
+    stationmgr = station_new( videoinput_get_norm_name( norm ),
+                              config_get_v4l_freq( ct ),
                               config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
-        fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
+        fputs( _("tvtime: Can't create station"
+                 "manager (no memory?), exiting.\n"), stderr );
         return 1;
     }
     station_set( stationmgr, config_get_prev_channel( ct ) );
@@ -1324,17 +1338,25 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( config_get_rvr_filename( ct ) ) {
         rvrreader = rvrreader_new( config_get_rvr_filename( ct ) );
         if( !rvrreader ) {
-            if( asprintf( &error_string, "Can't open rvr file '%s'.",
+            if( asprintf( &error_string, _("Can't open rvr file '%s'."),
                           config_get_rvr_filename( ct ) ) < 0 ) {
                 error_string = 0;
             }
-            fprintf( stderr, "tvtime: Can't open rvr file '%s'.\n",
+            /*
+             * The two following commands should NOT be reassembled into
+             * a single command -- since we don't want unneccecary string
+             * duplication for translators. (See asprintf() above for the
+             * exact same string.
+             */
+            fputs ("tvtime: ", stderr );
+            fprintf( stderr, _("Can't open rvr file '%s'.\n"),
                      config_get_rvr_filename( ct ) );
         } else {
             width = rvrreader_get_width( rvrreader );
             height = rvrreader_get_height( rvrreader );
             if( verbose ) {
-                fprintf( stderr, "tvtime: RVR frame sampling %d pixels per scanline.\n", width );
+                fprintf( stderr, _("tvtime: RVR frame sampling"
+                                   "%d pixels per scanline.\n"), width );
             }
         }
     } else {
@@ -1342,7 +1364,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                                 config_get_inputwidth( ct ), 
                                 norm, verbose );
         if( !vidin ) {
-            if( asprintf( &error_string, "Can't open video4linux device '%s'.",
+            if( asprintf( &error_string,
+                          _("Can't open video4linux device '%s'."),
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }
@@ -1355,7 +1378,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                     videoinput_set_audio_mode( vidin, VIDEOINPUT_MONO );
                 } else if( !strcasecmp( audiomode, "stereo" ) ) {
                     videoinput_set_audio_mode( vidin, VIDEOINPUT_STEREO );
-                } else if( !strcasecmp( audiomode, "sap" ) || !strcasecmp( audiomode, "lang1" ) ) {
+                } else if( !strcasecmp( audiomode, "sap" )
+                           || !strcasecmp( audiomode, "lang1" ) ) {
                     videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG1 );
                 } else {
                     videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
@@ -1364,14 +1388,17 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             width = videoinput_get_width( vidin );
             height = videoinput_get_height( vidin );
             if( verbose ) {
-                fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
+                fprintf( stderr,
+                         _("tvtime: V4L sampling %d pixels per scanline.\n"),
+                         width );
             }
         }
     }
 
     /* Set input size. */
     if( !output->set_input_size( width, height ) ) {
-        fprintf( stderr, "tvtime: Can't display input size %dx%d.\n", width, height );
+        fprintf( stderr, _("tvtime: Can't display input size %dx%d.\n"),
+                 width, height );
         /* FIXME: Clean up. */
         return 1;
     }
@@ -1390,27 +1417,32 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         fieldsavailable = 4;
     } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
-            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
-                     "Not enough to continue.  Exiting.\n",
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+                               "V4L.  Not enough to continue.  Exiting.\n"),
                      videoinput_get_numframes( vidin ) );
             return 1;
         } else if( videoinput_get_numframes( vidin ) == 2 ) {
-            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
-                     "tvtime: to those which only need 1 field.\n",
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+                               "V4L.  Limiting deinterlace plugins\n"
+                               "tvtime: to those which only need 1 field.\n"),
                      videoinput_get_numframes( vidin ) );
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
-            fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
-                     "tvtime: to those which only need 2 fields.\n",
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+                               "V4L.  Limiting deinterlace plugins\n"
+                               "tvtime: to those which only need 2 fields.\n"),
                      videoinput_get_numframes( vidin ) );
             fieldsavailable = 2;
         } else {
             fieldsavailable = 4;
         }
         if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
-            fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
-                               "*** See the support page at " PACKAGE_BUGREPORT " for information\n"
-                               "*** on how to increase your gbuffers setting.\n\n" );
+            fputs( _("\n*** You are using the bttv driver, but without enough"
+                     "gbuffers available.\n"
+                     "*** See the support page at " PACKAGE_BUGREPORT
+                     " for information\n"
+                     "*** on how to increase your gbuffers setting.\n\n",
+                     stderr );
         }
     } else {
         fieldsavailable = 4;
@@ -1422,13 +1454,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     } else {
         filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
         if( !output->is_interlaced() && !get_num_deinterlace_methods() ) {
-            fprintf( stderr, "tvtime: No deinterlacing methods "
-                             "available, exiting.\n" );
+            fprintf( stderr, _("tvtime: No deinterlacing methods "
+                               "available, exiting.\n") );
             return 1;
         }
         curmethodid = 0;
         curmethod = get_deinterlace_method( 0 );
-        while( strcasecmp( config_get_deinterlace_method( ct ), curmethod->short_name ) ) {
+        while( strcasecmp( config_get_deinterlace_method( ct ),
+                           curmethod->short_name ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             if( !curmethodid ) break;
@@ -1442,7 +1475,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     fadeframe = malloc( width * height * 2 );
     blueframe = malloc( width * height * 2 );
     if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
-        fprintf( stderr, "tvtime: Can't allocate extra frame storage memory.\n" );
+        fputs( _("tvtime: Can't allocate extra frame storage memory.\n"),
+               stderr );
         return 1;
     }
     build_colourbars( colourbars, width, height );
@@ -1453,11 +1487,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
 
     /* Setup OSD stuff. */
-    pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
+    pixel_aspect = ( (double) width ) /
+        ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
     osd = tvtime_osd_new( width, height, pixel_aspect, fieldtime,
-                          config_get_channel_text_rgb( ct ), config_get_other_text_rgb( ct ) );
+                          config_get_channel_text_rgb( ct ),
+                          config_get_other_text_rgb( ct ) );
     if( !osd ) {
-        fprintf( stderr, "tvtime: OSD initialization failed, OSD disabled.\n" );
+        fputs( _("tvtime: OSD initialization failed, OSD disabled.\n"),
+               stderr );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         if( curmethod ) {
@@ -1468,9 +1505,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
         } else if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
-            tvtime_osd_set_norm( osd, videoinput_get_norm_name( videoinput_get_norm( vidin ) ) );
+            tvtime_osd_set_norm
+                ( osd,
+                  videoinput_get_norm_name( videoinput_get_norm( vidin ) ) );
         } else {
-            tvtime_osd_set_input( osd, "No video source" );
+            tvtime_osd_set_input( osd, _("No video source") );
             tvtime_osd_set_norm( osd, "" );
         }
 
@@ -1487,63 +1526,75 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
-        fprintf( stderr, "tvtime: Can't create command handler.\n" );
+        fprintf( stderr, _("tvtime: Can't create command handler.\n") );
         return 1;
     }
-    build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
-    build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
+    build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),
+                             curmethodid );
+    build_deinterlacer_description_menu
+        (commands_get_menu( commands, "deintdescription" ), curmethodid );
 
     if( tvtime->inputfilter ) {
         /* Setup the video correction tables. */
-        videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
-        videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
-        videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
-        videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
-        videofilter_set_chroma_kill( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
+        videofilter_set_bt8x8_correction
+            ( tvtime->inputfilter,
+              commands_apply_luma_correction( commands ) );
+        videofilter_set_luma_power
+            ( tvtime->inputfilter, commands_get_luma_power( commands ) );
+        videofilter_set_colour_invert
+            ( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
+        videofilter_set_mirror
+            ( tvtime->inputfilter, commands_apply_mirror( commands ) );
+        videofilter_set_chroma_kill
+            ( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
     }
 
     if( vidin && videoinput_is_uyvy( vidin ) ) {
         if( tvtime->inputfilter ) {
             videofilter_enable_uyvy_conversion( tvtime->inputfilter );
         } else {
-            fprintf( stderr, "tvtime: Card requires conversion from UYVY, but "
-                     "we failed to initialize our converter!\n" );
+            fputs( _("tvtime: Card requires conversion from UYVY, but "
+                     "we failed to initialize our converter!\n"), stderr );
             return 1;
         }
     }
 
     /* Create the user's FIFO directory */
     if( !get_tvtime_fifodir( config_get_uid( ct ) ) ) {
-        fprintf( stderr, "tvtime: Cannot find FIFO directory.  "
-                         "FIFO disabled.\n" );
+        fputs( _("tvtime: Cannot find FIFO directory.  FIFO disabled.\n"),
+               stderr );
     } else {
         int success = 0;
-        if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU ) < 0 ) {
+        if( mkdir( get_tvtime_fifodir( config_get_uid( ct ) ), S_IRWXU )
+            < 0 ) {
             if( errno != EEXIST ) {
-                fprintf( stderr, "tvtime: Cannot create directory %s.  "
-                                 "FIFO disabled.\n", 
+                fprintf( stderr, _("tvtime: Cannot create directory %s.  "
+                                   "FIFO disabled.\n"), 
                          get_tvtime_fifodir( config_get_uid( ct ) ) );
             } else {
-                fifodir = opendir( get_tvtime_fifodir( config_get_uid( ct ) ) );
+                fifodir = opendir
+                    ( get_tvtime_fifodir( config_get_uid( ct ) ) );
                 if( !fifodir ) {
-                    fprintf( stderr, "tvtime: %s is not a directory.  "
-                                     "FIFO disabled.\n", 
+                    fprintf( stderr, _("tvtime: %s is not a directory.  "
+                                       "FIFO disabled.\n"), 
                              get_tvtime_fifodir( config_get_uid( ct ) ) );
                 } else {
                     struct stat dirstat;
                     closedir( fifodir );
                     /* Ensure the FIFO directory is owned by the user. */
-                    if( !stat( get_tvtime_fifodir( config_get_uid( ct ) ), &dirstat ) ) {
+                    if( !stat( get_tvtime_fifodir( config_get_uid( ct ) ),
+                               &dirstat ) ) {
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             success = 1;
                         } else {
-                            fprintf( stderr, "tvtime: You do not own %s.  "
-                                             "FIFO disabled.\n",
-                                     get_tvtime_fifodir( config_get_uid( ct ) ) );
+                            fprintf( stderr, _("tvtime: You do not own %s.  "
+                                               "FIFO disabled.\n"),
+                                     get_tvtime_fifodir (config_get_uid
+                                                         ( ct ) ) );
                         }
                     } else {
-                        fprintf( stderr, "tvtime: Cannot stat %s.  "
-                                         "FIFO disabled.\n",
+                        fprintf( stderr, _("tvtime: Cannot stat %s.  "
+                                         "FIFO disabled.\n"),
                                  get_tvtime_fifodir( config_get_uid( ct ) ) );
                     }
                 }
@@ -1555,23 +1606,25 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( success ) {
             /* Setup the FIFO */
             if( !get_tvtime_fifo( config_get_uid( ct ) ) ) {
-                fprintf( stderr, "tvtime: Cannot find FIFO file.  "
-                                 "Failed to create FIFO object.\n"  );
+                fputs( _("tvtime: Cannot find FIFO file.  "
+                         "Failed to create FIFO object.\n"), stderr );
             } else {
                 fifo = fifo_new( get_tvtime_fifo( config_get_uid( ct ) ) );
                 if( !fifo && verbose ) {
-                    fprintf( stderr, "tvtime: Not reading input from FIFO."
-                                     "  Failed to create FIFO object.\n" );
+                    fputs( _("tvtime: Not reading input from FIFO."
+                             "  Failed to create FIFO object.\n"), stderr );
                 }
             }
         }
     }
 
     /* Setup the console */
-    con = console_new( (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 16,
-                        width, height, pixel_aspect, config_get_other_text_rgb( ct ) );
+    con = console_new( (width*10)/100, height - (height*20)/100,
+                       (width*80)/100, (height*20)/100, 16,
+                       width, height, pixel_aspect,
+                       config_get_other_text_rgb( ct ) );
     if( !con ) {
-        fprintf( stderr, "tvtime: Could not setup console.\n" );
+        fputs( _("tvtime: Could not setup console.\n"), stderr );
     } else {
         if( fifo ) {
             console_setup_pipe( con, fifo_get_filename( fifo ) );
@@ -1585,7 +1638,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     in = input_new( ct, commands, con, verbose );
     if( !in ) {
-        fprintf( stderr, "tvtime: Can't create input handler.\n" );
+        fputs( _("tvtime: Can't create input handler.\n"), stderr );
         return 1;
     }
 
@@ -1593,14 +1646,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
-            fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
+            fputs( _("tvtime: Could not create vbiscreen,"
+                     "closed captions unavailable.\n"), stderr );
         }
 
         vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
         if( !vbidata ) {
-            fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+            fputs( _("tvtime: Could not create vbidata.\n"), stderr );
         } else {
-            vbidata_capture_mode( vbidata, config_get_cc( ct ) ? CAPTURE_CC1 : CAPTURE_OFF );
+            vbidata_capture_mode( vbidata, config_get_cc( ct )
+                                  ? CAPTURE_CC1 : CAPTURE_OFF );
             vbidata_capture_xds( vbidata, config_get_usexds( ct ) );
         }
         commands_set_vbidata( commands, vbidata );
@@ -1640,17 +1695,21 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( fieldsavailable == 2 ) {
             lastframe = videoinput_next_frame( vidin, &lastframeid );
         } else if( fieldsavailable == 4 ) {
-            secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
+            secondlastframe = videoinput_next_frame( vidin,
+                                                     &secondlastframeid );
             lastframe = videoinput_next_frame( vidin, &lastframeid );
         }
     }
 
     build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
                        output->is_fullscreen(), output->is_alwaysontop(),
-                       output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                       output->is_fullscreen_supported(),
+                       output->is_alwaysontop_supported(),
                        output->is_overscan_supported() );
-    build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
-    build_fspos_menu( commands_get_menu( commands, "fspos" ), config_get_fullscreen_position( ct ) );
+    build_matte_menu( commands_get_menu( commands, "matte" ),
+                      matte_mode, sixteennine );
+    build_fspos_menu( commands_get_menu( commands, "fspos" ),
+                      config_get_fullscreen_position( ct ) );
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1670,17 +1729,26 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             output_y = matte_y;
             output_h = matte_h;
         } else {
-            output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
-            output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
-            output_y = (int) ((((double) height) * commands_get_overscan( commands )) + 0.5);
-            output_h = (int) ((((double) height) - (((double) height) * commands_get_overscan( commands ) * 2.0)) + 0.5);
+            output_x = (int) ((((double) width) *
+                               commands_get_overscan( commands )) + 0.5);
+            output_w = (int) ((((double) width) -
+                               (((double) width) *
+                                commands_get_overscan( commands ) * 2.0)) +
+                              0.5);
+            output_y = (int) ((((double) height) *
+                               commands_get_overscan( commands )) + 0.5);
+            output_h = (int) ((((double) height) -
+                               (((double) height) *
+                                commands_get_overscan( commands ) * 2.0)) +
+                              0.5);
         }
 
         if( fifo ) {
             int cmd;
             cmd = fifo_get_next_command( fifo );
             fifo_args = fifo_get_arguments( fifo );
-            if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, fifo_args );
+            if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd,
+                                                           fifo_args );
         }
 
         if( read_stdin ) {
@@ -1729,7 +1797,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             break;
         }
         /* Check if it's time to sleep and dream well */
-        if( commands_sleeptimer( commands ) && commands_sleeptimer_do_shutdown( commands ) ) break;
+        if( commands_sleeptimer( commands ) &&
+            commands_sleeptimer_do_shutdown( commands ) )
+            break;
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
@@ -1750,50 +1820,66 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             if( cur ) {
                 if( !output->is_interlaced() ) {
                     int firstmethod = curmethodid;
-                    while( strcasecmp( config_get_deinterlace_method( cur ), curmethod->short_name ) ) {
-                        curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+                    while( strcasecmp( config_get_deinterlace_method( cur ),
+                                       curmethod->short_name ) ) {
+                        curmethodid = (curmethodid + 1) %
+                            get_num_deinterlace_methods();
                         curmethod = get_deinterlace_method( curmethodid );
                         tvtime_set_deinterlacer( tvtime, curmethod );
-                        if( curmethodid == firstmethod ) break;
+                        if( curmethodid == firstmethod )
+                            break;
                     }
                     if( osd ) {
-                        tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+                        tvtime_osd_set_deinterlace_method
+                            ( osd, curmethod->name );
                     }
                 }
 
-                if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
+                if( config_get_fullscreen( cur )
+                    && !output->is_fullscreen() ) {
                     output->toggle_fullscreen( 0, 0 );
-                    build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
-                                       output->is_fullscreen(), output->is_alwaysontop(),
-                                       output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+                    build_output_menu( commands_get_menu( commands, "output" ),
+                                       sixteennine,
+                                       output->is_fullscreen(),
+                                       output->is_alwaysontop(),
+                                       output->is_fullscreen_supported(),
+                                       output->is_alwaysontop_supported(),
                                        output->is_overscan_supported() );
                 } else {
                     if( config_get_outputheight( cur ) < 0 ) {
                         output->resize_window_fullscreen();
                     } else {
-                        output->set_window_height( config_get_outputheight( cur ) );
+                        output->set_window_height
+                            ( config_get_outputheight( cur ) );
                         if( config_get_useposition( cur ) ) {
-                            output->set_window_position( config_get_output_x( cur ), config_get_output_y( cur ) );
+                            output->set_window_position
+                                ( config_get_output_x( cur ),
+                                  config_get_output_y( cur ) );
                         }
                     }
                 }
                 if( framerate_mode != config_get_framerate_mode( cur ) ) {
-                    commands_set_framerate( commands, config_get_framerate_mode( cur ) );
+                    commands_set_framerate( commands,
+                                            config_get_framerate_mode( cur ) );
                 } else if( osd ) {
                     tvtime_osd_show_info( osd );
                 }
             }
         }
-        if( framerate_mode < 0 || framerate_mode != commands_get_framerate( commands ) ) {
-            int showlist = !(framerate_mode < 0 ) && !commands_menu_active( commands );
+        if( framerate_mode < 0
+            || framerate_mode != commands_get_framerate( commands ) ) {
+            int showlist = !(framerate_mode < 0 ) &&
+                !commands_menu_active( commands );
             framerate_mode = commands_get_framerate( commands );
 
             if( osd ) {
-                build_framerate_menu( commands_get_menu( commands, "framerate" ),
-                                      1000000.0 / ((double) fieldtime), framerate_mode );
+                build_framerate_menu
+                    ( commands_get_menu( commands, "framerate" ),
+                      1000000.0 / ((double) fieldtime), framerate_mode );
                 commands_refresh_menu( commands );
                 if( showlist ) {
-                    osd_list_framerates( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
+                    osd_list_framerates( osd, 1000000.0 / ((double) fieldtime),
+                                         framerate_mode );
                 }
             }
         }
@@ -1803,21 +1889,29 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             } else {
                 config_save( ct, "FullScreen", "0" );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
-                               output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+            build_output_menu( commands_get_menu( commands, "output" ),
+                               sixteennine,
+                               output->is_fullscreen(),
+                               output->is_alwaysontop(),
+                               output->is_fullscreen_supported(),
+                               output->is_alwaysontop_supported(),
                                output->is_overscan_supported() );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_alwaysontop( commands ) ) {
             if( output->toggle_alwaysontop() ) {
-                if( osd ) tvtime_osd_show_message( osd, _("Window set as always-on-top.") );
+                if( osd ) tvtime_osd_show_message
+                              ( osd, _("Window set as always-on-top.") );
             } else {
-                if( osd ) tvtime_osd_show_message( osd, _("Window set to normal stacking.") );
+                if( osd ) tvtime_osd_show_message
+                              ( osd, _("Window set to normal stacking.") );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
-                               output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+            build_output_menu( commands_get_menu( commands, "output" ),
+                               sixteennine,
+                               output->is_fullscreen(),
+                               output->is_alwaysontop(),
+                               output->is_fullscreen_supported(),
+                               output->is_alwaysontop_supported(),
                                output->is_overscan_supported() );
             commands_refresh_menu( commands );
         }
@@ -1826,24 +1920,32 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             output->set_matte( 0, 0 );
             if( output->toggle_aspect() ) {
                 sixteennine = 1;
-                if( osd ) tvtime_osd_show_message( osd, _("16:9 display mode active.") );
+                if( osd ) tvtime_osd_show_message
+                              ( osd, _("16:9 display mode active.") );
                 config_save( ct, "WideScreen", "1" );
-                pixel_aspect = ( (double) width ) / ( ( (double) height ) * (16.0 / 9.0) );
+                pixel_aspect = ( (double) width ) /
+                    ( ( (double) height ) * (16.0 / 9.0) );
             } else {
                 sixteennine = 0;
-                if( osd ) tvtime_osd_show_message( osd, _("4:3 display mode active.") );
+                if( osd ) tvtime_osd_show_message
+                              ( osd, _("4:3 display mode active.") );
                 config_save( ct, "WideScreen", "0" );
-                pixel_aspect = ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
+                pixel_aspect =
+                    ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
             }
             if( osd ) {
                 tvtime_osd_show_list( osd, 0 );
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
-            build_output_menu( commands_get_menu( commands, "output" ), sixteennine,
-                               output->is_fullscreen(), output->is_alwaysontop(),
-                               output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
+            build_output_menu( commands_get_menu( commands, "output" ),
+                               sixteennine,
+                               output->is_fullscreen(),
+                               output->is_alwaysontop(),
+                               output->is_fullscreen_supported(),
+                               output->is_alwaysontop_supported(),
                                output->is_overscan_supported() );
-            build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
+            build_matte_menu( commands_get_menu( commands, "matte" ),
+                              matte_mode, sixteennine );
             commands_refresh_menu( commands );
         }
         if( commands_get_fs_pos( commands ) ) {
@@ -1857,14 +1959,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 newpos = 0;
             }
             output->set_fullscreen_position( newpos );
-            config_save( ct, "FullscreenPosition", commands_get_fs_pos( commands ) );
+            config_save( ct, "FullscreenPosition",
+                         commands_get_fs_pos( commands ) );
             build_fspos_menu( commands_get_menu( commands, "fspos" ), newpos );
             commands_refresh_menu( commands );
         }
-        if( commands_toggle_matte( commands ) || commands_get_matte_mode( commands ) ) {
+        if( commands_toggle_matte( commands ) ||
+            commands_get_matte_mode( commands ) ) {
             double matte = 4.0 / 3.0;
-            int sqwidth = sixteennine ? ((height * 16) / 9) : ((height * 4) / 3);
-            int sqheight = sixteennine ? ((width * 9) / 16) : ((width * 3) / 4);
+            int sqwidth = sixteennine ?
+                ((height * 16) / 9) : ((height * 4) / 3);
+            int sqheight = sixteennine ?
+                ((width * 9) / 16) : ((width * 3) / 4);
 
             matte_x = 0;
             matte_w = width;
@@ -1873,9 +1979,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             } else {
                 if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
                     matte_mode = sixteennine ? 0 : 1;
-                } else if( !strcmp( commands_get_matte_mode( commands ), "1.85:1" ) ) {
+                } else if( !strcmp( commands_get_matte_mode( commands ),
+                                    "1.85:1" ) ) {
                     matte_mode = sixteennine ? 1 : 2;
-                } else if( !strcmp( commands_get_matte_mode( commands ), "2.35:1" ) ) {
+                } else if( !strcmp( commands_get_matte_mode( commands ),
+                                    "2.35:1" ) ) {
                     matte_mode = sixteennine ? 2 : 3;
                 } else {
                     matte_mode = sixteennine ? 3 : 0;
@@ -1914,37 +2022,48 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             if( osd && !commands_menu_active( commands ) ) {
                 osd_list_matte( osd, matte_mode, sixteennine );
             }
-            build_matte_menu( commands_get_menu( commands, "matte" ), matte_mode, sixteennine );
+            build_matte_menu( commands_get_menu( commands, "matte" ),
+                              matte_mode, sixteennine );
             commands_refresh_menu( commands );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
             if( height == 480 ) {
-                tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
+                tvtime->pulldown_alg =
+                    (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
                 commands_set_pulldown_alg( commands, tvtime->pulldown_alg );
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
-                        tvtime_osd_show_message( osd, _("2-3 Pulldown detection disabled.") );
+                        tvtime_osd_show_message
+                            ( osd, _("2-3 Pulldown detection disabled.") );
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
-                        tvtime_osd_show_message( osd, _("2-3 Pulldown detection enabled.") );
+                        tvtime_osd_show_message
+                            ( osd, _("2-3 Pulldown detection enabled.") );
                     }
                     commands_refresh_menu( commands );
                 }
             } else if( osd ) {
-                tvtime_osd_show_message( osd, _("2-3 Pulldown detection is not valid with your TV norm.") );
+                tvtime_osd_show_message( osd, _("2-3 Pulldown detection is not"
+                                                " valid with your TV norm.") );
             }
         }
         if( commands_show_deinterlacer_info( commands ) ) {
             osd_list_deinterlacer_info( osd, curmethodid );
         }
-        if( !output->is_interlaced() && commands_toggle_deinterlacer( commands ) ) {
+        if( !output->is_interlaced() &&
+            commands_toggle_deinterlacer( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
             curmethod = get_deinterlace_method( curmethodid );
             tvtime_set_deinterlacer( tvtime, curmethod );
             if( osd ) {
-                build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
-                build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
+                build_deinterlacer_menu ( commands_get_menu( commands,
+                                                             "deinterlacer" ),
+                                          curmethodid );
+                build_deinterlacer_description_menu
+                    ( commands_get_menu ( commands, "deintdescription" ),
+                      curmethodid );
                 commands_refresh_menu( commands );
-                if( !commands_menu_active( commands ) ) osd_list_deinterlacers( osd, curmethodid );
+                if( !commands_menu_active( commands ) )
+                    osd_list_deinterlacers( osd, curmethodid );
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );
                 tvtime_osd_show_info( osd );
             }
@@ -1953,14 +2072,20 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( commands_set_deinterlacer( commands ) ) {
             curmethodid = 0;
             curmethod = get_deinterlace_method( 0 );
-            while( strcasecmp( commands_get_new_deinterlacer( commands ), curmethod->short_name ) ) {
-                curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+            while( strcasecmp( commands_get_new_deinterlacer( commands ),
+                               curmethod->short_name ) ) {
+                curmethodid =
+                    (curmethodid + 1) % get_num_deinterlace_methods();
                 curmethod = get_deinterlace_method( curmethodid );
                 if( !curmethodid ) break;
             }
             if( osd ) {
-                build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ), curmethodid );
-                build_deinterlacer_description_menu( commands_get_menu( commands, "deintdescription" ), curmethodid );
+                build_deinterlacer_menu
+                    ( commands_get_menu( commands, "deinterlacer" ),
+                      curmethodid );
+                build_deinterlacer_description_menu
+                    ( commands_get_menu( commands, "deintdescription" ),
+                      curmethodid );
                 commands_refresh_menu( commands );
             }
             tvtime_set_deinterlacer( tvtime, curmethod );
@@ -1969,13 +2094,17 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( commands_set_freq_table( commands ) ) {
             station_writeconfig( stationmgr );
             station_delete( stationmgr );
-            stationmgr = station_new( videoinput_get_norm_name( norm ), commands_get_new_freq_table( commands ),
-                                      config_get_ntsc_cable_mode( ct ), verbose );
+            stationmgr = station_new( videoinput_get_norm_name( norm ),
+                                      commands_get_new_freq_table( commands ),
+                                      config_get_ntsc_cable_mode( ct ),
+                                      verbose );
             commands_set_station_mgr( commands, stationmgr );
-            config_save( ct, "Frequencies", commands_get_new_freq_table( commands ) );
+            config_save( ct, "Frequencies",
+                         commands_get_new_freq_table( commands ) );
         }
         if( commands_update_luma_power( commands ) ) {
-            videofilter_set_luma_power( tvtime->inputfilter, commands_get_luma_power( commands ) );
+            videofilter_set_luma_power( tvtime->inputfilter,
+                                        commands_get_luma_power( commands ) );
         }
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
@@ -1983,10 +2112,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         commands_next_frame( commands );
 
         /* Notice this because it's cheap. */
-        videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );
-        videofilter_set_colour_invert( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
-        videofilter_set_mirror( tvtime->inputfilter, commands_apply_mirror( commands ) );
-        videofilter_set_chroma_kill( tvtime->inputfilter, commands_apply_chroma_kill( commands ) );
+        videofilter_set_bt8x8_correction
+            ( tvtime->inputfilter,
+              commands_apply_luma_correction( commands ) );
+        videofilter_set_colour_invert
+            ( tvtime->inputfilter, commands_apply_colour_invert( commands ) );
+        videofilter_set_mirror( tvtime->inputfilter,
+                                commands_apply_mirror( commands ) );
+        videofilter_set_chroma_kill( tvtime->inputfilter,
+                                     commands_apply_chroma_kill( commands ) );
 
         if( osd ) {
             tvtime_osd_set_pulldown( osd, tvtime->pulldown_alg );
@@ -2004,14 +2138,16 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( rvrreader ) {
             tuner_state = TUNER_STATE_HAS_SIGNAL;
         } else if( vidin ) {
-            tuner_state = videoinput_check_for_signal( vidin, commands_check_freq_present( commands ) );
+            tuner_state = videoinput_check_for_signal
+                ( vidin, commands_check_freq_present( commands ) );
         } else {
             tuner_state = TUNER_STATE_NO_SIGNAL;
         }
 
         if( has_signal && tuner_state != TUNER_STATE_HAS_SIGNAL ) {
             has_signal = 0;
-            save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
+            save_last_frame
+                ( saveframe, lastframe, width, height, width*2, width*2 );
             fadepos = 0;
         }
 
@@ -2027,7 +2163,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
         }
 
-        if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
+        if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL ||
+                        tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
             acquired = 1;
             if( rvrreader ) {
                 if( !rvrreader_next_frame( rvrreader ) ) break;
@@ -2038,7 +2175,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 curframe = videoinput_next_frame( vidin, &curframeid );
                 if( !curframe ) {
                     has_signal = 0;
-                    save_last_frame( saveframe, lastframe, width, height, width*2, width*2 );
+                    save_last_frame( saveframe, lastframe, 
+                                     width, height, width*2, width*2 );
                     fadepos = 0;
                     tuner_state = TUNER_STATE_NO_SIGNAL;
                     acquired = 0;
@@ -2050,7 +2188,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                             lastframeid = -1;
                         }
                     } else if( fieldsavailable == 4 ) {
-                        if( videoinput_buffer_invalid( vidin, secondlastframeid ) ) {
+                        if( videoinput_buffer_invalid( vidin,
+                                                       secondlastframeid ) ) {
                             secondlastframe = curframe;
                             secondlastframeid = -1;
                         }
@@ -2068,11 +2207,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
              */
             if( rtctimer ) {
                 while( performance_get_usecs_since_frame_acquired( perf )
-                       < ( (fieldtime*2) - (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
+                       < ( (fieldtime*2) -
+                           (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
-            } else if( performance_get_usecs_since_frame_acquired( perf ) < fieldtime ) {
-                usleep( fieldtime - performance_get_usecs_since_frame_acquired( perf ) );
+            } else if( performance_get_usecs_since_frame_acquired( perf ) <
+                       fieldtime ) {
+                usleep( fieldtime -
+                        performance_get_usecs_since_frame_acquired( perf ) );
             }
         }
 
@@ -2115,11 +2257,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 after_pos = station_get_current_pos( stationmgr );
 
                 if( station_get_num_stations( stationmgr ) ) {
-                    numscanned += (after_pos + station_get_num_stations( stationmgr ) - before_pos) % station_get_num_stations( stationmgr );
+                    numscanned +=
+                        (after_pos + station_get_num_stations( stationmgr ) -
+                         before_pos) % station_get_num_stations( stationmgr );
                 }
 
                 /* Stop when we loop around. */
-                if( numscanned > station_get_num_stations( stationmgr ) || !station_get_num_stations( stationmgr ) ) {
+                if( numscanned > station_get_num_stations( stationmgr ) ||
+                    !station_get_num_stations( stationmgr ) ) {
                     commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
                 }
             }
@@ -2131,7 +2276,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             int framesize = width * height * 2;
-            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d.\n", 
+            fprintf( stderr, _("tvtime: Stats using '%s' at %dx%d.\n"), 
                      (curmethod) ? curmethod->name : "interlaced passthrough", 
                      width, height );
             if( curmethod && curmethod->doscalerbob ) {
@@ -2139,14 +2284,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             }
             performance_print_last_frame_stats( perf, framesize );
             if( osd ) {
-                osd_list_statistics( osd, perf, (curmethod) ? curmethod->name : "interlaced passthrough",
-                                     width, height, framesize, fieldtime, framerate_mode,
-                                     videoinput_get_norm( vidin ) );
+                osd_list_statistics
+                    ( osd, perf,
+                      (curmethod) ? curmethod->name : "interlaced passthrough",
+                      width, height, framesize, fieldtime, framerate_mode,
+                      videoinput_get_norm( vidin ) );
             }
         }
-        if( config_get_debug( ct ) && commands_check_freq_present( commands ) ) {
+        if( config_get_debug( ct ) &&
+            commands_check_freq_present( commands ) ) {
             if( curmethod )  {
-                performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
+                performance_print_frame_drops( perf, curmethod->doscalerbob ?
+                                               (width * height) :
+                                               (width * height * 2) );
             } else {
                 performance_print_frame_drops( perf, width * height * 2 );
             }
@@ -2155,11 +2305,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /**
          * Show the bottom field.
          */
-        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL ||
+                        framerate_mode == FRAMERATE_HALF_TFF) &&
+            !output->is_interlaced() ) {
             if( curmethod->doscalerbob && !showbars ) {
-                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+                output_success = output->show_frame( output_x, output_y/2,
+                                                     output_w, output_h/2 );
             } else {
-                output_success = output->show_frame( output_x, output_y, output_w, output_h );
+                output_success = output->show_frame( output_x, output_y,
+                                                     output_w, output_h );
             }
         }
         performance_checkpoint_show_bot_field( perf );
@@ -2169,24 +2323,31 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /**
          * Deinterlace the top field.
          */
-        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL ||
+                        framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
                 if( send_fields ) {
                     /* Wait until we can draw the even field. */
                     output->wait_for_sync( 0 );
 
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
-                                                   curframe, 0, width, height, width * 2, 
-                                                   output->get_output_stride(), 0);
+                    tvtime_build_interlaced_frame( tvtime,
+                                                   output->get_output_buffer(),
+                                                   curframe, 0, width, height,
+                                                   width * 2, 
+                                                   output->get_output_stride(),
+                                                   0);
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
                 } else {
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
-                                                   curframe, 0, width, height, width * 2, 
-                                                   output->get_output_stride(), 1 );
+                    tvtime_build_interlaced_frame( tvtime,
+                                                   output->get_output_buffer(),
+                                                   curframe, 0, width, height,
+                                                   width * 2,
+                                                   output->get_output_stride(),
+                                                   1 );
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
@@ -2196,23 +2357,30 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 output->lock_output_buffer();
                 if( showbars ) {
                     for( i = 0; i < height; i++ ) {
-                        blit_packed422_scanline( output->get_output_buffer() + i*output->get_output_stride(),
-                                                 colourbars + (i*width*2), width );
+                        blit_packed422_scanline
+                            ( output->get_output_buffer() +
+                              i*output->get_output_stride(),
+                              colourbars + (i*width*2), width );
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field( tvtime, output->get_output_buffer(),
-                                                   curframe, 0, width, height, width * 2,
-                                                   output->get_output_stride() );
+                        tvtime_build_copied_field
+                            ( tvtime, output->get_output_buffer(),
+                              curframe, 0, width, height, width * 2,
+                              output->get_output_stride () );
                     } else {
-                        tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
-                                                         curframe, lastframe, secondlastframe,
-                                                         0, width, height, width * 2,
-                                                         output->get_output_stride() );
+                        tvtime_build_deinterlaced_frame
+                            ( tvtime, output->get_output_buffer(),
+                              curframe, lastframe, secondlastframe,
+                              0, width, height, width * 2,
+                              output->get_output_stride() );
                     }
                 }
 
-                /* For the screenshot, use the output after we build the top field. */
+                /*
+                 * For the screenshot, use the output
+                 * after we build the top field.
+                 */
                 if( screenshot ) {
                     const char *basename;
                     const char *outfile;
@@ -2262,10 +2430,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
          */
         if( vidin && acquired ) {
             if( fieldsavailable == 4 ) {
-                if( secondlastframeid >= 0 ) videoinput_free_frame( vidin, secondlastframeid );
-                if( vbidata ) vbidata_process_frame( vbidata, printdebug );
+                if( secondlastframeid >= 0 )
+                    videoinput_free_frame( vidin, secondlastframeid );
+                if( vbidata )
+                    vbidata_process_frame( vbidata, printdebug );
             } else if( fieldsavailable == 2 ) {
-                if( lastframeid >= 0 ) videoinput_free_frame( vidin, lastframeid );
+               if( lastframeid >= 0 )
+                   videoinput_free_frame( vidin, lastframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
         }
@@ -2279,8 +2450,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                    < ( fieldtime - (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
                 rtctimer_next_tick( rtctimer );
             }
-        } else if( performance_get_usecs_since_frame_acquired( perf ) < fieldtime ) {
-            usleep( fieldtime - performance_get_usecs_since_frame_acquired( perf ) );
+        } else if( performance_get_usecs_since_frame_acquired( perf ) <
+                   fieldtime ) {
+            usleep( fieldtime -
+                    performance_get_usecs_since_frame_acquired( perf ) );
         }
         performance_checkpoint_wait_for_bot_field( perf );
 
@@ -2288,11 +2461,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /**
          * Show the top field.
          */
-        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) && !output->is_interlaced() ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL ||
+                        framerate_mode == FRAMERATE_HALF_BFF) &&
+            !output->is_interlaced() ) {
             if( curmethod->doscalerbob && !showbars ) {
-                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+                output_success = output->show_frame( output_x, output_y/2,
+                                                     output_w, output_h/2 );
             } else {
-                output_success = output->show_frame( output_x, output_y, output_w, output_h );
+                output_success = output->show_frame( output_x, output_y,
+                                                     output_w, output_h );
             }
         }
         performance_checkpoint_show_top_field( perf );
@@ -2302,16 +2479,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         /**
          * Deinterlace the bottom field.
          */
-        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL ||
+                        framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
                 if( send_fields ) {
                     /* Wait until we can draw the odd field. */
                     output->wait_for_sync( 1 );
                     
                     output->lock_output_buffer();
-                    tvtime_build_interlaced_frame( tvtime, output->get_output_buffer(),
-                                                   curframe, 1, width, height, width * 2, 
-                                                   output->get_output_stride(), 0 );
+                    tvtime_build_interlaced_frame
+                        ( tvtime, output->get_output_buffer(), curframe, 1,
+                          width, height, width * 2, 
+                          output->get_output_stride(), 0 );
                     output->unlock_output_buffer();
                     output->show_frame( output_x, output_y/2, 
                                         output_w, output_h/2 );
@@ -2321,22 +2500,30 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 output->lock_output_buffer();
                 if( showbars ) {
                     for( i = 0; i < height; i++ ) {
-                        blit_packed422_scanline( output->get_output_buffer() + i*output->get_output_stride(),
-                                                 colourbars + (i*width*2), width );
+                        blit_packed422_scanline
+                            ( output->get_output_buffer() +
+                              i*output->get_output_stride(),
+                              colourbars + (i*width*2), width );
                     }
                 } else {
                     if( curmethod->doscalerbob ) {
-                        tvtime_build_copied_field( tvtime, output->get_output_buffer(),
-                                                   curframe, 1, width, height, width * 2,
-                                                   output->get_output_stride() );
+                        tvtime_build_copied_field
+                            ( tvtime, output->get_output_buffer(),
+                              curframe, 1, width, height, width * 2,
+                              output->get_output_stride() );
                     } else {
-                        tvtime_build_deinterlaced_frame( tvtime, output->get_output_buffer(),
-                                                         curframe, lastframe, secondlastframe, 1,
-                                                         width, height, width * 2, output->get_output_stride() );
+                        tvtime_build_deinterlaced_frame
+                            ( tvtime, output->get_output_buffer(),
+                              curframe, lastframe, secondlastframe, 1,
+                              width, height, width * 2,
+                              output->get_output_stride() );
                     }
                 }
 
-                /* For the screenshot, use may need to use the output after we build the bot field. */
+                /*
+                 * For the screenshot, use may need to use
+                 * the output after we build the bot field.
+                 */
                 if( screenshot ) {
                     const char *basename;
                     const char *outfile;
@@ -2350,9 +2537,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                         basename = outfile = fifo_args;
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
-                                  config_get_timeformat( ct ), localtime( &tm ) );
-                        snprintf( filename, sizeof( filename ), "tvtime-output-%s.png", timestamp );
-                        snprintf( pathfilename, sizeof( pathfilename ), "%s/%s", config_get_screenshot_dir( ct ), filename );
+                                  config_get_timeformat( ct ),
+                                  localtime( &tm ) );
+                        snprintf( filename, sizeof( filename ),
+                                  "tvtime-output-%s.png", timestamp );
+                        snprintf( pathfilename, sizeof( pathfilename ),
+                                  "%s/%s",
+                                  config_get_screenshot_dir( ct ), filename );
                         outfile = pathfilename;
                         basename = filename;
                     }
@@ -2363,7 +2554,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                         pngscreenshot( outfile, output->get_output_buffer(),
                                        width, height, width * 2 );
                     }
-                    snprintf( message, sizeof( message ), _("Screenshot: %s"), basename );
+                    snprintf( message, sizeof( message ),
+                              _("Screenshot: %s"), basename );
                     if( osd ) tvtime_osd_show_message( osd, message );
                     screenshot = 0;
                 }
@@ -2384,7 +2576,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                 lastframeid = curframeid;
                 lastframe = curframe;
             } else {
-                if( curframeid >= 0 ) videoinput_free_frame( vidin, curframeid );
+                if( curframeid >= 0 )
+                    videoinput_free_frame( vidin, curframeid );
                 if( vbidata ) vbidata_process_frame( vbidata, printdebug );
             }
         }
@@ -2425,7 +2618,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     snprintf( number, 4, "%d", framerate_mode );
     config_save( ct, "FramerateMode", number );
 
-    snprintf( number, 4, "%2.1f", commands_get_overscan( commands ) * 2.0 * 100.0 );
+    snprintf( number, 4, "%2.1f",
+              commands_get_overscan( commands ) * 2.0 * 100.0 );
     config_save( ct, "OverScan", number );
 
     snprintf( number, 4, "%d", commands_check_freq_present( commands ) );
@@ -2449,7 +2643,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     output->shutdown();
 
     if( verbose ) {
-        fprintf( stderr, "tvtime: Cleaning up.\n" );
+        fputs( _("tvtime: Cleaning up.\n"), stderr );
     }
     if( rvrreader ) {
         rvrreader_delete( rvrreader );
@@ -2492,11 +2686,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     xmlCleanupParser();
 
     if( restarttvtime ) {
-        fprintf( stderr, "tvtime: Restarting.\n" );
+        fprintf( stderr, _("tvtime: Restarting.\n") );
         return 2;
     }
 
-    fprintf( stderr, "tvtime: Thank you for using tvtime.\n" );
+    fprintf( stderr, _("tvtime: Thank you for using tvtime.\n") );
     return 0;
 }
 
@@ -2506,48 +2700,70 @@ int main( int argc, char **argv )
     int read_stdin = 1;
     int result = 0;
 
-    fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
+    /*
+     * Setup i18n. This has to be done as early as possible in order
+     * to show startup messages in the users preferred language.
+     */
+    setup_i18n();
+
+    fputs( _("tvtime: Running " PACKAGE_STRING ".\n"), stderr );
 
     /* Disable this code for a release. */
-    fprintf( stderr, "\n*** WARNING: you are running a DEVELOPMENT version of tvtime.\n" );
-    fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
-                       "*** based on released versions only!!\n\n" );
+    fputs( _("\n"
+             "*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
+             "*** We often break stuff during development.  "
+             "Please submit bug reports\n"
+             "*** based on released versions only!!\n\n", stderr );
 
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
     if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "tvtime: Can't get realtime priority for better performance, need root access.\n" );
+        fputs( _("tvtime: Can't get realtime priority for better performance,"
+                 "need root access.\n"), stderr );
     }
 
     rtctimer = rtctimer_new( 1 );
     if( !rtctimer ) {
-        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
-                         "*** that you load the 'rtc' kernel module before starting tvtime,\n"
-                         "*** and make sure that your user has access to the device file.\n"
-                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
+        fputs( _("\n*** /dev/rtc support is needed for smooth video.  "
+                 "We STRONGLY recommend\n"
+                 "*** that you load the 'rtc' kernel module "
+                 "before starting tvtime,\n"
+                 "*** and make sure that your user "
+                 "has access to the device file.\n"
+                 "*** See our support page at " PACKAGE_BUGREPORT
+                 " for more information\n\n"), stderr );
     } else {
-        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
+        if( !rtctimer_set_interval( rtctimer, 1024 ) &&
+            !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "\n*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
-                         "*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
-                         "*** linux kernel version 2.4.19 or later, please run:\n"
+                fputs( _("\n*** Failed to get 1024hz resolution from /dev/rtc."
+                         "  This will\n"
+                         "*** cause video to be unsmooth.  Please run tvtime "
+                         "as root, or, with\n"
+                         "*** linux kernel version 2.4.19 or later, "
+                         "please run:\n"
                          "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
+                         "*** See our support page at " PACKAGE_BUGREPORT
+                         " for more information\n\n"), stderr );
             }
         }
     }
 
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
-    if( setuid( getuid() ) == -1 ) {                                                                           
-        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n",                                
-                 strerror( errno ) );                                                                          
-        return 1;                                                                                              
+    if( setuid( getuid() ) == -1 ) {
+        /*
+         * This used to say "Unknown problems", but we're printing an
+         * error string, so that didn't really make sense, did it?
+         */
+        fprintf( stderr, "tvtime: Problem dropping root access: %s\n",
+                 strerror( errno ) );
+        return 1;
     }
 
 
@@ -2556,9 +2772,6 @@ int main( int argc, char **argv )
         read_stdin = 0;
         close( STDIN_FILENO );
     }
-
-    /* Setup i18n. */
-    setup_i18n();
 
     /* Run tvtime. */
     for(;;) {
