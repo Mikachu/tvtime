@@ -57,6 +57,13 @@ ings in this Software without prior written authorization from him.
 #include <dirent.h>
 #include <pwd.h>
 #include <string.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#endif
 #include "tvtimeconf.h"
 #include "utils.h"
 

@@ -22,6 +22,8 @@ pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 rundir = $(localstatedir)/run
 pkgrundir = $(rundir)/@PACKAGE@
 
+localedir = $(datadir)/locale
+
 TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
 TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 
@@ -41,7 +43,7 @@ endif
 
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
 	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" \
-	-D_LARGEFILE64_SOURCE
+	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
