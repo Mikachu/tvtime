@@ -208,7 +208,7 @@ msgstr ""
 "    bufferů, aby tvtime zpracoval video optimálně. V kernelech\n"
 "    před 2.4.21 je toto nastavení standardní. Nastavte prosím\n"
 "    parametr bttv gbuffers=4 při nahrávání modulu. Více informací\n"
-"    dostanete na našich stránkách podpory %s\n"
+"    najdete na našich stránkách podpory %s\n"
 "\n"
 
 #: src/tvtime.c:1434
@@ -306,7 +306,7 @@ msgstr ""
 "    Podpora Enhanced Real Time Clock ve Vašem jádře je potřebná pro\n"
 "    plynulé video. Velmi doporučujeme nahrát modul 'rtc' před zapnutím\n"
 "    tvtime. Ujistěte se také, že uživatel má přístup k zařízení 'rtc'\n"
-"    (/dev/rtc nebo /dev/misc/rtc). Více informací dostanete na našich\n"
+"    (/dev/rtc nebo /dev/misc/rtc). Více informací najdete na našich\n"
 "    stránkách podpory %s.\n"
 "\n"
 
@@ -324,12 +324,12 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Nemo nastavit rozlišení 1024 Hz pro zařízení RTC. Vysoká frekvence\n"
+"    Nelze nastavit rozlišení 1024 Hz pro zařízení RTC. Vysoká frekvence\n"
 "    je potřebná, aby bylo video plynulé. Spouštějte prosím tvtime jako\n"
 "    root, nastavte tvtime SUID root nebo změňte maximální rozlišení RTC\n"
 "    povolené uživatelům zadáním následujícího příkazů jako root:\n"
 "        sysctl -w dev.rtc.max-user-freq=1024\n"
-"    Více informací dostanete na našich stránkách podpory %s.\n"
+"    Více informací najdete na našich stránkách podpory %s.\n"
 "\n"
 
 #: src/tvtime.c:2732
@@ -379,7 +379,7 @@ msgstr "Hledání signálu v kanálech"
 
 #: src/commands.c:339
 msgid "Reset all channels as active"
-msgstr "Všechny kanály byly aktivovány"
+msgstr "Aktivování všech kanálů"
 
 #: src/commands.c:345
 msgid "Finetune current channel"
