@@ -26,6 +26,7 @@ struct tvtime_osd_s
     osd_string_t *volume_bar;
     osd_string_t *data_bar;
     osd_string_t *muted_osd;
+    osd_string_t *channel_info;
     int muted;
 };
 
@@ -40,6 +41,10 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
                                           height, frameaspect );
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
     osd_string_show_border( osd->channel_number, 1 );
+
+    osd->channel_info = osd_string_new( "helr.ttf", 30, width,
+                                        height, frameaspect );
+    osd_string_set_colour( osd->channel_info, 220, 12, 155 );
 
     osd->volume_bar = osd_string_new( "helr.ttf", 15, width,
                                       height, frameaspect );
@@ -66,6 +71,11 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
 void tvtime_osd_show_channel_number( tvtime_osd_t *osd, const char *text )
 {
     osd_string_show_text( osd->channel_number, text, 80 );
+}
+
+void tvtime_osd_show_channel_info( tvtime_osd_t *osd, const char *text )
+{
+    osd_string_show_text( osd->channel_info, text, 80 );
 }
 
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
@@ -106,7 +116,10 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
     osd_string_composite_packed422( osd->channel_number, output, width,
                                     height, stride, 50, 50, 0 );
 
-    if( osd_string_visible( osd->data_bar ) ) {
+    if( osd_string_visible( osd->channel_info ) ) {
+        osd_string_composite_packed422( osd->channel_info, output, width,
+                                        height, stride, width/2, 60, 0 );
+    } else if( osd_string_visible( osd->data_bar ) ) {
         osd_string_composite_packed422( osd->data_bar, output, width, height,
                                         stride, 20, height - 40, 0 );
     } else if( osd->muted ) {
@@ -121,6 +134,7 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
 void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 {
     osd_string_advance_frame( osd->channel_number );
+    osd_string_advance_frame( osd->channel_info );
     osd_string_advance_frame( osd->volume_bar );
     osd_string_advance_frame( osd->data_bar );
 }

@@ -77,6 +77,7 @@ double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
+const char *config_get_timeformat( config_t *ct );
 
 void config_set_verbose( config_t *ct, int verbose );
 void config_set_debug( config_t *ct, int debug );
@@ -90,5 +91,6 @@ void config_set_v4l_device( config_t *ct, const char *v4ldev );
 void config_set_v4l_norm( config_t *ct, const char *v4lnorm );
 void config_set_v4l_freq( config_t *ct, const char *v4lfreq );
 void config_set_tuner_number( config_t *ct, int tuner_number );
+void config_set_timeformat( config_t *ct, const char *format );
 
 #endif /* TVTIMECONF_H_INCLUDED */

@@ -44,6 +44,7 @@ struct config_s
     char *freq;
     int tuner_number;
     int *keymap;
+    char *timeformat;
 };
 
 void config_init( config_t *ct );
@@ -112,6 +113,7 @@ config_t *config_new( int argc, char **argv )
     ct->v4ldev = strdup("/dev/video0");
     ct->norm = strdup("ntsc");
     ct->freq = strdup("us-cable");
+    ct->timeformat = strdup("%r");
     ct->keymap = (int *) malloc( TVTIME_LAST * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -255,13 +257,16 @@ void config_init( config_t *ct )
         ct->freq = strdup( tmp );
     }
 
+    if( (tmp = parser_get( &(ct->pf), "TimeFormat")) ) {
+        free( ct->timeformat );
+        ct->timeformat = strdup( tmp );
+    }
+
     if( (tmp = parser_get( &(ct->pf), "TunerNumber")) ) {
         ct->tuner_number = atoi( tmp );
     }
 
     config_init_keymap( ct );
-
-    config_dump( ct );
 }
 
 int string_to_key( const char *str )
@@ -598,6 +603,11 @@ const char *config_get_v4l_norm( config_t *ct )
 const char *config_get_v4l_freq( config_t *ct )
 {
     return ct->freq;
+}
+
+const char *config_get_timeformat( config_t *ct )
+{
+    return ct->timeformat;
 }
 
 #ifdef TESTHARNESS

@@ -220,6 +220,8 @@ int main( int argc, char **argv )
             /* XXX: Print valid frequency regions here. */
             return 1;
         } else {
+            char timestamp[50];
+            time_t tm = time(NULL);
             int rc = frequencies_find_current_index( vidin );
             if( rc == -1 ) {
                 /* set to a known frequency */
@@ -233,7 +235,10 @@ int main( int argc, char **argv )
                                        "tvtime: Changing to channel %s.\n",
                                        chanlist[ chanindex ].name );
             }
+            strftime( timestamp, 50, config_get_timeformat( ct ), 
+                      localtime(&tm) );
             tvtime_osd_show_channel_number( osd, chanlist[ chanindex ].name );
+            tvtime_osd_show_channel_info( osd, timestamp );
         }
     }
 

@@ -25,6 +25,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 
 void tvtime_osd_show_channel_number( tvtime_osd_t *osd, const char *text );
+void tvtime_osd_show_channel_info( tvtime_osd_t *osd, const char *text );
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage );
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );

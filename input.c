@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "tvtimeconf.h"
 #include "frequencies.h"
 #include "mixer.h"
@@ -178,6 +179,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
                               "tvtime: Can't change channel, "
                               "no tuner present!\n" );
              } else {
+                 char timestamp[50];
+                 time_t tm = time(NULL);
                  int start_index = chanindex;
                  do {
                      chanindex = (chanindex + 
@@ -196,6 +199,9 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                         chanlist[ chanindex ].name );
                  tvtime_osd_show_channel_number( in->osd,
                                                  chanlist[ chanindex ].name );
+                 strftime( timestamp, 50, config_get_timeformat( in->cfg ), 
+                           localtime(&tm) );
+                 tvtime_osd_show_channel_info( in->osd, timestamp );
              }
              break;
 
@@ -251,6 +257,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
          case TVTIME_ENTER:
              if( in->frame_counter ) {
                  if( *in->next_chan_buffer ) {
+                     char timestamp[50];
+                     time_t tm = time(NULL);
                      int found;
 
                      /* this sets chanindex accordingly */
@@ -270,7 +278,16 @@ void input_callback( input_t *in, InputEvent command, int arg )
                                       chanlist[ chanindex ].name );
                          }
 
-                         tvtime_osd_show_channel_number( in->osd, chanlist[ chanindex ].name );
+                         tvtime_osd_show_channel_number( 
+                             in->osd, 
+                             chanlist[ chanindex ].name );
+
+                         strftime( timestamp, 50, 
+                                   config_get_timeformat( in->cfg ), 
+                                   localtime(&tm) );
+
+                         tvtime_osd_show_channel_info( in->osd, timestamp );
+
                          in->frame_counter = 0;
                      } else {
                          /* no valid channel */
