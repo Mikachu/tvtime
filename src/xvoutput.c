@@ -73,6 +73,8 @@ static int motion_timeout = 0;
 static int xvoutput_verbose = 0;
 static int xvoutput_exposed = 0;
 
+static int xvoutput_error = 0;
+
 static char *atomNames[] = { "WM_PROTOCOLS", "WM_DELETE_WINDOW" };
 
 typedef struct {
@@ -90,6 +92,7 @@ int HandleXError( Display *display, XErrorEvent *xevent )
 
     XGetErrorText( display, xevent->error_code, str, 1024 );
     fprintf( stderr, "xvoutput: Received X error event: %s\n", str );
+    xvoutput_error = 1;
     return 0;
 }
 
@@ -496,6 +499,7 @@ int xv_init( int inputwidth, int inputheight, int outputheight, int aspect, int 
     xv_alloc_frame();
     xv_clear_screen();
     saver_off( display );
+    x11_InstallXErrorHandler();
     return 1;
 }
 
@@ -549,7 +553,7 @@ int xv_toggle_aspect( void )
     return output_aspect;
 }
 
-void xv_show_frame( int x, int y, int width, int height )
+int xv_show_frame( int x, int y, int width, int height )
 {
     XLockDisplay( display );
     XvShmPutImage( display, xv_port, window, gc, image,
@@ -565,6 +569,8 @@ void xv_show_frame( int x, int y, int width, int height )
             XDefineCursor( display, window, nocursor );
         }
     }
+    if( xvoutput_error ) return 0;
+    return 1;
 }
 
 void xv_poll_events( input_t *in )

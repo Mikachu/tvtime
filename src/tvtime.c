@@ -1250,6 +1250,7 @@ int main( int argc, char **argv )
         int we_were_late = 0;
         int paused = 0;
         int output_x, output_y, output_w, output_h;
+        int output_success = 1;
 
         output_x = (int) ((((double) width) * commands_get_horizontal_overscan( commands )) + 0.5);
         output_w = (int) ((((double) width) - (((double) width) * commands_get_horizontal_overscan( commands ) * 2.0)) + 0.5);
@@ -1546,9 +1547,9 @@ int main( int argc, char **argv )
                 performance_checkpoint_blit_top_field_start( perf );
                 if( use_vgasync ) vgasync_spin_until_out_of_refresh();
                 if( curmethod->doscalerbob && !showbars ) {
-                    output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+                    output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
                 } else {
-                    output->show_frame( output_x, output_y, output_w, output_h );
+                    output_success = output->show_frame( output_x, output_y, output_w, output_h );
                 }
             }
         } else {
@@ -1660,9 +1661,9 @@ int main( int argc, char **argv )
             performance_checkpoint_blit_bot_field_start( perf );
             if( use_vgasync ) vgasync_spin_until_out_of_refresh();
             if( curmethod->doscalerbob && !showbars ) {
-                output->show_frame( output_x, output_y/2, output_w, output_h/2 );
+                output_success = output->show_frame( output_x, output_y/2, output_w, output_h/2 );
             } else {
-                output->show_frame( output_x, output_y, output_w, output_h );
+                output_success = output->show_frame( output_x, output_y, output_w, output_h );
             }
             performance_checkpoint_blit_bot_field_end( perf );
         } else {
@@ -1674,6 +1675,8 @@ int main( int argc, char **argv )
         if( osd ) {
             tvtime_osd_advance_frame( osd );
         }
+
+        if( !output_success ) break;
     }
 
     if( config_get_configsave( ct ) ) {
