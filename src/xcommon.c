@@ -1516,8 +1516,20 @@ void xcommon_poll_events( input_t *in )
             break;
         case ConfigureNotify:
             if( event.xconfigure.window == wm_window ) {
-                window_area.x = event.xconfigure.x;
-                window_area.y = event.xconfigure.y;
+                if( event.xconfigure.send_event == False ) {
+                    int gx, gy;
+                    Window dw;
+
+                    if( XTranslateCoordinates( display, wm_window,
+                                               DefaultRootWindow( display ),
+                                               0, 0, &gx, &gy, &dw) == True) {
+                        window_area.x = gx;
+                        window_area.y = gy;
+                    }
+                } else {
+                    window_area.x = event.xconfigure.x;
+                    window_area.y = event.xconfigure.y;
+                }
                 window_area.width = event.xconfigure.width;
                 window_area.height = event.xconfigure.height;
             }
