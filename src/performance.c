@@ -4,11 +4,6 @@
 #include <sys/time.h>
 #include "performance.h"
 
-/**
- * Tolerance in usec for what we consider a frame drop.
- */
-static int tolerance = 2000;
-
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
@@ -160,7 +155,7 @@ void performance_print_last_frame_stats( performance_t *perf )
 
 void performance_print_frame_drops( performance_t *perf )
 {
-    if( timediff( &perf->aquired_input, &perf->lastframetime ) > ( (perf->fieldtime * 2) + tolerance ) ) {
+    if( timediff( &perf->aquired_input, &perf->lastframetime ) > (perf->fieldtime * 3) ) {
         fprintf( stderr, "tvtime: Frame drop detected (% 2.2fms between consecutive frames.\n",
             ((double) timediff( &perf->aquired_input, &perf->lastframetime)) / 1000.0 );
     }
