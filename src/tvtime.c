@@ -652,21 +652,22 @@ int main( int argc, char **argv )
                  videoinput_get_numframes( vidin ) );
         return 1;
     } else if( videoinput_get_numframes( vidin ) == 2 ) {
-        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
-                 "Limiting deinterlace plugins to those which only need 1 field.\n"
-                 "tvtime: If you are using the bttv driver, do 'modprobe bttv "
-                 "gbuffers=4' next time.\n",
+        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
+                 "tvtime: to those which only need 1 field.\n",
                  videoinput_get_numframes( vidin ) );
         fieldsavailable = 1;
     } else if( videoinput_get_numframes( vidin ) == 3 ) {
-        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
-                 "Limiting deinterlace plugins to those which only need 3 fields.\n"
-                 "tvtime: If you are using the bttv driver, do 'modprobe bttv "
-                 "gbuffers=4' next time.\n",
+        fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace plugins\n"
+                 "tvtime: to those which only need 3 fields.\n",
                  videoinput_get_numframes( vidin ) );
         fieldsavailable = 3;
     } else {
         fieldsavailable = 5;
+    }
+    if( fieldsavailable < 5 && videoinput_is_bttv( vidin ) ) {
+        fprintf( stderr, "\n*** You are using the bttv driver, but without enough gbuffers available.\n"
+                           "*** See the support page at http://tvtime.sourceforge.net/ for information\n"
+                           "*** on how to increase your gbuffers setting.\n\n" );
     }
     filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
     if( !get_num_deinterlace_methods() ) {
@@ -770,8 +771,9 @@ int main( int argc, char **argv )
     }
     rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
-        fprintf( stderr, "tvtime: /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
-                         "tvtime: that you load the 'rtc' kernel module before starting tvtime.\n" );
+        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+                         "*** that you load the 'rtc' kernel module before starting tvtime.\n"
+                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
@@ -780,9 +782,11 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "tvtime: /dev/rtc loaded fine, but we can't get 1024hz resolution!\n" );
-                fprintf( stderr, "tvtime: Please run tvtime as root, or, as root and with kernel >= 2.4.19, run:\n"
-                                 "        sysctl -w dev.rtc.max-user-freq=1024\n" );
+                fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  Support is available,\n"
+                         "*** but tvtime cannot get 1024hz resolution!  Please run tvtime as root,\n"
+                         "*** or, with linux kernel version 2.4.19 or later, run:\n"
+                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                         "*** See our support page at http://tvtime.sourceforge.net/ for more information\n\n" );
             }
         }
     }

@@ -243,7 +243,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
     struct video_picture grab_pict;
-    struct video_buffer fbuf;
+    /* struct video_buffer fbuf; */
     int i;
 
     if( !vidin ) {
@@ -284,7 +284,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     }
 
     if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Using video4linux driver '%s', type is %x, audio %d.\n",
+        fprintf( stderr, "videoinput: Using video4linux driver '%s'.\n"
+                         "videoinput: Card type is %x, audio %d.\n",
                  grab_cap.name, grab_cap.type, grab_cap.audios );
     }
 
@@ -303,7 +304,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* dirty hack time / v4l design flaw -- works with bttv only
      * this adds support for a few less common PAL versions */
     vidin->isbttv = 0;
-    if( ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0 ) {
+    if( !(ioctl( vidin->grab_fd, BTTV_VERSION, &i ) < 0) ) {
         vidin->isbttv = 1;
     } else if( norm > VIDEOINPUT_SECAM ) {
         fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
@@ -354,6 +355,9 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
      * I'm going to set up the framebuffer to whatever it's currently set to, and
      * see if this fixes annoying problems with like the SAA7134 driver.  Argh!
      */
+    /**
+     * This code didn't work as planned, so screw it for 0.9.7, it's too dangerous
+     * to leave in. -Billy
     if( ioctl( vidin->grab_fd, VIDIOCGFBUF, &fbuf ) < 0 ) {
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: Can't get framebuffer settings, which I don't need anyway: %s\n",
@@ -365,7 +369,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                      fbuf.base, fbuf.width, fbuf.height, fbuf.depth, fbuf.bytesperline );
         }
         if( !fbuf.width ) {
-            /* Just set some fake settings. */
+            // Just set some fake settings.
             fbuf.width = 1024;
             fbuf.height = 768;
             fbuf.depth = 16;
@@ -379,6 +383,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             }
         }
     }
+    */
 
     /* Set the format using the SPICT ioctl. */
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
@@ -403,8 +408,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         return 0;
     }
     if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Brightness %d, hue %d, colour %d, contrast %d, "
-                         "whiteness %d, depth %d, palette %d.\n",
+        fprintf( stderr, "videoinput: Brightness %d, hue %d, colour %d, contrast %d\n"
+                         "videoinput: Whiteness %d, depth %d, palette %d.\n",
                  grab_pict.brightness, grab_pict.hue, grab_pict.colour, grab_pict.contrast,
                  grab_pict.whiteness, grab_pict.depth, grab_pict.palette );
     }

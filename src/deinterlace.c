@@ -35,8 +35,6 @@ void register_deinterlace_method( deinterlace_method_t *method )
 {
     methodlist_item_t **dest;
 
-    fprintf( stderr, "deinterlace: Registering '%s' deinterlacing algorithm.\n", method->name );
-
     if( !methodlist ) {
         dest = &methodlist;
     } else {
@@ -44,6 +42,7 @@ void register_deinterlace_method( deinterlace_method_t *method )
         while( cur->next ) cur = cur->next;
         dest = &(cur->next);
     }
+    fprintf( stderr, "deinterlace: Loading %s...\n", method->name );
 
     *dest = (methodlist_item_t *) malloc( sizeof( methodlist_item_t ) );
     if( *dest ) {
@@ -105,16 +104,16 @@ void filter_deinterlace_methods( int accel, int fields_available )
 
         if( (cur->method->accelrequired & accel) != cur->method->accelrequired ) {
             /* This method is no good, drop it from the list. */
-            fprintf( stderr, "deinterlace: Removing '%s': required "
+            fprintf( stderr, "deinterlace: %s disabled: required "
                      "CPU accelleration features unavailable.\n",
-                     cur->method->name );
+                     cur->method->short_name );
             drop = 1;
         }
         if( cur->method->fields_required > fields_available ) {
             /* This method is no good, drop it from the list. */
-            fprintf( stderr, "deinterlace: Removing '%s': requires "
+            fprintf( stderr, "deinterlace: %s disabled: requires "
                      "%d field buffers, only %d available.\n",
-                     cur->method->name, cur->method->fields_required,
+                     cur->method->short_name, cur->method->fields_required,
                      fields_available );
             drop = 1;
         }
