@@ -1,5 +1,5 @@
 
 AUTOMAKE_OPTIONS = 1.6
-SUBDIRS = docs plugins src
+SUBDIRS = docs data plugins src
 EXTRA_DIST = BUGS
 

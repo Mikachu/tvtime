@@ -220,6 +220,7 @@ dnl builtin([include],[libmpeg2/configure.incl])
 AC_CONFIG_FILES([
 	Makefile
 	docs/Makefile
+	data/Makefile
 	plugins/Makefile
 	src/Makefile
 ])

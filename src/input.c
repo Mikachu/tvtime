@@ -41,6 +41,11 @@
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
 
+/*
+struct freqinfo_s {
+    
+};
+*/
 
 struct input_s {
     config_t *cfg;

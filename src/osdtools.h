@@ -29,6 +29,7 @@ typedef struct osd_string_s osd_string_t;
 typedef struct osd_databars_s osd_databars_t;
 typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_shape_s osd_shape_t;
+typedef struct osd_fixedfont_s osd_fixedfont_t;
 
 typedef enum OSD_Shapes_e {
     OSD_Rect        = (1<<0),
@@ -124,5 +125,12 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                unsigned char *background,
                                                int width, int xpos,
                                                int scanline );
+
+osd_fixedfont_t *osd_fixedfont_new( const char *filename, double pixel_aspect );
+void osd_fixedfont_delete( osd_fixedfont_t *fixed );
+int osd_fixedfont_get_char_width( osd_fixedfont_t *fixed );
+int osd_fixedfont_get_char_height( osd_fixedfont_t *fixed );
+void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, unsigned char *output, int width,
+                                   int scanline, char c, unsigned int fg, unsigned int bg, int alpha );
 
 #endif /* OSDTOOLS_H_INCLUDED */
