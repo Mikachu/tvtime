@@ -31,7 +31,7 @@ if [ "$action" = "configure" ]; then
     if [ -d /var/run/tvtime ] ; then
         if [ ! -x /usr/sbin/dpkg-statoverride ] || \
            ! /usr/sbin/dpkg-statoverride --list /var/run/tvtime >/dev/null; then
-	    chmod u=rwx,go=rx /var/run/tvtime
+	    chmod ug=rwx,o=rxt /var/run/tvtime
             chown root:video /var/run/tvtime
         fi
     fi
