@@ -22,7 +22,7 @@
 typedef struct credits_s credits_t;
 
 credits_t *credits_new( const char *filename, int output_height );
-void credits_delete( void );
+void credits_delete( credits_t *credits );
 void credits_restart( credits_t *credits, double speed );
 void credits_composite_packed422_scanline( credits_t *credits,
                                            unsigned char *output,

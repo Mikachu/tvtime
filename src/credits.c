@@ -96,8 +96,11 @@ credits_t *credits_new( const char *filename, int output_height )
     return credits;
 }
 
-void credits_delete( void )
+void credits_delete( credits_t *credits )
 {
+    free( credits->data );
+    free( credits->blanks );
+    free( credits );
 }
 
 void credits_restart( credits_t *credits, double speed )

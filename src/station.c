@@ -228,6 +228,10 @@ station_mgr_t *station_init( config_t *ct )
     return mgr;
 }
 
+void station_delete( station_mgr_t *mgr )
+{
+    free( mgr );
+}
 
 int station_set( station_mgr_t *mgr, int pos )
 {

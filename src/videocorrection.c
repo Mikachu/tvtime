@@ -142,6 +142,7 @@ void video_correction_delete( video_correction_t *vc )
 {
     free( vc->luma_table );
     free( vc->chroma_table );
+    free( vc->temp_scanline_data );
     free( vc );
 }
 

@@ -332,13 +332,13 @@ config_t *config_new( int argc, char **argv )
         case 'a': ct->aspect = 1; break;
         case 's': ct->debug = 1; break;
         case 'c': ct->apply_luma_correction = 1; break;
-        case 'd': ct->v4ldev = strdup( optarg ); break;
-        case 'b': ct->vbidev = strdup( optarg ); break;
+        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+        case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
         case 'l': ct->luma_correction = atof( optarg );
                   ct->apply_luma_correction = 1; break;
-        case 'n': ct->norm = strdup( optarg ); break;
-        case 'f': ct->freq = strdup( optarg ); break;
+        case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+        case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
         case 'F': configFile = strdup( optarg ); break;
         case 'm': ct->fullscreen = 1; break;
         case 'D': ct->preferred_deinterlace_method = atoi( optarg ); break;
@@ -373,8 +373,15 @@ config_t *config_new( int argc, char **argv )
 
 void config_delete( config_t *ct )
 {
+    parser_delete( &(ct->pf) );
     if( ct->keymap ) free( ct->keymap );
     if( ct->buttonmap ) free( ct->buttonmap );
+    free( ct->timeformat );
+    free( ct->norm );
+    free( ct->freq );
+    free( ct->vbidev );
+    free( ct->v4ldev );
+    free( ct );
 }
 
 void config_init( config_t *ct )

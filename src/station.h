@@ -32,6 +32,7 @@ extern "C" {
 typedef struct station_mgr_s station_mgr_t;
 
 station_mgr_t *station_init( config_t *ct );
+void station_delete( station_mgr_t *mgr );
 
 /**
  * Set the current channel.

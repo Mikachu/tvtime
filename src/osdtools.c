@@ -107,6 +107,7 @@ void osd_string_delete( osd_string_t *osds )
 {
     efs_delete( osds->efs );
     efont_delete( osds->font );
+    free( osds->image4444 );
     free( osds );
 }
 

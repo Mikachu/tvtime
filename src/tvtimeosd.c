@@ -377,7 +377,9 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
             osd_string_delete( osd->strings[ i ].string );
         }
     }
+    free( osd->strings );
     if( osd->channel_logo ) osd_graphic_delete( osd->channel_logo );
+    if( osd->credits ) credits_delete( osd->credits );
     free( osd );
 }
 

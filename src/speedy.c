@@ -879,7 +879,7 @@ void composite_alphamask_alpha_to_packed4444_scanline_c( unsigned char *output,
 
            if( a == 0xff ) {
                *((unsigned int *) output) = opaque;
-           } else if( (input[ 0 ] == 0x00) ) {
+           } else if( input[ 0 ] == 0x00 ) {
                *((unsigned int *) output) = (multiply_alpha( a, textcr ) << 24)
                                           | (multiply_alpha( a, textcb ) << 16)
                                           | (multiply_alpha( a, textluma ) << 8) | a;
