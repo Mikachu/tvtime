@@ -8,6 +8,9 @@
  * XDS and stuff.  Some help from Zapping's vbi library by
  * Michael H. Schimek and others, released under the GPL.
  *
+ * Excellent new filter code by Nathan Laredo, and no, I don't yet know
+ * how he derived it, but it does seem to improve our decoding.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -126,18 +129,13 @@ int parityok(int n)
 
 int decodebit(unsigned char *data, int threshold)
 {
-    return ((data[0] + data[1] + data[2] + data[3] + data[4] + data[5] +
-             data[6] + data[7] + data[8] + data[9] + data[10] + data[11] +
-             data[12] + data[13] + data[14] + data[15] + data[16] + data[17] +
-             data[18] + data[19] + data[20] + data[21] + data[22] + data[23] +
-             data[24] + data[25] + data[26] + data[27] + data[28] + data[29] +
-             data[30] + data[31])>>5 > threshold);
+    return (data[0] > threshold);
 }
 
 
 int ccdecode(unsigned char *vbiline)
 {
-    int max = 0, maxval = 0, minval = 255, i = 0, clk = 0, tmp = 0;
+    int max = 48, maxval = 128, minval = 255, i = 0, clk = 0, tmp = 0;
     int sample, packedbits = 0;
 
     for (i=0; i<250; i++) {
@@ -1027,12 +1025,31 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )
 {
+    int k;
+
     if( read( vbi->fd, vbi->buf, 65536 ) < 65536 ) {
         fprintf( stderr, "error, can't read vbi data.\n" );
         return;
     }
 
+    for (k = 1; k < 7; k++) {
+        int j = DO_LINE*2048;
+        int i;
+
+        for (i = 1600; i > 0; i--) {
+            vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+        }
+    }
     ProcessLine( vbi, &vbi->buf[ DO_LINE*2048 ], 0 );
+
+    for (k = 1; k < 7; k++) {
+        int j = (16+DO_LINE)*2048;
+        int i;
+
+        for (i = 1600; i > 0; i--) {
+            vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
+        }
+    }
     ProcessLine( vbi, &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
 }
 

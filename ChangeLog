@@ -1,6 +1,9 @@
 
 0.9.8
-  * (vektor) time and network information is now right justified (fixes
+  * (vektor) Added a new filter for the CC data written by diz.  It's
+    definitely better than the crappy averaging mess that was there before,
+    but it should probably go through another revision before we release.
+  * (vektor) Time and network information is now right justified (fixes
     bug 711654).
   * (vektor) Default to using locale information for the time format (fixes
     bug 710875).
