@@ -104,6 +104,50 @@ const char *videoinput_get_norm_name( int norm )
     }
 }
 
+static v4l2_std_id videoinput_get_v4l2_norm( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC ) {
+        return V4L2_STD_NTSC_M;
+    } else if( norm == VIDEOINPUT_PAL ) {
+        return V4L2_STD_PAL;
+    } else if( norm == VIDEOINPUT_SECAM ) {
+        return V4L2_STD_SECAM;
+    } else if( norm == VIDEOINPUT_PAL_NC ) {
+        return V4L2_STD_PAL_Nc;
+    } else if( norm == VIDEOINPUT_PAL_M ) {
+        return V4L2_STD_PAL_M;
+    } else if( norm == VIDEOINPUT_PAL_N ) {
+        return V4L2_STD_PAL_N;
+    } else if( norm == VIDEOINPUT_NTSC_JP ) {
+        return V4L2_STD_NTSC_M_JP;
+    } else if( norm == VIDEOINPUT_PAL_60 ) {
+        return V4L2_STD_PAL_60;
+    } else {
+        return 0;
+    }
+}
+
+static int videoinput_get_v4l1_norm( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC ) {
+        return VIDEO_MODE_NTSC;
+    } else if( norm == VIDEOINPUT_PAL ) {
+        return VIDEO_MODE_PAL;
+    } else if( norm == VIDEOINPUT_SECAM ) {
+        return VIDEO_MODE_SECAM;
+    } else if( norm == VIDEOINPUT_PAL_NC ) {
+        return 3;
+    } else if( norm == VIDEOINPUT_PAL_M ) {
+        return 4;
+    } else if( norm == VIDEOINPUT_PAL_N ) {
+        return 5;
+    } else if( norm == VIDEOINPUT_NTSC_JP ) {
+        return 6;
+    } else {
+        return 0;
+    }
+}
+
 int videoinput_get_norm_number( const char *name )
 {
     int i;
@@ -168,46 +212,50 @@ typedef struct capture_buffer_s
 
 struct videoinput_s
 {
+    int verbose;
+
     int grab_fd;
-    int grab_size;
-    int numframes;
-    int have_mmap;
+
     int numinputs;
+    int curinput;
+    char inputname[ 30 ];
 
     int width;
     int height;
-
     int norm;
+
     int isbttv;
     int isv4l2;
 
-    uint8_t *grab_data;
-    uint8_t *map;
-    struct video_mmap *grab_buf;
-    struct video_audio audio;
-    struct video_channel grab_chan;
     int curframe;
+    int numframes;
 
     int has_audio;
     int audiomode;
+    struct video_audio audio;
+    int muted;
+    int user_muted;
 
+    int numtuners;
     int tuner_number;
     struct video_tuner tuner;
-
-    struct video_mbuf gb_buffers;
-
-    int verbose;
 
     int cur_tuner_state;
     int signal_recover_wait;
     int signal_acquire_wait;
 
-    int muted;
-    int user_muted;
-
-    struct video_picture temp_pict;
-
+    /* V4L2 capture mode. */
     capture_buffer_t capbuffers[ MAX_CAPTURE_BUFFERS ];
+
+    /* V4L1 mmap mode. */
+    int have_mmap;
+    uint8_t *map;
+    struct video_mmap *grab_buf;
+    struct video_mbuf gb_buffers;
+
+    /* V4L1 read mode. */
+    int grab_size;
+    uint8_t *grab_data;
 };
 
 static int alarms;
@@ -233,11 +281,13 @@ static void free_frame( videoinput_t *vidin, int frameid )
 {
     if( vidin->isv4l2 ) {
         if( ioctl( vidin->grab_fd, VIDIOC_QBUF, &vidin->capbuffers[ frameid ].vidbuf ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't free frame %d: %s\n", frameid, strerror( errno ) );
+            fprintf( stderr, "videoinput: Can't free frame %d: %s\n",
+                     frameid, strerror( errno ) );
         }
     } else {
         if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frameid ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't free frame %d: %s\n", frameid, strerror( errno ) );
+            fprintf( stderr, "videoinput: Can't free frame %d: %s\n",
+                     frameid, strerror( errno ) );
         }
     }
 }
@@ -247,32 +297,30 @@ static void wait_for_frame_v4l1( videoinput_t *vidin, int frameid )
     alarms = 0;
     alarm( SYNC_TIMEOUT );
     if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frameid ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n", frameid, strerror( errno ) );
+        fprintf( stderr, "videoinput: Can't wait for frame %d: %s\n",
+                 frameid, strerror( errno ) );
     }
     alarm( 0 );
 }
 
 static void wait_for_frame_v4l2( videoinput_t * vidin )
 {
-    fd_set rdset;
     struct timeval timeout;
+    fd_set rdset;
     int n;
 
-    FD_ZERO (&rdset);
-    FD_SET (vidin->grab_fd, &rdset);
+    FD_ZERO( &rdset );
+    FD_SET( vidin->grab_fd, &rdset );
 
     timeout.tv_sec = SYNC_TIMEOUT;
     timeout.tv_usec = 0;
 
-    n = select (vidin->grab_fd + 1, &rdset, NULL, NULL, &timeout);
-    if (n == -1) {
+    n = select( vidin->grab_fd + 1, &rdset, 0, 0, &timeout );
+
+    if( n == -1 ) {
         fprintf (stderr, "select error.\n");
-        return;
-    } else if (n == 0) {
-        fprintf (stderr, "select timeout\n");
-        return;
-    } else if (FD_ISSET (vidin->grab_fd, &rdset)) {
-        return;
+    } else if( n == 0 ) {
+        sigalarm( 0 );
     }
 }
 
@@ -286,7 +334,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
         cur_buf.type = vidin->capbuffers[ 0 ].vidbuf.type;
         if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
             fprintf( stderr, "videoinput: Can't read frame. Error was: %s.\n",
-                             strerror( errno ) );
+                     strerror( errno ) );
             return 0;
         }
         *frameid = cur_buf.index;
@@ -314,7 +362,7 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
 
 void videoinput_free_frame( videoinput_t *vidin, int frameid )
 {
-    if( vidin->have_mmap ) {
+    if( vidin->isv4l2 || vidin->have_mmap ) {
         free_frame( vidin, frameid );
     }
 }
@@ -363,6 +411,9 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->user_muted = 0;
     vidin->has_audio = 1;
     vidin->isv4l2 = 0;
+    vidin->curinput = 0;
+    vidin->numtuners = 0;
+    vidin->have_mmap = 0;
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -451,6 +502,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             free( vidin );
             return 0;
         }
+#undef BTTV_VERSION
     }
 
     /* On initialization, set to input 0.  This is just to start things up. */
@@ -615,6 +667,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             close( vidin->grab_fd );
             free( vidin );
             return 0;
+        } else {
+            fprintf( stderr, "got %d frames\n", vidin->numframes );
         }
 
         /**
@@ -897,7 +951,7 @@ void videoinput_set_colour_relative( videoinput_t *vidin, int offset )
 
 int videoinput_has_tuner( videoinput_t *vidin )
 {
-    return (vidin->tuner_number > -1);
+    return ( vidin->numtuners > 0 );
 }
 
 int videoinput_is_muted( videoinput_t *vidin )
@@ -907,19 +961,21 @@ int videoinput_is_muted( videoinput_t *vidin )
 
 static void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
-    if( vidin->has_audio && mute != videoinput_is_muted( vidin ) ) {
+    if( !vidin->isv4l2 ) {
+        if( vidin->has_audio && mute != videoinput_is_muted( vidin ) ) {
 
-        if( mute ) {
-            vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-        } else {
-            vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
-        }
+            if( mute ) {
+                vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+            } else {
+                vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
+            }
 
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
-                     "might cause this.  Post a bug report with your driver info to "
-                     "http://www.sourceforge.net/projects/tvtime/\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+                fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
+                         "might cause this.  Post a bug report with your driver info to "
+                         "http://www.sourceforge.net/projects/tvtime/\n" );
+                fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+            }
         }
     }
 }
@@ -946,38 +1002,40 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
 
 void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 {
-    if( mode != vidin->audio.mode ) {
-        int was_muted = (vidin->audio.flags & VIDEO_AUDIO_MUTE);
+    if( !vidin->isv4l2 ) {
+        if( mode != vidin->audio.mode ) {
+            int was_muted = (vidin->audio.flags & VIDEO_AUDIO_MUTE);
 
-        /* Set the mode. */
-        vidin->audio.mode = mode;
-        // vidin->audio.volume = 65535;
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
-                     "might cause this.  Post a bug report with your driver info to "
-                     "http://www.sourceforge.net/projects/tvtime/\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-        }
-        if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
-            vidin->has_audio = 0;
-            fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
-                     strerror( errno ) );
-        }
-        if( vidin->audio.mode & mode ) {
-            vidin->audiomode = mode;
-        } else if( vidin->audio.mode > mode ) {
-            while( !(vidin->audio.mode & mode) && vidin->audio.mode > mode ) mode <<= 1;
-            videoinput_set_audio_mode( vidin, mode );
-        } else {
-            if( mode != VIDEO_SOUND_MONO ) {
-                videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
-            } else {
-                vidin->audiomode = VIDEO_SOUND_MONO;
+            /* Set the mode. */
+            vidin->audio.mode = mode;
+            // vidin->audio.volume = 65535;
+            if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+                fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
+                         "might cause this.  Post a bug report with your driver info to "
+                         "http://www.sourceforge.net/projects/tvtime/\n" );
+                fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
             }
-        }
-        if( was_muted & !(vidin->audio.flags & VIDEO_AUDIO_MUTE) ) {
-            /* Stupid card dropped the mute state, have to go back to being muted. */
-            videoinput_do_mute( vidin, 1 );
+            if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
+                vidin->has_audio = 0;
+                fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
+                         strerror( errno ) );
+            }
+            if( vidin->audio.mode & mode ) {
+                vidin->audiomode = mode;
+            } else if( vidin->audio.mode > mode ) {
+                while( !(vidin->audio.mode & mode) && vidin->audio.mode > mode ) mode <<= 1;
+                videoinput_set_audio_mode( vidin, mode );
+            } else {
+                if( mode != VIDEO_SOUND_MONO ) {
+                    videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
+                } else {
+                    vidin->audiomode = VIDEO_SOUND_MONO;
+                }
+            }
+            if( was_muted & !(vidin->audio.flags & VIDEO_AUDIO_MUTE) ) {
+                /* Stupid card dropped the mute state, have to go back to being muted. */
+                videoinput_do_mute( vidin, 1 );
+            }
         }
     }
 }
@@ -985,74 +1043,76 @@ void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
 /* freqKHz is in KHz (duh) */
 void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
 {
-    unsigned long frequency = freqKHz;
+    if( !vidin->isv4l2 ) {
+        unsigned long frequency = freqKHz;
 
-    if( videoinput_has_tuner( vidin ) ) {
-        if( frequency < 0 ) {
-            /* Ignore bogus frequencies. */
-            return;
+        if( videoinput_has_tuner( vidin ) ) {
+            if( frequency < 0 ) {
+                /* Ignore bogus frequencies. */
+                return;
+            }
+
+            frequency *= 16;
+
+            if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
+                frequency /= 1000; /* switch to MHz */
+            }
+
+            vidin->muted = 1;
+            videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
+            vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
+            vidin->signal_acquire_wait = SIGNAL_ACQUIRE_DELAY;
+            vidin->signal_recover_wait = 0;
+
+            if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
+                fprintf( stderr, "videoinput: Tuner present, but our request to change "
+                                 "to frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+            }
         }
-
-        frequency *= 16;
-
-        if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-            frequency /= 1000; /* switch to MHz */
-        }
-
-        vidin->muted = 1;
-        videoinput_do_mute( vidin, vidin->user_muted || vidin->muted );
-        vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
-        vidin->signal_acquire_wait = SIGNAL_ACQUIRE_DELAY;
-        vidin->signal_recover_wait = 0;
-
-        if( ioctl( vidin->grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
-            fprintf( stderr, "videoinput: Tuner present, but our request to change "
-                             "to frequency %d failed with this error: %s.\n", freqKHz, strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-        }
-    } else if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: Cannot set tuner freq on a channel without a tuner.\n" );
     }
 }
 
 int videoinput_get_tuner_freq( videoinput_t *vidin ) 
 {
-    unsigned long frequency;
+    if( !vidin->isv4l2 ) {
+        unsigned long frequency;
 
-    if (vidin->tuner.tuner > -1) {
+        if( vidin->tuner.tuner > -1 ) {
 
-        if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
-            fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
-                     strerror( errno ) );
-            fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
-            return 0;
+            if( ioctl( vidin->grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
+                fprintf( stderr, "videoinput: Tuner refuses to tell us the current frequency: %s\n",
+                         strerror( errno ) );
+                fprintf( stderr, "videoinput: Please file a bug report at http://tvtime.sourceforge.net/\n" );
+                return 0;
+            }
+
+            if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
+                frequency *= 1000; /* switch from MHz to KHz */
+            }
+
+            return frequency/16;
         }
-
-        if ( !(vidin->tuner.flags & VIDEO_TUNER_LOW) ) {
-            frequency *= 1000; /* switch from MHz to KHz */
-        }
-
-        return frequency/16;
-    } else if( vidin->verbose ) {
-        fprintf( stderr, "videoinput: cannot get tuner freq on a channel without a tuner\n" );
     }
     return 0;
 }
 
 int videoinput_freq_present( videoinput_t *vidin )
 {
-    if( videoinput_has_tuner( vidin ) ) {
-        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
-            if( vidin->verbose ) {
-                fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
-                         strerror( errno ) );
+    if( !vidin->isv4l2 ) {
+        if( videoinput_has_tuner( vidin ) ) {
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+                if( vidin->verbose ) {
+                    fprintf( stderr, "videoinput: Can't detect signal from tuner, ioctl failed: %s\n",
+                             strerror( errno ) );
+                }
+                return 1;
             }
-            return 1;
-        }
-        if( vidin->tuner.signal ) {
-            return 1;
-        } else {
-            return 0;
+            if( vidin->tuner.signal ) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
     return 1;
@@ -1060,12 +1120,12 @@ int videoinput_freq_present( videoinput_t *vidin )
 
 int videoinput_get_input_num( videoinput_t *vidin )
 {
-    return vidin->grab_chan.channel;
+    return vidin->curinput;
 }
 
 const char *videoinput_get_input_name( videoinput_t *vidin )
 {
-    return vidin->grab_chan.name;
+    return vidin->inputname;
 }
 
 /**
@@ -1076,123 +1136,129 @@ static void videoinput_find_and_set_tuner( videoinput_t *vidin )
     int found = 0;
     int i;
 
-    vidin->tuner_number = -1;
-    for( i = 0; i < vidin->grab_chan.tuners; i++ ) {
-        vidin->tuner.tuner = i;
+    if( !vidin->isv4l2 ) {
+        vidin->tuner_number = -1;
+        for( i = 0; i < vidin->numtuners; i++ ) {
+            vidin->tuner.tuner = i;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) >= 0 ) {
-            if( ((vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N) && vidin->tuner.flags & VIDEO_TUNER_PAL) ||
-                (vidin->norm == VIDEOINPUT_SECAM && vidin->tuner.flags & VIDEO_TUNER_SECAM) ||
-                ((vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M) && vidin->tuner.flags & VIDEO_TUNER_NTSC) ) {
-                found = 1;
-                vidin->tuner_number = i;
-                break;
-            }
-        }
-    }
-
-    if( found ) {
-        int mustchange = 0;
-
-        vidin->tuner.tuner = vidin->tuner_number;
-
-        if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N ) {
-            if( vidin->tuner.mode != VIDEO_MODE_PAL ) {
-                mustchange = 1;
-                vidin->tuner.mode = VIDEO_MODE_PAL;
-            }
-        } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-            if( vidin->tuner.mode != VIDEO_MODE_SECAM ) {
-                mustchange = 1;
-                vidin->tuner.mode = VIDEO_MODE_SECAM;
-            }
-        } else {
-            if( vidin->tuner.mode != VIDEO_MODE_NTSC ) {
-                mustchange = 1;
-                vidin->tuner.mode = VIDEO_MODE_NTSC;
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) >= 0 ) {
+                if( ((vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N) && vidin->tuner.flags & VIDEO_TUNER_PAL) ||
+                    (vidin->norm == VIDEOINPUT_SECAM && vidin->tuner.flags & VIDEO_TUNER_SECAM) ||
+                    ((vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M) && vidin->tuner.flags & VIDEO_TUNER_NTSC) ) {
+                    found = 1;
+                    vidin->tuner_number = i;
+                    break;
+                }
             }
         }
 
-        if( mustchange ) {
-            if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
-                fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
-                         "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
-                         "            indicating your card, driver and this error message: %s.\n",
-                         strerror( errno ) );
-            }
+        if( found ) {
+            int mustchange = 0;
 
-            /**
-             * After setting the tuner, we need to re-set the norm on our channel.
-             * Doing this fixes PAL-M, at least with the bttv driver in 2.4.20.
-             * I am not happy with this, as I haven't seen it documented anywhere.
-             * Please correct me if I'm wrong.
-             */
-            if( vidin->norm == VIDEOINPUT_NTSC ) {
-                vidin->grab_chan.norm = VIDEO_MODE_NTSC;
-            } else if( vidin->norm == VIDEOINPUT_PAL ) {
-                vidin->grab_chan.norm = VIDEO_MODE_PAL;
+            vidin->tuner.tuner = vidin->tuner_number;
+
+            if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_N ) {
+                if( vidin->tuner.mode != VIDEO_MODE_PAL ) {
+                    mustchange = 1;
+                    vidin->tuner.mode = VIDEO_MODE_PAL;
+                }
             } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-                vidin->grab_chan.norm = VIDEO_MODE_SECAM;
-            } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
-                vidin->grab_chan.norm = 3;
-            } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
-                vidin->grab_chan.norm = 4;
-            } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
-                vidin->grab_chan.norm = 5;
-            } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
-                vidin->grab_chan.norm = 6;
+                if( vidin->tuner.mode != VIDEO_MODE_SECAM ) {
+                    mustchange = 1;
+                    vidin->tuner.mode = VIDEO_MODE_SECAM;
+                }
+            } else {
+                if( vidin->tuner.mode != VIDEO_MODE_NTSC ) {
+                    mustchange = 1;
+                    vidin->tuner.mode = VIDEO_MODE_NTSC;
+                }
             }
 
-            if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
-                fprintf( stderr, "videoinput: Card refuses to re-set the channel.\n"
-                         "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
-                         "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
+            if( mustchange ) {
+                struct video_channel grab_chan;
+
+                if( ioctl( vidin->grab_fd, VIDIOCSTUNER, &(vidin->tuner) ) < 0 ) {
+                    fprintf( stderr, "videoinput: Tuner is not in the correct mode, and we can't set it.\n"
+                             "            Please file a bug report at http://www.sourceforge.net/projects/tvtime/\n"
+                             "            indicating your card, driver and this error message: %s.\n",
+                             strerror( errno ) );
+                }
+
+                /**
+                 * After setting the tuner, we need to re-set the norm on our channel.
+                 * Doing this fixes PAL-M, at least with the bttv driver in 2.4.20.
+                 * I am not happy with this, as I haven't seen it documented anywhere.
+                 * Please correct me if I'm wrong.
+                 */
+                if( vidin->norm == VIDEOINPUT_NTSC ) {
+                    grab_chan.norm = VIDEO_MODE_NTSC;
+                } else if( vidin->norm == VIDEOINPUT_PAL ) {
+                    grab_chan.norm = VIDEO_MODE_PAL;
+                } else if( vidin->norm == VIDEOINPUT_SECAM ) {
+                    grab_chan.norm = VIDEO_MODE_SECAM;
+                } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
+                    grab_chan.norm = 3;
+                } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
+                    grab_chan.norm = 4;
+                } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
+                    grab_chan.norm = 5;
+                } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
+                    grab_chan.norm = 6;
+                }
+
+                if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
+                    fprintf( stderr, "videoinput: Card refuses to re-set the channel.\n"
+                             "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
+                             "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
+                } else {
+                    vidin->numtuners = grab_chan.tuners;
+                }
             }
         }
-    }
 
-    if( vidin->grab_chan.tuners > 0 ) {
-        vidin->tuner.tuner = vidin->tuner_number;
+        if( vidin->numtuners > 0 ) {
+            vidin->tuner.tuner = vidin->tuner_number;
 
-        if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
-            fprintf( stderr, "videoinput: Input indicates that tuners are available, but "
-                     "driver refuses to give information about them.\n"
-                     "videoinput: Please file a bug report at http://www.sourceforge.net/projects/tvtime/ "
-                     "and indicate that card and driver you have.\n" );
-            fprintf( stderr, "videoinput: Also include this error: '%s'\n", strerror( errno ) );
-            return;
-        }
-
-        if( vidin->verbose ) {
-            fprintf( stderr, "videoinput: tuner.tuner = %d\n"
-                             "videoinput: tuner.name = %s\n"
-                             "videoinput: tuner.rangelow = %ld\n"
-                             "videoinput: tuner.rangehigh = %ld\n"
-                             "videoinput: tuner.signal = %d\n"
-                             "videoinput: tuner.flags = ",
-                     vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
-                     vidin->tuner.rangehigh, vidin->tuner.signal );
-
-            if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
-            if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
-            if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
-            if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
-            if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
-            if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
-            if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
-            if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
-
-            fprintf( stderr, "\nvideoinput: tuner.mode = " );
-            switch (vidin->tuner.mode) {
-            case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
-            case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
-            case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
-            case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
-            default: fprintf( stderr, "UNDEFINED" ); break;
+            if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) < 0 ) {
+                fprintf( stderr, "videoinput: Input indicates that tuners are available, but "
+                         "driver refuses to give information about them.\n"
+                         "videoinput: Please file a bug report at http://www.sourceforge.net/projects/tvtime/ "
+                         "and indicate that card and driver you have.\n" );
+                fprintf( stderr, "videoinput: Also include this error: '%s'\n", strerror( errno ) );
+                return;
             }
-            fprintf( stderr, "\n");
+
+            if( vidin->verbose ) {
+                fprintf( stderr, "videoinput: tuner.tuner = %d\n"
+                                 "videoinput: tuner.name = %s\n"
+                                 "videoinput: tuner.rangelow = %ld\n"
+                                 "videoinput: tuner.rangehigh = %ld\n"
+                                 "videoinput: tuner.signal = %d\n"
+                                 "videoinput: tuner.flags = ",
+                         vidin->tuner.tuner, vidin->tuner.name, vidin->tuner.rangelow,
+                         vidin->tuner.rangehigh, vidin->tuner.signal );
+
+                if( vidin->tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
+                if( vidin->tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
+                if( vidin->tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
+                if( vidin->tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
+                if( vidin->tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
+                if( vidin->tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
+                if( vidin->tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
+                if( vidin->tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
+
+                fprintf( stderr, "\nvideoinput: tuner.mode = " );
+                switch (vidin->tuner.mode) {
+                case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
+                case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
+                case VIDEO_MODE_SECAM: fprintf( stderr, "SECAM" ); break;
+                case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
+                default: fprintf( stderr, "UNDEFINED" ); break;
+                }
+                fprintf( stderr, "\n");
+            }
         }
-    }
+   }
 }
 
 
@@ -1222,43 +1288,36 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                      strerror( errno ) );
         } else {
             fprintf( stderr, "standard is %llx\n", std );
+            std = videoinput_get_v4l2_norm( vidin->norm );
+            if( ioctl( vidin->grab_fd, VIDIOC_S_STD, &std ) < 0 ) {
+                fprintf( stderr, "can't set the current standard: %s\n",
+                         strerror( errno ) );
+            }
         }
     } else {
         if( inputnum >= vidin->numinputs ) {
             fprintf( stderr, "videoinput: Requested input number %d not valid, "
                      "max is %d.\n", inputnum, vidin->numinputs );
         } else {
-            vidin->grab_chan.channel = inputnum;
-            if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) ) < 0 ) {
+            struct video_channel grab_chan;
+
+            grab_chan.channel = inputnum;
+            if( ioctl( vidin->grab_fd, VIDIOCGCHAN, &grab_chan ) < 0 ) {
                 fprintf( stderr, "videoinput: Card refuses to give information on its current input.\n"
                          "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
                          "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
             } else {
-                vidin->grab_chan.channel = inputnum;
-                if( vidin->norm == VIDEOINPUT_NTSC ) {
-                    vidin->grab_chan.norm = VIDEO_MODE_NTSC;
-                } else if( vidin->norm == VIDEOINPUT_PAL ) {
-                    vidin->grab_chan.norm = VIDEO_MODE_PAL;
-                } else if( vidin->norm == VIDEOINPUT_SECAM ) {
-                    vidin->grab_chan.norm = VIDEO_MODE_SECAM;
-                } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
-                    vidin->grab_chan.norm = 3;
-                } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
-                    vidin->grab_chan.norm = 4;
-                } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
-                    vidin->grab_chan.norm = 5;
-                } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
-                    vidin->grab_chan.norm = 6;
-                }
+                grab_chan.channel = inputnum;
+                grab_chan.norm = videoinput_get_v4l1_norm( vidin->norm );
 
-                if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
+                if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &grab_chan ) < 0 ) {
                     fprintf( stderr, "videoinput: Card refuses to set the channel.\n"
                              "Please post a bug report to http://www.sourceforge.net/projects/tvtime/\n"
                              "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
                 }
 
-                vidin->grab_chan.channel = inputnum;
-                ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) );
+                // grab_chan.channel = inputnum;
+                // ioctl( vidin->grab_fd, VIDIOCGCHAN, &(vidin->grab_chan) );
             }
         }
 
