@@ -122,7 +122,7 @@ static int videoinput_next_compatible_norm( int norm, int isbttv )
     return norm;
 }
 
-const char *videoinput_audio_mode_name( int mode )
+const char *videoinput_get_audio_mode_name( int mode )
 {
     if( mode == VIDEO_SOUND_MONO ) {
         return "Mono";
@@ -135,7 +135,6 @@ const char *videoinput_audio_mode_name( int mode )
     } else if( mode == 0 ) {
         return "Unset";
     } else {
-        fprintf( stderr, "error: %d\n", mode );
         return "ERROR";
     }
 }
@@ -667,40 +666,6 @@ int videoinput_has_tuner( videoinput_t *vidin )
     return (vidin->tuner_number > -1);
 }
 
-int videoinput_get_audio_mode( videoinput_t *vidin )
-{
-    return vidin->audiomode;
-}
-
-void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
-{
-    vidin->audio.mode = mode;
-    // vidin->audio.volume = 65535;
-    if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
-                 "might cause this.  Post a bug report with your driver info to "
-                 "http://www.sourceforge.net/projects/tvtime/\n" );
-        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-    }
-    if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
-        vidin->has_audio = 0;
-        fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
-                 strerror( errno ) );
-    }
-    if( vidin->audio.mode & mode ) {
-        vidin->audiomode = mode;
-    } else if( vidin->audio.mode > mode ) {
-        while( !(vidin->audio.mode & mode) && vidin->audio.mode > mode ) mode <<= 1;
-        videoinput_set_audio_mode( vidin, mode );
-    } else {
-        if( mode != VIDEO_SOUND_MONO ) {
-            videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
-        } else {
-            vidin->audiomode = VIDEO_SOUND_MONO;
-        }
-    }
-}
-
 int videoinput_is_muted( videoinput_t *vidin )
 {
     return ( ( vidin->audio.flags & VIDEO_AUDIO_MUTE ) == VIDEO_AUDIO_MUTE );
@@ -734,6 +699,53 @@ void videoinput_mute( videoinput_t *vidin, int mute )
 int videoinput_get_muted( videoinput_t *vidin )
 {
     return vidin->user_muted;
+}
+
+int videoinput_get_audio_mode( videoinput_t *vidin )
+{
+    if( !vidin->audiomode || vidin->audiomode > VIDEO_SOUND_LANG2 ) {
+        return VIDEO_SOUND_MONO;
+    } else {
+        return vidin->audiomode;
+    }
+}
+
+void videoinput_set_audio_mode( videoinput_t *vidin, int mode )
+{
+    if( mode != vidin->audio.mode ) {
+        int was_muted = (vidin->audio.flags & VIDEO_AUDIO_MUTE);
+
+        /* Set the mode. */
+        vidin->audio.mode = mode;
+        // vidin->audio.volume = 65535;
+        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
+            fprintf( stderr, "videoinput: Can't set audio mode setting.  I have no idea what "
+                     "might cause this.  Post a bug report with your driver info to "
+                     "http://www.sourceforge.net/projects/tvtime/\n" );
+            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+        }
+        if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
+            vidin->has_audio = 0;
+            fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
+                     strerror( errno ) );
+        }
+        if( vidin->audio.mode & mode ) {
+            vidin->audiomode = mode;
+        } else if( vidin->audio.mode > mode ) {
+            while( !(vidin->audio.mode & mode) && vidin->audio.mode > mode ) mode <<= 1;
+            videoinput_set_audio_mode( vidin, mode );
+        } else {
+            if( mode != VIDEO_SOUND_MONO ) {
+                videoinput_set_audio_mode( vidin, VIDEO_SOUND_MONO );
+            } else {
+                vidin->audiomode = VIDEO_SOUND_MONO;
+            }
+        }
+        if( was_muted & !(vidin->audio.flags & VIDEO_AUDIO_MUTE) ) {
+            /* Stupid card dropped the mute state, have to go back to being muted. */
+            videoinput_do_mute( vidin, 1 );
+        }
+    }
 }
 
 /* freqKHz is in KHz (duh) */

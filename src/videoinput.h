@@ -59,6 +59,12 @@ typedef struct videoinput_s videoinput_t;
 #define TUNER_STATE_NO_SIGNAL       3
 
 /**
+ * Possible audio modes.
+ */
+#define VIDEOINPUT_MONO    1
+#define VIDEOINPUT_STEREO  2
+
+/**
  * Returns a text version of the norm.
  */
 const char *videoinput_get_norm_name( int norm );
@@ -66,7 +72,7 @@ const char *videoinput_get_norm_name( int norm );
 /**
  * Returns a text version of the audio mode.
  */
-const char *videoinput_audio_mode_name( int mode );
+const char *videoinput_get_audio_mode_name( int mode );
 
 /**
  * Create a new input device from the given device name and which input
