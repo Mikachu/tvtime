@@ -27,12 +27,12 @@ AC_FUNC_MMAP
 AC_CHECK_FUNCS([atexit gettimeofday memset strerror])
 
 dnl ---------------------------------------------
-dnl zlib
+dnl libsdl - Currently disabled
 dnl ---------------------------------------------
 dnl AM_PATH_SDL(1.2.2, , AC_MSG_ERROR([Requires SDL 1.2 or later]))
-if 0; then
-  AC_DEFINE([HAVE_SDL],,[Define this to include SDL support])
-fi
+dnl if 0; then
+dnl   AC_DEFINE([HAVE_SDL],,[Define this to include SDL support])
+dnl fi
 
 
 dnl ---------------------------------------------
@@ -77,10 +77,10 @@ dnl Test for directfb
 dnl AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
 dnl AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
 dnl if test "$DIRECTFB_CONFIG" != "no" ; then
-AM_CONDITIONAL(HAVE_DIRECTFB, 0)
-if 0; then
-  AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
-fi
+dnl AM_CONDITIONAL(HAVE_DIRECTFB, 0)
+dnl if 0; then
+dnl   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
+dnl fi
 
 dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension

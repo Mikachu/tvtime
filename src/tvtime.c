@@ -30,7 +30,6 @@
 #include "pnginput.h"
 #include "videoinput.h"
 #include "rtctimer.h"
-#include "sdloutput.h"
 #include "videotools.h"
 #include "mixer.h"
 #include "tvtimeosd.h"
@@ -42,7 +41,6 @@
 #include "videocorrection.h"
 #include "plugins.h"
 #include "performance.h"
-#include "dfboutput.h"
 #include "taglines.h"
 #include "xvoutput.h"
 
@@ -609,12 +607,10 @@ int main( int argc, char **argv )
     }
 
     /* Setup the output. */
-    /*output = get_dfb_output();*/
-    /*output = get_sdl_output();*/
     output = get_xv_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
                        config_get_aspect( ct ) ) ) {
-        fprintf( stderr, "tvtime: SDL failed to initialize: "
+        fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );
         return 1;
     }
