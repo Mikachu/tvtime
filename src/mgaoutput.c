@@ -28,10 +28,13 @@
 #include <sys/mman.h>
 #include "mga_vid.h"
 #include "mgaoutput.h"
+#include "speedy.h"
 
 static mga_vid_config_t mga_config;
 static uint8_t *mga_vid_base;
+static uint8_t *backbuffer;
 static int mga_fd;
+static int mga_input_width;
 static int mga_width;
 static int mga_height;
 static int mga_stride;
@@ -50,37 +53,45 @@ static int mga_init( int outputheight, int aspect, int verbose )
     return 1;
 }
 
+static void mga_reconfigure( void )
+{
+    mga_config.src_width = mga_input_width;
+    mga_config.src_height = mga_height;
+    mga_config.dest_width = 640;
+    mga_config.dest_height = 480;
+    mga_config.x_org = 0;
+    mga_config.y_org = 0;
+
+    mga_config.colkey_on = 0;
+
+    mga_config.format = MGA_VID_FORMAT_YUY2;
+    mga_config.frame_size = mga_frame_size;
+    mga_config.num_frames = 2;
+
+    if( ioctl( mga_fd, MGA_VID_CONFIG, &mga_config ) ) {
+        fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n", strerror( errno ) );
+    }
+}
+
 static int mga_set_input_size( int inputwidth, int inputheight )
 {
     mga_width = (inputwidth + 31) & ~31;
     mga_stride = mga_width * 2;
     mga_height = inputheight;
     mga_frame_size = mga_stride * mga_height;
+    mga_input_width = inputwidth;
 
-    mga_config.src_width = inputwidth;
-    mga_config.src_height = inputheight;
-    mga_config.dest_width = 1024;
-    mga_config.dest_height = 768;
-    mga_config.x_org = 0;
-    mga_config.y_org = 0;
-    mga_config.colkey_on = 0;
-    mga_config.format = MGA_VID_FORMAT_YUY2;
-    mga_config.frame_size = mga_frame_size;
-    mga_config.num_frames = 2;
+    mga_reconfigure();
 
     curframe = 0;
-
-    if( ioctl( mga_fd, MGA_VID_CONFIG, &mga_config ) ) {
-        fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n", strerror( errno ) );
-    }
 
     fprintf( stderr, "mgaoutput: MGA %s Backend Scaler with %d MB of RAM.\n",
              mga_config.card_type == MGA_G200 ? "G200" : "G400", mga_config.ram_size );
 
     ioctl( mga_fd, MGA_VID_ON, 0 );
     mga_vid_base = mmap( 0, mga_frame_size * mga_config.num_frames, PROT_WRITE, MAP_SHARED, mga_fd, 0 );
-    fprintf( stderr, "mgaoutput: Base address = %8p.\n", mga_vid_base );
     memset( mga_vid_base, 0, mga_frame_size );
+    backbuffer = malloc( mga_frame_size * mga_config.num_frames );
 
     return 1;
 }
@@ -91,7 +102,8 @@ static void mga_lock_output_buffer( void )
 
 static uint8_t *mga_get_output_buffer( void )
 {
-    return mga_vid_base + (curframe*mga_frame_size);
+    return backbuffer;
+    // return mga_vid_base + (curframe*mga_frame_size);
 }
 
 static int mga_get_output_stride( void )
@@ -134,9 +146,19 @@ static void mga_wait_for_sync( int field )
 
 static int mga_show_frame( int x, int y, int width, int height )
 {
-    int id = curframe;
-    ioctl( mga_fd, MGA_VID_FSEL, &id );
-    id = !id;
+    static int foobar = 0;
+    uint8_t *base = mga_vid_base + (curframe*mga_frame_size);
+    int i;
+
+    for( i = 0; i < mga_height; i++ ) {
+     // blit_colour_packed422_scanline( base + (i * mga_get_output_stride()),
+     //                                 mga_input_width, foobar, 128, 128 );
+        blit_packed422_scanline( base + (i * mga_stride), backbuffer + (i * mga_stride), width );
+    }
+    foobar = (foobar + 1) % 256;
+
+    ioctl( mga_fd, MGA_VID_FSEL, &curframe );
+    curframe = (curframe + 1) % mga_config.num_frames;
     return 1;
 }
 
