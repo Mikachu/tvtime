@@ -479,27 +479,27 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
 
     if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_NC ) {
         if( !strcasecmp( tablename, "us-cable" ) ) {
-            sprintf( string, "%c%c%c  US Cable", 0xee, 0x80, 0xa5 );
+            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa5 );
         } else {
-            sprintf( string, "%c%c%c  US Cable", 0xee, 0x80, 0xa4 );
+            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa4 );
         }
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
         menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "us-cable" );
         menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
         if( !strcasecmp( tablename, "us-broadcast" ) ) {
-            sprintf( string, "%c%c%c  US Broadcast", 0xee, 0x80, 0xa5 );
+            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa5 );
         } else {
-            sprintf( string, "%c%c%c  US Broadcast", 0xee, 0x80, 0xa4 );
+            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa4 );
         }
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
         menu_set_right_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "us-broadcast" );
         menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
         if( !strcasecmp( tablename, "us-cable100" ) ) {
-            sprintf( string, "%c%c%c  US Cable with channels 100+", 0xee, 0x80, 0xa5 );
+            sprintf( string, "%c%c%c  Cable with channels 100+", 0xee, 0x80, 0xa5 );
         } else {
-            sprintf( string, "%c%c%c  US Cable with channels 100+", 0xee, 0x80, 0xa4 );
+            sprintf( string, "%c%c%c  Cable with channels 100+", 0xee, 0x80, 0xa4 );
         }
         menu_set_text( menu, 3, string );
         menu_set_enter_command( menu, 3, TVTIME_SET_FREQUENCY_TABLE, "us-cable100" );
@@ -512,18 +512,18 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
         menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "stations" );
     } else if( norm == VIDEOINPUT_NTSC_JP ) {
         if( !strcasecmp( tablename, "japan-cable" ) ) {
-            sprintf( string, "%c%c%c  Japan Cable", 0xee, 0x80, 0xa5 );
+            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa5 );
         } else {
-            sprintf( string, "%c%c%c  Japan Cable", 0xee, 0x80, 0xa4 );
+            sprintf( string, "%c%c%c  Cable", 0xee, 0x80, 0xa4 );
         }
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
         menu_set_right_command( menu, 1, TVTIME_SET_FREQUENCY_TABLE, "japan-cable" );
         menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
         if( !strcasecmp( tablename, "japan-broadcast" ) ) {
-            sprintf( string, "%c%c%c  Japan Broadcast", 0xee, 0x80, 0xa5 );
+            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa5 );
         } else {
-            sprintf( string, "%c%c%c  Japan Broadcast", 0xee, 0x80, 0xa4 );
+            sprintf( string, "%c%c%c  Broadcast", 0xee, 0x80, 0xa4 );
         }
         menu_set_text( menu, 2, string );
         menu_set_enter_command( menu, 2, TVTIME_SET_FREQUENCY_TABLE, "japan-broadcast" );
