@@ -141,11 +141,11 @@ int dfb_init( int outputheight, int aspect, int verbose )
     DFBDisplayLayerConfigFlags failed;
 
     if (verbose)
-	fprintf(stderr,"Using directfb version:%d\n",DIRECTFB_VERSION);
+        fprintf(stderr,"Using directfb version:%d\n",DIRECTFB_VERSION);
     if (DIRECTFB_VERSION < 918)
-	fprintf(stderr,"\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
-		       "*** this may lead to less than optimal output\n");
-
+        fprintf(stderr,"\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
+                "*** this may lead to less than optimal output\n");
+    
     DirectFBInit( 0, 0 );
 
     DirectFBSetOption( "fbdev", fb_dev_name );
@@ -171,11 +171,11 @@ int dfb_init( int outputheight, int aspect, int verbose )
 
 #ifdef DIRECTFB_HAS_TRIPLE
     if (verbose)
-	fprintf(stderr,"Using triple buffering\n");
+        fprintf(stderr,"Using triple buffering\n");
     dlc.buffermode = DLBM_TRIPLE;/*DLBM_BACKVIDEO;DLBM_FRONTONLY;*/
 #else
     if (verbose)
-	fprintf(stderr,"Using double buffering\n");
+        fprintf(stderr,"Using double buffering\n");
     dlc.buffermode = DLBM_BACKVIDEO;
 #endif
     
@@ -199,15 +199,15 @@ int dfb_init( int outputheight, int aspect, int verbose )
 
     if (DIRECTFB_VERSION > 917)
     {
-	parity = 0;
+        parity = 0;
     }
     else
     {
-	parity = 1;
+        parity = 1;
     }
-
+    
     if (verbose)
-	fprintf(stderr,"Using initial field parity:%d\n",parity);
+        fprintf(stderr,"Using initial field parity:%d\n",parity);
 #ifdef DIRECTFB_HAS_FIELD_PARITY
     crtc2->SetFieldParity( crtc2, parity );
 #endif
@@ -215,7 +215,7 @@ int dfb_init( int outputheight, int aspect, int verbose )
 
     c2frame->SetBlittingFlags( c2frame, DSBLIT_NOFX );
     c2frame->GetSize( c2frame, &output_width, &output_height );
-   
+    
     fprintf( stderr, "DirectFB: Screen is %d x %d\n", 
              output_width, output_height );
 
@@ -371,9 +371,9 @@ void dfb_poll_events( input_t *in )
 
                 case DIKI_INSERT: 
 #ifdef DIRECTFB_HAS_FIELD_PARITY
-		    if (parity == 0) parity = 1; else parity = 0;
-		    fprintf(stderr,"Setting parity to:%d\n",parity);
-		    crtc2->SetFieldParity( crtc2, parity );
+                    if (parity == 0) parity = 1; else parity = 0;
+                    fprintf(stderr,"Setting parity to:%d\n",parity);
+                    crtc2->SetFieldParity( crtc2, parity );
 #endif
                     break;
                 default:
