@@ -298,6 +298,58 @@ static int pulldown_copy = 0;
 static int did_copy_top = 0;
 static int last_fieldcount = 0;
 
+static void tvtime_do_pulldown_action( unsigned char *output,
+                                       unsigned char *curframe,
+                                       unsigned char *lastframe,
+                                       unsigned char *secondlastframe,
+                                       tvtime_osd_t *osd,
+                                       console_t *con,
+                                       vbiscreen_t *vs,
+                                       int bottom_field,
+                                       int width,
+                                       int frame_height,
+                                       int instride,
+                                       int outstride,
+                                       int action )
+{
+    unsigned int topdiff = 0;
+    unsigned int botdiff = 0;
+    int i;
+
+    for( i = 0; i < frame_height; i++ ) {
+        unsigned char *curoutput = output + (i * outstride);
+
+        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, i ) ) {
+            videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
+        }
+
+        if( pulldown_alg == PULLDOWN_VEKTOR ) {
+            if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+                topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
+                                                           lastframe + (i*instride), width );
+                botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
+                                                           lastframe + (i*instride) + instride,
+                                                           width );
+            }
+        }
+
+        if( action != PULLDOWN_ACTION_DROP2 ) {
+            if( action == PULLDOWN_ACTION_MRGE3 && (i & 1) ) {
+                blit_packed422_scanline( curoutput, lastframe + (i*instride), width );
+            } else {
+                blit_packed422_scanline( curoutput, curframe + (i*instride), width );
+            }
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+            if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+        }
+    }
+
+    last_topdiff = topdiff;
+    last_botdiff = botdiff;
+    filtered_cur = 1;
+}
+
 static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              unsigned char *curframe,
                                              unsigned char *lastframe,
@@ -365,61 +417,22 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             }
             if( curoffset == PULLDOWN_OFFSET_2 ) {
                 // Drop.
-                for( i = 0; i < frame_height; i++ ) {
-                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
-                                                                   lastframe + (i*instride*2), width );
-                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
-                                                                   lastframe + (i*instride*2) + instride,
-                                                                   width );
-                    }
-                }
-                last_topdiff = topdiff;
-                last_botdiff = botdiff;
+                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_DROP2 );
             } else if( curoffset == PULLDOWN_OFFSET_3 ) {
                 // Merge.
-                for( i = 0; i < frame_height; i++ ) {
-                    unsigned char *curoutput = output + (i * outstride);
-
-                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
-                                                                   lastframe + (i*instride*2), width );
-                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
-                                                                   lastframe + (i*instride*2) + instride,
-                                                                   width );
-                    }
-
-                    if( i & 1 ) {
-                        blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
-                    } else {
-                        blit_packed422_scanline( curoutput, curframe + (i * instride), width );
-                    }
-                    if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                    if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                    if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-                }
-                last_topdiff = topdiff;
-                last_botdiff = botdiff;
+                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_MRGE3 );
             } else if( curoffset == PULLDOWN_OFFSET_4 ) {
                 // Copy.
-                for( i = 0; i < frame_height; i++ ) {
-                    unsigned char *curoutput = output + (i * outstride);
-
-                    if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                        topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
-                                                                   lastframe + (i*instride*2), width );
-                        botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
-                                                                   lastframe + (i*instride*2) + instride,
-                                                                   width );
-                    }
-
-                    blit_packed422_scanline( curoutput, curframe + (i * instride), width );
-                    if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                    if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                    if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-                }
-                last_topdiff = topdiff;
-                last_botdiff = botdiff;
+                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_COPY4 );
             }
             return;
         } else {
@@ -435,24 +448,16 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
         if( curoffset == PULLDOWN_OFFSET_1 || curoffset == PULLDOWN_OFFSET_5 ) {
             // Copy.
-            for( i = 0; i < frame_height; i++ ) {
-                unsigned char *curoutput = output + (i * outstride);
-
-                if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
-                    topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
-                                                               lastframe + (i*instride*2), width );
-                    botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
-                                                               lastframe + (i*instride*2) + instride,
-                                                               width );
-                }
-
-                blit_packed422_scanline( curoutput, curframe + (i * instride), width );
-                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-            }
-            last_topdiff = topdiff;
-            last_botdiff = botdiff;
+            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                       osd, con, vs, bottom_field, width,
+                                       frame_height, instride, outstride,
+                                       PULLDOWN_ACTION_COPY1 );
+        } else if( curoffset == PULLDOWN_OFFSET_5 ) {
+            // Copy.
+            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                       osd, con, vs, bottom_field, width,
+                                       frame_height, instride, outstride,
+                                       PULLDOWN_ACTION_COPY5 );
         }
         return;
     }
@@ -494,42 +499,28 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             if( drop || do_drop ) return;
             if( !pulldown_copy ) return;
             // Copy.
-            for( i = 0; i < frame_height; i++ ) {
-                unsigned char *curoutput = output + (i * outstride);
-                blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
-                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-            }
+            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                       osd, con, vs, bottom_field, width,
+                                       frame_height, instride, outstride,
+                                       PULLDOWN_ACTION_COPY1 );
             pulldown_copy--;
             did_copy_top = 1;
             // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
         } else if( pulldown_merge ) {
             // Merge.
-            for( i = 0; i < frame_height; i++ ) {
-                unsigned char *curoutput = output + (i * outstride);
-
-                if( i & 1 ) {
-                    blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
-                } else {
-                    blit_packed422_scanline( curoutput, curframe + (i * instride), width );
-                }
-                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-            }
+            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                       osd, con, vs, bottom_field, width,
+                                       frame_height, instride, outstride,
+                                       PULLDOWN_ACTION_MRGE3 );
             pulldown_merge = 0;
             // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
         } else if( !pulldown_copy ) {
             // Copy.
             if( did_copy_top ) { did_copy_top = 0; return; }
-            for( i = 0; i < frame_height; i++ ) {
-                unsigned char *curoutput = output + (i * outstride);
-                blit_packed422_scanline( curoutput, lastframe + (i * instride), width );
-                if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-                if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-                if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
-            }
+            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                       osd, con, vs, bottom_field, width,
+                                       frame_height, instride, outstride,
+                                       PULLDOWN_ACTION_COPY4 );
             // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
         }
         return;
@@ -539,18 +530,21 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
 
-        if( (pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field ) {
-            for( i = 40; i < frame_height/2 - 40; i += 2 ) {
-                topdiff += diff_factor_packed422_scanline( curframe + (i*instride*2),
-                                                           lastframe + (i*instride*2), width );
+        if( ((pulldown_alg == PULLDOWN_VEKTOR) && !bottom_field) || (filter && !filtered_cur) ) {
+            for( i = 0; i < frame_height; i++ ) {
+                if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
+                    topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
+                                                               lastframe + (i*instride), width );
+                    botdiff += diff_factor_packed422_scanline( curframe + (i*instride) + instride,
+                                                               lastframe + (i*instride) + instride, width );
+                }
+                if( videofilter_active_on_scanline( filter, i ) ) {
+                    videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
+                }
             }
-            for( i = 40; i < frame_height/2 - 40; i += 2 ) {
-                botdiff += diff_factor_packed422_scanline( curframe + (i*instride*2) + instride,
-                                                           lastframe + (i*instride*2) + instride, width );
-            }
-            last_topdiff = topdiff;
-            last_botdiff = botdiff;
         }
+        last_topdiff = topdiff;
+        last_botdiff = botdiff;
 
         data.f0 = curframe;
         data.f1 = lastframe;
@@ -606,7 +600,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             data.b0 = curframe + (instride*2);
 
             if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
-                videofilter_packed422_scanline( filter, data.b0, width, 0, scanline + 1 );
+                videofilter_packed422_scanline( filter, curframe + instride, width, 0, scanline );
+                videofilter_packed422_scanline( filter, curframe + (instride*2), width, 0, scanline + 1 );
             }
 
             if( bottom_field ) {
@@ -698,6 +693,8 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             scanline++;
         }
     }
+
+    filtered_cur = 1;
 }
 
 static void tvtime_build_interlaced_frame( unsigned char *output,
@@ -1626,7 +1623,6 @@ int main( int argc, char **argv )
         if( osd ) {
             tvtime_osd_advance_frame( osd );
         }
-        filtered_cur = 1;
     }
 
     snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
