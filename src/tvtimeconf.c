@@ -1032,6 +1032,11 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
     char *configFile = 0;
     char c;
 
+    if( argc == 1 ) {
+        print_config_usage( argv );
+        return 0;
+    }
+
     while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
