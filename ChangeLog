@@ -1,6 +1,5 @@
 
 0.9.7
-  * (vektor) Added support for a system wide /etc/tvtimerc
   * (PunkeR) Added numeric channel commands for better lirc support.
   * (vektor) Added commands for scanline length bias and overscan.
   * (vektor) Added a channel scanner that rocks sooo much.

@@ -37,7 +37,6 @@ typedef struct {
 } Cmd_Names;
 
 static Cmd_Names cmd_table[] = {
-
     { "QUIT", TVTIME_QUIT },
     { "CHANNEL_UP", TVTIME_CHANNEL_UP },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
@@ -99,8 +98,6 @@ static Cmd_Names cmd_table[] = {
     { "CHANNEL_9", TVTIME_CHANNEL_9 },
     { "CHANNEL_0", TVTIME_CHANNEL_0 },
 };
-
-
 #define NUM_CMDS (sizeof(cmd_table)/sizeof(Cmd_Names))
 
 
@@ -188,7 +185,7 @@ static void print_usage( char **argv )
                      "\t  \t\tfrance\n"
                      "\t  \t\trussia\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
-                     "\t  \t(defaults to 0 : Greedy - Low Motion)\n");
+                     "\t  \t(defaults to 0)\n");
 }
 
 
@@ -305,13 +302,6 @@ config_t *config_new( int argc, char **argv )
     ct->buttonmap[ 3 ] = TVTIME_TV_VIDEO;
     ct->buttonmap[ 4 ] = TVTIME_CHANNEL_UP;
     ct->buttonmap[ 5 ] = TVTIME_CHANNEL_DOWN;
-
-    if( !parser_new( &(ct->pf), "/etc/tvtimerc" ) ) {
-        fprintf( stderr, "config: Could not read configuration from %s\n", "/etc/tvtimerc" );
-    } else {
-        config_init( ct );
-        parser_delete( &(ct->pf) );
-    }
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 235 );
