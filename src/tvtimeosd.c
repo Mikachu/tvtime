@@ -26,6 +26,10 @@
 #include "commands.h"
 #include "pulldown.h"
 
+//rmd
+// #include <mysql/mysql.h>
+//dmr
+
 typedef struct string_object_s
 {
     osd_string_t *string;
@@ -52,6 +56,10 @@ enum osd_objects
     OSD_SHOW_INFO,
     OSD_MESSAGE1_BAR,
     OSD_MESSAGE2_BAR,
+    OSD_PROGRAM1_BAR,
+    OSD_PROGRAM2_BAR,
+    OSD_PROGRAM3_BAR,
+    OSD_PROGRAM4_BAR,     
     OSD_DATA_VALUE,
     OSD_MUTED,
     OSD_TIME_STRING,
@@ -252,6 +260,10 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_SIGNAL_INFO ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_MESSAGE1_BAR ].string = osd_string_new( osd->medfont );
     osd->strings[ OSD_MESSAGE2_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_PROGRAM1_BAR ].string = osd_string_new( osd->medfont );
+    osd->strings[ OSD_PROGRAM2_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_PROGRAM3_BAR ].string = osd_string_new( osd->smallfont );
+    osd->strings[ OSD_PROGRAM4_BAR ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_DATA_VALUE ].string = osd_string_new( osd->smallfont );
     osd->strings[ OSD_MUTED ].string = osd_string_new( osd->smallfont );
 
@@ -263,6 +275,8 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         !osd->strings[ OSD_INPUT_NAME ].string || !osd->strings[ OSD_NETWORK_NAME ].string ||
         !osd->strings[ OSD_TUNER_INFO ].string || !osd->strings[ OSD_SIGNAL_INFO ].string ||
         !osd->strings[ OSD_MESSAGE1_BAR ].string || !osd->strings[ OSD_MESSAGE2_BAR ].string ||
+        !osd->strings[ OSD_PROGRAM1_BAR ].string || !osd->strings[ OSD_PROGRAM2_BAR ].string ||
+        !osd->strings[ OSD_PROGRAM3_BAR ].string || !osd->strings[ OSD_PROGRAM4_BAR ].string ||
         !osd->strings[ OSD_DATA_VALUE ].string || !osd->strings[ OSD_MUTED ].string ||
         !osd->strings[ OSD_SHOW_INFO ].string ) {
 
@@ -345,6 +359,40 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_TUNER_INFO ].xpos = osd->margin_right;
     osd->strings[ OSD_TUNER_INFO ].ypos = osd->strings[ OSD_INPUT_NAME ].ypos
                                         + osd_string_get_height( osd->strings[ OSD_INPUT_NAME ].string );
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM1_BAR ].string, channel_r, channel_g, channel_b );
+    osd_string_show_border( osd->strings[ OSD_PROGRAM1_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, "8", 0 );
+    osd->strings[ OSD_PROGRAM1_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_PROGRAM1_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_PROGRAM1_BAR ].ypos = ( osd->strings[ OSD_SIGNAL_INFO ].ypos
+                                          + osd_string_get_height( osd->strings[ OSD_SIGNAL_INFO ].string ) * 2 )  ;
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM2_BAR ].string, channel_r, other_g, channel_b );
+    osd_string_show_border( osd->strings[ OSD_PROGRAM2_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string, "8", 0 );
+    osd->strings[ OSD_PROGRAM2_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_PROGRAM2_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_PROGRAM2_BAR ].ypos = osd->strings[ OSD_PROGRAM1_BAR ].ypos
+                                          + osd_string_get_height( osd->strings[ OSD_PROGRAM1_BAR ].string );
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_PROGRAM3_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string, "8", 0 );
+    osd->strings[ OSD_PROGRAM3_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_PROGRAM3_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_PROGRAM3_BAR ].ypos = osd->strings[ OSD_PROGRAM2_BAR ].ypos
+                                          + osd_string_get_height( osd->strings[ OSD_PROGRAM2_BAR ].string );
+
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string, other_r, other_g, other_b );
+    osd_string_show_border( osd->strings[ OSD_PROGRAM4_BAR ].string, 1 );
+    osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, "8", 0 );
+    osd->strings[ OSD_PROGRAM4_BAR ].align = OSD_LEFT;
+    osd->strings[ OSD_PROGRAM4_BAR ].xpos = osd->margin_left;
+    osd->strings[ OSD_PROGRAM4_BAR ].ypos = osd->strings[ OSD_PROGRAM3_BAR ].ypos
+                                          + osd_string_get_height( osd->strings[ OSD_PROGRAM3_BAR ].string );
+
+//dmr
 
 
     /* Bottom. */
@@ -623,6 +671,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, osd->delay );
     if( osd->film_logo && osd->pulldown_mode ) osd_animation_set_timeout( osd->film_logo, osd->delay );
 
+   //rmd
+   // show_mythtv_program_info(osd);
+   //dmr
+   
     osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? osd->delay : 0 );
 }
 
@@ -641,7 +693,7 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
         sprintf( bar, "%s", barname );
         osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
-
+   
         sprintf( bar, " %d", percentage );
         osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, osd->delay );
 
@@ -904,3 +956,155 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
     }
 }
 
+//rmd
+#if 0
+char * show_mythtv_program_info(tvtime_osd_t *osd)
+     {
+    MYSQL *m ;
+    MYSQL_RES *res ;
+    MYSQL_ROW row;
+    int channel_offset = 2000 ; 
+    char * desc = 0;
+    char * title = 0 ;
+    char * subtitle = 0;
+    char * callsign = 0 ;
+    char *info =0 ;
+    int channel_number_int ;
+    int result;
+    char query[2024];    
+    char * line2_p = 0;
+    char c_tmp = 0;
+    char * line1 = 0 ;
+    int desc_i = -1;
+
+        osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, "", osd->delay );
+        osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string, "", osd->delay );
+        osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string, "", osd->delay );
+        osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, "", osd->delay );
+
+
+    
+    
+    
+    m = mysql_init(NULL);
+
+    if (!m)
+      {
+         fprintf(stderr, "cannot allocate mysql object\n");
+         return NULL;
+      }
+    m = mysql_real_connect(m, HOSTNAME, SOMETHING?, PASSWORD?, NOTSURE, 3306, NULL, 0) ;
+    if (!m)
+      {
+         
+         fprintf(stderr, "couldn't connect to db\n");
+         return NULL;
+      }
+    channel_number_int = strtol(osd->channel_number_text, NULL, 10)  ;
+    sprintf(query, "select  channel.chanid,starttime,endtime,title,subtitle,description,category,channel.channum,channel.callsign,channel.name,channel.icon FROM program,channel WHERE channel.channum = %d AND starttime < now() AND endtime > now() AND program.chanid = channel.chanid", channel_number_int) ;
+    fprintf(stderr, "query = %s\n" , query);
+       result = mysql_query(m, query);
+    
+    if (result)
+      {
+         fprintf(stderr, "Database query error\n" ) ;
+         return NULL;
+      }
+    
+    res = mysql_store_result(m) ;
+    
+    if (res && (mysql_num_rows(res) > 0 ))
+        {
+           row = mysql_fetch_row(res);
+           
+           
+           callsign = strdup(row[8]);
+           title = strdup(row[3]);
+           subtitle = strdup(row[4]);
+           desc = strdup(row[5]);
+//           if (asprintf(&info, "%s : %s", subtitle, desc) == -1) {
+//          fprintf(stderr, "Could not allocate program information\n") ;
+//          exit(1) ;
+//           }
+           fprintf(stderr, "title = %s\nsubt = %s\ndesc = %s\n", title, subtitle,desc);
+           
+           line1 = desc ;
+           line2_p = 0;
+           /* split into two lines and only if line is long enough */
+           if (desc && (strlen(desc) > 45 ) ) {
+          desc_i = strlen(desc) / 2  ;
+          /* find nearest white space */
+          while(desc_i > 0 ) {
+             if (desc[desc_i] == ' ') break;
+             else
+               desc_i-- ;
+          }
+          if (desc_i > 0) {
+             /* get second line */
+             line2_p = strdup(desc + desc_i + 1); // +1 for space
+             fprintf(stderr, "line2_p = %s\n", line2_p);
+             c_tmp = *line2_p ;
+             *(desc + desc_i) = '\0';
+          }
+          line1 = strdup(desc) ;
+          if (line2_p) *(desc + desc_i) = c_tmp;
+           }
+        }
+    else {
+       mysql_free_result(res);
+       mysql_close(m);
+       return NULL;
+    }
+       
+    mysql_free_result(res);
+    mysql_close(m);
+
+
+    FILE *fp;
+    //write out channel to file
+    if ((fp = fopen("/tmp/chan_num", "w")) != NULL) {
+       fprintf(fp,"%s\n%s\n%s\n%s\n%s\n", osd->channel_number_text,
+           title,subtitle,line1,(!line2_p ? "" : line2_p));
+       
+       fclose(fp);
+    }
+    
+    tvtime_osd_show_mythtv_message(osd, title,subtitle,line1, line2_p);
+        
+//    if (info) free(info);
+    if (desc) free(desc);
+    if (title) free(title);
+    if (subtitle) free(subtitle) ;
+    if((desc_i > 0) && line1) free(line1) ;
+    if (line2_p) free(line2_p) ;
+     
+      
+ }
+
+void tvtime_osd_show_mythtv_message( tvtime_osd_t *osd, const char *message1, const char *message2, const char *message3, const char *message4 )
+{
+   
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM1_BAR ].string, 0 );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM2_BAR ].string, 0 );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM3_BAR ].string, 0 );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM4_BAR ].string, 0 );       
+
+   if( !*(osd->hold_message) ) {
+
+        if (message1) osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, message1, osd->delay );
+        if (message2) osd_string_show_text( osd->strings[ OSD_PROGRAM2_BAR ].string, message2, osd->delay );
+        if (message3) osd_string_show_text( osd->strings[ OSD_PROGRAM3_BAR ].string, message3, osd->delay );
+        if (message4) osd_string_show_text( osd->strings[ OSD_PROGRAM4_BAR ].string, message4, osd->delay );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM1_BAR ].string, osd->delay );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM2_BAR ].string, osd->delay );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM3_BAR ].string, osd->delay );
+        osd_string_set_timeout( osd->strings[ OSD_PROGRAM4_BAR ].string, osd->delay );       
+//        osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
+//        osd_rect_set_timeout( osd->databar, 0 );
+//        osd_rect_set_timeout( osd->databarbg, 0 );
+    }
+}
+
+
+#endif
+// dmr

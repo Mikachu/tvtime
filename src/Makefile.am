@@ -71,6 +71,7 @@ EXTRA_PROGRAMS = expandpng timingtest rvr
 
 tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) tvtime.c
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+# -lmysqlclient
 
 tvtime_command_SOURCES = $(COMMON_SRCS) tvtime-command.c
 tvtime_command_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
