@@ -1278,6 +1278,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 fprintf( stderr, "won't tell us input info: %s\n", strerror( errno ) );
             } else {
                 snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", input.name );
+                vidin->numtuners = input.tuner ? 1 : 0;
             }
         }
 
@@ -1321,6 +1322,7 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                              "indicating your card, driver, and this error message: %s.\n", strerror( errno ) );
                 } else {
                     snprintf( vidin->inputname, sizeof( vidin->inputname ), "%s", grab_chan.name );
+                    vidin->numtuners = grab_chan.tuners;
                 }
             }
         }
