@@ -26,6 +26,7 @@
 #include FT_GLYPH_H
 
 #include "leetft.h"
+#include "hashtable.h"
 
 static int ft_lib_refcount = 0;
 static FT_Library ft_lib = 0;
@@ -37,8 +38,8 @@ struct ft_font_s
     int fontsize;
     int xdpi;
     FT_Face face;
-    FT_Glyph glyphs[ 256 ];
-    FT_Glyph bitmaps[ 256 ];
+    struct hashtable *glyphs; // These contain FT_Glyph
+    struct hashtable *bitmaps;
     FT_UInt glyphpos[ MAX_STRING_LENGTH ];
     FT_UInt glyphindex[ MAX_STRING_LENGTH ];
     int max_height;
@@ -53,9 +54,16 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     if( !font ) return 0;
 
+    font->glyphs = hashtable_init (307); // 307 is a prime number.
+    font->bitmaps = hashtable_init (307); // 307 is a prime number.
+    if (font->glyphs == NULL || font->bitmaps == NULL)
+        return NULL;
+
     if( !ft_lib_refcount ) {
         if( FT_Init_FreeType( &ft_lib ) ) {
            fprintf( stderr, "ftfont: Can't load freetype library.\n" );
+           hashtable_destroy (font->glyphs);
+           hashtable_destroy (font->bitmaps);
            free( font );
            return 0;
         }
@@ -89,37 +97,68 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
     for( i = 0; i < 256; i++ ) {
         FT_UInt glyph_index = FT_Get_Char_Index( font->face, i );
-        font->glyphs[ i ] = 0;
+        if (hashtable_insert (font->glyphs, i, 0) == 1) {
+            // Out of memory! (Only happens when hashtable has to be resized.)
+            // What now?
+            return NULL;
+        }
 
         if( glyph_index ) {
             FT_BBox glyph_bbox;
+            FT_Glyph temp;
 
             error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
             if( error ) {
                 fprintf( stderr, "leetft: Can't load glyph %d\n", i );
                 continue;
             }
-            error = FT_Get_Glyph( font->face->glyph, &(font->glyphs[ i ]) );
+            error = FT_Get_Glyph( font->face->glyph, (FT_Glyph *) &temp );
             if( error ) {
                 fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", i );
                 continue;
             }
-            error = FT_Glyph_Copy( font->glyphs[ i ], &font->bitmaps[ i ] );
+            error = hashtable_insert (font->glyphs, i, temp);
+            if (error == 1) {
+                // Out of memory! Only happens when hashtable has to be
+                // resized. What now?
+                return NULL;
+            }
+            error = FT_Glyph_Copy((FT_Glyph) (hashtable_lookup (font->glyphs, i)), &temp );
             if( error ) {
                 fprintf( stderr, "leetft: Can't copy glyph %d\n", i );
-                FT_Done_Glyph( font->glyphs[ i ] );
-                font->glyphs[ i ] = 0;
+                FT_Done_Glyph(hashtable_lookup (font->glyphs, i));
+                if (hashtable_insert (font->glyphs, i, 0) == 1) {
+                    // Out of memory! Only happens when hashtable has to be
+                    // resized. What now?
+                    return NULL;
+                }
                 continue;
             }
-            error = FT_Glyph_To_Bitmap( &font->bitmaps[ i ], ft_render_mode_normal, 0, 1 );
+            error = hashtable_insert (font->bitmaps, i, temp );
+            if (error == 1) {
+                // Out of memory! Only happens when hashtable has to be
+                // resized. What now?
+                return NULL;
+            }
+            error = FT_Glyph_To_Bitmap( &temp, ft_render_mode_normal, 0, 1 );
             if( error ) {
                 fprintf( stderr, "leetft: Can't render glyph %d\n", i );
-                FT_Done_Glyph( font->glyphs[ i ] );
-                font->glyphs[ i ] = 0;
+                FT_Done_Glyph( hashtable_lookup (font->glyphs, i) );
+                if (hashtable_insert (font->glyphs, i, 0) == 1) {
+                    // Out of memory! Only happens when hashtable has to be
+                    // resized. What now?
+                    return NULL;
+                }
                 continue;
             }
+            error = hashtable_insert (font->bitmaps, i, temp );
+            if (error == 1) {
+                // Out of memory! Only happens when hashtable has to be
+                // resized. What now?
+                return NULL;
+            }
 
-            FT_Glyph_Get_CBox( font->glyphs[ i ], ft_glyph_bbox_subpixels, &glyph_bbox );
+            FT_Glyph_Get_CBox( hashtable_lookup (font->glyphs, i), ft_glyph_bbox_subpixels, &glyph_bbox );
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
             if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
         }
@@ -132,15 +171,11 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
 
 void ft_font_delete( ft_font_t *font )
 {
-    int i;
-
-    for( i = 0; i < 256; i++ ) {
-        if( font->glyphs[ i ] ) {
-            FT_Done_Glyph( font->glyphs[ i ] );
-            FT_Done_Glyph( font->bitmaps[ i ] );
-        }
-    }
     FT_Done_Face( font->face );
+    hashtable_freeall (font->glyphs);
+    hashtable_destroy (font->glyphs);
+    hashtable_freeall (font->bitmaps);
+    hashtable_destroy (font->bitmaps);
     free( font );
 
     ft_lib_refcount--;
@@ -165,7 +200,7 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points )
     return ( font->xdpi * points * 65536 ) / 72;
 }
 
-static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos,
+static FT_BBox prerender_text( FT_Face face, struct hashtable *glyphs, FT_UInt *glyphpos,
                                FT_UInt *glyphindex, const char *text, int len )
 {
     FT_Bool use_kerning;
@@ -184,7 +219,7 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
     for( i = 0; i < len; i++ ) {
         int cur = text[ i ];
 
-        if( glyphs[ cur ] ) {
+        if( hashtable_lookup (glyphs, cur) ) {
             FT_BBox glyph_bbox;
 
             glyphindex[ i ] = FT_Get_Char_Index( face, cur );
@@ -205,10 +240,10 @@ static FT_BBox prerender_text( FT_Face face, FT_Glyph *glyphs, FT_UInt *glyphpos
             glyphpos[ i ] = pen_x;
 
             /* Advance is in 16.16 format. */
-            pen_x += glyphs[ cur ]->advance.x;
+            pen_x += ((FT_Glyph)hashtable_lookup(glyphs, cur))->advance.x;
 
 
-            FT_Glyph_Get_CBox( glyphs[ cur ], ft_glyph_bbox_subpixels, &glyph_bbox );
+            FT_Glyph_Get_CBox( hashtable_lookup(glyphs, cur), ft_glyph_bbox_subpixels, &glyph_bbox );
 
             glyph_bbox.xMin *= 1024;
             glyph_bbox.xMax *= 1024;
@@ -309,8 +344,8 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
     for( i = 0; i < len; i++ ) {
         int cur = text[ i ];
 
-        if( font->glyphs[ cur ] ) {
-            FT_BitmapGlyph bit = (FT_BitmapGlyph) font->bitmaps[ cur ];
+        if( hashtable_lookup (font->glyphs, cur) ) {
+            FT_BitmapGlyph bit = (FT_BitmapGlyph) hashtable_lookup (font->bitmaps, cur);
 
             blit_glyph_subpix( output, *width, *height, *width,
                                bit->bitmap.buffer, bit->bitmap.width,
