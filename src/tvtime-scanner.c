@@ -46,6 +46,11 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    if( !config_parse_tvtime_scanner_command_line( cfg, argc, argv ) ) {
+        config_delete( cfg );
+        return 1;
+    }
+
     verbose = config_get_verbose( cfg );
 
     if( !strcasecmp( config_get_v4l_norm( cfg ), "pal" ) ) {

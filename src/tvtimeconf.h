@@ -33,6 +33,7 @@ config_t *config_new( void );
 void config_delete( config_t *ct );
 int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv );
 int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv );
+int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **argv );
 
 int config_key_to_command( config_t *ct, int key );
 int config_command_to_key( config_t *ct, int command );

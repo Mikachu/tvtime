@@ -644,6 +644,21 @@ static void print_config_usage( char **argv )
              "                                 video, radio, monitor\n" );
 }
 
+static void print_scanner_usage( char **argv )
+{
+    fprintf( stderr, "usage: %s [OPTION]...\n\n", argv[ 0 ] );
+
+    fprintf( stderr,
+             "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+             "  -F, --configfile=FILE      Additional config file to load settings from.\n"
+             "  -h, --help                 Show this help message.\n"
+             "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+             "  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+             "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+             "                             PAL-N or PAL-60 (defaults to NTSC).\n" );
+}
+
+
 
 config_t *config_new( void )
 {
@@ -713,9 +728,11 @@ config_t *config_new( void )
     ct->keymap[ 'j' ] = TVTIME_CHANNEL_DEC;
     ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
+
     ct->keymap[ 'c' ] = TVTIME_TOGGLE_LUMA_CORRECTION;
     ct->keymap[ 'z' ] = TVTIME_LUMA_DOWN;
     ct->keymap[ 'x' ] = TVTIME_LUMA_UP;
+
     ct->keymap[ 'm' ] = TVTIME_TOGGLE_MUTE;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
@@ -1111,6 +1128,55 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
     return 1;
 }
+
+int config_parse_tvtime_scanner_command_line( config_t *ct, int argc, char **argv )
+{
+    static struct option long_options[] = {
+        { "help", 0, 0, 'h' },
+        { "height", 1, 0, 'H' },
+        { "input", 1, 0, 'i' },
+        { "configfile", 1, 0, 'F' },
+        { "norm", 1, 0, 'n' },
+        { "device", 1, 0, 'd' },
+        { 0, 0, 0, 0 }
+    };
+    int option_index = 0;
+    char *configFile = 0;
+    char c;
+
+    while( (c = getopt_long( argc, argv, "hF:d:i:n:",
+            long_options, &option_index )) != -1 ) {
+        switch( c ) {
+        case 'F': if( configFile ) { free( configFile ); }
+                  configFile = strdup( optarg ); break;
+        case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
+        case 'i': ct->inputnum = atoi( optarg ); break;
+        case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
+        default:
+            print_scanner_usage( argv );
+            return 0;
+        }
+    }
+
+    /* Then read in additional settings. */
+    if( configFile ) {
+        char *temp = expand_user_path( configFile );
+        if( temp ) {
+            free( configFile );
+            configFile = temp;
+        }
+    }
+    if( configFile ) {
+        if( ct->config_filename ) free( ct->config_filename );
+        ct->config_filename = configFile;
+
+        fprintf( stderr, "config: Reading configuration from %s\n", configFile );
+        conf_xml_parse( ct, configFile );
+    }
+
+    return 1;
+}
+
 
 
 void config_free_data( config_t *ct )
