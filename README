@@ -1,13 +1,15 @@
 
 
-              * * * *     tvtime     * * * *
+		     * * * *     tvtime     * * * *
 
-              http://tvtime.sourceforge.net/
+		     http://tvtime.sourceforge.net/
 
 
-  tvtime is a high quality television application for use with video capture
-cards.  tvtime processes the input from a capture card and displays it on a
-computer monitor or projector.
+tvtime is a high quality television application for use with video
+capture cards.  tvtime processes the input from a capture card and
+displays it on a computer monitor or projector.  Unlike other television
+applications, tvtime focuses on high visual quality making it ideal for
+videophiles.
 
   tvtime supports:
 
@@ -29,19 +31,19 @@ computer monitor or projector.
       from NTSC sources.
 
 
-  Contents
-  --------
-  1. Where to find help with tvtime
-  2. How to configure your tvtime
-  3. An introduction to using tvtime
-  4. Setting up your channel list in tvtime
+Contents
+--------
+1. Where to find help with tvtime
+2. How to configure your tvtime
+3. An introduction to using tvtime
+4. Setting up your channel list in tvtime
 
 
 1 Where to find help with tvtime
   ------------------------------
 
-  Detailed help, documentation, known bugs, and known hardware issues can be
-  found on the tvtime website:
+Detailed help, documentation, known bugs, and known hardware issues 
+can be found on the tvtime website:
 
      http://tvtime.sourceforge.net/
 
@@ -49,10 +51,10 @@ computer monitor or projector.
 2 How to configure your tvtime
   ----------------------------
 
-  Run 'tvtime -h' to get a list of command line arguments.  You can also
+Run 'tvtime -h' to get a list of command line arguments.  You can also
 save command line arguments to your config file using the -S option.
 
-  tvtime -S -n pal -f europe
+     tvtime -S -n pal -f europe
 
   Will save to your config file the norm PAL and frequency table Europe
 as your defaults.  See docs/default.tvtime.xml for a default
@@ -101,7 +103,7 @@ channel 15.  Run 'tvtime-command' to get a list of commands.
 4 Setting up your channel list in tvtime
   --------------------------------------
 
-  tvtime supports a channel scanner, channel renumbering, channel names,
+tvtime supports a channel scanner, channel renumbering, channel names,
 and a list of active channels for browsing.  Below are the commands
 available for input bindings and through tvtime-command, along with
 their default key bindings.
@@ -136,7 +138,7 @@ their default key bindings.
 4.1 stationlist.xml
     ---------------
 
-  The station listing is read in from the ~/.tvtime/stationlist.xml.
+The station listing is read in from the ~/.tvtime/stationlist.xml.
 Channel settings are saved specific to norm and frequency table.
 Entries in a list are in the following form:
 
@@ -174,7 +176,7 @@ Entries in a list are in the following form:
 4.2 Future enhancements
     -------------------
 
-  tvtime still needs a method of editing channel names at runtime
+tvtime still needs a method of editing channel names at runtime
 (should not be hard), a full frequency band scanner, native support for
 the weird frequencies used by some cable providers such as UPC.
 
