@@ -203,6 +203,7 @@ const char *get_tvtime_fifo( config_t *ct )
         char *hostname = NULL;
         size_t hostenv_size = 256; 
         char *hostenv = NULL;
+	char *hostenv_realloc = NULL;
 
         /* Get the FIFO directory. */
         fifodir = get_tvtime_fifodir( ct );
@@ -215,9 +216,13 @@ const char *get_tvtime_fifo( config_t *ct )
         hostenv = (char *) malloc( hostenv_size );
         while( gethostname( hostenv, hostenv_size ) < 0) {
             hostenv_size *= 2;
-            if (realloc( hostname, hostenv_size ) < 0) {
+            hostenv_realloc = realloc( hostenv, hostenv_size );
+            if( hostenv_realloc == NULL ) {
                 /* Use a partial hostname. */
+                hostenv_size /= 2;
                 break;
+            } else {
+                hostenv = hostenv_realloc;
             }
         }
 
