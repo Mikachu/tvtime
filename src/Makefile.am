@@ -60,7 +60,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	utils.c diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c \
 	pulldown.h pulldown.c hashtable.h hashtable.c
 
-OUTPUT_SRCS = display.c display.h outputapi.h vroot.h xvoutput.h xvoutput.c \
+OUTPUT_SRCS = display.c display.h outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c
 
 bin_PROGRAMS = tvtime tvtime-command
