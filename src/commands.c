@@ -526,6 +526,52 @@ static void reinit_tuner( commands_t *cmd )
     }
 }
 
+static void reset_pal_input_menu( menu_t *menu, videoinput_t *vidin )
+{
+    char string[ 128 ];
+    int cur = 2;
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+              _("Preferred audio mode") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "audiomode" );
+    cur++;
+
+    if( videoinput_is_v4l2( vidin ) ) {
+        snprintf( string, sizeof( string ), videoinput_get_pal_audio_mode( vidin ) ?
+                  TVTIME_ICON_GENERALTOGGLEON "  %s" :
+                  TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+                  _("Use PAL-DK audio decoding") );
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_TOGGLE_PAL_DK_AUDIO, "" );
+        cur++;
+    }
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
+              _("Audio volume boost") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "audioboost" );
+    cur++;
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
+              _("Television standard") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "norm" );
+    cur++;
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
+              _("Horizontal resolution") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "hres" );
+    cur++;
+
+    snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
+              _("Back") );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "root" );
+    cur++;
+}
+
 static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename )
 {
     char string[ 128 ];
@@ -846,8 +892,7 @@ static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
                                 int apply_pulldown )
 {
     char string[ 128 ];
-    int cur;
-    cur = 1;
+    int cur = 1;
 
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "processing" );
 
@@ -1225,32 +1270,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
-              _("Preferred audio mode") );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
-              _("Audio volume boost") );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "audioboost" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_TELEVISIONSTANDARD "  %s",
-              _("Television standard") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "norm" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
-              _("Horizontal resolution") );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "hres" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
-              _("Back") );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
-
+    reset_pal_input_menu( menu, vidin );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "hres" );
@@ -2064,6 +2084,27 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             *cmd->screenshotfile = 0;
         }
         cmd->screenshot = 1;
+        break;
+
+    case TVTIME_TOGGLE_PAL_DK_AUDIO:
+        if( cmd->vidin ) {
+            char message[ 128 ];
+            videoinput_set_pal_audio_mode( cmd->vidin,
+                !videoinput_get_pal_audio_mode( cmd->vidin ) );
+            if( cmd->osd ) {
+                if( videoinput_get_pal_audio_mode( cmd->vidin ) ) {
+                    snprintf( message, sizeof( message ),
+                              _("Using PAL-DK audio decoding.") );
+                } else {
+                    snprintf( message, sizeof( message ),
+                              _("Using PAL-BG audio decoding.") );
+                }
+                reset_pal_input_menu( commands_get_menu( cmd, "input-pal" ),
+                                      cmd->vidin );
+                commands_refresh_menu( cmd );
+                tvtime_osd_show_message( cmd->osd, message );
+            }
+        }
         break;
 
     case TVTIME_TOGGLE_BARS:
