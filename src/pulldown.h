@@ -13,6 +13,9 @@
 #define PULLDOWN_OFFSET_4 (1<<3)
 #define PULLDOWN_OFFSET_5 (1<<4)
 
+/**
+ * Actions that we can return.
+ */
 #define PULLDOWN_ACTION_COPY1 (1<<0)
 #define PULLDOWN_ACTION_DROP2 (1<<1)
 #define PULLDOWN_ACTION_MRGE3 (1<<2)
