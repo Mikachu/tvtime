@@ -83,6 +83,10 @@ struct tvtime_osd_s
     int film_logo_xpos;
     int film_logo_ypos;
 
+    osd_animation_t *info_icon;
+    int info_icon_xpos;
+    int info_icon_ypos;
+
     osd_graphic_t *backdrop;
 
     char channel_number_text[ 20 ];
@@ -105,6 +109,7 @@ struct tvtime_osd_s
     char hold_message[ 255 ];
 
     int film_mode;
+    int info_available;
     int pulldown_mode;
     int mutestate;
     int hold;
@@ -285,6 +290,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     /* We create the film logo, but it's ok if it fails to load. */
     osd->film_logo = osd_animation_new( "filmstrip", pixel_aspect, 256, 2 );
+    osd->info_icon = osd_animation_new( "infoicon", pixel_aspect, 256, 2 );
 
     if( !osd->strings[ OSD_CHANNEL_NUM ].string || !osd->strings[ OSD_TIME_STRING ].string ||
         !osd->strings[ OSD_INPUT_NAME ].string || !osd->strings[ OSD_NETWORK_NAME ].string ||
@@ -457,6 +463,11 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         osd->film_logo_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos
                               - osd_animation_get_height( osd->film_logo );
     }
+    if( osd->info_icon ) {
+        osd->info_icon_xpos = osd->margin_right;
+        osd->info_icon_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos
+                              - osd_animation_get_height( osd->info_icon );
+    }
 
     return osd;
 }
@@ -471,6 +482,7 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
         }
     }
     if( osd->film_logo ) osd_animation_delete( osd->film_logo );
+    if( osd->info_icon ) osd_animation_delete( osd->info_icon );
     osd_list_delete( osd->list );
     osd_rect_delete( osd->databarbg );
     osd_rect_delete( osd->databar );
@@ -507,6 +519,7 @@ void tvtime_osd_hold( tvtime_osd_t *osd, int hold )
     }
     if( osd->backdrop ) osd_graphic_set_hold( osd->backdrop, hold );
     if( osd->film_logo ) osd_animation_set_hold( osd->film_logo, hold );
+    if( osd->info_icon ) osd_animation_set_hold( osd->info_icon, hold );
 }
 
 void tvtime_osd_clear( tvtime_osd_t *osd )
@@ -518,6 +531,7 @@ void tvtime_osd_clear( tvtime_osd_t *osd )
     }
     if( osd->backdrop ) osd_graphic_set_timeout( osd->backdrop, 0 );
     if( osd->film_logo ) osd_animation_set_timeout( osd->film_logo, 0 );
+    if( osd->info_icon ) osd_animation_set_timeout( osd->info_icon, 0 );
     if( osd->chinfo ) {
         osd_list_set_timeout( osd->list, 0 );
         osd->chinfo = 0;
@@ -563,6 +577,19 @@ void tvtime_osd_set_film_mode( tvtime_osd_t *osd, int mode )
 {
     osd->film_mode = mode;
     if( osd->film_logo ) osd_animation_pause( osd->film_logo, mode > 0 ? 0 : 1 );
+}
+
+void tvtime_osd_set_info_available( tvtime_osd_t *osd, int mode )
+{
+    osd->info_available = mode;
+    if( osd->info_icon ) {
+        osd_animation_pause( osd->info_icon, mode > 0 ? 0 : 1 );
+        if( mode ) {
+            osd_animation_set_timeout( osd->info_icon, osd->delay );
+        } else {
+            osd_animation_set_timeout( osd->info_icon, 0 );
+        }
+    }
 }
 
 void tvtime_osd_set_pulldown( tvtime_osd_t *osd, int mode )
@@ -841,6 +868,7 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
 
     if( osd->backdrop ) osd_graphic_advance_frame( osd->backdrop );
     if( osd->film_logo ) osd_animation_advance_frame( osd->film_logo );
+    if( osd->info_icon ) osd_animation_advance_frame( osd->info_icon );
     osd_list_advance_frame( osd->list );
     osd_rect_advance_frame( osd->databar );
     osd_rect_advance_frame( osd->databarbg );
@@ -934,6 +962,29 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                                                 width - startx,
                                                                 strx,
                                                                 scanline - osd->film_logo_ypos );
+                }
+            }
+        }
+    }
+
+    if( osd->info_icon ) {
+        if( osd_animation_visible( osd->info_icon ) ) {
+            if( scanline >= osd->info_icon_ypos &&
+                scanline < osd->info_icon_ypos + osd_animation_get_height( osd->info_icon ) ) {
+
+                int startx = osd->info_icon_xpos - osd_animation_get_width( osd->info_icon ) - xpos;
+                int strx = 0;
+                if( startx < 0 ) {
+                    strx = -startx;
+                    startx = 0;
+                }
+                if( startx < width ) {
+                    osd_animation_composite_packed422_scanline( osd->info_icon,
+                                                                output + (startx*2),
+                                                                output + (startx*2),
+                                                                width - startx,
+                                                                strx,
+                                                                scanline - osd->info_icon_ypos );
                 }
             }
         }
