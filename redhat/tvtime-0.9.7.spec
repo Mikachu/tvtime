@@ -1,31 +1,29 @@
-%define tvtime_ver 0.9.7
+# Some useful constants
+%define ver 0.9.7
 %define beta beta
-%define tvtime_rpm_ver 1
-%define icon docs/tvtime-icon-black.png
-%{!?rh_ver:%define rh_ver %(cut -d' ' -f5 /etc/redhat-release )}
+%define rpm_ver 2
+%define docsdir docs
+%define rhdocsdir redhat
+%define icon %{docsdir}/tvtime-icon-black.png
+%define desktop_filename %{rhdocsdir}/custom-tvtime.desktop
 
-%if "{%rh_ver}" >= "8.0"
-#%define desktop_file 1
-%define desktop_filename redhat/custom-tvtime.desktop
-#%else
-#%define desktop_file 0
-%endif
+# Check if we're running RedHat 8.0 or higher
+%{!?rh_ver:%define rh_ver %(cut -d' ' -f5 /etc/redhat-release )}
 
 Summary: A high quality TV viewer.
 Name: tvtime
-Version: %{tvtime_ver}
-Release: %{?beta:0.%{beta}.}%{tvtime_rpm_ver}
-URL: http://tvtime.sourceforge.net
+Version: %{ver}
+Release: %{?beta:0.%{beta}.}%{rpm_ver}
+URL: http://%{name}.sourceforge.net
 Source0: %{name}-%{version}.tar.gz
 License: GPL
 Group: Applications/Multimedia
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: freetype-devel zlib-devel libstdc++-devel libpng-devel XFree86-libs libgcc freetype-devel glibc-debug
-BuildPrereq: sh-utils
-Requires: desktop-file-utils fileutils sh-utils
+BuildRequires: freetype-devel zlib-devel libstdc++-devel libpng-devel XFree86-libs libgcc freetype-devel glibc-debug textutils
+Requires: sh-utils man groff desktop-file-utils
 
 %description
-tvtime is a high quality television application for use with video capture cards. tvtime processes the input from a capture card and displays it on a computer monitor or projector.
+%{name} is a high quality television application for use with video capture cards. %{name} processes the input from a capture card and displays it on a computer monitor or projector.
 
 %prep
 %setup -q
@@ -37,17 +35,23 @@ tvtime is a high quality television application for use with video capture cards
 %install
 %{__rm} -rf %{buildroot}
 %makeinstall
+
+# On RedHat 8.0+ distributions, add a menu entry
 %if "%{rh_ver}" >= "8.0"
 
 # Copy icon
 install -D -m 644 %{icon} %{buildroot}%{_datadir}/pixmaps/%{name}-logo.png
 
 # Copy desktop file
-mkdir -p %{buildroot}%_datadir}/applications
+mkdir -p %{buildroot}%{_datadir}/applications
 desktop-file-install --vendor custom --delete-original --dir %{buildroot}%{_datadir}/applications --add-category X-Red-Hat-Extra --add-category Application --add-category AudioVideo %{desktop_filename}
-%else
-echo RH8.0 version test failed
 %endif
+
+# Add man pages
+mkdir -p %{_mandir}/man1
+mkdir -p %{_mandir}/man5
+install -D -m 644 %{docsdir}/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
+install -D -m 644 %{docsdir}/%{name}rc.5 %{buildroot}%{_mandir}/man5/%{name}rc.5
 
 %clean
 rm -rf %{buildroot}
@@ -60,12 +64,13 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/%{name}-logo.png
 %{_datadir}/applications/*%{name}.desktop
-#%{_mandir}/tvtime.1
-#%{_mandir}/tvtime.5
+%{_mandir}/man1/%{name}.1*
+%{_mandir}/man5/%{name}rc.5*
 
 %changelog
-* Mon Feb 24 2003 Paul Jara
+* Mon Feb 24 2003 Paul Jara <rascasse at sourceforge.net>
+- Added man pages for tvtime and tvtimerc
 - Macro-ized some common shell commands
 - Added icon and menu entry for RedHat 8.0+
-* Sun Feb 23 2003 Paul Jara
+* Sun Feb 23 2003 Paul Jara <rascasse at sourceforge.net>
 - Initial build.

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Comment=High quality TV viewer
+Icon=tvtime-logo.png
+Exec=tvtime
+Name=Television Viewer
+Terminal=0
+Type=Application
+Categories=Application;AudioVideo;
