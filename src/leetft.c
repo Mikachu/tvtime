@@ -306,7 +306,7 @@ ft_string_t *ft_string_new( ft_font_t *font )
     if( !fts ) return 0;
 
     fts->font = font;
-    fts->datasize = 65536 * 1024;
+    fts->datasize = 65536 ;
     fts->data = (unsigned char *) malloc( fts->datasize );
     if( !fts->data ) {
         free( fts );
