@@ -192,29 +192,31 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         return 0;
     }
 
-    if( ioctl( grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-        perror( "ioctl VIDIOCGPICT" );
-        return 0;
-    }
-
-    if (grab_chan.tuners > 0) {
+    if( grab_chan.tuners > 0 ) {
         tuner.tuner = 0;
         if( ioctl( grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
             perror( "ioctl VIDIOCGTUNER" );
             return 0;
         }
-        fprintf( stderr, "tuner.tuner = %d\ntuner.name = %s\ntuner.rangelow = %ld\ntuner.rangehigh = %ld\ntuner.signal = %d\ntuner.flags = ",tuner.tuner,tuner.name,tuner.rangelow,tuner.rangehigh,tuner.signal );
+        fprintf( stderr, "tuner.tuner = %d\n"
+                         "tuner.name = %s\n"
+                         "tuner.rangelow = %ld\n"
+                         "tuner.rangehigh = %ld\n"
+                         "tuner.signal = %d\n"
+                         "tuner.flags = ",
+                 tuner.tuner, tuner.name, tuner.rangelow,
+                 tuner.rangehigh, tuner.signal );
 
-        if (tuner.flags & VIDEO_TUNER_PAL) fprintf( stderr, "PAL " );
-        if (tuner.flags & VIDEO_TUNER_NTSC) fprintf( stderr, "NTSC " );
-        if (tuner.flags & VIDEO_TUNER_SECAM) fprintf( stderr, "SECAM " );
-        if (tuner.flags & VIDEO_TUNER_LOW) fprintf( stderr, "LOW " );
-        if (tuner.flags & VIDEO_TUNER_NORM) fprintf( stderr, "NORM " );
-        if (tuner.flags & VIDEO_TUNER_STEREO_ON) fprintf( stderr, "STEREO_ON " );
-        if (tuner.flags & VIDEO_TUNER_RDS_ON) fprintf( stderr, "RDS_ON " );
-        if (tuner.flags & VIDEO_TUNER_MBS_ON) fprintf( stderr, "MBS_ON" );
+        if( tuner.flags & VIDEO_TUNER_PAL ) fprintf( stderr, "PAL " );
+        if( tuner.flags & VIDEO_TUNER_NTSC ) fprintf( stderr, "NTSC " );
+        if( tuner.flags & VIDEO_TUNER_SECAM ) fprintf( stderr, "SECAM " );
+        if( tuner.flags & VIDEO_TUNER_LOW ) fprintf( stderr, "LOW " );
+        if( tuner.flags & VIDEO_TUNER_NORM ) fprintf( stderr, "NORM " );
+        if( tuner.flags & VIDEO_TUNER_STEREO_ON ) fprintf( stderr, "STEREO_ON " );
+        if( tuner.flags & VIDEO_TUNER_RDS_ON ) fprintf( stderr, "RDS_ON " );
+        if( tuner.flags & VIDEO_TUNER_MBS_ON ) fprintf( stderr, "MBS_ON" );
+
         fprintf( stderr, "\ntuner.mode = " );
-
         switch (tuner.mode) {
         case VIDEO_MODE_PAL: fprintf( stderr, "PAL" ); break;
         case VIDEO_MODE_NTSC: fprintf( stderr, "NTSC" ); break;
@@ -222,30 +224,32 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         case VIDEO_MODE_AUTO: fprintf( stderr, "AUTO" ); break;
         default: fprintf( stderr, "UNDEFINED" ); break;
         }
-        
         fprintf( stderr, "\n");
-
     } else {
         tuner.tuner = -1;
         fprintf( stderr, "videoinput: Channel %d has no tuner.\n", grab_chan.channel );
     }
 
-    
 
-    fprintf( stderr, "videoinput: brightness %d, hue %d, colour %d, contrast %d.\n",
+    if( ioctl( grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
+        perror( "ioctl VIDIOCGPICT" );
+        return 0;
+    }
+    fprintf( stderr, "videoinput: Current brightness %d, hue %d, colour %d, contrast %d.\n",
              grab_pict.brightness, grab_pict.hue, grab_pict.colour,
              grab_pict.contrast );
 
-/*
-    grab_pict.brightness = 32000;
-    grab_pict.colour = 32768;
-    grab_pict.contrast = 23000;
+    grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
+    grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
+    grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
+    grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_NTSC) / 511.0) * 65535.0);
     if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
     }
-*/
-
+    fprintf( stderr, "videoinput: Set to brightness %d, hue %d, colour %d, contrast %d.\n",
+             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+             grab_pict.contrast );
 
     numframes = gb_buffers.frames;
     if( maxbufs < numframes ) numframes = maxbufs;
@@ -275,26 +279,20 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     /* Fallback to read(). */
     fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
     have_mmap = 0;
-/*
-    grab_pict.depth = 12;
-    grab_pict.palette = VIDEO_PALETTE_YUV420P;
-*/
+
     grab_pict.depth = 16;
     grab_pict.palette = VIDEO_PALETTE_YUV422P;
-
     if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
     }
-
-    fprintf( stderr, "\n\nbright %d, hue %d, colour %d, contrast %d, whiteness %d\n\n",
-             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-             grab_pict.contrast, grab_pict.whiteness );
-
     if( ioctl( grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         perror("ioctl VIDIOCGPICT");
         return 0;
     }
+    fprintf( stderr, "\n\nbright %d, hue %d, colour %d, contrast %d, whiteness %d\n\n",
+             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
+             grab_pict.contrast, grab_pict.whiteness );
 
     memset( &grab_win, 0, sizeof( struct video_window ) );
     grab_win.width = width;
@@ -320,7 +318,8 @@ void videoinput_set_tuner(int tuner_number, int mode)
 {
     if (tuner.tuner > -1) {
         if (grab_chan.tuners <= tuner_number) {
-            fprintf( stderr, "videoinput: tuner %d is not a valid tuner for channel %d\n", tuner_number, grab_chan.channel );
+            fprintf( stderr, "videoinput: tuner %d is not a valid tuner for channel %d\n",
+                     tuner_number, grab_chan.channel );
             return;
         }
 
