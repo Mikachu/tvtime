@@ -32,6 +32,7 @@ Delete Button         0xEE 0x80 0xA9  U+E029
 Favorites Icon        0xEE 0x80 0xAA  U+E02A
 Deinterlacer Desc.    0xEE 0x80 0xAB  U+E02B
 Attempted Framerate   0xEE 0x80 0xAC  U+E02C
-Input Filters         ????
+Television Standard   0xEE 0x80 0xAD  U+E02D
+Input Filters         0xEE 0x80 0xAE  U+E02E
 Rename channel        ????
 Renumber channel      ????
