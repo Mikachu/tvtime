@@ -32,6 +32,7 @@
 typedef struct {
   int horizontal_pixels;
   int vertical_pixels;
+  double refresh_rate;
 } resolution_t;
 
 typedef struct {
@@ -81,10 +82,12 @@ int DpyInfoGetScreenOffset(Display *dpy, int screen_nr,
 
 int DpyInfoGetResolution(Display *dpy, int screen_nr,
 			 int *horizontal_pixels,
-			 int *vertical_pixels)
+			 int *vertical_pixels,
+			 double *refresh_rate)
 {
   *horizontal_pixels = dpyinfo.resolution.horizontal_pixels;
   *vertical_pixels = dpyinfo.resolution.vertical_pixels;
+  *refresh_rate = dpyinfo.resolution.refresh_rate;
 
   return 1;
 }
@@ -194,9 +197,8 @@ static int update_resolution_xf86vidmode(dpy_info_t *info, Display *dpy,
     }
     info->resolution.horizontal_pixels = modeline.hdisplay;
     info->resolution.vertical_pixels = modeline.vdisplay;
-    fprintf( stderr, "vidmode: refresh    %5.2fhz.\n",
-             (double) ( (double) dotclk * 1000.0 ) /
-             (double) ( modeline.htotal * modeline.vtotal ) );
+    info->resolution.refresh_rate = (double) ( (double) dotclk * 1000.0 ) /
+                                    (double) ( modeline.htotal * modeline.vtotal );
 
     if(XF86VidModeGetViewPort(dpy, screen_nr, &x, &y)) {
       info->screen_offset.x = x;
@@ -350,6 +352,7 @@ int DpyInfoInit(Display *dpy, int screen_nr)
   dpyinfo.screen_offset.y = 0;
   dpyinfo.resolution.horizontal_pixels = 0;
   dpyinfo.resolution.vertical_pixels = 0;
+  dpyinfo.resolution.refresh_rate = 0.0;
   dpyinfo.geometry.width = 0;
   dpyinfo.geometry.height = 0;
 

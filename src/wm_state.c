@@ -29,10 +29,11 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "config.h"
 #include "debug_print.h"
 #include "display.h"
 #include "wm_state.h"
+
+#include "config.h"
 
 
 static WindowState_t current_state = WINDOW_STATE_NORMAL;
@@ -122,6 +123,8 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
   int dest_y_ret;
   Window dest_win;
   
+  DNOTE("configure x: %d, y: %d\n",
+	ev->xconfigure.x,  ev->xconfigure.y);
   if(ev->xconfigure.send_event == True) {
 
     //DNOTE("send_event: True\n");
@@ -137,13 +140,11 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
 			  &dest_win);
     
     if(*x != dest_x_ret) {
-      DNOTE("%s", "f**king non-compliant wm, we can't trust it on x-coords\n");
       DNOTE("wm_x: %d, xtranslate_x: %d\n", *x, dest_x_ret);
       *x = dest_x_ret;
     }
 
     if(*y != dest_y_ret) {
-      DNOTE("%s", "f**king non-compliant wm, we can't trust it on y-coords\n");
       DNOTE("wm_y: %d, xtranslate_y: %d\n", *y, dest_y_ret);
       *y = dest_y_ret;
     }
@@ -158,12 +159,13 @@ static void calc_coords(Display *dpy, Window win, int *x, int *y, XEvent *ev)
 			  &dest_x_ret,
 			  &dest_y_ret,
 			  &dest_win);
+    DNOTE("xtranslate x: %d, y: %d\n", dest_x_ret, dest_y_ret);
     *x = dest_x_ret;
     *y = dest_y_ret;
     
   }
 
-  //DNOTE(stderr, "x: %d, y: %d\n", *x, *y);
+  //DNOTE("x: %d, y: %d\n", *x, *y);
 }
 
 
@@ -192,10 +194,10 @@ static void save_normal_geometry(Display *dpy, Window win)
 			&dest_y_ret,
 			&dest_win);
   
-  normal_state_geometry.x = dest_x_ret - x;
-  normal_state_geometry.y = dest_y_ret - y;
-  
+  normal_state_geometry.x = dest_x_ret;
+  normal_state_geometry.y = dest_y_ret;
   /*
+  DNOTE("x_ret: %d, y_ret: %d\n", dest_x_ret, dest_y_ret);
   DNOTE("normal_state_geometry: x: %d, y: %d, w: %d, h: %d, bw: %d, d: %d\n",
 	x, y,
 	normal_state_geometry.width,
@@ -208,8 +210,9 @@ static void save_normal_geometry(Display *dpy, Window win)
 static void restore_normal_geometry(Display *dpy, Window win)
 {
   XWindowChanges win_changes;
-  XEvent ev;
-  
+  XEvent ev, ret_ev;
+  int x, y;
+  int n;
   // Try to resize
   win_changes.x = normal_state_geometry.x;
   win_changes.y = normal_state_geometry.y;
@@ -221,13 +224,96 @@ static void restore_normal_geometry(Display *dpy, Window win)
 		       CWWidth | CWHeight,
 		       &win_changes);
 
+  
   // Wait for a configure notify
   do {
     XNextEvent(dpy, &ev);
   } while(ev.type != ConfigureNotify);
+  
+  // save the configure event so we can return it
+  ret_ev = ev;
+  
+  calc_coords(dpy, win, &x, &y, &ev);
 
+  for(n = 0; n < 10; n++) {
+    while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
+      ret_ev = ev;
+      calc_coords(dpy, win, &x, &y, &ev);
+    }
+    if(abs(x-win_changes.x) < 100 &&
+       abs(y-win_changes.y) < 100) {
+      break;
+    }
+    usleep(100000);
+  }
+    
+  //DNOTE("no more configure notify\n");
+  //try to move one more time, maybe we didn't get all configure events?
+  if(x != win_changes.x || y != win_changes.y) {
+    DNOTE("window is not at %d, %d. Trying to move again\n",
+	  win_changes.x, win_changes.y);
+    
+    XSync(dpy, True);
+    XReconfigureWMWindow(dpy, win, 0, CWX | CWY,
+			 &win_changes);
+
+    /*    
+    do {
+      XNextEvent(dpy, &ev);
+    } while(ev.type != ConfigureNotify);
+    
+    ret_ev = ev;
+    
+    calc_coords(dpy, win, &x, &y, &ev);
+    */
+    while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
+      ret_ev = ev;
+      calc_coords(dpy, win, &x, &y, &ev);
+    }
+  } 
+  // ugly hack, but what can you do
+  //  when we don't end up at (win_changes.x, win_changes.y)
+  //  try to compensate and move one more time
+  if((x != win_changes.x || y != win_changes.y) &&
+     abs(x - win_changes.x) < 100 && abs(y - win_changes.y) < 100) {
+    XWindowChanges win_compensate;
+    win_compensate.x = win_changes.x+win_changes.x-x;
+    win_compensate.y = win_changes.y+win_changes.y-y;
+    DNOTE("window is not at %d, %d\n", win_changes.x, win_changes.y);
+    DNOTE("Compensating by moving to x: %d= %d+%d-%d, y: %d= %d+%d-%d\n",
+	  win_compensate.x, win_changes.x, win_changes.x, x,
+	  win_compensate.y, win_changes.y, win_changes.y, y);
+    
+    XSync(dpy, True);
+    XReconfigureWMWindow(dpy, win, 0, CWX | CWY,
+			 &win_compensate);
+    
+    do {
+      XNextEvent(dpy, &ev);
+    } while(ev.type != ConfigureNotify);
+    
+    ret_ev = ev;
+
+    calc_coords(dpy, win, &x, &y, &ev);
+    
+    while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
+      ret_ev = ev;
+      calc_coords(dpy, win, &x, &y, &ev);
+    }
+    
+    if(x != win_changes.x || y != win_changes.y) {
+      DNOTE("Couldn't place window at %d,%d\n",
+	    win_changes.x, win_changes.y);
+      DNOTE("Window is at %d, %d\n",
+	    x, y);
+    } else {
+      //DNOTE("Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y);
+    }
+    
+  }
+  
   XPutBackEvent(dpy, &ev);
-
+  
 }
 
 
@@ -240,13 +326,15 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   XWindowAttributes attrs;
   XWindowChanges win_changes;
   int x, y;
+  int n;
   XSizeHints *sizehints;
+  double refresh;
   // We don't want to have to replace the window manually when remapping it
   sizehints = XAllocSizeHints();
-  sizehints->flags = USPosition;
+  sizehints->flags = USPosition | PWinGravity;
   sizehints->x = 0; // obsolete but should be set in case
   sizehints->y = 0; // there is an old wm used
-  
+  sizehints->win_gravity = NorthWestGravity;
   save_normal_geometry(dpy, win);
   
   if(!has_ewmh_state_fullscreen) {
@@ -258,15 +346,14 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
-    XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     
     remove_motif_decorations(dpy, win);
     
     XSetWMNormalHints(dpy, win, sizehints);
     XFree(sizehints);
     if(wm_name != NULL && (strcmp(wm_name, "KWin") == 0) && kwin_bug) {
-      fprintf(stderr, "wm_state: Sleeping before map to avoid a kwin bug.\n");
-      sleep(1);
+      //seems to work, instead of using a sleep(1);
+      XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     }
     XMapWindow(dpy, win);
     
@@ -291,10 +378,13 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
 			   &win_changes.x, &win_changes.y);
     
     DpyInfoGetResolution(dpy, XScreenNumberOfScreen(attrs.screen),
-			 &win_changes.width, &win_changes.height);
+			 &win_changes.width, &win_changes.height, &refresh);
     
     win_changes.stack_mode = Above;
-    
+    DNOTE("Placing window at %d,%d with size %d,%d\n",
+	  win_changes.x, win_changes.y,
+	  win_changes.width, win_changes.height);
+
     XReconfigureWMWindow(dpy, win, 0, CWX | CWY |
 			 CWWidth | CWHeight |
 			 CWStackMode,
@@ -360,7 +450,6 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
       }
     }
     
-    
     // Wait for a configure notify
     do {
       XNextEvent(dpy, &ev);
@@ -370,50 +459,86 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     ret_ev = ev;
     
     calc_coords(dpy, win, &x, &y, &ev);
-    
-    while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
-      ret_ev = ev;
-      calc_coords(dpy, win, &x, &y, &ev);
-    }
-    
-    if(!has_ewmh_state_fullscreen) {
-      //DNOTE("no more configure notify\n");
-      
-      // ugly hack, but what can you do when the wm's not removing decorations
-      //  if we don't end up at (win_changes.x, win_changes.y)
-      //  try to compensate and move one more time
-      if(x != win_changes.x || y != win_changes.y) {
-	XWindowChanges win_compensate;
-	DNOTE("%s", "window is not at screen start trying to fix that\n");
-	
-	win_compensate.x = win_changes.x+win_changes.x-x;
-	win_compensate.y = win_changes.y+win_changes.y-y;
-	
-	XReconfigureWMWindow(dpy, win, 0, CWX | CWY,
-			     &win_compensate);
-	
-	do {
-	  XNextEvent(dpy, &ev);
-	} while(ev.type != ConfigureNotify);
-	
+
+    for(n = 0; n < 10; n++) {
+      while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
 	ret_ev = ev;
-	
 	calc_coords(dpy, win, &x, &y, &ev);
-	
-	while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
-	  ret_ev = ev;
-	  calc_coords(dpy, win, &x, &y, &ev);
-	}
-	
-	if(x != win_changes.x || y != win_changes.y) {
-	  DNOTE("Couldn't place window at %d,%d\n", win_changes.x, win_changes.y);
-	} else {
-	  //DNOTE("Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y);
-	}
-	
       }
+      if(abs(x-win_changes.x) < 100 &&
+	 abs(y-win_changes.y) < 100) {
+	break;
+      }
+      usleep(100000);
     }
-  
+    
+    //DNOTE("no more configure notify\n");
+    //try to move one more time, maybe we didn't get all configure events?
+    if(x != win_changes.x || y != win_changes.y) {
+      DNOTE("%s", "window is not at screen start. Trying to move again\n");
+      
+      XSync(dpy, True);
+      XReconfigureWMWindow(dpy, win, 0, CWX | CWY,
+			   &win_changes);
+
+      /*      
+      do {
+	XNextEvent(dpy, &ev);
+      } while(ev.type != ConfigureNotify);
+      
+      ret_ev = ev;
+      
+      calc_coords(dpy, win, &x, &y, &ev);
+      */
+      while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
+	ret_ev = ev;
+	calc_coords(dpy, win, &x, &y, &ev);
+      }
+    } 
+    // ugly hack, but what can you do when the wm's not removing decorations
+    //  if we don't end up at (win_changes.x, win_changes.y)
+    //  try to compensate and move one more time
+
+
+    if((x != win_changes.x || y != win_changes.y) &&
+       abs(x - win_changes.x) < 100 && abs(y - win_changes.y) < 100) {
+      XWindowChanges win_compensate;
+      win_compensate.x = win_changes.x+win_changes.x-x;
+      win_compensate.y = win_changes.y+win_changes.y-y;
+      DNOTE("%s", "window is not at screen start\n");
+      DNOTE("Compensating by moving to x: %d= %d+%d-%d, y: %d= %d+%d-%d\n",
+	    win_compensate.x, win_changes.x, win_changes.x, x,
+	    win_compensate.y, win_changes.y, win_changes.y, y);
+      
+      XSync(dpy, True);
+      XReconfigureWMWindow(dpy, win, 0, CWX | CWY,
+			   &win_compensate);
+      
+      do {
+	XNextEvent(dpy, &ev);
+      } while(ev.type != ConfigureNotify);
+      
+      ret_ev = ev;
+      
+      calc_coords(dpy, win, &x, &y, &ev);
+      
+      while(XCheckTypedEvent(dpy, ConfigureNotify, &ev) == True) {
+	ret_ev = ev;
+	calc_coords(dpy, win, &x, &y, &ev);
+      }
+      
+      if(x != win_changes.x || y != win_changes.y) {
+	DNOTE("Couldn't place window at %d,%d\n",
+	      win_changes.x, win_changes.y);
+	DNOTE("Window is at %d, %d\n",
+	      x, y);
+      } else {
+	//DNOTE("Fixed, window is now at %d,%d\n", win_changes.x, win_changes.y);
+      }
+      
+    }
+    
+    
     XPutBackEvent(dpy, &ret_ev);
   } else {
     // ewmh_state_fullscreen is supported
@@ -458,7 +583,6 @@ static void switch_to_normal_state(Display *dpy, Window win)
     do {
       XNextEvent(dpy, &ev);
     } while(ev.type != UnmapNotify);
-    XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     
     disable_motif_decorations(dpy, win);
     
@@ -466,8 +590,8 @@ static void switch_to_normal_state(Display *dpy, Window win)
     XFree(sizehints);
 
     if(wm_name != NULL && (strcmp(wm_name, "KWin") == 0) && kwin_bug) {
-      fprintf(stderr, "wm_state: Sleeping before map to avoid a kwin bug.\n");
-      sleep(1);
+      //seems to work, instead of using a sleep(1);
+      XReparentWindow( dpy, win, DefaultRootWindow( dpy ),  0, 0 );
     }
     
     XMapWindow(dpy, win);
@@ -1063,69 +1187,6 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     }
 
     EWMH_wm = check_for_EWMH_wm(dpy, &wm_name);
-/* Billy: This is my nasty ass hack.
-    if( wm_name && !strcmp( wm_name, "KWin" ) && !getenv( "TVTIME_USE_OGLE_KWIN_CODE" ) ) {
-        XEvent ev;
-        XSizeHints vo_hint;
-        XWindowAttributes attrs;
-        int x, y, w, h;
-        int screen_nr;
-        static int warned = 0;
-
-        if( !warned ) {
-            fprintf( stderr, "wm_state: WARNING, enabling EVIL HACK for kwin fullscreen mode.\n" );
-            fprintf( stderr, "wm_state: Report any bugs: http://tvtime.sourceforge.net/\n" );
-            warned = 1;
-        }
-
-        XGetWindowAttributes(dpy, win, &attrs);
-        screen_nr = XScreenNumberOfScreen(attrs.screen);
-
-        switch(state) {
-        case WINDOW_STATE_FULLSCREEN:
-            save_normal_geometry(dpy, win);
-            DpyInfoGetScreenOffset(dpy, screen_nr, &x, &y);
-            DpyInfoGetResolution(dpy, screen_nr, &w, &h);
-            current_state = WINDOW_STATE_FULLSCREEN;
-            break;
-        case WINDOW_STATE_NORMAL:
-            x = normal_state_geometry.x;
-            y = normal_state_geometry.y;
-            w = normal_state_geometry.width;
-            h = normal_state_geometry.height;
-            current_state = WINDOW_STATE_NORMAL;
-            break;
-        default:
-            ERROR("%s", "unknown window state\n");
-            break;
-        }
-
-        vo_hint.x = x;
-        vo_hint.y = y;
-        vo_hint.width = w;
-        vo_hint.height = h;
-        vo_hint.max_width = 0;
-        vo_hint.max_height = 0;
-        vo_hint.win_gravity = StaticGravity;
-        vo_hint.flags = PPosition | PSize | PWinGravity;
-        XSetWMNormalHints( dpy, win, &vo_hint );
-        XMoveResizeWindow( dpy, win, x, y, w, h );
-
-        ev.type = ClientMessage;
-        ev.xclient.window = win;
-        ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", True);
-        ev.xclient.format = 32;
-        if( state == WINDOW_STATE_FULLSCREEN ) {
-            ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD
-        } else {
-            ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE
-        }
-        ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_STAYS_ON_TOP", False);
-        ev.xclient.data.l[2] = 0;
-        XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureNotifyMask, &ev);
-        XFlush( dpy );
-    } else {
-*/
     if(EWMH_wm) {
       if(DpyInfoGetEWMHFullscreen()) {
 	has_ewmh_state_fullscreen = check_for_state_fullscreen(dpy);
@@ -1142,7 +1203,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     if(gnome_wm) {
       gnome_wm_layers = check_for_gnome_wm_layers(dpy);
     }
-
+    
     switch(state) {
     case WINDOW_STATE_FULLSCREEN:
       switch_to_fullscreen_state(dpy, win);
@@ -1154,9 +1215,6 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
       ERROR("%s", "unknown window state\n");
       break;
     }
-/*
-    }
-*/
     if(wm_name != NULL) {
       free(wm_name);
       wm_name = NULL;
