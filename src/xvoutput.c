@@ -3,11 +3,11 @@
 #include "config.h"
 #include "xvoutput.h"
 
+#ifdef HAVE_XV
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
-#include <assert.h>
 
 #if defined(__FreeBSD__)
 #include <machine/param.h>
@@ -346,6 +346,7 @@ void xv_poll_events( input_t *in )
     XEvent event;
     KeySym mykey;
     int arg = 0;
+    char mykey_string;
 
     while (XPending(display)) {
         XNextEvent(display, &event);
@@ -368,6 +369,17 @@ void xv_poll_events( input_t *in )
             if( event.xkey.state & ShiftMask ) arg |= I_SHIFT;
             if( event.xkey.state & ControlMask ) arg |= I_CTRL;
             if( event.xkey.state & Mod1Mask ) arg |= I_META;
+
+            if( mykey >= XK_a && mykey <= XK_z ) {
+                arg |= mykey - XK_a + 'a';
+            } else if( mykey >= XK_A && mykey <= XK_Z ) {
+                arg |= mykey - XK_A + 'a';
+            } else if( mykey >= XK_0 && mykey <= XK_9 ) {
+                arg |= mykey - XK_0 + '0';
+            } else {
+                XLookupString( &event.xkey, &mykey_string, 1, 0, 0 );
+                arg |= mykey_string;
+            }
 
             switch( mykey ) {
             case XK_Escape: arg |= I_ESCAPE; break;
@@ -410,7 +422,17 @@ void xv_poll_events( input_t *in )
             case XK_KP_Add: arg |= '+'; break;
             case XK_KP_Divide: arg |= '/'; break;
 
-            default: arg |= mykey - XK_a + 'a'; break;
+            case XK_KP_End: arg |= '1'; break;
+            case XK_KP_Down: arg |= '2'; break;
+            case XK_KP_Next: arg |= '3'; break;
+            case XK_KP_Left: arg |= '4'; break;
+            case XK_KP_Begin: arg |= '5'; break;
+            case XK_KP_Right: arg |= '6'; break;
+            case XK_KP_Home: arg |= '7'; break;
+            case XK_KP_Up: arg |= '8'; break;
+            case XK_KP_Prior: arg |= '9'; break;
+
+            default: break;
             }
             input_callback( in, I_KEYDOWN, arg );
         default: break;
@@ -482,4 +504,13 @@ output_api_t *get_xv_output( void )
 {
     return &xvoutput;
 }
+
+#else
+
+output_api_t *get_xv_output( void )
+{
+    return 0;
+}
+
+#endif
 
