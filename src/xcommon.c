@@ -117,7 +117,6 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
     * I will be doing some detection code, but in the mean time,
     * let's not use the hints.  -Billy
     */
-/*
     XSizeHints hints;
 
     hints.flags = PAspect;
@@ -127,7 +126,6 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
     hints.max_aspect.y = aspect_height;
 
     XSetWMNormalHints( dpy, win, &hints );
-*/
 }
 
 /**
