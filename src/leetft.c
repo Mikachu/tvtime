@@ -167,9 +167,10 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
         if (ft_cache_glyph (font, i, &glyph_bbox)) {
             if( glyph_bbox.yMin < bbox.yMin ) bbox.yMin = glyph_bbox.yMin;
             if( glyph_bbox.yMax > bbox.yMax ) bbox.yMax = glyph_bbox.yMax;
-            font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
         }
     }
+
+    font->max_height = font->fontsize - ((bbox.yMin + 32) >> 6);
 
     return font;
 }
