@@ -13,7 +13,9 @@ Setup
     Back
   Input configuration
     Device setup
+      Television standard
       Sharpness
+      Back
     Data services
     Restart with new settings
     Back
@@ -33,6 +35,7 @@ Setup
     Back
   Video processing
     Deinterlacer configuration
+    Current deinterlacer description
     Attempted framerate
       Full rate: %.2ffps
       Half rate, deinterlace top fields: %.2ffps
