@@ -77,9 +77,6 @@ static Cmd_Names cmd_table[] = {
     { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
     { "FINETUNE_UP", TVTIME_FINETUNE_UP },
 
-    { "FREQLIST_DOWN", TVTIME_FREQLIST_DOWN },
-    { "FREQLIST_UP", TVTIME_FREQLIST_UP },
-
     { "HUE_DOWN", TVTIME_HUE_DOWN },
     { "HUE_UP", TVTIME_HUE_UP },
 
@@ -589,10 +586,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 tvtime_osd_show_message( in->osd, message );
             }
         }
-        break;
-
-    case TVTIME_FREQLIST_DOWN:
-    case TVTIME_FREQLIST_UP:
         break;
 
     case TVTIME_AUTO_ADJUST_PICT:

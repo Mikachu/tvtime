@@ -516,8 +516,6 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'j' ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ 'l' ] = TVTIME_FINETUNE_UP;
-    ct->keymap[ '[' ] = TVTIME_FREQLIST_DOWN;
-    ct->keymap[ ']' ] = TVTIME_FREQLIST_UP;
     ct->keymap[ 'c' ] = TVTIME_TOGGLE_LUMA_CORRECTION;
     ct->keymap[ 'z' ] = TVTIME_LUMA_DOWN;
     ct->keymap[ 'x' ] = TVTIME_LUMA_UP;
