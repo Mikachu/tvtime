@@ -308,38 +308,40 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     if( value ) xmlFree( value );
 }
 
-static void parse_keys( config_t *ct, xmlNodePtr node )
+static void parse_bind( config_t *ct, xmlNodePtr node )
 {
-    xmlChar *buf;
-    int key;
+    xmlChar *command = xmlGetProp( node, BAD_CAST "command" );
 
-    while( node ) {
-        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
-            if( ( key = match_special_key( (const char *) buf ) ) ) {
-                ct->keymap[ key ] = tvtime_string_to_command( (const char *) node->name );
-            } else {
-                ct->keymap[ *buf ] = tvtime_string_to_command( (const char *) node->name );
-            }
-        }
-        node = node->next;
-    }
-}
+    if( command ) {
+        xmlNodePtr binding = node->xmlChildrenNode;
 
-static void parse_mouse( config_t *ct, xmlNodePtr node )
-{
-    xmlChar *buf;
-    int button;
-
-    while( node ) {
-        if( !xmlIsBlankNode( node ) && ((buf = xmlGetProp( node, BAD_CAST "value" ) ) != NULL) ) {
-            if( sscanf( (const char *) buf, "button_%d", &button ) ) {
-                if( (button > 0) && (button < MAX_BUTTONS) ) {
-                    ct->buttonmap[ button ] = tvtime_string_to_command( (const char *) node->name );
+        while( binding ) {
+            if( !xmlStrcasecmp( binding->name, BAD_CAST "keyboard" ) ) {
+                xmlChar *key = xmlGetProp( binding, BAD_CAST "key" );
+                if( key ) {
+                    int keycode = match_special_key( (const char *) key );
+                    if( !keycode ) {
+                        keycode = (*key);
+                    }
+                    ct->keymap[ keycode ] = tvtime_string_to_command( (const char *) command );
+                    xmlFree( key );
+                }
+            } else if( !xmlStrcasecmp( binding->name, BAD_CAST "mouse" ) ) {
+                xmlChar *button = xmlGetProp( binding, BAD_CAST "button" );
+                if( button ) {
+                    int id;
+                    if( sscanf( (const char *) button, "button_%d", &id ) ) {
+                        if( (id > 0) && (id < MAX_BUTTONS) ) {
+                            ct->buttonmap[ id ] = tvtime_string_to_command( (const char *) command );
+                        }
+                    }
+                    xmlFree( button );
                 }
             }
+            binding = binding->next;
         }
 
-        node = node->next;
+        xmlFree( command );
     }
 }
 
@@ -372,10 +374,8 @@ static int conf_xml_parse( config_t *ct, char *configFile )
         if( !xmlIsBlankNode( node ) ) {
             if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
                 parse_option( ct, node );
-            } else if( !xmlStrcasecmp( node->name, BAD_CAST "keybindings" ) ) {
-                parse_keys( ct, node->xmlChildrenNode );
-            } else if( !xmlStrcasecmp( node->name, BAD_CAST "mousebindings" ) ) {
-                parse_mouse(ct, node->xmlChildrenNode);
+            } else if( !xmlStrcasecmp( node->name, BAD_CAST "bind" ) ) {
+                parse_bind( ct, node );
             }
         }
         node = node->next;
