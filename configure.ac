@@ -35,18 +35,6 @@ AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday
 # Check for gettext
 AM_GNU_GETTEXT
 
-# Let's set the group of the $(localstatedir)/run/tvtime directory
-# On most GNU/Linux systems, this should be `video', but most GNU/Linux
-# systems only have `users'.  We'll default to `users'.
-AC_ARG_WITH([fifogroup], 
-            AC_HELP_STRING([--with-fifogroup=GROUP],
-                           [group that can create FIFOs (default is users)]),
-            [ac_cv_use_fifogroup=$withval], [ac_cv_use_fifogroup=users])
-AC_CACHE_CHECK([which group can create FIFOs],
-               [ac_cv_use_fifogroup], [ac_cv_use_fifogroup=users])
-PKGRUNDIRGROUP=$ac_cv_use_fifogroup
-AC_SUBST(PKGRUNDIRGROUP)
-
 dnl ---------------------------------------------
 dnl libsdl - Currently disabled
 dnl ---------------------------------------------

@@ -131,7 +131,7 @@ const char *get_tvtime_fifodir( uid_t uid )
         }
 
         /* First try the FIFODIR. */
-        if( asprintf( &fifodir, "%s/TV-%s", FIFODIR, user ) < 0 ) {
+        if( asprintf( &fifodir, "%s/.TV-%s", FIFODIR, user ) < 0 ) {
             free( user );
             fprintf( stderr, "utils: Out of memory.\n" );
             return 0;

@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Changed fifodir to /tmp.  This is both easier for packaging,
+      and more FHS-correct.
   * vektor: Added logic to decode channel names from tv_grab_na.
   * vektor: Fixed the screenshot command to be more flexible with
       where it takes arguments from, should work for keybindings now.

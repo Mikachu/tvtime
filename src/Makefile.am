@@ -18,10 +18,7 @@
 SUBDIRS = wine
 
 pkgsysconfdir = $(sysconfdir)/@PACKAGE@
-
-rundir = $(localstatedir)/run
-pkgrundir = $(rundir)/@PACKAGE@
-
+tmpdir = /tmp
 localedir = $(datadir)/locale
 
 TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
@@ -42,23 +39,24 @@ DIRECTFB_LIBS =
 endif
 
 OPT_CFLAGS = -Wall -I. -pedantic -DDATADIR="\"$(pkgdatadir)\"" \
-	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(pkgrundir)\"" \
+	-DCONFDIR="\"$(pkgsysconfdir)\"" -DFIFODIR="\"$(tmpdir)\"" \
 	-D_LARGEFILE64_SOURCE -DLOCALEDIR="\"$(localedir)\""
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
-	deinterlace.c videocorrection.c videotools.c attributes.h deinterlace.h \
-	leetft.h input.h mixer.h mm_accel.h mmx.h osdtools.h pnginput.h \
-	pngoutput.h rtctimer.h speedy.h taglines.h tvtimeconf.h tvtimeosd.h \
-	videocorrection.h videoinput.h videotools.h performance.h performance.c \
-	vbidata.h vbidata.c credits.c credits.h console.h console.c speedtools.h \
-	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
-	videofilter.c station.h station.c bands.h vsync.h vsync.c dscalerplugin.h \
-	dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h utils.h \
-	utils.c diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c \
-	pulldown.h pulldown.c hashtable.h hashtable.c cpuinfo.h cpuinfo.c \
-	videodev.h videodev2.h menu.c menu.h outputfilter.h outputfilter.c \
-	dfbmatroxtv.c xmltv.h xmltv.c gettext.h tvtimeglyphs.h
+	deinterlace.c videocorrection.c videotools.c attributes.h \
+	deinterlace.h leetft.h input.h mixer.h mm_accel.h mmx.h osdtools.h \
+	pnginput.h pngoutput.h rtctimer.h speedy.h taglines.h tvtimeconf.h \
+	tvtimeosd.h videocorrection.h videoinput.h videotools.h performance.h \
+	performance.c vbidata.h vbidata.c credits.c credits.h console.h \
+	console.c speedtools.h vbiscreen.h vbiscreen.c fifo.h fifo.c \
+	commands.h commands.c videofilter.h videofilter.c station.h station.c \
+	bands.h vsync.h vsync.c dscalerplugin.h dscalerplugin.c \
+	DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h utils.h utils.c diffcomp.h \
+	diffcomp.c rvrreader.h rvrreader.c ree.h ree.c pulldown.h pulldown.c \
+	hashtable.h hashtable.c cpuinfo.h cpuinfo.c videodev.h videodev2.h \
+	menu.c menu.h outputfilter.h outputfilter.c dfbmatroxtv.c xmltv.h \
+	xmltv.c gettext.h tvtimeglyphs.h
 
 OUTPUT_SRCS = xfullscreen.h xfullscreen.c outputapi.h xvoutput.h xvoutput.c \
 	dfboutput.h dfboutput.c mgaoutput.h mgaoutput.c mga_vid.h \
@@ -73,16 +71,21 @@ tvtime_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
 tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
-tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
+	$(DYNAMIC_LD_LIBS) -lm
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la \
+	-lpthread
 
-tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c tvtime-command.c
+tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
+	tvtime-command.c
 tvtime_command_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_command_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c tvtime-configure.c
+tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
+	tvtime-configure.c
 tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.h tvtimeconf.c station.c tvtime-scanner.c
+tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.h tvtimeconf.c \
+	station.c tvtime-scanner.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 
@@ -92,11 +95,14 @@ timingtest_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
 timingtest_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
-	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
-timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
+	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) \
+	$(DYNAMIC_LD_LIBS) -lm
+timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la \
+	wine/libwine.la -lpthread
 
 rvr_SOURCES = reepktq.h reepktq.c rtctimer.h rtctimer.c utils.h utils.c \
-	videoinput.h videoinput.c tvtimeconf.h tvtimeconf.c rvrmain.c diffcomp.h diffcomp.c
+	videoinput.h videoinput.c tvtimeconf.h tvtimeconf.c rvrmain.c \
+	diffcomp.h diffcomp.c
 rvr_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 rvr_LDADD = $(ZLIB_LIBS) $(XML2_LIBS) -lpthread
 
@@ -108,36 +114,4 @@ external_dependencies = ../plugins/libtvtimeplugins.la wine/libwine.la
 .PHONY: $(external_dependencies)
 $(external_dependencies):
 	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
-
-# Hook into the installation and uninstallation to create the required
-# FIFO directories.
-.PHONY: install-exec-hook uninstall-hook
-install-exec-hook:
-	-$(INSTALL) -d -m 'ug=rwx,o=rxt' '$(DESTDIR)$(pkgrundir)'            \
-	   || touch nofifodir
-	@if [ -f nofifodir ]; then (                                         \
-	  echo 'Warning: I could not create the directory'                   \
-	       '`$(DESTDIR)$(pkgrundir)'"'"                                 ;\
-	  echo '         You do not have permission to create the'           \
-	       'directory.  See the'                                        ;\
-          echo '         `Quirks when Compiling tvtime'"' section of the"    \
-	       '`INSTALL'"' file."); fi
-	-if [ -f nofifodir ]; then                                           \
-	   rm -f nofifodir;                                                  \
-	 else                                                                \
-	   $(INSTALL) -d -m 'ug=rwx,o=rxt' -g '@PKGRUNDIRGROUP@'             \
-	     '$(DESTDIR)$(pkgrundir)' || touch nofifodir;                    \
-	 fi
-	@if [ -f nofifodir ]; then rm -f nofifodir; (                        \
-	  echo 'Warning: I could not create the directory'                   \
-	       '`$(DESTDIR)$(pkgrundir)'"'"                                 ;\
-	  echo '         with group owner `@PKGRUNDIRGROUP@'"'."            ;\
-          echo '         You are not a member of the `@PKGRUNDIRGROUP@'"'"   \
-	       'group.  See the'                                            ;\
-          echo '         `Quirks when Compiling tvtime'"' section of the"    \
-	       '`INSTALL'"' file."); fi
-
-uninstall-hook:
-	-rm -rf '$(DESTDIR)$(pkgrundir)'
-	-rmdir -p '$(DESTDIR)$(rundir)'
 
