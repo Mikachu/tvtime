@@ -1,3 +1,20 @@
+tvtime (0.9.6-3) unstable; urgency=low
+
+  * Added debian/examples : docs/default.tvtimerc file.
+  * Added debian/undocumented for missing tvtime manpage.
+
+ -- Nicolas Boos <nicolaxx@free.fr>  Thu, 26 Dec 2002 20:04:12 +0100
+
+tvtime (0.9.6-2) unstable; urgency=low
+
+  * debian/control :
+     - Added zlib1g-dev, libpng-dev, libfreetype6-dev and
+       xlibs-dev to B-D.
+  * debian/docs :
+     - Added BUGS and AUTHORS files.
+
+ -- Nicolas Boos <nicolaxx@free.fr>  Tue, 24 Dec 2002 15:15:31 +0100
+
 tvtime (0.9.6-1) unstable; urgency=low
 
   * New Upstream Release 

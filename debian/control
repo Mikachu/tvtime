@@ -2,7 +2,7 @@ Source: tvtime
 Section: x11
 Priority: optional
 Maintainer: Bart Dorsey <echo@thebucket.org>
-Build-Depends: debhelper (>> 3.0.0)
+Build-Depends: debhelper (>> 3.0.0), zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev
 Standards-Version: 3.5.2
 
 Package: tvtime
