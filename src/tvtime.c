@@ -1165,7 +1165,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int scanning = 0;
     int numscanned = 0;
     int framerate_mode = -1;
-    int preset_mode = -1;
     char kbd_cmd[ 1024 ];
     int kbd_pos = 0;
     int kbd_available;
@@ -1706,59 +1705,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             exposed = 1;
         }
         paused = commands_pause( commands );
-        if( commands_toggle_mode( commands ) && config_get_num_modes( ct ) ) {
-            config_t *cur;
-            preset_mode = (preset_mode + 1) % config_get_num_modes( ct );
-            cur = config_get_mode_info( ct, preset_mode );
-            if( cur ) {
-                if( !output->is_interlaced() ) {
-                    int firstmethod = curmethodid;
-                    while( strcasecmp( config_get_deinterlace_method( cur ),
-                                       curmethod->short_name ) ) {
-                        curmethodid = (curmethodid + 1) %
-                            get_num_deinterlace_methods();
-                        curmethod = get_deinterlace_method( curmethodid );
-                        tvtime_set_deinterlacer( tvtime, curmethod );
-                        if( curmethodid == firstmethod )
-                            break;
-                    }
-                    if( osd ) {
-                        tvtime_osd_set_deinterlace_method
-                            ( osd, curmethod->name );
-                    }
-                }
-
-                if( config_get_fullscreen( cur )
-                    && !output->is_fullscreen() ) {
-                    output->toggle_fullscreen( 0, 0 );
-                    build_output_menu( commands_get_menu( commands, "output" ),
-                                       sixteennine,
-                                       output->is_fullscreen(),
-                                       output->is_alwaysontop(),
-                                       output->is_fullscreen_supported(),
-                                       output->is_alwaysontop_supported(),
-                                       output->is_overscan_supported() );
-                } else {
-                    if( config_get_outputheight( cur ) < 0 ) {
-                        output->resize_window_fullscreen();
-                    } else {
-                        output->set_window_height
-                            ( config_get_outputheight( cur ) );
-                        if( config_get_useposition( cur ) ) {
-                            output->set_window_position
-                                ( config_get_output_x( cur ),
-                                  config_get_output_y( cur ) );
-                        }
-                    }
-                }
-                if( framerate_mode != config_get_framerate_mode( cur ) ) {
-                    commands_set_framerate( commands,
-                                            config_get_framerate_mode( cur ) );
-                } else if( osd ) {
-                    tvtime_osd_show_info( osd );
-                }
-            }
-        }
         if( framerate_mode < 0
             || framerate_mode != commands_get_framerate( commands ) ) {
             int showlist = !(framerate_mode < 0 ) &&

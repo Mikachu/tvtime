@@ -194,9 +194,6 @@ int config_get_mirror( config_t *ct );
 int config_get_audio_boost( config_t *ct );
 int config_get_pal_audio_mode( config_t *ct );
 
-int config_get_num_modes( config_t *ct );
-config_t *config_get_mode_info( config_t *ct, int mode );
-
 #ifdef __cplusplus
 };
 #endif

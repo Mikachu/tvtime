@@ -71,7 +71,6 @@ int commands_toggle_fullscreen( commands_t *cmd );
 int commands_toggle_aspect( commands_t *cmd );
 int commands_toggle_deinterlacer( commands_t *cmd );
 int commands_toggle_pulldown_detection( commands_t *cmd );
-int commands_toggle_mode( commands_t *cmd );
 int commands_toggle_matte( commands_t *cmd );
 int commands_toggle_alwaysontop( commands_t *cmd );
 int commands_show_bars( commands_t *cmd );

@@ -316,37 +316,6 @@
 
 
   <!--
-    Preset "modes" may be defined for convenience.  By default, tvtime 
-    ships with three useful modes: LargeWindow, SmallWindow and
-    FullscreenWindow.
-  -->
-
-  <mode name="LargeWindow">
-    <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
-    <option name="FramerateMode" value="0"/>
-    <option name="OutputHeight" value="576"/>
-    <option name="UseWindowPosition" value="1"/>
-    <option name="WindowX" value="320"/>
-    <option name="WindowY" value="240"/>
-  </mode>
-
-  <mode name="SmallWindow">
-    <option name="DeinterlaceMethod" value="TelevisionHalf"/>
-    <option name="FramerateMode" value="1"/>
-    <option name="OutputHeight" value="288"/>
-    <option name="UseWindowPosition" value="1"/>
-    <option name="WindowX" value="320"/>
-    <option name="WindowY" value="240"/>
-  </mode>
-
-  <mode name="FullscreenWindow">
-    <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
-    <option name="FramerateMode" value="0"/>
-    <option name="OutputHeight" value="Full"/>
-  </mode>
-
-
-  <!--
     The rest of the configuration file defines how the input to
     tvtime is mapped to tvtime commands.  Each command can be bound
     to multiple keys and mouse buttons.  Up to nine mouse buttons
@@ -560,7 +529,6 @@
 
   <bind command="auto_adjust_window">  <keyboard key="/"/>    </bind>
   <bind command="toggle_bars">         <keyboard key="b"/>    </bind>
-  <bind command="toggle_mode">         <keyboard key="*"/>    </bind>
   <bind command="toggle_pause">        <keyboard key="end"/>  </bind>
   <bind command="toggle_console">      <keyboard key="`"/>    </bind>
   <bind command="scroll_console_up">   <keyboard key="pgup"/> </bind>

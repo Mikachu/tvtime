@@ -33,8 +33,7 @@ The
 .I tvtime.xml
 file is the main configuration file for
 .BR tvtime .
-It contains all of the default settings, key bindings, and preset mode
-definitions.  The
+It contains all of the default settings and key bindings.  The
 .I tvtime.xml
 file is updated by
 .B tvtime
@@ -65,7 +64,7 @@ http://tvtime.sourceforge.net/DTD/
 
 .B tvtime
 supports a multitude of options.  The <option> tag should be contained
-within a <tvtime> tag, or within a <mode> tag.
+within a <tvtime> tag.
 
 The following is a list of options and their default values, along with
 a description of what the option does.
@@ -443,29 +442,6 @@ Progressive: Top Field First
 Progressive: Bottom Field First
 .PD
 .RE
-
-.SH MODES
-
-Modes are used to define a certain group of presets and exist within
-the <tvtime> tag.  Just like the global <tvtime> tag, a <mode> can
-contain any number of <option> tags.
-
-Preset \(lqmodes\(rq may be defined for convenience.  By default,
-.B tvtime
-ships with two useful modes:
-.I LargeWindow
-and
-.IR SmallWindow .
-
-    <mode name="LargeWindow">
-      <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
-    </mode>
-
-    <mode name="SmallWindow">
-      <option name="DeinterlaceMethod" value="TelevisionHalf"/>
-      <option name="FramerateMode" value="1"/>
-      <option name="OutputHeight" value="288"/>
-    </mode>
 
 .SH BINDINGS
 

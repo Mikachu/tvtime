@@ -49,9 +49,6 @@
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
 
-/* Mode list. */
-typedef struct tvtime_modelist_s tvtime_modelist_t;
-
 struct config_s
 {
     int outputheight;
@@ -123,50 +120,7 @@ struct config_s
 
     char *config_filename;
     xmlDocPtr doc;
-
-    int nummodes;
-    tvtime_modelist_t *modelist;
 };
-
-/* Mode list. */
-struct tvtime_modelist_s
-{
-    config_t settings;
-    char *name;
-    tvtime_modelist_t *next;
-};
-
-static void copy_config( config_t *dest, config_t *src )
-{
-    (*dest) = (*src);
-
-    /* Some of these I am keeping invalid for now. */
-    dest->v4ldev = 0;
-    dest->vbidev = 0;
-    dest->rvr_filename = 0;
-    dest->mpeg_filename = 0;
-    dest->mixerdev = 0;
-    dest->config_filename = 0;
-    dest->modelist = 0;
-    dest->nummodes = 0;
-    dest->doc = 0;
-    dest->audiomode = 0;
-    dest->xmltvfile = 0;
-    dest->xmltvlanguage = 0;
-    dest->dkmode = 0;
-
-    /* Useful strings must be copied. */
-    dest->norm = strdup( src->norm );
-    dest->freq = strdup( src->freq );
-    dest->ssdir = strdup( src->ssdir );
-    dest->timeformat = strdup( src->timeformat );
-    dest->deinterlace_method = strdup( src->timeformat );
-
-    memset( dest->keymap_arg, 0, sizeof( dest->keymap_arg ) );
-    memset( dest->keymapmenu_arg, 0, sizeof( dest->keymapmenu_arg ) );
-    memset( dest->buttonmap_arg, 0, sizeof( dest->buttonmap_arg ) );
-    memset( dest->buttonmapmenu_arg, 0, sizeof( dest->buttonmapmenu_arg ) );
-}
 
 static unsigned int parse_colour( const char *str )
 {
@@ -493,36 +447,6 @@ static void parse_bind( config_t *ct, xmlNodePtr node )
     if( arg ) xmlFree( arg );
 }
 
-static void parse_mode( config_t *ct, xmlNodePtr node )
-{
-    xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
-
-    if( name ) {
-        tvtime_modelist_t *mode = malloc( sizeof( tvtime_modelist_t ) );
-        if( mode ) {
-
-            /* Start with the default settings from the config file. */
-            copy_config( &(mode->settings), ct );
-
-            node = node->xmlChildrenNode;
-            while( node ) {
-                if( !xmlIsBlankNode( node ) ) {
-                    if( !xmlStrcasecmp( node->name, BAD_CAST "option" ) ) {
-                        parse_option( &(mode->settings), node );
-                    }
-                }
-                node = node->next;
-            }
-
-            mode->name = strdup( (char *) name );
-            mode->next = ct->modelist;
-            ct->modelist = mode;
-            ct->nummodes++;
-        }
-        xmlFree( name );
-    }
-}
-
 static int conf_xml_parse( config_t *ct, char *configFile )
 {
     xmlDocPtr doc;
@@ -558,8 +482,6 @@ static int conf_xml_parse( config_t *ct, char *configFile )
                 parse_option( ct, node );
             } else if( !xmlStrcasecmp( node->name, BAD_CAST "bind" ) ) {
                 parse_bind( ct, node );
-            } else if( !xmlStrcasecmp( node->name, BAD_CAST "mode" ) ) {
-                parse_mode( ct, node );
             }
         }
         node = node->next;
@@ -850,9 +772,6 @@ config_t *config_new( void )
 
     ct->config_filename = 0;
     ct->doc = 0;
-
-    ct->nummodes = 0;
-    ct->modelist = 0;
 
     /* Default key bindings. */
     ct->keymap[ 0 ] = TVTIME_NOCOMMAND;
@@ -1359,14 +1278,6 @@ void config_delete( config_t *ct )
 {
     int i;
 
-    while( ct->modelist ) {
-        tvtime_modelist_t *mode = ct->modelist;
-        ct->modelist = mode->next;
-        config_free_data( &(mode->settings) );
-        free( mode->name );
-        free( mode );
-    }
-
     for( i = 0; i < 8 * MAX_KEYSYMS; i++ ) {
         if( ct->keymap_arg[ i ] ) free( ct->keymap_arg[ i ] );
         if( ct->keymapmenu_arg[ i ] ) free( ct->keymapmenu_arg[ i ] );
@@ -1519,28 +1430,6 @@ const char *config_button_to_menu_command_argument( config_t *ct, int button )
             return ct->buttonmap_arg[ button ];
         }
     }
-}
-
-int config_get_num_modes( config_t *ct )
-{
-    return ct->nummodes;
-}
-
-config_t *config_get_mode_info( config_t *ct, int mode )
-{
-    tvtime_modelist_t *cur = ct->modelist;
-
-    if( !cur ) {
-        /* No modes. */
-        return 0;
-    }
-
-    while( mode && cur->next ) {
-        cur = cur->next;
-        mode--;
-    }
-
-    return &(cur->settings);
 }
 
 int config_get_verbose( config_t *ct )

@@ -128,7 +128,6 @@ struct commands_s {
     int togglealwaysontop;
     int toggledeinterlacer;
     int togglepulldowndetection;
-    int togglemode;
     int togglematte;
     int framerate;
     int scan_channels;
@@ -999,7 +998,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->togglealwaysontop = 0;
     cmd->toggledeinterlacer = 0;
     cmd->togglepulldowndetection = 0;
-    cmd->togglemode = 0;
     cmd->togglematte = 0;
     cmd->framerate = FRAMERATE_FULL;
     cmd->scan_channels = 0;
@@ -3143,10 +3141,6 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_MATTE:
         cmd->togglematte = 1;
         break;
-
-    case TVTIME_TOGGLE_MODE:
-        cmd->togglemode = 1;
-        break;
     }
 }
 
@@ -3237,7 +3231,6 @@ void commands_next_frame( commands_t *cmd )
     cmd->togglealwaysontop = 0;
     cmd->toggledeinterlacer = 0;
     cmd->togglepulldowndetection = 0;
-    cmd->togglemode = 0;
     cmd->togglematte = 0;
     cmd->update_luma = 0;
     cmd->resizewindow = 0;
@@ -3300,11 +3293,6 @@ int commands_toggle_deinterlacer( commands_t *cmd )
 int commands_toggle_pulldown_detection( commands_t *cmd )
 {
     return cmd->togglepulldowndetection;
-}
-
-int commands_toggle_mode( commands_t *cmd )
-{
-    return cmd->togglemode;
 }
 
 int commands_toggle_matte( commands_t *cmd )
