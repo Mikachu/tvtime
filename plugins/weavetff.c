@@ -1,5 +1,6 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Weave frames, top-field-first.
+ * Copyright (C) 2003 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,33 +26,37 @@
 #include "speedy.h"
 #include "deinterlace.h"
 
-static void deinterlace_scanline_linear( uint8_t *output,
-                                         deinterlace_scanline_data_t *data,
-                                         int width )
+static void deinterlace_scanline_weave( uint8_t *output,
+                                        deinterlace_scanline_data_t *data,
+                                        int width )
 {
-    interpolate_packed422_scanline( output, data->t0, data->b0, width );
+    blit_packed422_scanline( output, data->m1, width );
 }
 
 static void copy_scanline( uint8_t *output,
                            deinterlace_scanline_data_t *data,
                            int width )
 {
-    blit_packed422_scanline( output, data->m0, width );
+    if( data->bottom_field ) {
+        blit_packed422_scanline( output, data->m0, width );
+    } else {
+        blit_packed422_scanline( output, data->m2, width );
+    }
 }
 
 
-static deinterlace_method_t linearmethod =
+static deinterlace_method_t weavemethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Television: Full resolution",
-    "TelevisionFull",
-    1,
+    "Progressive: Top Field First",
+    "ProgressiveTFF",
+    3,
     0,
     0,
     0,
     0,
     1,
-    deinterlace_scanline_linear,
+    deinterlace_scanline_weave,
     copy_scanline,
     0
 };
@@ -59,9 +64,9 @@ static deinterlace_method_t linearmethod =
 #ifdef BUILD_TVTIME_PLUGINS
 void deinterlace_plugin_init( void )
 #else
-void linear_plugin_init( void )
+void weavetff_plugin_init( void )
 #endif
 {
-    register_deinterlace_method( &linearmethod );
+    register_deinterlace_method( &weavemethod );
 }
 

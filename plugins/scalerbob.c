@@ -25,8 +25,8 @@
 static deinterlace_method_t scalerbobmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "Overlay Bob",
-    "OverlayBob",
+    "Television: Half Resolution",
+    "TelevisionHalf",
     1,
     0,
     1,

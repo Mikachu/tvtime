@@ -117,6 +117,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_CONSOLE", TVTIME_TOGGLE_CONSOLE },
     /* { "TOGGLE_CREDITS", TVTIME_TOGGLE_CREDITS }, Disabled for 0.9.8 */
     { "TOGGLE_DEINTERLACER", TVTIME_TOGGLE_DEINTERLACER },
+    { "TOGGLE_DEINTERLACER_MODE", TVTIME_TOGGLE_DEINTERLACER_MODE },
     { "TOGGLE_FULLSCREEN", TVTIME_TOGGLE_FULLSCREEN },
     { "TOGGLE_FRAMERATE", TVTIME_TOGGLE_FRAMERATE },
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
@@ -188,7 +189,8 @@ struct commands_s {
     int showbars;
     int togglefullscreen;
     int toggleaspect;
-    int toggledeinterlacingmode;
+    int toggledeinterlacer;
+    int toggledeinterlacermode;
     int togglepulldowndetection;
     int togglemode;
     int framerate;
@@ -294,7 +296,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
-    in->toggledeinterlacingmode = 0;
+    in->toggledeinterlacer = 0;
+    in->toggledeinterlacermode = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
     in->framerate = FRAMERATE_FULL;
@@ -532,7 +535,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_DEINTERLACER:
-        in->toggledeinterlacingmode = 1;
+        in->toggledeinterlacer = 1;
+        break;
+
+    case TVTIME_TOGGLE_DEINTERLACER_MODE:
+        in->toggledeinterlacermode = 1;
         break;
 
     case TVTIME_TOGGLE_PULLDOWN_DETECTION:
@@ -965,7 +972,8 @@ void commands_next_frame( commands_t *in )
     in->screenshot = 0;
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
-    in->toggledeinterlacingmode = 0;
+    in->toggledeinterlacer = 0;
+    in->toggledeinterlacermode = 0;
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
     in->update_luma = 0;
@@ -1007,9 +1015,14 @@ int commands_toggle_aspect( commands_t *in )
     return in->toggleaspect;
 }
 
-int commands_toggle_deinterlacing_mode( commands_t *in )
+int commands_toggle_deinterlacer( commands_t *in )
 {
-    return in->toggledeinterlacingmode;
+    return in->toggledeinterlacer;
+}
+
+int commands_toggle_deinterlacer_mode( commands_t *in )
+{
+    return in->toggledeinterlacermode;
 }
 
 int commands_toggle_pulldown_detection( commands_t *in )

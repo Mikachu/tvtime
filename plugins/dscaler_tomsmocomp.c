@@ -117,8 +117,8 @@ static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
 static deinterlace_method_t tomsmocompmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "DScaler: TomsMoComp",
-    "TomsMoComp",
+    "Motion Adaptive: Motion Search",
+    "AdaptiveSearch",
     4,
     MM_ACCEL_X86_MMXEXT,
     0,

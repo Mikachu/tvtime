@@ -341,51 +341,36 @@ This setting is saved at runtime to remember the current channel.
 This setting is saved at runtime to remember the previous channel.
 
 .TP
-<option name="DeinterlaceMethod" value="GreedyH"/>
+<option name="DeinterlaceMethod" value="AdaptiveStatic"/>
 This setting is saved at runtime to remember the deinterlacer used.
 
 Supported deinterlacers are:
 .RS
 .TP 15
 .PD 0
-.I LineDoubler
-Line Doubler
+.I TelevisionFull
+Television: Full Resolution
 .TP
-.I Greedy
-Dscaler: Greedy \[em] Low Motion
+.I TelevisionHalf
+Television: Half Resolution
 .TP
-.I Greedy2Frame
-DScaler: Greedy \[em] 2-frame
+.I BlurVertical
+Blur: Vertical
 .TP
-.I GreedyH
-DScaler: Greedy \[em] High Motion
+.I BlurTemporal
+Blur: Temporal
 .TP
-.I TomsMoComp
-DScaler: TomsMoComp
+.I AdaptiveSearch
+Motion Adaptive: Motion Search
 .TP
-.I TwoFrame
-DScaler: TwoFrame
+.I AdaptiveStatic
+Motion Adaptive: Static Detection
 .TP
-.I VideoBob
-DScaler: Video Bob
+.I ProgressiveTFF
+Progressive: Top Field First
 .TP
-.I VideoWeave
-DScaler: Video Weave
-.TP
-.I Linear
-Linear Interpolation
-.TP
-.I LinearBlend
-mplayer: Linear Blend
-.TP
-.I OverlayBob
-Overlay Bob
-.TP
-.I Vertical
-ffmpeg: Vertical Deinterlace Filter
-.TP
-.I Weave
-Weave Last Field
+.I ProgressiveBFF
+Progressive: Bottom Field First
 .PD
 .RE
 
@@ -403,11 +388,11 @@ and
 .IR SmallWindow .
 
     <mode name="LargeWindow">
-      <option name="DeinterlaceMethod" value="GreedyH"/>
+      <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
     </mode>
 
     <mode name="SmallWindow">
-      <option name="DeinterlaceMethod" value="OverlayBob"/>
+      <option name="DeinterlaceMethod" value="TelevisionHalf"/>
       <option name="FramerateMode" value="1"/>
       <option name="OutputHeight" value="288"/>
     </mode>

@@ -32,6 +32,8 @@ void greedy2frame_plugin_init( void );
 void twoframe_plugin_init( void );
 void linear_plugin_init( void );
 void weave_plugin_init( void );
+void weavetff_plugin_init( void );
+void weavebff_plugin_init( void );
 void videobob_plugin_init( void );
 void double_plugin_init( void );
 void linearblend_plugin_init( void );

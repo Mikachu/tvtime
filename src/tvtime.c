@@ -896,24 +896,17 @@ int main( int argc, char **argv )
     setup_speedy_calls( mm_accel(), verbose );
 
     if( !output->is_interlaced() ) {
-        dscaler_greedyh_plugin_init();
-        greedy_plugin_init();
+        linear_plugin_init();
+        scalerbob_plugin_init();
 
         linearblend_plugin_init();
-
-        dscaler_greedy2frame_plugin_init();
-        dscaler_twoframe_plugin_init();
-
-        dscaler_videobob_plugin_init();
-        dscaler_videoweave_plugin_init();
-        dscaler_tomsmocomp_plugin_init();
-
-        linear_plugin_init();
-        weave_plugin_init();
-        double_plugin_init();
         vfir_plugin_init();
 
-        scalerbob_plugin_init();
+        dscaler_tomsmocomp_plugin_init();
+        dscaler_greedyh_plugin_init();
+
+        weavetff_plugin_init();
+        weavebff_plugin_init();
     }
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
@@ -1399,8 +1392,12 @@ int main( int argc, char **argv )
                 }
             }
         }
-        if( !output->is_interlaced() && commands_toggle_deinterlacing_mode( commands ) ) {
-            curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+        if( !output->is_interlaced() && (commands_toggle_deinterlacer( commands ) || commands_toggle_deinterlacer_mode( commands ) ) ) {
+            if( commands_toggle_deinterlacer( commands ) ) {
+                curmethodid = (curmethodid + 2) % get_num_deinterlace_methods();
+            } else {
+                curmethodid = (curmethodid & ~1) + (((curmethodid & 1) + 1) % 2);
+            }
             curmethod = get_deinterlace_method( curmethodid );
             if( osd ) {
                 tvtime_osd_set_deinterlace_method( osd, curmethod->name );

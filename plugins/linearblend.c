@@ -171,8 +171,8 @@ static void deinterlace_scanline_linear_blend2( uint8_t *output,
 static deinterlace_method_t linearblendmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "mplayer: Linear Blend",
-    "LinearBlend",
+    "Blur: Temporal",
+    "BlurTemporal",
     2,
 #ifdef ARCH_X86
     MM_ACCEL_X86_MMX,

@@ -229,21 +229,16 @@
 
     Supported deinterlacers are:
 
-    LineDoubler    Line Doubler
-    Greedy         Dscaler: Greedy - Low Motion
-    Greedy2Frame   DScaler: Greedy - 2-frame
-    GreedyH        DScaler: Greedy - High Motion
-    TomsMoComp     DScaler: TomsMoComp
-    TwoFrame       DScaler: TwoFrame
-    VideoBob       DScaler: Video Bob
-    VideoWeave     DScaler: Video Weave
-    Linear         Linear Interpolation
-    LinearBlend    mplayer: Linear Blend
-    OverlayBob     Overlay Bob
-    Vertical       ffmpeg: Vertical Deinterlace Filter
-    Weave          Weave Last Field
+    TelevisionFull  Television: Full Resolution
+    TelevisionHalf  Television: Half Resolution
+    BlurVertical    Blur: Vertical
+    BlurTemporal    Blur: Temporal
+    AdaptiveSearch  Motion Adaptive: Motion Search
+    AdaptiveStatic  Motion Adaptive: Static Detection
+    ProgressiveTFF  Progressive: Top Field First
+    ProgressiveBFF  Progressive: Bottom Field First
   -->
-  <option name="DeinterlaceMethod" value="GreedyH"/>
+  <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
 
   <!--
     This option selects which output driver will be used.  tvtime
@@ -264,11 +259,11 @@
   -->
 
   <mode name="LargeWindow">
-    <option name="DeinterlaceMethod" value="GreedyH"/>
+    <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
   </mode>
 
   <mode name="SmallWindow">
-    <option name="DeinterlaceMethod" value="OverlayBob"/>
+    <option name="DeinterlaceMethod" value="TelevisionHalf"/>
     <option name="FramerateMode" value="1"/>
     <option name="OutputHeight" value="288"/>
   </mode>
@@ -449,6 +444,10 @@
 
   <bind command="toggle_deinterlacer">
     <keyboard key="t"/>
+  </bind>
+
+  <bind command="toggle_deinterlacer_mode">
+    <keyboard key="y"/>
   </bind>
 
   <bind command="toggle_pulldown_detection">

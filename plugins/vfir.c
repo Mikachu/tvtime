@@ -144,8 +144,8 @@ static void copy_scanline( uint8_t *output,
 static deinterlace_method_t vfirmethod =
 {
     DEINTERLACE_PLUGIN_API_VERSION,
-    "ffmpeg: Vertical Blend",
-    "Vertical",
+    "Blur: Vertical",
+    "BlurVertical",
     1,
 #ifdef ARCH_X86
     MM_ACCEL_X86_MMXEXT,
