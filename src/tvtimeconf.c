@@ -555,6 +555,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
+    ct->keymap[ 'p' ] = TVTIME_TOGGLE_PULLDOWN_DETECTION;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
     ct->keymap[ 'r' ] = TVTIME_CHANNEL_SKIP;

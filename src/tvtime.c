@@ -58,7 +58,7 @@
 /**
  * Set this to 1 to enable the experimental pulldown detection code.
  */
-const unsigned int detect_pulldown = 0;
+static unsigned int detect_pulldown = 1;
 
 /**
  * scratch paper:
@@ -425,6 +425,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             // We're in pulldown, reverse it.
             if( !filmmode ) {
                 fprintf( stderr, "Film mode enabled.\n" );
+                // if( osd ) tvtime_osd_show_message( osd, "Film mode enabled." );
                 filmmode = 1;
             }
             if( curoffset == PULLDOWN_OFFSET_2 ) {
@@ -495,6 +496,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         } else {
             if( filmmode ) {
                 fprintf( stderr, "Film mode disabled.\n" );
+                // if( osd ) tvtime_osd_show_message( osd, "Film mode disabled." );
                 filmmode = 0;
             }
         }
@@ -1222,18 +1224,29 @@ int main( int argc, char **argv )
         if( commands_toggle_fullscreen( commands ) ) {
             if( output->toggle_fullscreen( 0, 0 ) ) {
                 configsave( "FullScreen", "1", 1 );
+                if( osd ) tvtime_osd_show_message( osd, "Fullscreen mode active." );
             } else {
                 configsave( "FullScreen", "0", 1 );
+                if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
         }
         if( commands_toggle_aspect( commands ) ) {
             if( output->toggle_aspect() ) {
-                tvtime_osd_show_message( osd, "16:9 display mode" );
+                if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
                 configsave( "WideScreen", "1", 1 );
             } else {
-                tvtime_osd_show_message( osd, "4:3 display mode" );
+                if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
                 configsave( "WideScreen", "0", 1 );
             }
+        }
+        if( commands_toggle_pulldown_detection( commands ) ) {
+            if( detect_pulldown ) {
+                if( osd ) tvtime_osd_show_message( osd, "Pulldown detection disabled." );
+            } else {
+                if( osd ) tvtime_osd_show_message( osd, "Pulldown detection enabled." );
+            }
+            detect_pulldown = !detect_pulldown;
+            fprintf( stderr, "Pulldown detection %s.\n", detect_pulldown ? "enabled" : "disabled" );
         }
         if( commands_toggle_deinterlacing_mode( commands ) ) {
             curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();

@@ -106,6 +106,7 @@ static Cmd_Names cmd_table[] = {
     { "TOGGLE_INPUT", TVTIME_TOGGLE_INPUT },
     { "TOGGLE_LUMA_CORRECTION", TVTIME_TOGGLE_LUMA_CORRECTION },
     { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
+    { "TOGGLE_PULLDOWN_DETECTION", TVTIME_TOGGLE_PULLDOWN_DETECTION },
 
     { "QUIT", TVTIME_QUIT },
 };
@@ -170,6 +171,7 @@ struct commands_s {
     int togglefullscreen;
     int toggleaspect;
     int toggledeinterlacingmode;
+    int togglepulldowndetection;
     int halfrate;
     int scan_channels;
     
@@ -253,6 +255,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->togglepulldowndetection = 0;
     in->halfrate = 0;
     in->menu_on = 0;
     in->console_on = 0;
@@ -421,6 +424,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_DEINTERLACINGMODE:
         in->toggledeinterlacingmode = 1;
+        break;
+
+    case TVTIME_TOGGLE_PULLDOWN_DETECTION:
+        in->togglepulldowndetection = 1;
         break;
 
     case TVTIME_CHANNEL_CHAR:
@@ -714,6 +721,11 @@ int commands_toggle_deinterlacing_mode( commands_t *in )
     return in->toggledeinterlacingmode;
 }
 
+int commands_toggle_pulldown_detection( commands_t *in )
+{
+    return in->togglepulldowndetection;
+}
+
 int commands_toggle_menu( commands_t *in )
 {
     in->menu_on = !in->menu_on;
@@ -747,6 +759,7 @@ void commands_next_frame( commands_t *in )
     in->togglefullscreen = 0;
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
+    in->togglepulldowndetection = 0;
 }
 
 
