@@ -56,6 +56,7 @@
 #include "commands.h"
 #include "station.h"
 #include "dfboutput.h"
+#include "mgaoutput.h"
 #include "rvrreader.h"
 #include "pulldown.h"
 
@@ -73,7 +74,7 @@
 /**
  * Set this to 1 to enable startup time profiling.
  */
-const unsigned int profile_startup = 1;
+const unsigned int profile_startup = 0;
 
 /**
  * Function for profiling.
@@ -102,6 +103,7 @@ static unsigned int pulldown_alg = 0;
 enum {
     OUTPUT_XV = 0,
     OUTPUT_DIRECTFB = 1,
+    OUTPUT_MGA = 2,
 };
 static unsigned int output_driver = 0;
 
@@ -935,6 +937,8 @@ int main( int argc, char **argv )
         if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
             fprintf( stderr, "tvtime: Using DirectFB output driver.\n" );
             output_driver = OUTPUT_DIRECTFB;
+        } else if( !strcasecmp( config_get_output_driver( ct ), "mga_vid" ) ) {
+            output_driver = OUTPUT_MGA;
         } else {
             output_driver = OUTPUT_XV;
         }
@@ -1002,6 +1006,8 @@ int main( int argc, char **argv )
     /* Setup the output. */
     if( output_driver == OUTPUT_DIRECTFB ) {
         output = get_dfb_output();
+    } else if( output_driver == OUTPUT_MGA ) {
+        output = get_mga_output();
     } else {
         output = get_xv_output();
     }
