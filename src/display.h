@@ -27,6 +27,7 @@ extern "C" {
 
 typedef enum {
   DpyInfoOriginX11 = 1,
+  DpyInfoOriginXF86VidMode,
   DpyInfoOriginUser,
   DpyInfoOriginXinerama
 } DpyInfoOrigin_t;

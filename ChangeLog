@@ -2,8 +2,6 @@
 0.9.9.1
   * vektor: Fixed device closing for V4L2, fixes some problems with
       restarting tvtime.
-  * vektor: Never use vidmode for resolution information, it breaks
-      for dual-head configurations that do not support XINERAMA.
   * vektor: Added a sleep command and sleep timer.
   * vektor: Security update for tvtime dropping root privs.
   * vektor: Only show the alwaysontop menu entry and fullscreen menu
