@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2005 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ void register_deinterlace_method( deinterlace_method_t *method )
         (*dest)->method = method;
         (*dest)->next = 0;
     } else {
-        fprintf( stderr, "deinterlace: Can't allocate memory.\n" );
+        fprintf( stderr, "deinterlace: Cannot allocate memory.\n" );
     }
 }
 
