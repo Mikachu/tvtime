@@ -429,7 +429,7 @@ static void reinit_tuner( commands_t *cmd )
 
         if( cmd->osd ) {
             char channel_display[ 20 ];
-            char *xmltv_name = 0;
+            const char *xmltv_name = 0;
 
             snprintf( channel_display, sizeof( channel_display ), "%d",
                       station_get_current_id( cmd->stationmgr ) );
@@ -443,7 +443,7 @@ static void reinit_tuner( commands_t *cmd )
             if ( !xmltv_name ) {
                 tvtime_osd_set_channel_name( cmd->osd, station_get_current_channel_name( cmd->stationmgr ) );
             }
-            tvtime_osd_set_norm( cmmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
             tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
             tvtime_osd_set_freq_table( cmd->osd, station_get_current_band( cmd->stationmgr ) );
             tvtime_osd_set_channel_number( cmd->osd, channel_display );
