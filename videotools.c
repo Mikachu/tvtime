@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include "speedy.h"
 #include "videotools.h"
-#include "twoframe.h"
 
 struct video_correction_s
 {
@@ -269,9 +268,9 @@ void packed422_field_to_frame_bot_twoframe( unsigned char *output, int outstride
         unsigned char *mid0 = lastframe + linestride;
         unsigned char *bot0 = lastframe + (linestride*2);
 
-        deinterlace_twoframe_packed422_scanline_mmxext( output, top1, mid1,
-                                                        bot1, top0, mid0,
-                                                        bot0, width );
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
         output += outstride;
 
         curframe += (linestride*2);
@@ -302,9 +301,9 @@ void packed422_field_to_frame_top_twoframe( unsigned char *output, int outstride
         unsigned char *mid0 = lastframe + linestride;
         unsigned char *bot0 = lastframe + (linestride*2);
 
-        deinterlace_twoframe_packed422_scanline_mmxext( output, top1, mid1,
-                                                        bot1, top0, mid0,
-                                                        bot0, width );
+        deinterlace_twoframe_packed422_scanline( output, top1, mid1,
+                                                 bot1, top0, mid0,
+                                                 bot0, width );
         output += outstride;
 
         curframe += (linestride*2);

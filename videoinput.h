@@ -27,7 +27,7 @@ typedef struct videoinput_s videoinput_t;
 
 /**
  * This object represents a video4linux capture device.  Frames are returned as
- * planar Y'CbCr image maps with 4:2:2 encoding: luma first, then cb, then cr.
+ * packed Y'CbCr image maps with 4:2:2 encoding: luma first, then cb, then cr.
  */
 
 /**
@@ -57,12 +57,14 @@ int videoinput_get_height( videoinput_t *vidin );
  * Returns a pointer to the next image buffer.  Also returns the last field
  * number captured.
  */
-unsigned char *videoinput_next_image( videoinput_t *vidin );
+unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid );
 
 /**
- * Returns the number of buffers we've got.
+ * Signal to the videoinput device that we're done reading the last frame, to
+ * allow the hardware to use the buffer.
  */
-int videoinput_get_num_frames( videoinput_t *vidin );
+void videoinput_free_frame( videoinput_t *vidin, int frameid );
+void videoinput_free_all_frames( videoinput_t *vidin );
 
 /**
  * Returns true if this input has a tuner.
@@ -108,13 +110,6 @@ int videoinput_get_tuner_freq( videoinput_t *vidin );
  * Returns 1 if the frequency tuned to is a decent picture
  */
 int videoinput_freq_present( videoinput_t *vidin );
-
-/**
- * Signal to the videoinput device that we're done reading the last frame, to
- * allow the hardware to use the buffer.
- */
-void videoinput_free_last_frame( videoinput_t *vidin );
-void videoinput_free_all_frames( videoinput_t *vidin );
 
 #ifdef __cplusplus
 };

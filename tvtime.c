@@ -125,6 +125,7 @@ int main( int argc, char **argv )
     int secam = 0;
     int fieldtime;
     int blittime = 0;
+    int curframeid, lastframeid;
     int skipped = 0;
     int verbose;
     tvtime_osd_t *osd;
@@ -183,7 +184,8 @@ int main( int argc, char **argv )
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
     colourbars = (unsigned char *) malloc( width * height * 2 );
-    if( !testframe_odd || !testframe_even || !colourbars ) {
+    lastframe = (unsigned char *) malloc( width * height * 2 );
+    if( !testframe_odd || !testframe_even || !colourbars || !lastframe ) {
         fprintf( stderr, "tvtime: Can't allocate test memory.\n" );
         return 1;
     }
@@ -318,8 +320,6 @@ int main( int argc, char **argv )
     /* Begin capturing frames. */
     videoinput_free_all_frames( vidin );
 
-    lastframe = videoinput_next_image( vidin );
-
     /* Initialize our timestamps. */
     for( i = 0; i < 7; i++ ) gettimeofday( &(checkpoint[ i ]), 0 );
     gettimeofday( &lastframetime, 0 );
@@ -354,7 +354,7 @@ int main( int argc, char **argv )
         gettimeofday( &(checkpoint[ 0 ]), 0 );
 
         /* Aquire the next frame. */
-        curframe = videoinput_next_image( vidin );
+        curframe = videoinput_next_frame( vidin, &curframeid );
 
         if( screenshot ) {
             char filename[ 256 ];
@@ -404,7 +404,10 @@ int main( int argc, char **argv )
                                                                width, height/2,
                                                                width*4 );
             } else {
-                packed422_field_to_frame_top_twoframe( sdl_get_output(), width*2, curframe, lastframe, width, height, width*2 );
+                packed422_field_to_frame_top_twoframe( sdl_get_output(),
+                                                       width*2, curframe,
+                                                       lastframe, width,
+                                                       height, width*2 );
 /*
                 packed422_field_to_frame_top( sdl_get_output(), width*2, 
                                               curframe,
@@ -471,7 +474,10 @@ int main( int argc, char **argv )
                                                                width, height/2,
                                                                width*4 );
             } else {
-                packed422_field_to_frame_bot_twoframe( sdl_get_output(), width*2, curframe, lastframe, width, height, width*2 );
+                packed422_field_to_frame_bot_twoframe( sdl_get_output(),
+                                                       width*2, curframe,
+                                                       lastframe, width,
+                                                       height, width*2 );
 /*
                 packed422_field_to_frame_bot( sdl_get_output(), width*2, 
                                               curframe + (width*2),
@@ -496,8 +502,8 @@ int main( int argc, char **argv )
 
 
         /* We're done with the input now. */
-        videoinput_free_last_frame( vidin );
-        lastframe = curframe;
+        // blit_packed422_scanline( lastframe, curframe, width * height );
+        videoinput_free_frame( vidin, curframeid );
 
 
         /* CHECKPOINT6 : Released a frame to V4L. */

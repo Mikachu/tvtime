@@ -88,39 +88,31 @@ struct videoinput_s
 };
 
 
-int videoinput_get_num_frames( videoinput_t *vidin )
+static void free_frame( videoinput_t *vidin, int frameid )
 {
-    return vidin->numframes;
-}
-
-static int grab_next( videoinput_t *vidin )
-{
-    int frame = vidin->curframe++ % vidin->numframes;
-
-    if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frame ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCMCAPTURE, vidin->grab_buf + frameid ) < 0 ) {
         perror( "VIDIOCMCAPTURE" );
     }
-
-    return frame;
 }
 
-static int grab_wait( videoinput_t *vidin )
+static void wait_for_frame( videoinput_t *vidin, int frameid )
 {
-    int frame = vidin->curframe % vidin->numframes;
-
-    if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frame ) < 0 ) {
+    if( ioctl( vidin->grab_fd, VIDIOCSYNC, vidin->grab_buf + frameid ) < 0 ) {
         perror( "VIDIOCSYNC" );
     }
-
-    return frame;
 }
 
-unsigned char *videoinput_next_image( videoinput_t *vidin )
+unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
 {
     int rc;
 
     if( vidin->have_mmap ) {
-        return vidin->map + vidin->gb_buffers.offsets[ grab_wait(vidin) ];
+        unsigned char *cur;
+        wait_for_frame( vidin, vidin->curframe );
+        cur = vidin->map + vidin->gb_buffers.offsets[ vidin->curframe ];
+        *frameid = vidin->curframe;
+        vidin->curframe = ( vidin->curframe + 1 ) % vidin->numframes;
+        return cur;
     } else {
         rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
         if( vidin->grab_size != rc ) {
@@ -132,16 +124,20 @@ unsigned char *videoinput_next_image( videoinput_t *vidin )
     }
 }
 
-void videoinput_free_last_frame( videoinput_t *vidin )
+void videoinput_free_frame( videoinput_t *vidin, int frameid )
 {
-    grab_next( vidin );
+    free_frame( vidin, frameid );
 }
 
 void videoinput_free_all_frames( videoinput_t *vidin )
 {
     int i;
 
-    for( i = 0; i < vidin->numframes; i++ ) grab_next( vidin );
+    fprintf( stderr, "buffers: %d\n", vidin->numframes );
+    for( i = 0; i < vidin->numframes; i++ ) {
+        free_frame( vidin, i );
+    }
+    vidin->curframe = 0;
 }
 
 int videoinput_get_width( videoinput_t *vidin )
