@@ -837,6 +837,7 @@ struct osd_list_s
     int numlines;
     int hilight;
     int width;
+    int height;
     osd_font_t *font;
     osd_string_t *lines[ OSD_LIST_MAX_LINES ];
 };
@@ -854,6 +855,7 @@ osd_list_t *osd_list_new( double pixel_aspect )
     osdl->numlines = 0;
     osdl->frames_left = 0;
     osdl->width = 0;
+    osdl->height = 0;
     osdl->font = osd_font_new( "FreeSansBold.ttf", 18, pixel_aspect );
     if( !osdl->font ) {
         free( osdl );
@@ -895,9 +897,6 @@ void osd_list_set_text( osd_list_t *osdl, int line, const char *text )
 {
     if( line < OSD_LIST_MAX_LINES ) {
         osd_string_show_text( osdl->lines[ line ], text, 100 );
-        if( osd_string_get_width( osdl->lines[ line ] ) > osdl->width ) {
-            osdl->width = osd_string_get_width( osdl->lines[ line ] );
-        }
     }
 }
 
@@ -910,7 +909,6 @@ void osd_list_set_lines( osd_list_t *osdl, int numlines )
 {
     if( numlines > OSD_LIST_MAX_LINES ) numlines = OSD_LIST_MAX_LINES;
     osdl->numlines = numlines;
-    osdl->width = 0;
 }
 
 void osd_list_set_hilight( osd_list_t *osdl, int pos )
@@ -947,6 +945,17 @@ void osd_list_set_timeout( osd_list_t *osdl, int timeout )
     for( i = 0; i < osdl->numlines; i++ ) {
         osd_string_set_timeout( osdl->lines[ i ], timeout );
     }
+
+    if( timeout ) {
+        osdl->width = 0;
+        osdl->height = 0;
+        for( i = 0; i < osdl->numlines; i++ ) {
+            int width = osd_string_get_width( osdl->lines[ i ] );
+            int height = osd_string_get_height( osdl->lines[ i ] );
+            if( width > osdl->width ) osdl->width = width;
+            if( height > osdl->height ) osdl->height = height;
+        }
+    }
 }
 
 int osd_list_visible( osd_list_t *osdl )
@@ -976,7 +985,7 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
     int i;
 
     for( i = 0; i < osdl->numlines && scanline >= 0; i++ ) {
-        if( scanline < (osd_string_get_height( osdl->lines[ i ] ) + 2) ) {
+        if( scanline < osdl->height ) {
             int bgwidth = osdl->width - xpos;
             int alpha150, alpha80;
 
@@ -1003,7 +1012,7 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                                                      output, background,
                                                      width, xpos, scanline );
         }
-        scanline -= osd_string_get_height( osdl->lines[ i ] ) + 2;
+        scanline -= osdl->height;
     }
 }
 
