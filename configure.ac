@@ -8,11 +8,16 @@ AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 if test x"$host_alias" = x""; then host_alias="$host"; fi
 
-# Checks for programs.
+# Check for compilers.
 AC_PROG_CC
-type "$CC" || exit 1
+AC_CHECK_PROG(found_cc, "$CC", yes, no)
+test "x$found_cc" = "xyes" || exit 1
+
 AC_PROG_CXX
-type "$CXX" || exit 1
+AC_CHECK_PROG(found_cxx, "$CXX", yes, no)
+test "x$found_cxx" = "xyes" || exit 1
+
+# Check for libtool.
 AC_PROG_LIBTOOL
 
 # Checks for header files.
