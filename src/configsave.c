@@ -152,7 +152,6 @@ void configsave_close( configsave_t *cs )
 int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, const int INIT_num )
 {
     xmlNodePtr top, node;
-    xmlAttrPtr attr;
 
     top = xmlDocGetRootElement( cs->Doc );
     if( !top ) {
@@ -163,8 +162,8 @@ int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, c
     node = find_option( top->xmlChildrenNode, INIT_name );
     if( !node ) {
         node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
-        attr = xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
-        attr = xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
+        xmlNewProp( node, BAD_CAST "name", BAD_CAST INIT_name );
+        xmlNewProp( node, BAD_CAST "value", BAD_CAST INIT_val );
     } else {
         xmlSetProp( node, BAD_CAST "value", BAD_CAST INIT_val );
     }
