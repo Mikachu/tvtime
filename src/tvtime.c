@@ -1630,8 +1630,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             int cmd;
             cmd = fifo_get_next_command( fifo );
             fifo_args = fifo_get_arguments( fifo );
-            if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd,
-                                                           fifo_args );
+            if( cmd != TVTIME_NOCOMMAND ) {
+                output->update_server_time( 0 );
+                commands_handle( commands, cmd, fifo_args );
+            }
         }
 
         if( read_stdin ) {

@@ -95,6 +95,8 @@ static Atom net_wm_state;
 static Atom net_wm_state_above;
 static Atom net_wm_state_below;
 static Atom net_wm_state_fullscreen;
+static Atom net_wm_user_time;
+static Atom net_active_window;
 static Atom utf8_string;
 static Atom kwm_keep_on_top;
 static Atom wm_protocols;
@@ -112,6 +114,7 @@ static area_t scale_area;
 
 static Time lastpresstime = 0;
 static Time lastreleasetime = 0;
+static Time last_server_time = 0;
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -135,6 +138,8 @@ static void load_atoms( Display *dpy )
         "_NET_WM_STATE_ABOVE",
         "_NET_WM_STATE_BELOW",
         "_NET_WM_STATE_FULLSCREEN",
+        "_NET_WM_USER_TIME",
+        "_NET_ACTIVE_WINDOW",
         "UTF8_STRING",
         "KWM_KEEP_ON_TOP",
         "WM_PROTOCOLS",
@@ -142,9 +147,9 @@ static void load_atoms( Display *dpy )
         "_XAWTV_STATION",
         "_XAWTV_REMOTE"
     };
-    Atom atoms_return[ 13 ];
+    Atom atoms_return[ 15 ];
 
-    XInternAtoms( display, atom_names, 13, False, atoms_return );
+    XInternAtoms( display, atom_names, 15, False, atoms_return );
     net_supporting_wm_check = atoms_return[ 0 ];
     net_supported = atoms_return[ 1 ];
     net_wm_name = atoms_return[ 2 ];
@@ -152,12 +157,14 @@ static void load_atoms( Display *dpy )
     net_wm_state_above = atoms_return[ 4 ];
     net_wm_state_below = atoms_return[ 5 ];
     net_wm_state_fullscreen = atoms_return[ 6 ];
-    utf8_string = atoms_return[ 7 ];
-    kwm_keep_on_top = atoms_return[ 8 ];
-    wm_protocols = atoms_return[ 9 ];
-    wm_delete_window = atoms_return[ 10 ];
-    xawtv_station = atoms_return[ 11 ];
-    xawtv_remote = atoms_return[ 12 ];
+    net_wm_user_time = atoms_return[ 7 ];
+    net_active_window = atoms_return[ 8 ];
+    utf8_string = atoms_return[ 9 ];
+    kwm_keep_on_top = atoms_return[ 10 ];
+    wm_protocols = atoms_return[ 11 ];
+    wm_delete_window = atoms_return[ 12 ];
+    xawtv_station = atoms_return[ 13 ];
+    xawtv_remote = atoms_return[ 14 ];
 }
 
 
@@ -1155,6 +1162,22 @@ int xcommon_toggle_alwaysontop( void )
     return alwaysontop;
 }
 
+static void xcommon_activate_window( void )
+{
+    XEvent ev;
+
+    ev.type = ClientMessage;
+    ev.xclient.window = wm_window;
+    ev.xclient.message_type = net_active_window;
+    ev.xclient.format = 32;
+    ev.xclient.data.l[ 0 ] = 1;
+    ev.xclient.data.l[ 1 ] = last_server_time;
+    ev.xclient.data.l[ 2 ] = 0;
+
+    XSendEvent( display, DefaultRootWindow( display ), False,
+                SubstructureNotifyMask|SubstructureRedirectMask, &ev );
+}
+
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
     output_fullscreen = !output_fullscreen;
@@ -1190,6 +1213,9 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             XSendEvent( display, DefaultRootWindow( display ), False,
                         SubstructureNotifyMask | SubstructureRedirectMask,
                         &ev );
+
+            /* When we go fullscreen, explicitly ask to get focus. */
+            xcommon_activate_window();
         } else {
             /* Show our fullscreen window. */
             XMoveResizeWindow( display, fs_window, x, y, w, h );
@@ -1261,6 +1287,31 @@ int xcommon_toggle_aspect( void )
     calculate_video_area();
     xcommon_clear_screen();
     return output_aspect;
+}
+
+void xcommon_update_server_time( unsigned long timestamp )
+{
+    if( !timestamp ) {
+        /**
+         * Get the current timestamp by causing an event to be generated
+         * by the X server.  This is only a single round-trip to the
+         * X server.  Inspired by kapplication::updateUserTimestamp().
+         */
+        unsigned char data[ 1 ];
+        Window w = XCreateSimpleWindow( display, DefaultRootWindow( display ),
+                                        0, 0, 1, 1, 0, 0, 0 );
+        XEvent ev;
+        XSelectInput( display, w, PropertyChangeMask );
+        XChangeProperty( display, w, XA_ATOM, XA_ATOM, 8,
+                         PropModeAppend, data, 1 );
+        XWindowEvent( display, w, PropertyChangeMask, &ev );
+        timestamp = ev.xproperty.time;
+        XDestroyWindow( display, w );
+    }
+
+    last_server_time = timestamp;
+    XChangeProperty( display, wm_window, net_wm_user_time, XA_CARDINAL, 32,
+                     PropModeReplace, (unsigned char *) &timestamp, 1 );
 }
 
 void xcommon_poll_events( input_t *in )
@@ -1429,6 +1480,7 @@ void xcommon_poll_events( input_t *in )
             }
             break;
         case KeyPress:
+            xcommon_update_server_time( event.xkey.time );
             /* if( event.xkey.state & ShiftMask ) arg |= I_SHIFT; */
             /* this alternate approach allows handling of keys like '<' and '>' -- mrallen */
             if( event.xkey.state & ShiftMask ) {
@@ -1508,6 +1560,7 @@ void xcommon_poll_events( input_t *in )
             input_callback( in, I_KEYDOWN, arg );
             break;
         case ButtonPress:
+            xcommon_update_server_time( event.xbutton.time );
             if( event.xbutton.time != lastpresstime ) {
                 input_callback( in, I_BUTTONPRESS, event.xbutton.button );
                 lastpresstime = event.xbutton.time;
@@ -1515,6 +1568,7 @@ void xcommon_poll_events( input_t *in )
             getfocus = 1;
             break;
         case ButtonRelease:
+            xcommon_update_server_time( event.xbutton.time );
             if( event.xbutton.time != lastreleasetime ) {
                 input_callback( in, I_BUTTONRELEASE, event.xbutton.button );
                 lastreleasetime = event.xbutton.time;
@@ -1683,5 +1737,4 @@ void xcommon_update_xawtv_station( int frequency, int channel_id,
                      XA_STRING, 8, PropModeReplace,
                      (unsigned char *) data, length );
 }
-
 

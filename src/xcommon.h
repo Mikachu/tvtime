@@ -66,6 +66,7 @@ int xcommon_is_fullscreen_supported( void );
 int xcommon_is_alwaysontop_supported( void );
 void xcommon_update_xawtv_station( int frequency, int channel_id,
                                    const char *channel_name );
+void xcommon_update_server_time( unsigned long timestamp );
 
 #ifdef __cplusplus
 };

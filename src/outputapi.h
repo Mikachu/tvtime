@@ -65,6 +65,7 @@ typedef struct output_api_s
     void (* set_window_caption)( const char *caption );
     void (* update_xawtv_station)( int frequency, int channel_id,
                                    const char *channel_name );
+    void (* update_server_time)( unsigned long timestamp );
 
     void (* set_window_position)( int x, int y );
     void (* set_window_height)( int window_height );
