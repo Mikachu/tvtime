@@ -1,0 +1,478 @@
+# Dutch translation iof tvtime.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the tvtime package.
+# Vincent van Adrighem <adrighem@gnome.org>, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime cvs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-10-04 23:11+0200\n"
+"PO-Revision-Date: 2003-10-04 23:10+0200\n"
+"Last-Translator: Vincent van Adrighem <adrighem@gnome.org>\n"
+"Language-Team: Dutch <nl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/tvtime.c:1817
+msgid "Fullscreen mode active."
+msgstr "Volledig scherm."
+
+#: src/tvtime.c:1820
+msgid "Windowed mode active."
+msgstr "TV in een venster."
+
+#: src/tvtime.c:1830
+msgid "Window set as always-on-top."
+msgstr "Venster altijd bovenaan"
+
+#: src/tvtime.c:1832
+msgid "Window set to normal stacking."
+msgstr "Venster instellen op normale volgorde"
+
+#: src/tvtime.c:1845
+msgid "16:9 display mode active."
+msgstr "16:9 verhouding."
+
+#: src/tvtime.c:1850
+msgid "4:3 display mode active."
+msgstr "4:3 verhouding."
+
+#: src/tvtime.c:1927
+msgid "2-3 Pulldown detection disabled."
+msgstr "2-3 oprekdetectie uitgeschakeld."
+
+#: src/tvtime.c:1929
+msgid "2-3 Pulldown detection enabled."
+msgstr "2-3 oprekdetectie ingeschakeld."
+
+#: src/tvtime.c:1934
+msgid "2-3 Pulldown detection is not valid with your TV norm."
+msgstr "2-3 oprekdetectie onnodig voor uw TV-standaard."
+
+#: src/tvtime.c:2248 src/tvtime.c:2365
+#, c-format
+msgid "Screenshot: %s"
+msgstr "Schermafdruk: %s"
+
+#: src/commands.c:1985
+#, c-format
+msgid "Sleep in %d minutes."
+msgstr "Slaapstand over %d minuten."
+
+#: src/commands.c:1988
+msgid "Sleep off."
+msgstr "Slaapstand uit."
+
+#: src/commands.c:2039
+msgid "Channel marked as active in the browse list."
+msgstr "Kanaal ingeschakeld als actief in de lijst"
+
+#: src/commands.c:2041
+msgid "Channel disabled from the browse list."
+msgstr "Kanaal uitgeschakeld in de lijst."
+
+#: src/commands.c:2083
+msgid "Processing every input field."
+msgstr "Verwerken van ieder invoerveld."
+
+#: src/commands.c:2085
+msgid "Processing every top field."
+msgstr "Verwerken van ieder bovenste veld."
+
+#: src/commands.c:2087
+msgid "Processing every bottom field."
+msgstr "Verwerken van ieder onderste veld."
+
+#: src/commands.c:2099
+#, c-format
+msgid "Sharpness will be %d on restart."
+msgstr "Scherpte zal %d zijn na herstarten."
+
+#: src/commands.c:2137
+#, c-format
+msgid "Television standard will be %s on restart."
+msgstr "Televisiestandaard zal %s zijn na herstarten."
+
+#: src/commands.c:2165
+msgid "All channels re-activated."
+msgstr "Alle kanalen geactiveerd."
+
+#: src/commands.c:2185
+#, c-format
+msgid "Remapping %d.  Enter new channel number."
+msgstr "Verplaatsen van %d. Geef nieuw kanaalnummer."
+
+#: src/commands.c:2196
+msgid "Scanner unavailable: Signal checking disabled."
+msgstr "Zoeken niet beschikbaar. Signaalcontrole uitgeschakeld."
+
+#: src/commands.c:2222
+msgid "Scanning for active channels."
+msgstr "Zoeken naar actieve kanalen."
+
+#: src/commands.c:2238
+msgid "Closed captions disabled."
+msgstr "Ondertiteling uitgeschakeld."
+
+#: src/commands.c:2241
+msgid "Closed captions enabled."
+msgstr "Ondertiteling ingeschakeld."
+
+#: src/commands.c:2245
+msgid "No VBI device configured for CC decoding."
+msgstr "Geen VBI-apparaat ingesteld voor CC-decodering."
+
+#: src/commands.c:2259
+#, c-format
+msgid "Colour decoding for this channel set to %s."
+msgstr "Kleurdecodering voor dit kanaal ingesteld op %s."
+
+#: src/commands.c:2288
+#, c-format
+msgid "Running: %s"
+msgstr "Actief: %s"
+
+#: src/commands.c:2364
+msgid "Signal detection enabled."
+msgstr "Signaaldetectie ingeschakeld."
+
+#: src/commands.c:2366
+msgid "Signal detection disabled."
+msgstr "Signaaldetectie uitgeschakeld."
+
+#: src/commands.c:2378
+msgid "XDS decoding enabled."
+msgstr "XDS-decodering ingeschakeld."
+
+#: src/commands.c:2380
+msgid "XDS decoding disabled."
+msgstr "XDS-decodering uitgeschakeld."
+
+#: src/commands.c:2426
+msgid "Colour invert enabled."
+msgstr "Kleurinversie ingeschakeld."
+
+#: src/commands.c:2428
+msgid "Colour invert disabled."
+msgstr "Kleurinversie uitgeschakeld."
+
+#: src/commands.c:2445
+msgid "Mirror enabled."
+msgstr "Spiegeling ingeschakeld."
+
+#: src/commands.c:2447
+msgid "Mirror disabled."
+msgstr "Spiegeling uitgeschakeld."
+
+# Wat is chroma-kill in hemelsnaam?
+# Volgens dict heeft het met kleurhelderheid en verzadiging te maken.
+#: src/commands.c:2464
+msgid "Chroma kill enabled."
+msgstr "Chroma-kill ingeschakeld."
+
+#: src/commands.c:2466
+msgid "Chroma kill disabled."
+msgstr "Chroma-kill uitgeschakeld."
+
+#: src/commands.c:2483
+msgid "Luma correction enabled."
+msgstr "Luma-correctie ingeschakeld."
+
+#: src/commands.c:2486
+msgid "Luma correction disabled."
+msgstr "Luma-correctie uitgeschakeld."
+
+#: src/commands.c:2499
+#, c-format
+msgid "Overscan: %.1f%%"
+msgstr "Overscan: %1.f%%"
+
+#: src/commands.c:2524
+#, c-format
+msgid "Luma correction value: %.1f"
+msgstr "Luma correctiewaarde: %.1f"
+
+#: src/commands.c:2554
+msgid "Picture settings reset to defaults."
+msgstr "Standaard beeldinstellingen hersteld"
+
+#: src/commands.c:2806
+msgid "Saved current picture settings as global defaults.\n"
+msgstr "Huidige beeldinstellingen als algemene standaard opgeslagen.\n"
+
+#: src/commands.c:2818
+#, c-format
+msgid "Saved current picture settings on channel %d.\n"
+msgstr "Huidige beeldinstellingen opgeslagen voor kaneel %d.\n"
+
+#: src/commands.c:2900
+msgid "Paused."
+msgstr "Pauze."
+
+#: src/commands.c:2900
+msgid "Resumed."
+msgstr "Actief."
+
+#: src/tvtimeconf.c:611
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (first run tvtime-scanner)\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -k, --slave                Disables input handling in tvtime (slave "
+"mode).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
+"  -s, --showdrops            Print stats on frame drops (for debugging).\n"
+"  -S, --saveoptions          Save command line options to the config file.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -v, --verbose              Print debugging messages to stderr.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"Gebruik: %s [OPTIES]...\n"
+"\n"
+"  -a, --widescreen           16:9 stand.\n"
+"  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
+"  -c, --channel=KANAAL       Starten op dit kanaal.\n"
+"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
+"  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (standaard: Xv).\n"
+"  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
+"                             (standaard: us-cable).\n"
+"\n"
+"                             Geldige waarden zijn:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (eerst tvtime-scanner starten)\n"
+"\n"
+"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+"laden.\n"
+"  -h, --help                 Deze hulptekst weergeven.\n"
+"  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
+"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+"  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
+"                             (standaard: 720).\n"
+"  -k, --slave                Schakelt invoercontrole uit (slaafstand).\n"
+"  -m, --fullscreen           Tvtime schermvullend starten.\n"
+"  -M, --window               Tvtime in een venster starten.\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
+"ondersteunt:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (standaard: NTSC).\n"
+"  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
+"                             centre (standaard).\n"
+"  -r, --rvr=BESTAND          Af te spelen RVR bestand (voor debuggen).\n"
+"  -s, --showdrops            Framedropstatistieken weergeven (voor "
+"debuggen).\n"
+"  -S, --saveoptions          Opties van huidige opdracht opslaan in "
+"configuratie.\n"
+"  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
+"  -v, --verbose              Debug-info uitvoeren naar stderr.\n"
+"  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
+"                             (standaard: /dev/mixer:line)\n"
+"\n"
+"                             Geldige kanalen:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:665
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -a, --widescreen           16:9 mode.\n"
+"  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
+"  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -D, --driver=NAME          Output driver to use: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (defaults to Xv).\n"
+"  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
+"                             (defaults to us-cable).\n"
+"\n"
+"                             Valid values are:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -H, --height=HEIGHT        Output window height (defaults to 576).\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -I, --inputwidth=SAMPLING  video4linux input scanline sampling\n"
+"                             (defaults to 720).\n"
+"  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
+"  -M, --window               Start tvtime in window mode.\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+"  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
+"                             centre (default).\n"
+"  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
+"  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
+"  -X, --display=DISPLAY      Use the given X display to connect to.\n"
+"  -x, --mixer=DEVICE[:CH]    The mixer device and channel to control.\n"
+"                             (defaults to /dev/mixer:line)\n"
+"\n"
+"                             Valid channels are:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+msgstr ""
+"Gebruik: %s [OPTIES]...\n"
+"\n"
+"  -a, --widescreen           16:9 stand.\n"
+"  -b, --vbidevice=DEVICE     VBI apparaat (standaard: /dev/vbi0).\n"
+"  -c, --channel=KANAAL       Starten op dit kanaal.\n"
+"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
+"  -D, --driver=NAAM          Beeldweergave: Xv, DirectFB, mga,\n"
+"                             xmga, matroxtv or SDL (standaard: Xv).\n"
+"  -f, --frequencies=NAAM     De te begruiken frequentietabel.\n"
+"                             (standaard: us-cable).\n"
+"\n"
+"                             Geldige waarden zijn:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (eerst tvtime-scanner starten)\n"
+"\n"
+"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+"laden.\n"
+"  -h, --help                 Deze hulptekst weergeven.\n"
+"  -H, --height=HOOGTE        Hoogte van venster (standaard: 576).\n"
+"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+"  -I, --inputwidth=BEMONST   video4linux invoer scanlinebemonstering\n"
+"                             (standaard: 720).\n"
+"  -m, --fullscreen           Tvtime schermvullend starten.\n"
+"  -M, --window               Tvtime in een venster starten.\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
+"ondersteunt:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (standaard: NTSC).\n"
+"  -p, --fspos=POS            Positie voor volledig scherm: top, bottom of\n"
+"                             centre (standaard).\n"
+"  -R, --priority=PRI         Prioriteit van het tvtime proces.\n"
+"  -t, --xmltv=BESTAND        XMLTV inlezen uit dit bestand.\n"
+"  -X, --display=SCHERM       Het gegeven X-scherm gebruiken.\n"
+"  -x, --mixer=DEVICE[:KAN]   Te gebruiken mixerapparaat en -kanaal.\n"
+"                             (standaard: /dev/mixer:line)\n"
+"\n"
+"                             Geldige kanalen:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
+
+#: src/tvtimeconf.c:715
+#, c-format
+msgid ""
+"usage: %s [OPTION]...\n"
+"\n"
+"  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
+"  -F, --configfile=FILE      Additional config file to load settings from.\n"
+"  -h, --help                 Show this help message.\n"
+"  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (defaults to NTSC).\n"
+msgstr ""
+"Gebruik: %s [OPTIES]...\n"
+"\n"
+"  -d, --device=DEVICE        video4linux apparaat (standaard: /dev/video0).\n"
+"  -F, --configfile=BESTAND   Extra configuratie om instellingen uit te "
+"laden.\n"
+"  -h, --help                 Deze hulptekst weergeven.\n"
+"  -i, --input=INVOERNUM      video4linux invoernummer (standaard: 0).\n"
+"  -n, --norm=NORM            De te gebruiken norm voor de invoer. tvtime "
+"ondersteunt:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N or PAL-60 (standaard: NTSC).\n"
