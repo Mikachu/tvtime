@@ -1824,10 +1824,6 @@ void commands_add_menu( commands_t *cmd, menu_t *menu )
     int i;
 
     for( i = 0; i < MAX_USER_MENUS; i++ ) {
-        if( cmd->menus[ i ] && !strcasecmp( menu_get_name( cmd->menus[ i ] ), menu_get_name( menu ) ) ) {
-            fprintf( stderr, "commands: Adding duplicate menu %s!\n",
-                     menu_get_name( menu ) );
-        }
         if( !cmd->menus[ i ] ) {
             cmd->menus[ i ] = menu;
             return;
@@ -2039,9 +2035,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             station_set_current_active( cmd->stationmgr, !station_get_current_active( cmd->stationmgr ) );
             if( cmd->osd ) {
                 if( station_get_current_active( cmd->stationmgr ) ) {
-                    tvtime_osd_show_message( cmd->osd, _("Channel marked as active in the browse list.") );
+                    tvtime_osd_show_message( cmd->osd,
+                        _("Channel marked as active in the browse list.") );
                 } else {
-                    tvtime_osd_show_message( cmd->osd, _("Channel disabled from the browse list.") );
+                    tvtime_osd_show_message( cmd->osd,
+                        _("Channel disabled from the browse list.") );
                 }
             }
             reset_stations_menu( commands_get_menu( cmd, "stations" ),
@@ -2083,11 +2081,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         if( cmd->osd ) {
             if( cmd->framerate == FRAMERATE_FULL ) {
-                tvtime_osd_show_message( cmd->osd, _("Processing every input field.") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Processing every input field.") );
             } else if( cmd->framerate == FRAMERATE_HALF_TFF ) {
-                tvtime_osd_show_message( cmd->osd, _("Processing every top field.") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Processing every top field.") );
             } else {
-                tvtime_osd_show_message( cmd->osd, _("Processing every bottom field.") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Processing every bottom field.") );
             }
         }
         break;
@@ -2175,7 +2176,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_CHANNEL_ACTIVATE_ALL:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
-            if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("All channels re-activated.") );
+            if( cmd->osd ) {
+                tvtime_osd_show_message( cmd->osd,
+                                         _("All channels re-activated.") );
+            }
             station_activate_all_channels( cmd->stationmgr );
             station_writeconfig( cmd->stationmgr );
         }
@@ -2206,7 +2210,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
             if( !cmd->checkfreq ) {
                 if( cmd->osd ) {
-                    tvtime_osd_show_message( cmd->osd, _("Scanner unavailable with signal checking disabled.") );
+                    tvtime_osd_show_message( cmd->osd,
+                      _("Scanner unavailable with signal checking disabled.") );
                 }
             } else {
                 cmd->scan_channels = !cmd->scan_channels;
@@ -2232,7 +2237,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
-                        tvtime_osd_set_hold_message( cmd->osd, _("Scanning for channels being broadcast.") );
+                        tvtime_osd_set_hold_message( cmd->osd,
+                            _("Scanning for channels being broadcast.") );
                     } else {
                         /* Nuke the hold message, and make sure we show nothing (hack). */
                         tvtime_osd_set_hold_message( cmd->osd, "" );
@@ -2248,10 +2254,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->vbi ) {
             vbidata_capture_mode( cmd->vbi, cmd->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
             if( cmd->capturemode ) {
-                if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("Closed captions disabled.") );
+                if( cmd->osd ) {
+                    tvtime_osd_show_message( cmd->osd,
+                        _("Closed captions disabled.") );
+                }
                 cmd->capturemode = CAPTURE_OFF;
             } else {
-                if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("Closed captions enabled.") );
+                if( cmd->osd ) {
+                    tvtime_osd_show_message( cmd->osd,
+                        _("Closed captions enabled.") );
+                }
                 cmd->capturemode = CAPTURE_CC1;
             }
             if( cmd->capturemode ) {
@@ -2260,7 +2272,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 config_save( cmd->cfg, "ShowCC", "0" );
             }
         } else {
-            if( cmd->osd ) tvtime_osd_show_message( cmd->osd, _("No VBI device configured for CC decoding.") );
+            if( cmd->osd ) {
+                tvtime_osd_show_message( cmd->osd,
+                    _("No VBI device configured for CC decoding.") );
+            }
         }
         break;
 
@@ -2393,9 +2408,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                  station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
                                  cmd->scan_channels );
             if( cmd->checkfreq ) {
-                tvtime_osd_show_message( cmd->osd, _("Signal detection enabled.") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Signal detection enabled.") );
             } else {
-                tvtime_osd_show_message( cmd->osd, _("Signal detection disabled.") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Signal detection disabled.") );
             }
             commands_refresh_menu( cmd );
         }
@@ -2407,9 +2424,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             vbidata_capture_xds( cmd->vbi, cmd->usexds );
             if( cmd->osd ) {
                 if( cmd->usexds ) {
-                    tvtime_osd_show_message( cmd->osd, _("XDS decoding enabled.") );
+                    tvtime_osd_show_message( cmd->osd,
+                        _("XDS decoding enabled.") );
                 } else {
-                    tvtime_osd_show_message( cmd->osd, _("XDS decoding disabled.") );
+                    tvtime_osd_show_message( cmd->osd,
+                        _("XDS decoding disabled.") );
                 }
             }
         }
@@ -2563,8 +2582,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             snprintf( message, sizeof( message ), "%.1f", cmd->luma_power );
             config_save( cmd->cfg, "LumaCorrection", message );
             if( cmd->osd ) {
-                snprintf( message, sizeof( message ), _("Luma correction value: %.1f"),
-                          cmd->luma_power );
+                snprintf( message, sizeof( message ),
+                          _("Luma correction value: %.1f"), cmd->luma_power );
                 tvtime_osd_show_message( cmd->osd, message );
             }
         }
@@ -2593,19 +2612,20 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 videoinput_set_hue( cmd->vidin, 50 );
             }
             if( cmd->osd ) {
-                tvtime_osd_show_message( cmd->osd, _("Picture settings reset to defaults.") );
-                menu_set_value (commands_get_menu (cmd, "brightness"),
+                tvtime_osd_show_message( cmd->osd,
+                    _("Picture settings reset to defaults.") );
+                menu_set_value( commands_get_menu( cmd, "brightness" ),
                                 videoinput_get_brightness( cmd->vidin ),
-                                TVTIME_ICON_BRIGHTNESS);
-                menu_set_value (commands_get_menu (cmd, "contrast"),
+                                TVTIME_ICON_BRIGHTNESS );
+                menu_set_value( commands_get_menu( cmd, "contrast" ),
                                 videoinput_get_brightness( cmd->vidin ),
-                                TVTIME_ICON_CONTRAST);
-                menu_set_value (commands_get_menu (cmd, "colour"),
+                                TVTIME_ICON_CONTRAST );
+                menu_set_value( commands_get_menu( cmd, "colour" ),
                                 videoinput_get_brightness( cmd->vidin ),
-                                TVTIME_ICON_COLOUR);
-                menu_set_value (commands_get_menu (cmd, "hue"),
+                                TVTIME_ICON_COLOUR );
+                menu_set_value( commands_get_menu( cmd, "hue" ),
                                 videoinput_get_brightness( cmd->vidin ),
-                                TVTIME_ICON_HUE);
+                                TVTIME_ICON_HUE );
             }
         }
         break;
@@ -2880,7 +2900,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             cmd->colour = videoinput_get_colour( cmd->vidin );
             cmd->hue = videoinput_get_hue( cmd->vidin );
             if( cmd->osd ) {
-                tvtime_osd_show_message( cmd->osd, _("Saved current picture settings as global defaults.\n") );
+                tvtime_osd_show_message( cmd->osd,
+                    _("Saved current picture settings as global defaults.\n") );
             }
         }
         break;
@@ -2975,7 +2996,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
     case TVTIME_TOGGLE_PAUSE:
         cmd->pause = !(cmd->pause);
-        if( cmd->osd ) tvtime_osd_show_message( cmd->osd, cmd->pause ? _("Paused.") : _("Resumed.") );
+        if( cmd->osd ) {
+            tvtime_osd_show_message( cmd->osd,
+                  cmd->pause ? _("Paused.") : _("Resumed.") );
+        }
         break;
 
     case TVTIME_TOGGLE_MATTE:

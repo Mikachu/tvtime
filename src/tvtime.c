@@ -1846,11 +1846,15 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
         if( commands_toggle_alwaysontop( commands ) ) {
             if( output->toggle_alwaysontop() ) {
-                if( osd ) tvtime_osd_show_message
-                              ( osd, _("Window set as always-on-top.") );
+                if( osd ) {
+                    tvtime_osd_show_message( osd,
+                          _("Window set as always-on-top.") );
+                }
             } else {
-                if( osd ) tvtime_osd_show_message
-                              ( osd, _("Window set to normal stacking.") );
+                if( osd ) {
+                    tvtime_osd_show_message( osd,
+                          _("Window set to normal stacking.") );
+                }
             }
             build_output_menu( commands_get_menu( commands, "output" ),
                                sixteennine,
@@ -1866,15 +1870,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             output->set_matte( 0, 0 );
             if( output->toggle_aspect() ) {
                 sixteennine = 1;
-                if( osd ) tvtime_osd_show_message
-                              ( osd, _("16:9 display mode active.") );
+                if( osd ) {
+                    tvtime_osd_show_message( osd,
+                          _("16:9 display mode active.") );
+                }
                 config_save( ct, "WideScreen", "1" );
                 pixel_aspect = ( (double) width ) /
                     ( ( (double) height ) * (16.0 / 9.0) );
             } else {
                 sixteennine = 0;
-                if( osd ) tvtime_osd_show_message
-                              ( osd, _("4:3 display mode active.") );
+                if( osd ) {
+                    tvtime_osd_show_message( osd,
+                          _("4:3 display mode active.") );
+                }
                 config_save( ct, "WideScreen", "0" );
                 pixel_aspect =
                     ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
@@ -1979,17 +1987,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 commands_set_pulldown_alg( commands, tvtime->pulldown_alg );
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
-                        tvtime_osd_show_message
-                            ( osd, _("2-3 Pulldown detection disabled.") );
+                        tvtime_osd_show_message( osd,
+                              _("2-3 Pulldown detection disabled.") );
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
-                        tvtime_osd_show_message
-                            ( osd, _("2-3 Pulldown detection enabled.") );
+                        tvtime_osd_show_message( osd,
+                              _("2-3 Pulldown detection enabled.") );
                     }
                     commands_refresh_menu( commands );
                 }
             } else if( osd ) {
-                tvtime_osd_show_message( osd, _("2-3 Pulldown detection is not"
-                                                " valid with your TV norm.") );
+                tvtime_osd_show_message( osd,
+                    _("2-3 Pulldown detection is not"
+                      " valid with your TV norm.") );
             }
         }
         if( commands_show_deinterlacer_info( commands ) ) {

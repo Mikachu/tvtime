@@ -112,7 +112,7 @@ int mkdir_and_force_owner( const char *path, uid_t uid, gid_t gid )
 {
     if( mkdir( path, S_IRWXU ) < 0 ) {
         if( errno != EEXIST ) {
-            lfprintf( stderr, _("Cannot create %s: %s.\n"),
+            lfprintf( stderr, _("Cannot create %s: %s\n"),
                       path, strerror( errno ) );
         } else {
             /* It exists, make sure it's a directory. */
