@@ -26,6 +26,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
+#include <termio.h>
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
@@ -859,6 +860,9 @@ int main( int argc, char **argv )
     int use_vgasync = 0;
     int framerate_mode = -1;
     int preset_mode = -1;
+    char kbd_cmd[ 1024 ];
+    int kbd_pos = 0;
+    int kbd_available;
     int i;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
@@ -1280,6 +1284,33 @@ int main( int argc, char **argv )
             cmd = fifo_get_next_command( fifo );
             fifo_args = fifo_get_arguments( fifo );
             if( cmd != TVTIME_NOCOMMAND ) commands_handle( commands, cmd, 0 );
+        }
+
+        /* Read commands from standard input. */
+        while( !ioctl( 0, FIONREAD, &kbd_available ) ) {
+            char c;
+
+            if( (kbd_available > 0) && read( 0, &c, 1 ) == 1 ) {
+                if( c == '\n' ) {
+                    int cmd;
+
+                    cmd = tvtime_string_to_command( kbd_cmd );
+                    if( cmd != TVTIME_NOCOMMAND ) {
+                        commands_handle( commands, cmd, 0 );
+                    }
+                    memset( kbd_cmd, 0, sizeof( kbd_cmd ) );
+                    kbd_pos = 0;
+                } else {
+                    if( kbd_pos < sizeof( kbd_cmd ) - 1 ) {
+                        kbd_cmd[ kbd_pos++ ] = c;
+                    } else {
+                        memset( kbd_cmd, 0, sizeof( kbd_cmd ) );
+                        kbd_pos = 0;
+                    }
+                }
+            } else {
+                break;
+            }
         }
 
         output->poll_events( in );
