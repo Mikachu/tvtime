@@ -542,7 +542,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
     ct->keymap[ I_F11 ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ I_F12 ] = TVTIME_TOGGLE_CREDITS;
-    ct->keymap[ 'd' ] = TVTIME_DEBUG;
+    ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
     ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;

@@ -128,7 +128,7 @@
     <keyboard key="F12"/>
   </bind>
 
-  <bind command="debug">
+  <bind command="show_stats">
     <keyboard key="d"/>
   </bind>
 

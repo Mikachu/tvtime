@@ -71,7 +71,6 @@ static Cmd_Names cmd_table[] = {
     { "CONT_DOWN", TVTIME_CONT_DOWN },
     { "CONT_UP", TVTIME_CONT_UP },
 
-    { "DEBUG", TVTIME_DEBUG },
     { "DEINTERLACING_MODE", TVTIME_DEINTERLACINGMODE },
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
 
@@ -100,6 +99,8 @@ static Cmd_Names cmd_table[] = {
     { "SCREENSHOT", TVTIME_SCREENSHOT },
     { "SCROLL_CONSOLE_DOWN", TVTIME_SCROLL_CONSOLE_DOWN },
     { "SCROLL_CONSOLE_UP", TVTIME_SCROLL_CONSOLE_UP },
+
+    { "SHOW_STATS", TVTIME_SHOW_STATS },
 
     { "TOGGLE_ASPECT", TVTIME_TOGGLE_ASPECT },
     { "TOGGLE_AUDIO_MODE", TVTIME_TOGGLE_AUDIO_MODE },
@@ -381,7 +382,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             menu_init( in->menu );
         break;
 
-    case TVTIME_DEBUG:
+    case TVTIME_SHOW_STATS:
         in->printdebug = 1;
         break;
 
