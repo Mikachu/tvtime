@@ -131,7 +131,7 @@ console_t *console_new( int x, int y, int width, int height,
         return NULL;
     }
 
-    con->fontfile = DATADIR "/FreeSansBold.ttf";
+    con->fontfile = "FreeSansBold.ttf";
     con->fontsize = fontsize;
 
 #if 0
@@ -144,16 +144,6 @@ console_t *console_new( int x, int y, int width, int height,
     con->line[0] = osd_string_new( con->fontfile, fontsize, video_width, 
                                    video_height,
                                    video_aspect );
-
-    if( !con->line[0] ) {
-        con->fontfile = "../data/FreeSansBold.ttf";
-
-        con->line[0] = osd_string_new( con->fontfile, fontsize, 
-                                       video_width, 
-                                       video_height,
-                                       video_aspect );
-    }
-
     if( !con->line[0] ) {
         fprintf( stderr, "console: Could not find my font (%s)!\n", 
                  con->fontfile );

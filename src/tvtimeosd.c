@@ -188,7 +188,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
     memset( osd->deinterlace_text, 0, sizeof( osd->deinterlace_text ) );
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
 
-    fontfile = DATADIR "/FreeSansBold.ttf";
+    fontfile = "FreeSansBold.ttf";
     logofile = DATADIR "/testlogo.png";
     creditsfile = DATADIR "/credits.png";
 
@@ -201,11 +201,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect,
 
     osd->strings[ OSD_CHANNEL_NUM ].rightjustified = 0;
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
-    if( !osd->strings[ OSD_CHANNEL_NUM ].string ) {
-        fontfile = "../data/FreeSansBold.ttf";
-        logofile = "../data/testlogo.png";
-        osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( fontfile, 80, width, height, frameaspect );
-    }
     osd->strings[ OSD_TIME_STRING ].rightjustified = 1;
     osd->strings[ OSD_TIME_STRING ].string = osd_string_new( fontfile, 30, width, height, frameaspect );
     osd->strings[ OSD_TUNER_INFO ].rightjustified = 0;

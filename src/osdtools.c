@@ -16,6 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -24,6 +25,7 @@
 #include "pnginput.h"
 #include "leetft.h"
 #include "osdtools.h"
+#include "utils.h"
 
 #define OSD_FADEOUT_TIME 15
 
@@ -60,6 +62,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
     double pixel_aspect;
+    char *fontfilename = 0;
 
     if( !osds ) {
         return 0;
@@ -71,8 +74,31 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
         return 0;
     }
 
+    if( asprintf( &fontfilename, "%s%s", DATADIR, fontfile ) < 0 ) {
+        fontfilename = 0;
+    } else if( !file_is_openable_for_read( fontfilename ) ) {
+        free( fontfilename );
+
+        if( asprintf( &fontfilename, "%s%s", "../data/", fontfile ) < 0 ) {
+            fontfilename = 0;
+        } else if( !file_is_openable_for_read( fontfilename ) ) {
+            fprintf( stderr, "osd_string: Can't find font '%s' in path '%s' or path '%s'.\n",
+                     fontfile, DATADIR, "../data/" );
+            free( fontfilename );
+            fontfilename = 0;
+        }
+    }
+
+    if( !fontfilename ) {
+        free( osds->image4444 );
+        free( osds );
+        return 0;
+    }
+
     pixel_aspect = ( (double) video_width ) / ( ( (double) video_height ) * video_aspect );
-    osds->font = ft_font_new( fontfile, fontsize, pixel_aspect );
+    osds->font = ft_font_new( fontfilename, fontsize, pixel_aspect );
+    free( fontfilename );
+
     if( !osds->font ) {
         fprintf( stderr, "osd_string: Can't open font '%s'\n", fontfile );
         free( osds );
@@ -545,21 +571,21 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
 {
     osd_graphic_t *osdg = (osd_graphic_t *) malloc( sizeof( struct osd_graphic_s ) );
     if( !osdg ) {
-        return NULL;
+        return 0;
     }
 
     osdg->png = pnginput_new( filename );
     if( !osdg->png ) {
         free( osdg );
-        return NULL;
+        return 0;
     }
 
     osdg->frames_left = 0;
-    osdg->image4444 = (unsigned char *)malloc( video_width * video_height * 4);
+    osdg->image4444 = (unsigned char *) malloc( video_width * video_height * 4);
     if( !osdg->image4444 ) {
         pnginput_delete( osdg->png );
         free( osdg );
-        return NULL;
+        return 0;
     }
     osdg->image_width = video_width;
     osdg->image_height = video_height;

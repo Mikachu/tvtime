@@ -100,7 +100,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->bg_cr = 128;
     vs->rows = ROWS;
     vs->cols = COLS;
-    vs->fontfile = DATADIR "/FreeMonoBold.ttf";
+    vs->fontfile = "FreeMonoBold.ttf";
     vs->fontsize = fontsize;
     vs->width = video_width;
     vs->height = video_height;
@@ -118,16 +118,6 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->line[0] = osd_string_new( vs->fontfile, fontsize, video_width, 
                                   video_height,
                                   video_aspect );
-
-    if( !vs->line[0] ) {
-        vs->fontfile = "../data/FreeMonoBold.ttf";
-
-        vs->line[0] = osd_string_new( vs->fontfile, fontsize, 
-                                       video_width, 
-                                       video_height,
-                                       video_aspect );
-    }
-
     if( !vs->line[0] ) {
         fprintf( stderr, "vbiscreen: Could not find my font (%s)!\n", 
                  vs->fontfile );

@@ -109,8 +109,7 @@ menu_t *menu_new( commands_t *in, config_t *cfg, videoinput_t *vidin,
 */
 
     for( i = 0; i < MENU_LINES; i++ ) {
-        m->menu_line[ i ].line = osd_string_new( DATADIR "/FreeSansBold.ttf", 
-                                                 20, width, height, aspect );
+        m->menu_line[ i ].line = osd_string_new( "FreeSansBold.ttf", 20, width, height, aspect );
         if( !m->menu_line[ i ].line ) {
             menu_delete( m );
             return 0;
