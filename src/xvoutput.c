@@ -179,6 +179,8 @@ static int open_display( void )
     XColor curs_col;
     XSetWindowAttributes xswa;
     unsigned long mask;
+    int displaywidthratio;
+    int displayheightratio;
 
     display = XOpenDisplay( 0 );
     if( !display ) {
@@ -287,11 +289,10 @@ static int open_display( void )
     DpyInfoUpdateResolution( display, screen, 0, 0 );
     DpyInfoUpdateGeometry( display, screen );
 
-    {
-        int t1, t2;
-        if( DpyInfoGetGeometry( display, screen, &t1, &t2 ) ) {
-            fprintf( stderr, "xvoutput: Geometry %dx%d, aspect ratio %.2f\n", t1, t2, (double) t1 / (double) t2 );
-        }
+    if( xvoutput_verbose && DpyInfoGetGeometry( display, screen, &displaywidthratio, &displayheightratio ) ) {
+        fprintf( stderr, "xvoutput: Geometry %dx%d, display aspect ratio %.2f\n",
+                 displaywidthratio, displayheightratio,
+                 (double) displaywidthratio / (double) displayheightratio );
     }
 
     XInternAtoms( display, atomNames, 2, False, &wmProtocolsAtom );
@@ -361,18 +362,47 @@ static void calculate_video_area( void )
     int curwidth, curheight;
     int widthratio = output_aspect ? 16 : 4;
     int heightratio = output_aspect ? 9 : 3;
+    int sar_frac_n, sar_frac_d;
+    int sqpx_width, sqpx_height;
 
-    curwidth = output_width;
-    curheight = ( output_width / widthratio ) * heightratio;
-    if( curheight > output_height ) {
-        curheight = output_height;
-        curwidth = ( output_height / heightratio ) * widthratio;
+    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
+                     sar_frac_n, sar_frac_d );
+        }
+    } else {
+        /* Assume 4:3 aspect ? */
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
+        }
+        sar_frac_n = 1;
+        sar_frac_d = 1;
     }
+
+    /* Correct for non-square pixel displays. */
+    sqpx_width = output_width * sar_frac_n;
+    sqpx_height = output_height * sar_frac_d;
+
+    /* Correct for our current aspect ratio (4:3 or 16:9). */
+    curwidth = sqpx_width;
+    curheight = ( sqpx_width * heightratio ) / widthratio;
+    if( curheight > sqpx_height ) {
+        curheight = sqpx_height;
+        curwidth = ( sqpx_height * widthratio ) / heightratio;
+    }
+
+    /* Reverse correction for non-square pixel displays. */
+    curwidth /= sar_frac_n;
+    curheight /= sar_frac_d;
 
     video_area.x = ( output_width - curwidth ) / 2;
     video_area.y = ( output_height - curheight ) / 2;
     video_area.width = curwidth;
     video_area.height = curheight;
+
+    if( xvoutput_verbose ) {
+        fprintf( stderr, "xvoutput: Displaying in a %dx%d window inside %dx%d space.\n", curwidth, curheight, output_width, output_height );
+    }
 }
 
 static int get_colorkey( void )
@@ -422,11 +452,11 @@ int xv_init( int inputwidth, int inputheight, int outputwidth, int aspect, int v
     output_width = outputwidth;
     output_height = ( output_width * 3 ) / 4;
     xvoutput_verbose = verbose;
-    calculate_video_area();
 
     if( !open_display() ) return 0;
     if( !xv_check_extension() ) return 0;
 
+    calculate_video_area();
     xv_alloc_frame();
     xv_clear_screen();
     saver_off( display );
