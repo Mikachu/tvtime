@@ -1,8 +1,24 @@
-tvtime (0.9.10-6.1) experimental; urgency=low
- 
+tvtime (0.9.10-8.1) experimental; urgency=low
+
   * Unofficial build from CVS.
- 
- -- J. Random Hacker <jrhacker@example.com>  Wed, 17 Sep 2003 01:30:32 -0400
+
+ -- J. Random Hacker <jrhacker@example.com>  Fri, 24 Oct 2003 12:56:14 -0400
+
+tvtime (0.9.10-8) unstable; urgency=low
+
+  * Switch to gettext-based debconf templates.  (Closes: Bug#217271)
+    Thanks to Michel Grentzinger <mic.grentz@online.fr>
+  * Add a French translation of the debconf templates.  (Closes: Bug#217272)
+    Also thanks to Michel.
+
+ -- Simon Law <sfllaw@debian.org>  Fri, 24 Oct 2003 10:22:55 -0400
+
+tvtime (0.9.10-7) unstable; urgency=low
+
+  * Add the website information to the description.
+  * Switch to DebHelper 4.
+
+ -- Simon Law <sfllaw@debian.org>  Sat, 11 Oct 2003 20:13:16 -0400
 
 tvtime (0.9.10-6) unstable; urgency=low
 
