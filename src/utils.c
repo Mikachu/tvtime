@@ -513,6 +513,7 @@ static command_names_t command_table[] = {
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
     { "SET_FREQUENCY_TABLE", TVTIME_SET_FREQUENCY_TABLE },
     { "SET_FULLSCREEN_POSITION", TVTIME_SET_FULLSCREEN_POSITION },
+    { "SET_INPUT", TVTIME_SET_INPUT },
     { "SET_INPUT_WIDTH", TVTIME_SET_INPUT_WIDTH },
     { "SET_MATTE", TVTIME_SET_MATTE },
     { "SET_NORM", TVTIME_SET_NORM },
@@ -614,7 +615,7 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION ||
             command == TVTIME_MIXER_UP || command == TVTIME_MIXER_DOWN ||
             command == TVTIME_SET_AUDIO_BOOST || command == TVTIME_SET_STATION ||
-            command == TVTIME_SET_XMLTV_LANGUAGE);
+            command == TVTIME_SET_XMLTV_LANGUAGE || command == TVTIME_SET_INPUT);
 }
 
 #ifdef ENABLE_NLS

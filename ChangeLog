@@ -1,5 +1,6 @@
 
 0.9.14 -
+  * vektor: Added a SET_INPUT command.
   * vektor: Added support for _NET_WM_ICON based on a patch from
       Andrei Badea.
   * vektor: Removed the "bt8x8 luma correction" feature.  It's confusing,

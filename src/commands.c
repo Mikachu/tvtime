@@ -3047,6 +3047,36 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
+    case TVTIME_SET_INPUT:
+        if( cmd->vidin ) {
+            cmd->frame_counter = 0;
+
+            if( cmd->renumbering ) {
+                memset( cmd->next_chan_buffer, 0, sizeof( cmd->next_chan_buffer ) );
+                commands_handle( cmd, TVTIME_ENTER, 0 );
+            }
+
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
+            }
+
+            videoinput_set_input_num( cmd->vidin, atoi( arg ) % videoinput_get_num_inputs( cmd->vidin ) );
+            reinit_tuner( cmd );
+
+            if( cmd->osd ) {
+                char string[ 128 ];
+                snprintf( string, sizeof( string ),
+                          TVTIME_ICON_VIDEOINPUT "  %s: %s",
+                          _("Change video source"),
+                          videoinput_get_input_name( cmd->vidin ) );
+                menu_set_text( commands_get_menu( cmd, "input" ), 1, string );
+                commands_refresh_menu( cmd );
+                tvtime_osd_set_input( cmd->osd, videoinput_get_input_name( cmd->vidin ) );
+                tvtime_osd_show_info( cmd->osd );
+            }
+        }
+        break;
+
     case TVTIME_HUE_UP:
     case TVTIME_HUE_DOWN:
         if( cmd->vidin ) {

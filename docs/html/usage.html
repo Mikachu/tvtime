@@ -605,18 +605,6 @@ and <b>DOWN</b> commands.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
-<tr><th class="docboxleft">LUMA_DOWN
-<tr><td class="docentry"><p>
-Decreases the luma correction value.
-</p></table><p></p>
-
-<table width="90%" class="doclist">
-<tr><th class="docboxleft">LUMA_UP
-<tr><td class="docentry"><p>
-Increases the luma correction value.
-</p></table><p></p>
-
-<table width="90%" class="doclist">
 <tr><th class="docboxleft">MENU_DOWN
 <tr><td class="docentry"><p>
 In menu mode, this command moves the cursor down one entry in the menu.
@@ -826,6 +814,15 @@ mode, either top for the top of the screen, center, or bottom.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
+<tr><th class="docboxleft">SET_INPUT
+<tr><td class="docentry"><p>
+This command takes a parameter and sets the the capture card input (0-n).
+Among the Inputs are: the tuner, composite, or S-Video connectors on the
+capture card.
+</p><p>The <b>SET_INPUT</b> command was added in tvtime 0.9.14.
+</p></table><p></p>
+
+<table width="90%" class="doclist">
 <tr><th class="docboxleft">SET_INPUT_WIDTH
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current input width in pixels.
@@ -1011,14 +1008,6 @@ field deinterlaced to a frame).
 <tr><td class="docentry"><p>
 Switches the capture card input used.  Among the Inputs are: the
 tuner, composite, or S-Video connectors on the capture card.
-</p></table><p></p>
-
-<table width="90%" class="doclist">
-<tr><th class="docboxleft">TOGGLE_LUMA_CORRECTION
-<tr><td class="docentry"><p>
-This command enables or disables the luma correction feature.
-When enabled, this will try to correct for the incorrect colour space
-provided by bt848 and bt878 based capture cards.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
