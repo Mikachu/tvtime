@@ -438,6 +438,43 @@ void blit_packed422_scanline_mmxext_xine( unsigned char *dest, const unsigned ch
     SPEEDY_END();
 }
 
+void blit_packed422_scanline_mmxext_billy( unsigned char *dest, const unsigned char *src, int width )
+{
+    SPEEDY_START();
+
+    if( dest != src ) {
+        int i;
+
+        READ_PREFETCH_2048( src );
+
+        for( i = width/32; i; i-- ) {
+            movq_m2r( src[ 0 ], mm0 );
+            movq_m2r( src[ 8 ], mm1 );
+            movq_m2r( src[ 16 ], mm2 );
+            movq_m2r( src[ 24 ], mm3 );
+            movq_m2r( src[ 32 ], mm4 );
+            movq_m2r( src[ 40 ], mm5 );
+            movq_m2r( src[ 48 ], mm6 );
+            movq_m2r( src[ 56 ], mm7 );
+            movntq_r2m( mm0, dest[ 0 ] );
+            movntq_r2m( mm1, dest[ 8 ] );
+            movntq_r2m( mm2, dest[ 16 ] );
+            movntq_r2m( mm3, dest[ 24 ] );
+            movntq_r2m( mm4, dest[ 32 ] );
+            movntq_r2m( mm5, dest[ 40 ] );
+            movntq_r2m( mm6, dest[ 48 ] );
+            movntq_r2m( mm7, dest[ 56 ] );
+            dest += 64;
+            src += 64;
+        }
+        memcpy( dest, src, (width*2) & 63 );
+        emms();
+    }
+
+    SPEEDY_END();
+}
+
+
 void blit_packed422_scanline_i386_linux( unsigned char *dest, const unsigned char *src, int width )
 {
     SPEEDY_START();
@@ -1062,7 +1099,7 @@ void setup_speedy_calls( void )
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
-        blit_packed422_scanline = blit_packed422_scanline_mmxext_xine;
+        blit_packed422_scanline = blit_packed422_scanline_mmxext_billy;
         composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_mmxext;
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;

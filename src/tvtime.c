@@ -418,7 +418,6 @@ int main( int argc, char **argv )
     performance_t *perf;
     console_t *con;
     int has_signal = 0;
-    int framecount = 0;
 
     setup_speedy_calls();
 
@@ -712,14 +711,6 @@ int main( int argc, char **argv )
         }
         input_next_frame( in );
 
-/*
-        framecount++;
-        if( framecount % 10 == 0 ) {
-            fprintf( stderr, "speedy: %dus\n", speedy_get_usecs() );
-            speedy_reset_timer();
-        }
-*/
-
         /* Aquire the next frame. */
         tuner_state = videoinput_check_for_signal( vidin );
 
@@ -760,10 +751,12 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf );
+            fprintf( stderr, "Speedy time last frame: %dus\n", speedy_get_usecs() );
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf );
         }
+        speedy_reset_timer();
 
         if( output->is_interlaced() ) {
             /* Wait until we can draw the even field. */
