@@ -7,9 +7,7 @@
 #include "console.h"
 #include "speedy.h"
 
-
-struct console_line {
-    osd_string_t *text;
+struct console_line_coords {
     int x, y;
 };
 
@@ -18,7 +16,8 @@ struct console_s {
     config_t *cfg;
 
     char *text;
-    struct console_line *line;
+    osd_string_t **line;
+    struct console_line_coords *coords;
 
     int timeout;  /* fade delay */
     
@@ -34,6 +33,8 @@ struct console_s {
 
     int x, y; /* where to draw console */
     int width, height;  /* the size box we have to draw in */
+    
+    int num_lines;
 
     int curx, cury; /* cursor position */
     int rows, cols;
@@ -41,15 +42,20 @@ struct console_s {
     int stdin, stdout, stderr;
 
     int visible;
+    char *fontfile;
+    int fontsize;
+
+    int first_line;
+    int dropdown;
+    int drop_pos;
 
 };
 
-console_t *console_new( config_t *cfg, int x, int y, int cols, int rows,
+console_t *console_new( config_t *cfg, int x, int y, int width, int height,
                         int fontsize, int video_width, int video_height, 
                         double video_aspect )
 {
-    int i=0;
-    char *fontfile;
+    int i=0, rowheight;
     console_t *con = (console_t *)malloc(sizeof(struct console_s));
 
     if( !con ) {
@@ -75,69 +81,86 @@ console_t *console_new( config_t *cfg, int x, int y, int cols, int rows,
     con->stdout = 1;
     con->stderr = 2;
     con->visible = 0;
-    con->rows = rows;
-    con->cols = cols+1; /* +1 for NULL */
+    con->rows = 0;
+    con->cols = 0;
     con->text = NULL;
     con->line = NULL;
+    con->first_line = 0;
+    con->num_lines = 0;
+    con->coords = NULL;
 
+#if 0
     con->text = (char *)malloc( con->rows * con->cols ); 
     if( !con->text ) {
         console_delete( con );
         return NULL;
     }
+#endif
 
-    con->line = (struct console_line *)malloc( rows * sizeof( struct console_line ) );
+    con->line = (osd_string_t **)malloc( 1 * sizeof( osd_string_t * ) );
     if( !con->line ) {
         console_delete( con );
         return NULL;
     }
 
-    fontfile = DATADIR "/FreeSansBold.ttf";
+    con->fontfile = DATADIR "/FreeSansBold.ttf";
+    con->fontsize = fontsize;
 
+#if 0
     memset( con->text, 0, con->cols * con->rows );
+#endif
 
-    con->width = -1;
-    con->height = -1;
+    con->width = width;
+    con->height = height;
+
+    con->line[0] = osd_string_new( con->fontfile, fontsize, video_width, 
+                                   video_height,
+                                   video_aspect );
+
+    if( !con->line ) {
+        con->fontfile = "./FreeSansBold.ttf";
+
+        con->line[0] = osd_string_new( con->fontfile, fontsize, 
+                                       video_width, 
+                                       video_height,
+                                       video_aspect );
+    }
+
+    if( !con->line ) {
+        fprintf( stderr, "console: Could not find my font (%s)!\n", 
+                 con->fontfile );
+        console_delete( con );
+        return NULL;
+    }
+
+    osd_string_show_text( con->line[0], "H", 0 );
+
+    rowheight = osd_string_get_height( con->line[0] );
+    con->rows = (double)height / (double)rowheight - 0.5;
+
+    osd_string_delete( con->line[0] );
+    
+    free( con->line );
+    con->line = NULL;
+
+    con->coords = (struct console_line_coords *)malloc( con->rows * sizeof( struct console_line_coords ) );
+    if( !con->coords ) {
+        console_delete( con );
+        return NULL;
+    }
+
 
     for( i=0; i < con->rows; i++ ) {
-        con->line[ i ].text = osd_string_new( fontfile, fontsize, 
-                                              video_width, 
-                                              video_height,
-                                              video_aspect );
-        if( !con->line[ i ].text ) {
-            fontfile = "./FreeSansBold.ttf";
+        int tmp;
 
-            con->line[ i ].text = osd_string_new( fontfile, fontsize, 
-                                                  video_width, 
-                                                  video_height,
-                                                  video_aspect );
-        }
+        con->coords[ i ].x = con->x + video_width / 100 ;
 
-        if( !con->line[ i ].text ) {
-            fprintf( stderr, "console: Could not find my font (%s)!\n", 
-                     fontfile );
-            console_delete( con );
-            return NULL;
-        }
+        if( i == 0 ) 
+            tmp = con->y + ((double)height - (double)rowheight * (double)con->rows) / (double)2;
+        else 
+            tmp = con->coords[ i-1 ].y + rowheight;
 
-        osd_string_set_colour_rgb( con->line[ i ].text, 
-                                   (con->fgcolour >> 16) & 0xff, 
-                                   (con->fgcolour >> 8) & 0xff, 
-                                   (con->fgcolour & 0xff) );
-        osd_string_show_text( con->line[ i ].text, " ", 0 );
-
-        if( con->height == -1 ) {
-            con->height = ( con->rows * 
-                            (osd_string_get_height( con->line[ i ].text )
-                             + 2) );
-        }
-
-
-        con->line[ i ].x = con->x + ( ( video_width * 1 ) / 100 );
-        con->line[ i ].y = 1 + con->y +
-            (i*osd_string_get_height( con->line[ i ].text))
-            + 2;
-
+        con->coords[ i ].y = tmp;
     }
 
     return con;
@@ -149,33 +172,127 @@ void console_delete( console_t *con )
     int i=0;
 
     if( con->line ) {
-        for( i=0; i < con->rows; i++ ) {
-            if( con->line[ i ].text )
-                osd_string_delete( con->line[ i ].text );
+        for( i=0; i < con->num_lines; i++ ) {
+            if( con->line[ i ] )
+                osd_string_delete( con->line[ i ] );
         }
         free( con->line );
     }
 
     if( con->text ) free( con->text );
+    if( con->coords ) free( con->coords );
 
     free( con );
 }
 
 void update_osd_strings( console_t *con )
 {
-    int i;
+    char *ptr;
+    char tmpstr[1024];
+    int maxwidth = con->width - ( ( con->frame_width * 1 ) / 100 );
     
     if( !con ) return;
-    for( i=0; i < con->rows; i++ ) {
-        osd_string_set_colour_rgb( con->line[ i ].text, 
+    ptr = con->text + con->curx;
+    tmpstr[0] = '\0';
+
+    if( !con->line ) {
+        con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
+        if( !con->line ) {
+            fprintf(stderr, 
+                    "console: Couldn't add a line.\n" );
+
+            return;
+        }
+        con->line[0] = osd_string_new( con->fontfile, 
+                                       con->fontsize, 
+                                       con->frame_width, 
+                                       con->frame_height,
+                                       con->frame_aspect );
+        if( !con->line[ 0 ] ) {
+            fprintf( stderr, 
+                     "console: Could not create new string.\n" );
+            return;
+        }
+        osd_string_set_colour_rgb( con->line[ 0 ], 
                                    (con->fgcolour >> 16) & 0xff, 
                                    (con->fgcolour >> 8) & 0xff, 
                                    (con->fgcolour & 0xff) );
-        osd_string_show_text( con->line[ i ].text, con->text + i*con->cols, 51 );
 
+        osd_string_show_text( con->line[ 0 ], " ", 51 );
+        con->num_lines++;
     }
 
+
+    for(;;) {
+
+        if( !*ptr ) break;
+
+        if( *ptr != '\n' ) {
+            char blah[2];
+            if( !isprint( *ptr ) ) *ptr = ' ';
+            blah[0] = *ptr;
+            blah[1] = '\0';
+            strcat( tmpstr, blah );
+            osd_string_set_colour_rgb( con->line[ con->cury ], 
+                                       (con->fgcolour >> 16) & 0xff, 
+                                       (con->fgcolour >> 8) & 0xff, 
+                                       (con->fgcolour & 0xff) );
+
+            osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
+        }
+        
+        if( *ptr == '\n' 
+            || osd_string_get_width( con->line[ con->cury ] ) > maxwidth ) {
+            if( con->line ) {
+                osd_string_t **hmm;
+                hmm = (osd_string_t **)realloc( (void *)con->line, sizeof(osd_string_t*)*(con->num_lines+1) );
+                if( hmm ) {
+                    con->num_lines++;
+                    con->line = hmm;
+                } else {
+                    fprintf(stderr, 
+                            "console: Couldn't add another line.\n" );
+                    return;
+                }
+            }
+            con->curx += strlen( tmpstr );
+            if( *ptr == '\n' ) con->curx++;
+            if( strlen( tmpstr ) != 0 )
+                tmpstr[ strlen(tmpstr) ] = '\0';
+            else {
+                tmpstr[0] = ' ';
+                tmpstr[1] = '\0';
+            }
+            osd_string_set_colour_rgb( con->line[ con->cury ], 
+                                       (con->fgcolour >> 16) & 0xff, 
+                                       (con->fgcolour >> 8) & 0xff, 
+                                       (con->fgcolour & 0xff) );
+
+            osd_string_show_text( con->line[ con->cury ], tmpstr, 51 );
+            con->cury++;
+            tmpstr[0] = '\0';
+            con->line[ con->cury ] = osd_string_new( con->fontfile, 
+                                                     con->fontsize, 
+                                                     con->frame_width, 
+                                                     con->frame_height,
+                                                     con->frame_aspect );
+            if( !con->line[ con->cury ] ) {
+                fprintf( stderr, 
+                         "console: Could not create new string.\n" );
+                con->cury--;
+                return;
+            }
+            osd_string_set_colour_rgb( con->line[ con->cury ], 
+                                       (con->fgcolour >> 16) & 0xff, 
+                                       (con->fgcolour >> 8) & 0xff, 
+                                       (con->fgcolour & 0xff) );
+
+            osd_string_show_text( con->line[ con->cury ], " ", 51 );
+        }
+        ptr++;
+    }
 }
+
 
 void console_printf( console_t *con, char *format, ... )
 {
@@ -204,6 +321,7 @@ void console_printf( console_t *con, char *format, ... )
     }
     va_end( ap );
 
+#if 0
     ptr = str;
     while( ptr && *ptr ) {
         int newline;
@@ -264,14 +382,40 @@ void console_printf( console_t *con, char *format, ... )
     }
 
     con->text[ con->curx + con->cury * con->cols ] = '\0';
+#endif
 
-    if( str ) free( str );
+    if( str ) {
+        char *hmm;
+        hmm = realloc( (void *)str, strlen(str)+1 );
+        if( hmm ) {
+            size = strlen(str)+1;
+            str = hmm;
+        }
+    }
+
+    if( con->text ) {
+        char *hmm;
+        hmm = realloc( (void *)con->text, con->cols + size - 1 );
+        if( hmm ) {
+            con->text = hmm;
+            strcat( con->text, str );
+            con->cols += size - 1;
+        } else {
+            if( str )
+                free( str );
+            return;
+        }
+    } else {
+        con->cols = size;
+        con->text = str;
+    }
 
     update_osd_strings( con );
 }
 
 void console_gotoxy( console_t *con, int x, int y )
 {
+    return; /*NOWARN*/
     if( !con ) return;
     if( x < 0 ) x *= -1;
     if( y < 0 ) y *= -1;
@@ -294,10 +438,25 @@ void console_setbg( console_t *con, unsigned int bg )
     con->bgcolour = bg;
 }
 
+void console_scroll_n( console_t *con, int n )
+{
+    if( !con ) return;
+
+    if( n > 0) {
+        con->first_line = (con->num_lines-1 > con->first_line + n) ? con->first_line + n : con->num_lines - 1;
+    } else {
+        con->first_line = (0 > con->first_line + n) ? 0 : con->first_line + n;
+    }
+}
+
 void console_toggle_console( console_t *con )
 {
     if( !con ) return;
     con->visible = !con->visible;
+    if( con->visible ) {
+        con->dropdown = 1;
+        con->drop_pos = con->y;
+    }
 }
 
 void console_composite_packed422_scanline( console_t *con, 
@@ -308,17 +467,20 @@ void console_composite_packed422_scanline( console_t *con,
 
     if( !con ) return;
 
-    if( con->visible && scanline >= con->y && scanline < con->y + con->height ) {
+    if( scanline <= con->drop_pos &&
+        con->visible && scanline >= con->y && 
+        scanline < con->y + con->height ) {
 
         blit_colour_packed422_scanline( output + (con->x*2), con->width,
                                         con->bg_luma, con->bg_cb, con->bg_cr );
 
         for( i = 0; i < con->rows; i++ ) {
-            if( osd_string_visible( con->line[i].text ) ) {
-                if( scanline >= con->line[i].y &&
-                    scanline < con->line[i].y + osd_string_get_height( con->line[i].text ) ) {
-
-                    int startx = con->line[i].x - xpos;
+            if( con->first_line + i >= con->num_lines ) break;
+            if( osd_string_visible( con->line[ con->first_line + i ] ) ) {
+                if( scanline >= con->coords[i].y &&
+                    scanline < con->coords[i].y + 
+                    osd_string_get_height( con->line[ con->first_line + i ] ) ) {
+                    int startx = con->coords[i].x - xpos;
                     int strx = 0;
 
                     if( startx < 0 ) {
@@ -326,16 +488,17 @@ void console_composite_packed422_scanline( console_t *con,
                         startx = 0;
                     }
                     if( startx < width ) {
-                        osd_string_composite_packed422_scanline( con->line[i].text,
+                        osd_string_composite_packed422_scanline( con->line[ con->first_line + i ],
                                                                  output + (startx*2),
                                                                  output + (startx*2),
-                                                                 osd_string_get_width(con->line[i].text),
+                                                                 osd_string_get_width(con->line[ con->first_line + i ]),
                                                                  strx,
-                                                                 scanline - con->line[i].y );
+                                                                 scanline - con->coords[i].y );
                     }
                 }
             }
         }
     }
+    if( scanline == con->frame_height-1 ) con->drop_pos+=4;
 }
 

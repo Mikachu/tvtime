@@ -633,7 +633,7 @@ int main( int argc, char **argv )
     }
 
     /* Setup the console */
-    con = console_new( ct, 10,10, 20, 10, 15,
+    con = console_new( ct, 10,10, (width*80)/100, (height*20)/100, 10,
                        width, height, 
                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !con ) {
@@ -642,8 +642,7 @@ int main( int argc, char **argv )
     }
 
 
-    console_printf( con, "
-You should also get your employer (if you work as a programmer) or your
+    console_printf( con, "You should also get your employer (if you work as a programmer) or your
 school, if any, to sign a copyright disclaimer for the program, if
 necessary.  Here is a sample; alter the names:
 
@@ -725,6 +724,8 @@ Public License instead of this License.
         if( input_toggle_console( in ) ) {
             console_toggle_console( con );
         }
+        console_scroll_n( con, input_scroll_console( in ) );
+
         input_next_frame( in );
 
 
@@ -814,12 +815,14 @@ Public License instead of this License.
 
             /* Wait until it's time to blit the first field. */
             if( rtctimer ) {
+
                 while( performance_get_usecs_since_frame_aquired( perf )
                        < ( fieldtime - safetytime
                            - performance_get_usecs_of_last_blit( perf )
                            - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
+
             }
             performance_checkpoint_delayed_blit_top_field( perf );
 
@@ -877,12 +880,14 @@ Public License instead of this License.
         if( !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer ) {
+
                 while( performance_get_usecs_since_last_field( perf )
                        < ( fieldtime
                            - performance_get_usecs_of_last_blit( perf )
                            - ( rtctimer_get_usecs( rtctimer ) / 2 ) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
+
             }
             performance_checkpoint_delayed_blit_bot_field( perf );
 

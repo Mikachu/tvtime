@@ -49,6 +49,7 @@ struct input_s {
     int toggleaspect;
     int toggledeinterlacingmode;
     int toggleconsole;
+    int scrollconsole;
     
     int togglemenumode;
     menu_t *menu;
@@ -415,6 +416,12 @@ void input_callback( input_t *in, InputEvent command, int arg )
             in->togglefullscreen = 1;
             break;
 
+        case TVTIME_SCROLL_CONSOLE_UP:
+        case TVTIME_SCROLL_CONSOLE_DOWN:
+            in->scrollconsole = (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1;
+            break;
+            
+
         case TVTIME_TOGGLE_CONSOLE:
             in->toggleconsole = 1;
             break;
@@ -686,6 +693,12 @@ int input_toggle_console( input_t *in )
     return in->toggleconsole;
 }
 
+int input_scroll_console( input_t *in )
+{
+    return in->scrollconsole;
+}
+
+
 int input_toggle_menu( input_t *in )
 {
     in->togglemenumode = !in->togglemenumode;
@@ -720,6 +733,7 @@ void input_next_frame( input_t *in )
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->toggleconsole = 0;
+    in->scrollconsole = 0;
     
     if( in->togglemenumode ) menu_refresh( in->menu );
 }
