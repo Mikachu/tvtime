@@ -443,10 +443,6 @@
     <keyboard key="a"/>
   </bind>
 
-  <bind command="toggle_aspect">
-    <keyboard key="a"/>
-  </bind>
-
   <bind command="screenshot">
     <keyboard key="s"/>
   </bind>
