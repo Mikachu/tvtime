@@ -32,7 +32,7 @@ static const char *videodev = "/dev/video0";
 
 static const int block_size = 4096;
 
-static const int use_hufftftm = 0;
+static const int use_hufftftm = 1;
 static unsigned int blocks_written = 0;
 
 static ree_file_header_t *fileheader;
@@ -127,27 +127,10 @@ static void *video_capture_thread_main( void *crap )
         if( use_hufftftm ) {
             ree_split_packet_t *huffpkt = (ree_split_packet_t *) vpkt;
 
-            huffpkt->hdr.id = REE_VIDEO_DIFFCOMP;
+            huffpkt->hdr.id = REE_VIDEO_DIFFC422;
             huffpkt->hdr.datasize = sizeof( int32_t ) * 3;
-
-            huffpkt->lumasize = diffcomp_compress_plane( huffpkt->data, curimage,
-                                                         fileheader->width, fileheader->height );
-
-            /*
-            chroma_422_to_420( tmp420space,
-                               curimage + (fileheader->width * fileheader->height),
-                               fileheader->width/2, fileheader->height*2 );
-            */
-
-            huffpkt->cbsize = diffcomp_compress_plane( huffpkt->data + huffpkt->lumasize,
-                                                       tmp420space,
-                                                       fileheader->width/2, fileheader->height/2 );
-            huffpkt->crsize = diffcomp_compress_plane( huffpkt->data + huffpkt->lumasize
-                                                                     + huffpkt->cbsize,
-                                                       tmp420space + (fileheader->width/2
-                                                                      * fileheader->height/2),
-                                                       fileheader->width/2, fileheader->height/2 );
-            huffpkt->hdr.datasize += huffpkt->lumasize + huffpkt->cbsize + huffpkt->crsize;
+            huffpkt->hdr.datasize += diffcomp_compress_packed422( huffpkt->data, curimage,
+                                                                  fileheader->width, fileheader->height );
         } else {
             vpkt->hdr.id = REE_VIDEO_YCBCR422;
             vpkt->hdr.datasize = fileheader->width * fileheader->height * 2;
