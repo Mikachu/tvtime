@@ -529,10 +529,10 @@ static int open_display( void )
     XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
 
     /* The class hint is useful for window managers like WindowMaker. */
-    classhint.res_name = "tvtime";
-    classhint.res_class = "TVWindow";
+    classhint.res_class = "tvtime";
+    classhint.res_name = "TVWindow";
     XSetClassHint( display, wm_window, &classhint );
-    classhint.res_class = "TVFullscreen";
+    classhint.res_name = "TVFullscreen";
     XSetClassHint( display, fs_window, &classhint );
 
     XMapWindow( display, output_window );
