@@ -19,6 +19,8 @@
 #ifndef TVTIMECONF_H_INCLUDED
 #define TVTIMECONF_H_INCLUDED
 
+#include <sys/types.h>
+#include <unistd.h>
 #include "configsave.h"
 
 typedef struct config_s config_t;
@@ -46,6 +48,7 @@ unsigned int config_get_channel_text_rgb( config_t *ct );
 unsigned int config_get_other_text_rgb( config_t *ct );
 int config_get_fullscreen( config_t *ct );
 int config_get_priority( config_t *ct );
+uid_t config_get_uid( config_t *ct );
 const char *config_get_command_pipe( config_t *ct );
 int config_get_preferred_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );

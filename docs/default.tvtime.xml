@@ -43,7 +43,6 @@
   <option name="FramerateMode" value="0"/>
   <option name="Norm" value="NTSC"/>
   <option name="Frequencies" value="US-Cable"/>
-  <option name="CommandPipe" value="~/.tvtime/tvtimefifo"/>
   <option name="TimeFormat" value="%X"/>
   <option name="ScreenShotDir" value="~"/>
   <option name="MenuBG" value="0"/>

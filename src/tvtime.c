@@ -22,6 +22,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -846,6 +847,7 @@ int main( int argc, char **argv )
     int has_signal = 0;
     vbidata_t *vbidata = 0;
     vbiscreen_t *vs = 0;
+    DIR *fifodir = 0;
     fifo_t *fifo = 0;
     commands_t *commands = 0;
     int usevbi = 1;
@@ -1137,11 +1139,20 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    /* setup the fifo */
-    fifo = fifo_new( config_get_command_pipe( ct ) );
-    if( !fifo ) {
-        fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
-                         "fifo object failed.\n" );
+    /* Ensure the FIFO directory exists */
+    fifodir = opendir( FIFODIR );
+    if( !fifodir ) {
+        fprintf( stderr, "tvtime: Not reading input from fifo.  "
+                         "Directory " FIFODIR " does not exist.\n" );
+    }
+    else {
+        closedir( fifodir );
+        /* Setup the FIFO */
+        fifo = fifo_new( config_get_command_pipe( ct ) );
+        if( !fifo ) {
+            fprintf( stderr, "tvtime: Not reading input from FIFO. Creating "
+                             "FIFO object failed.\n" );
+        }
     }
 
     /* Setup the console */

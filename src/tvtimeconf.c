@@ -25,7 +25,10 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <langinfo.h>
+#include <pwd.h>
+#include <errno.h>
 #include <libxml/parser.h>
 #include "tvtimeconf.h"
 #include "input.h"
@@ -108,6 +111,8 @@ struct config_s
     unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
+
+    uid_t uid;
     char command_pipe[ 256 ];
 
     char *rvr_filename;
@@ -248,14 +253,6 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "Frequencies" ) ) {
             free( ct->freq );
             ct->freq = strdup( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "CommandPipe" ) ) {
-            if( curval[ 0 ] == '~' && getenv( "HOME" ) ) {
-                snprintf( ct->command_pipe, sizeof( ct->command_pipe ), "%s%s", getenv( "HOME" ), curval + 1 );
-            } else {
-                strncpy( ct->command_pipe, curval, 255 );
-            }
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "TimeFormat" ) ) {
@@ -449,10 +446,12 @@ static int file_is_openable_for_read( const char *filename )
 
 config_t *config_new( int argc, char **argv )
 {
+    DIR *temp_dir = 0;
     char temp_dirname[ 1024 ];
     char base[ 256 ];
     char *configFile = 0;
     char c;
+    struct passwd *pwuid = 0;
 
     config_t *ct = (config_t *) malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -473,8 +472,17 @@ config_t *config_new( int argc, char **argv )
     ct->vbidev = strdup( "/dev/vbi0" );
     ct->norm = strdup( "ntsc" );
     ct->freq = strdup( "us-cable" );
-    strncpy( ct->command_pipe, getenv( "HOME" ), 235 );
-    strncat( ct->command_pipe, "/.tvtime/tvtimefifo", 255 );
+
+    ct->uid = getuid( );
+    pwuid = getpwuid( ct->uid );
+    if( !pwuid ) {
+        fprintf( stderr, "config: You don't exist, go away!\n" );
+        free( ct );
+        return 0;
+    }
+    snprintf( ct->command_pipe, sizeof( ct->command_pipe ), 
+              FIFODIR "/TV-%s", pwuid->pw_name );
+
     if( strlen( nl_langinfo( T_FMT ) ) ) {
         ct->timeformat = strdup( nl_langinfo( T_FMT ) );
     } else {
@@ -572,7 +580,26 @@ config_t *config_new( int argc, char **argv )
 
     /* Make the ~/.tvtime directory every time on startup, to be safe. */
     snprintf( temp_dirname, sizeof( temp_dirname ), "%s%s", getenv( "HOME" ), "/.tvtime" );
-    mkdir( temp_dirname, 0777 );
+    if( mkdir( temp_dirname, S_IRWXU ) < 0) {
+        if( errno != EEXIST ) {
+            fprintf( stderr, "config: Cannot create %s.\n", temp_dirname );
+            free( ct );
+            return 0;
+        }
+        else {
+            temp_dir = opendir( temp_dirname );
+            if( !temp_dir ) {
+                fprintf( stderr, "config: %s is not a directory.\n", 
+                         temp_dirname );
+                free( ct );
+                return 0;
+            }
+            else {
+                closedir( temp_dir );
+            }
+        }
+        /* If the directory already exists, we didn't need to create it. */
+    }
 
     /* First read in global settings. */
     strncpy( base, CONFDIR, 245 );
@@ -790,6 +817,11 @@ unsigned int config_get_other_text_rgb( config_t *ct )
 const char *config_get_config_filename( config_t *ct )
 {
     return ct->config_filename;
+}
+
+uid_t config_get_uid( config_t *ct )
+{
+    return ct->uid;
 }
 
 const char *config_get_command_pipe( config_t *ct )
