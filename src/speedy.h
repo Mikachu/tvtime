@@ -148,6 +148,7 @@ extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned 
 extern void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                          unsigned char *src2, int width, int pos );
 extern void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
+extern void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 /**
  * Sets up the function pointers to point at the fastest function available.

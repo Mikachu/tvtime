@@ -70,6 +70,7 @@ void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *i
 void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                   unsigned char *src2, int width, int pos );
 void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
+void (*speedy_memcpy)( void *output, void *input, size_t size );
 
 
 static unsigned int speedy_time = 0;
@@ -387,6 +388,23 @@ __asm__ __volatile__(
         :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
         : "memory");
 return (to);
+}
+
+static void temp_memcpy( void *to, void *from, size_t n )
+{
+int d0, d1, d2;
+__asm__ __volatile__(
+        "rep ; movsl\n\t"
+        "testb $2,%b4\n\t"
+        "je 1f\n\t"
+        "movsw\n"
+        "1:\ttestb $1,%b4\n\t"
+        "je 2f\n\t"
+        "movsb\n"
+        "2:"
+        : "=&c" (d0), "=&D" (d1), "=&S" (d2)
+        :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
+        : "memory");
 }
 
 /**
@@ -1058,6 +1076,7 @@ void setup_speedy_calls( int verbose )
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
     filter_luma_11_packed422_scanline = filter_luma_11_packed422_scanline_c;
+    speedy_memcpy = temp_memcpy;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         if( verbose ) {
