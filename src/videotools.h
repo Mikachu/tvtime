@@ -45,12 +45,11 @@ void cheap_packed422_to_packed444_scanline( unsigned char *output,
                                             unsigned char *input, int width );
 
 /**
- * This filter actually does not meet the spec so I'm not
- * sure what to call it.  I got it from Poynton's site.
+ * This filter actually does not meet the spec so calling it rec601
+ * is a bit of a lie.  I got the filter from Poynton's site.
  */
-void chroma422_to_chroma444_rec601_scanline( unsigned char *dest,
-                                             unsigned char *src,
-                                             int srcwidth );
+void packed422_to_packed444_rec601_scanline( unsigned char *dest,
+                                             unsigned char *src, int width );
 void packed444_to_rgb24_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width );
 void rgb24_to_packed444_rec601_scanline( unsigned char *output,

@@ -331,59 +331,41 @@ void composite_bars_packed4444_scanline( unsigned char *output,
 }
 
 
-const int filterkernel[] = { -1, 3, -6, 12, -24, 80, 80, -24, 12, -6, 3, -1 };
-const int kernelsize = sizeof( filterkernel ) / sizeof( int );
-
-void chroma422_to_chroma444_rec601_scanline( unsigned char *dest, unsigned char *src,
-                                             int srcwidth )
+/**
+ * For the middle pixels, the filter kernel is:
+ *
+ * [-1 3 -6 12 -24 80 80 -24 12 -6 3 -1]
+ */
+void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char *src, int width )
 {
-    if( srcwidth ) {
-        int halfksize = kernelsize / 2;
-        int i;
+    int i;
 
-        /* Handle the first few samples. */
-        for( i = 0; i < halfksize; i++ ) {
-            int sum = 0;
-            int j;
+    /* Process two input pixels at a time.  Input is [Y'][Cb][Y'][Cr]. */
+    for( i = 0; i < width / 2; i++ ) {
+        dest[ (i*6) + 0 ] = src[ (i*4) + 0 ];
+        dest[ (i*6) + 1 ] = src[ (i*4) + 1 ];
+        dest[ (i*6) + 2 ] = src[ (i*4) + 3 ];
 
-            for( j = 0; j < kernelsize; j++ ) {
-                int pos = (i - halfksize + 1) + j;
-
-                if( pos >= 0 && pos < srcwidth ) {
-                    sum += filterkernel[ j ] * src[ pos ];
-                }
-            }
-
-            dest[ i*2 ] = src[ i ];
-            dest[ i*2 + 1 ] = ( sum + 128 ) >> 8;
-        }
-
-        /* Handle samples where we have the full padding. */
-        for( i = halfksize; i < srcwidth - halfksize; i++ ) {
-            dest[ i*2 ] = src[ i ];
-            dest[ i*2 + 1 ] = ((  (160*(src[i  ] + src[i+1]))
-                                - ( 48*(src[i-1] + src[i+2]))
-                                + ( 24*(src[i-2] + src[i+3]))
-                                - ( 12*(src[i-3] + src[i+4]))
-                                + (  6*(src[i-4] + src[i+5]))
-                                - (  2*(src[i-5] + src[i+6]))) + 128) >> 8;
-        }
-
-        /* Handle last few samples. */
-        for( i = srcwidth - halfksize; i < srcwidth; i++ ) {
-            int sum = 0;
-            int j;
-
-            for( j = 0; j < kernelsize; j++ ) {
-                int pos = (i - halfksize + 1) + j;
-
-                if( pos >= 0 && pos < srcwidth ) {
-                    sum += filterkernel[ j ] * src[ pos ];
-                }
-            }
-
-            dest[ i*2 ] = src[ i ];
-            dest[ i*2 + 1 ] = ( sum + 128 ) >> 8;
+        dest[ (i*6) + 3 ] = src[ (i*4) + 2 ];
+        if( i > 3 && i < ((width/2) - 4) ) {
+            dest[ (i*6) + 4 ] = ((  (160*(src[ (i*4) + 1 ] + src[ (i*4) + 5 ]))
+                                  - ( 48*(src[ (i*4) - 3 ] + src[ (i*4) + 9 ]))
+                                  + ( 24*(src[ (i*4) - 7 ] + src[ (i*4) + 13]))
+                                  - ( 12*(src[ (i*4) - 11] + src[ (i*4) + 17]))
+                                  + (  6*(src[ (i*4) - 15] + src[ (i*4) + 21]))
+                                  - (  2*(src[ (i*4) - 19] + src[ (i*4) + 25]))) + 128) >> 8;
+            dest[ (i*6) + 5 ] = ((  (160*(src[ (i*4) + 3 ] + src[ (i*4) + 7 ]))
+                                  - ( 48*(src[ (i*4) - 1 ] + src[ (i*4) + 11]))
+                                  + ( 24*(src[ (i*4) - 5 ] + src[ (i*4) + 15]))
+                                  - ( 12*(src[ (i*4) - 9 ] + src[ (i*4) + 19]))
+                                  + (  6*(src[ (i*4) - 13] + src[ (i*4) + 23]))
+                                  - (  2*(src[ (i*4) - 17] + src[ (i*4) + 27]))) + 128) >> 8;
+        } else if( i < ((width/2) - 1) ) {
+            dest[ (i*6) + 4 ] = (src[ (i*4) + 1 ] + src[ (i*4) + 5 ] + 5) >> 1;
+            dest[ (i*6) + 5 ] = (src[ (i*4) + 3 ] + src[ (i*4) + 5 ] + 7) >> 1;
+        } else {
+            dest[ (i*6) + 4 ] = 128;
+            dest[ (i*6) + 5 ] = 128;
         }
     }
 }

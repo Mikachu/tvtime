@@ -189,12 +189,7 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 
     for( i = 0; i < height; i++ ) {
         unsigned char *input422 = frame422 + (i * stride);
-        /**
-         * This function clearly has bugs:
-         * chroma422_to_chroma444_rec601_scanline( tempscanline,
-         *                                         input422, width );
-         */
-        cheap_packed422_to_packed444_scanline( tempscanline, input422, width );
+        packed422_to_packed444_rec601_scanline( tempscanline, input422, width );
         packed444_to_rgb24_rec601_scanline( tempscanline, tempscanline, width );
         pngoutput_scanline( pngout, tempscanline );
     }
