@@ -1624,13 +1624,17 @@ int main( int argc, char **argv )
             if( osd ) osd_list_matte( osd, matte_mode, sixteennine );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
-            tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
-            if( osd ) {
-                if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
-                    tvtime_osd_show_message( osd, "Pulldown detection disabled." );
-                } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
-                    tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
+            if( videoinput_get_height( vidin ) == 480 ) {
+                tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
+                if( osd ) {
+                    if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
+                        tvtime_osd_show_message( osd, "Pulldown detection disabled." );
+                    } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
+                        tvtime_osd_show_message( osd, "Using vektor's adaptive pulldown detection." );
+                    }
                 }
+            } else if( osd ) {
+                tvtime_osd_show_message( osd, "Pulldown detection not available for your TV norm." );
             }
         }
         if( !output->is_interlaced() && commands_toggle_deinterlacer( commands ) ) {
