@@ -33,6 +33,11 @@
 #include "videotools.h"
 #include "mixer.h"
 
+/**
+ * Warning tolerance, just for debugging.
+ */
+static int tolerance = 4000;
+
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
@@ -79,6 +84,8 @@ static void print_usage( char **argv )
 
 int main( int argc, char **argv )
 {
+    struct timeval lastfieldtime;
+    struct timeval lastframetime;
     double luma_correction = 1.0;
     video_correction_t *vc;
     videoinput_t *vidin;
@@ -95,6 +102,8 @@ int main( int argc, char **argv )
     int fieldtime;
     int tuner_number = 0;
     int secam = 0;
+    int blittime = 0;
+    int skipped = 0;
     int c;
     long last_chan_time = 0;
     int volume;
@@ -233,11 +242,16 @@ int main( int argc, char **argv )
     /* Setup the video input. */
     videoinput_free_all_frames( vidin );
 
+    gettimeofday( &lastframetime, 0 );
+    gettimeofday( &lastfieldtime, 0 );
     for(;;) {
         unsigned char *curluma;
         unsigned char *curcb422;
         unsigned char *curcr422;
-        struct timeval firstfield;
+        struct timeval curframetime;
+        struct timeval curfieldtime;
+        struct timeval blitstart;
+        struct timeval blitend;
         int commands;
 
         commands = sdl_poll_events();
@@ -357,6 +371,14 @@ int main( int argc, char **argv )
         curcb422 = curluma  + ( width   * height );
         curcr422 = curcb422 + ( width/2 * height );
 
+        gettimeofday( &curframetime, 0 );
+        if( (timediff( &curframetime, &lastframetime ) + tolerance) > (fieldtime*2) ) {
+            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, fieldtime %dus\n",
+                     skipped++, timediff( &curframetime, &lastframetime ),
+                     (fieldtime*2) );
+        }
+        lastframetime = curframetime;
+
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
             luma_plane_field_to_frame( sdl_get_output(), curluma,
@@ -374,9 +396,21 @@ int main( int argc, char **argv )
                                                                  0, width * 2, width, width, height );
         }
 
-        /* Display. */
-        gettimeofday( &firstfield, 0 );
+        /* Wait for the next field time and display. */
+        gettimeofday( &curfieldtime, 0 );
+        while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
+            if( rtctimer ) {
+                rtctimer_next_tick( rtctimer );
+            } else {
+                usleep( 20 );
+            }
+            gettimeofday( &curfieldtime, 0 );
+        }
+        gettimeofday( &blitstart, 0 );
         sdl_show_frame();
+        gettimeofday( &blitend, 0 );
+        lastfieldtime = blitend;
+        blittime = timediff( &blitend, &blitstart );
 
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
@@ -398,29 +432,21 @@ int main( int argc, char **argv )
         /* We're done with the input now. */
         videoinput_free_last_frame( vidin );
 
-        /* Wait for next field time. */
-        for(;;) {
-            struct timeval secondfield;
-            gettimeofday( &secondfield, 0 );
-
-            /**
-             * Hack: Give 6ms for the blit time.
-             */
-            if( timediff( &secondfield, &firstfield ) > fieldtime - 6000 ) {
-                /* Display. */
-                sdl_show_frame();
-                break;
-            }
-
-            /**
-             * We spin while we're waiting, and use /dev/rtc to throttle.
-             */
+        /* Wait for the next field time and display. */
+        gettimeofday( &curfieldtime, 0 );
+        while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
             if( rtctimer ) {
                 rtctimer_next_tick( rtctimer );
             } else {
                 usleep( 20 );
             }
+            gettimeofday( &curfieldtime, 0 );
         }
+        gettimeofday( &blitstart, 0 );
+        sdl_show_frame();
+        gettimeofday( &blitend, 0 );
+        lastfieldtime = blitend;
+        blittime = timediff( &blitend, &blitstart );
     }
 
     fprintf( stderr, "tvtime: Cleaning up.\n" );
