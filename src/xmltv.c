@@ -109,6 +109,19 @@ static xmlNodePtr get_program( xmltv_t *xmltv, xmlDocPtr doc, xmlNodePtr cur, co
                                 return cur;
                             }
                             xmlFree( stop );
+                        } else {
+                            xmltv->end_year = start_year;
+                            xmltv->end_month = start_month;
+                            xmltv->end_day = start_day;
+                            xmltv->end_hour = 23;
+                            xmltv->end_min = 59;
+                            if( date_compare( xmltv->end_year, xmltv->end_month, xmltv->end_day,
+                                              xmltv->end_hour, xmltv->end_min, year, month,
+                                              day, hour, min ) > 0 ) {
+                                xmlFree( start );
+                                xmlFree( channel );
+                                return cur;
+                            }
                         }
                     }
                     xmlFree( start );
