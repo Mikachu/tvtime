@@ -199,36 +199,36 @@ static int open_display( void )
         if( strstr( ServerVendor( display ), "XFree86" ) ) {
             int vendrel = VendorRelease( display );
 
-	    fprintf( stderr, "XFree86 " );
+            fprintf( stderr, "XFree86 " );
             if( vendrel < 336 ) {
-	        /*
-	         * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
-	         * those cases here.
-	         */
-	        fprintf( stderr, "%d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
-	    } else if( vendrel < 3900 ) {
-	        /* 3.3.x versions, other than the exceptions handled above */
-	        fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 100) % 10);
-	        if (((vendrel / 10) % 10) || (vendrel % 10)) {
-		    fprintf( stderr, ".%d", (vendrel / 10) % 10);
-		    if (vendrel % 10) {
-		        fprintf( stderr, ".%d", vendrel % 10);
-		    }
-	        }
-	    } else if( vendrel < 40000000 ) {
-	        /* 4.0.x versions */
-	        fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 10) % 10);
-	        if( vendrel % 10 ) {
-		    fprintf( stderr, ".%d", vendrel % 10 );
-	        }
-	    } else {
-	        /* post-4.0.x */
-	        fprintf( stderr, "%d.%d.%d", vendrel / 10000000, (vendrel / 100000) % 100, (vendrel / 1000) % 100);
-	        if( vendrel % 1000 ) {
-		    fprintf( stderr, ".%d", vendrel % 1000);
-	        }
-	    }
-	    fprintf( stderr, "\n" );
+                /*
+                 * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
+                 * those cases here.
+                 */
+                fprintf( stderr, "%d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
+            } else if( vendrel < 3900 ) {
+                /* 3.3.x versions, other than the exceptions handled above */
+                fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 100) % 10);
+                if (((vendrel / 10) % 10) || (vendrel % 10)) {
+                    fprintf( stderr, ".%d", (vendrel / 10) % 10);
+                    if (vendrel % 10) {
+                        fprintf( stderr, ".%d", vendrel % 10);
+                    }
+                }
+            } else if( vendrel < 40000000 ) {
+                /* 4.0.x versions */
+                fprintf( stderr, "%d.%d", vendrel / 1000, (vendrel / 10) % 10);
+                if( vendrel % 10 ) {
+                    fprintf( stderr, ".%d", vendrel % 10 );
+                }
+            } else {
+                /* post-4.0.x */
+                fprintf( stderr, "%d.%d.%d", vendrel / 10000000, (vendrel / 100000) % 100, (vendrel / 1000) % 100);
+                if( vendrel % 1000 ) {
+                    fprintf( stderr, ".%d", vendrel % 1000);
+                }
+            }
+            fprintf( stderr, "\n" );
         } else {
             fprintf( stderr, "vendor release %d\n", VendorRelease( display ) );
         }
