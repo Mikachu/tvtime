@@ -24,7 +24,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
@@ -55,6 +54,7 @@
 #include "config.h"
 #include "vgasync.h"
 #include "rvrreader.h"
+#include "pulldown.h"
 
 /**
  * Set this to 1 to enable the experimental pulldown detection code.
@@ -213,117 +213,6 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  */
 #define PULLDOWN_ERROR_THRESHOLD 4
 
-/**
- * Possible pulldown offsets.
- */
-#define PULLDOWN_OFFSET_1 (1<<0)
-#define PULLDOWN_OFFSET_2 (1<<1)
-#define PULLDOWN_OFFSET_3 (1<<2)
-#define PULLDOWN_OFFSET_4 (1<<3)
-#define PULLDOWN_OFFSET_5 (1<<4)
-
-/* Offset                  1     2     3      4      5   */
-/* Field Pattern          [T B  T][B  T][B   T B]  [T B] */
-/* Action                 Copy  Save  Merge  Copy  Copy  */
-/*                              Bot   Top                */
-int tff_top_pattern[] = { 0,    1,    0,     0,    0     };
-int tff_bot_pattern[] = { 0,    0,    0,     1,    0     };
-
-#define HISTORY_SIZE 5
-
-static int tophistory[ 5 ];
-static int bothistory[ 5 ];
-static int histpos = 0;
-
-void fill_history( int tff )
-{
-    if( tff ) {
-        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
-        tophistory[ 1 ] =       0; bothistory[ 1 ] = INT_MAX;
-        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
-        tophistory[ 3 ] = INT_MAX; bothistory[ 3 ] =       0;
-        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
-    } else {
-        tophistory[ 0 ] = INT_MAX; bothistory[ 0 ] = INT_MAX;
-        tophistory[ 1 ] = INT_MAX; bothistory[ 1 ] =       0;
-        tophistory[ 2 ] = INT_MAX; bothistory[ 2 ] = INT_MAX;
-        tophistory[ 3 ] =       0; bothistory[ 3 ] = INT_MAX;
-        tophistory[ 4 ] = INT_MAX; bothistory[ 3 ] = INT_MAX;
-    }
-
-    histpos = 0;
-}
-
-int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff, int *realbest )
-{
-    int avgbot = 0;
-    int avgtop = 0;
-    int best = 0;
-    int min = -1;
-    int minpos = 0;
-    int minbot = 0;
-    int j;
-    int ret;
-    int mintopval = -1;
-    int mintoppos = -1;
-    int minbotval = -1;
-    int minbotpos = -1;
-
-    tophistory[ histpos ] = top_repeat;
-    bothistory[ histpos ] = bot_repeat;
-
-    for( j = 0; j < HISTORY_SIZE; j++ ) {
-        avgtop += tophistory[ j ];
-        avgbot += bothistory[ j ];
-    }
-    avgtop /= 5;
-    avgbot /= 5;
-
-    for( j = 0; j < HISTORY_SIZE; j++ ) {
-        // int cur = (tophistory[ j ] - avgtop);
-        int cur = tophistory[ j ];
-        if( cur < min || min < 0 ) {
-            min = cur;
-            minpos = j;
-        }
-        if( cur < mintopval || mintopval < 0 ) {
-            mintopval = cur;
-            mintoppos = j;
-        }
-    }
-
-    for( j = 0; j < HISTORY_SIZE; j++ ) {
-        // int cur = (bothistory[ j ] - avgbot);
-        int cur = bothistory[ j ];
-        if( cur < min || min < 0 ) {
-            min = cur;
-            minpos = j;
-            minbot = 1;
-        }
-        if( cur < minbotval || minbotval < 0 ) {
-            minbotval = cur;
-            minbotpos = j;
-        }
-    }
-
-    if( minbot ) {
-        best = tff ? ( minpos + 2 ) : ( minpos + 4 );
-    } else {
-        best = tff ? ( minpos + 4 ) : ( minpos + 2 );
-    }
-    best = best % HISTORY_SIZE;
-    *realbest = 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
-
-    best = (minbotpos + 2) % 5;
-    ret  = 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
-    best = (mintoppos + 4) % 5;
-    ret |= 1 << ( ( histpos + (2*HISTORY_SIZE) - best ) % HISTORY_SIZE );
-
-    histpos = (histpos + 1) % HISTORY_SIZE;
-    return ret;
-}
-
-
 
 /**
  * Explination of the loop:
@@ -414,22 +303,25 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
     /* Make pulldown decisions every top field. */
     if( detect_pulldown && !bottom_field ) {
-        int realbest;
         int predicted;
 
         predicted = pdoffset << 1;
         if( predicted > PULLDOWN_OFFSET_5 ) predicted = PULLDOWN_OFFSET_1;
-        pdoffset = determine_pulldown_offset( last_topdiff, last_botdiff, 1, &realbest );
-        if( pdoffset & predicted ) {
-            pdoffset = predicted;
-            // fprintf( stderr, "   LUCK %d:%d\n", last_topdiff, last_botdiff );
-        } else {
-            pdoffset = realbest;
-            // fprintf( stderr, "NO LUCK %d:%d\n", last_topdiff, last_botdiff );
-        }
+
+        /**
+         * Old algorithm:
+        pdoffset = determine_pulldown_offset_history( last_topdiff, last_botdiff, 1, &realbest );
+        if( pdoffset & predicted ) { pdoffset = predicted; } else { pdoffset = realbest; }
+         */
+
+        pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
 
         /* 3:2 pulldown state machine. */
-        if( pdoffset != predicted ) {
+        if( !pdoffset ) {
+            /* No pulldown offset applies, drop out of pulldown immediately. */
+            pdlastbusted = 0;
+            pderror = PULLDOWN_ERROR_WAIT;
+        } else if( pdoffset != predicted ) {
             if( pdlastbusted ) {
                 pdlastbusted--;
                 pdoffset = predicted;
@@ -454,7 +346,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             // We're in pulldown, reverse it.
             if( !filmmode ) {
                 fprintf( stderr, "Film mode enabled.\n" );
-                // if( osd ) tvtime_osd_show_message( osd, "Film mode enabled." );
+                if( osd ) tvtime_osd_show_message( osd, "Film mode enabled." );
                 filmmode = 1;
             }
             if( curoffset == PULLDOWN_OFFSET_2 ) {
@@ -519,7 +411,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         } else {
             if( filmmode ) {
                 fprintf( stderr, "Film mode disabled.\n" );
-                // if( osd ) tvtime_osd_show_message( osd, "Film mode disabled." );
+                if( osd ) tvtime_osd_show_message( osd, "Film mode disabled." );
                 filmmode = 0;
             }
         }
