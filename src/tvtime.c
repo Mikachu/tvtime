@@ -813,7 +813,6 @@ static void tvtime_build_copied_field( unsigned char *output,
     }
 }
 
-
 int main( int argc, char **argv )
 {
     videoinput_t *vidin = 0;
@@ -858,6 +857,7 @@ int main( int argc, char **argv )
     int firstscan = 0;
     int use_vgasync = 0;
     int framerate_mode = -1;
+    int preset_mode = -1;
     int i;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
@@ -1270,6 +1270,32 @@ int main( int argc, char **argv )
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
         paused = commands_pause( commands );
+        if( commands_toggle_mode( commands ) && config_get_num_modes( ct ) ) {
+            tvtime_mode_settings_t *cur;
+            preset_mode = (preset_mode + 1) % config_get_num_modes( ct );
+            cur = config_get_mode_info( ct, preset_mode );
+            if( cur ) {
+                int firstmethod = curmethodid;
+                while( strcasecmp( cur->deinterlacer, curmethod->short_name ) ) {
+                    curmethodid = (curmethodid + 1) % get_num_deinterlace_methods();
+                    curmethod = get_deinterlace_method( curmethodid );
+                    if( curmethodid == firstmethod ) break;
+                }
+                if( osd ) {
+                    tvtime_osd_set_deinterlace_method( osd, curmethod->name );
+                }
+                if( cur->fullscreen && !output->is_fullscreen() ) {
+                    output->toggle_fullscreen( cur->fullscreen_width, cur->fullscreen_height );
+                } else if( cur->window_height ) {
+                    output->set_window_height( cur->window_height );
+                }
+                if( framerate_mode != cur->framerate_mode ) {
+                    commands_set_framerate( commands, cur->framerate_mode );
+                } else if( osd ) {
+                    tvtime_osd_show_info( osd );
+                }
+            }
+        }
         if( framerate_mode < 0 || framerate_mode != commands_get_framerate( commands ) ) {
             framerate_mode = commands_get_framerate( commands );
             if( osd ) {
