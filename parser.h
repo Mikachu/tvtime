@@ -16,8 +16,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef PARSER_H_INCLUDED
+#define PARSER_H_INCLUDED
 
 struct parser_file_s {
     FILE *fh;
@@ -31,8 +31,9 @@ struct parser_file_s {
 typedef struct parser_file_s parser_file_t;
 
 int parser_new( parser_file_t *pf, const char *filename );
-int parser_get( parser_file_t *pf, const char *name, const char *def, char **value );
+int parser_get( parser_file_t *pf, const char *name,
+                const char *def, char **value );
 void parser_delete( parser_file_t *pf );
 int parser_dump( parser_file_t *pf );
 
-#endif
+#endif /* PARSER_H_INCLUDED */

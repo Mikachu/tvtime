@@ -114,6 +114,8 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
                                                        int width, int alpha );
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );
+void cheap_packed422_to_packed444_scanline( unsigned char *output,
+                                            unsigned char *input, int width );
 
 /**
  * This filter actually does not meet the spec so I'm not

@@ -1,8 +1,6 @@
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
- * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -18,31 +16,26 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIG_H_INCLUDED
+#define CONFIG_H_INCLUDED
 
-#include "parser.h"
+typedef struct config_s config_t;
 
-struct config_t {
-    parser_file_t pf;
+config_t *config_new( const char *filename );
+int config_init( config_t *ct );
+int config_dump( config_t *ct );
 
-    int outputwidth;
-    int inputwidth;
-    int verbose;
-    int aspect;
-    int debug;
-    int apply_luma_correction;
-    int output420;
-    char *v4ldev;
-    int inputnum;
-    double luma_correction;
-    char *norm;
-    char *freq;
-    int tuner_number;
-};
+int config_get_verbose( config_t *ct );
+int config_get_debug( config_t *ct );
+int config_get_outputwidth( config_t *ct );
+int config_get_inputwidth( config_t *ct );
+int config_get_aspect( config_t *ct );
+int config_get_inputnum( config_t *ct );
+int config_get_tuner_number( config_t *ct );
+int config_get_apply_luma_correction( config_t *ct );
+double config_get_luma_correction( config_t *ct );
+const char *config_get_v4l_device( config_t *ct );
+const char *config_get_v4l_norm( config_t *ct );
+const char *config_get_v4l_freq( config_t *ct );
 
-int config_new( struct config_t *ct, const char *filename );
-int config_init( struct config_t *ct );
-int config_dump( struct config_t *ct );
-
-#endif
+#endif /* CONFIG_H_INCLUDED */

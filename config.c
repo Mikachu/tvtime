@@ -1,8 +1,6 @@
 /**
  * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
- * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or (at
@@ -24,16 +22,41 @@
 #include "parser.h"
 #include "config.h"
 
-int config_new( struct config_t *ct, const char *filename )
+struct config_s
 {
-    if( !parser_new( &(ct->pf), filename ) ) {
+    parser_file_t pf;
+
+    int outputwidth;
+    int inputwidth;
+    int verbose;
+    int aspect;
+    int debug;
+    int apply_luma_correction;
+    char *v4ldev;
+    int inputnum;
+    double luma_correction;
+    char *norm;
+    char *freq;
+    int tuner_number;
+};
+
+
+config_t *config_new( const char *filename )
+{
+    config_t *ct = (config_t *) malloc( sizeof( config_t ) );
+    if( !ct ) {
         return 0;
     }
 
-    return 1;
+    if( !parser_new( &(ct->pf), filename ) ) {
+        free( ct );
+        return 0;
+    }
+
+    return ct;
 }
 
-int config_init( struct config_t *ct )
+int config_init( config_t *ct )
 {
     char *tmp;
 
@@ -91,13 +114,6 @@ int config_init( struct config_t *ct )
         ct->luma_correction = 1.0;
     }
 
-    if( parser_get( &(ct->pf), "Output420", "0", &tmp) ) {
-        ct->output420 = atoi( tmp );
-        free( tmp );
-    } else {
-        ct->output420 = 0;
-    }
-
     if( !parser_get( &(ct->pf), "V4LDevice", "/dev/video0", &(ct->v4ldev)) ) {
         ct->v4ldev = strdup("/dev/video0");
         if( !ct->v4ldev ) fprintf( stderr, "config: Error setting v4ldev.\n" );
@@ -132,9 +148,70 @@ int config_init( struct config_t *ct )
     return 1;
 }
 
-int config_dump( struct config_t *ct )
+int config_dump( config_t *ct )
 {
     if( !ct ) return 0;
 
     return parser_dump( &(ct->pf) );
 }
+
+int config_get_verbose( config_t *ct )
+{
+    return ct->verbose;
+}
+
+int config_get_debug( config_t *ct )
+{
+    return ct->debug;
+}
+
+int config_get_outputwidth( config_t *ct )
+{
+    return ct->outputwidth;
+}
+
+int config_get_inputwidth( config_t *ct )
+{
+    return ct->inputwidth;
+}
+
+int config_get_aspect( config_t *ct )
+{
+    return ct->aspect;
+}
+
+int config_get_inputnum( config_t *ct )
+{
+    return ct->inputnum;
+}
+
+int config_get_tuner_number( config_t *ct )
+{
+    return ct->tuner_number;
+}
+
+int config_get_apply_luma_correction( config_t *ct )
+{
+    return ct->apply_luma_correction;
+}
+
+double config_get_luma_correction( config_t *ct )
+{
+    return ct->luma_correction;
+}
+
+const char *config_get_v4l_device( config_t *ct )
+{
+    return ct->v4ldev;
+}
+
+const char *config_get_v4l_norm( config_t *ct )
+{
+    return ct->norm;
+}
+
+const char *config_get_v4l_freq( config_t *ct )
+{
+    return ct->freq;
+}
+

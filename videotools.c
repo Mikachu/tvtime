@@ -104,6 +104,22 @@ void cheap_packed444_to_packed422_scanline( unsigned char *output,
     }
 }
 
+void cheap_packed422_to_packed444_scanline( unsigned char *output,
+                                            unsigned char *input, int width )
+{
+    width /= 2;
+    while( width-- ) {
+        output[ 0 ] = input[ 0 ];
+        output[ 1 ] = input[ 1 ];
+        output[ 2 ] = input[ 3 ];
+        output[ 3 ] = input[ 2 ];
+        output[ 4 ] = input[ 1 ];
+        output[ 5 ] = input[ 3 ];
+        output += 6;
+        input += 4;
+    }
+}
+
 void interpolate_packed422_from_planar422_scanline( unsigned char *output,
                                                     unsigned char *topluma,
                                                     unsigned char *topcb,
@@ -852,6 +868,16 @@ static void init_YCbCr_to_RGB_tables(void)
   conv_YR_inited = 1;
 }
 
+static inline unsigned char clip255( int x )
+{
+    if( x > 255 ) {
+        return 255;
+    } else if( x < 0 ) {
+        return 0;
+    } else {
+        return x;
+    }
+}
 
 void rgb24_to_packed444_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width )
@@ -881,9 +907,9 @@ void packed444_to_rgb24_rec601_scanline( unsigned char *output,
         int cb = input[ 1 ];
         int cr = input[ 2 ];
 
-        output[ 0 ] = (RGB_Y[ luma ] + R_Cr[ cr ]) >> FP_BITS;
-        output[ 1 ] = (RGB_Y[ luma ] + G_Cb[ cb ] + G_Cr[cr]) >> FP_BITS;
-        output[ 2 ] = (RGB_Y[ luma ] + B_Cb[ cb ]) >> FP_BITS;
+        output[ 0 ] = clip255( (RGB_Y[ luma ] + R_Cr[ cr ]) >> FP_BITS );
+        output[ 1 ] = clip255( (RGB_Y[ luma ] + G_Cb[ cb ] + G_Cr[cr]) >> FP_BITS );
+        output[ 2 ] = clip255( (RGB_Y[ luma ] + B_Cb[ cb ]) >> FP_BITS );
 
         output += 3;
         input += 3;
