@@ -71,6 +71,7 @@
 #include "utils.h"
 #include "cpuinfo.h"
 #include "mm_accel.h"
+#include "menu.h"
 
 /**
  * This is how many frames to wait until deciding if the pulldown phase
@@ -1293,6 +1294,55 @@ int main( int argc, char **argv )
     if( !commands ) {
         fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;
+    }
+
+    {
+        /* this is soooo temporary. */
+        menu_t *menu;
+
+        menu = menu_new( "root" );
+        menu_set_text( menu, 0, "tvtime: Setup" );
+        menu_set_text( menu, 1, "Stations" );
+        menu_set_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+        menu_set_text( menu, 2, "Input" );
+        menu_set_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+        menu_set_text( menu, 3, "Picture" );
+        menu_set_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+        menu_set_text( menu, 4, "Video processing setup" );
+        menu_set_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+        menu_set_text( menu, 5, "Exit" );
+        menu_set_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+        commands_add_menu( commands, menu );
+
+        menu = menu_new( "stations" );
+        menu_set_text( menu, 0, "Station configuration" );
+        menu_set_text( menu, 1, "Renumber channel" );
+        menu_set_command( menu, 1, TVTIME_SHOW_MENU, "renumber" );
+        menu_set_text( menu, 2, "Favorites" );
+        menu_set_command( menu, 2, TVTIME_SHOW_MENU, "favorites" );
+        menu_set_text( menu, 3, "Back" );
+        menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( commands, menu );
+
+        menu = menu_new( "input" );
+        menu_set_text( menu, 0, "Input configuration" );
+        menu_set_text( menu, 1, "Device setup" );
+        menu_set_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+        menu_set_text( menu, 2, "Data services" );
+        menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+        menu_set_text( menu, 3, "Back" );
+        menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( commands, menu );
+
+        menu = menu_new( "processing" );
+        menu_set_text( menu, 0, "Video processing setup" );
+        menu_set_text( menu, 1, "Deinterlacer configuration" );
+        menu_set_command( menu, 1, TVTIME_SHOW_MENU, "device" );
+        menu_set_text( menu, 2, "Attempted framerate" );
+        menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+        menu_set_text( menu, 3, "Back" );
+        menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+        commands_add_menu( commands, menu );
     }
 
     if( tvtime->filter ) {
