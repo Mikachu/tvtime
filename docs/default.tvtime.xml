@@ -187,6 +187,14 @@
   <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
 
 
+  <!--
+    Special keys known by tvtime:
+
+      Up, Down, Left, Right, Insert, Home, End, PageUp, PageDown,
+      F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15
+      Backspace, Escape, Enter, Print, Menu
+  -->
+
   <bind command="quit">
     <keyboard key="escape"/>
     <keyboard key="q"/>
@@ -368,6 +376,10 @@
 
   <bind command="display_info">
     <mouse button="1"/>
+  </bind>
+
+  <bind command="toggle_mode">
+    <keyboard key="*"/>
   </bind>
 
 </tvtime>
