@@ -50,6 +50,7 @@
 #include "vbiscreen.h"
 #include "fifo.h"
 #include "commands.h"
+#include "station.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -507,6 +508,7 @@ int main( int argc, char **argv )
     double_plugin_init();
     linearblend_plugin_init();
     scalerbob_plugin_init();
+    
 
     ct = config_new( argc, argv );
     if( !ct ) {
@@ -515,6 +517,9 @@ int main( int argc, char **argv )
     }
     verbose = config_get_verbose( ct );
 
+    station_init(ct);
+    
+    
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         norm = VIDEOINPUT_PAL;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {

@@ -19,14 +19,14 @@
             fprintf(conf,"[%s]\nchannel = %s\n\n",name,chanlist[i].name);
             fflush(conf);
         }
-*/
+
 
 #include <stdio.h>
 #include "bands.h"
 #include "videoinput.h"
-
+*/
 int main( int argc, char **argv )
-{
+{/*
     videoinput_t *vidin = 0;
     int i;
 
@@ -41,7 +41,9 @@ int main( int argc, char **argv )
         int tuner_state;
         tuner_state = videoinput_check_for_signal( vidin, 1 );
     }
-
+*/
     return 0;
 }
 
+
+// I'll do that in station.c

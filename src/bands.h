@@ -281,4 +281,7 @@ const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
  JP Air     JP Bcast
 */
 
+#define NTSC_CABLE_HRC(x) ((x == 77250) ? 78000 : ((x == 83250) ? 84000 : (x - 1250)))
+#define NTSC_CABLE_IRC(x) ((x == 77250) ? 79250 : ((x == 83250) ? 85250 : x))
+
 #endif /* BANDS_H_INCLUDED */
