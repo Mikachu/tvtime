@@ -163,6 +163,16 @@ void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
     osds->frames_left = timeout;
 }
 
+int osd_string_get_width( osd_string_t *osds )
+{
+    return osds->image_textwidth;
+}
+
+int osd_string_get_height( osd_string_t *osds )
+{
+    return osds->image_textheight;
+}
+
 void osd_string_set_timeout( osd_string_t *osds, int timeout )
 {
     osds->frames_left = timeout;
@@ -177,6 +187,28 @@ void osd_string_advance_frame( osd_string_t *osds )
 {
     if( osds->frames_left > 0 ) {
         osds->frames_left--;
+    }
+}
+
+void osd_string_composite_packed422_scanline( osd_string_t *osds,
+                                              unsigned char *output,
+                                              int width, int xpos,
+                                              int scanline )
+{
+    if( !osds->efs || !osds->frames_left ) return;
+
+    if( scanline < osds->image_textheight && xpos < osds->image_textwidth ) {
+        if( osds->frames_left < 50 ) {
+            int alpha;
+            alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
+            composite_packed4444_alpha_to_packed422_scanline( output, output,
+                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                width, alpha );
+        } else {
+            composite_packed4444_to_packed422_scanline( output, output,
+                osds->image4444 + (osds->image_width*4*scanline) + (xpos*4),
+                width );
+        }
     }
 }
 

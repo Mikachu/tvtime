@@ -19,11 +19,16 @@
 #ifndef TVTIMEOSD_H_INCLUDED
 #define TVTIMEOSD_H_INCLUDED
 
+/**
+ * This object is the master on-screen-display controler.  It's basically
+ * the high-level API to control the simple OSD items like the channel
+ * number, volume bar, etc.
+ */
+
 typedef struct tvtime_osd_s tvtime_osd_t;
 
 /**
  */
-
 tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 

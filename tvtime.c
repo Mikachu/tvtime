@@ -192,6 +192,7 @@ static void tvtime_build_frame( unsigned char *output,
                                 int instride,
                                 int outstride )
 {
+    int scanline = 0;
     unsigned char *out = output;
     int i;
 
@@ -203,7 +204,9 @@ static void tvtime_build_frame( unsigned char *output,
 
         /* Clear a scanline. */
         blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
+        scanline++;
     }
 
     /* Copy a scanline. */
@@ -212,7 +215,9 @@ static void tvtime_build_frame( unsigned char *output,
     } else {
         blit_packed422_scanline( output, curframe, width );
     }
+    tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     output += outstride;
+    scanline++;
 
     for( i = (frame_height - 2) / 2; i; --i ) {
         unsigned char *top1 = curframe;
@@ -232,7 +237,9 @@ static void tvtime_build_frame( unsigned char *output,
         } else {
             blit_packed422_scanline( output, top1, width );
         }
+        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
+        scanline++;
 
         curframe += instride * 2;
         lastframe += instride * 2;
@@ -244,16 +251,19 @@ static void tvtime_build_frame( unsigned char *output,
         } else {
             blit_packed422_scanline( output, curframe, width );
         }
+        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
+        scanline++;
     }
 
     if( !bottom_field ) {
         /* Clear a scanline. */
         blit_colour_packed422_scanline( output, width, 16, 128, 128 );
+        tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
+        scanline++;
     }
 
-    tvtime_osd_composite_packed422( osd, out, width, frame_height, outstride );
     menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
 

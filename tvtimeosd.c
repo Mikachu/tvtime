@@ -153,13 +153,15 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
                                      int width, int height, int stride )
 {
-
     osd_string_composite_packed422( osd->channel_number, output, width,
-                                    height, stride, 40, 30, 0 );
+                                    height, stride, osd->channel_number_xpos,
+                                    osd->channel_number_ypos, 0 );
     osd_string_composite_packed422( osd->channel_info, output, width,
-                                    height, stride, width/2, 40, 0 );
+                                    height, stride, osd->channel_info_xpos,
+                                    osd->channel_info_ypos, 0 );
     osd_graphic_composite_packed422( osd->channel_logo, output, width, 
-                                     height, stride, width/2, 86 );
+                                     height, stride, osd->channel_logo_xpos,
+                                     osd->channel_logo_ypos );
 
     /**
      * For the bottom info, the data bar has priority over the
@@ -167,13 +169,13 @@ void tvtime_osd_composite_packed422( tvtime_osd_t *osd, unsigned char *output,
      */
     if( osd_string_visible( osd->data_bar ) ) {
         osd_string_composite_packed422( osd->data_bar, output, width, height,
-                                        stride, 20, height - 40, 0 );
+                                        stride, osd->data_bar_xpos, osd->data_bar_ypos, 0 );
     } else if( osd->ismuted ) {
         osd_string_composite_packed422( osd->muted, output, width, height,
-                                        stride, 20, height - 40, 0 );
+                                        stride, osd->muted_xpos, osd->muted_ypos, 0 );
     } else if( osd_string_visible( osd->volume_bar ) ) {
         osd_string_composite_packed422( osd->volume_bar, output, width, height,
-                                        stride, 20, height - 40, 0 );
+                                        stride, osd->volume_bar_xpos, osd->volume_bar_ypos, 0 );
     }
 }
 
@@ -191,5 +193,105 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
                                               int width, int xpos,
                                               int scanline )
 {
+    if( osd_string_visible( osd->channel_number ) ) {
+        if( scanline >= osd->channel_number_ypos &&
+            scanline < osd->channel_number_ypos + osd_string_get_height( osd->channel_number ) ) {
+
+            int startx = osd->channel_number_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->channel_number,
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->channel_number_ypos );
+            }
+        }
+    }
+
+
+    if( osd_string_visible( osd->channel_info ) ) {
+        if( scanline >= osd->channel_info_ypos &&
+            scanline < osd->channel_info_ypos + osd_string_get_height( osd->channel_number ) ) {
+
+            int startx = osd->channel_info_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->channel_info,
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->channel_info_ypos );
+            }
+        }
+    }
+
+    /**
+     * For the bottom info, the data bar has priority over the
+     * muted indicator which has priority over the volume bar.
+     */
+    if( osd_string_visible( osd->data_bar ) ) {
+        if( scanline >= osd->data_bar_ypos &&
+            scanline < osd->data_bar_ypos + osd_string_get_height( osd->channel_number ) ) {
+
+            int startx = osd->data_bar_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->data_bar,
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->data_bar_ypos );
+            }
+        }
+    } else if( osd->ismuted ) {
+        if( scanline >= osd->muted_ypos &&
+            scanline < osd->muted_ypos + osd_string_get_height( osd->channel_number ) ) {
+
+            int startx = osd->muted_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->muted,
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->muted_ypos );
+            }
+        }
+    } else if( osd_string_visible( osd->volume_bar ) ) {
+        if( scanline >= osd->volume_bar_ypos &&
+            scanline < osd->volume_bar_ypos + osd_string_get_height( osd->channel_number ) ) {
+
+            int startx = osd->volume_bar_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_string_composite_packed422_scanline( osd->volume_bar,
+                                                         output + (startx*2),
+                                                         width - startx,
+                                                         strx,
+                                                         scanline - osd->volume_bar_ypos );
+            }
+        }
+    }
 }
 
