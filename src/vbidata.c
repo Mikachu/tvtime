@@ -309,6 +309,8 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         int hour = packet[3];
         int min = packet[2];
 
+        if( month < 1 || month > 12 ) month = 1;
+
         if( vbi->verbose ) {
             fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
                      day & 31, months[month & 15], hour & 31, min & 63 );
