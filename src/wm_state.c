@@ -1057,11 +1057,71 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     if(getenv("OGLE_KWIN_BUG")) {
       kwin_bug = 1;
     } else {
-      /* billy: enable kwin bug all the time for now. */
-      kwin_bug = 1;
+      kwin_bug = 0;
     }
 
     EWMH_wm = check_for_EWMH_wm(dpy, &wm_name);
+    if( wm_name && !strcmp( wm_name, "KWin" ) && !getenv( "TVTIME_USE_OGLE_KWIN_CODE" ) ) {
+        XEvent ev;
+        XSizeHints vo_hint;
+        XWindowAttributes attrs;
+        int x, y, w, h;
+        int screen_nr;
+        static int warned = 0;
+
+        if( !warned ) {
+            fprintf( stderr, "wm_state: WARNING, enabling EVIL HACK for kwin fullscreen mode.\n" );
+            fprintf( stderr, "wm_state: Report any bugs: http://tvtime.sourceforge.net/\n" );
+            warned = 1;
+        }
+
+        XGetWindowAttributes(dpy, win, &attrs);
+        screen_nr = XScreenNumberOfScreen(attrs.screen);
+
+        switch(state) {
+        case WINDOW_STATE_FULLSCREEN:
+            save_normal_geometry(dpy, win);
+            DpyInfoGetScreenOffset(dpy, screen_nr, &x, &y);
+            DpyInfoGetResolution(dpy, screen_nr, &w, &h);
+            current_state = WINDOW_STATE_FULLSCREEN;
+            break;
+        case WINDOW_STATE_NORMAL:
+            x = normal_state_geometry.x;
+            y = normal_state_geometry.y;
+            w = normal_state_geometry.width;
+            h = normal_state_geometry.height;
+            current_state = WINDOW_STATE_NORMAL;
+            break;
+        default:
+            ERROR("%s", "unknown window state\n");
+            break;
+        }
+
+        vo_hint.x = x;
+        vo_hint.y = y;
+        vo_hint.width = w;
+        vo_hint.height = h;
+        vo_hint.max_width = 0;
+        vo_hint.max_height = 0;
+        vo_hint.win_gravity = StaticGravity;
+        vo_hint.flags = PPosition | PSize | PWinGravity;
+        XSetWMNormalHints( dpy, win, &vo_hint );
+        XMoveResizeWindow( dpy, win, x, y, w, h );
+
+        ev.type = ClientMessage;
+        ev.xclient.window = win;
+        ev.xclient.message_type = XInternAtom(dpy, "_NET_WM_STATE", True);
+        ev.xclient.format = 32;
+        if( state == WINDOW_STATE_FULLSCREEN ) {
+            ev.xclient.data.l[0] = 1; // _NET_WM_STATE_ADD
+        } else {
+            ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE
+        }
+        ev.xclient.data.l[1] = XInternAtom(dpy, "_NET_WM_STATE_STAYS_ON_TOP", False);
+        ev.xclient.data.l[2] = 0;
+        XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureNotifyMask, &ev);
+        XFlush( dpy );
+    } else {
     if(EWMH_wm) {
       if(DpyInfoGetEWMHFullscreen()) {
 	has_ewmh_state_fullscreen = check_for_state_fullscreen(dpy);
@@ -1079,14 +1139,6 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
       gnome_wm_layers = check_for_gnome_wm_layers(dpy);
     }
 
-    if( wm_name && ( strcmp( wm_name, "KWin" ) == 0 ) ) {
-        fprintf( stderr, "\n*** You are using KDE's window manager.  We have been experiencing\n"
-                           "*** ANNOYING and TIMING DEPENDENT bugs with fullscreen support, and\n"
-                           "*** are working with the kwin maintainers to track them down.  Please\n"
-                           "*** check for updates at http://tvtime.sourceforge.net/\n"
-                           "*** Apologies for any inconvenience this may cause.\n\n" );
-    }
-    
     switch(state) {
     case WINDOW_STATE_FULLSCREEN:
       switch_to_fullscreen_state(dpy, win);
@@ -1097,6 +1149,7 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     default:
       ERROR("%s", "unknown window state\n");
       break;
+    }
     }
     if(wm_name != NULL) {
       free(wm_name);

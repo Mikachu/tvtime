@@ -1,5 +1,7 @@
 
 0.9.7
+  * (vektor) Added a temporary and nasty hack to avoid fullscreen problems
+    with KWin from KDE 3.1 (avoids bug 692137)
   * (vektor) tvtime now creates the ~/.tvtime/tvtimerc file on startup
   * (vektor) tvtime now creates the ~/.tvtime directory on startup
   * (vektor) Fixed screenshot code to handle the XVideo Bob filter
