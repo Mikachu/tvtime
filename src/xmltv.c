@@ -94,23 +94,22 @@ static xmlNodePtr get_program( xmltv_t *xmltv, xmlDocPtr doc, xmlNodePtr cur, co
                     parse_xmltv_date( &start_year, &start_month, &start_day,
                                       &start_hour, &start_min, (char *) start );
                     if( date_compare( start_year, start_month, start_day, start_hour, start_min,
-                                      year, month, day, hour, min ) < 0 ) {
+                                      year, month, day, hour, min ) <= 0 ) {
                         xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
                         if( stop ) {
                             parse_xmltv_date( &xmltv->end_year, &xmltv->end_month,
                                               &xmltv->end_day, &xmltv->end_hour,
                                               &xmltv->end_min, (char *) stop );
+                            if( date_compare( xmltv->end_year, xmltv->end_month, xmltv->end_day,
+                                              xmltv->end_hour, xmltv->end_min, year, month,
+                                              day, hour, min ) > 0 ) {
+                                xmlFree( start );
+                                xmlFree( channel );
+                                xmlFree( stop );
+                                return cur;
+                            }
                             xmlFree( stop );
-                        } else {
-                            xmltv->end_year = start_year;
-                            xmltv->end_month = start_month;
-                            xmltv->end_day = start_day;
-                            xmltv->end_hour = start_hour + 1;
-                            xmltv->end_min = start_min;
                         }
-                        xmlFree( start );
-                        xmlFree( channel );
-                        return cur;
                     }
                     xmlFree( start );
                 }

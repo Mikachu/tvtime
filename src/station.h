@@ -228,4 +228,4 @@ int station_writeconfig( station_mgr_t *mgr );
 #ifdef __cplusplus
 };
 #endif
-#endif // STATION_H_INCLUDED
+#endif /* STATION_H_INCLUDED */
