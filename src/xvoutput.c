@@ -63,7 +63,7 @@ static int HandleXError( Display *display, XErrorEvent *xevent )
 "    Cannot allocate enough off-screen video memory.  This may be fixed by:\n"
 "\n"
 "      1. Closing or restarting large X applications.\n"
-"      2. Lowering the sharpness setting of tvtime (--inputwidth parameter).\n"
+"      2. Lowering the input width of tvtime (--inputwidth parameter).\n"
 "      3. Lowering your colour depth or highest configured resolution.\n"
 "      4. Increasing the amount of video memory in your X config file\n"
 "         (for example, if you are using the i810 XFree86 driver.)\n"

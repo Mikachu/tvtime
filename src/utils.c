@@ -471,9 +471,9 @@ static command_names_t command_table[] = {
     { "SET_FRAMERATE", TVTIME_SET_FRAMERATE },
     { "SET_FREQUENCY_TABLE", TVTIME_SET_FREQUENCY_TABLE },
     { "SET_FULLSCREEN_POSITION", TVTIME_SET_FULLSCREEN_POSITION },
+    { "SET_INPUT_WIDTH", TVTIME_SET_INPUT_WIDTH },
     { "SET_MATTE", TVTIME_SET_MATTE },
     { "SET_NORM", TVTIME_SET_NORM },
-    { "SET_SHARPNESS", TVTIME_SET_SHARPNESS },
 
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
     { "SHOW_MENU", TVTIME_SHOW_MENU },
@@ -565,7 +565,7 @@ int tvtime_command_takes_arguments( int command )
     return (command == TVTIME_DISPLAY_MESSAGE || command == TVTIME_SCREENSHOT ||
             command == TVTIME_KEY_EVENT || command == TVTIME_SET_DEINTERLACER ||
             command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE ||
-            command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_SHARPNESS ||
+            command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_INPUT_WIDTH ||
             command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE ||
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION);
 }

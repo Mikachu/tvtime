@@ -35,7 +35,7 @@ Setup
       PAL-60
       Restart with new settings
       Back
-    Sharpness
+    Input width (level of detail)
       Current: %d pixels
       Low (360 pixels)
       Moderate (576 pixels)

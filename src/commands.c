@@ -137,7 +137,7 @@ struct commands_s {
     int setdeinterlacer;
     int normset;
     const char *newnorm;
-    int newsharpness;
+    int newinputwidth;
     char deinterlacer[ 128 ];
     int setfreqtable;
     char newfreqtable[ 128 ];
@@ -639,39 +639,39 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
     }
 }
 
-static void reset_sharpness_menu( menu_t *menu, int sharpness )
+static void reset_inputwidth_menu( menu_t *menu, int inputwidth )
 {
     char string[ 128 ];
 
     snprintf( string, sizeof( string ),
-              _("%s  Current: %d pixels"), TVTIME_ICON_SHARPNESS, sharpness );
+              _("%s  Current: %d pixels"), TVTIME_ICON_INPUTWIDTH, inputwidth );
     menu_set_text( menu, 1, string );
     menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "input" );
 
-    snprintf( string, sizeof( string ), (sharpness == 360) ?
+    snprintf( string, sizeof( string ), (inputwidth == 360) ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
               _("Low (360 pixels)") );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SET_SHARPNESS, "360" );
+    menu_set_enter_command( menu, 2, TVTIME_SET_INPUT_WIDTH, "360" );
 
-    snprintf( string, sizeof( string ), (sharpness == 576) ?
+    snprintf( string, sizeof( string ), (inputwidth == 576) ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
               _("Moderate (576 pixels)") );
     menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SET_SHARPNESS, "576" );
+    menu_set_enter_command( menu, 3, TVTIME_SET_INPUT_WIDTH, "576" );
 
-    snprintf( string, sizeof( string ), (sharpness == 720) ?
+    snprintf( string, sizeof( string ), (inputwidth == 720) ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
               _("Standard (720 pixels)") );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SET_SHARPNESS, "720" );
+    menu_set_enter_command( menu, 4, TVTIME_SET_INPUT_WIDTH, "720" );
 
-    snprintf( string, sizeof( string ), (sharpness == 768) ?
+    snprintf( string, sizeof( string ), (inputwidth == 768) ?
               TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
               _("High (768 pixels)") );
     menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SET_SHARPNESS, "768" );
+    menu_set_enter_command( menu, 5, TVTIME_SET_INPUT_WIDTH, "768" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_RESTART "  %s",
               _("Restart with new settings") );
@@ -921,7 +921,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->setdeinterlacer = 0;
     cmd->normset = 0;
     cmd->newnorm = 0;
-    cmd->newsharpness = 0;
+    cmd->newinputwidth = 0;
     memset( cmd->deinterlacer, 0, sizeof( cmd->deinterlacer ) );
     cmd->setfreqtable = 0;
     snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", config_get_v4l_freq( cfg ) );
@@ -1145,10 +1145,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_SHARPNESS "  %s",
-              _("Sharpness") );
+    snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
+              _("Input width (level of detail)") );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "inputwidth" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_CLOSEDCAPTIONICON "  %s",
               _("Toggle closed captions") );
@@ -1192,10 +1192,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "norm" );
 
-    snprintf( string, sizeof( string ), TVTIME_ICON_SHARPNESS "  %s",
-              _("Sharpness") );
+    snprintf( string, sizeof( string ), TVTIME_ICON_INPUTWIDTH "  %s",
+              _("Input width (level of detail)") );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "sharpness" );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "inputwidth" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
@@ -1204,13 +1204,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "sharpness" );
+    menu = menu_new( "inputwidth" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
-              _("Setup"), _("Input configuration"), _("Sharpness") );
+              _("Setup"), _("Input configuration"), _("Input width") );
     menu_set_text( menu, 0, string );
     menu_set_default_cursor( menu, 1 );
     commands_add_menu( cmd, menu );
-    reset_sharpness_menu( commands_get_menu( cmd, "sharpness" ), config_get_inputwidth( cfg ) );
+    reset_inputwidth_menu( commands_get_menu( cmd, "inputwidth" ), config_get_inputwidth( cfg ) );
 
     menu = menu_new( "audiomode" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
@@ -2093,16 +2093,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
-    case TVTIME_SET_SHARPNESS:
-        cmd->newsharpness = atoi( arg );
+    case TVTIME_SET_INPUT_WIDTH:
+        cmd->newinputwidth = atoi( arg );
         if( cmd->osd ) {
-            menu_t *sharpmenu = commands_get_menu( cmd, "sharpness" );
+            menu_t *sharpmenu = commands_get_menu( cmd, "inputwidth" );
             char message[ 128 ];
-            reset_sharpness_menu( sharpmenu, cmd->newsharpness );
+            reset_inputwidth_menu( sharpmenu, cmd->newinputwidth );
             commands_refresh_menu( cmd );
             snprintf( message, sizeof (message),
-                      _("Sharpness will be %d on restart."),
-                      cmd->newsharpness );
+                      _("Input width will be %d on restart."),
+                      cmd->newinputwidth );
             tvtime_osd_show_message( cmd->osd, message );
         }
         break;
@@ -3282,9 +3282,9 @@ void commands_set_half_size( commands_t *cmd, int halfsize )
     cmd->halfsize = halfsize;
 }
 
-int commands_get_new_sharpness( commands_t *cmd )
+int commands_get_new_input_width( commands_t *cmd )
 {
-    return cmd->newsharpness;
+    return cmd->newinputwidth;
 }
 
 int commands_get_global_brightness( commands_t *cmd )

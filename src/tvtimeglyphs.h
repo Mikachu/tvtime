@@ -89,5 +89,5 @@
 #define TVTIME_ICON_CHANGENTSCMODE     "\xee\x80\xbf" /* Change NTSC Mode    */
 #define TVTIME_ICON_APPLYMATTE         "\xee\x81\x80" /* Apply Matte         */
 #define TVTIME_ICON_SETFSPOS           "\xee\x80\xb5" /* Fullscreen Position */
-#define TVTIME_ICON_SHARPNESS          "\xee\x81\x81" /* Output Sharpness    */
+#define TVTIME_ICON_INPUTWIDTH         "\xee\x81\x81" /* Input width         */
 #define TVTIME_ICON_ALLCHANNELSACTIVE  "\xee\x80\xa7" /* Set All Active      */

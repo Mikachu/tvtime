@@ -1,5 +1,7 @@
 
 0.9.11 -
+  * vektor: Renamed 'sharpness' to 'input width (level of detail)' to avoid
+      some confusion.
   * vektor: Don't set our own colourkey, just re-define the system colour
       key instead.  This lets users change it if they want to do silly
       transparency effects.

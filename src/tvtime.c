@@ -2559,8 +2559,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         station_writeconfig( stationmgr );
     }
 
-    if( commands_get_new_sharpness( commands ) ) {
-        snprintf( number, 4, "%d", commands_get_new_sharpness( commands ) );
+    if( commands_get_new_input_width( commands ) ) {
+        snprintf( number, 4, "%d", commands_get_new_input_width( commands ) );
         config_save( ct, "InputWidth", number );
     }
 
