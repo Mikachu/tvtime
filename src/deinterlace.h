@@ -19,6 +19,8 @@
 #ifndef DEINTERLACE_H_INCLUDED
 #define DEINTERLACE_H_INCLUDED
 
+#include <stdint.h>
+
 #define DEINTERLACE_PLUGIN_API_VERSION 0x00000003
 
 /**
@@ -56,10 +58,10 @@ typedef void (*deinterlace_plugin_init_t)( void );
  */
 struct deinterlace_scanline_data_s
 {
-    unsigned char *tt0, *t0, *m0, *b0, *bb0;
-    unsigned char *tt1, *t1, *m1, *b1, *bb1;
-    unsigned char *tt2, *t2, *m2, *b2, *bb2;
-    unsigned char *tt3, *t3, *m3, *b3, *bb3;
+    uint8_t *tt0, *t0, *m0, *b0, *bb0;
+    uint8_t *tt1, *t1, *m1, *b1, *bb1;
+    uint8_t *tt2, *t2, *m2, *b2, *bb2;
+    uint8_t *tt3, *t3, *m3, *b3, *bb3;
     int bottom_field;
 };
 
@@ -78,7 +80,7 @@ struct deinterlace_scanline_data_s
  *
  * Pointers are always to scanlines in the standard packed 4:2:2 format.
  */
-typedef void (*deinterlace_interp_scanline_t)( unsigned char *output,
+typedef void (*deinterlace_interp_scanline_t)( uint8_t *output,
                                                deinterlace_scanline_data_t *data,
                                                int width );
 /**
@@ -93,7 +95,7 @@ typedef void (*deinterlace_interp_scanline_t)( unsigned char *output,
  * |   B3    |         |   B1    |         |
  * |         |   BB2   |         |  BB0    |
  */
-typedef void (*deinterlace_copy_scanline_t)( unsigned char *output,
+typedef void (*deinterlace_copy_scanline_t)( uint8_t *output,
                                              deinterlace_scanline_data_t *data,
                                              int width );
 
@@ -103,13 +105,13 @@ typedef void (*deinterlace_copy_scanline_t)( unsigned char *output,
  */
 struct deinterlace_frame_data_s
 {
-    unsigned char *f0;
-    unsigned char *f1;
-    unsigned char *f2;
-    unsigned char *f3;
+    uint8_t *f0;
+    uint8_t *f1;
+    uint8_t *f2;
+    uint8_t *f3;
 };
 
-typedef void (*deinterlace_frame_t)( unsigned char *output,
+typedef void (*deinterlace_frame_t)( uint8_t *output,
                                      deinterlace_frame_data_t *data,
                                      int bottom_field, int width, int height );
 

@@ -18,12 +18,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "pnginput.h"
 #include "pngoutput.h"
 
 int main( int argc, char **argv )
 {
-    unsigned char *temp;
+    uint8_t *temp;
     pnginput_t *greyimage;
     pngoutput_t *outimage;
     int width, height, i;
@@ -31,12 +32,12 @@ int main( int argc, char **argv )
     greyimage = pnginput_new( argv[ 1 ] );
     width = pnginput_get_width( greyimage );
     height = pnginput_get_height( greyimage );
-    temp = (unsigned char *) malloc( width * 4 );
+    temp = (uint8_t *) malloc( width * 4 );
 
     outimage = pngoutput_new( argv[ 2 ], width, height, 1, 0.45 );
 
     for( i = 0; i < height; i++ ) {
-        unsigned char *inscanline = pnginput_get_scanline( greyimage, i );
+        uint8_t *inscanline = pnginput_get_scanline( greyimage, i );
         int j;
 
         for( j = 0; j < width; j++ ) {
