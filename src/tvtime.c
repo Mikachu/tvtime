@@ -222,19 +222,6 @@ static void build_blue_frame( uint8_t *output, int width, int height )
                                     blueycbcr[ 1 ], blueycbcr[ 2 ] );
 }
 
-static int curpos = 0;
-static void save_channel( uint8_t *previewframe, uint8_t *curframe,
-                          int width, int height, int savestride, int curstride )
-{
-    int startx, starty;
-
-    startx = ((curpos % 3) * (width/3)) & ~1;
-    starty = (curpos / 3) * (height/3);
-    pointsample_packed422_image( previewframe + (startx*2) + (starty*savestride), width/3, height/3, savestride,
-                                 curframe, width, height, curstride );
-    curpos = (curpos + 1) % 9;
-}
-
 static void save_last_frame( uint8_t *saveframe, uint8_t *curframe,
                              int width, int height, int savestride, int curstride )
 {
