@@ -1,0 +1,47 @@
+Wed Feb  5 00:45:42 AST 2003
+ This is the first draft of a survey i think we should run.
+ Please comment on it (or answer it!) and send to vektor@dumbterm.net
+ for now.  We should decide on what questions we should ask and run
+ this when we release 0.9.7.
+    -vektor
+
+
+What capture card do you have (name on the box)?
+
+What driver do you use?
+
+Did you compile the driver separately or was it in your kernel already?
+
+What tvtime versions have you tried?
+
+What distribution do you use?
+
+What kernel is currently running on your machine?
+
+What is your output device
+  a) A standard CRT monitor
+  b) An LCD panel
+  c) A data projector
+  d) A television
+
+What is the size of your output device in inches?
+
+Have you ever heard of the 'DScaler' application for Windows?
+
+Have you ever used 'DScaler' under Windows?
+
+Which of the following features is most important to you:
+  1) Film-mode detection for higher quality deinterlacing for movies
+  2) Motion-adaptive deinterlacing for higher quality TV broadcasts
+  3) Less CPU-intensive deinterlacing methods
+
+Do you mostly watch TV
+  a) in a little window
+  b) in a large window
+  c) fullscreen
+
+Would you consider using tvtime as a component in a home theatre system?
+
+If we have any follow-up questions and you would be willing to answer them,
+please write your email here.
+
