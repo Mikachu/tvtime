@@ -32,7 +32,6 @@
 
 static mga_vid_config_t mga_config;
 static uint8_t *mga_vid_base;
-static uint8_t *backbuffer;
 static int mga_fd;
 static int mga_input_width;
 static int mga_width;
@@ -69,7 +68,7 @@ static void mga_reconfigure( void )
     mga_config.colkey_on = 0;
     mga_config.format = MGA_VID_FORMAT_YUY2;
     mga_config.frame_size = mga_frame_size;
-    mga_config.num_frames = 2;
+    mga_config.num_frames = 3;
 
     if( ioctl( mga_fd, MGA_VID_CONFIG, &mga_config ) ) {
         fprintf( stderr, "mgaoutput: Error in config ioctl: %s\n", strerror( errno ) );
@@ -94,7 +93,6 @@ static int mga_set_input_size( int inputwidth, int inputheight )
     ioctl( mga_fd, MGA_VID_ON, 0 );
     mga_vid_base = mmap( 0, mga_frame_size * mga_config.num_frames, PROT_WRITE, MAP_SHARED, mga_fd, 0 );
     memset( mga_vid_base, 0, mga_frame_size );
-    backbuffer = malloc( mga_frame_size * mga_config.num_frames );
 
     return 1;
 }
@@ -105,8 +103,7 @@ static void mga_lock_output_buffer( void )
 
 static uint8_t *mga_get_output_buffer( void )
 {
-    return backbuffer;
-    // return mga_vid_base + (curframe*mga_frame_size);
+    return mga_vid_base + (curframe*mga_frame_size);
 }
 
 static int mga_get_output_stride( void )
@@ -149,16 +146,8 @@ static void mga_wait_for_sync( int field )
 
 static int mga_show_frame( int x, int y, int width, int height )
 {
-    // static int foobar = 0;
     uint8_t *base = mga_vid_base + (curframe*mga_frame_size);
     int i;
-
-    for( i = 0; i < mga_height; i++ ) {
-        // blit_colour_packed422_scanline( base + (i * mga_get_output_stride()),
-        //                                 mga_input_width, foobar, 128, 128 );
-        blit_packed422_scanline( base + (i * mga_stride), backbuffer + (i * mga_stride), width );
-    }
-    // foobar = (foobar + 1) % 256;
 
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
@@ -222,7 +211,6 @@ static output_api_t mgaoutput =
     mga_poll_events,
     mga_shutdown
 };
-
 
 output_api_t *get_mga_output( void )
 {
