@@ -218,6 +218,12 @@ static void reinit_tuner( commands_t *in )
         tvtime_osd_set_freq_table( in->osd, "" );
         tvtime_osd_set_channel_number( in->osd, "" );
         tvtime_osd_show_info( in->osd );
+        tvtime_osd_set_network_call( vbi->osd, "" );
+        tvtime_osd_set_network_name( vbi->osd, "" );
+        tvtime_osd_set_show_name( vbi->osd, "" );
+        tvtime_osd_set_show_rating( vbi->osd, "" );
+        tvtime_osd_set_show_start( vbi->osd, "" );
+        tvtime_osd_set_show_length( vbi->osd, "" );
     }
 }
 
