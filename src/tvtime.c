@@ -43,7 +43,7 @@
 #include "menu.h"
 #include "videocorrection.h"
 #include "plugins.h"
-#include "dfboutput.h"
+// #include "dfboutput.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -579,8 +579,8 @@ int main( int argc, char **argv )
     }
 
     /* Setup the output. */
-    output = get_dfb_output();
-    //output = get_sdl_output();
+    //output = get_dfb_output();
+    output = get_sdl_output();
     if( !output->init( width, height, config_get_outputwidth( ct ), 
                        config_get_aspect( ct ) ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: "
