@@ -33,17 +33,17 @@ Setup
       PAL-N
       NTSC-JP
       PAL-60
+      Restart with new settings
       Back
     Sharpness
       Current: %d pixels
-      Poor (180 pixels)
       Low (360 pixels)
       Moderate (576 pixels)
       Standard (720 pixels)
       High (768 pixels)
+      Restart with new settings
       Back
     Toggle closed captions [NTSC only]
-    Restart with new settings
     Back
   Picture
     Brightness
