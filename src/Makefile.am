@@ -41,11 +41,13 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	station.h station.c bands.h configsave.h configsave.c x11tools.c \
 	x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c
 
-bin_PROGRAMS = tvtime tvscanner
+bin_PROGRAMS = tvtime timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
 
 tvscanner_SOURCES = $(COMMON_SRCS) tvscanner.c
+
+timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 

@@ -18,13 +18,12 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <sys/time.h>
+#include <string.h>
 #include "rtctimer.h"
 #include "videotools.h"
+#include "speedy.h"
 
-static inline void get_time( int64_t *const ptime )
-{
-   asm volatile ("rdtsc" : "=A" (*ptime));
-}
+#define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
 
 static int timediff( struct timeval *large, struct timeval *small )
 {
@@ -32,64 +31,111 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
+/* Use a constant random seed for tests. */
+const unsigned int seed = 2;
+
+/* Test against NTSC resolution. */
+const unsigned int width = 720;
+const unsigned int height = 480;
+
+/* Run for 1000 runs. */
+const unsigned int numruns = 1000;
+
+static const char *tests[] = {
+   "blit_colour_packed422_scanline_c",
+   "blit_colour_packed422_scanline_mmx",
+   "blit_colour_packed422_scanline_mmxext",
+};
+const int numtests = ( sizeof( tests ) / sizeof( char * ) );
+
 int main( int argc, char **argv )
 {
     unsigned char *source422planar;
     unsigned char *dest422packed;
-    int width, height;
-    int avg_sum = 0;
-    int avg_count = 0;
-    int i = 0;
-    int64_t before;
-    int64_t after;
-    video_correction_t *vc = video_correction_new();
+    uint64_t avg_sum = 0;
+    uint64_t avg_count = 0;
+    uint64_t before = 0;
+    uint64_t after = 0;
+    int testid = 0;
+    int i;
 
-    if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "timingtest: Can't set realtime priority (need root).\n" );
+    for( i = 0; i < numtests; i++ ) {
+        fprintf( stderr, "timingtest: %2d: %s\n", i, tests[ i ] );
     }
 
-/*
-    width = 720;
-    height = 480;
+    if( argc < 2 ) {
+        fprintf( stderr, "usage: timingtest <testid>\n" );
+        return 1;
+    }
+    testid = atoi( argv[ 1 ] );
+
+    if( testid >= numtests ) {
+        fprintf( stderr, "timingtest: Test %d not found.\n", testid );
+        return 1;
+    } else {
+        fprintf( stderr, "timingtest: Testing %s.\n", tests[ testid ] );
+    }
+  
+    if( !set_realtime_priority( 0 ) ) {
+        fprintf( stderr, "timingtest: Can't set realtime priority (need root).\n" );
+        fprintf( stderr, "timingtest: Results will be inaccurate.\n" );
+    }
+
+    /* Always use the same random seed. */
+    fprintf( stderr, "timingtest: Random seed is %d.\n", seed );
+    srandom( seed );
+
+    /* For the logs. */
+    fprintf( stderr, "timingtest: Resolution is %dx%d\n", width, height );
 
     source422planar = (unsigned char *) malloc( width * height * 2 );
     dest422packed = (unsigned char *) malloc( width * height * 2 );
 
+    if( !source422planar || !dest422packed ) {
+        fprintf( stderr, "timingtest: Can't allocate memory.\n" );
+        return 1;
+    }
+
+    fprintf( stderr, "timingtest: Initializing source to random bytes...\n" );
     for( i = 0; i < width*height*2; i++ ) {
-        source422planar[ i ] = i % 256;
+        //source422planar[ i ] = i % 256;
+        source422planar[ i ] = random() % 256;
     }
+    fprintf( stderr, "timingtest: Initialization complete.\n" );
+
+    /* Sleep to let the system cool off. */
     usleep( 10000 );
-    for( i = 0; i < 100; i++ ) {
-        struct timeval time_before;
-        struct timeval time_after;
+
+    fprintf( stderr, "timingtest: Starting test:\n" );
+    for( i = 0; i < numruns; i++ ) {
+
+        /* Pause to let the scheduler run. */
         usleep( 20 );
-        gettimeofday( &time_before, 0 );
-        get_time( &before );
-        video_correction_planar422_field_to_packed422_frame( vc, dest422packed,
-            source422planar, source422planar + (width*height),
-            source422planar + (width*height) + (width/2 * height), 0, width*2, width, width, height );
-        get_time( &after );
-        gettimeofday( &time_after, 0 );
-        fprintf( stderr, "top: %10d\r", timediff( &time_after, &time_before ) );
-        avg_sum += timediff( &time_after, &time_before );
-        avg_count++;
-        usleep( 20 );
-        gettimeofday( &time_before, 0 );
-        get_time( &before );
-        video_correction_planar422_field_to_packed422_frame( vc, dest422packed,
-            source422planar + width, source422planar + (width*height) + (width/2),
-            source422planar + (width*height) + (width/2 * height) + (width/2), 1, width*2, width, width, height );
-        get_time( &after );
-        gettimeofday( &time_after, 0 );
-        fprintf( stderr, "bot: %10d\r", timediff( &time_after, &time_before ) );
-        avg_sum += timediff( &time_after, &time_before );
+
+        if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_c" ) ) {
+            rdtscll( before );
+            blit_colour_packed422_scanline_c( source422planar, width, 128, 128, 128 );
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx" ) ) {
+            rdtscll( before );
+            blit_colour_packed422_scanline_mmx( source422planar, width, 128, 128, 128 );
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext" ) ) {
+            rdtscll( before );
+            blit_colour_packed422_scanline_mmxext( source422planar, width, 128, 128, 128 );
+            rdtscll( after );
+        }
+
+        fprintf( stderr, "[%4d] Cycles: %7d\r", i, (int) (after - before) );
+        avg_sum += (after - before);
         avg_count++;
     }
-    fprintf( stderr, "\n%d fields tested, average was %fus.\n", avg_count, ((double) avg_sum) / ((double) avg_count) );
+
+    fprintf( stderr, "\ntimingtest: %llu runs tested, average time was %llu cycles.\n",
+             avg_count, (avg_sum/avg_count ) );
 
     free( source422planar );
     free( dest422packed );
-*/
     return 0;
 }
 
