@@ -408,7 +408,7 @@ static int conf_xml_parse( config_t *ct, char *configFile )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-ahkmsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
+    fprintf( stderr, "usage: %s [-ahkmMsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
                      "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n", argv[ 0 ] );
 
@@ -416,6 +416,7 @@ static void print_usage( char **argv )
     fprintf( stderr, "\t-h\tShow this help message.\n" );
     fprintf( stderr, "\t-k\tDisables keyboard input handling in tvtime (slave mode).\n" );
     fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
+    fprintf( stderr, "\t-M\tStart tvtime in windowed mode.\n" );
     fprintf( stderr, "\t-s\tPrint stats on frame drops (for debugging).\n" );
 
     fprintf( stderr, "\t-S\tSave command line options to the config file.\n" );
@@ -641,11 +642,12 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt( argc, argv, "ahkmsSvF:r:H:I:d:b:i:c:n:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:f:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'k': ct->slave_mode = 1; break;
         case 'm': ct->fullscreen = 1; break;
+        case 'M': ct->fullscreen = 0; break;
         case 's': ct->debug = 1; break;
         case 'S': saveoptions = 1; break;
         case 'v': ct->verbose = 1; break;
