@@ -43,7 +43,7 @@ const unsigned int width = 720;
 const unsigned int height = 480;
 
 /* Run for 1000 runs. */
-const unsigned int numruns = 2*60;
+const unsigned int numruns = 4*60;
 
 static const char *tests[] = {
    "blit_colour_packed422_scanline_c 720x480 frame",
