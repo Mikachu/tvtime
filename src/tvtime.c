@@ -1404,6 +1404,7 @@ int main( int argc, char **argv )
         int paused = 0;
         int output_x, output_y, output_w, output_h;
         int output_success = 1;
+        int exposed = output->is_exposed();
 
         output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
         output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
@@ -1454,6 +1455,15 @@ int main( int argc, char **argv )
         printdebug = commands_print_debug( commands );
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
+        if( screenshot ) {
+            /**
+             * If we're being asked to take a screenshot, force a draw by
+             * marking us exposed (just for this frame).  This makes sure
+             * that screenshots always happen regardless of whether the
+             * window is or becomes obscured.
+             */
+            exposed = 1;
+        }
         paused = commands_pause( commands );
         if( commands_toggle_mode( commands ) && config_get_num_modes( ct ) ) {
             config_t *cur;
@@ -1653,7 +1663,7 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
-        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the even field. */
                 output->wait_for_sync( 0 );
@@ -1749,7 +1759,7 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_blit_top_field_end( perf );
 
-        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the odd field. */
                 output->wait_for_sync( 1 );
@@ -1833,7 +1843,7 @@ int main( int argc, char **argv )
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
-        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
+        if( exposed && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 

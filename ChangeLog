@@ -1,5 +1,12 @@
 
 0.9.8.3 -
+  * vektor: Removed the vgasync code until we have something that
+      can correctly use the vsync.h stuff (it was a bad hack anyway)
+  * vektor: Screenshot now works even if the window is not currently
+      exposed (fixes 731637)
+  * vektor: New fullscreen code, based on SDL's fullscreen code with
+      some from ogle's (fixes 693329, 694455, 693337, 694282, 720300)
+  * vektor: Don't use Position hint (fixes 732012).
 
 0.9.8.2 - Sat May  3 18:01:30 ADT 2003
   * Paco-Paco: Fixed the build.
