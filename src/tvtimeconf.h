@@ -75,6 +75,7 @@ enum tvtime_commands
     TVTIME_SHOW_CREDITS,
 
     TVTIME_TOGGLE_NTSC_CABLE_MODE,
+    TVTIME_AUTO_ADJUST_PICT,
 
     TVTIME_LAST
 };
@@ -98,9 +99,9 @@ const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
 const char *config_get_timeformat( config_t *ct );
-const char *config_get_menu_bg_rgb( config_t *ct );
-const char *config_get_channel_text_rgb( config_t *ct );
-const char *config_get_other_text_rgb( config_t *ct );
+unsigned int config_get_menu_bg_rgb( config_t *ct );
+unsigned int config_get_channel_text_rgb( config_t *ct );
+unsigned int config_get_other_text_rgb( config_t *ct );
 
 void config_set_verbose( config_t *ct, int verbose );
 void config_set_debug( config_t *ct, int debug );

@@ -402,6 +402,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
             }
             break;
 
+        case TVTIME_AUTO_ADJUST_PICT:
+            videoinput_reset_default_settings( in->vidin );
+            break;
+
         case TVTIME_TOGGLE_NTSC_CABLE_MODE:
             if( videoinput_has_tuner( in->vidin ) ) {
                 toggle_ntsc_cable_mode();

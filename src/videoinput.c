@@ -794,10 +794,12 @@ int videoinput_is_bttv( videoinput_t *vidin )
 
 void videoinput_reset_default_settings( videoinput_t *vidin )
 {
-/*
+
+    struct video_picture grab_pict;
+
     if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCGPICT" );
-        return 0;
+        return;
     }
 
     if( vidin->verbose ) {
@@ -820,7 +822,7 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
     }
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
-        return 0;
+        return;
     }
 
     if( vidin->verbose ) {
@@ -829,7 +831,7 @@ void videoinput_reset_default_settings( videoinput_t *vidin )
                 grab_pict.brightness, grab_pict.hue, grab_pict.colour,
                 grab_pict.contrast );
     }
-*/
+
 }
 
 void videoinput_delete( videoinput_t *vidin )

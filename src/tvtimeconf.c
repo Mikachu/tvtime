@@ -75,7 +75,8 @@ static Cmd_Names cmd_table[] = {
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
     { "SHOW_CREDITS", TVTIME_SHOW_CREDITS },
 
-    { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE }
+    { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE },
+    { "AUTO_ADJUST_PICT", TVTIME_AUTO_ADJUST_PICT }
 };
 
 
@@ -105,14 +106,15 @@ struct config_s
     int *keymap;
     char *timeformat;
     int *buttonmap;
-    char *menu_bg_rgb;
-    char *channel_text_rgb;
-    char *other_text_rgb;
+    unsigned int menu_bg_rgb;
+    unsigned int channel_text_rgb;
+    unsigned int other_text_rgb;
 };
 
 void config_init( config_t *ct );
 void config_init_keymap( config_t *ct );
 void config_init_buttonmap( config_t *ct );
+unsigned int parse_colour( const char *str );
 
 static void print_usage( char **argv )
 {
@@ -175,9 +177,9 @@ config_t *config_new( int argc, char **argv )
     ct->freq = strdup( "us-cable" );
     ct->timeformat = strdup( "%r" );
     ct->finetune = 0;
-    ct->menu_bg_rgb = strdup( "000000" );
-    ct->channel_text_rgb = strdup( "FFFF00" );
-    ct->other_text_rgb = strdup( "F5DEB3" );
+    ct->menu_bg_rgb = 4278190080U; /* opaque black */
+    ct->channel_text_rgb = 4294967040U; /* opaque yellow */
+    ct->other_text_rgb = 4294303411U; /* opaque wheat */
     ct->keymap = (int *) malloc( 8*MAX_KEYSYMS * sizeof( int ) );
 
     if( !ct->keymap ) {
@@ -233,6 +235,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
+    ct->keymap[ ' ' ] = TVTIME_AUTO_ADJUST_PICT;
 
     memset( ct->buttonmap, 0, MAX_BUTTONS * sizeof(int) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;
@@ -363,18 +366,15 @@ void config_init( config_t *ct )
     }
 
     if( (tmp = parser_get( &(ct->pf), "MenuBG", 1 )) ) {
-        free( ct->menu_bg_rgb );
-        ct->menu_bg_rgb = strdup( tmp );
+        ct->menu_bg_rgb = parse_colour( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "ChannelTextFG", 1 )) ) {
-        free( ct->channel_text_rgb );
-        ct->channel_text_rgb = strdup( tmp );
+        ct->channel_text_rgb = parse_colour( tmp );
     }
 
     if( (tmp = parser_get( &(ct->pf), "OtherTextFG", 1 )) ) {
-        free( ct->other_text_rgb );
-        ct->other_text_rgb = strdup( tmp );
+        ct->other_text_rgb = parse_colour( tmp );
     }
 
 
@@ -681,19 +681,53 @@ int config_get_finetune( config_t *ct )
     return ct->finetune;
 }
 
-const char *config_get_menu_bg_rgb( config_t *ct )
+unsigned int config_get_menu_bg_rgb( config_t *ct )
 {
     return ct->menu_bg_rgb;
 }
 
-const char *config_get_channel_text_rgb( config_t *ct )
+unsigned int config_get_channel_text_rgb( config_t *ct )
 {
     return ct->channel_text_rgb;
 }
 
-const char *config_get_other_text_rgb( config_t *ct )
+unsigned int config_get_other_text_rgb( config_t *ct )
 {
     return ct->other_text_rgb;
+}
+
+unsigned int parse_colour( const char *str )
+{
+    unsigned int a,r,g,b;
+    int ret;
+    
+    if( !str || !*str ) return 0;
+
+    if( strlen( str ) == 1 ) return (unsigned int)atoi( str );
+
+    if( str[0] == '0' && str[1] == 'x' ) {
+        ret = sscanf( str, "0x%2x%2x%2x%2x", &a, &r, &g, &b );
+    } else {
+        ret = sscanf( str, "%u %u %u %u", &a, &r, &g, &b );
+    }
+    switch( ret ) {
+    case 0:
+        return 0;
+        break;
+    case 1:
+        return a;
+        break;
+    case 2:
+        return 0xff000000 | ( (a & 0xff) << 8 ) | (r & 0xff);
+        break;
+    case 3:
+        return 0xff000000 | ( (a & 0xff) << 16 ) | ( (r & 0xff) << 8 ) | ( g & 0xff);
+        break;
+    case 4:
+        return ( (a & 0xff) << 24 ) | ( (r & 0xff) << 16 ) | ( ( g & 0xff) << 8 ) | (b & 0xff);
+    }
+
+    return 0;
 }
 
 void config_rgb_to_ycbcr( const char *rgbhex, unsigned char *y, unsigned char *cb, unsigned char *cr )

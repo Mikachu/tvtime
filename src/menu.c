@@ -74,7 +74,7 @@ menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin,
 {
     menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
     int i;
-    const char *rgb;
+    unsigned int rgb;
     unsigned char oconv[3];
 
     if( !m ) {
@@ -102,12 +102,13 @@ menu_t *menu_new( input_t *in, config_t *cfg, videoinput_t *vidin,
         menu_delete( m );
         return 0;
     }
+
+/** Removed by Doug until we can convert argb to ay'cbcr
     rgb = config_get_menu_bg_rgb( cfg );
-    config_rgb_to_ycbcr( rgb, &oconv[0], &oconv[1], &oconv[2] );
     m->bg_luma = (int)oconv[0];
     m->bg_cb = (int)oconv[1];
     m->bg_cr = (int)oconv[2];
-    
+*/
 
     for( i = 0; i < MENU_LINES; i++ ) {
         m->menu_line[ i ].line = osd_string_new( DATADIR "/FreeSansBold.ttf", 
