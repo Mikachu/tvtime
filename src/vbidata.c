@@ -310,7 +310,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         vbi->start_day = day & 31;
         vbi->start_hour = hour & 31;
         vbi->start_min = hour & 63;
-        snprintf( str, 32, "%02d %s, %02d:%02d\n",
+        snprintf( str, 32, "%02d %s, %02d:%02d",
                   day & 31, months[month & 15], hour & 31, min & 63 );
         tvtime_osd_set_show_start( vbi->osd, str );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
