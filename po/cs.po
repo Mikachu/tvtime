@@ -539,9 +539,8 @@ msgid "High (768 pixels)"
 msgstr "Vysoké (768 bodů)"
 
 #: src/commands.c:838
-#, fuzzy, c-format
 msgid "%s  Maximum (%d pixels)"
-msgstr "%s  Současně: %d bodů"
+msgstr "%s  Maximum: (%d bodů)"
 
 #: src/commands.c:848 src/commands.c:1388
 msgid "Restart with new settings"
