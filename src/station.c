@@ -171,7 +171,7 @@ int station_readconfig( station_mgr_t *mgr )
         return 0;
     }
 
-    if( xmlStrcmp( cur->name, (const xmlChar *) "STATIONRC" ) ) {
+    if( xmlStrcmp( cur->name, BAD_CAST "STATIONRC" ) ) {
         fprintf( stderr, "station: %s: document of the wrong type", mgr->stationrc );
         xmlFreeDoc( doc );
         return 0;
@@ -179,7 +179,7 @@ int station_readconfig( station_mgr_t *mgr )
 
     station = cur->xmlChildrenNode;
     while( station ) {
-        if( !xmlStrcmp( station->name, (const xmlChar *) "station" ) ) {
+        if( !xmlStrcmp( station->name, BAD_CAST "station" ) ) {
             xmlChar *name = 0;
             xmlChar *active_s = 0;
             xmlChar *pos_s = 0;
@@ -189,15 +189,15 @@ int station_readconfig( station_mgr_t *mgr )
 
             cur = station->xmlChildrenNode;
             while( cur ) {
-                if( !xmlStrcmp( cur->name, (const xmlChar *) "name" ) ) {
+                if( !xmlStrcmp( cur->name, BAD_CAST "name" ) ) {
                     name = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, (const xmlChar *) "active" ) ) {
+                } else if( !xmlStrcmp( cur->name, BAD_CAST "active" ) ) {
                     active_s = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, (const xmlChar *) "pos" ) ) {
+                } else if( !xmlStrcmp( cur->name, BAD_CAST "pos" ) ) {
                     pos_s = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, (const xmlChar *) "band" ) ) {
+                } else if( !xmlStrcmp( cur->name, BAD_CAST "band" ) ) {
                     band = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !strcmp( cur->name, (const xmlChar *) "channel" ) ) {
+                } else if( !strcmp( cur->name, BAD_CAST "channel" ) ) {
                     channel = xmlNodeGetContent( cur->xmlChildrenNode );
                 }
 
@@ -209,7 +209,7 @@ int station_readconfig( station_mgr_t *mgr )
             }
 
             station_add( mgr, pos, (char *) band, (char *) channel, (char *) name );
-            station_set_current_active( mgr, !( active_s && ( !xmlStrcmp( active_s, (const xmlChar *) "false" ) ) ) );
+            station_set_current_active( mgr, !( active_s && ( !xmlStrcmp( active_s, BAD_CAST "false" ) ) ) );
         }
         station = station->next;
     }
@@ -225,7 +225,7 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
     if( !mgr ) return 0;
 
     strncpy( mgr->stationrc, getenv( "HOME" ), 235 );
-    strncat( mgr->stationrc, "/.tvtime/stationrc", 255 );
+    strncat( mgr->stationrc, "/.tvtime/stations.xml", 255 );
     mgr->verbose = verbose;
     mgr->first = 0;
     mgr->current = 0;
@@ -573,23 +573,23 @@ int station_writeconfig( station_mgr_t *mgr)
         return 1;
     }
 
-    doc = xmlNewDoc( (const xmlChar *) "1.0" );
-    doc->children = xmlNewDocNode( doc, 0, (const xmlChar *) "STATIONRC", 0 );
+    doc = xmlNewDoc( BAD_CAST "1.0" );
+    doc->children = xmlNewDocNode( doc, 0, BAD_CAST "STATIONRC", 0 );
 
     sprintf( buf, "%d", mgr->current->pos );
 
     do {
-        tree = xmlNewChild( doc->children, 0, (const xmlChar *) "station", 0 );
+        tree = xmlNewChild( doc->children, 0, BAD_CAST "station", 0 );
 
-        subtree = xmlNewChild( tree, 0, (const xmlChar *) "name", (const xmlChar *) rp->name );
+        subtree = xmlNewChild( tree, 0, BAD_CAST "name", BAD_CAST rp->name );
 
-        subtree = xmlNewChild( tree, 0, (const xmlChar *) "active", (const xmlChar *) (rp->active ? "true" : "false") );
+        subtree = xmlNewChild( tree, 0, BAD_CAST "active", BAD_CAST (rp->active ? "true" : "false") );
 
         sprintf( buf, "%d", rp->pos );
-        subtree = xmlNewChild( tree, 0, (const xmlChar *) "pos", (const xmlChar *) buf );
+        subtree = xmlNewChild( tree, 0, BAD_CAST "pos", BAD_CAST buf );
 
-        subtree = xmlNewChild( tree, 0, (const xmlChar *) "band", (const xmlChar *) rp->band->name );
-        subtree = xmlNewChild( tree, 0, (const xmlChar *) "channel", (const xmlChar *) rp->channel->name );
+        subtree = xmlNewChild( tree, 0, BAD_CAST "band", BAD_CAST rp->band->name );
+        subtree = xmlNewChild( tree, 0, BAD_CAST "channel", BAD_CAST rp->channel->name );
         rp = rp->next;
     } while( rp != mgr->first );
 
