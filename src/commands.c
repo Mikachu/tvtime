@@ -420,15 +420,17 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_SKIP:
-        station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
-        if( in->osd ) {
-            if( station_get_current_active( in->stationmgr ) ) {
-                tvtime_osd_show_message( in->osd, "Channel active in list." );
-            } else {
-                tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
+            if( in->osd ) {
+                if( station_get_current_active( in->stationmgr ) ) {
+                    tvtime_osd_show_message( in->osd, "Channel active in list." );
+                } else {
+                    tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+                }
             }
+            station_writeconfig( in->stationmgr );
         }
-        station_writeconfig( in->stationmgr );
     break;
             
     case TVTIME_TOGGLE_ASPECT:
