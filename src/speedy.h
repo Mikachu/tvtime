@@ -124,6 +124,18 @@ void kill_chroma_packed422_inplace_scanline_c( unsigned char *data, int width );
 void mirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 void halfmirror_packed422_inplace_scanline_c( unsigned char *data, int width );
 
+void cheap_packed444_to_packed422_scanline( unsigned char *output,
+                                            unsigned char *input, int width );
+void cheap_packed422_to_packed444_scanline( unsigned char *output,
+                                            unsigned char *input, int width );
+
+/**
+ * This filter actually does not meet the spec so calling it rec601
+ * is a bit of a lie.  I got the filter from Poynton's site.
+ */
+void packed422_to_packed444_rec601_scanline( unsigned char *dest,
+                                             unsigned char *src, int width );
+
 /**
  * Here are the function pointers which will be initialized to point at the
  * fastest available version of the above after a call to setup_speedy_calls().

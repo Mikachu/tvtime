@@ -68,36 +68,6 @@ void blit_colour_packed422( unsigned char *output, int width, int height,
     }
 }
 
-void cheap_packed444_to_packed422_scanline( unsigned char *output,
-                                            unsigned char *input, int width )
-{
-    width /= 2;
-    while( width-- ) {
-        output[ 0 ] = input[ 0 ];
-        output[ 1 ] = input[ 1 ];
-        output[ 2 ] = input[ 3 ];
-        output[ 3 ] = input[ 2 ];
-        output += 4;
-        input += 6;
-    }
-}
-
-void cheap_packed422_to_packed444_scanline( unsigned char *output,
-                                            unsigned char *input, int width )
-{
-    width /= 2;
-    while( width-- ) {
-        output[ 0 ] = input[ 0 ];
-        output[ 1 ] = input[ 1 ];
-        output[ 2 ] = input[ 3 ];
-        output[ 3 ] = input[ 2 ];
-        output[ 4 ] = input[ 1 ];
-        output[ 5 ] = input[ 3 ];
-        output += 6;
-        input += 4;
-    }
-}
-
 void composite_alphamask_to_packed4444( unsigned char *output, int owidth,
                                         int oheight, int ostride,
                                         unsigned char *mask, int mwidth,
@@ -326,46 +296,6 @@ void composite_bars_packed4444_scanline( unsigned char *output,
             curout[ 1 ] = curin[ 1 ] + multiply_alpha( luma - curin[ 1 ], alpha );
             curout[ 2 ] = curin[ 2 ] + multiply_alpha( cb - curin[ 2 ], alpha );
             curout[ 3 ] = curin[ 3 ] + multiply_alpha( cr - curin[ 3 ], alpha );
-        }
-    }
-}
-
-
-/**
- * For the middle pixels, the filter kernel is:
- *
- * [-1 3 -6 12 -24 80 80 -24 12 -6 3 -1]
- */
-void packed422_to_packed444_rec601_scanline( unsigned char *dest, unsigned char *src, int width )
-{
-    int i;
-
-    /* Process two input pixels at a time.  Input is [Y'][Cb][Y'][Cr]. */
-    for( i = 0; i < width / 2; i++ ) {
-        dest[ (i*6) + 0 ] = src[ (i*4) + 0 ];
-        dest[ (i*6) + 1 ] = src[ (i*4) + 1 ];
-        dest[ (i*6) + 2 ] = src[ (i*4) + 3 ];
-
-        dest[ (i*6) + 3 ] = src[ (i*4) + 2 ];
-        if( i > 3 && i < ((width/2) - 4) ) {
-            dest[ (i*6) + 4 ] = ((  (80*(src[ (i*4) + 1 ] + src[ (i*4) + 5 ]))
-                                  - (24*(src[ (i*4) - 3 ] + src[ (i*4) + 9 ]))
-                                  + (12*(src[ (i*4) - 7 ] + src[ (i*4) + 13]))
-                                  - ( 6*(src[ (i*4) - 11] + src[ (i*4) + 17]))
-                                  + ( 3*(src[ (i*4) - 15] + src[ (i*4) + 21]))
-                                  - (   (src[ (i*4) - 19] + src[ (i*4) + 25]))) + 64) >> 7;
-            dest[ (i*6) + 5 ] = ((  (80*(src[ (i*4) + 3 ] + src[ (i*4) + 7 ]))
-                                  - (24*(src[ (i*4) - 1 ] + src[ (i*4) + 11]))
-                                  + (12*(src[ (i*4) - 5 ] + src[ (i*4) + 15]))
-                                  - ( 6*(src[ (i*4) - 9 ] + src[ (i*4) + 19]))
-                                  + ( 3*(src[ (i*4) - 13] + src[ (i*4) + 23]))
-                                  - (   (src[ (i*4) - 17] + src[ (i*4) + 27]))) + 64) >> 7;
-        } else if( i < ((width/2) - 1) ) {
-            dest[ (i*6) + 4 ] = (src[ (i*4) + 1 ] + src[ (i*4) + 5 ] + 1) >> 1;
-            dest[ (i*6) + 5 ] = (src[ (i*4) + 3 ] + src[ (i*4) + 7 ] + 1) >> 1;
-        } else {
-            dest[ (i*6) + 4 ] = src[ (i*4) + 1 ];
-            dest[ (i*6) + 5 ] = src[ (i*4) + 3 ];
         }
     }
 }
