@@ -34,11 +34,14 @@
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
 
-/*
-  struct freqinfo_s {
-    
-  };
-*/
+typedef struct freqinfo_s freqinfo_t;
+
+struct freqinfo_s {
+    int enabled;
+};
+
+freqinfo_t freq_info[ NUM_FREQ_TABLES * CHAN_ENTRIES ];
+static freqinfo_t *get_freq_info( int table, int channel ) { return &(freq_info[ (table * CHAN_ENTRIES) + channel ]); }
 
 struct commands_s {
     config_t *cfg;
@@ -81,7 +84,7 @@ static void toggle_ntsc_cable_mode( void ) { ntsc_cable_mode = ( ntsc_cable_mode
 
 static int get_current_frequency( void )
 {
-    int base = tvtuner[ cur_channel ].freq[ cur_freq_table ].freq;
+    int base = tvtuner[ cur_channel ].freq[ cur_freq_table ];
 
     if( !base ) {
         return 0;
@@ -111,7 +114,7 @@ static int frequencies_find_current_index( videoinput_t *vidin )
     }
 
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        int curfreq = tvtuner[ i ].freq[ cur_freq_table ].freq;
+        int curfreq = tvtuner[ i ].freq[ cur_freq_table ];
 
         if( curfreq && ((closest < 0) || (abs( curfreq - tunerfreq ) < abs( closest - tunerfreq ))) ) {
             closest = curfreq;
@@ -129,7 +132,7 @@ static void frequencies_choose_first_frequency( void )
     cur_channel = 0;
 
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        if( tvtuner[ i ].freq[ cur_freq_table ].freq ) {
+        if( tvtuner[ i ].freq[ cur_freq_table ] ) {
             cur_channel = i;
             break;
         }
@@ -179,26 +182,24 @@ void frequencies_set_tuner_by_name( const char *tuner_name )
     cur_freq_table = NTSC_CABLE;
 }
 
-void frequencies_list_disabled_freqs( )
+void frequencies_list_disabled_freqs( void )
 {
     int i;
 
-    
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        if( tvtuner[ i ].freq[ cur_freq_table ].freq
-            && !tvtuner[ i ].freq[ cur_freq_table ].enabled ) {
+        if( tvtuner[ i ].freq[ cur_freq_table ] && !(get_freq_info( cur_freq_table, i )->enabled) ) {
             fprintf( stderr, "channel = %s %s 0\n", freq_table_names[ cur_freq_table ].short_name, tvtuner[ i ].name );
         }
     }
 }
 
-void frequencies_disable_all( )
+void frequencies_disable_all( void )
 {
     int i;
 
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        if( tvtuner[ i ].freq[ cur_freq_table ].freq ) {
-            tvtuner[ i ].freq[ cur_freq_table ].enabled = 0;
+        if( tvtuner[ i ].freq[ cur_freq_table ] ) {
+            get_freq_info( cur_freq_table, i )->enabled = 0;
         }
     }
 }
@@ -254,12 +255,13 @@ void frequencies_disable_freqs( config_t *ct )
         }
 
         if( the_channel > -1 && the_freq_table > -1 )
-            tvtuner[ the_channel ].freq[ the_freq_table ].enabled = enabled;
+            get_freq_info( the_freq_table, the_channel )->enabled = enabled;
     }
 }
 
 static void reinit_tuner( commands_t *in )
 {
+    fprintf( stderr, "reinit tuner.\n" );
     /* Setup the tuner if available. */
     if( videoinput_has_tuner( in->vidin ) ) {
         /**
@@ -304,6 +306,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           tvtime_osd_t *osd, video_correction_t *vc )
 {
     commands_t *in = (commands_t *) malloc( sizeof( struct commands_s ) );
+    int i;
 
     if( !in ) {
         return NULL;
@@ -341,6 +344,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     reinit_tuner( in );
 
+    for( i = 0; i < NUM_FREQ_TABLES * CHAN_ENTRIES; i++ ) {
+        freq_info[ i ].enabled = 1;
+    }
+
     frequencies_disable_freqs( cfg );
 
     return in;
@@ -369,9 +376,9 @@ static void commands_channel_change_relative( commands_t *in, int offset )
         prev_channel = cur_channel;
 		for(;;) {
             cur_channel = (cur_channel + offset + CHAN_ENTRIES) % CHAN_ENTRIES;
-            if( tvtuner[ cur_channel ].freq[ cur_freq_table ].freq 
-                && tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled ) 
+            if( tvtuner[ cur_channel ].freq[ cur_freq_table ] && get_freq_info( cur_freq_table, cur_channel )->enabled ) {
                 break;
+            }
         }
 
         
@@ -438,11 +445,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_SKIP_CHANNEL:
-        tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled = !tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled;
+        get_freq_info( cur_freq_table, cur_channel )->enabled = !(get_freq_info( cur_freq_table, cur_channel )->enabled);
         fprintf( stderr, "channel = %s %s %d\n", 
                  freq_table_names[ cur_freq_table ].short_name, 
                  tvtuner[ cur_channel ].name, 
-                 tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled );
+                 get_freq_info( cur_freq_table, cur_channel )->enabled );
         break;
             
     case TVTIME_ASPECT:
@@ -646,7 +653,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
                 if( frequencies_find_named_channel( in->next_chan_buffer ) ) {
                     /* go to the next valid channel instead */
                     for(;;) {
-                        if( tvtuner[ cur_channel ].freq[ cur_freq_table ].freq ) break;
+                        if( tvtuner[ cur_channel ].freq[ cur_freq_table ] ) break;
                         cur_channel = (cur_channel + 1 + CHAN_ENTRIES) % CHAN_ENTRIES;
                     }
                     videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
