@@ -145,7 +145,7 @@ static int xv_check_extension( void )
     fprintf( stderr, "xvoutput: No XVIDEO port found which supports YUY2 images.\n" );
 
     fprintf( stderr, "\n*** tvtime requires hardware YUY2 overlay support from your video card\n"
-                       "*** driver.  If you are using an older nVidia card (TNT2), then\n"
+                       "*** driver.  If you are using an older NVIDIA card (TNT2), then\n"
                        "*** this capability is only available with their binary drivers.\n"
                        "*** For some ATI cards, this feature may be found in the experimental\n"
                        "*** GATOS drivers: http://gatos.souceforge.net/\n"

@@ -186,8 +186,8 @@ int vsync_init( void )
 
     nvidia_fd = open( nvidia_dev, O_RDONLY );
     if( nvidia_fd < 0 ) {
-        fprintf( stderr, "vsync: Can't open nVidia device %s: %s\n", nvidia_dev, strerror( errno ) );
-        fprintf( stderr, "vsync: Assuming non-nVidia hardware.\n" );
+        fprintf( stderr, "vsync: Can't open NVIDIA device %s: %s\n", nvidia_dev, strerror( errno ) );
+        fprintf( stderr, "vsync: Assuming non-NVIDIA hardware.\n" );
 
         dri_fd = open( dri_dev, O_RDWR );
         if( dri_fd < 0 ) {
