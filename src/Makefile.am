@@ -92,7 +92,15 @@ wine/libwine.la:
 # FIFO directories.
 .PHONY: install-exec-hook uninstall-hook
 install-exec-hook:
-	$(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir)
+	-$(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir)||(\
+	  echo 'Warning: I could not create the directory `$(pkgrundir)'"'" ;\
+	  echo '         with group owner `@PKGRUNDIRGROUP@'"'."            ;\
+	  echo '         You either do not have permission to create the '   \
+	       'directory, or you'                                          ;\
+          echo '         are not a member of the `@PKGRUNDIRGROUP@'"' group."\
+	       '  See the'                                                  ;\
+          echo '         `Quirks when Compiling tvtime'"' section of the "   \
+	       '`INSTALL'"' file.")
 
 uninstall-hook:
 	rm -rf $(pkgrundir)
