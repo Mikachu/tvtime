@@ -205,14 +205,8 @@ static void update_xmltv_listings( commands_t *cmd )
 {
     if( cmd->xmltv && cmd->osd ) {
         time_t tm = time( 0 );
-        struct tm *curtime = localtime( &tm );
-        int year = 1900 + curtime->tm_year;
-        int month = 1 + curtime->tm_mon;
-        int day = curtime->tm_mday;
-        int hour = curtime->tm_hour;
-        int min = curtime->tm_min;
 
-        if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
+        if( xmltv_needs_refresh( cmd->xmltv, tm ) ) {
             const char *desc;
             char title[ 128 ];
             char next_title_data[ 128 ];
@@ -222,7 +216,7 @@ static void update_xmltv_listings( commands_t *cmd )
             char *line2 = 0;
             char *next_title = 0;
 
-            xmltv_refresh( cmd->xmltv, year, month, day, hour, min );
+            xmltv_refresh( cmd->xmltv, tm );
 
             desc = xmltv_get_description( cmd->xmltv );
             if( desc ) {

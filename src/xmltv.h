@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#include <time.h>
+
 typedef struct xmltv_s xmltv_t;
 
 /**
@@ -43,8 +45,7 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel );
 /**
  * Refreshes the information given a new time.
  */
-void xmltv_refresh( xmltv_t *xmltv, int year, int month, int day,
-                    int hour, int min );
+void xmltv_refresh( xmltv_t *xmltv, time_t now );
 
 /**
  * Returns the current show title if one is set, 0 otherwise.
@@ -80,8 +81,7 @@ const char *xmltv_get_channel( xmltv_t *xmltv );
  * Returns true if the show information must be updated (the current
  * program has ended.
  */
-int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
-                         int hour, int min );
+int xmltv_needs_refresh( xmltv_t *xmltv, time_t now );
 
 /**
  * Looks up the xmltv id of a channel given a corresponding xmltv display name.
