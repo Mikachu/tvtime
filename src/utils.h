@@ -41,4 +41,10 @@ char *get_tvtime_file( const char *filename );
  */
 const char *get_tvtime_paths( void );
 
+/**
+ * Expands a pathname using wordexp.  This expands ~/foo
+ * and ~username/foo to full paths.
+ */
+char *expand_user_path( const char *path );
+
 #endif /* UTILS_H_INCLUDED */

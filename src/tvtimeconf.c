@@ -243,13 +243,7 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "ScreenShotDir" ) ) {
             if( ct->ssdir ) free( ct->ssdir );
-            if( curval[ 0 ] == '~' && getenv( "HOME" ) ) {
-                if( asprintf( &(ct->ssdir), "%s/%s", getenv( "HOME" ), curval + 1 ) < 0 ) {
-                    ct->ssdir = 0;
-                }
-            } else {
-                ct->ssdir = strdup( curval );
-            }
+            ct->ssdir = expand_user_path( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "MenuBG" ) ) {
@@ -671,6 +665,13 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     }
 
     /* Then read in additional settings. */
+    if( configFile ) {
+        char *temp = expand_user_path( configFile );
+        if( temp ) {
+            free( configFile );
+            configFile = temp;
+        }
+    }
     if( configFile ) {
         if( ct->config_filename ) free( ct->config_filename );
         ct->config_filename = configFile;

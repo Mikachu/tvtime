@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <wordexp.h>
 #include "utils.h"
 
 int file_is_openable_for_read( const char *filename )
@@ -71,5 +72,33 @@ char *get_tvtime_file( const char *filename )
     if( cur ) return cur;
 
     return 0;
+}
+
+char *expand_user_path( const char *path )
+{
+    wordexp_t result;
+    char *ret = 0;
+    int i;
+
+    /* Expand the string.  */
+    switch( wordexp( path, &result, 0 ) ) {
+        case 0:  /* Successful.  */
+            break;
+        case WRDE_NOSPACE:
+            /**
+             * If the error was `WRDE_NOSPACE',
+             * then perhaps part of the result was allocated.
+             */
+            wordfree( &result );
+        default: /* Some other error.  */
+            return 0;
+    }
+
+    if( asprintf( &ret, "%s", result.we_wordv[ 0 ] ) < 0 ) {
+        ret = 0;
+    }
+
+    wordfree( &result );
+    return ret;
 }
 
