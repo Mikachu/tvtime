@@ -25,6 +25,9 @@
 #define DROP_HISTORY_SIZE        10
 #define NUM_TO_AVERAGE           30
 
+/* Use a large epsilon for timing information. */
+const double epsilon = 0.001;
+
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
@@ -50,8 +53,13 @@ struct performance_s
 
     int total_blits;
     int curblit;
-    double total_blit_time[ NUM_TO_AVERAGE ];
     double total_blitting_ms;
+    double total_blit_time[ NUM_TO_AVERAGE ];
+
+    int total_renders;
+    int currender;
+    double total_rendering_ms;
+    double total_render_time[ NUM_TO_AVERAGE ];
     
     int drop_history[ DROP_HISTORY_SIZE ];
     int drop_pos;
@@ -70,10 +78,18 @@ performance_t *performance_new( int fieldtimeus )
     perf->time_bot_to_top = 0;
     perf->time_top_to_bot = 0;
     perf->drop_reset = 0;
+    perf->frames_dropped = 0;
+
     perf->total_blits = 0;
     perf->curblit = 0;
     perf->total_blitting_ms = 0.0;
     memset( perf->total_blit_time, 0, sizeof( perf->total_blit_time ) );
+
+    perf->total_renders = 0;
+    perf->currender = 0;
+    perf->total_rendering_ms = 0.0;
+    memset( perf->total_render_time, 0, sizeof( perf->total_render_time ) );
+
     gettimeofday( &perf->lastframetime, 0 );
     gettimeofday( &perf->acquired_input, 0 );
     gettimeofday( &perf->show_bot, 0 );
@@ -102,6 +118,7 @@ void performance_checkpoint_acquired_input_frame( performance_t *perf )
 
     dropdiff = timediff( &perf->acquired_input, &perf->lastframetime ) - (perf->fieldtime * 3);
     if( dropdiff >= 0 ) {
+        perf->frames_dropped++;
         perf->drop_history[ perf->drop_pos ] = ( dropdiff / (perf->fieldtime*2) ) + 2;
     } else {
         perf->drop_history[ perf->drop_pos ] = 1;
@@ -111,19 +128,33 @@ void performance_checkpoint_acquired_input_frame( performance_t *perf )
 
 void performance_checkpoint_show_bot_field( performance_t *perf )
 {
+    double curtime;
     gettimeofday( &perf->show_bot, 0 );
     perf->time_top_to_bot = timediff( &perf->show_bot, &perf->show_top );
      
-    perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
-    perf->total_blit_time[ perf->curblit ] = ((double) timediff( &perf->show_bot, &perf->acquired_input )) / 1000.0;
-    perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
-    perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
-    perf->total_blits++;
+    curtime = ((double) timediff( &perf->show_bot, &perf->acquired_input )) / 1000.0;
+    if( curtime > epsilon ) {
+        perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
+        perf->total_blit_time[ perf->curblit ] = curtime;
+        perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
+        perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
+        perf->total_blits++;
+    }
 }
 
 void performance_checkpoint_constructed_top_field( performance_t *perf )
 {
+    double curtime;
     gettimeofday( &perf->constructed_top, 0 );
+
+    curtime = ((double) timediff( &perf->constructed_top, &perf->show_bot )) / 1000.0;
+    if( curtime > epsilon ) {
+        perf->total_rendering_ms -= perf->total_render_time[ perf->currender ];
+        perf->total_render_time[ perf->currender ] = curtime;
+        perf->total_rendering_ms += perf->total_render_time[ perf->currender ];
+        perf->currender = (perf->currender + 1) % NUM_TO_AVERAGE;
+        perf->total_renders++;
+    }
 }
 
 void performance_checkpoint_wait_for_bot_field( performance_t *perf )
@@ -133,19 +164,33 @@ void performance_checkpoint_wait_for_bot_field( performance_t *perf )
 
 void performance_checkpoint_show_top_field( performance_t *perf )
 {
+    double curtime;
     gettimeofday( &perf->show_top, 0 );
     perf->time_bot_to_top = timediff( &perf->show_top, &perf->show_bot );
     
-    perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
-    perf->total_blit_time[ perf->curblit ] = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
-    perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
-    perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
-    perf->total_blits++;
+    curtime = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
+    if( curtime > epsilon ) {
+        perf->total_blitting_ms -= perf->total_blit_time[ perf->curblit ];
+        perf->total_blit_time[ perf->curblit ] = curtime;
+        perf->total_blitting_ms += perf->total_blit_time[ perf->curblit ];
+        perf->curblit = (perf->curblit + 1) % NUM_TO_AVERAGE;
+        perf->total_blits++;
+    }
 }
 
 void performance_checkpoint_constructed_bot_field( performance_t *perf )
 {
+    double curtime;
     gettimeofday( &perf->constructed_bot, 0 );
+
+    curtime = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
+    if( curtime > epsilon ) {
+        perf->total_rendering_ms -= perf->total_render_time[ perf->currender ];
+        perf->total_render_time[ perf->currender ] = curtime;
+        perf->total_rendering_ms += perf->total_render_time[ perf->currender ];
+        perf->currender = (perf->currender + 1) % NUM_TO_AVERAGE;
+        perf->total_renders++;
+    }
 }
 
 int performance_get_usecs_since_frame_acquired( performance_t *perf )
@@ -230,9 +275,12 @@ double get_estimated_video_card_speed( performance_t *perf, int framesize )
 
 double get_estimated_rendering_time( performance_t *perf )
 {
-    double constructed_top = ((double) timediff( &perf->constructed_top, &perf->show_bot )) / 1000.0;
-    double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
-    return (constructed_top + constructed_bot);
+    double nummeasured = NUM_TO_AVERAGE;
+
+    if( nummeasured > perf->total_renders ) {
+        nummeasured = perf->total_renders;
+    }
+    return perf->total_rendering_ms / nummeasured;
 }
 
 double get_time_top_to_bot( performance_t *perf )
@@ -243,5 +291,10 @@ double get_time_top_to_bot( performance_t *perf )
 double get_time_bot_to_top( performance_t *perf )
 {
     return (double) perf->time_bot_to_top / 1000.0;
+}
+
+int performance_get_dropped_frames( performance_t *perf )
+{
+    return perf->frames_dropped;
 }
 

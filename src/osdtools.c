@@ -910,6 +910,7 @@ void osd_list_set_lines( osd_list_t *osdl, int numlines )
 {
     if( numlines > OSD_LIST_MAX_LINES ) numlines = OSD_LIST_MAX_LINES;
     osdl->numlines = numlines;
+    osdl->width = 0;
 }
 
 void osd_list_set_hilight( osd_list_t *osdl, int pos )

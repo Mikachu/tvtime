@@ -787,24 +787,44 @@ void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
     tvtime_osd_show_list( osd, 1 );
 }
 
-void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf, int framesize )
+void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
+                          const char *deinterlacer, int width,
+                          int height, int framesize, int fieldtime,
+                          int frameratemode )
 {
     char text[ 200 ];
 
-    tvtime_osd_list_set_lines( osd, 4 );
+    tvtime_osd_list_set_lines( osd, frameratemode ? 7 : 8 );
     tvtime_osd_list_set_text( osd, 0, "Performance estimates" );
+
+    sprintf( text, "Deinterlacer: %s", deinterlacer );
+    tvtime_osd_list_set_text( osd, 1, text );
+
+    sprintf( text, "Input frame size:  %dx%d", width, height );
+    tvtime_osd_list_set_text( osd, 2, text );
+
+    sprintf( text, "Attempted framerate: %.2ffps",
+             frameratemode ? 1000000.0 / ((double) (fieldtime*2)) : 1000000.0 / ((double) fieldtime) );
+    tvtime_osd_list_set_text( osd, 3, text );
 
     sprintf( text, "Video upload speed: %.2fMB/sec",
              get_estimated_video_card_speed( perf, framesize ) );
-    tvtime_osd_list_set_text( osd, 1, text );
+    tvtime_osd_list_set_text( osd, 4, text );
 
     sprintf( text, "Rendering time: %5.2fms",
              get_estimated_rendering_time( perf ) );
-    tvtime_osd_list_set_text( osd, 2, text );
+    tvtime_osd_list_set_text( osd, 5, text );
 
-    sprintf( text, "Field time (%5.2f/%5.2f)",
-             get_time_top_to_bot( perf ), get_time_bot_to_top( perf ) );
-    tvtime_osd_list_set_text( osd, 3, text );
+    sprintf( text, "Dropped frames: %d",
+             performance_get_dropped_frames( perf ) );
+    tvtime_osd_list_set_text( osd, 6, text );
+
+    if( !frameratemode ) {
+        sprintf( text, "Blit spacing: %4.1f/%4.1fms (want %4.1fms)",
+                 get_time_top_to_bot( perf ), get_time_bot_to_top( perf ),
+                 ((double) fieldtime) / 1000.0 );
+        tvtime_osd_list_set_text( osd, 7, text );
+    }
 
     tvtime_osd_list_set_hilight( osd, -1 );
     tvtime_osd_show_list( osd, 1 );
@@ -1685,7 +1705,8 @@ int main( int argc, char **argv )
                 framesize = width * height;
             }
             performance_print_last_frame_stats( perf, framesize );
-            osd_list_statistics( osd, perf, framesize );
+            osd_list_statistics( osd, perf, (curmethod) ? curmethod->name : "interlaced passthrough",
+                                 width, height, framesize, fieldtime, framerate_mode );
         }
         if( config_get_debug( ct ) ) {
             if( curmethod )  {

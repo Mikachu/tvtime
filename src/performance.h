@@ -54,6 +54,7 @@ double get_estimated_video_card_speed( performance_t *perf, int framesize );
 double get_estimated_rendering_time( performance_t *perf );
 double get_time_top_to_bot( performance_t *perf );
 double get_time_bot_to_top( performance_t *perf );
+int performance_get_dropped_frames( performance_t *perf );
 
 #ifdef __cplusplus
 };
