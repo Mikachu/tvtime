@@ -19,9 +19,11 @@
 #ifndef STATION_H_INCLUDED
 #define STATION_H_INCLUDED
 
-
 #include "tvtimeconf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct station_info {
     int pos;
@@ -51,4 +53,7 @@ int station_scan(int band);
 
 int station_writeConfig(FILE config);
 
+#ifdef __cplusplus
+};
+#endif
 #endif // STATION_H_INCLUDED

@@ -19,11 +19,11 @@
 #ifndef PARSER_H_INCLUDED
 #define PARSER_H_INCLUDED
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdio.h>
 
 struct parser_file_s {
     FILE *fh;
@@ -41,6 +41,7 @@ const char *parser_get( parser_file_t *pf, const char *name, int k );
 void parser_delete( parser_file_t *pf );
 int parser_dump( parser_file_t *pf );
 int parser_merge_file( parser_file_t* pf, const char *filename );
+
 #ifdef __cplusplus
 };
 #endif

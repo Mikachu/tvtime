@@ -19,6 +19,10 @@
 #ifndef FREQ_H_INCLUDED
 #define FREQ_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define US_CABLE_NOMINAL 	0
 #define US_CABLE_HRC		1
 #define US_CABLE_IRC		2
@@ -32,4 +36,7 @@ int freq_for_band( const char *band, int us_cable, freq_callback_t f );
 // tab-seperated
 //char *freq_getBands();
 
+#ifdef __cplusplus
+};
+#endif
 #endif /* FREQ_H_INCLUDED */
