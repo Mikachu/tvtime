@@ -2648,7 +2648,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_DISPLAY_INFO:
         cmd->displayinfo = !cmd->displayinfo;
         if( cmd->osd ) {
-            update_xmltv_listings( cmd );
+            if( cmd->xmltv && cmd->vidin &&
+                videoinput_has_tuner( cmd->vidin ) ) {
+                update_xmltv_display( cmd );
+            }
             if( cmd->displayinfo ) {
                 tvtime_osd_hold( cmd->osd, 1 );
                 tvtime_osd_show_info( cmd->osd );
