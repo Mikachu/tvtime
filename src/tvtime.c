@@ -898,14 +898,6 @@ int main( int argc, char **argv )
 
     scalerbob_plugin_init();
 
-    stationmgr = station_new( config_get_v4l_freq( ct ), config_get_ntsc_cable_mode( ct ), verbose );
-    if( !stationmgr ) {
-        fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
-        return 1;
-    }
-    station_set( stationmgr, config_get_prev_channel( ct ) );
-    station_set( stationmgr, config_get_start_channel( ct ) );
-
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
         norm = VIDEOINPUT_PAL;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {
@@ -935,6 +927,15 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't initialize performance monitor, exiting.\n" );
         return 1;
     }
+
+    stationmgr = station_new( videoinput_norm_name( norm ), config_get_v4l_freq( ct ),
+                              config_get_ntsc_cable_mode( ct ), verbose );
+    if( !stationmgr ) {
+        fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
+        return 1;
+    }
+    station_set( stationmgr, config_get_prev_channel( ct ) );
+    station_set( stationmgr, config_get_start_channel( ct ) );
 
     /* Default to a width specified on the command line. */
     width = config_get_inputwidth( ct );

@@ -52,6 +52,7 @@ struct station_mgr_s
     int new_install;
     char band_and_frequency[ 1024 ];
     char stationrc[255];
+    char *norm;
 };
 
 static const band_t *get_band( const char *band )
@@ -158,11 +159,31 @@ static void station_dump( station_mgr_t *mgr )
     } while( rp != mgr->first );
 }
 
+static xmlNodePtr find_norm( xmlNodePtr node, const char *norm )
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST "norm" ) ) {
+            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+            if( name && !xmlStrcasecmp( name, BAD_CAST norm ) ) {
+                xmlFree( name );
+                return node;
+            }
+            if( name ) xmlFree( name );
+        }
+
+        node = node->next;
+    }
+
+    return 0;
+}
+
 int station_readconfig( station_mgr_t *mgr )
 {
     xmlNodePtr cur;
     xmlDocPtr doc;
     xmlNodePtr station;
+    xmlNodePtr norm;
 
     doc = xmlParseFile( mgr->stationrc );
     if( !doc ) {
@@ -176,15 +197,23 @@ int station_readconfig( station_mgr_t *mgr )
         return 0;
     }
 
-    if( xmlStrcmp( cur->name, BAD_CAST "stationlist" ) ) {
-        fprintf( stderr, "station: %s: document not a stationlist.", mgr->stationrc );
+    if( xmlStrcasecmp( cur->name, BAD_CAST "stationlist" ) ) {
+        fprintf( stderr, "station: %s: Document not a stationlist.\n", mgr->stationrc );
         xmlFreeDoc( doc );
         return 0;
     }
 
-    station = cur->xmlChildrenNode;
+    norm = find_norm( cur->xmlChildrenNode, mgr->norm );
+    if( !norm ) {
+        fprintf( stderr, "station: %s: No station list for norm '%s'.\n",
+                 mgr->stationrc, mgr->norm );
+        xmlFreeDoc( doc );
+        return 0;
+    }
+
+    station = norm->xmlChildrenNode;
     while( station ) {
-        if( !xmlStrcmp( station->name, BAD_CAST "station" ) ) {
+        if( !xmlStrcasecmp( station->name, BAD_CAST "station" ) ) {
             xmlChar *name = xmlGetProp( station, BAD_CAST "name" );
             xmlChar *active_s = xmlGetProp( station, BAD_CAST "active" );
             xmlChar *pos_s = xmlGetProp( station, BAD_CAST "position" );
@@ -220,7 +249,7 @@ int station_readconfig( station_mgr_t *mgr )
     return 1;
 }
 
-station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
+station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mode, int verbose )
 {
     station_mgr_t *mgr = (station_mgr_t *) malloc( sizeof( station_mgr_t ) );
     const char *frequencies;
@@ -236,6 +265,8 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
     mgr->us_cable_mode = us_cable_mode;
     mgr->last_channel = 0;
     mgr->new_install = 0;
+    mgr->norm = strdup( norm );
+    if( !mgr->norm ) return 0;
 
     if( !station_readconfig( mgr ) ) {
         fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
@@ -299,6 +330,7 @@ station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
 
 void station_delete( station_mgr_t *mgr )
 {
+    free( mgr->norm );
     free( mgr );
 }
 
@@ -526,7 +558,8 @@ int station_remove( station_mgr_t *mgr )
     return 1;
 }
 
-station_info_t *ripout( station_mgr_t *mgr, int pos ) {
+station_info_t *ripout( station_mgr_t *mgr, int pos )
+{
     station_info_t *rp = mgr->first;
 
     do {
@@ -613,10 +646,11 @@ static int file_is_openable_for_read( const char *filename )
     }
 }
 
-int station_writeconfig( station_mgr_t *mgr)
+int station_writeconfig( station_mgr_t *mgr )
 {
     xmlDocPtr doc;
     xmlNodePtr top;
+    xmlNodePtr norm;
     char filename[ 255 ];
     station_info_t *rp = mgr->first;
 
@@ -655,13 +689,19 @@ int station_writeconfig( station_mgr_t *mgr)
         }
     }
 
+    norm = find_norm( top, mgr->norm );
+    if( !norm ) {
+        norm = xmlNewTextChild( top, 0, BAD_CAST "norm", 0 );
+        xmlNewProp( norm, BAD_CAST "name", BAD_CAST mgr->norm );
+    }
+
     do {
-        xmlNodePtr node = find_station( top, rp->name );
+        xmlNodePtr node = find_station( norm, rp->name );
         char buf[ 255 ];
 
         sprintf( buf, "%d", rp->pos );
         if( !node ) {
-            node = xmlNewTextChild( top, 0, BAD_CAST "station", 0 );
+            node = xmlNewTextChild( norm, 0, BAD_CAST "station", 0 );
         }
         xmlNewProp( node, BAD_CAST "name", BAD_CAST rp->name );
         xmlNewProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );

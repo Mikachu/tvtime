@@ -32,7 +32,7 @@ extern "C" {
 
 typedef struct station_mgr_s station_mgr_t;
 
-station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose );
+station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mode, int verbose );
 void station_delete( station_mgr_t *mgr );
 
 /**
