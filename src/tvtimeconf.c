@@ -153,7 +153,7 @@ config_t *config_new( int argc, char **argv )
 
     if( !configFile ) {
         strncpy( base, getenv( "HOME" ), 245 );
-        strcat( base, "/.tvtime" );
+        strcat( base, "/.tvtimerc" );
         configFile = base;
     }
 
@@ -633,7 +633,7 @@ const char *config_get_timeformat( config_t *ct )
 int main() {
     config_t *ct;
 
-    ct = config_new( "/home/drbell/.tvtime" );
+    ct = config_new( "/home/drbell/.tvtimerc" );
     config_init( ct );
  
 }
