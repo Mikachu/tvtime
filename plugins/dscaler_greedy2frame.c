@@ -43,7 +43,7 @@
 
 static DEINTERLACE_METHOD *di_greedy2frame;
 
-static void deinterlace_frame_di_greedy2frame( uint8_t *output,
+static void deinterlace_frame_di_greedy2frame( uint8_t *output, int outstride,
                                                deinterlace_frame_data_t *data,
                                                int bottom_field, int width, int height )
 {
@@ -57,7 +57,7 @@ static void deinterlace_frame_di_greedy2frame( uint8_t *output,
     Info.FrameWidth = width;
     Info.InputPitch = stride*2;
     Info.LineLength = stride;
-    Info.OverlayPitch = stride;
+    Info.OverlayPitch = outstride;
     Info.pMemcpy = dscaler_memcpy;
 
     if( bottom_field ) {

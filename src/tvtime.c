@@ -73,7 +73,7 @@
 /**
  * Set this to 1 to enable startup time profiling.
  */
-const unsigned int profile_startup = 0;
+const unsigned int profile_startup = 1;
 
 /**
  * Function for profiling.
@@ -557,7 +557,7 @@ static void tvtime_build_deinterlaced_frame( uint8_t *output,
         data.f1 = lastframe;
         data.f2 = secondlastframe;
 
-        curmethod->deinterlace_frame( output, &data, bottom_field, width, frame_height );
+        curmethod->deinterlace_frame( output, outstride, &data, bottom_field, width, frame_height );
 
         for( i = 0; i < frame_height; i++ ) {
             uint8_t *curoutput = output + (i * outstride);

@@ -43,9 +43,9 @@
 
 static DEINTERLACE_METHOD *di_tomsmocomp;
 
-static void deinterlace_frame_di_tomsmocomp( uint8_t *output,
-                                           deinterlace_frame_data_t *data,
-                                           int bottom_field, int width, int height )
+static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
+                                             deinterlace_frame_data_t *data,
+                                             int bottom_field, int width, int height )
 {
     TDeinterlaceInfo Info;
     TPicture Picture[ 8 ];
@@ -57,7 +57,7 @@ static void deinterlace_frame_di_tomsmocomp( uint8_t *output,
     Info.FrameWidth = width;
     Info.InputPitch = stride*2;
     Info.LineLength = stride;
-    Info.OverlayPitch = stride;
+    Info.OverlayPitch = outstride;
     Info.pMemcpy = dscaler_memcpy;
 
     if( bottom_field ) {

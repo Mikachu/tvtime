@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#define DEINTERLACE_PLUGIN_API_VERSION 0x00000003
+#define DEINTERLACE_PLUGIN_API_VERSION 0x00000004
 
 /**
  * Our deinterlacer plugin API is modeled after DScaler's.  This module
@@ -111,7 +111,7 @@ struct deinterlace_frame_data_s
     uint8_t *f3;
 };
 
-typedef void (*deinterlace_frame_t)( uint8_t *output,
+typedef void (*deinterlace_frame_t)( uint8_t *output, int outstride,
                                      deinterlace_frame_data_t *data,
                                      int bottom_field, int width, int height );
 
