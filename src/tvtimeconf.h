@@ -23,13 +23,6 @@
 
 typedef struct config_s config_t;
 
-/** 
- * NTSC cable modes.
- */
-#define NTSC_CABLE_MODE_NOMINAL 0
-#define NTSC_CABLE_MODE_IRC     1
-#define NTSC_CABLE_MODE_HRC     2
-
 config_t *config_new( int argc, char **argv );
 void config_delete( config_t *ct );
 int config_key_to_command( config_t *ct, int key );
@@ -47,6 +40,7 @@ double config_get_luma_correction( config_t *ct );
 const char *config_get_v4l_device( config_t *ct );
 const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
+int config_get_ntsc_cable_mode( config_t *ct );
 const char *config_get_timeformat( config_t *ct );
 unsigned int config_get_menu_bg_rgb( config_t *ct );
 unsigned int config_get_channel_text_rgb( config_t *ct );

@@ -41,8 +41,8 @@ struct station_mgr_s
     station_info_t *first;
     station_info_t *current;
     int verbose;
-    int debug;
     int us_cable_mode;
+    int is_us_cable;
     int last_channel;
     char band_and_frequency[ 1024 ];
     char stationrc[255];
@@ -209,7 +209,7 @@ int station_readconfig( station_mgr_t *mgr )
     return 1;
 }
 
-station_mgr_t *station_init( config_t *ct )
+station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose )
 {
     station_mgr_t *mgr = (station_mgr_t *) malloc( sizeof( station_mgr_t ) );
     const char *frequencies;
@@ -218,17 +218,17 @@ station_mgr_t *station_init( config_t *ct )
 
     strncpy( mgr->stationrc, getenv( "HOME" ), 235 );
     strncat( mgr->stationrc, "/.tvtime/stationrc", 255 );
-    mgr->debug = config_get_debug( ct );
-    mgr->verbose = config_get_verbose( ct );
+    mgr->verbose = verbose;
     mgr->first = 0;
     mgr->current = 0;
-    mgr->us_cable_mode = 0;
+    mgr->is_us_cable = 0;
+    mgr->us_cable_mode = us_cable_mode;
     mgr->last_channel = 0;
 
     if( !station_readconfig( mgr ) ) {
         fprintf( stderr, "station: Errors reading %s\n", mgr->stationrc );
 
-        frequencies = config_get_v4l_freq( ct );
+        frequencies = table;
         fprintf( stderr, "station: Adding frequency table %s, all channels active\n", frequencies );
 
         if( !strcasecmp( frequencies, "europe-west" ) || !strcasecmp( frequencies, "europe-east" ) ||
@@ -241,6 +241,7 @@ station_mgr_t *station_init( config_t *ct )
 
         if( !strcasecmp( frequencies, "us-cable" ) ) {
             station_add_band( mgr, "us cable" );
+            mgr->is_us_cable = 1;
         } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
             station_add_band( mgr, "us broadcast" );
         } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
@@ -358,8 +359,15 @@ const char *station_get_current_band( station_mgr_t *mgr )
     if( !mgr->current ) {
         return "No Band";
     } else {
-        sprintf( mgr->band_and_frequency, "%s: %s",
-                 mgr->current->band->name, mgr->current->channel->name );
+        if( mgr->is_us_cable && mgr->us_cable_mode ) {
+            sprintf( mgr->band_and_frequency, "%s [%s]: %s",
+                     mgr->current->band->name,
+                     mgr->us_cable_mode == NTSC_CABLE_MODE_HRC ? "HRC" : "IRC",
+                     mgr->current->channel->name );
+        } else {
+            sprintf( mgr->band_and_frequency, "%s: %s",
+                     mgr->current->band->name, mgr->current->channel->name );
+        }
         return mgr->band_and_frequency;
     }
 }
@@ -375,9 +383,9 @@ int station_get_current_frequency( station_mgr_t *mgr )
         return 0;
     } else {
         if( mgr->current->band == us_cable_band ) {
-            if( mgr->us_cable_mode == US_CABLE_HRC ) {
+            if( mgr->us_cable_mode == NTSC_CABLE_MODE_HRC ) {
                 return NTSC_CABLE_HRC( mgr->current->channel->freq );
-            } else if( mgr->us_cable_mode == US_CABLE_IRC ) {
+            } else if( mgr->us_cable_mode == NTSC_CABLE_MODE_IRC ) {
                 return NTSC_CABLE_IRC( mgr->current->channel->freq );
             }
         }

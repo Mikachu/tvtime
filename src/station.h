@@ -19,19 +19,20 @@
 #ifndef STATION_H_INCLUDED
 #define STATION_H_INCLUDED
 
-#include "tvtimeconf.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define US_CABLE_NOMINAL 	0
-#define US_CABLE_HRC		1
-#define US_CABLE_IRC		2
+/** 
+ * NTSC cable modes.
+ */
+#define NTSC_CABLE_MODE_NOMINAL 0
+#define NTSC_CABLE_MODE_IRC     1
+#define NTSC_CABLE_MODE_HRC     2
 
 typedef struct station_mgr_s station_mgr_t;
 
-station_mgr_t *station_init( config_t *ct );
+station_mgr_t *station_new( const char *table, int us_cable_mode, int verbose );
 void station_delete( station_mgr_t *mgr );
 
 /**

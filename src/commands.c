@@ -22,11 +22,9 @@
 #include <unistd.h>
 #include "config.h"
 #include <ctype.h>
-#include "tvtimeconf.h"
 #include "station.h"
 #include "mixer.h"
 #include "commands.h"
-#include "menu.h"
 #include "console.h"
 #include "configsave.h"
 

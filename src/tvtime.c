@@ -596,7 +596,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );
     }
 
-    stationmgr = station_init( ct );
+    stationmgr = station_new( config_get_v4l_freq( ct ), config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
         fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
         return 1;

@@ -29,6 +29,7 @@
 #include "parser.h"
 #include "tvtimeconf.h"
 #include "input.h"
+#include "station.h"
 
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
@@ -835,6 +836,11 @@ double config_get_horizontal_overscan( config_t *ct )
 double config_get_vertical_overscan( config_t *ct )
 {
     return ct->voverscan;
+}
+
+int config_get_ntsc_cable_mode( config_t *ct )
+{
+    return ct->ntsc_mode;
 }
 
 void config_set_horizontal_overscan( config_t *ct, double hoverscan )
