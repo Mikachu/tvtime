@@ -21,6 +21,9 @@ Authors and contributors
   Craig Dooley <cd5697@albany.edu>
     - added a previous channel command
 
+  Alexander S. Belov <asbel@sice.ru>
+    - config file work, check for signal present config parameter
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
