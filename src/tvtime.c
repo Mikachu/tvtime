@@ -74,21 +74,6 @@
  */
 
 /**
- * Set this to 1 to enable startup time profiling.
- */
-const unsigned int profile_startup = 0;
-
-/**
- * Function for profiling.
- */
-static int timediff( struct timeval *large, struct timeval *small )
-{
-    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
-             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
-}
-
-
-/**
  * Which pulldown algorithm we're using.
  */
 enum {
@@ -915,13 +900,6 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Parsed config.\n", timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
     verbose = config_get_verbose( ct );
 
     send_fields = config_get_send_fields( ct );
@@ -997,14 +975,6 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Stole resources.\n", timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
-
     /* Setup the output. */
     if( output_driver == OUTPUT_DIRECTFB ) {
         output = get_dfb_output();
@@ -1022,15 +992,6 @@ int main( int argc, char **argv )
         /* FIXME: Delete everything here! */
         return 1;
     }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Created our output.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
 
     /* Setup the speedy calls. */
     setup_speedy_calls( verbose );
@@ -1054,14 +1015,6 @@ int main( int argc, char **argv )
         vfir_plugin_init();
 
         scalerbob_plugin_init();
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup deinterlacers.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
@@ -1102,15 +1055,6 @@ int main( int argc, char **argv )
     }
     station_set( stationmgr, config_get_prev_channel( ct ) );
     station_set( stationmgr, config_get_start_channel( ct ) );
-
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup stations.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
 
 
     /* Default to a width specified on the command line. */
@@ -1156,14 +1100,6 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't display input size %dx%d.\n", width, height );
         /* FIXME: Clean up. */
         return 1;
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup input.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
 
@@ -1240,15 +1176,6 @@ int main( int argc, char **argv )
     secondlastframe = lastframe = blueframe;
 
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Allocated and built temp frames.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
-
 
     /* Setup OSD stuff. */
     pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) ) );
@@ -1280,26 +1207,10 @@ int main( int argc, char **argv )
         }
     }
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Created the OSD.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
     commands = commands_new( ct, vidin, stationmgr, osd );
     if( !commands ) {
         fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Created the command parser.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
     /* Setup the video correction tables. */
@@ -1310,14 +1221,6 @@ int main( int argc, char **argv )
     } else {
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
         videofilter_set_luma_power( filter, commands_get_luma_power( commands ) );
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup the filter tables.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
     /* Create the user's FIFO directory */
@@ -1393,14 +1296,6 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup the FIFO, console and input.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
     usevbi = config_get_usevbi( ct );
     if( usevbi ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
@@ -1418,14 +1313,6 @@ int main( int argc, char **argv )
             vbidata_capture_mode( vbidata, CAPTURE_OFF );
         }
         commands_set_vbidata( commands, vbidata );
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Setup the VBI.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
     /* Randomly assign a tagline as the window caption. */
@@ -1452,14 +1339,6 @@ int main( int argc, char **argv )
     /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
 
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Did startup work.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
-    }
-
     /* Begin capturing frames. */
     if( vidin ) {
         if( fieldsavailable == 2 ) {
@@ -1468,14 +1347,6 @@ int main( int argc, char **argv )
             secondlastframe = videoinput_next_frame( vidin, &secondlastframeid );
             lastframe = videoinput_next_frame( vidin, &lastframeid );
         }
-    }
-
-    if( profile_startup ) {
-        struct timeval profiletime;
-        gettimeofday( &profiletime, 0 );
-        fprintf( stderr, "tvtime: [%8dms] Pre-rolled capture.\n",
-                 timediff( &profiletime, &startup_time ) / 1000 );
-        fflush( stderr );
     }
 
     /* Initialize our timestamps. */
