@@ -25,50 +25,53 @@ if [ "$action" = "configure" ]; then
         fi
     fi
 
-    # Start with the new default config file.
-    gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz > $CONFIGFILE.new
-
     db_get tvtime/norm
-    tvtime-configure --configfile=$CONFIGFILE.new --norm=$RET
-    case "$RET" in
+    NORM=$RET
+    case "$NORM" in
         NTSC|PAL-M|PAL-Nc)
             db_get tvtime/frequencies-ntsc
             case "$RET" in
-                Cable) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-cable ;;
-                Broadcast) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-broadcast ;;
-                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=us-cable100 ;;
+                Cable) FREQTABLE=us-cable ;;
+                Broadcast) FREQTABLE=us-broadcast ;;
+                *) FREQTABLE=us-cable100 ;;
             esac
             ;;
         NTSC-JP)
             db_get tvtime/frequencies-jp
             case "$RET" in
-                Cable) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=japan-cable ;;
-                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=japan-broadcast ;;
+                Cable) FREQTABLE=japan-cable ;;
+                *) FREQTABLE=japan-broadcast ;;
             esac
             ;;
         *)
             db_get tvtime/frequencies-pal
             case "$RET" in
-                Europe) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=europe ;;
-                France) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=france ;;
-                Russia) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=russia ;;
-                Australia) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=australia ;;
-                "New Zealand") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=newzealand ;;
-                "China Broadcast") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=china-broadcast ;;
-                "Australia Optus cable") tvtime-configure --configfile=$CONFIGFILE.new --frequencies=australia-optus ;;
-                *) tvtime-configure --configfile=$CONFIGFILE.new --frequencies=custom ;;
+                Europe) FREQTABLE=europe ;;
+                France) FREQTABLE=france ;;
+                Russia) FREQTABLE=russia ;;
+                Australia) FREQTABLE=australia ;;
+                "New Zealand") FREQTABLE=newzealand ;;
+                "China Broadcast") FREQTABLE=china-broadcast ;;
+                "Australia Optus cable") FREQTABLE=australia-optus ;;
+                *) FREQTABLE=custom ;;
             esac
             ;;
     esac
 
     db_get tvtime/v4ldevice
-    tvtime-configure --configfile=$CONFIGFILE.new --device=$RET
-
+    V4LDEV=$RET
     db_get tvtime/vbidevice
-    tvtime-configure --configfile=$CONFIGFILE.new --vbidevice=$RET
-
+    VBIDEV=$RET
     db_get tvtime/processpriority
-    tvtime-configure --configfile=$CONFIGFILE.new --priority=$RET
+    PRI=$RET
+
+    # Start with the new default config file.
+    gunzip -c /usr/share/doc/tvtime/examples/default.tvtime.xml.gz > $CONFIGFILE.new
+
+    # Configure tvtime.
+    tvtime-configure --configfile=$CONFIGFILE.new --norm=$NORM \
+	--frequencies=$FREQTABLE --device=$V4LDEV --vbidevice=$VBIDEV \
+	--priority=$PRI
 
     # Now run ucf on our new config file.
     db_stop
