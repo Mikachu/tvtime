@@ -1,5 +1,7 @@
 
 0.9.8.5 -
+  * vektor: tvtime now drops root access before reading any
+      configuration files.
   * nitrogen: Added DirectFB version check to configure.ac
   * vektor: Added support for long-format command line arguments
       like --norm=pal or --fullscreen.  Nice.

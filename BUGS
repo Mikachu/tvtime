@@ -11,84 +11,88 @@ bug tracker on our sourceforge webpage:
   Known bugs
   ----------
 
-710430	RPMs don't depend on lirc package
-717289	OSD fadeout time should depend on TV norm
-729964	tvtime does not change V4L input volume
-751093	dalias' pulldown algorithm needs work
-736098	Start on fullscreen broken in some cases?
-727947	tvtime needs a -geometry environment variable
-694544	linux-dvb driver broken and CVS version needs V4L2 support
-727946	tvtime needs a -display command line flag.
-730565	OSD crashes for UTF-8 characters
-726637	Duplicate frequencies should automatically be disabled
-726635	Don't create a new entry if freq already exists
-726822	Filter not hitting all scanlines when using dalias' pulldown
-729726	tvtime console does not process commands if no fifo active
-735053	tvtime should use SIGALRM to watch for hangs
-729660	No support for PAL-60
-726638	No way to enable VBI decoding at runtime
-726640	No way to send OSD messages through FIFO
-750698	Aspect ratio changes slight on resolution/fullscreen change.
-744951	tvtime should support more explicit layer modes
-743918	tvtime should have runtime norm selection (50/60Hz)
-744001	Screen displaying green line on top
-707738	No way to disable signal detection at runtime
-722855	SRPM dependency on glibc-debug
-694681	No way to change deinterlacer settings
-690473	Blue frame shown on channel change when gbuffers=2
-728259	tvtime needs a multiscreen mode
-691857	tvtime ignores wss signals
-650218	No way to disable deinterlacing algs
-692392	XVideo problems with two X servers and X4.2.1 mga driver
-634674	tvtime drops frames when gkrellm running
-698201	XVideo output failed to initialize
-739376	Should use a different state directory for fifos
-721200	Numeral feedback for V4L settings
-721203	Single-press should display settings
-735582	CC displays black-on-black sometimes
-735554	Buffer problems with closed captioning?
-712045	Start/Quit command line option
-720075	client / server mode
-720072	Closed Caption text messed up
-707615	full-screen + no window manager == X restart
-715054	screenshot too slow
-723926	icons should be installed by the source distribution
-725830	BadAtom errors from something
-726623	Can't save settings per channel
-738588	OSD quality poor in 'overlay bob' mode
-727949	Need a user-configurable fullscreen size
-729713	It would be nice to use backspace during renumbering
-732468	Channel Preview Window Addition
-731637	Controlling the output of screenshot
-732469	Controlling OSD Output
-732827	shortcut to external
-712050	XMLTV support
-733568	Confusing fullscreen behaviour
-738167	Problems with changed option/bind names
-744631	Compile error on dfboutput.c
-691892	Fullscreen doesn't follow virtual desktop position
-727069	Can't display on the root window
-633235	No on-frame indication of dropped frames
-630236	No MMX versions of MMXEXT functions
-691797	rivatv requires UYVY support
-724354	tvtime should not clobber settings as aggressively
-725864	videobob port is broken
-704780	greedy2frame and twoframe ports busted
-733386	Desktop mouse switching: mandelbug
+710430 RPMs don't depend on lirc package
+717289 OSD fadeout time should depend on TV norm
+729964 tvtime does not change V4L input volume
+752604 [Debian] The setuid question should use dpkg-statoverride
+751093 dalias' pulldown algorithm needs work
+736098 Start on fullscreen broken in some cases?
+727947 tvtime needs a -geometry environment variable
+694544 linux-dvb driver broken and CVS version needs V4L2 support
+727946 tvtime needs a -display command line flag.
+730565 OSD crashes for UTF-8 characters
+726637 Duplicate frequencies should automatically be disabled
+726635 Don't create a new entry if freq already exists
+726822 Filter not hitting all scanlines when using dalias' pulldown
+729726 tvtime console does not process commands if no fifo active
+735053 tvtime should use SIGALRM to watch for hangs
+729660 No support for PAL-60
+726638 No way to enable VBI decoding at runtime
+726640 No way to send OSD messages through FIFO
+744951 tvtime should support more explicit layer modes
+753274 tvtime won't go fullscreen when window doesn't have focus
+753275 CPU Load to 100% when signal is lost
+751253 Fullscreen doesn't work in Openbox wm
+750698 Aspect ratio changes slight on resolution/fullscreen change.
+743918 tvtime should have runtime norm selection (50/60Hz)
+744001 Screen displaying green line on top
+707738 No way to disable signal detection at runtime
+722855 SRPM dependency on glibc-debug
+694681 No way to change deinterlacer settings
+690473 Blue frame shown on channel change when gbuffers=2
+728259 tvtime needs a multiscreen mode
+691857 tvtime ignores wss signals
+650218 No way to disable deinterlacing algs
+692392 XVideo problems with two X servers and X4.2.1 mga driver
+634674 tvtime drops frames when gkrellm running
+698201 XVideo output failed to initialize
+739376 Should use a different state directory for fifos
+721200 Numeral feedback for V4L settings
+721203 Single-press should display settings
+735582 CC displays black-on-black sometimes
+735554 Buffer problems with closed captioning?
+712045 Start/Quit command line option
+720075 client / server mode
+720072 Closed Caption text messed up
+707615 full-screen + no window manager == X restart
+715054 screenshot too slow
+723926 icons should be installed by the source distribution
+725830 BadAtom errors from something
+726623 Can't save settings per channel
+738588 OSD quality poor in 'overlay bob' mode
+727949 Need a user-configurable fullscreen size
+729713 It would be nice to use backspace during renumbering
+732468 Channel Preview Window Addition
+731637 Controlling the output of screenshot
+732469 Controlling OSD Output
+732827 shortcut to external
+712050 XMLTV support
+733568 Confusing fullscreen behaviour
+738167 Problems with changed option/bind names
+744631 Compile error on dfboutput.c
+691892 Fullscreen doesn't follow virtual desktop position
+727069 Can't display on the root window
+633235 No on-frame indication of dropped frames
+630236 No MMX versions of MMXEXT functions
+691797 rivatv requires UYVY support
+724354 tvtime should not clobber settings as aggressively
+725864 videobob port is broken
+704780 greedy2frame and twoframe ports busted
+733386 Desktop mouse switching: mandelbug
 
 
   Known incompatibility problems
   ------------------------------
 
-711428	Tuner type=2 almost always misdetected
-711966	Mute/Unmute while in Comp/S-Video switches sound to tuner
-630585	blits are still taking waaay too long
-743785	Odd Screensaver-related problem?
-691315	i845G XVideo crashes
-672810	g400 marvel
-636338	SiS XVideo driver unusably slow in XFree86 4.2.1 and earlier
-694144	Overscan feature vs nvidia driver: corrupted borders
-738524	mga_vid does not provide a sane API for our overscan feature
-702539	Using overlay mode in xawtv/zapping causes system crashes
-628292	Voodoo 3500 driver does not support capture
+711428 Tuner type=2 almost always misdetected
+711966 Mute/Unmute while in Comp/S-Video switches sound to tuner
+630585 blits are still taking waaay too long
+743785 Odd Screensaver-related problem?
+691315 i845G XVideo crashes
+672810 g400 marvel
+636338 SiS XVideo driver unusably slow in XFree86 4.2.1 and earlier
+694144 Overscan feature vs nvidia driver: corrupted borders
+738524 mga_vid does not provide a sane API for our overscan feature
+702539 Using overlay mode in xawtv/zapping causes system crashes
+628292 Voodoo 3500 driver does not support capture
 

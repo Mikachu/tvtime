@@ -6,6 +6,10 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.8.5
 
+  * Some root safety improvements.
+  * Added support for long-format command line arguments.
+  * Added config file options to set startup window position.
+  * Compile fixes for non-C99 compilers and older DirectFB versions.
 
 News for 0.9.8.4
 
