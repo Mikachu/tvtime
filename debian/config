@@ -268,7 +268,9 @@ if (-x $tvtime_configure) {
     parse_conf();
 }
 elsif (-e $tvtime_xml) {
-    open(OUT, ">", "$pkgsysconfdir/debconf.tvtime.xml");
+    # touch /etc/tvtime/debconf.tvtime.xml
+    open(OUT, ">$pkgsysconfdir/debconf.tvtime.xml");
+    close(OUT);
     $first_question = 5;		# Only ask setuid questions
 }
 ask_questions($first_question);
