@@ -89,83 +89,66 @@ void tvtime_osd_set_scan_channels( tvtime_osd_t* osd, const char *str )
 
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Network Name: " );
-        strncat( fullstr, str, 127 );
-        osd->network_name = str;
-        osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, 
-                              str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_NETWORK_NAME ].string ) );
-    }
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Network Name: " );
+    strncat( fullstr, str, 127 );
+    osd->network_name = str;
+    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, 
+                          str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_NAME ].string ) );
 }
 
 void tvtime_osd_set_show_name( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Show Name: " );
-        strncat( fullstr, str, 127 );
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Show Name: " );
+    strncat( fullstr, str, 127 );
 
-        osd->show_name = str;
-        osd_string_show_text( osd->strings[ OSD_SHOW_NAME ].string, str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_SHOW_NAME ].string ) );
-
-    }
+    osd->show_name = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_NAME ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_NAME ].string ) );
 }
 
 void tvtime_osd_set_network_call( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Call Letters: " );
-        strncat( fullstr, str, 127 );
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Call Letters: " );
+    strncat( fullstr, str, 127 );
 
-        osd->network_call = str;
-        osd_string_show_text( osd->strings[ OSD_NETWORK_CALL ].string, 
-                              str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_NETWORK_CALL ].string ) );
-
-    }
+    osd->network_call = str;
+    osd_string_show_text( osd->strings[ OSD_NETWORK_CALL ].string, 
+                          str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_NETWORK_CALL ].string ) );
 }
 
 void tvtime_osd_set_show_rating( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Show Rating: " );
-        strncat( fullstr, str, 127 );
-        osd->show_rating = str;
-        osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_SHOW_RATING ].string ) );
-
-    }
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Show Rating: " );
+    strncat( fullstr, str, 127 );
+    osd->show_rating = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_RATING ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_RATING ].string ) );
 }
 
 void tvtime_osd_set_show_start( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Start Time: " );
-        strncat( fullstr, str, 127 );
-        osd->show_start = str;
-        osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_SHOW_START ].string ) );
-
-    }
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Start Time: " );
+    strncat( fullstr, str, 127 );
+    osd->show_start = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_START ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_START ].string ) );
 }
 
 void tvtime_osd_set_show_length( tvtime_osd_t* osd, const char *str )
 {
-    if( osd ) {
-        char fullstr[ 128 ];
-        strcpy( fullstr, "Elapsed/Length: " );
-        strncat( fullstr, str, 127 );
-        osd->show_length = str;
-        osd_string_show_text( osd->strings[ OSD_SHOW_LENGTH ].string, str, 
-                              osd_string_get_frames_left( osd->strings[ OSD_SHOW_LENGTH ].string ) );
-
-    }
+    char fullstr[ 128 ];
+    strcpy( fullstr, "Elapsed/Length: " );
+    strncat( fullstr, str, 127 );
+    osd->show_length = str;
+    osd_string_show_text( osd->strings[ OSD_SHOW_LENGTH ].string, str, 
+                          osd_string_get_frames_left( osd->strings[ OSD_SHOW_LENGTH ].string ) );
 }
 
 const int top_size = 7;

@@ -239,7 +239,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( vbi->verbose ) fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
         if( vbi->program_name ) free( vbi->program_name );
         vbi->program_name = strdup(packet + 2);
-        tvtime_osd_set_show_name( vbi->osd, vbi->program_name );
+        if( vbi->osd ) tvtime_osd_set_show_name( vbi->osd, vbi->program_name );
     } else if( packet[ 0 ] == 0x03 && packet[ 1 ] == 0x03 ) {
         if( vbi->verbose ) fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
@@ -250,7 +250,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( vbi->verbose ) fprintf( stderr, "Network name: '%s'\n", packet + 2 );
         if( vbi->network_name ) free( vbi->network_name );
         vbi->network_name = strdup( packet + 2 );
-        tvtime_osd_set_network_name( vbi->osd, vbi->network_name );
+        if( vbi->osd ) tvtime_osd_set_network_name( vbi->osd, vbi->network_name );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
         int movie_rating = packet[ 2 ] & 7;
         int scheme = (packet[ 2 ] & 56) >> 3;
@@ -302,7 +302,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         }
         if( vbi->verbose ) fprintf( stderr, "\n" );
         vbi->rating = str;
-        tvtime_osd_set_show_rating( vbi->osd, vbi->rating );
+        if( vbi->osd ) tvtime_osd_set_show_rating( vbi->osd, vbi->rating );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
         if( vbi->call_letters && !strcmp(vbi->call_letters, packet + 2 ) ) {
             return;
@@ -311,7 +311,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( vbi->verbose ) fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
         if( vbi->call_letters ) free( vbi->call_letters );
         vbi->call_letters = strdup( packet + 2 );
-        tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
+        if( vbi->osd ) tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
         int month = packet[5];
         int day = packet[4];
@@ -326,7 +326,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         vbi->start_min = hour & 63;
         snprintf( str, 32, "%02d %s, %02d:%02d",
                   day & 31, months[month & 15], hour & 31, min & 63 );
-        tvtime_osd_set_show_start( vbi->osd, str );
+        if( vbi->osd ) tvtime_osd_set_show_start( vbi->osd, str );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
         if( vbi->verbose ) fprintf( stderr, "Program type: " );
         for( i = 0; i < length - 2; i++ ) {
@@ -381,7 +381,7 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         } else {
             vbi->length_elapsed_hour = 0;
         }
-        tvtime_osd_set_show_length( vbi->osd, str );
+        if( vbi->osd ) tvtime_osd_set_show_length( vbi->osd, str );
         if( vbi->verbose ) fprintf( stderr, "\n" );
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x04 ) {
         if( vbi->verbose ) fprintf( stderr, "Transmission Signal Identifier (TSID): 0x%04x\n",
@@ -946,12 +946,14 @@ void vbidata_reset( vbidata_t *vbi )
     vbi->length_elapsed_min = 0;
     vbi->length_elapsed_sec = 0;
 
-    tvtime_osd_set_network_call( vbi->osd, "" );
-    tvtime_osd_set_network_name( vbi->osd, "" );
-    tvtime_osd_set_show_name( vbi->osd, "" );
-    tvtime_osd_set_show_rating( vbi->osd, "" );
-    tvtime_osd_set_show_start( vbi->osd, "" );
-    tvtime_osd_set_show_length( vbi->osd, "" );
+    if( vbi->osd ) {
+        tvtime_osd_set_network_call( vbi->osd, "" );
+        tvtime_osd_set_network_name( vbi->osd, "" );
+        tvtime_osd_set_show_name( vbi->osd, "" );
+        tvtime_osd_set_show_rating( vbi->osd, "" );
+        tvtime_osd_set_show_start( vbi->osd, "" );
+        tvtime_osd_set_show_length( vbi->osd, "" );
+    }
 
 
 
