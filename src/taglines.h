@@ -168,7 +168,8 @@ static const char *taglines[] = {
 "tvtime: i don't want to grow up, i'm a tvtime kid",
 "tvtime: extra starka, extra friska",
 "tvtime: grillat är godast",
-"tvtime: i'm lovin' it"
+"tvtime: i'm lovin' it",
+"tvtime: the most banana of them all"
 };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
