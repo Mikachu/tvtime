@@ -819,7 +819,7 @@ static void* WINAPI expWaitForMultipleObjects(int count, const void** objects,
 {
     int i;
     void *object;
-    int ret;
+    void *ret;
 
     dbgprintf("WaitForMultipleObjects(%d, 0x%x, %d, duration %d) =>\n",
 	count, objects, WaitAll, duration);
@@ -845,7 +845,7 @@ static void WINAPI expExitThread(int retcode)
 static HANDLE WINAPI expCreateMutexA(void *pSecAttr,
 		    char bInitialOwner, const char *name)
 {
-    HANDLE mlist = expCreateEventA(pSecAttr, 0, 0, name);
+    HANDLE mlist = (HANDLE) expCreateEventA(pSecAttr, 0, 0, name);
     
     if (name)
 	dbgprintf("CreateMutexA(0x%x, %d, '%s') => 0x%x\n",
@@ -857,6 +857,8 @@ static HANDLE WINAPI expCreateMutexA(void *pSecAttr,
     /* 10l to QTX, if CreateMutex returns a real mutex, WaitForSingleObject
        waits for ever, else it works ;) */
     return mlist;
+#else
+    return 0;
 #endif
 }
 
@@ -890,7 +892,6 @@ static void WINAPI expGetSystemInfo(SYSTEM_INFO* si)
     /* FIXME: better values for the two entries below... */
     static int cache = 0;
     static SYSTEM_INFO cachedsi;
-    unsigned int regs[4];
     dbgprintf("GetSystemInfo(%p) =>\n", si);
 
     if (cache) {
@@ -2527,7 +2528,7 @@ static int WINAPI expGetMonitorInfoA(void *mon, LPMONITORINFO lpmi)
 
     if (lpmi->cbSize == sizeof(MONITORINFOEX))
     {
-	LPMONITORINFOEX lpmiex = lpmi;
+	LPMONITORINFOEX lpmiex = (LPMONITORINFOEX) lpmi;
 	dbgprintf("MONITORINFOEX!\n");
 	strncpy(lpmiex->szDevice, "Monitor1", CCHDEVICENAME);
     }
@@ -3568,9 +3569,9 @@ static DWORD WINAPI expGetFullPathNameA
 #endif
 #else
     if (strrchr(lpFileName, '\\'))
-	*lpFilePart = strrchr(lpFileName, '\\');
+	*lpFilePart = (int) strrchr(lpFileName, '\\');
     else
-	*lpFilePart = lpFileName;
+	*lpFilePart = (int) lpFileName;
 #endif
     strcpy(lpBuffer, lpFileName);
 //    strncpy(lpBuffer, lpFileName, rindex(lpFileName, '\\')-lpFileName);
@@ -4442,7 +4443,7 @@ static WIN_BOOL WINAPI expSetThreadPriority(
 
 static void WINAPI expExitProcess( DWORD status )
 {
-    printf("EXIT - code %d\n",status);
+    printf("EXIT - code %d\n",(int) status);
     exit(status);
 }
 
@@ -4501,7 +4502,7 @@ static int expSysStringByteLen(void *str)
 static int expDirectDrawCreate(void)
 {
     dbgprintf("DirectDrawCreate(...) => NULL\n");
-    return NULL;
+    return 0;
 }
 
 #if 1
@@ -4527,8 +4528,8 @@ static HPALETTE WINAPI expCreatePalette(CONST LOGPALETTE *lpgpl)
     dbgprintf("CreatePalette(%x) => NULL\n", lpgpl);
 
     i = sizeof(LOGPALETTE)+((lpgpl->palNumEntries-1)*sizeof(PALETTEENTRY));
-    test = malloc(i);
-    memcpy(test, lpgpl, i);
+    test = (HPALETTE) malloc(i);
+    memcpy((void *) test, lpgpl, i);
 
     return test;
 }
@@ -5131,9 +5132,9 @@ void* LookupExternal(const char* library, int ordinal)
 	       hand, func);
 	return func;
     }
-#endif
 
 no_dll:
+#endif
     if(pos>150)return 0;
     sprintf(export_names[pos], "%s:%d", library, ordinal);
     return add_stub();

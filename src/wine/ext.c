@@ -74,7 +74,7 @@ HANDLE WINAPI GetProcessHeap(void)
 
 LPVOID WINAPI HeapAlloc(HANDLE heap, DWORD flags, DWORD size)
 {
-    static int i = 5;
+    //static int i = 5;
     void* m = (flags & 0x8) ? calloc(size, 1) : malloc(size);
     //printf("HeapAlloc %p  %d  (%d)\n", m, size, flags);
     //if (--i == 0)
@@ -326,7 +326,7 @@ int FILE_munmap( LPVOID start, DWORD size_high, DWORD size_low )
       printf("offsets larger than 4Gb not supported\n");
     return munmap( start, size_low );
 }
-static int mapping_size=0;
+//static int mapping_size=0;
 
 struct file_mapping_s;
 typedef struct file_mapping_s
@@ -481,7 +481,7 @@ LPVOID WINAPI VirtualAlloc(LPVOID address, DWORD size, DWORD type,  DWORD protec
 	    }
 	    if(str->state==0)
 	    {
-#warning FIXME
+//#warning FIXME
 		if(((unsigned)address+size<(unsigned)str->address+str->mapping_size) && (type & MEM_COMMIT))
 		{
 		    close(fd);

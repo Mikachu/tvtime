@@ -22,10 +22,8 @@ EXTRA_DIST = stubs.s wrapper.S
 # Simon: I think I understand, and we don't use xine flags.
 # AM_CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer
 
-AM_CFLAGS = \
-            -fno-omit-frame-pointer \
-	    -Wmissing-prototypes \
-	    -Wimplicit-function-declaration \
+AM_CFLAGS = -Wall \
+	    -fno-omit-frame-pointer \
 	    -D__WINE__ \
 	    -Ddbg_printf=__vprintf \
 	    -DTRACE=__vprintf \
