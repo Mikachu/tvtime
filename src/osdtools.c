@@ -31,6 +31,8 @@
 
 #define MEMORY_PER_STRING (256*1024)
 
+#define OSD_LIST_MAX_LINES 16
+
 struct osd_font_s
 {
     ft_font_t *font;
@@ -761,8 +763,6 @@ void osd_animation_composite_packed422_scanline( osd_animation_t *osda,
         }
     }
 }
-
-#define OSD_LIST_MAX_LINES 16
 
 struct osd_list_s
 {
