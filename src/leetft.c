@@ -288,7 +288,7 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
         FT_Error error;
         int cur = text[ i ];
 
-        if( glyphs[ cur ] ) {
+        if( font->glyphs[ cur ] ) {
 
             /* Create a copy of the original glyph. */
             error = FT_Glyph_Copy( font->glyphs[ cur ], &image );
