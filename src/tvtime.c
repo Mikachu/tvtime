@@ -250,121 +250,43 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              int instride,
                                              int outstride )
 {
-    int scanline = 0;
     int i;
 
-    if( bottom_field ) {
-        /* Advance frame pointers to the next input line. */
-        curframe += instride;
-        lastframe += instride;
-        secondlastframe += instride;
+    if( !curmethod->scanlinemode ) {
+        /* Call deinterlacer here.
+        tvtime_just_deinterlace_frame( output, curframe, lastframe, secondlastframe,
+                                       bottom_field, width, frame_height, instride, outstride );
+         */
 
-        /* Double the top scanline a scanline. */
-        blit_packed422_scanline( output, curframe, width );
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
-        output += outstride;
-        scanline++;
-    }
-
-    /* Copy a scanline. */
-    blit_packed422_scanline( output, curframe, width );
-
-    if( correct_input ) {
-        video_correction_correct_packed422_scanline( vc, output, output, width );
-    }
-    if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-    if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
-    output += outstride;
-    scanline++;
-
-    for( i = ((frame_height - 2) / 2); i; --i ) {
-        deinterlace_scanline_data_t data;
-
-        data.t0 = curframe;
-        data.b0 = curframe + (instride*2);
+        for( i = 0; i < frame_height; i++ ) {
+            unsigned char *curoutput = output + (i * outstride);
+            if( correct_input ) {
+                video_correction_correct_packed422_scanline( vc, curoutput, curoutput, width );
+            }
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
+            if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+        }
+    } else {
+        int scanline = 0;
 
         if( bottom_field ) {
-            data.tt1 = 0;
-            data.m1  = curframe + instride;
-            data.bb1 = 0;
-        } else {
-            data.tt1 = 0;
-            data.m1  = lastframe + instride;
-            data.bb1 = 0;
+            /* Advance frame pointers to the next input line. */
+            curframe += instride;
+            lastframe += instride;
+            secondlastframe += instride;
+
+            /* Double the top scanline a scanline. */
+            blit_packed422_scanline( output, curframe, width );
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+            output += outstride;
+            scanline++;
         }
 
-        data.t2 = lastframe;
-        data.b2 = lastframe + (instride*2);
-
-        if( bottom_field ) {
-            data.tt3 = 0;
-            data.m3  = lastframe + instride;
-            data.bb3 = 0;
-        } else {
-            data.tt3 = 0;
-            data.m3  = secondlastframe + instride;
-            data.bb3 = 0;
-        }
-
-        curmethod->interpolate_scanline( output, &data, width );
-        if( correct_input ) {
-            video_correction_correct_packed422_scanline( vc, output, output, width );
-        }
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
-        output += outstride;
-        scanline++;
-
-        data.tt0 = 0;
-        data.m0  = curframe + (instride*2);
-        data.bb0 = 0;
-
-        if( bottom_field ) {
-            data.t1 = curframe + instride;
-            data.b1 = curframe + (instride*3);
-        } else {
-            data.t1 = lastframe + instride;
-            data.b1 = lastframe + (instride*3);
-        }
-
-        data.tt2 = 0;
-        data.m2  = lastframe + (instride*2);
-        data.bb2 = 0;
-
-        if( bottom_field ) {
-            data.t2 = lastframe + instride;
-            data.b2 = lastframe + (instride*3);
-        } else {
-            data.t2 = secondlastframe + instride;
-            data.b2 = secondlastframe + (instride*3);
-        }
-       
         /* Copy a scanline. */
-        curmethod->copy_scanline( output, &data, width );
-        curframe += instride * 2;
-        lastframe += instride * 2;
-        secondlastframe += instride * 2;
-
-        if( correct_input ) {
-            video_correction_correct_packed422_scanline( vc, output, output, width );
-        }
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
-        if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
-
-        output += outstride;
-        scanline++;
-    }
-
-    if( !bottom_field ) {
-        /* Double the bottom scanline. */
         blit_packed422_scanline( output, curframe, width );
 
         if( correct_input ) {
@@ -374,52 +296,107 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
 
-
         output += outstride;
         scanline++;
-    }
-}
 
+        for( i = ((frame_height - 2) / 2); i; --i ) {
+            deinterlace_scanline_data_t data;
 
-#if 0
-/**
- * This will be used by the DScaler filters.
- */
-static void tvtime_build_deinterlaced_frame_multipass( unsigned char *output,
-                                                       unsigned char *curframe,
-                                                       unsigned char *lastframe,
-                                                       unsigned char *secondlastframe,
-                                                       video_correction_t *vc,
-                                                       tvtime_osd_t *osd,
-                                                       console_t *con,
-                                                       vbiscreen_t *vs,
-                                                       int bottom_field,
-                                                       int correct_input,
-                                                       int width,
-                                                       int frame_height,
-                                                       int instride,
-                                                       int outstride )
-{
-    int i;
+            data.t0 = curframe;
+            data.b0 = curframe + (instride*2);
 
-    /* Call deinterlacer here.
-    tvtime_just_deinterlace_frame( output, curframe, lastframe, secondlastframe,
-                                   bottom_field, width, frame_height, instride, outstride );
-     */
+            if( bottom_field ) {
+                data.tt1 = 0;
+                data.m1  = curframe + instride;
+                data.bb1 = 0;
+            } else {
+                data.tt1 = 0;
+                data.m1  = lastframe + instride;
+                data.bb1 = 0;
+            }
 
-    for( i = 0; i < frame_height; i++ ) {
-        unsigned char *curoutput = output + (i * outstride);
-        if( correct_input ) {
-            video_correction_correct_packed422_scanline( vc, curoutput, curoutput, width );
+            data.t2 = lastframe;
+            data.b2 = lastframe + (instride*2);
+
+            if( bottom_field ) {
+                data.tt3 = 0;
+                data.m3  = lastframe + instride;
+                data.bb3 = 0;
+            } else {
+                data.tt3 = 0;
+                data.m3  = secondlastframe + instride;
+                data.bb3 = 0;
+            }
+
+            curmethod->interpolate_scanline( output, &data, width );
+            if( correct_input ) {
+                video_correction_correct_packed422_scanline( vc, output, output, width );
+            }
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+            output += outstride;
+            scanline++;
+
+            data.tt0 = 0;
+            data.m0  = curframe + (instride*2);
+            data.bb0 = 0;
+
+            if( bottom_field ) {
+                data.t1 = curframe + instride;
+                data.b1 = curframe + (instride*3);
+            } else {
+                data.t1 = lastframe + instride;
+                data.b1 = lastframe + (instride*3);
+            }
+
+            data.tt2 = 0;
+            data.m2  = lastframe + (instride*2);
+            data.bb2 = 0;
+
+            if( bottom_field ) {
+                data.t2 = lastframe + instride;
+                data.b2 = lastframe + (instride*3);
+            } else {
+                data.t2 = secondlastframe + instride;
+                data.b2 = secondlastframe + (instride*3);
+            }
+
+            /* Copy a scanline. */
+            curmethod->copy_scanline( output, &data, width );
+            curframe += instride * 2;
+            lastframe += instride * 2;
+            secondlastframe += instride * 2;
+
+            if( correct_input ) {
+                video_correction_correct_packed422_scanline( vc, output, output, width );
+            }
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+            output += outstride;
+            scanline++;
         }
-        if( vs ) vbiscreen_composite_packed422_scanline( vs, curoutput, width, 0, i );
-        if( osd ) tvtime_osd_composite_packed422_scanline( osd, curoutput, width, 0, i );
-        if( con ) console_composite_packed422_scanline( con, curoutput, width, 0, i );
+
+        if( !bottom_field ) {
+            /* Double the bottom scanline. */
+            blit_packed422_scanline( output, curframe, width );
+
+            if( correct_input ) {
+                video_correction_correct_packed422_scanline( vc, output, output, width );
+            }
+            if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
+            if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+            if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
+
+
+            output += outstride;
+            scanline++;
+        }
     }
 }
-#endif
-
-
 
 static void tvtime_build_interlaced_frame( unsigned char *output,
                                            unsigned char *curframe,
