@@ -381,6 +381,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
          */
 
         pdoffset = determine_pulldown_offset_short_history_new( last_topdiff, last_botdiff, 1, predicted );
+        //pdoffset = determine_pulldown_offset_history_new( last_topdiff, last_botdiff, 1, predicted );
 
         /* 3:2 pulldown state machine. */
         if( !pdoffset ) {
@@ -469,9 +470,9 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             static pulldown_metrics_t old_peak;
             static pulldown_metrics_t old_rel;
             static pulldown_metrics_t old_mean;
-            static int drop = 0;
-            int do_drop = 0;
+            static int drop_next = 0;
             pulldown_metrics_t new_peak, new_rel, new_mean;
+            int drop_cur = 0;
 
             diff_factor_packed422_frame( &new_peak, &new_rel, &new_mean, lastframe, curframe,
                                          width, frame_height, width*2, width*2 );
@@ -480,14 +481,18 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                     new_peak.d, new_rel.e, new_rel.o, new_rel.t, new_rel.s, new_rel.p, new_rel.d );
             */
 
-            if( drop ) {
-                drop = 0;
-                do_drop = 1;
+            if( drop_next ) {
+                tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_DROP2 );
+                drop_next = 0;
+                drop_cur = 1;
                 pulldown_copy = 2;
             } else {
                 switch(determine_pulldown_offset_dalias( &old_peak, &old_rel, &old_mean,
                                                          &new_peak, &new_rel, &new_mean )) {
-                    case PULLDOWN_ACTION_MRGE3: drop = 1; pulldown_merge = 1; break;
+                    case PULLDOWN_ACTION_MRGE3: drop_next = 1; pulldown_merge = 1; break;
                     default:
                     case PULLDOWN_ACTION_COPY1: break;
                     case PULLDOWN_ACTION_DROP2: break;
@@ -496,16 +501,16 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             old_peak = new_peak;
             old_rel = new_rel;
             old_mean = new_mean;
-            if( drop || do_drop ) return;
-            if( !pulldown_copy ) return;
-            // Copy.
-            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
-                                       osd, con, vs, bottom_field, width,
-                                       frame_height, instride, outstride,
-                                       PULLDOWN_ACTION_COPY1 );
-            pulldown_copy--;
-            did_copy_top = 1;
-            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+            if( !drop_next && !drop_cur && pulldown_copy ) {
+                // Copy.
+                tvtime_do_pulldown_action( output, lastframe, curframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_COPY1 );
+                pulldown_copy--;
+                did_copy_top = 1;
+                // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+            }
         } else if( pulldown_merge ) {
             // Merge.
             tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
@@ -516,12 +521,15 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
         } else if( !pulldown_copy ) {
             // Copy.
-            if( did_copy_top ) { did_copy_top = 0; return; }
-            tvtime_do_pulldown_action( output, curframe, lastframe, secondlastframe,
-                                       osd, con, vs, bottom_field, width,
-                                       frame_height, instride, outstride,
-                                       PULLDOWN_ACTION_COPY4 );
-            // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+            if( did_copy_top ) {
+                did_copy_top = 0;
+            } else {
+                tvtime_do_pulldown_action( output, lastframe, curframe, secondlastframe,
+                                           osd, con, vs, bottom_field, width,
+                                           frame_height, instride, outstride,
+                                           PULLDOWN_ACTION_COPY4 );
+                // fprintf( stderr, ": %d\n", last_fieldcount ); last_fieldcount = 0;
+            }
         }
         return;
     }
