@@ -234,7 +234,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
   save_normal_geometry(dpy, win);
   
   if(!has_ewmh_state_fullscreen) {
-#if 1 // bloody wm's that can't cope with unmap/map
+#if 0 // bloody wm's that can't cope with unmap/map
     // We have to be unmapped to change motif decoration hints 
     XUnmapWindow(dpy, win);
     
