@@ -53,7 +53,7 @@ void config_init_keymap( config_t *ct );
 static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-vasb] [-w <width>] [-I <sampling>] "
-                     "[-d <device>] [-i <input>] [-n <norm>] "
+                     "[-d <device>]\n\t\t[-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
                      "\t-v\tShow verbose messages.\n"
                      "\t-a\t16:9 mode.\n"
@@ -88,8 +88,7 @@ static void print_usage( char **argv )
                      "\t  \t\tsouthafrica\n"
                      "\t  \t\targentina\n"
                      "\t  \t\tcanada-cable\n"
-                     "\t  \t\taustralia-optus\n"
-                     "\n\tSee the README for more details.\n",
+                     "\t  \t\taustralia-optus\n\n",
                      argv[ 0 ] );
 }
 
@@ -182,7 +181,7 @@ config_t *config_new( int argc, char **argv )
         case 'F': configFile = strdup( optarg ); break;
         default:
             print_usage( argv );
-            return NULL;
+            return 0;
         }
     }
 
