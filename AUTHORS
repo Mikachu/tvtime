@@ -17,6 +17,9 @@ Authors and contributors
   Robert Högberg <cogline@linux.se>
     - added lirc support
 
+  Craig Dooley <cd5697@albany.edu>
+    - added a previous channel command
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler

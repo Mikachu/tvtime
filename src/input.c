@@ -81,6 +81,7 @@ struct input_s {
  * Tuner settings.
  */
 static int cur_channel = 0;
+static int prev_channel = 0;
 static int cur_freq_table = 1;
 static int ntsc_cable_mode = NTSC_CABLE_MODE_NOMINAL;
 static int finetune_amount = 0;
@@ -403,7 +404,8 @@ static void input_channel_change_relative( input_t *in, int offset )
             fprintf( stderr, "tvtime: Can't change channel, "
                      "no tuner available on this input!\n" );
     } else {
-        for(;;) {
+        prev_channel = cur_channel;
+		for(;;) {
             cur_channel = (cur_channel + offset + CHAN_ENTRIES) % CHAN_ENTRIES;
             if( tvtuner[ cur_channel ].freq[ cur_freq_table ].freq 
                 && tvtuner[ cur_channel ].freq[ cur_freq_table ].enabled ) 
@@ -653,7 +655,11 @@ void input_callback( input_t *in, InputEvent command, int arg )
             input_channel_change_relative( in, (tvtime_cmd == TVTIME_CHANNEL_UP) ?  1 : -1 );
             break;
 
-        case TVTIME_MIXER_UP: 
+        case TVTIME_CHANNEL_PREV:
+       		input_channel_change_relative(in, (prev_channel - cur_channel));
+			break;
+		
+		case TVTIME_MIXER_UP: 
         case TVTIME_MIXER_DOWN:
 
             volume = mixer_set_volume( 
@@ -722,7 +728,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
         case TVTIME_ENTER:
             if( in->frame_counter ) {
                 if( *in->next_chan_buffer ) {
-
+					prev_channel = cur_channel;
                     /* this sets the current channel accordingly */
                     if( frequencies_find_named_channel( in->next_chan_buffer ) ) {
                         /* go to the next valid channel instead */

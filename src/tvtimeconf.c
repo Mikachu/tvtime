@@ -41,6 +41,7 @@ static Cmd_Names cmd_table[] = {
     { "QUIT", TVTIME_QUIT },
     { "CHANNEL_UP", TVTIME_CHANNEL_UP },
     { "CHANNEL_DOWN", TVTIME_CHANNEL_DOWN },
+    { "CHANNEL_PREV", TVTIME_CHANNEL_PREV },
     { "LUMA_CORRECTION_TOGGLE", TVTIME_LUMA_CORRECTION_TOGGLE },
     { "LUMA_UP", TVTIME_LUMA_UP },
     { "LUMA_DOWN", TVTIME_LUMA_DOWN },
@@ -223,6 +224,7 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_DOWN ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ I_LEFT ] = TVTIME_FINETUNE_DOWN;
     ct->keymap[ I_RIGHT ] = TVTIME_FINETUNE_UP;
+    ct->keymap[ 'p' ] = TVTIME_CHANNEL_PREV;
     ct->keymap[ 'k' ] = TVTIME_CHANNEL_UP;
     ct->keymap[ 'j' ] = TVTIME_CHANNEL_DOWN;
     ct->keymap[ 'h' ] = TVTIME_FINETUNE_DOWN;
