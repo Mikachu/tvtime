@@ -40,6 +40,7 @@ static station_info_t *first = 0;
 static station_info_t *current = 0;
 static int verbose = 0;
 static int debug = 0;
+static int us_cable_mode = 0;
 
 const band_t *get_band( const char *band )
 {
@@ -224,11 +225,24 @@ const char *station_get_current_band( void )
     }
 }
 
+void station_set_us_cable_mode( int us_cable )
+{
+    us_cable_mode = us_cable;
+}
+
 int station_get_current_frequency( void )
 {
     if( !current ) {
         return 0;
     } else {
+        if( current->band == us_cable_band ) {
+            if( us_cable_mode == US_CABLE_HRC ) {
+                return NTSC_CABLE_HRC( current->channel->freq );
+            } else if( us_cable_mode == US_CABLE_IRC ) {
+                return NTSC_CABLE_IRC( current->channel->freq );
+            }
+        }
+
         return current->channel->freq;
     }
 }

@@ -251,6 +251,11 @@ const band_entry_t band_data_japan_catv[] = {
 };
 
 const band_t bands[] = {
+    { "US Cable", band_data_us_catv, sizeof( band_data_us_catv ) / sizeof( band_entry_t ) },
+    { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
+    { "US Broadcast", band_data_us_bcast, sizeof( band_data_us_bcast ) / sizeof( band_entry_t ) },
+    { "Japan Broadcast", band_data_japan_bcast, sizeof( band_data_japan_bcast ) / sizeof( band_entry_t ) },
+    { "Japan Cable", band_data_japan_catv, sizeof( band_data_japan_catv ) / sizeof( band_entry_t ) },
     { "VHF E2-E12", band_data_vhf_e1_e12, sizeof( band_data_vhf_e1_e12 ) / sizeof( band_entry_t ) },
     { "VHF S1-S41", band_data_vhf_s1_s41, sizeof( band_data_vhf_s1_s41 ) / sizeof( band_entry_t ) },
     { "VHF Misc", band_data_vhf_misc, sizeof( band_data_vhf_misc ) / sizeof( band_entry_t ) },
@@ -259,14 +264,10 @@ const band_t bands[] = {
     { "VHF Australia", band_data_vhf_australia, sizeof( band_data_vhf_australia ) / sizeof( band_entry_t ) },
     { "VHF Italy", band_data_vhf_italy, sizeof( band_data_vhf_italy ) / sizeof( band_entry_t ) },
     { "VHF Ireland", band_data_vhf_ireland, sizeof( band_data_vhf_ireland ) / sizeof( band_entry_t ) },
-    { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) },
-    { "US Cable", band_data_us_catv, sizeof( band_data_us_catv ) / sizeof( band_entry_t ) },
-    { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
-    { "US Broadcast", band_data_us_bcast, sizeof( band_data_us_bcast ) / sizeof( band_entry_t ) },
-    { "Japan Broadcast", band_data_japan_bcast, sizeof( band_data_japan_bcast ) / sizeof( band_entry_t ) },
-    { "Japan Cable", band_data_japan_catv, sizeof( band_data_japan_catv ) / sizeof( band_entry_t ) },
+    { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) }
 };
 const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
+const band_t *us_cable_band = &(bands[ 0 ]);
 
 /*
  UK         VHF Ireland, VHF Misc, UHF
