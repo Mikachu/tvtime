@@ -48,6 +48,8 @@ static const char *tests[] = {
    "blit_packed422_scanline_c 720x480 frame",
    "blit_packed422_scanline_i386_linux 720x480 frame",
    "blit_packed422_scanline_mmxext_billy 720x480 frame",
+   "interpolate_packed422_scanline_c 720x480->720x240 frame",
+   "interpolate_packed422_scanline_mmxext 720x480->720x240 frame",
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -141,6 +143,22 @@ int main( int argc, char **argv )
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
                 blit_packed422_scanline_mmxext_billy( dest422packed + (stride*j), source422packed + (stride*j), width );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_c 720x480->720x240 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height/2; j++ ) {
+                interpolate_packed422_scanline_c( dest422packed + (stride*j),
+                                                  source422packed + (stride*j*2),
+                                                  source422packed + (stride*j*2) + stride, width );
+            }
+            rdtscll( after );
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmxext 720x480->720x240 frame" ) ) {
+            rdtscll( before );
+            for( j = 0; j < height/2; j++ ) {
+                interpolate_packed422_scanline_mmxext( dest422packed + (stride*j),
+                                                       source422packed + (stride*j*2),
+                                                       source422packed + (stride*j*2) + stride, width );
             }
             rdtscll( after );
         }
