@@ -326,8 +326,8 @@ int main( int argc, char **argv )
         int printdebug = 0, showtest = 0;
         int commands;
 
-        if( !sdl_poll_events( in ) ) break;
-        input_next_frame( in );
+        sdl_poll_events( in );
+        if ( !input_next_frame( in ) ) break;
 
         /* CHECKPOINT1 : Blit the second field */
         gettimeofday( &(checkpoint[ 0 ]), 0 );

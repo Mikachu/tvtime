@@ -55,6 +55,6 @@ void sdl_show_frame( void );
  * Perform the polling of events.  Returns a bitfield of the commands
  * listed above.
  */
-int sdl_poll_events( input_t *in );
+void sdl_poll_events( input_t *in );
 
 #endif /* SDLOUTPUT_H_INCLUDED */

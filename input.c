@@ -42,6 +42,7 @@ struct input_s {
     int frame_counter;
     int digit_counter;
     int videohold;
+    int quit;
 };
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
@@ -60,6 +61,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->frame_counter = 0;
     in->digit_counter = 0;
     in->videohold = 0;
+    in->quit = 0;
 
     return in;
 }
@@ -74,12 +76,15 @@ void input_callback( input_t *in, InputEvent command, int arg )
     int tvtime_cmd, verbose;
     int volume;
 
+    if( in->quit ) return;
+
     verbose = config_get_verbose( in->cfg );
 
     fprintf( stderr, "input: command = %d  arg = %d\n", command, arg );
 
     switch( command ) {
     case I_QUIT:
+        in->quit = 1;
         break;
 
     case I_KEYDOWN:
@@ -240,8 +245,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
 }
 
-void input_next_frame( input_t *in )
+int input_next_frame( input_t *in )
 {
+    if( in->quit ) return 0;
+
     /* Decrement the frame counter if user is typing digits */
     if( in->frame_counter > 0 ) in->frame_counter--;
 
@@ -258,6 +265,8 @@ void input_next_frame( input_t *in )
             strcat( input_text, "_" );
         tvtime_osd_show_channel_number( in->osd, input_text );
     }
+
+    return 1;
 }
 
 void input_dec_videohold( input_t *in ) 

@@ -78,7 +78,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
                     tvtime_osd_t *osd, video_correction_t *vc );
 void    input_delete( input_t *in );
 void    input_callback( input_t *in, InputEvent command, int arg );
-void    input_next_frame( input_t *in );
+int     input_next_frame( input_t *in );
 
 /* XXX: these are temporary */
 int     input_get_videohold( input_t *in );

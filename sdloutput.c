@@ -106,7 +106,7 @@ void sdl_show_frame( void )
     SDL_LockYUVOverlay( frame );
 }
 
-int sdl_poll_events( input_t *in )
+void sdl_poll_events( input_t *in )
 {
     SDL_Event event;
     int curcommand = 0, arg = 0;
@@ -217,7 +217,4 @@ int sdl_poll_events( input_t *in )
 
         input_callback( in, curcommand, arg );
     }
-    if( curcommand == I_QUIT ) return 0;
-    return 1;
 }
-
