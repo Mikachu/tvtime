@@ -96,11 +96,12 @@ Code we stole (well, used under the GPL)
     Being a reasonable 'port' of much of the DScaler code is definitely
     one of our goals.
 
-  Original Freetype2 code and compositing ideas from MythTV
+  Original Freetype2 code, compositing ideas, and XMLTV code from MythTV
     http://mythtv.sourceforge.net/
     We since rewrote our font renderer, but originally we borrowed from
     this great project.  It would be nice to re-sync some of our rendering
-    code.
+    code.  We also took ideas on how to parse some of the XMLTV stuff from
+    the MythTV codebase.
 
   Some great colourbar generation and Y'CbCr<->R'G'B' code
     Copyright (C) 2001 Matthew J. Marjanovic <maddog@mir.com>

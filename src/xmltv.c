@@ -40,6 +40,37 @@ struct xmltv_s
     xmlChar *curchan;
 };
 
+/**
+ * Timezone parsing code based loosely on the algorithm in
+ * filldata.cpp of MythTV.
+ */
+static int parse_xmltv_timezone( const char *tzstring )
+{
+    /* We signal an error by setting it invalid (> 720min = 12hr). */
+    int result = 721;
+
+    if( strlen( tzstring ) == 5 && (tzstring[ 0 ] == '+' || tzstring[ 0 ] == '-') ) {
+        char hour[ 3 ];
+        int min;
+
+        hour[ 0 ] = tzstring[ 1 ];
+        hour[ 1 ] = tzstring[ 2 ];
+        hour[ 2 ] = 0;
+
+        result = atoi( hour );
+        result *= 60;
+
+        min = atoi( tzstring + 3 );
+        result += min;
+
+        if( tzstring[ 0 ] == '-' ) {
+            result *= -1;
+        }
+    }
+
+    return result;
+}
+
 static void parse_xmltv_date( int *year, int *month, int *day, int *hour, int *min, const char *date )
 {
     char syear[ 6 ];
