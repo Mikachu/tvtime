@@ -58,9 +58,6 @@ rtctimer_t *rtctimer_new( int verbose )
             free( rtctimer );
             return 0;
         }
-        if( rtctimer->verbose ) {
-            fprintf( stderr, "rtctimer: Using /dev/misc/rtc instead.\n" );
-        }
     }
 
     if( fcntl( rtctimer->rtc_fd, F_SETOWN, getpid() ) < 0 ) {
