@@ -967,8 +967,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
         cmd->apply_luma = 0;
-        lfputs( _("commands: Your capture card is not a BT878/BT848, "
-                  "disabling luma correction.\n"), stderr );
     }
 
     if( vidin && videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC &&
@@ -994,8 +992,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
-        lfputs( _("commands: Luma correction value out of range. "
-                  "Using 1.0.\n"), stderr );
         cmd->luma_power = 1.0;
     }
 
