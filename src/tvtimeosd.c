@@ -378,36 +378,36 @@ void tvtime_osd_delete( tvtime_osd_t *osd )
 
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm )
 {
-    if( osd->tv_norm_text ) snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, norm );
+    if( osd->tv_norm_text ) snprintf( osd->tv_norm_text, sizeof( osd->tv_norm_text ) - 1, "%s", norm );
 }
 
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
 {
-    if( osd->input_text ) snprintf( osd->input_text, sizeof( osd->input_text ) - 1, norm );
+    if( osd->input_text ) snprintf( osd->input_text, sizeof( osd->input_text ) - 1, "%s", norm );
 }
 
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
 {
     if( osd->freqtable_text ) {
-        snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
+        snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, "%s", freqtable );
     }
 }
 
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
 {
     if( osd->channel_number_text ) {
-        snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
+        snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, "%s", norm );
     }
 }
 
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )
 {
-    snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ) - 1, method );
+    snprintf( osd->deinterlace_text, sizeof( osd->deinterlace_text ) - 1, "%s", method );
 }
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format )
 {
-    snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, format );
+    snprintf( osd->timeformat, sizeof( osd->timeformat ) - 1, "%s", format );
 }
 
 void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
