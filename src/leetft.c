@@ -408,10 +408,10 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
 struct ft_string_s
 {
     ft_font_t *font;
-    uint8_t *data;
-    int datasize;
     int width;
     int height;
+    int datasize;
+    uint8_t data[ 256 * 1024 ];
 };
 
 ft_string_t *ft_string_new( ft_font_t *font )
@@ -420,12 +420,7 @@ ft_string_t *ft_string_new( ft_font_t *font )
     if( !fts ) return 0;
 
     fts->font = font;
-    fts->datasize = 262144;
-    fts->data = malloc( fts->datasize );
-    if( !fts->data ) {
-        free( fts );
-        return 0;
-    }
+    fts->datasize = sizeof( fts->data );
 
     return fts;
 }
