@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <stdint.h>
 #include "pngoutput.h"
 #include "frequencies.h"
 #include "videoinput.h"
