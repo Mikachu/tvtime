@@ -28,7 +28,7 @@
 /* when do we not have XDPMS? */
 #define HAVE_XDPMS
 
-int stop_xscreensaver=1;
+int stop_xscreensaver=0;
 
 static int dpms_disabled=0;
 static int timeout_save=0;
