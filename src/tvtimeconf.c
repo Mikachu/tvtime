@@ -1047,6 +1047,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         config_save( ct, "Frequencies", ct->freq );
 
         config_save( ct, "MixerDevice", ct->mixerdev );
+
+        config_save( ct, "XMLTVFile", ct->xmltvfile );
     }
 
     return 1;
@@ -1217,6 +1219,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         config_save( ct, "Frequencies", ct->freq );
 
         config_save( ct, "MixerDevice", ct->mixerdev );
+
+        config_save( ct, "XMLTVFile", ct->xmltvfile );
     }
 
     return 1;
