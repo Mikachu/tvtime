@@ -638,7 +638,7 @@ void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output, un
             *output = tmp2 & 0xff;
 
             if( ( i & 1 ) == 0 ) {
-                if( i == 0 || i == (width-1) ) {
+                if( 1 ) { // i == 0 || i == (width-1) ) {
                     tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
                     tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
                     output[ 1 ] = tmp2 & 0xff;
