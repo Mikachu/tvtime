@@ -174,29 +174,30 @@ int main( int argc, char **argv )
                  chanlist[ chanindex ].name );
     }
 
+    fprintf( stderr, "tvtime: Attempting to aquire performance-enhancing features.\n" );
     if( setpriority( 0, 0, -19 ) < 0 ) {
-        fprintf( stderr, "tvtime: can't renice to -19\n" );
+        fprintf( stderr, "tvtime: Can't renice to -19.\n" );
     }
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) ) {
-        fprintf( stderr, "tvtime: Warning, mlockall() failed.\n" );
+        fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
+    }
+
+    if( !set_realtime_priority( 0 ) ) {
+        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
 
     rtctimer = rtctimer_new();
     if( !rtctimer ) {
         fprintf( stderr, "tvtime: Can't open /dev/rtc "
                          "(for my wakeup call).\n" );
-        return 1;
-    }
-
-    if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
-        fprintf( stderr, "tvtime: Can't set 1024hz from /dev/rtc (need root).\n" );
-        return 1;
-    }
-    rtctimer_start_clock( rtctimer );
-
-    if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
-        return 1;
+    } else {
+        if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
+            fprintf( stderr, "tvtime: Can't set 1024hz from /dev/rtc (need root).\n" );
+            rtctimer_delete( rtctimer );
+            rtctimer = 0;
+        } else {
+            rtctimer_start_clock( rtctimer );
+        }
     }
 
     width = videoinput_get_width( vidin );
@@ -414,13 +415,19 @@ int main( int argc, char **argv )
             /**
              * We spin while we're waiting, and use /dev/rtc to throttle.
              */
-            rtctimer_next_tick( rtctimer );
+            if( rtctimer ) {
+                rtctimer_next_tick( rtctimer );
+            } else {
+                usleep( 20 );
+            }
         }
     }
 
     fprintf( stderr, "tvtime: Cleaning up.\n" );
     videoinput_delete( vidin );
-    rtctimer_delete( rtctimer );
+    if( rtctimer ) {
+        rtctimer_delete( rtctimer );
+    }
     return 0;
 }
 
