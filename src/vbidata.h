@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>
  * Copyright (c) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
  * CC code from Nathan Laredo's ccdecode.
@@ -42,7 +42,7 @@ typedef struct vbidata_s vbidata_t;
 #define CAPTURE_T4  9
 
 vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
-                        tvtime_osd_t* osd, int verbose  );
+                        tvtime_osd_t* osd, int verbose );
 
 void vbidata_delete( vbidata_t *vbi );
 void vbidata_reset( vbidata_t *vbi );

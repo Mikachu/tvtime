@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (c) 2002, 2003 Billy Biggs <vektor@dumbterm.net>
  * Copyright (c) 2002 Doug Bell <drbell@users.sourceforge.net>
  *
  * CC code from Nathan Laredo's ccdecode, used under the GPL.
@@ -39,7 +39,6 @@
 #include "vbiscreen.h"
 #include "tvtimeosd.h"
 
-#define DO_LINE 11
 static int pll = 0;
 
 struct vbidata_s
@@ -72,9 +71,9 @@ struct vbidata_s
     char xds_packet[ 2048 ];
     int xds_cursor;
 
-    char *program_name;
-    char *network_name;
-    char *call_letters;
+    char program_name[ 33 ];
+    char network_name[ 33 ];
+    char call_letters[ 7 ];
     const char *rating;
     const char *program_type;
     int start_day;
@@ -86,7 +85,7 @@ struct vbidata_s
     int length_elapsed_hour;
     int length_elapsed_min;
     int length_elapsed_sec;
-    char *program_desc[8];
+    char program_desc[ 8 ][ 33 ];
 };
 
 
@@ -111,8 +110,9 @@ static char *extcode2 = "\0303\0343\0315\0314\0354\0322\0362\0325"
                         "{}\\^_|~\0304\0344\0326\0366\0337\0245\0244|"
                         "\0305\0345\0330\0370++++";
 
-int parityok(int n)
-{				/* check parity for 2 bytes packed in n */
+/* Check parity for 2 bytes packed in n. */
+int parityok( int n )
+{
     int j, k;
     for (k = 0, j = 0; j < 7; j++)
         if (n & (1 << j))
@@ -159,7 +159,7 @@ int ccdecode(unsigned char *vbiline)
     if (!decodebit(&vbiline[i], sample))
         return 0;
 #ifndef PAL_DECODE
-    tmp = i + 57;		/* tmp = data bit zero */
+    tmp = i + 57;  /* tmp = data bit zero */
 #else
     tmp = i + 71;
 #endif
@@ -176,7 +176,7 @@ int ccdecode(unsigned char *vbiline)
     if (parityok(packedbits))
         return packedbits;
     return 0;
-}				/* ccdecode */
+}
 
 const char *movies[] = { "N/A", "G", "PG", "PG-13", "R", 
                          "NC-17", "X", "Not Rated" };
@@ -216,8 +216,6 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
     int sum = 0;
     int i;
 
-    if( !vbi ) return;
-
     /* Check the checksum for validity of the packet. */
     for( i = 0; i < length - 1; i++ ) {
         sum += packet[ i ];
@@ -231,24 +229,32 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
     length -= 2;
 
     if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x03 ) {
-        if( vbi->program_name && !strcmp(vbi->program_name, packet + 2 ) ) {
+        if( !strcmp( vbi->program_name, packet + 2 ) ) {
             return;
         }
-        if( vbi->verbose ) fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
-        if( vbi->program_name ) free( vbi->program_name );
-        vbi->program_name = strdup(packet + 2);
-        if( vbi->osd ) tvtime_osd_set_show_name( vbi->osd, vbi->program_name );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Current program name: '%s'\n", packet + 2 );
+        }
+        snprintf( vbi->program_name, sizeof( vbi->program_name ), "%s", packet + 2 );
+        if( vbi->osd ) {
+            tvtime_osd_set_show_name( vbi->osd, vbi->program_name );
+        }
     } else if( packet[ 0 ] == 0x03 && packet[ 1 ] == 0x03 ) {
-        if( vbi->verbose ) fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Future program name: '%s'\n", packet + 2 );
+        }
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
-        if( vbi->network_name && !strcmp(vbi->network_name, packet + 2 ) ) {
+        if( !strcmp( vbi->network_name, packet + 2 ) ) {
             return;
         }
 
-        if( vbi->verbose ) fprintf( stderr, "Network name: '%s'\n", packet + 2 );
-        if( vbi->network_name ) free( vbi->network_name );
-        vbi->network_name = strdup( packet + 2 );
-        if( vbi->osd ) tvtime_osd_set_network_name( vbi->osd, vbi->network_name );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Network name: '%s'\n", packet + 2 );
+        }
+        snprintf( vbi->network_name, sizeof( vbi->network_name ), "%s", packet + 2 );
+        if( vbi->osd ) {
+            tvtime_osd_set_network_name( vbi->osd, vbi->network_name );
+        }
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
         int movie_rating = packet[ 2 ] & 7;
         int scheme = (packet[ 2 ] & 56) >> 3;
@@ -282,34 +288,35 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
             return;
         }
 
-        if( vbi->verbose ) fprintf( stderr, "Show rating: %s", str );
-        if( ((VSL | scheme) & 3) == 1 || ((VSL | scheme) & 3) == 0 ) {
-            /* show VSLD for the americans */
-            if( (VSL | scheme) & 32 ) {
-                if( vbi->verbose ) fprintf( stderr, " V" );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Show rating: %s", str );
+            if( ((VSL | scheme) & 3) == 1 || ((VSL | scheme) & 3) == 0 ) {
+                /* show VSLD for the americans */
+                if( (VSL | scheme) & 32 ) fprintf( stderr, " V" );
+                if( (VSL | scheme) & 16 ) fprintf( stderr, " S" );
+                if( (VSL | scheme) &  8 ) fprintf( stderr, " L" );
+                if( (VSL | scheme) &  4 ) fprintf( stderr, " D" );
             }
-            if( (VSL | scheme) & 16 ) {
-                if( vbi->verbose ) fprintf( stderr, " S" );
-            }
-            if( (VSL | scheme) & 8 ) {
-                if( vbi->verbose ) fprintf( stderr, " L" );
-            }
-            if( (VSL | scheme) & 4 ) {
-                if( vbi->verbose ) fprintf( stderr, " D" );
-            }
+            fprintf( stderr, "\n" );
         }
-        if( vbi->verbose ) fprintf( stderr, "\n" );
         vbi->rating = str;
-        if( vbi->osd ) tvtime_osd_set_show_rating( vbi->osd, vbi->rating );
+
+        if( vbi->osd ) {
+            tvtime_osd_set_show_rating( vbi->osd, vbi->rating );
+        }
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x02 ) {
-        if( vbi->call_letters && !strcmp(vbi->call_letters, packet + 2 ) ) {
+        if( !strcmp( vbi->call_letters, packet + 2 ) ) {
             return;
         }
 
-        if( vbi->verbose ) fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
-        if( vbi->call_letters ) free( vbi->call_letters );
-        vbi->call_letters = strdup( packet + 2 );
-        if( vbi->osd ) tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Network call letters: '%s'\n", packet + 2 );
+        }
+
+        snprintf( vbi->call_letters, sizeof( vbi->call_letters ), "%s", packet + 2 );
+        if( vbi->osd ) {
+            tvtime_osd_set_network_call( vbi->osd, vbi->call_letters );
+        }
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x01 ) {
         int month = packet[5];
         int day = packet[4];
@@ -317,8 +324,10 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         int min = packet[2];
         char str[32];
 
-        if( vbi->verbose ) fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
-                 day & 31, months[month & 15], hour & 31, min & 63 );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Program Start: %02d %s, %02d:%02d\n",
+                     day & 31, months[month & 15], hour & 31, min & 63 );
+        }
         vbi->start_month = month & 15;
         vbi->start_day = day & 31;
         vbi->start_hour = hour & 31;
@@ -327,11 +336,15 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
                   day & 31, months[month & 15], hour & 31, min & 63 );
         if( vbi->osd ) tvtime_osd_set_show_start( vbi->osd, str );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x04 ) {
-        if( vbi->verbose ) fprintf( stderr, "Program type: " );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Program type: " );
+        }
         for( i = 0; i < length - 2; i++ ) {
             int cur = packet[ 2 + i ] - 0x20;
             if( cur >= 0 && cur < 96 ) {
-                if( vbi->verbose ) fprintf( stderr, "%s%s", i ? ", " : "", eia608_program_type[ cur ] );
+                if( vbi->verbose ) {
+                    fprintf( stderr, "%s%s", i ? ", " : "", eia608_program_type[ cur ] );
+                }
                 /* this will cause us to keep only the last type we check */
                 vbi->program_type = eia608_program_type[ cur ];
             }
@@ -339,16 +352,15 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
         if( vbi->verbose ) fprintf( stderr, "\n" );
     } else if( packet[ 0 ] < 0x03 && packet[ 1 ] >= 0x10 && packet[ 1 ] <= 0x17 ) {
 
-        if( vbi->program_desc[ packet[1] & 0xf ] && 
-            !strcmp(vbi->program_desc[ packet[1] & 0xf ], packet + 2 ) ) {
+        if( !strcmp( vbi->program_desc[ packet[ 1 ] & 0xf ], packet + 2 ) ) {
             return;
         }
 
-        if( vbi->verbose ) fprintf( stderr, "Program Description: Line %d", packet[1] & 0xf );
-        if( vbi->verbose ) fprintf( stderr, "%s\n", packet + 2 );
-        if( vbi->program_desc[ packet[1] & 0xf ] ) 
-            free( vbi->program_desc[ packet[1] & 0xf ] );
-        vbi->program_desc[ packet[1] & 0xf ] = strdup( packet + 2 );
+        if( vbi->verbose ) {
+            fprintf( stderr, "Program Description: Line %d: %s\n", packet[1] & 0xf, packet + 2 );
+        }
+        snprintf( vbi->program_desc[ packet[ 1 ] & 0xf ],
+                  sizeof( vbi->program_desc[ packet[ 1 ] & 0xf ] ), "%s", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x02 ) {
         char str[ 32 ];
         str[0] = 0;
@@ -390,33 +402,36 @@ static void parse_xds_packet( vbidata_t *vbi, char *packet, int length )
     } else {
         /* unknown */
 
-        if( vbi->verbose ) fprintf( stderr, "Unknown XDS packet, class " );
-        switch( packet[ 0 ] ) {
-        case 0x1: if( vbi->verbose ) fprintf( stderr, "CURRENT start\n" ); break;
-        case 0x2: if( vbi->verbose ) fprintf( stderr, "CURRENT continue\n" ); break;
+        if( vbi->verbose ) {
+            fprintf( stderr, "vbidata: Unknown XDS packet, class " );
+            switch( packet[ 0 ] ) {
+            case 0x1: fprintf( stderr, "CURRENT start" ); break;
+            case 0x2: fprintf( stderr, "CURRENT continue" ); break;
 
-        case 0x3: if( vbi->verbose ) fprintf( stderr, "FUTURE start\n" ); break;
-        case 0x4: if( vbi->verbose ) fprintf( stderr, "FUTURE continue\n" ); break;
+            case 0x3: fprintf( stderr, "FUTURE start" ); break;
+            case 0x4: fprintf( stderr, "FUTURE continue" ); break;
 
-        case 0x5: if( vbi->verbose ) fprintf( stderr, "CHANNEL start\n" ); break;
-        case 0x6: if( vbi->verbose ) fprintf( stderr, "CHANNEL continue\n" ); break;
+            case 0x5: fprintf( stderr, "CHANNEL start" ); break;
+            case 0x6: fprintf( stderr, "CHANNEL continue" ); break;
 
-        case 0x7: if( vbi->verbose ) fprintf( stderr, "MISC start\n" ); break;
-        case 0x8: if( vbi->verbose ) fprintf( stderr, "MISC continue\n" ); break;
+            case 0x7: fprintf( stderr, "MISC start" ); break;
+            case 0x8: fprintf( stderr, "MISC continue" ); break;
 
-        case 0x9: if( vbi->verbose ) fprintf( stderr, "PUB start\n" ); break;
-        case 0xa: if( vbi->verbose ) fprintf( stderr, "PUB continue\n" ); break;
+            case 0x9: fprintf( stderr, "PUB start" ); break;
+            case 0xa: fprintf( stderr, "PUB continue" ); break;
 
-        case 0xb: if( vbi->verbose ) fprintf( stderr, "RES start\n" ); break;
-        case 0xc: if( vbi->verbose ) fprintf( stderr, "RES continue\n" ); break;
+            case 0xb: fprintf( stderr, "RES start" ); break;
+            case 0xc: fprintf( stderr, "RES continue" ); break;
 
-        case 0xd: if( vbi->verbose ) fprintf( stderr, "UNDEF start\n" ); break;
-        case 0xe: if( vbi->verbose ) fprintf( stderr, "UNDEF continue\n" ); break;
+            case 0xd: fprintf( stderr, "UNDEF start" ); break;
+            case 0xe: fprintf( stderr, "UNDEF continue" ); break;
+            }
+            fprintf( stderr, "\nvbidata: Data " );
+            for( i = 0; i < length; i++ ) {
+                fprintf( stderr, "0x%02x ", packet[ i ] );
+            }
+            fprintf( stderr, "\n" );
         }
-        for( i = 0; i < length; i++ ) {
-            if( vbi->verbose ) fprintf( stderr, "0x%02x ", packet[ i ] );
-        }
-        if( vbi->verbose ) fprintf( stderr, "\n" );
     }
 }
 
@@ -505,7 +520,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 {
     int w1, b1, b2;
 
-    w1 = ccdecode(s);
+    w1 = ccdecode( s );
 
     b1 = w1 & 0x7f;
     b2 = (w1 >> 8) & 0x7f;
@@ -821,8 +836,9 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
     vbi->lastcode = 0;
     vbi->lastcount = 0;
 
-    if( !vbi->initialised )
+    if( !vbi->initialised ) {
         return 0;
+    }
 
     if( !bottom != vbi->wanttop || vbi->current_chan != vbi->chan || 
         vbi->current_istext != vbi->wanttext ) {
@@ -875,12 +891,10 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 
 
     return 1;
-}				/* ProcessLine */
-
-
+}
 
 vbidata_t *vbidata_new( const char *filename, vbiscreen_t *vs, 
-                        tvtime_osd_t* osd, int verbose  )
+                        tvtime_osd_t* osd, int verbose )
 {
     vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
 
@@ -913,6 +927,8 @@ void vbidata_delete( vbidata_t *vbi )
 
 void vbidata_reset( vbidata_t *vbi )
 {
+    int i;
+
     vbi->wanttop = 0;
     vbi->wanttext = 0;
     vbi->colour = 0xFFFFFFFFU;
@@ -920,19 +936,23 @@ void vbidata_reset( vbidata_t *vbi )
 
     vbi->ital = 0; 
     vbi->indent = 0;
-    vbi->ul=0;
+    vbi->ul = 0;
 
-    vbi->chan=0;
+    vbi->chan = 0;
 
     vbi->initialised = 0;
     vbi->enabled = 0;
 
-    memset(vbi->program_desc, 0, 8*sizeof(char*) );
-    vbi->program_name = NULL;
-    vbi->network_name = NULL;
-    vbi->call_letters = NULL;
-    vbi->rating = NULL;
-    vbi->program_type = NULL;
+    memset( vbi->program_name, 0, sizeof( vbi->program_name ) );
+    memset( vbi->network_name, 0, sizeof( vbi->network_name ) );
+    memset( vbi->call_letters, 0, sizeof( vbi->call_letters ) );
+    vbi->rating = 0;
+    vbi->program_type = 0;
+
+    memset( vbi->program_desc, 0, 8 * sizeof( char * ) );
+    for( i = 0; i < 8; i++ ) {
+        memset( vbi->program_desc[ i ], 0, sizeof( vbi->program_desc[ i ] ) );
+    }
 
     vbi->start_day = 0;
     vbi->start_month = 0;
@@ -953,13 +973,14 @@ void vbidata_reset( vbidata_t *vbi )
         tvtime_osd_set_show_length( vbi->osd, "" );
     }
 
-
-
     vbi->lastcode = 0;
     vbi->lastcount = 0;
     vbi->xds_packet[ 0 ] = 0;
     vbi->xds_cursor = 0;
-    if( vbi->vs ) vbiscreen_reset( vbi->vs );
+
+    if( vbi->vs ) {
+        vbiscreen_reset( vbi->vs );
+    }
 }
 
 void vbidata_capture_mode( vbidata_t *vbi, int mode )
@@ -1024,31 +1045,36 @@ void vbidata_capture_mode( vbidata_t *vbi, int mode )
 
 void vbidata_process_frame( vbidata_t *vbi, int printdebug )
 {
+    int scanline = 11; /* Process line 21. */
     int k;
 
     if( read( vbi->fd, vbi->buf, 65536 ) < 65536 ) {
-        fprintf( stderr, "error, can't read vbi data.\n" );
+        if( vbi->verbose ) {
+            fprintf( stderr, "vbidata: Error, can't read vbi data.\n" );
+        }
         return;
     }
 
-    for (k = 1; k < 7; k++) {
-        int j = DO_LINE*2048;
+    /* Apply diz' new filter. */
+    for( k = 1; k < 7; k++ ) {
+        int j = scanline * 2048;
         int i;
 
-        for (i = 1600; i > 0; i--) {
+        for( i = 1600; i > 0; i-- ) {
             vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
         }
     }
-    ProcessLine( vbi, &vbi->buf[ DO_LINE*2048 ], 0 );
+    ProcessLine( vbi, &vbi->buf[ scanline * 2048 ], 0 );
 
-    for (k = 1; k < 7; k++) {
-        int j = (16+DO_LINE)*2048;
+    /* Apply diz' new filter. */
+    for( k = 1; k < 7; k++ ) {
+        int j = ( 16 + scanline )*2048;
         int i;
 
-        for (i = 1600; i > 0; i--) {
+        for( i = 1600; i > 0; i-- ) {
             vbi->buf[i + j] = (vbi->buf[i + j + k] + vbi->buf[i + j]) / 2;
         }
     }
-    ProcessLine( vbi, &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
+    ProcessLine( vbi, &vbi->buf[ ( 16 + scanline ) * 2048 ], 1 );
 }
 
