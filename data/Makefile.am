@@ -19,7 +19,10 @@ tvtimedatadir = $(pkgdatadir)
 dist_tvtimedata_DATA = FreeSansBold.ttf FreeMonoBold.ttf DI_GreedyH.dll \
 	DI_Greedy2Frame.dll DI_TwoFrame.dll DI_VideoWeave.dll \
 	DI_VideoBob.dll DI_TomsMoComp.dll tvtimelogo-small.png \
-	tvtimelogo-large.png
+	tvtimelogo-large.png \
+	tvtimelogo_0000.png tvtimelogo_0001.png tvtimelogo_0002.png \
+	tvtimelogo_0003.png tvtimelogo_0004.png tvtimelogo_0005.png \
+	tvtimelogo_0006.png tvtimelogo_0007.png
 
 EXTRA_DIST = freefont-sfd.tar.gz DScaler401src.zip COPYING.DScaler
 
