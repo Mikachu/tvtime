@@ -139,11 +139,4 @@ void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
                                                int width, int xpos,
                                                int scanline );
 
-osd_fixedfont_t *osd_fixedfont_new( const char *filename, double pixel_aspect );
-void osd_fixedfont_delete( osd_fixedfont_t *fixed );
-int osd_fixedfont_get_char_width( osd_fixedfont_t *fixed );
-int osd_fixedfont_get_char_height( osd_fixedfont_t *fixed );
-void osd_fixedfont_composite_char( osd_fixedfont_t *fixed, uint8_t *output, int width,
-                                   int scanline, char c, unsigned int fg, unsigned int bg, int alpha );
-
 #endif /* OSDTOOLS_H_INCLUDED */
