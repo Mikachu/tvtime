@@ -16,6 +16,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -960,7 +961,7 @@ int main( int argc, char **argv )
                                 config_get_inputwidth( ct ), 
                                 norm, verbose );
         if( !vidin ) {
-            if( asprintf( &error_string, "Can't open V4L device '%s'.",
+            if( asprintf( &error_string, "Can't open video4linux device '%s'.",
                           config_get_v4l_device( ct ) ) < 0 ) {
                 error_string = 0;
             }
