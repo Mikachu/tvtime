@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "osd.h"
 #include "tvtimeosd.h"
 

@@ -33,7 +33,7 @@ all: tvtime
 	$(CC) -shared $(CFLAGS) -o $@ $<
 
 tvtime: $(OBJS) tvtime.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 plugins: $(PLUGINS)
 
