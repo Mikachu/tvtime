@@ -18,6 +18,11 @@
 #endif
 #include <linux/compiler.h> /* need __user */
 
+/* for kernel versions 2.4.26 and below: */
+#ifndef __user
+#define __user
+#endif
+
 /*
  *	M I S C E L L A N E O U S
  */
