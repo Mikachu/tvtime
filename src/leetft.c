@@ -119,7 +119,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect )
                 continue;
             }
 
-            error = FT_Get_Glyph( font->face->glyph, (FT_Glyph *) &curglyph );
+            error = FT_Get_Glyph( font->face->glyph, &curglyph );
             if( error ) {
                 fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %d\n", i );
                 continue;
