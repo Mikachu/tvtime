@@ -1,60 +1,95 @@
 
   ...   tvtime!
 
-  tvtime is the start of my realtime video4linux deinterlacer.
-Currently, tvtime attempts to mimic the behavior of a cheap TV, and once
-I'm happy with the performance there, I can start enabling more
-expensive deinterlacing algorithms to improve the visual quality.
-Getting high framerates using X's Xv drivers and the Linux bttv driver
-has proven enough of a challenge for now.
+  tvtime is a realtime video4linux deinterlacer.  Currently, tvtime
+attempts to mimic the behavior of a cheap TV, and once I'm happy with
+the performance there, I can start enabling more expensive deinterlacing
+algorithms to improve the visual quality.  Getting high framerates using
+X's Xv drivers and the Linux bttv driver has proven enough of a
+challenge for now.
 
   tvtime currently grabs frames of video and draws each field
 independently to the screen, using linear interpolation on the missing
 scanlines.  Each field is shown at the correct time, and we assume the
 frames from the video4linux device are always top-field-first.
 
-  I'm using the original video4linux API (i.e., not v4l2).  This only
-enables me to get an interrupt once every frame, and not every field, so
-I have to use /dev/rtc to sleep until the time for the second field
-arrives to blit it.  This is really unfortunate, and hopefully with v4l2
-I can get an interrupt every field to fix this.  I plan to try that out
-soon.
+  I'm using the original video4linux API (not v4l2).  This only enables
+me to get an interrupt once every frame, and not every field, so I have
+to use /dev/rtc to sleep until the time for the second field arrives to
+blit it.  This is really unfortunate, and hopefully with v4l2 I can get
+an interrupt every field to fix this.  I plan to try that out soon.
 
   I would appreciate any comments you have.  The source code is
 reasonably documented, so please take a look if you're curious.
 
   - Billy Biggs <vektor@dumbterm.net>
     Sat Dec 15 22:01:30 EST 2001
+    Tue Oct  8 14:44:37 ADT 2002
 
 
   Using tvtime
 
-usage: ./tvtime [-aps] [-w <width>] [-o <mode>] [-d <device> [-i <input>]
-	-p	PAL mode.
-	-a	16:9 mode.
-	-s	Sync to VGA (experimental and dangerous).
-	-w	Output window width, defaults to 800.
-	-o	Output mode: '422' (default) or '420'.
-	-d	video4linux device (defaults to /dev/video0).
-	-i	video4linux input number (defaults to 0).
+usage: ./tvtime [-as] [-w <width>] [-o <mode>] [-d <device>
+                [-i <input>] [-n <norm>] [-f <frequencies>] [-t <tuner>]
+        -a        16:9 mode.
+        -s        Print frame skip information (for debugging).
+        -w        Output window width, defaults to 800.
+        -o        Output mode: '422' (default) or '420'.
+        -d        video4linux device (defaults to /dev/video0).
+        -i        video4linux input number (defaults to 0).
+        -l        Luma correction value (defaults to 1.0).
+        -n        The mode to set the tuner to: PAL, NTSC or SECAM.
+                  (defaults to NTSC)
+        -f        The channels you are receiving with the tuner
+                  (defaults to us-cable).
+                  Valid values are:
+                          us-bcast
+                          us-cable
+                          us-cable-hrc
+                          japan-bcast
+                          japan-cable
+                          europe-west
+                          europe-east
+                          italy
+                          newzealand
+                          australia
+                          ireland
+                          france
+                          china-bcast
+                          southafrica
+                          argentina
+                          canada-cable
+                          australia-optus
+        -t        The tuner number for this input (defaults to 0).
 
-	See the README for more details.
 
-  I don't do any tuning or anything like that, so you'll need to set
-your channel using xawtv or similar if you're taking input from the
-tuner.  In 16:9 mode we stretch the output (for full resolution from
-widescreen DVDs).  The output width parameter is for the output window,
-the height is determined by the aspect ratio.
+Notes and FAQ
 
-  VGA syncing is kinda weird, it's just that I'll wait for the retrace
-to finish before starting to blit the frame, but if your Xv driver is
-double buffering this won't matter.  It's basically just to test around
-with my crappy Matrox g400 (the open source Xv driver for this card is
-useless).
+1.  16:9 mode
+
+  In 16:9 mode we stretch the output (for full resolution from
+widescreen DVDs), simulating a 16:9 TV.  If you're using a hardware DVD
+player, you should tell it that you have a 16:9 TV.  The output width
+parameter is for the output window, the height is determined by the
+aspect ratio (yeah, we assume square pixels for now).
+
+2.  bttv kernel buffers
 
   Someone noted that if you have a few number of kernel buffers for your
 bttv card, then they had problems.  I could not reproduce it.  I use
 'modprobe bttv gbuffers=8' but even using 2 buffers seemed fine for me.
 Using a large number (like 8) may suck since the audio sync may be too
 off.  Let me know if you have problems.
+
+3.  Luma correction and the bttv
+
+  We do a mapping of the input luma values.  There are two reasons to do
+this.  The first is that the values from bttv-based capture cards are
+wrong, and so I correct for a hardware bug.  This means that quality on
+non-bttv capture cards will suffer until I add a command-line option.
+The second reason is to increase or decrease the brightness.  If the
+display is too dark or too light, you may like what you get from values
+like -l 1.3 or -l 0.8 or similar.  This applies a gamma correction curve
+to the luminance channel, and will distort your colour, but maybe in a
+way that you find improves your mood. :)
 
