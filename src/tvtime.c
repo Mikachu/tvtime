@@ -1443,8 +1443,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                        "enough gbuffers available.\n"
                        "*** See the support page at %s "
                        "for information\n"
-                       "*** on how to increase your gbuffers setting.\n\n",
-                       PACKAGE_BUGREPORT ) );
+                       "*** on how to increase your gbuffers setting.\n\n"),
+                       PACKAGE_BUGREPORT );
         }
     } else {
         fieldsavailable = 4;
@@ -2715,7 +2715,7 @@ int main( int argc, char **argv )
              "*** WARNING: you are running a DEVELOPMENT version of tvtime.\n"
              "*** We often break stuff during development.  "
              "Please submit bug reports\n"
-             "*** based on released versions only!!\n\n", stderr );
+             "*** based on released versions only!!\n\n"), stderr );
 
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
