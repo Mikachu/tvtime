@@ -309,46 +309,54 @@
 
     Commands known to tvtime:
 
-      AUTO_ADJUST_PICT           FINETUNE_UP              
-      AUTO_ADJUST_WINDOW         HUE_DOWN                 
-      BRIGHTNESS_DOWN            HUE_UP                   
-      BRIGHTNESS_UP              LUMA_DOWN                
-      CHANNEL_1                  LUMA_UP                  
+      AUTO_ADJUST_PICT           MENU_ENTER               
+      AUTO_ADJUST_WINDOW         MENU_EXIT                
+      BRIGHTNESS_DOWN            MENU_LEFT                
+      BRIGHTNESS_UP              MENU_RIGHT               
+      CHANNEL_1                  MENU_UP                  
       CHANNEL_2                  MIXER_DOWN               
       CHANNEL_3                  MIXER_TOGGLE_MUTE        
       CHANNEL_4                  MIXER_UP                 
       CHANNEL_5                  OVERSCAN_DOWN            
       CHANNEL_6                  OVERSCAN_UP              
-      CHANNEL_7                  SCREENSHOT               
-      CHANNEL_8                  SCROLL_CONSOLE_DOWN      
-      CHANNEL_9                  SCROLL_CONSOLE_UP        
-      CHANNEL_0                  SHOW_STATS               
-      CHANNEL_ACTIVATE_ALL       TOGGLE_ALWAYSONTOP       
-      CHANNEL_DEC                TOGGLE_ASPECT            
-      CHANNEL_DOWN               TOGGLE_AUDIO_MODE        
-      CHANNEL_INC                TOGGLE_BARS              
-      CHANNEL_PREV               TOGGLE_CC                
-      CHANNEL_RENUMBER           TOGGLE_COMPATIBLE_NORM   
-      CHANNEL_SAVE_TUNING        TOGGLE_CONSOLE           
-      CHANNEL_SCAN               TOGGLE_DEINTERLACER      
-      CHANNEL_SKIP               TOGGLE_FULLSCREEN        
-      CHANNEL_UP                 TOGGLE_FRAMERATE         
-      COLOUR_DOWN                TOGGLE_INPUT             
-      COLOUR_UP                  TOGGLE_LUMA_CORRECTION   
-      COLOR_DOWN                 TOGGLE_MATTE             
-      COLOR_UP                   TOGGLE_MODE              
-      CONTRAST_DOWN              TOGGLE_MUTE              
-      CONTRAST_UP                TOGGLE_NTSC_CABLE_MODE   
-      DISPLAY_INFO               TOGGLE_PAUSE             
-      ENTER                      TOGGLE_PULLDOWN_DETECTION
-      FINETUNE_DOWN              QUIT                     
-
+      CHANNEL_7                  RESTART                  
+      CHANNEL_8                  SCREENSHOT               
+      CHANNEL_9                  SCROLL_CONSOLE_DOWN      
+      CHANNEL_0                  SCROLL_CONSOLE_UP        
+      CHANNEL_ACTIVATE_ALL       SET_DEINTERLACER         
+      CHANNEL_DEC                SET_NORM                 
+      CHANNEL_DOWN               SHOW_DEINTERLACER_INFO   
+      CHANNEL_INC                SHOW_MENU                
+      CHANNEL_PREV               SHOW_STATS               
+      CHANNEL_RENUMBER           TOGGLE_ALWAYSONTOP       
+      CHANNEL_SAVE_TUNING        TOGGLE_ASPECT            
+      CHANNEL_SCAN               TOGGLE_AUDIO_MODE        
+      CHANNEL_SKIP               TOGGLE_BARS              
+      CHANNEL_UP                 TOGGLE_CC                
+      COLOR_DOWN                 TOGGLE_COLOR_INVERT      
+      COLOR_UP                   TOGGLE_COLOUR_INVERT     
+      COLOUR_DOWN                TOGGLE_CONSOLE           
+      COLOUR_UP                  TOGGLE_DEINTERLACER      
+      CONTRAST_DOWN              TOGGLE_FULLSCREEN        
+      CONTRAST_UP                TOGGLE_FRAMERATE         
+      DISPLAY_INFO               TOGGLE_INPUT             
+      DISPLAY_MESSAGE            TOGGLE_LUMA_CORRECTION   
+      ENTER                      TOGGLE_MATTE             
+      FINETUNE_DOWN              TOGGLE_MIRROR            
+      FINETUNE_UP                TOGGLE_MODE              
+      HUE_DOWN                   TOGGLE_MUTE              
+      HUE_UP                     TOGGLE_NTSC_CABLE_MODE   
+      KEY_EVENT                  TOGGLE_PAL_SECAM         
+      LUMA_DOWN                  TOGGLE_PAUSE             
+      LUMA_UP                    TOGGLE_PULLDOWN_DETECTION
+      MENU_DOWN                  QUIT                     
 
     Special keys known by tvtime:
 
-      Up, Down, Left, Right, Insert, Home, End, PageUp, PageDown,
-      F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15
-      Backspace, Escape, Enter, Print, Menu
+      Up, Down, Left, Right, Insert, Home, End, PgUp, Page_Up, PageUp,
+      PgDn, Page_Down, PageDown, F1, F2, F3, F4, F5, F6, F7, F8, F9,
+      F10, F11, F12, F13, F14, F15 Backspace, BS, Delete, Del, Esc,
+      Escape, Enter, Print, Menu
   -->
 
   <bind command="quit">
@@ -539,7 +547,7 @@
     <keyboard key="/"/>
   </bind>
 
-  <bind command="toggle_compatible_norm">
+  <bind command="toggle_pal_secam">
     <keyboard key="n"/>
   </bind>
 
