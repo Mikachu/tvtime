@@ -30,40 +30,8 @@
 #endif
 
 #include "mm_accel.h"
+#include "greedyh.h"
 
-#include "greedyhmacros.h"
-
-#define MAXCOMB_DEFAULT          5
-#define MOTIONTHRESHOLD_DEFAULT 25
-#define MOTIONSENSE_DEFAULT     30
-
-static unsigned int GreedyMaxComb = 5;
-static unsigned int GreedyMotionThreshold = 25;
-static unsigned int GreedyMotionSense = 30;
-
-#define IS_SSE
-#define SSE_TYPE SSE
-#define FUNCT_NAME filterDScaler_SSE
-#include "greedyh.asm"
-#undef SSE_TYPE
-#undef IS_SSE
-#undef FUNCT_NAME
-
-#define IS_3DNOW
-#define FUNCT_NAME filterDScaler_3DNOW
-#define SSE_TYPE 3DNOW
-#include "greedyh.asm"
-#undef SSE_TYPE
-#undef IS_3DNOW
-#undef FUNCT_NAME
-
-#define IS_3DNOW
-#define SSE_TYPE MMX
-#define FUNCT_NAME filterDScaler_MMX
-#include "greedyh.asm"
-#undef SSE_TYPE
-#undef IS_3DNOW
-#undef FUNCT_NAME
 
 static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
                                           deinterlace_frame_data_t *data,
@@ -123,11 +91,11 @@ static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
     }
 
     if( mm_accel() & MM_ACCEL_X86_MMXEXT ) {
-        filterDScaler_SSE( &Info );
+        greedyh_filter_mmx( &Info );
     } else if( mm_accel() & MM_ACCEL_X86_3DNOW ) {
-        filterDScaler_3DNOW( &Info );
+        greedyh_filter_3dnow( &Info );
     } else {
-        filterDScaler_MMX( &Info );
+        greedyh_filter_sse( &Info );
     }
 }
 
@@ -164,8 +132,6 @@ void dscaler_greedyh_plugin_init( void )
 #endif
 {
     register_deinterlace_method( &greedymethod );
-    GreedyMaxComb         = MAXCOMB_DEFAULT;
-    GreedyMotionThreshold = MOTIONTHRESHOLD_DEFAULT;
-    GreedyMotionSense     = MOTIONSENSE_DEFAULT;
+    greedyh_init();
 }
 

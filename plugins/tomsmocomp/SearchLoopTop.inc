@@ -1,31 +1,21 @@
 // -*- c++ -*-
 
-static unsigned char*	     pDest;
-static const unsigned char* pSrcP;
-static const unsigned char* pSrc;
-static const unsigned char* pBob;
-static const unsigned char* pBobP;
-static Q_INT64 Max_Mov;
-static Q_INT64 DiffThres;
-static Q_INT64 YMask;
-static Q_INT64 UVMask;
-static Q_INT64 TENS;
-static Q_INT64 FOURS;
-static Q_INT64 ONES;
-static Q_INT64 Min_Vals;
-static Q_INT64 Max_Vals;
-static Q_INT64 ShiftMask;
+unsigned char*	     pDest;
+const unsigned char* pSrcP;
+const unsigned char* pSrc;
+const unsigned char* pBob;
+const unsigned char* pBobP;
 
-Max_Mov   = 0x0404040404040404ull; 
-DiffThres = 0x0f0f0f0f0f0f0f0full; 
-YMask     = 0x00ff00ff00ff00ffull; // keeps only luma
-UVMask    = 0xff00ff00ff00ff00ull; // keeps only chroma
-TENS      = 0x0a0a0a0a0a0a0a0aull; 
-FOURS     = 0x0404040404040404ull; 
-ONES      = 0x0101010101010101ull; 
-Min_Vals  = 0x0000000000000000ull;
-Max_Vals  = 0x0000000000000000ull;
-ShiftMask = 0xfefffefffefffeffull;
+Q_INT64 Max_Mov   = 0x0404040404040404ull; 
+Q_INT64 DiffThres = 0x0f0f0f0f0f0f0f0full; 
+Q_INT64 YMask     = 0x00ff00ff00ff00ffull; // keeps only luma
+Q_INT64 UVMask    = 0xff00ff00ff00ff00ull; // keeps only chroma
+Q_INT64 TENS      = 0x0a0a0a0a0a0a0a0aull; 
+Q_INT64 FOURS     = 0x0404040404040404ull; 
+Q_INT64 ONES      = 0x0101010101010101ull; 
+Q_INT64 Min_Vals  = 0x0000000000000000ull;
+Q_INT64 Max_Vals  = 0x0000000000000000ull;
+Q_INT64 ShiftMask = 0xfefffefffefffeffull;
 
 #if defined(DBL_RESIZE) || defined(USE_FOR_DSCALER)
 int	    src_pitch2 = src_pitch;			// even & odd lines are not interleaved in DScaler

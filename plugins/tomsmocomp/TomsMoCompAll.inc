@@ -26,9 +26,13 @@
 #define Q_INT64 long long
 #endif
 
-#include "tomsmocompmacros.h"
-
+#ifndef TopFirst
 #define TopFirst IsOdd
+#endif
+
+#ifdef SEFUNC
+#undef SEFUNC
+#endif
 
 #if defined(IS_SSE)
 #define SEFUNC(x) Search_Effort_SSE_##x()
@@ -38,7 +42,7 @@
 #define SEFUNC(x) Search_Effort_MMX_##x()
 #endif
 
-static void FUNCT_NAME(TDeinterlaceInfo* pInfo)
+void FUNCT_NAME(TDeinterlaceInfo* pInfo)
 {
 	pMyMemcpy = pInfo->pMemcpy;
 
@@ -91,7 +95,7 @@ static void FUNCT_NAME(TDeinterlaceInfo* pInfo)
 	// then go fill in the hard part, being variously lazy depending upon
 	// SearchEffort
 
-    if(UseStrangeBob == 0) {
+    if(UseStrangeBob == false) {
 		if (SearchEffort == 0)
 		{
             SEFUNC(0);

@@ -30,117 +30,7 @@
 #endif
 
 #include "mm_accel.h"
-
-static int  Search_Effort_MMX_0();
-static int  Search_Effort_MMX_1();
-static int  Search_Effort_MMX_3();
-static int  Search_Effort_MMX_5();
-static int  Search_Effort_MMX_9();
-static int  Search_Effort_MMX_11();
-static int  Search_Effort_MMX_13();
-static int  Search_Effort_MMX_15();
-static int  Search_Effort_MMX_19();
-static int  Search_Effort_MMX_21();
-static int  Search_Effort_MMX_Max();
-
-static int  Search_Effort_MMX_0_SB();
-static int  Search_Effort_MMX_1_SB();
-static int  Search_Effort_MMX_3_SB();
-static int  Search_Effort_MMX_5_SB();
-static int  Search_Effort_MMX_9_SB();
-static int  Search_Effort_MMX_11_SB();
-static int  Search_Effort_MMX_13_SB();
-static int  Search_Effort_MMX_15_SB();
-static int  Search_Effort_MMX_19_SB();
-static int  Search_Effort_MMX_21_SB();
-static int  Search_Effort_MMX_Max_SB();
-
-static int  Search_Effort_3DNOW_0();
-static int  Search_Effort_3DNOW_1();
-static int  Search_Effort_3DNOW_3();
-static int  Search_Effort_3DNOW_5();
-static int  Search_Effort_3DNOW_9();
-static int  Search_Effort_3DNOW_11();
-static int  Search_Effort_3DNOW_13();
-static int  Search_Effort_3DNOW_15();
-static int  Search_Effort_3DNOW_19();
-static int  Search_Effort_3DNOW_21();
-static int  Search_Effort_3DNOW_Max();
-
-static int  Search_Effort_3DNOW_0_SB();
-static int  Search_Effort_3DNOW_1_SB();
-static int  Search_Effort_3DNOW_3_SB();
-static int  Search_Effort_3DNOW_5_SB();
-static int  Search_Effort_3DNOW_9_SB();
-static int  Search_Effort_3DNOW_11_SB();
-static int  Search_Effort_3DNOW_13_SB();
-static int  Search_Effort_3DNOW_15_SB();
-static int  Search_Effort_3DNOW_19_SB();
-static int  Search_Effort_3DNOW_21_SB();
-static int  Search_Effort_3DNOW_Max_SB();
-
-static int  Search_Effort_SSE_0();
-static int  Search_Effort_SSE_1();
-static int  Search_Effort_SSE_3();
-static int  Search_Effort_SSE_5();
-static int  Search_Effort_SSE_9();
-static int  Search_Effort_SSE_11();
-static int  Search_Effort_SSE_13();
-static int  Search_Effort_SSE_15();
-static int  Search_Effort_SSE_19();
-static int  Search_Effort_SSE_21();
-static int  Search_Effort_SSE_Max();
-
-static int  Search_Effort_SSE_0_SB();
-static int  Search_Effort_SSE_1_SB();
-static int  Search_Effort_SSE_3_SB();
-static int  Search_Effort_SSE_5_SB();
-static int  Search_Effort_SSE_9_SB();
-static int  Search_Effort_SSE_11_SB();
-static int  Search_Effort_SSE_13_SB();
-static int  Search_Effort_SSE_15_SB();
-static int  Search_Effort_SSE_19_SB();
-static int  Search_Effort_SSE_21_SB();
-static int  Search_Effort_SSE_Max_SB();
-
-static long SearchEffort;
-static int UseStrangeBob;
-
-static MEMCPY_FUNC* pMyMemcpy;
-static int IsOdd;
-static const unsigned char* pWeaveSrc;
-static const unsigned char* pWeaveSrcP;
-static unsigned char* pWeaveDest;
-static const unsigned char* pCopySrc;
-static const unsigned char* pCopySrcP;
-static unsigned char* pCopyDest;
-static int src_pitch;
-static int dst_pitch;
-static int rowsize;
-static int FldHeight;
-
-static int Fieldcopy(void *dest, const void *src, size_t count, 
-                     int rows, int dst_pitch, int src_pitch)
-{
-    unsigned char* pDest = (unsigned char*) dest;
-    unsigned char* pSrc = (unsigned char*) src;
-    int i;
-
-    for (i=0; i < rows; i++) {
-        pMyMemcpy(pDest, pSrc, count);
-        pSrc += src_pitch;
-        pDest += dst_pitch;
-    }
-    return 0;
-}
-
-
-#include "tomsmocomp/tomsmocompfilter_sse.cpp"
-#include "tomsmocomp/tomsmocompfilter_mmx.cpp"
-#include "tomsmocomp/tomsmocompfilter_3dnow.cpp"
-
-#define SearchEffortDefault 5
-#define UseStrangeBobDefault 0
+#include "tomsmocomp.h"
 
 static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
                                              deinterlace_frame_data_t *data,
@@ -200,11 +90,11 @@ static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
     }
 
     if( mm_accel() & MM_ACCEL_X86_MMXEXT ) {
-        filterDScaler_SSE( &Info );
+        tomsmocomp_filter_mmx( &Info );
     } else if( mm_accel() & MM_ACCEL_X86_3DNOW ) {
-        filterDScaler_3DNOW( &Info );
+        tomsmocomp_filter_3dnow( &Info );
     } else {
-        filterDScaler_MMX( &Info );
+        tomsmocomp_filter_sse( &Info );
     }
 }
 
@@ -241,7 +131,6 @@ void dscaler_tomsmocomp_plugin_init( void )
 #endif
 {
     register_deinterlace_method( &tomsmocompmethod );
-    SearchEffort  = SearchEffortDefault;
-    UseStrangeBob = UseStrangeBobDefault;
+    tomsmocomp_init();
 }
 

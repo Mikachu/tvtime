@@ -16,50 +16,40 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-static void FUNCT_NAME(TDeinterlaceInfo* pInfo)
+void GreedyHImageFilter::FUNCT_NAME(TDeinterlaceInfo* pInfo)
 {
-    uint64_t i;
-    int InfoIsOdd = (pInfo->PictureHistory[0]->Flags & PICTURE_INTERLACED_ODD) ? 1 : 0;
-    static uint64_t YMask;
-    static uint64_t UVMask;
-    static uint64_t ShiftMask;
-    static uint64_t QW256;
-    static uint64_t MaxComb;
-    static uint64_t MotionThreshold;
-    static uint64_t MotionSense;
-    int Line;
-    static int LoopCtr;
-    unsigned int Pitch;
-    static unsigned char* L1;					// ptr to Line1, of 3
-    static unsigned char* L2;					// ptr to Line2, the weave line
-    static unsigned char* L3;					// ptr to Line3
-
-    static unsigned char* L2P;					// ptr to prev Line2
-    static unsigned char* Dest;
-    static uint64_t QW256B;
-    static uint64_t LastAvg;			//interp value from left qword
+    int64_t i;
+    bool InfoIsOdd = (pInfo->PictureHistory[0]->Flags & PICTURE_INTERLACED_ODD) ? 1 : 0;
 
     // in tight loop some vars are accessed faster in local storage
-    YMask        = 0x00ff00ff00ff00ffull; // to keep only luma
-    UVMask       = 0xff00ff00ff00ff00ull; // to keep only chroma
-    ShiftMask    = 0xfefffefffefffeffull; // to avoid shifting chroma to luma
-    QW256        = 0x0100010001000100ull; // 4 256's
+    int64_t YMask        = 0x00ff00ff00ff00ffull; // to keep only luma
+    int64_t UVMask       = 0xff00ff00ff00ff00ull; // to keep only chroma
+    int64_t ShiftMask    = 0xfefffefffefffeffull; // to avoid shifting chroma to luma
+    int64_t QW256        = 0x0100010001000100ull; // 4 256's
     
 	// Set up our two parms that are actually evaluated for each pixel
 	i=GreedyMaxComb;
-	MaxComb = i << 56 | i << 48 | i << 40 | i << 32 | i << 24 | i << 16 | i << 8 | i;
+	int64_t MaxComb = i << 56 | i << 48 | i << 40 | i << 32 | i << 24 | i << 16 | i << 8 | i;
     
 	i = GreedyMotionThreshold;		// scale to range of 0-257
-	MotionThreshold = i << 48 | i << 32 | i << 16 | i | UVMask;
+	int64_t MotionThreshold = i << 48 | i << 32 | i << 16 | i | UVMask;
     
 	i = GreedyMotionSense;		// scale to range of 0-257
-	MotionSense = i << 48 | i << 32 | i << 16 | i;
+	int64_t MotionSense = i << 48 | i << 32 | i << 16 | i;
 
-    Pitch = pInfo->InputPitch;
+    int Line;
+    int LoopCtr;
+    unsigned int Pitch = pInfo->InputPitch;
 
-    Dest = pInfo->Overlay;
+    unsigned char* L1;					// ptr to Line1, of 3
+    unsigned char* L2;					// ptr to Line2, the weave line
+    unsigned char* L3;					// ptr to Line3
 
-    LastAvg=0;			//interp value from left qword
+    unsigned char* L2P;					// ptr to prev Line2
+    unsigned char* Dest = pInfo->Overlay;
+
+    int64_t QW256B;
+    int64_t LastAvg=0;			//interp value from left qword
 
     i = 0xffffffff - 256;
     QW256B =  i << 48 |  i << 32 | i << 16 | i;  // save a couple instr on PMINSW instruct.

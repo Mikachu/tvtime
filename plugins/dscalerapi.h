@@ -25,6 +25,8 @@
 #ifndef __DS_APICOMON_H__
 #define __DS_APICOMON_H__ 1
 
+#include <stdlib.h>
+
 /** Deinterlace functions return true if the overlay is ready to be displayed.
 */
 typedef void (MEMCPY_FUNC)(void* pOutput, const void* pInput, size_t nSize);

@@ -1,12 +1,16 @@
 // -*- c++ -*-
 
-#ifdef USE_STRANGE_BOB
-#define SEARCH_EFFORT_FUNC(n) SEFUNC(n##_SB)
-#else
-#define SEARCH_EFFORT_FUNC(n) SEFUNC(n)
+#ifdef SEARCH_EFFORT_FUNC
+#undef SEARCH_EFFORT_FUNC
 #endif
 
-static int SEARCH_EFFORT_FUNC(0)		// we don't try at all ;-)
+#ifdef USE_STRANGE_BOB
+#define SEARCH_EFFORT_FUNC(n) TomsMoCompImageFilter::SEFUNC(n##_SB)
+#else
+#define SEARCH_EFFORT_FUNC(n) TomsMoCompImageFilter::SEFUNC(n)
+#endif
+
+int SEARCH_EFFORT_FUNC(0)		// we don't try at all ;-)
 {
 		//see Search_Effort_Max() for comments
 #define SKIP_SEARCH
@@ -15,7 +19,7 @@ static int SEARCH_EFFORT_FUNC(0)		// we don't try at all ;-)
 #undef SKIP_SEARCH
 }
 
-static int SEARCH_EFFORT_FUNC(1)
+int SEARCH_EFFORT_FUNC(1)
 {
 		//see Search_Effort_Max() for comments
 #include "SearchLoopTop.inc"	
@@ -24,7 +28,7 @@ static int SEARCH_EFFORT_FUNC(1)
 #include "SearchLoopBottom.inc"
 }
 
-static int SEARCH_EFFORT_FUNC(3)
+int SEARCH_EFFORT_FUNC(3)
 {
 		//see Search_Effort_Max() for comments
 #include "SearchLoopTop.inc"	
@@ -34,7 +38,7 @@ static int SEARCH_EFFORT_FUNC(3)
 #include "SearchLoopBottom.inc"
 }
 
-static int SEARCH_EFFORT_FUNC(5)
+int SEARCH_EFFORT_FUNC(5)
 {
 		//see Search_Effort_Max() for comments
 #include "SearchLoopTop.inc"	
@@ -46,7 +50,7 @@ static int SEARCH_EFFORT_FUNC(5)
 }
 
 // 3x3 search
-static int SEARCH_EFFORT_FUNC(9)
+int SEARCH_EFFORT_FUNC(9)
 {
 		//see SearchEffortMax() for comments
 #include "SearchLoopTop.inc"	
@@ -58,7 +62,7 @@ static int SEARCH_EFFORT_FUNC(9)
 }
 
 // Search 9 with 2 H-half pels added
-static int SEARCH_EFFORT_FUNC(11)
+int SEARCH_EFFORT_FUNC(11)
 {
 		//see SearchEffortMax() for comments
 #include "SearchLoopTop.inc"	
@@ -71,7 +75,7 @@ static int SEARCH_EFFORT_FUNC(11)
 }
 
 // Search 11 with 2 V-half pels added
-static int SEARCH_EFFORT_FUNC(13)
+int SEARCH_EFFORT_FUNC(13)
 {
 		//see SearchEffortMax() for comments
 #include "SearchLoopTop.inc"	
@@ -85,7 +89,7 @@ static int SEARCH_EFFORT_FUNC(13)
 }
 
 // 5x3
-static int SEARCH_EFFORT_FUNC(15)
+int SEARCH_EFFORT_FUNC(15)
 {
 		//see SearchEffortMax() for comments
 #include "SearchLoopTop.inc"	
@@ -98,7 +102,7 @@ static int SEARCH_EFFORT_FUNC(15)
 }
 
 // 5x3 + 4 half pels
-static int SEARCH_EFFORT_FUNC(19)
+int SEARCH_EFFORT_FUNC(19)
 {
 		//see SearchEffortMax() for comments
 #include "SearchLoopTop.inc"	
@@ -115,7 +119,7 @@ static int SEARCH_EFFORT_FUNC(19)
 // Handle one 4x1 block of pixels
 // Search a 7x3 area, no half pels
 
-static int SEARCH_EFFORT_FUNC(21)
+int SEARCH_EFFORT_FUNC(21)
 {
 		//see SearchLoopTop.inc for comments
 #include "SearchLoopTop.inc"
@@ -140,7 +144,7 @@ static int SEARCH_EFFORT_FUNC(21)
 
 // Handle one 4x1 block of pixels
 // Search a 9x3 area, no half pels
-static int SEARCH_EFFORT_FUNC(Max)
+int SEARCH_EFFORT_FUNC(Max)
 {
 		//see SearchLoopTop.inc for comments
 #include "SearchLoopTop.inc"
