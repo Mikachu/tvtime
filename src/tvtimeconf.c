@@ -568,8 +568,8 @@ config_t *config_new( void )
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
     ct->keymap[ I_F9 ] = TVTIME_CHANNEL_SAVE_TUNING;
     ct->keymap[ I_F10 ] = TVTIME_CHANNEL_SCAN;
-    ct->keymap[ I_F11 ] = TVTIME_TOGGLE_BARS;
-    ct->keymap[ I_F12 ] = TVTIME_TOGGLE_CREDITS;
+    ct->keymap[ I_F11 ] = TVTIME_CHANNEL_ACTIVATE_ALL;
+    ct->keymap[ I_F12 ] = TVTIME_TOGGLE_BARS;
     ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;

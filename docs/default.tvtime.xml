@@ -358,11 +358,11 @@
     <keyboard key="F10"/>
   </bind>
 
-  <bind command="toggle_bars">
+  <bind command="channel_activate_all">
     <keyboard key="F11"/>
   </bind>
 
-  <bind command="toggle_credits">
+  <bind command="toggle_bars">
     <keyboard key="F12"/>
   </bind>
 
