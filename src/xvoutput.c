@@ -239,6 +239,7 @@ static int get_colourkey( void )
                     if( !strcmp( attr[ k ].name, "XV_COLORKEY" ) ) {
                         atom = XInternAtom( display, "XV_COLORKEY", False );
                         if( atom != None ) {
+                            XvSetPortAttribute( display, xv_port, atom, 16740766 );
                             XvGetPortAttribute( display, xv_port, atom, &value );
                             XFree( attr );
                             return value;
