@@ -28,6 +28,7 @@ computer monitor or projector.
   o   2-3 Pulldown detection for optimal quality viewing of film content
       from NTSC sources.
 
+
   Contents
   --------
   1. Where to find help with tvtime
@@ -57,32 +58,53 @@ save command line arguments to your config file using the -S option.
 as your defaults.  See docs/default.tvtime.xml for a default
 configuration file and the default runtime keybindings.
 
+
 3 An introduction to using tvtime
   -------------------------------
 
   General keys
-    Quit                                 Escape and q
-    Channel up/down and fine tuning      Arrow keys, vi movement keys
-                                         Mouse wheel
-    Mixer mute                           m
-    Volume Control (Line input)          +/-
-    Channel access                       Numbers + enter
-    Fullscreen toggle                    f
-    Take a screenshot                    s
-    Switch deinterlacer                  t
-    Switch framerate                     =
-    Change overscan level                < and >
-    Load next preset settings mode       *
+    Quit                                  Escape and q
+    Channel up/down and fine tuning       Arrow keys, vi movement keys
+                                          Mouse wheel
+    Previous channel                      Backspace
+    Channel access                        Numbers + enter
+    Display info                          Left Mouse Button
+    Mixer mute                            m and Middle Mouse Button
+    Volume Control (Line input)           +/-
+    Switch deinterlacer                   t
+    Switch framerate                      =
+    Toggle pulldown detection mode        p
+    Fullscreen toggle                     f
+    Aspect ratio toggle                   a
+    Take a screenshot                     s
+    Change overscan level                 < and >
+    Load next preset settings mode        *
 
   Video input keys
-    Switch input (Tuner, S-Video, ...)   i
-    Enable closed captions               w
-    Brightness/Contrast/Colour/Hue       F1-F8
-    Show colourbars                      b
+    Switch input (Tuner, S-Video, ...)    i and Right Mouse Button
+    Toggle audio mode (Stero, Mono, SAP)  e
+    Enable closed captions                w
+    Brightness/Contrast/Colour/Hue        F1-F8
+    Reset default colour settings         Spacebar
+    Show colourbars                       b
+
+  Channel setup keys
+    See below
+
+
+  Commands can be sent to a running tvtime using the 'tvtime-command'
+application.  For example, 'tvtime-command channel_up' to change
+channel, or 'tvtime-command channel_1 channel_5 enter' to change to
+channel 15.  Run 'tvtime-command' to get a list of commands.
 
 
 4 Setting up your channel list in tvtime
   --------------------------------------
+
+  tvtime supports a channel scanner, channel renumbering, channel names,
+and a list of active channels for browsing.  Below are the commands
+available for input bindings and through tvtime-command, along with
+their default key bindings.
 
   Command reference:
 
@@ -109,6 +131,7 @@ configuration file and the default runtime keybindings.
     - Renumbers the current channel.  This will swap the current channel
       with the number you type in.  Use this to configure your station
       list to suit preference or locality.
+
 
 4.1 stationlist.xml
     ---------------
@@ -146,6 +169,7 @@ Entries in a list are in the following form:
 
        <station name="2" active="1" position="0"
                 band="Custom" channel="55.69MHz"/>
+
 
 4.2 Future enhancements
     -------------------
