@@ -28,10 +28,6 @@ http://sourceforge.net/projects/tvtime/
  * You can use the -s switch to see when you drop frames, but it would
    be nice to be told somehow using the OSD or something...
 
-635005 - No way to specify deinterlacing alg
- * There is currently no way to specify a default deinterlacing algorithm
-   on the command line or in the config file.
-
 636423 - No support for 16:9 geometry output
  * We should detect when your monitor's aspect ratio is not 4:3 and
    correct for that, and also check for non-square pixel sizes.

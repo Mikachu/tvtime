@@ -1,32 +1,38 @@
 
 0.9.7
-  * (PunkeR) Added numeric channel commands for better lirc support.
-  * (vektor) Added commands for scanline length bias and overscan.
-  * (vektor) Added a channel scanner that rocks sooo much.
+  * (vektor) Europe-east is now just part of the 'europe' frequency map.
+    If you are just using the OIRT frequencies and UHF, you can also use
+    'russia' (fixes 640620)
+  * (vektor) More confident about the australian channel map (fixes 650055)
+  * (PunkeR) Added numeric channel commands for better lirc support
+  * (vektor) Added commands for scanline length bias and overscan
+  * (vektor) Added a channel scanner that rocks sooo much
   * (vektor) We now set the window and palette with V4L before using mmap
-    mode.  This should solve some issues with V4L drivers other than bttv.
+    mode.  This should solve some issues with V4L drivers other than bttv
   * (vektor) Fixed a bunch of OSD crap relating to inputs with no tuner, and
-    some unnecessary error messages will be avoided.
+    some unnecessary error messages will be avoided
   * (batchall) Added a more flexible station subsystem. Deactivated channels
-    are saved now, more to come.
-  * (vektor) Moved fonts and graphics into the data directory.
-  * (vektor) Increased the version number of the deinterlace plugin API.
+    are saved now, more to come
+  * (vektor) Moved fonts and graphics into the data directory
+  * (vektor) Increased the version number of the deinterlace plugin API
   * (vektor) Removed the mlockall() call, I don't want to bother with
-    that right now.
+    that right now
   * (vektor) Added the 'XVideo Bob' equivalent to DScaler's 'scalerbob'
-    plugin (feature request 642661).
-  * (vektor) Added the SECAM-DK frequencies ("russia").
+    plugin (feature request 642661)
+  * (vektor) Added the SECAM-DK frequencies ("russia")
   * (vektor) Officially re-enabled the EWMH code from the ogle
-    fullscreen handler wm_state.c.
-  * (vektor) Reverted to previous frequencies.h format.
-  * (vektor) Added a half-framerate mode, default key is '='.
-  * (xlnx-x) Added a previous channel button.
-  * (vektor) We now exit properly on window manager destroy messages.
+    fullscreen handler wm_state.c
+  * (vektor) Reverted to previous frequencies.h format
+  * (vektor) Added a half-framerate mode, default key is '='
+  * (xlnx-x) Added a previous channel button
+  * (vektor) We now exit properly on window manager destroy messages
+    (fixes 659877)
   * (vektor) Added a configure check for Xinerama (bug 636424)
   * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576
-    (fixes bug 646494).
+    (fixes bug 646494)
+  * (rascasse) You can now specify the startup deinterlacing alg (fixes 635005)
   * (vektor) You can now change the default process priority in the .tvtimerc
-    using the ProcessPriority value.
+    using the ProcessPriority value
 
 0.9.6 - Thu Nov 14 16:37:25 AST 2002
   * (bitstream) Added the -m switch to start fullscreen (bug 636044)
