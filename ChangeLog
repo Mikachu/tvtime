@@ -1,7 +1,11 @@
 
 0.9.14 -
+  * inguin: Xinerama: Go to fullscreen on the head that contains the largest
+      part of the tvtime window.
   * vektor: Fixed fullscreen problems with Xinerama and certain window
       managers.
+  * inguin: Offer a "Maximum" item in the horizontal resolution menu in case
+      the capture card can do more then 768 pixels per scanline.
   * vektor: Added a SET_INPUT command.
   * vektor: Added support for _NET_WM_ICON based on a patch from
       Andrei Badea.
@@ -14,8 +18,6 @@
       a library.
   * vektor: Increase the max number of mouse buttons to 15 (Mikachu has
       a mouse with 11 buttons).
-  * inguin: Offer a "Maximum" item in the horizontal resolution menu in case
-      the capture card can do more then 768 pixels per scanline.
 
 0.9.13 - Sat Sep 25 13:51:13 EDT 2004
   * inguin: German translation of man pages.

@@ -1258,9 +1258,10 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     output_fullscreen = !output_fullscreen;
     if( output_fullscreen ) {
         int x, y, w, h;
-  
+
         xfullscreen_update( xf );
         xfullscreen_get_position( xf, window_area.x, window_area.y,
+                                  window_area.width, window_area.height,
                                   &x, &y, &w, &h );
 
         output_width = w;

@@ -69,7 +69,8 @@ void xfullscreen_update( xfullscreen_t *xf );
  * a fullscreen window positioned at window_x and window_y.
  */
 void xfullscreen_get_position( xfullscreen_t *xf, int window_x,
-                               int window_y, int *x, int *y,
+                               int window_y, int window_width,
+                               int window_height, int *x, int *y,
                                int *w, int *h );
 
 /**

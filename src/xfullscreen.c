@@ -245,7 +245,10 @@ void xfullscreen_update( xfullscreen_t *xf )
 #endif
 }
 
+#define MIN(x,y)((x)<(y)?(x):(y))
+#define MAX(x,y)((x)>(y)?(x):(y))
 void xfullscreen_get_position( xfullscreen_t *xf, int window_x, int window_y,
+                               int window_width, int window_height,
                                int *x, int *y, int *w, int *h )
 {
     if( xf->usevidmode ) {
@@ -254,18 +257,31 @@ void xfullscreen_get_position( xfullscreen_t *xf, int window_x, int window_y,
         *w = xf->hdisplay;
         *h = xf->vdisplay;
     } else {
+        /* Find the screen that displays the largest part of the window */
+        int win_x1 = window_x, win_x2 = window_x + window_width - 1;
+        int win_y1 = window_y, win_y2 = window_x + window_height - 1;
+        int max_area = -1;
         int i;
 
         for( i = 0; i < xf->nheads; i++ ) {
-            if( (xf->heads[ i ].x <= window_x) &&
-                (window_x < (xf->heads[ i ].x + xf->heads[ i ].w)) &&
-                (xf->heads[ i ].y <= window_y) &&
-                (window_y < (xf->heads[ i ].y + xf->heads[ i ].h)) ) {
+            int head_x1 = xf->heads[ i ].x;
+            int head_x2 = xf->heads[ i ].x + xf->heads[ i ].w - 1;
+            int head_y1 = xf->heads[ i ].y;
+            int head_y2 = xf->heads[ i ].y + xf->heads[ i ].h - 1;
+            int area;
+            if ( win_x2 < head_x1 || win_x1 > head_x2 ||
+                 win_y2 < head_y1 || win_y1 > head_y2 ) {
+                area = 0;
+            } else {
+                area = ( MIN( win_x2, head_x2 ) - MAX( win_x1, head_x1 ) - 1 )
+                     * ( MIN( win_y2, head_y2 ) - MAX( win_y1, head_y1 ) - 1 );
+            }
+            if( area > max_area ) {
                 *x = xf->heads[ i ].x;
                 *y = xf->heads[ i ].y;
                 *w = xf->heads[ i ].w;
                 *h = xf->heads[ i ].h;
-                return;
+                max_area = area;
             }
         }
     }
