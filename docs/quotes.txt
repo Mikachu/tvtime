@@ -1,4 +1,9 @@
 
+Wed Feb 26 23:25:30 AST 2003
+[msg(mkeadle)] so, when will the ebuild be posted? :)
+[mkeadle] well, i'll have to watch some pr0n for about 6 hours to make
+          sure it works ok
+
 Thu Oct 24 19:50:20 ADT 2002
 <bitstream> i think we should get magic pixies to do the compositing.
             i bet they could do it fast!
