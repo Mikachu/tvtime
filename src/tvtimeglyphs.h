@@ -88,6 +88,7 @@
 #define TVTIME_ICON_RESETTODEFAULTS    "\xee\x80\xbe" /* Reset to Defaults   */
 #define TVTIME_ICON_CHANGENTSCMODE     "\xee\x80\xbf" /* Change NTSC Mode    */
 #define TVTIME_ICON_APPLYMATTE         "\xee\x81\x80" /* Apply Matte         */
+#define TVTIME_ICON_SETFSPOS           "\xee\x80\xb5" /* Fullscreen Position */
 
 /*
  * Both "Reset all channels as active" and "Sharpness" are currently
