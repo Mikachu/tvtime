@@ -45,6 +45,7 @@ static int mga_init( int outputheight, int aspect, int verbose )
 {
     mga_fd = open( "/dev/mga_vid", O_RDWR );
     if( mga_fd < 0 ) {
+        fprintf( stderr, "mgaoutput: Can't open /dev/mga_vid: %s\n", strerror( errno ) );
         return 0;
     }
 
