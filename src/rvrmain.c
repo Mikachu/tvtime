@@ -44,7 +44,6 @@ static int fieldtime;
  */
 static void *video_capture_thread_main( void *crap )
 {
-    unsigned char *tmp420space;
     struct timeval starttime;
     int gotframes = 0;
     int frameid;
@@ -56,14 +55,6 @@ static void *video_capture_thread_main( void *crap )
      * lower priority than the audio thread (theoretically).
      */
     set_realtime_priority( 0 );
-
-
-    /**
-     * Allocate some space (more than enough for kicks) to store our results
-     * from the conversion 4:2:2->4:2:0.
-     */
-    tmp420space = malloc( ( fileheader->width * fileheader->height * 3 ) / 2 );
-
 
     pthread_mutex_lock( &rec_start_mut );
     pthread_cond_broadcast( &rec_start_cond );
