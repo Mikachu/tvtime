@@ -277,8 +277,10 @@ static void reinit_tuner( input_t *in )
             /* set to a known frequency */
             frequencies_choose_first_frequency();
             videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
-            if( in->vbi )
+            if( in->vbi ) {
                 vbidata_reset( in->vbi );
+                vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+            }
         }
 
         if( config_get_verbose( in->cfg ) ) {
@@ -410,8 +412,10 @@ static void input_channel_change_relative( input_t *in, int offset )
 
         
         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
-        if( in->vbi )
+        if( in->vbi ) {
             vbidata_reset( in->vbi );
+            vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+        }
 
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
@@ -631,8 +635,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
                 videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
-                if( in->vbi )
+                if( in->vbi ) {
                     vbidata_reset( in->vbi );
+                    vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+                }
 
                 if( in->osd ) {
                     char message[ 200 ];
@@ -725,8 +731,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             cur_channel = (cur_channel + 1 + CHAN_ENTRIES) % CHAN_ENTRIES;
                         }
                         videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
-                        if( in->vbi )
+                        if( in->vbi ) {
                             vbidata_reset( in->vbi );
+                            vbidata_capture_mode( in->vbi, CAPTURE_CC1 );
+                        }
 
 
                         if( verbose ) {

@@ -47,6 +47,7 @@
 #include "xvoutput.h"
 #include "console.h"
 #include "vbidata.h"
+#include "vbiscreen.h"
 
 /**
  * This is ridiculous, but apparently I need to give my own
@@ -222,6 +223,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              tvtime_osd_t *osd,
                                              menu_t *menu,
                                              console_t *con,
+                                             vbiscreen_t *vs,
                                              int bottom_field,
                                              int correct_input,
                                              int width,
@@ -240,6 +242,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
 
         /* Double the top scanline a scanline. */
         blit_packed422_scanline( output, curframe, width );
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -254,7 +257,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
     if( correct_input ) {
         video_correction_correct_packed422_scanline( vc, output, output, width );
     }
-
+    if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
     if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
     if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
     if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -289,6 +292,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -306,6 +310,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -321,6 +326,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         if( correct_input ) {
             video_correction_correct_packed422_scanline( vc, output, output, width );
         }
+        if( vs ) vbiscreen_composite_packed422_scanline( vs, output, width, 0, scanline );
         if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         if( menu ) menu_composite_packed422_scanline( menu, output, width, 0, scanline );
         if( con ) console_composite_packed422_scanline( con, output, width, 0, scanline );
@@ -338,6 +344,7 @@ static void tvtime_build_interlaced_frame( unsigned char *output,
                                            tvtime_osd_t *osd,
                                            menu_t *menu,
                                            console_t *con,
+                                           vbiscreen_t *vs,
                                            int bottom_field,
                                            int correct_input,
                                            int width,
@@ -420,6 +427,7 @@ int main( int argc, char **argv )
     console_t *con;
     int has_signal = 0;
     vbidata_t *vbidata;
+    vbiscreen_t *vs;
 
     setup_speedy_calls();
 
@@ -656,8 +664,20 @@ int main( int argc, char **argv )
         input_set_console( in, con );
     }
 
+    vs = vbiscreen_new( width, height, 
+                        config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
+    if( !vs ) {
+        fprintf( stderr, "tvtime: Could not create vbiscreen.\n" );
+        return 1;
+    }
+
     /* Open the VBI device. */
-    vbidata = vbidata_new( "/dev/vbi0", con );
+    vbidata = vbidata_new( "/dev/vbi0", vs, verbose );
+    if( !vbidata ) {
+        fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+    } else {
+        vbidata_capture_mode( vbidata, CAPTURE_CC1 );
+    }
 
     /* Setup the output. */
     output = get_xv_output();
@@ -778,7 +798,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, con, 0,
+                       curframe, vc, osd, menu, con, vs, 0,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -791,7 +811,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                    curframe, lastframe, secondlastframe,
-                                   vc, osd, menu, con, 0,
+                                   vc, osd, menu, con, vs, 0,
                                    vc && config_get_apply_luma_correction( ct ),
                                    width, height, width * 2, output->get_output_stride() );
             }
@@ -838,7 +858,7 @@ int main( int argc, char **argv )
 
             output->lock_output_buffer();
             tvtime_build_interlaced_frame( output->get_output_buffer(),
-                       curframe, vc, osd, menu, con, 1,
+                       curframe, vc, osd, menu, con, vs, 1,
                        vc && config_get_apply_luma_correction( ct ),
                        width, height, width * 2, output->get_output_stride() );
             output->unlock_output_buffer();
@@ -851,7 +871,7 @@ int main( int argc, char **argv )
             } else {
                 tvtime_build_deinterlaced_frame( output->get_output_buffer(),
                                   curframe, lastframe,
-                                  secondlastframe, vc, osd, menu, con, 1,
+                                  secondlastframe, vc, osd, menu, con, vs, 1,
                                   vc && config_get_apply_luma_correction( ct ),
                                   width, height, width * 2, output->get_output_stride() );
             }
@@ -926,6 +946,9 @@ int main( int argc, char **argv )
     }
     if( con ) {
         console_delete( con );
+    }
+    if( vs ) {
+        vbiscreen_delete( vs );
     }
     return 0;
 }
