@@ -141,6 +141,7 @@ struct commands_s {
     char newfreqtable[ 128 ];
     int checkfreq;
     int usexds;
+    int pulldown_alg;
 
     int delay;
 
@@ -856,6 +857,81 @@ static void reset_overscan_menu( menu_t *menu, double overscan )
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "output" );
 }
 
+static void reset_filters_menu( menu_t *menu, int isbttv, int apply_luma,
+                                int apply_invert, int apply_mirror,
+                                int apply_chroma_kill, int isntsc,
+                                int apply_pulldown )
+{
+    char string[ 128 ];
+    int cur;
+    cur = 1;
+
+    if( isbttv ) {
+        if( apply_luma ) {
+            sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
+        } else {
+            sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
+        }
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
+        menu_set_right_command( menu, cur, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
+        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+        cur++;
+    }
+
+    if( isntsc ) {
+        if( apply_pulldown ) {
+            snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb7 );
+        } else {
+            snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb8 );
+        }
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
+        menu_set_right_command( menu, cur, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
+        menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+        cur++;
+    }
+
+    if( apply_invert ) {
+        sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb7 );
+    } else {
+        sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_TOGGLE_COLOUR_INVERT, "" );
+    menu_set_right_command( menu, cur, TVTIME_TOGGLE_COLOUR_INVERT, "" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+    cur++;
+
+    if( apply_mirror ) {
+        sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb7 );
+    } else {
+        sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_TOGGLE_MIRROR, "" );
+    menu_set_right_command( menu, cur, TVTIME_TOGGLE_MIRROR, "" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+    cur++;
+
+    if( apply_chroma_kill ) {
+        sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb7 );
+    } else {
+        sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
+    }
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_TOGGLE_CHROMA_KILL, "" );
+    menu_set_right_command( menu, cur, TVTIME_TOGGLE_CHROMA_KILL, "" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+    cur++;
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, cur, string );
+    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+    menu_set_right_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+    menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "processing" );
+}
+
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime )
@@ -918,6 +994,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     snprintf( cmd->newfreqtable, sizeof( cmd->newfreqtable ), "%s", config_get_v4l_freq( cfg ) );
     cmd->checkfreq = config_get_check_freq_present( cfg );
     cmd->usexds = config_get_usexds( cfg );
+    cmd->pulldown_alg = 0;
 
     /* Number of frames to wait for next channel digit. */
     cmd->delay = 1000000 / fieldtime;
@@ -1279,36 +1356,13 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     menu = menu_new( "filters" );
     menu_set_text( menu, 0, "Setup - Video processing - Input filters" );
-    if( cmd->apply_luma ) {
-        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
-    } else {
-        sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
-    }
-    menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
-    menu_set_right_command( menu, 1, TVTIME_TOGGLE_LUMA_CORRECTION, "" );
-    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_COLOUR_INVERT, "" );
-    menu_set_right_command( menu, 2, TVTIME_TOGGLE_COLOUR_INVERT, "" );
-    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
-    menu_set_right_command( menu, 3, TVTIME_TOGGLE_MIRROR, "" );
-    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_TOGGLE_CHROMA_KILL, "" );
-    menu_set_right_command( menu, 4, TVTIME_TOGGLE_CHROMA_KILL, "" );
-    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
     commands_add_menu( cmd, menu );
+    reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                        cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                        cmd->apply_luma, cmd->apply_invert,
+                        cmd->apply_mirror, cmd->apply_chroma_kill,
+                        cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                        cmd->pulldown_alg );
 
     menu = menu_new( "picture-notuner" );
     menu_set_text( menu, 0, "Setup - Picture" );
@@ -2334,15 +2388,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_COLOUR_INVERT:
         cmd->apply_invert = !cmd->apply_invert;
         if( cmd->osd ) {
-            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
-            char string[ 128 ];
-
-            if( cmd->apply_invert ) {
-                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb7 );
-            } else {
-                sprintf( string, "%c%c%c  Colour invert", 0xee, 0x80, 0xb8 );
-            }
-            menu_set_text( filtermenu, 2, string );
+            reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                                cmd->apply_luma, cmd->apply_invert,
+                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                                cmd->pulldown_alg );
             commands_refresh_menu( cmd );
 
             if( cmd->apply_invert ) {
@@ -2356,15 +2407,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_MIRROR:
         cmd->apply_mirror = !cmd->apply_mirror;
         if( cmd->osd ) {
-            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
-            char string[ 128 ];
-
-            if( cmd->apply_mirror ) {
-                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb7 );
-            } else {
-                sprintf( string, "%c%c%c  Mirror", 0xee, 0x80, 0xb8 );
-            }
-            menu_set_text( filtermenu, 3, string );
+            reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                                cmd->apply_luma, cmd->apply_invert,
+                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                                cmd->pulldown_alg );
             commands_refresh_menu( cmd );
 
             if( cmd->apply_mirror ) {
@@ -2378,15 +2426,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_CHROMA_KILL:
         cmd->apply_chroma_kill = !cmd->apply_chroma_kill;
         if( cmd->osd ) {
-            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
-            char string[ 128 ];
-
-            if( cmd->apply_chroma_kill ) {
-                sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb7 );
-            } else {
-                sprintf( string, "%c%c%c  Chroma killer", 0xee, 0x80, 0xb8 );
-            }
-            menu_set_text( filtermenu, 4, string );
+            reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                                cmd->apply_luma, cmd->apply_invert,
+                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                                cmd->pulldown_alg );
             commands_refresh_menu( cmd );
 
             if( cmd->apply_chroma_kill ) {
@@ -2400,15 +2445,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_TOGGLE_LUMA_CORRECTION:
         cmd->apply_luma = !cmd->apply_luma;
         if( cmd->osd ) {
-            menu_t *filtermenu = commands_get_menu( cmd, "filters" );
-            char string[ 128 ];
-
-            if( cmd->apply_luma ) {
-                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb7 );
-            } else {
-                sprintf( string, "%c%c%c  BT8x8 luma correction", 0xee, 0x80, 0xb8 );
-            }
-            menu_set_text( filtermenu, 1, string );
+            reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                                cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                                cmd->apply_luma, cmd->apply_invert,
+                                cmd->apply_mirror, cmd->apply_chroma_kill,
+                                cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                                cmd->pulldown_alg );
             commands_refresh_menu( cmd );
 
             if( cmd->apply_luma ) {
@@ -3157,5 +3199,17 @@ int commands_sleeptimer_do_shutdown( commands_t *cmd )
     time( &now );
 
     return (now >= ((sleeptimer_function( cmd->sleeptimer ) * 60) + cmd->sleeptimer_start));
+}
+
+void commands_set_pulldown_alg( commands_t *cmd, int pulldown_alg )
+{
+    cmd->pulldown_alg = pulldown_alg;
+    reset_filters_menu( commands_get_menu( cmd, "filters" ),
+                        cmd->vidin && videoinput_is_bttv( cmd->vidin ),
+                        cmd->apply_luma, cmd->apply_invert,
+                        cmd->apply_mirror, cmd->apply_chroma_kill,
+                        cmd->vidin && videoinput_get_height( cmd->vidin ) == 480,
+                        cmd->pulldown_alg );
+    commands_refresh_menu( cmd );
 }
 

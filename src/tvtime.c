@@ -953,26 +953,6 @@ static void build_output_menu( menu_t *menu, int widescreen,
     menu_set_left_command( menu, cur, TVTIME_SHOW_MENU, "root" );
 }
 
-static void build_pulldown_menu( menu_t *menu, int pulldownactive )
-{
-    char string[ 128 ];
-
-    if( pulldownactive ) {
-        snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb7 );
-    } else {
-        snprintf( string, sizeof( string ), "%c%c%c  2-3 pulldown inversion", 0xee, 0x80, 0xb8 );
-    }
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-    menu_set_right_command( menu, 5, TVTIME_TOGGLE_PULLDOWN_DETECTION, "" );
-    menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
-    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
-    menu_set_right_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
-    menu_set_left_command( menu, 6, TVTIME_SHOW_MENU, "processing" );
-}
-
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1677,9 +1657,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
                        output->is_fullscreen(), output->is_alwaysontop(),
                        output->is_fullscreen_supported(), output->is_alwaysontop_supported(),
                        output->is_overscan_supported() );
-    if( height == 480 ) {
-        build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
-    }
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1918,13 +1895,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         if( commands_toggle_pulldown_detection( commands ) ) {
             if( height == 480 ) {
                 tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
+                commands_set_pulldown_alg( commands, tvtime->pulldown_alg );
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
                         tvtime_osd_show_message( osd, _("2-3 Pulldown detection disabled.") );
                     } else if( tvtime->pulldown_alg == PULLDOWN_VEKTOR ) {
                         tvtime_osd_show_message( osd, _("2-3 Pulldown detection enabled.") );
                     }
-                    build_pulldown_menu( commands_get_menu( commands, "filters" ), tvtime->pulldown_alg );
                     commands_refresh_menu( commands );
                 }
             } else if( osd ) {
