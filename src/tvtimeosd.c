@@ -104,30 +104,30 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
 
     osd_string_set_colour( osd->channel_number, 220, 12, 155 );
     osd_string_show_border( osd->channel_number, 1 );
-    osd->channel_number_xpos = 40;
-    osd->channel_number_ypos = 30;
+    osd->channel_number_xpos = ( width * 5 ) / 100;
+    osd->channel_number_ypos = ( height * 5 ) / 100;
 
     osd_string_set_colour( osd->channel_info, 220, 12, 155 );
     osd_string_show_border( osd->channel_info, 1 );
-    osd->channel_info_xpos = width / 2;
-    osd->channel_info_ypos = 40;
+    osd->channel_info_xpos = ( width * 60 ) / 100;
+    osd->channel_info_ypos = ( height * 5 ) / 100;
 
     osd_string_set_colour( osd->volume_bar, 200, 128, 128 );
-    osd->volume_bar_xpos = 20;
-    osd->volume_bar_ypos = height - 40;
+    osd->volume_bar_xpos = ( width * 5 ) / 100;
+    osd->volume_bar_ypos = ( height * 90 ) / 100;
 
     osd_string_set_colour( osd->data_bar, 200, 128, 128 );
-    osd->data_bar_xpos = 20;
-    osd->data_bar_ypos = height - 40;
+    osd->data_bar_xpos = ( width * 5 ) / 100;
+    osd->data_bar_ypos = ( height * 90 ) / 100;
 
     osd_string_set_colour( osd->muted, 200, 128, 128 );
     osd_string_show_text( osd->muted, "Mute", 100 );
+    osd->muted_xpos = ( width * 5 ) / 100;
+    osd->muted_ypos = ( height * 90 ) / 100;
     osd->ismuted = 0;
-    osd->muted_xpos = 20;
-    osd->muted_ypos = height - 40;
 
-    osd->channel_logo_xpos = width / 2;
-    osd->channel_logo_ypos = 86;
+    osd->channel_logo_xpos = ( width * 60 ) / 100;
+    osd->channel_logo_ypos = ( height * 14 ) / 100;
 
     return osd;
 }
@@ -179,6 +179,7 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     osd_string_show_text( osd->channel_info, timestamp, 80 );
     sprintf( text, "[%s] %s - %s", osd->tv_norm_text, osd->input_text, osd->deinterlace_text );
     osd_string_show_text( osd->data_bar, text, 80 );
+    osd_graphic_show_graphic( osd->channel_logo, 80 );
     osd_string_set_timeout( osd->volume_bar, 0 );
 }
 

@@ -16,13 +16,17 @@ DIRECTFB_CFLAGS =
 DIRECTFB_LIBS = 
 endif
 
+VIDMODE_CFLAGS =
+VIDMODE_LIBS = -lX11 -lXext -lXxf86vm
+
 OPT_CFLAGS = -Wall -I. -O3 -rdynamic -pedantic -DDATADIR="\"$(tvtimedatadir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS)
 AM_CXXFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGINS_CFLAGS) $(DIRECTFB_CFLAGS)
-AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) $(PLUGINS_LIBS) -lm
+AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+	$(PLUGINS_LIBS) $(VIDMODE_LIBS) -lm
 
 COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	rtctimer.c ttfont.cpp efs.cpp osdtools.c parser.c tvtimeconf.c \
@@ -32,7 +36,8 @@ COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	input.h menu.h mixer.h mm_accel.h mmx.h osdtools.h parser.h pnginput.h \
 	pngoutput.h rtctimer.h sdloutput.h speedy.h taglines.h ttfont.h \
 	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
-	outputapi.h dfboutput.h dfboutput.c performance.h performance.c
+	outputapi.h dfboutput.h dfboutput.c performance.h performance.c \
+	vidmode.h vidmode.c
 
 bin_PROGRAMS = tvtime
 

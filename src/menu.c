@@ -44,14 +44,8 @@ typedef struct menu_text_s {
 } menu_text;
 
 struct menu_s {
-    osd_graphic_t *bg;
-    int bgx, bgy;
-
     osd_shape_t *box;
     int box_x, box_y;
-
-    osd_shape_t *circle;
-    int circle_x, circle_y;
 
     MenuScreen menu_screen;
     MenuScreen menu_previous_screen;
@@ -70,54 +64,62 @@ struct menu_s {
 menu_t *menu_new( input_t *in, config_t *cfg, int width, 
                   int height, double aspect )
 {
+    menu_t *m = (menu_t *) malloc( sizeof( menu_t ) );
     int i;
-    menu_t *m = (menu_t *)malloc( sizeof( struct menu_s ) );
-    if( !m ) return NULL;
+
+    if( !m ) {
+        return 0;
+    }
 
     m->in = in;
     m->cfg = cfg;
     m->frame_width = width;
     m->frame_height = height;
     m->frame_aspect = aspect;
-    m->bg = osd_graphic_new( DATADIR "/menubg.png" , width, height, aspect, 255 );
-    if( !m->bg ) {
-        free( m );
-        return NULL;
-    }
-    m->bgx = 10;
-    m->bgy = 10;
 
-    m->box = osd_shape_new( OSD_Rect, width, height, width-100, 300, aspect, 255 );
+    m->box = osd_shape_new( OSD_Rect, width, height, ( width * 80 ) / 100,
+                            ( height * 80 ) / 100, aspect, 255 );
     if( !m->box ) {
-        osd_graphic_delete( m->bg );
         free( m );
-        return NULL;
+        return 0;
     }
-    m->box_x = 10;
-    m->box_y = 10;
-
-
-    m->circle = osd_shape_new( OSD_Circle, width, height, 50, 50, aspect, 255 );
-    if( !m->circle ) {
-        osd_graphic_delete( m->bg );
-        osd_shape_delete( m->box );
-        free( m );
-        return NULL;
-    }
-    m->circle_x = width-55;
-    m->circle_y = 10;
-
+    m->box_x = ( width * 10 ) / 100;
+    m->box_y = ( height * 10 ) / 100;
     osd_shape_set_colour( m->box, 16, 128, 128 );
-    osd_shape_set_colour( m->circle, 200, 200, 200 );
 
-    for( i=0; i < MENU_LINES; i++ ) {
-        m->menu_line[i].line = osd_string_new( DATADIR "/FreeSansBold.ttf", 
-                                                20, width, height, aspect);
-        m->menu_line[i].x = m->box_x + 5;
-        m->menu_line[i].y = m->box_y + i*35 + 10;
+    for( i = 0; i < MENU_LINES; i++ ) {
+        m->menu_line[ i ].line = osd_string_new( DATADIR "/FreeSansBold.ttf", 
+                                                 20, width, height, aspect );
+        if( !m->menu_line[ i ].line ) {
+            menu_delete( m );
+            return 0;
+        }
+        osd_string_show_text( m->menu_line[ i ].line, "Height", 1 );
+        m->menu_line[ i ].x = m->box_x + ( width * 5 ) / 100;
+        m->menu_line[ i ].y = m->box_y +
+                              ( i * osd_string_get_height( m->menu_line[ i ].line ) ) +
+                              ( ( height * 5 ) / 100 );
     }
 
     return m;
+}
+
+void menu_delete( menu_t *m )
+{
+    int i;
+
+    for( i = 0; i < MENU_LINES; i++ ) {
+        if( m->menu_line[ i ].line ) {
+            osd_string_delete( m->menu_line[ i ].line );
+        } else {
+            break;
+        }
+    }
+    if( m->box ) {
+        osd_shape_delete( m->box );
+    }
+
+    free( m );
 }
 
 /* Menus */
@@ -129,9 +131,7 @@ void menu_init( menu_t *m )
     m->menu_state = 0;
     m->menu_previous_screen = MENU_MAIN;
     
-//    osd_graphic_show_graphic( m->bg, 51 );
     osd_shape_show_shape( m->box, 51 );
-//    osd_shape_show_shape( m->circle, 51 );
 
     menu_main( m, 0 );
 
@@ -346,9 +346,7 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
                 input_toggle_menu( m->in );
                 m->menu_screen = MENU_MAIN;
                 /* now remove OSD */
-//                osd_graphic_set_timeout( m->bg, 0 );
                 osd_shape_set_timeout( m->box, 0 );
-//                osd_shape_set_timeout( m->circle, 0 );
                 for( i=0; i < MENU_LINES; i++ ) {
                     osd_string_show_text(m->menu_line[i].line, "", 0);
                 }
@@ -372,37 +370,9 @@ int menu_callback( menu_t *m, InputEvent command, int arg )
     return 1;
 }
 
-/*
-void menu_composite_packed422( menu_t *m, unsigned char *output,
-                               int width, int height, int stride )
-{
-    if( osd_graphic_visible( m->bg ) ) {
-        osd_graphic_composite_packed422( m->bg, 
-                                         output,
-                                         width, height, stride,
-                                         m->bgx, m->bgy );
-    }
-
-    if( osd_shape_visible( m->box ) ) {
-        osd_shape_composite_packed422( m->box, 
-                                       output,
-                                       width, height, stride,
-                                       m->box_x, m->box_y );
-    }
-
-    if( osd_shape_visible( m->circle ) ) {
-        osd_shape_composite_packed422( m->circle, 
-                                       output,
-                                       width, height, stride,
-                                       m->circle_x, m->circle_y );
-    }
-}
-*/
-
 void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
                                         int width, int xpos, int scanline )
 {
-
     int i;
 
     if( osd_shape_visible( m->box ) ) {
@@ -428,7 +398,7 @@ void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
         }
     }
 
-    for( i=0; i < MENU_LINES; i++ ) {
+    for( i = 0; i < MENU_LINES; i++ ) {
         if( osd_string_visible( m->menu_line[i].line ) ) {
             if( scanline >= m->menu_line[i].y &&
                 scanline < m->menu_line[i].y + osd_string_get_height( m->menu_line[i].line ) ) {
@@ -450,6 +420,5 @@ void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
             }
         }
     }
-
 }
 

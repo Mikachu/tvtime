@@ -254,9 +254,6 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         output += outstride;
         scanline++;
     }
-
-    /* Billy- Disabled the menu for now.    */
-
 }
 
 
@@ -809,6 +806,9 @@ int main( int argc, char **argv )
     }
     if( rtctimer ) {
         rtctimer_delete( rtctimer );
+    }
+    if( menu ) {
+        menu_delete( menu );
     }
     return 0;
 }

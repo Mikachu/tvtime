@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef MENU_H_INCLUDED
-#define MENU_H_INCLUDED
+#ifndef VIDMODE_H_INCLUDED
+#define VIDMODE_H_INCLUDED
 
-#include "input.h"
-#include "tvtimeconf.h"
+typedef struct vidmode_s vidmode_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+vidmode_t *vidmode_new( void );
+void vidmode_delete( vidmode_t *vm );
 
-typedef struct menu_s menu_t;
+void vidmode_print_modeline( vidmode_t *vm );
 
-menu_t *menu_new( input_t *in, config_t *cfg, int width, 
-                  int height, double aspect );
-void menu_delete( menu_t *m );
-
-void menu_init( menu_t *m );
-int menu_callback( menu_t *m, InputEvent command, int arg );
-void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
-                                        int width, int xpos, int scanline );
-
-#ifdef __cplusplus
-};
-#endif
-#endif /* MENU_H_INCLUDED */
+#endif /* VIDMODE_H_INCLUDED */

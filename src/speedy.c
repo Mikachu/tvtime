@@ -20,7 +20,8 @@ void (*blit_colour_packed4444_scanline)( unsigned char *output,
 void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
 
 
-void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid, unsigned char *bot, int width )
+void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
+                                     unsigned char *bot, int width )
 {
     const int64_t qwYMask = 0x00ff00ff00ff00ff;
     const int64_t qwOnes = 0x0001000100010001;

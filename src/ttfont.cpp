@@ -372,7 +372,7 @@ TTFFont::TTFFont(const char *file, int size, int video_width, int video_height, 
    FT_Error            error;
    FT_CharMap          char_map;
    FT_BBox             bbox;
-   int                 xdpi = 96, ydpi = 96;
+   int                 xdpi = 72, ydpi = 72;
    unsigned short      i, n, code;
 
    valid = false;

@@ -75,6 +75,17 @@ dnl if test "$DIRECTFB_CONFIG" != "no" ; then
 dnl   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
 dnl fi
 
+dnl ---------------------------------------------
+dnl XF86VidModeExtension
+dnl ---------------------------------------------
+dnl Test for vidmode
+dnl AC_ARG_WITH(xf86vm-path,[  --with-xf86vm-path=path    Where libXxf86vm is installed],
+dnl            xv_path="$withval", xv_path="/usr/X11R6/lib")
+AC_CHECK_LIB(Xxf86vm, XF86VidModeGetModeLine,
+        [ AC_CHECK_HEADER(X11/extensions/xf86vmode.h,
+          have_vidmode=yes
+          VIDMODE_LIBS="-lX11 -lXext -lXxf86vm",)],,-lX11 -lXext -lXxf86vm)
+AM_CONDITIONAL(HAVE_VIDMODE, [test x"$have_vidmode" = x"yes"])
 
 
 AC_ARG_ENABLE([warnings],
