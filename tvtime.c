@@ -111,13 +111,12 @@ int main( int argc, char **argv )
     int blittime = 0;
     int skipped = 0;
     int verbose = 0;
-    long last_chan_time = 0;
     int volume;
     int debug = 0;
-    int muted = 0;
     osd_font_t *osdf;
     osd_string_t *channel_number;
-    int c, i;
+    int c, i, frame_counter = 0, digit_counter = 0;
+    char next_chan_buffer[4];
 
 
     osdf = osd_font_new( "helr.ttf" );
@@ -133,6 +132,8 @@ int main( int argc, char **argv )
 
     /* Default freq */
     strcpy( freq, "us-cable" );
+    
+    memset( next_chan_buffer, 0, 4 );
 
     while( (c = getopt( argc, argv, "hw:avcso:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
@@ -299,7 +300,6 @@ int main( int argc, char **argv )
                 fprintf( stderr, "tvtime: Can't change channel, no tuner present!\n" );
             } else {
                 chanindex = (chanindex + ( (commands & TVTIME_CHANNEL_UP) ? 1 : -1) + chancount) % chancount;
-                last_chan_time = 0;
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
                 if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
                 osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
@@ -309,52 +309,73 @@ int main( int argc, char **argv )
             volume = mixer_set_volume( ( (commands & TVTIME_MIXER_UP) ? 3 : -3 ) );
         }
         if( commands & TVTIME_MIXER_MUTE ) {
-            muted = ~muted;
-            mixer_mute( muted );
+            mixer_toggle_mute();
         }
         if( commands & TVTIME_DIGIT ) {
-            int digit = 0;
+            char digit = '0';
+            char input_text[5];
 
-            if( commands & TVTIME_KP0 ) { digit = 0; }
-            if( commands & TVTIME_KP1 ) { digit = 1; }
-            if( commands & TVTIME_KP2 ) { digit = 2; }
-            if( commands & TVTIME_KP3 ) { digit = 3; }
-            if( commands & TVTIME_KP4 ) { digit = 4; }
-            if( commands & TVTIME_KP5 ) { digit = 5; }
-            if( commands & TVTIME_KP6 ) { digit = 6; }
-            if( commands & TVTIME_KP7 ) { digit = 7; }
-            if( commands & TVTIME_KP8 ) { digit = 8; }
-            if( commands & TVTIME_KP9 ) { digit = 9; }
+            if( commands & TVTIME_KP0 ) { digit = '0'; }
+            if( commands & TVTIME_KP1 ) { digit = '1'; }
+            if( commands & TVTIME_KP2 ) { digit = '2'; }
+            if( commands & TVTIME_KP3 ) { digit = '3'; }
+            if( commands & TVTIME_KP4 ) { digit = '4'; }
+            if( commands & TVTIME_KP5 ) { digit = '5'; }
+            if( commands & TVTIME_KP6 ) { digit = '6'; }
+            if( commands & TVTIME_KP7 ) { digit = '7'; }
+            if( commands & TVTIME_KP8 ) { digit = '8'; }
+            if( commands & TVTIME_KP9 ) { digit = '9'; }
 
-            if( (long)time(NULL) - last_chan_time > 500 ) {
-                if( digit == 0 ) {
-                    last_chan_time = 0;
-                    chanindex = 0;
+            next_chan_buffer[ digit_counter ] = digit;
+            digit_counter++;
+            digit_counter %= 3;
+            frame_counter = 50;
+
+            strcpy( input_text, next_chan_buffer );
+            strcat( input_text, "_" );
+            osd_string_show_text( channel_number, 
+                                  input_text, 50 );
+
+
+        }
+        if( commands & TVTIME_KP_ENTER ) {
+            if( frame_counter ) {
+                if( *next_chan_buffer ) {
+                    int found;
+
+                    /* this sets chanindex accordingly */
+                    found = frequencies_find_named_channel( next_chan_buffer );
+                    if( found > -1 ) {
+                        videoinput_set_tuner_freq( vidin, 
+                                                   chanlist[ chanindex ].freq );
+
+                        if( verbose ) 
+                            fprintf( stderr, 
+                                     "tvtime: Changing to channel %s\n", 
+                                     chanlist[ chanindex ].name );
+
+                        osd_string_show_text( channel_number, 
+                                              chanlist[ chanindex ].name, 80 );
+                    } else {
+                        /* no valid channel */
+                        frame_counter = 0;
+                        memset( (void*)next_chan_buffer, 0, 4 );
+                        digit_counter = 0;
+                    }
                 } else {
-                    last_chan_time = time(NULL);
-                    chanindex = digit - 1;
-
-                    videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
-
-                    if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
-                    osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
-
+                    /* no channel */
+                    memset( (void*)next_chan_buffer, 0, 4 );
+                    digit_counter = 0;
                 }
-            } else {
-                last_chan_time = time(NULL);
-                if( ((chanindex+1)*10 + digit - 1) >= chancount ) {
-                    chanindex = digit - 1;
-                } else {
-                    chanindex = (chanindex+1)*10 + digit - 1;
-                }
-
-                videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
-
-                if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
-                osd_string_show_text( channel_number, chanlist[ chanindex ].name, 80 );
             }
         }
 
+        /* Increment the frame counter if user is typing digits */
+        if( frame_counter > 0 ) frame_counter--;
+        if( frame_counter == 0 ) {
+            memset( (void*)next_chan_buffer, 0, 4 );
+            digit_counter = 0;
+        }
 
         /* CHECKPOINT1 : Blit the second field */
         gettimeofday( &(checkpoint[ 0 ]), 0 );

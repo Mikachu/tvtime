@@ -1343,3 +1343,19 @@ int frequencies_find_current_index( videoinput_t *vidin )
     chanindex = i;
     return i;
 }
+
+int frequencies_find_named_channel( char *str )
+{
+    int i;
+    
+    if( !str ) return -1;
+
+    for( i=0; i < chancount; i++ ) {
+        if( !strncasecmp(chanlist[i].name, str, 3) )
+            break;
+    }
+
+    if( i == chancount ) return -1;
+    chanindex = i;
+    return i;
+}

@@ -120,5 +120,6 @@ extern struct CHANLIST   *chanlist;
 extern int                chancount;
 int                       frequencies_set_chanlist( char *str );
 int                       frequencies_find_current_index( videoinput_t *vidin );
+int                       frequencies_find_named_channel( char *str );
 extern int                chanindex;
 #endif
