@@ -102,7 +102,6 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
         fprintf( stderr, "sdloutput: Can't get a hardware YUY2 overlay surface, giving up.\n" );
         return 0;
     }
-    SDL_LockYUVOverlay( frame );
 
     SDL_WM_SetCaption( tagline, 0 );
     SDL_ShowCursor( 0 );
@@ -111,17 +110,16 @@ int sdl_init( int inputwidth, int inputheight, int outputwidth, int aspect )
 }
 
 
-void sdl_toggle_fullscreen( void )
+int sdl_toggle_fullscreen( void )
 {
     SDL_WM_ToggleFullScreen( screen );
     fs = !fs;
+    return fs;
 }
 
 static void sdl_reset_display( void )
 {
-    SDL_UnlockYUVOverlay( frame );
     screen = SDL_SetVideoMode( outwidth, outheight, 0, sdlflags );
-    SDL_LockYUVOverlay( frame );
 }
 
 int sdl_toggle_aspect( void )
@@ -152,9 +150,7 @@ void sdl_show_frame( void )
     r.w = curwidth;
     r.h = curheight;
 
-    SDL_UnlockYUVOverlay( frame );
     SDL_DisplayYUVOverlay( frame, &r );
-    SDL_LockYUVOverlay( frame );
 }
 
 void sdl_poll_events( input_t *in )
@@ -228,8 +224,55 @@ void sdl_quit( void )
         SDL_WM_ToggleFullScreen( screen );
         fs = 0;
     }
-    SDL_UnlockYUVOverlay( frame );
     SDL_FreeYUVOverlay( frame );
     SDL_Quit();
+}
+
+int sdl_get_stride( void )
+{
+    return frame->w * 2;
+}
+
+int sdl_is_interlaced( void )
+{
+    return 0;
+}
+
+void sdl_wait_for_sync( int field )
+{
+}
+
+void sdl_lock_output( void )
+{
+    SDL_LockYUVOverlay( frame );
+}
+
+void sdl_unlock_output( void )
+{
+    SDL_UnlockYUVOverlay( frame );
+}
+
+
+static output_api_t sdloutput =
+{
+    sdl_init,
+
+    sdl_lock_output,
+    sdl_get_output,
+    sdl_get_stride,
+    sdl_unlock_output,
+
+    sdl_is_interlaced,
+    sdl_wait_for_sync,
+    sdl_show_frame,
+    sdl_toggle_aspect,
+    sdl_toggle_fullscreen,
+    sdl_poll_events,
+    sdl_quit
+};
+
+output_api_t *get_sdl_output( void )
+{
+    return &sdloutput;
 }
 

@@ -57,8 +57,8 @@ typedef enum InputEvent_e {
 /* Function keys */
 #define I_F1                    282
 #define I_F2                    283
-#define I_F3			        284
-#define I_F4			        285
+#define I_F3                    284
+#define I_F4                    285
 #define I_F5                    286
 #define I_F6                    287
 #define I_F7                    288

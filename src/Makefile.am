@@ -8,6 +8,9 @@ TTF_LIBS = `freetype-config --libs`
 PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
 PLUGINS_LIBS = -L$(top_builddir)/plugins -ltvtimeplugins
 
+DIRECTFB_CFLAGS = `directfb-config --cflags`
+DIRECTFB_LIBS = `directfb-config --libs`
+
 OPT_CFLAGS = -Wall -I. -O3 -rdynamic -DDATADIR="\"$(tvtimedatadir)\""
 
 AM_CFLAGS = $(SDL_CFLAGS) $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) $(PLUGINS_CFLAGS)
@@ -21,7 +24,8 @@ COMMON_SRCS = frequencies.c mixer.c videoinput.c sdloutput.c \
 	videotools.c attributes.h deinterlace.h efs.h frequencies.h \
 	input.h menu.h mixer.h mm_accel.h mmx.h osd.h parser.h pnginput.h \
 	pngoutput.h rtctimer.h sdloutput.h speedy.h taglines.h ttfont.h \
-	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h
+	tvtimeconf.h tvtimeosd.h videocorrection.h videoinput.h videotools.h \
+	outputapi.h
 
 bin_PROGRAMS = tvtime
 

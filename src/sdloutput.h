@@ -20,6 +20,7 @@
 #define SDLOUTPUT_H_INCLUDED
 
 #include "input.h"
+#include "outputapi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,7 +58,7 @@ void sdl_show_frame( void );
 /**
  * Toggle fullscreen mode.
  */
-void sdl_toggle_fullscreen( void );
+int sdl_toggle_fullscreen( void );
 
 /**
  * Toggle display aspect ratio.
@@ -73,6 +74,8 @@ void sdl_poll_events( input_t *in );
  * Shutdown SDL.
  */
 void sdl_quit( void );
+
+output_api_t *get_sdl_output( void );
 
 #ifdef __cplusplus
 };

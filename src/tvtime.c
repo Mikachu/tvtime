@@ -190,19 +190,19 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
  * frame, and in case 2, we only need the previous frame, since the
  * current frame contains both Field 3 and Field 4.
  */
-static void tvtime_build_frame( unsigned char *output,
-                                unsigned char *curframe,
-                                unsigned char *lastframe,
-                                unsigned char *secondlastframe,
-                                video_correction_t *vc,
-                                tvtime_osd_t *osd,
-                                menu_t *menu,
-                                int bottom_field,
-                                int correct_input,
-                                int width,
-                                int frame_height,
-                                int instride,
-                                int outstride )
+static void tvtime_build_deinterlaced_frame( unsigned char *output,
+                                             unsigned char *curframe,
+                                             unsigned char *lastframe,
+                                             unsigned char *secondlastframe,
+                                             video_correction_t *vc,
+                                             tvtime_osd_t *osd,
+                                             menu_t *menu,
+                                             int bottom_field,
+                                             int correct_input,
+                                             int width,
+                                             int frame_height,
+                                             int instride,
+                                             int outstride )
 {
     int scanline = 0;
     unsigned char *out = output;
@@ -289,6 +289,64 @@ static void tvtime_build_frame( unsigned char *output,
     if( menu ) menu_composite_packed422( menu, out, width, frame_height, outstride );
 }
 
+
+static void tvtime_build_interlaced_frame( unsigned char *output,
+                                           unsigned char *curframe,
+                                           video_correction_t *vc,
+                                           tvtime_osd_t *osd,
+                                           menu_t *menu,
+                                           int bottom_field,
+                                           int correct_input,
+                                           int width,
+                                           int frame_height,
+                                           int instride,
+                                           int outstride )
+{
+    int scanline = 0;
+    int i;
+
+    if( bottom_field ) {
+        /* Advance frame pointers to the next input line. */
+        curframe += instride;
+
+        /* Skip the top scanline. */
+        output += outstride;
+        scanline++;
+    }
+
+    /* Copy a scanline. */
+    blit_packed422_scanline( output, curframe, width );
+
+/*
+    if( correct_input ) {
+        video_correction_correct_packed422_scanline( vc, output, output, width );
+    }
+    if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+*/
+    output += outstride;
+    scanline++;
+
+    for( i = ((frame_height - 2) / 2); i; --i ) {
+        /* Skip a scanline. */
+        output += outstride;
+        scanline++;
+
+        /* Copy a scanline. */
+        curframe += instride * 2;
+        blit_packed422_scanline( output, curframe, width );
+
+/*
+        if( correct_input ) {
+            video_correction_correct_packed422_scanline( vc, output, output, width );
+        }
+        if( osd ) tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
+*/
+        output += outstride;
+        scanline++;
+    }
+}
+
+
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -316,6 +374,7 @@ int main( int argc, char **argv )
     config_t *ct;
     input_t *in;
     menu_t *menu;
+    output_api_t *output;
 
     setup_speedy_calls();
 
@@ -552,8 +611,10 @@ int main( int argc, char **argv )
     }
 
     /* Setup the output. */
-    if( !sdl_init( width, height, config_get_outputwidth( ct ), 
-                   config_get_aspect( ct ) ) ) {
+    //output = get_dfb_output();
+    output = get_sdl_output();
+    if( !output->init( width, height, config_get_outputwidth( ct ), 
+                       config_get_aspect( ct ) ) ) {
         fprintf( stderr, "tvtime: SDL failed to initialize: "
                          "no video output available.\n" );
         return 1;
@@ -584,7 +645,7 @@ int main( int argc, char **argv )
         int printdebug = 0;
         int showbars, showtest, videohold, screenshot;
 
-        sdl_poll_events( in );
+        output->poll_events( in );
 
         if( input_quit( in ) ) break;
         videohold = input_videohold( in );
@@ -593,10 +654,10 @@ int main( int argc, char **argv )
         showtest = input_show_test( in );
         screenshot = input_take_screenshot( in );
         if( input_toggle_fullscreen( in ) ) {
-            sdl_toggle_fullscreen();
+            output->toggle_fullscreen();
         }
         if( input_toggle_aspect( in ) ) {
-            if( sdl_toggle_aspect() ) {
+            if( output->toggle_aspect() ) {
                 tvtime_osd_show_message( osd, "16:9 display mode" );
             } else {
                 tvtime_osd_show_message( osd, "4:3 display mode" );
@@ -656,119 +717,162 @@ int main( int argc, char **argv )
         lastframetime = curframetime;
 
 
-        /* Build the output from the top field. */
-        if( showbars ) {
-            blit_packed422_scanline( sdl_get_output(), colourbars, width*height );
-        } else if( showtest ) {
-            blit_packed422_scanline( sdl_get_output(), testframe_even, width*height );
+        if( output->is_interlaced ) {
+            /* Wait until we can draw the even field. */
+            output->wait_for_sync( 0 );
+
+            output->lock_output_buffer();
+            tvtime_build_interlaced_frame( output->get_output_buffer(), curframe, vc, osd, menu, 0,
+                                           vc && config_get_apply_luma_correction( ct ),
+                                           width, height, width * 2, output->get_output_stride() );
+            output->unlock_output_buffer();
         } else {
-            tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, 0, vc && config_get_apply_luma_correction( ct ),
-                                width, height, width * 2, width * 2 );
-        }
-        if( screenshot ) {
-            char filename[ 256 ];
-            sprintf( filename, "tvtime-shot-top-%d-%d.png",
-                     (int) checkpoint[ 0 ].tv_sec,
-                     (int) checkpoint[ 0 ].tv_usec );
-            pngscreenshot( filename, sdl_get_output(), width, height, width * 2 );
-        }
-
-
-
-        /* CHECKPOINT3 : Constructed the top field. */
-        gettimeofday( &(checkpoint[ 2 ]), 0 );
-
-
-        /* Wait for the next field time and display. */
-        gettimeofday( &curfieldtime, 0 );
-
-        /**
-         * I'm commenting this out for now, tvtime takes
-         * too much CPU here -Billy
-        while( timediff( &curfieldtime, &lastfieldtime )
-                                < (fieldtime-blittime) ) {
-            if( rtctimer ) {
-                rtctimer_next_tick( rtctimer );
+            /* Build the output from the top field. */
+            output->lock_output_buffer();
+            if( showbars ) {
+                blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
+            } else if( showtest ) {
+                blit_packed422_scanline( output->get_output_buffer(), testframe_even, width*height );
             } else {
-                usleep( 20 );
+                tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
+                                    secondlastframe, vc, osd, menu, 0,
+                                    vc && config_get_apply_luma_correction( ct ),
+                                    width, height, width * 2, width * 2 );
             }
+            if( screenshot ) {
+                char filename[ 256 ];
+                sprintf( filename, "tvtime-shot-top-%d-%d.png",
+                         (int) checkpoint[ 0 ].tv_sec,
+                         (int) checkpoint[ 0 ].tv_usec );
+                pngscreenshot( filename, output->get_output_buffer(), width, height, width * 2 );
+            }
+            output->unlock_output_buffer();
+
+
+
+            /* CHECKPOINT3 : Constructed the top field. */
+            gettimeofday( &(checkpoint[ 2 ]), 0 );
+
+
+            /* Wait for the next field time and display. */
             gettimeofday( &curfieldtime, 0 );
+
+            /**
+             * I'm commenting this out for now, tvtime takes
+             * too much CPU here -Billy
+            while( timediff( &curfieldtime, &lastfieldtime )
+                                    < (fieldtime-blittime) ) {
+                if( rtctimer ) {
+                    rtctimer_next_tick( rtctimer );
+                } else {
+                    usleep( 20 );
+                }
+                gettimeofday( &curfieldtime, 0 );
+            }
+            */
+            gettimeofday( &blitstart, 0 );
+            if( !videohold ) output->show_frame();
+            gettimeofday( &blitend, 0 );
+            lastfieldtime = blitend;
+            blittime = timediff( &blitend, &blitstart );
         }
-        */
-        gettimeofday( &blitstart, 0 );
-        if( !videohold ) sdl_show_frame();
-        gettimeofday( &blitend, 0 );
-        lastfieldtime = blitend;
-        blittime = timediff( &blitend, &blitstart );
 
 
         /* CHECKPOINT4 : Blit the first field */
         gettimeofday( &(checkpoint[ 3 ]), 0 );
 
 
-        /* Build the output from the bottom field. */
-        if( showbars ) {
-            blit_packed422_scanline( sdl_get_output(), colourbars, width*height );
-        } else if( showtest ) {
-            blit_packed422_scanline( sdl_get_output(), testframe_odd, width*height );
-        } else {
-            tvtime_build_frame( sdl_get_output(), curframe, lastframe, secondlastframe, vc,
-                                osd, menu, 1, vc && config_get_apply_luma_correction( ct ),
-                                width, height, width * 2, width * 2 );
-        }
-        if( screenshot ) {
-            char filename[ 256 ];
-            sprintf( filename, "tvtime-shot-bot-%d-%d.png",
-                     (int) checkpoint[ 0 ].tv_sec,
-                     (int) checkpoint[ 0 ].tv_usec );
-            pngscreenshot( filename, sdl_get_output(), width, height, width * 2 );
-        }
+        if( output->is_interlaced ) {
+            /* Wait until we can draw the odd field. */
+            output->wait_for_sync( 1 );
 
+            output->lock_output_buffer();
+            tvtime_build_interlaced_frame( output->get_output_buffer(), curframe, vc, osd, menu, 1,
+                                           vc && config_get_apply_luma_correction( ct ),
+                                           width, height, width * 2, output->get_output_stride() );
+            output->unlock_output_buffer();
 
-        /* CHECKPOINT5 : Built the second field */
-        gettimeofday( &(checkpoint[ 4 ]), 0 );
-
-
-        /* We're done with the input now. */
-        if( fieldsavailable == 3 ) {
-            videoinput_free_frame( vidin, lastframeid );
-            lastframeid = curframeid;
-            lastframe = curframe;
-        } else if( fieldsavailable == 5 ) {
-            videoinput_free_frame( vidin, secondlastframeid );
-            secondlastframeid = lastframeid;
-            lastframeid = curframeid;
-            secondlastframe = lastframe;
-            lastframe = curframe;
-        } else {
-            videoinput_free_frame( vidin, curframeid );
-        }
-
-        /* CHECKPOINT6 : Released a frame to V4L. */
-        gettimeofday( &(checkpoint[ 5 ]), 0 );
-
-        /* Wait for the next field time. */
-        gettimeofday( &curfieldtime, 0 );
-        while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
-            if( rtctimer ) {
-                rtctimer_next_tick( rtctimer );
+            /* We're done with the input now. */
+            if( fieldsavailable == 3 ) {
+                videoinput_free_frame( vidin, lastframeid );
+                lastframeid = curframeid;
+                lastframe = curframe;
+            } else if( fieldsavailable == 5 ) {
+                videoinput_free_frame( vidin, secondlastframeid );
+                secondlastframeid = lastframeid;
+                lastframeid = curframeid;
+                secondlastframe = lastframe;
+                lastframe = curframe;
             } else {
-                usleep( 20 );
+                videoinput_free_frame( vidin, curframeid );
             }
+        } else {
+            /* Build the output from the bottom field. */
+            output->lock_output_buffer();
+            if( showbars ) {
+                blit_packed422_scanline( output->get_output_buffer(), colourbars, width*height );
+            } else if( showtest ) {
+                blit_packed422_scanline( output->get_output_buffer(), testframe_odd, width*height );
+            } else {
+                tvtime_build_deinterlaced_frame( output->get_output_buffer(), curframe, lastframe,
+                                    secondlastframe, vc, osd, menu, 1,
+                                    vc && config_get_apply_luma_correction( ct ),
+                                    width, height, width * 2, width * 2 );
+            }
+            if( screenshot ) {
+                char filename[ 256 ];
+                sprintf( filename, "tvtime-shot-bot-%d-%d.png",
+                         (int) checkpoint[ 0 ].tv_sec,
+                         (int) checkpoint[ 0 ].tv_usec );
+                pngscreenshot( filename, output->get_output_buffer(), width, height, width * 2 );
+            }
+            output->unlock_output_buffer();
+
+
+            /* CHECKPOINT5 : Built the second field */
+            gettimeofday( &(checkpoint[ 4 ]), 0 );
+
+
+            /* We're done with the input now. */
+            if( fieldsavailable == 3 ) {
+                videoinput_free_frame( vidin, lastframeid );
+                lastframeid = curframeid;
+                lastframe = curframe;
+            } else if( fieldsavailable == 5 ) {
+                videoinput_free_frame( vidin, secondlastframeid );
+                secondlastframeid = lastframeid;
+                lastframeid = curframeid;
+                secondlastframe = lastframe;
+                lastframe = curframe;
+            } else {
+                videoinput_free_frame( vidin, curframeid );
+            }
+
+            /* CHECKPOINT6 : Released a frame to V4L. */
+            gettimeofday( &(checkpoint[ 5 ]), 0 );
+
+            /* Wait for the next field time. */
             gettimeofday( &curfieldtime, 0 );
+            while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
+                if( rtctimer ) {
+                    rtctimer_next_tick( rtctimer );
+                } else {
+                    usleep( 20 );
+                }
+                gettimeofday( &curfieldtime, 0 );
+            }
+
+            /* CHECKPOINT7 : Done waiting to blit the bottom field. */
+            gettimeofday( &(checkpoint[ 6 ]), 0 );
+
+
+            /* Display the bottom field. */
+            gettimeofday( &blitstart, 0 );
+            if( !videohold ) output->show_frame();
+            gettimeofday( &blitend, 0 );
+            lastfieldtime = blitend;
+            blittime = timediff( &blitend, &blitstart );
         }
-
-        /* CHECKPOINT7 : Done waiting to blit the bottom field. */
-        gettimeofday( &(checkpoint[ 6 ]), 0 );
-
-
-        /* Display the bottom field. */
-        gettimeofday( &blitstart, 0 );
-        if( !videohold ) sdl_show_frame();
-        gettimeofday( &blitend, 0 );
-        lastfieldtime = blitend;
-        blittime = timediff( &blitend, &blitstart );
 
 
         if( osd ) {
@@ -776,7 +880,7 @@ int main( int argc, char **argv )
         }
     }
 
-    sdl_quit();
+    output->shutdown();
 
     if( verbose ) {
         fprintf( stderr, "tvtime: Cleaning up.\n" );
