@@ -34,9 +34,9 @@ typedef struct station_info {
 } station_info_t;
 
 
-int station_init(config_t *ct);
+int station_init( config_t *ct );
 
-int station_set(int pos);
+int station_set( int pos );
 
 void station_next( void );
 void station_prev( void );

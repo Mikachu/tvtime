@@ -30,11 +30,10 @@ typedef struct node {
 typedef node_t *node;
 
 
-node first= NULL;
-node current= NULL;
-
-int debug= 0;
-int verbose= 0;
+static node first = NULL;
+static node current = NULL;
+static int debug = 0;
+static int verbose = 0;
 
 node newNode(node next, node prev, station_info_t *info) {
 	node_t *n;
@@ -131,7 +130,7 @@ int station_init(config_t *ct) {
 }
 
 
-int station_set(int pos) {
+int station_set( int pos ) {
 	node rp= first;
 	do {
 		if ( rp->info->pos == pos ) {
@@ -227,8 +226,6 @@ int scan_callback( const char *band, const char *channel, unsigned int freq ) {
 	return 0;
 }
 
-
-
 int station_add_band( char* band, int us_cable ) {
 	return freq_for_band( band, us_cable, add_band_callback );
 }
@@ -240,3 +237,4 @@ int station_scan( char *band, int us_cable ) {
 int station_writeConfig( config_t *ct ) {
 	return 0;
 }
+

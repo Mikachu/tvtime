@@ -721,11 +721,13 @@ int main( int argc, char **argv )
     }
 
     /* setup the fifo */
+    /* this should not be enabled in the next release.
     fifo = fifo_new( ct, NULL );
     if( !fifo ) {
         fprintf( stderr, "tvtime: Not reading input from fifo. Creating "
                          "fifo object failed.\n" );
     }
+    */
 
     /* Setup the console */
     con = console_new( ct, (width*10)/100, height - (height*20)/100, (width*80)/100, (height*20)/100, 10,
@@ -737,8 +739,9 @@ int main( int argc, char **argv )
 
 
     if( con ) {
-        if( fifo )
+        if( fifo ) {
             console_setup_pipe( con, fifo_get_filename( fifo ) );
+        }
         commands_set_console( commands, con );
     }
 
@@ -1064,7 +1067,9 @@ int main( int argc, char **argv )
     config_delete( ct );
     input_delete( in );
     commands_delete( commands );
-    fifo_delete( fifo );
+    if( fifo ) {
+        fifo_delete( fifo );
+    }
     if( vbidata ) {
         vbidata_delete( vbidata );
     }
