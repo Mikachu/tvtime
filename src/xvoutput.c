@@ -261,7 +261,11 @@ static int xv_get_width_for_height( int window_height )
 
 static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int aspect_height )
 {
-/* This code is causing problems for some WMs, and breaks in fullscreen modes -Billy */
+   /* These hints don't work with current versions of metacity.
+    * I will be doing some detection code, but in the mean time,
+    * let's not use the hints.  -Billy
+    */
+/*
     XSizeHints hints;
 
     hints.flags = PAspect;
@@ -271,6 +275,7 @@ static void x11_aspect_hint( Display *dpy, Window win, int aspect_width, int asp
     hints.max_aspect.y = aspect_height;
 
     XSetWMNormalHints( dpy, win, &hints );
+*/
 }
 
 /**
