@@ -367,7 +367,7 @@ xmltv_t *xmltv_new( const char *filename, const char *locale )
         return 0;
     }
 
-    xmltv->locale = BAD_CAST strdup( locale );
+    xmltv->locale = locale ? BAD_CAST strdup( locale ) : 0;
 
     xmltv->doc = xmlParseFile( filename );
     if( !xmltv->doc ) {
@@ -420,7 +420,7 @@ void xmltv_delete( xmltv_t *xmltv )
     program_delete( xmltv->next_pro );
     if( xmltv->curchan ) xmlFree( xmltv->curchan );
     if( xmltv->display_chan ) xmlFree( xmltv->display_chan );
-    if( xmltv->locale) xmlFree( xmltv->locale );
+    if( xmltv->locale ) xmlFree( xmltv->locale );
     xmlFreeDoc( xmltv->doc );
     free( xmltv );
 }
