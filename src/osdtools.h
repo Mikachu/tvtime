@@ -38,7 +38,6 @@ extern "C" {
 typedef struct osd_string_s osd_string_t;
 typedef struct osd_font_s osd_font_t;
 typedef struct osd_rect_s osd_rect_t;
-typedef struct osd_graphic_s osd_graphic_t;
 typedef struct osd_animation_s osd_animation_t;
 typedef struct osd_list_s osd_list_t;
 
@@ -104,21 +103,6 @@ void osd_rect_set_size( osd_rect_t *osdr, int width, int height );
 void osd_rect_composite_packed422_scanline( osd_rect_t *osdr, uint8_t *output,
                                             uint8_t *background, int width, int xpos,
                                             int scanline );
-
-osd_graphic_t *osd_graphic_new( const char *filename, double pixel_aspect, int alpha );
-void osd_graphic_delete( osd_graphic_t *osdg );
-int osd_graphic_get_width( osd_graphic_t *osdg );
-int osd_graphic_get_height( osd_graphic_t *osdg );
-int osd_graphic_active_on_scanline( osd_graphic_t *osdg, int scanline );
-void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
-void osd_graphic_set_hold( osd_graphic_t *osdg, int hold );
-int osd_graphic_visible( osd_graphic_t *osdg );
-void osd_graphic_advance_frame( osd_graphic_t *osdg );
-void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
-                                               uint8_t *output,
-                                               uint8_t *background,
-                                               int width, int xpos,
-                                               int scanline );
 
 osd_animation_t *osd_animation_new( const char *filename_base,
                                     double pixel_aspect, int alpha, int frametime );
