@@ -357,13 +357,14 @@ void composite_textmask_packed422_scanline( unsigned char *output, unsigned char
                                             unsigned char *textmask, int width,
                                             int textluma, int textcb, int textcr, double textalpha )
 {
-    int alpha_table[ 5 ];
+    int alpha_table[ 9 ];
     int i;
 
     if( textalpha > 1.0 ) textalpha = 1.0;
     if( textalpha < 0.0 ) textalpha = 0.0;
-    for( i = 0; i < 5; i++ ) {
+    for( i = 0; i < 9; i++ ) {
         alpha_table[ i ] = (int) ( ( ( ( ( (double) i ) * textalpha ) / 5.0 ) * 255.0 ) + 0.5 );
+        if( alpha_table[ i ] > 255 ) alpha_table[ i ] = 255;
     }
 
     for( i = 0; i < width; i++ ) {
