@@ -180,7 +180,7 @@ void osd_string_render_image4444( osd_string_t *osds )
 
 void osd_string_show_text( osd_string_t *osds, const char *text, int timeout )
 {
-    ft_string_set_text( osds->fts, text );
+    ft_string_set_text( osds->fts, text, 0 );
     osd_string_render_image4444( osds );
     osds->frames_left = timeout;
 }

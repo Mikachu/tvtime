@@ -46,7 +46,7 @@ ft_font_t *ft_font_new( const char *file, int fontsize, double pixel_aspect );
 void ft_font_delete( ft_font_t *font );
 
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
-                     int *width, int *height, int outsize );
+                     int subpix_pos, int *width, int *height, int outsize );
 
 /**
  * Creates a new string object for the given font.  You can reset the
@@ -62,7 +62,7 @@ void ft_string_delete( ft_string_t *efs );
 /**
  * Sets the text of the string object.
  */
-void ft_string_set_text( ft_string_t *efs, const char *text );
+void ft_string_set_text( ft_string_t *efs, const char *text, int subpix_pos );
 
 /**
  * Returns the width in pixels.

@@ -198,8 +198,8 @@ static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height
             unsigned char *cursrc = src + (y*src_stride);
             int prev = 0;
             int pos = dst_xpos_subpix & 0xffff;
-            int x;
             int tmp;
+            int x;
 
             for( x = 0; x < blit_width; x++ ) {
                 tmp = ( ( prev * pos ) + ( cursrc[ x ] * ( 0xffff - pos ) ) ) / 65535;
@@ -209,13 +209,13 @@ static void blit_glyph_subpix( unsigned char *dst, int dst_width, int dst_height
             }
             tmp = ( prev * pos ) / 65535;
             tmp += curdst[ blit_width ];
-            curdst[ x ] = (tmp > 255) ? 255 : tmp;
+            curdst[ blit_width ] = (tmp > 255) ? 255 : tmp;
         }
     }
 }
 
 void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
-                     int *width, int *height, int outsize )
+                     int subpix_pos, int *width, int *height, int outsize )
 {
     FT_BBox string_bbox;
     int len;
@@ -234,13 +234,13 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
      * starts at a negative position, so I'm pushing everything over to
      * the left if that is the case.
      */
-    push_x = 0;
-    *width = string_bbox.xMax;
+    push_x = subpix_pos;
+    *width = subpix_pos + string_bbox.xMax;
     if( string_bbox.xMin < 0 ) {
         /* I should figure out if this is a bug. */
         /* fprintf( stderr, "leetft: Negative xmin?  Sigh..\n" ); */
         *width += -string_bbox.xMin;
-        push_x = -string_bbox.xMin;
+        push_x += -string_bbox.xMin;
     }
     *width = ( (*width + 32768) >> 16 ) + 1;
 
@@ -271,7 +271,7 @@ void ft_font_render( ft_font_t *font, unsigned char *output, const char *text,
                     blit_glyph_subpix( output, *width, *height, *width,
                                        bit->bitmap.buffer, bit->bitmap.width,
                                        bit->bitmap.rows, bit->bitmap.pitch,
-                                       (push_x*0xffff) + font->glyphpos[ i ] + (bit->left*65536),
+                                       push_x + font->glyphpos[ i ] + (bit->left*65536),
                                        font->fontsize - bit->top );
 
                     FT_Done_Glyph( image );
@@ -296,7 +296,7 @@ ft_string_t *ft_string_new( ft_font_t *font )
     if( !fts ) return 0;
 
     fts->font = font;
-    fts->datasize = 65536;
+    fts->datasize = 65536 * 1024;
     fts->data = (unsigned char *) malloc( fts->datasize );
     if( !fts->data ) {
         free( fts );
@@ -312,9 +312,10 @@ void ft_string_delete( ft_string_t *fts )
     free( fts );
 }
 
-void ft_string_set_text( ft_string_t *fts, const char *text )
+void ft_string_set_text( ft_string_t *fts, const char *text, int subpix_pos )
 {
-    ft_font_render( fts->font, fts->data, text, &fts->width, &fts->height, fts->datasize );
+    ft_font_render( fts->font, fts->data, text, subpix_pos,
+                    &fts->width, &fts->height, fts->datasize );
 }
 
 int ft_string_get_width( ft_string_t *fts )
