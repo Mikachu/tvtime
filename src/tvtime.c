@@ -888,6 +888,9 @@ int main( int argc, char **argv )
         /* FIXME: Delete everything here! */
         return 1;
     }
+    if( config_get_useposition( ct ) ) {
+        output->set_window_position( config_get_output_x( ct ), config_get_output_y( ct ) );
+    }
 
     /* Setup the speedy calls. */
     setup_speedy_calls( mm_accel(), verbose );
@@ -1341,6 +1344,9 @@ int main( int argc, char **argv )
                     output->toggle_fullscreen( 0, 0 );
                 } else {
                     output->set_window_height( config_get_outputheight( cur ) );
+                    if( config_get_useposition( cur ) ) {
+                        output->set_window_position( config_get_output_x( cur ), config_get_output_y( cur ) );
+                    }
                 }
                 if( framerate_mode != config_get_framerate_mode( cur ) ) {
                     commands_set_framerate( commands, config_get_framerate_mode( cur ) );

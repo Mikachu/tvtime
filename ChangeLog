@@ -1,5 +1,7 @@
 
 0.9.8.5 -
+  * vektor: Added config file options to set window startup
+      position.
   * vektor: Added a colour inversion filter.
   * vektor: Compile fixes for non-C99 compilers (argh, we need to
       do better on this)

@@ -121,6 +121,15 @@
   <option name="OutputHeight" value="576"/>
 
   <!--
+    tvtime can be told to position its window on startup.  Setting
+    UseWindowPosition to 1 instructs tvtime that it should read its
+    position from the WindowX and WindowY config file parameters.
+  -->
+  <option name="UseWindowPosition" value="0"/>
+  <option name="WindowX" value="320"/>
+  <option name="WindowY" value="240"/>
+
+  <!--
     This sets the percent of the sides to leave to the overscan, that
     is, don't show them at all.  Safe action area on a television is 10%
     in the overscan, but that's a bit restrictive.  If you want tvtime

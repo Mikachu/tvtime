@@ -57,6 +57,9 @@ struct config_s
     char *output_driver;
     int apply_luma_correction;
     double luma_correction;
+    int useposition;
+    int x;
+    int y;
 
     int keymap[ 8 * MAX_KEYSYMS ];
     int buttonmap[ MAX_BUTTONS ];
@@ -188,6 +191,18 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
             ct->outputheight = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "UseWindowPosition" ) ) {
+            ct->useposition = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "WindowX" ) ) {
+            ct->x = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "WindowY" ) ) {
+            ct->y = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "InputWidth" ) ) {
@@ -572,6 +587,9 @@ config_t *config_new( void )
     }
 
     ct->outputheight = 576;
+    ct->useposition = 0;
+    ct->x = 320;
+    ct->y = 240;
     ct->inputwidth = 720;
     ct->verbose = 0;
     ct->send_fields = 0;
@@ -958,6 +976,21 @@ int config_get_debug( config_t *ct )
 int config_get_outputheight( config_t *ct )
 {
     return ct->outputheight;
+}
+
+int config_get_useposition( config_t *ct )
+{
+    return ct->useposition;
+}
+
+int config_get_output_x( config_t *ct )
+{
+    return ct->x;
+}
+
+int config_get_output_y( config_t *ct )
+{
+    return ct->x;
 }
 
 int config_get_inputwidth( config_t *ct )
