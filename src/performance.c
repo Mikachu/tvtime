@@ -61,9 +61,6 @@ struct performance_s
     double total_rendering_ms;
     double total_render_time[ NUM_TO_AVERAGE ];
     
-    int drop_history[ DROP_HISTORY_SIZE ];
-    int drop_pos;
-
     int drop_reset;
 };
 
@@ -98,9 +95,6 @@ performance_t *performance_new( int fieldtimeus )
     gettimeofday( &perf->show_top, 0 );
     gettimeofday( &perf->constructed_bot, 0 );
 
-    memset( perf->drop_history, 0, sizeof( perf->drop_history ) );
-    perf->drop_pos = 0;
-
     return perf;
 }
 
@@ -111,19 +105,12 @@ void performance_delete( performance_t *perf )
 
 void performance_checkpoint_acquired_input_frame( performance_t *perf )
 {
-    int dropdiff;
-
     perf->lastframetime = perf->acquired_input;
     gettimeofday( &perf->acquired_input, 0 );
 
-    dropdiff = timediff( &perf->acquired_input, &perf->lastframetime ) - (perf->fieldtime * 3);
-    if( dropdiff >= 0 ) {
+    if( (timediff( &perf->acquired_input, &perf->lastframetime ) - (perf->fieldtime * 3)) >= 0 ) {
         perf->frames_dropped++;
-        perf->drop_history[ perf->drop_pos ] = ( dropdiff / (perf->fieldtime*2) ) + 2;
-    } else {
-        perf->drop_history[ perf->drop_pos ] = 1;
     }
-    perf->drop_pos = ( perf->drop_pos + 1 ) % DROP_HISTORY_SIZE;
 }
 
 void performance_checkpoint_show_bot_field( performance_t *perf )
@@ -202,36 +189,20 @@ int performance_get_usecs_since_frame_acquired( performance_t *perf )
 
 void performance_print_last_frame_stats( performance_t *perf, int framesize )
 {
-    double acquire = ((double) timediff( &perf->acquired_input, &perf->constructed_bot )) / 1000.0;
-    double show_bot = ((double) timediff( &perf->show_bot, &perf->lastframetime )) / 1000.0;
-    double constructed_top = ((double) timediff( &perf->constructed_top, &perf->show_bot )) / 1000.0;
-    double wait_for_bot = ((double) timediff( &perf->wait_for_bot, &perf->constructed_top )) / 1000.0;
-    double show_top = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) / 1000.0;
-    double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) / 1000.0;
-    double cycle_time = ((double) timediff( &perf->acquired_input, &perf->lastframetime )) / 1000.0;
-    double nummeasured = NUM_TO_AVERAGE;
-    double avgblittime;
-
-    //double blit_time = show_bot;
-    //if( show_bot > show_top ) blit_time = show_top;
-
-    if( nummeasured > perf->total_blits ) {
-        nummeasured = perf->total_blits;
-    }
-    avgblittime = perf->total_blitting_ms / nummeasured;
+    double acquire = ((double) timediff( &perf->acquired_input, &perf->constructed_bot )) * 0.001;
+    double show_bot = ((double) timediff( &perf->show_bot, &perf->lastframetime )) * 0.001;
+    double constructed_top = ((double) timediff( &perf->constructed_top, &perf->show_bot )) * 0.001;
+    double wait_for_bot = ((double) timediff( &perf->wait_for_bot, &perf->constructed_top )) * 0.001;
+    double show_top = ((double) timediff( &perf->show_top, &perf->wait_for_bot )) * 0.001;
+    double constructed_bot = ((double) timediff( &perf->constructed_bot, &perf->show_top )) * 0.001;
 
     fprintf( stderr, "tvtime: acquire %5.2fms, show bot %5.2fms, build top %5.2fms\n"
                      "tvtime: waitbot %5.2fms, show top %5.2fms, build bot %5.2fms\n"
-		     "tvtime: total_blits: %d, average blit time: %.2f\n",
+		     "tvtime: average blit time: %.2fms, average render time: %.2fms\n",
              acquire, show_bot, constructed_top, wait_for_bot, show_top, constructed_bot,
-             perf->total_blits, avgblittime );
-
-    fprintf( stderr, "tvtime: System->video blit %.2fMB/sec, used %.2f%% CPU to deinterlace.\n",
-             ( ((double) framesize) / avgblittime ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ),
-             ( ( constructed_top + constructed_bot ) / cycle_time ) * 100.0 );
-    fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2f, bot-to-top: %5.2f\n",
-             (double) perf->time_top_to_bot / 1000.0,
-             (double) perf->time_bot_to_top / 1000.0 );
+             performance_get_estimated_blit_time( perf ), performance_get_estimated_rendering_time( perf ) );
+    fprintf( stderr, "tvtime: Last frame times top-to-bot: %5.2fms, bot-to-top: %5.2fms\n",
+             performance_get_time_top_to_bot( perf ), performance_get_time_bot_to_top( perf ) );
 }
 
 void performance_print_frame_drops( performance_t *perf, int framesize )
@@ -249,31 +220,7 @@ void performance_print_frame_drops( performance_t *perf, int framesize )
     }
 }
 
-double performance_get_percentage_dropped( performance_t *perf )
-{
-    int cur = 0;
-    int i;
-
-    for( i = 0; i < DROP_HISTORY_SIZE; i++ ) {
-        cur += perf->drop_history[ i ];
-    }
-
-    return 1.0 - ( ( (double) DROP_HISTORY_SIZE ) / ( (double) cur ) );
-}
-
-double get_estimated_video_card_speed( performance_t *perf, int framesize )
-{
-    double nummeasured = NUM_TO_AVERAGE;
-    double avgblittime;
-
-    if( nummeasured > perf->total_blits ) {
-        nummeasured = perf->total_blits;
-    }
-    avgblittime = perf->total_blitting_ms / nummeasured;
-    return (( ((double) framesize) / avgblittime ) * ( 1000.0 / ( 1024.0 * 1024.0 ) ));
-}
-
-double get_estimated_rendering_time( performance_t *perf )
+double performance_get_estimated_rendering_time( performance_t *perf )
 {
     double nummeasured = NUM_TO_AVERAGE;
 
@@ -283,14 +230,24 @@ double get_estimated_rendering_time( performance_t *perf )
     return perf->total_rendering_ms / nummeasured;
 }
 
-double get_time_top_to_bot( performance_t *perf )
+double performance_get_estimated_blit_time( performance_t *perf )
 {
-    return (double) perf->time_top_to_bot / 1000.0;
+    double nummeasured = NUM_TO_AVERAGE;
+
+    if( nummeasured > perf->total_blits ) {
+        nummeasured = perf->total_blits;
+    }
+    return perf->total_blitting_ms / nummeasured;
 }
 
-double get_time_bot_to_top( performance_t *perf )
+double performance_get_time_top_to_bot( performance_t *perf )
 {
-    return (double) perf->time_bot_to_top / 1000.0;
+    return (double) perf->time_top_to_bot * 0.001;
+}
+
+double performance_get_time_bot_to_top( performance_t *perf )
+{
+    return (double) perf->time_bot_to_top * 0.001;
 }
 
 int performance_get_dropped_frames( performance_t *perf )

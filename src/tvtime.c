@@ -792,6 +792,7 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
                           int height, int framesize, int fieldtime,
                           int frameratemode )
 {
+    double blit_time = performance_get_estimated_blit_time( perf );
     char text[ 200 ];
 
     tvtime_osd_list_set_lines( osd, frameratemode ? 7 : 8 );
@@ -807,12 +808,12 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
              frameratemode ? 1000000.0 / ((double) (fieldtime*2)) : 1000000.0 / ((double) fieldtime) );
     tvtime_osd_list_set_text( osd, 3, text );
 
-    sprintf( text, "Video upload speed: %.2fMB/sec",
-             get_estimated_video_card_speed( perf, framesize ) );
+    sprintf( text, "Average blit time: %.2fms (%.0fMB/sec)",
+             blit_time, (((double) framesize) * 0.00095367431640625000) / blit_time );
     tvtime_osd_list_set_text( osd, 4, text );
 
-    sprintf( text, "Rendering time: %5.2fms",
-             get_estimated_rendering_time( perf ) );
+    sprintf( text, "Average render time: %5.2fms",
+             performance_get_estimated_rendering_time( perf ) );
     tvtime_osd_list_set_text( osd, 5, text );
 
     sprintf( text, "Dropped frames: %d",
@@ -821,8 +822,9 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
 
     if( !frameratemode ) {
         sprintf( text, "Blit spacing: %4.1f/%4.1fms (want %4.1fms)",
-                 get_time_top_to_bot( perf ), get_time_bot_to_top( perf ),
-                 ((double) fieldtime) / 1000.0 );
+                 performance_get_time_top_to_bot( perf ),
+                 performance_get_time_bot_to_top( perf ),
+                 ((double) fieldtime) * 0.001 );
         tvtime_osd_list_set_text( osd, 7, text );
     }
 
