@@ -17,7 +17,8 @@
            this effectively simulates a television.
          When do I use it?
          - You want TV-quality with low CPU, and you have
-           configured your monitor to run at 59.94hz or 50hz.
+           configured your monitor to run at the refresh
+           rate of the video signal (59.94 Hz or 50 Hz).
 
          Modes available:
          - Full Resolution: High quality for fullscreen use.
@@ -49,8 +50,10 @@
            refresh rate, and don't mind using a lot of CPU.
 
          Modes available:
-         - Static detection: Pure interpolation where motion
-           is detected, copy where no motion.  Moderate CPU
+         - Simple and Advanced detection: Linear
+           interpolation where motion is detected, copy
+           where no motion.  Simple and advanced versions
+           are provided to give small or moderate CPU
            requirements with high quality output.
          - Motion search: Follow motion vectors for more
            accurate interpolation.  High quality with high

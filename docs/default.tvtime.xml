@@ -238,16 +238,17 @@
 
     Supported deinterlacers are:
 
-    TelevisionFull  Television: Full Resolution
-    TelevisionHalf  Television: Half Resolution
-    BlurVertical    Blur: Vertical
-    BlurTemporal    Blur: Temporal
-    AdaptiveSearch  Motion Adaptive: Motion Search
-    AdaptiveStatic  Motion Adaptive: Static Detection
-    ProgressiveTFF  Progressive: Top Field First
-    ProgressiveBFF  Progressive: Bottom Field First
+    TelevisionFull    Television: Full Resolution
+    TelevisionHalf    Television: Half Resolution
+    BlurVertical      Blur: Vertical
+    BlurTemporal      Blur: Temporal
+    AdaptiveSearch    Motion Adaptive: Motion Search
+    AdaptiveAdvanced  Motion Adaptive: Advanced Detection
+    AdaptiveSimple    Motion Adaptive: Simple Detection
+    ProgressiveTFF    Progressive: Top Field First
+    ProgressiveBFF    Progressive: Bottom Field First
   -->
-  <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
+  <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
 
   <!--
     This option selects which output driver will be used.  tvtime
@@ -275,7 +276,7 @@
   -->
 
   <mode name="LargeWindow">
-    <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
+    <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
     <option name="FramerateMode" value="0"/>
     <option name="OutputHeight" value="576"/>
     <option name="UseWindowPosition" value="1"/>
@@ -293,7 +294,7 @@
   </mode>
 
   <mode name="FullscreenWindow">
-    <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
+    <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
     <option name="FramerateMode" value="0"/>
     <option name="OutputHeight" value="Full"/>
   </mode>

@@ -357,7 +357,7 @@ This setting is saved at runtime to remember the current channel.
 This setting is saved at runtime to remember the previous channel.
 
 .TP
-<option name="DeinterlaceMethod" value="AdaptiveStatic"/>
+<option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
 This setting is saved at runtime to remember the deinterlacer used.
 
 Supported deinterlacers are:
@@ -379,8 +379,11 @@ Blur: Temporal
 .I AdaptiveSearch
 Motion Adaptive: Motion Search
 .TP
-.I AdaptiveStatic
-Motion Adaptive: Static Detection
+.I AdaptiveAdvanced
+Motion Adaptive: Advanced Detection
+.TP
+.I AdaptiveSimple
+Motion Adaptive: Simple Detection
 .TP
 .I ProgressiveTFF
 Progressive: Top Field First
@@ -404,7 +407,7 @@ and
 .IR SmallWindow .
 
     <mode name="LargeWindow">
-      <option name="DeinterlaceMethod" value="AdaptiveStatic"/>
+      <option name="DeinterlaceMethod" value="AdaptiveAdvanced"/>
     </mode>
 
     <mode name="SmallWindow">
