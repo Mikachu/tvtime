@@ -29,7 +29,6 @@
 #endif
 
 #include "display.h"
-#include "debug_print.h"
 
 
 typedef struct {
@@ -465,8 +464,6 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	dpyinfo.resolution_origin = DpyInfoOriginXinerama;
 	return dpyinfo.resolution_origin;
       }
-    } else {
-      NOTE("%s", "Xinerama extension not found/active\n");
     }
 #endif
   case DpyInfoOriginXF86VidMode:
@@ -476,8 +473,6 @@ DpyInfoOrigin_t DpyInfoSetUpdateResolution(Display *dpy, int screen_nr,
 	dpyinfo.resolution_origin = DpyInfoOriginXF86VidMode;
 	return dpyinfo.resolution_origin;
       }
-    } else {
-      NOTE("%s", "XF86VidMode extension not found\n");
     }
 #endif
   case DpyInfoOriginX11:

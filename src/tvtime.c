@@ -113,12 +113,6 @@ const double fadespeed = 65.0;
  */
 const int scan_delay = 10;
 
-/**
- * These are for the ogle code.
- */
-char *program_name = "tvtime";
-int dlevel = 3;
-
 static void build_colourbars( uint8_t *output, int width, int height )
 {
     uint8_t *cb444 = (uint8_t *) malloc( width * height * 3 );
