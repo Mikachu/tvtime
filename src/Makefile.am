@@ -90,15 +90,21 @@ $(external_dependencies):
 # FIFO directories.
 .PHONY: install-exec-hook uninstall-hook
 install-exec-hook:
-	-$(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir)||(\
+	-$(INSTALL) -d -m 'ug=rwx,o=rx' $(pkgrundir) || touch nofifodir
+	@if [ -f nofifodir ]; then (\
+	  echo 'Warning: I could not create the directory `$(pkgrundir)'"'" ;\
+	  echo '         You do not have permission to create the'           \
+	       'directory.  See the'                                        ;\
+          echo '         `Quirks when Compiling tvtime'"' section of the"    \
+	       '`INSTALL'"' file."); fi
+	-if [ -f nofifodir ]; then rm -f nofifodir; else $(INSTALL) -d -m 'ug=rwx,o=rx' -g '@PKGRUNDIRGROUP@' $(pkgrundir) || touch nofifodir; fi
+	@if [ -f nofifodir ]; then rm -f nofifodir; (\
 	  echo 'Warning: I could not create the directory `$(pkgrundir)'"'" ;\
 	  echo '         with group owner `@PKGRUNDIRGROUP@'"'."            ;\
-	  echo '         You either do not have permission to create the '   \
-	       'directory, or you'                                          ;\
-          echo '         are not a member of the `@PKGRUNDIRGROUP@'"' group."\
-	       '  See the'                                                  ;\
-          echo '         `Quirks when Compiling tvtime'"' section of the "   \
-	       '`INSTALL'"' file.")
+          echo '         You are not a member of the `@PKGRUNDIRGROUP@'"'"   \
+	       'group.  See the'                                            ;\
+          echo '         `Quirks when Compiling tvtime'"' section of the"    \
+	       '`INSTALL'"' file."); fi
 
 uninstall-hook:
 	rm -rf $(pkgrundir)
