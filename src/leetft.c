@@ -61,6 +61,7 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
 {
     FT_Error error;
     FT_UInt glyph_index;
+    ft_glyph_data_t *cur;
 
     if( hashtable_lookup( font->glyphdata, wchar ) ) {
         return 1; // The glyph already is cached, no need to re-cache it.
@@ -71,7 +72,7 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
     if( !glyph_index )
         return 0;
 
-    ft_glyph_data_t *cur = malloc (sizeof (*cur));
+    cur = malloc (sizeof (*cur));
     
     if (cur == NULL) {
         fprintf ( stderr, "leeft: Out of memory\n");

@@ -33,6 +33,8 @@ struct hashtable_object {
 hashtable_t *hashtable_init( size_t size )
 {
 	hashtable_t *ht;
+	int i;
+
 	ht = malloc (sizeof (*ht));
 	if (ht == NULL)
 		return NULL;
@@ -44,7 +46,7 @@ hashtable_t *hashtable_init( size_t size )
         }
 	 
 	ht->size = size;
-	for (int i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		ht->table [i].status = NEVER_USED;
 		ht->table [i].index = 0;
 		ht->table [i].data = NULL;
@@ -61,7 +63,9 @@ static struct hashtable_object * hashtable_probe( hashtable_t *ht, int index, in
 static struct hashtable_object *hashtable_find( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj;
-	for (int probe = 0; probe < ht->size; probe++) {
+	int probe;
+
+	for (probe = 0; probe < ht->size; probe++) {
 		obj = hashtable_probe (ht, index, probe);
 		switch (obj->status) {
 		case NEVER_USED:
@@ -98,6 +102,7 @@ static struct hashtable_object *hashtable_find( hashtable_t *ht, int index )
 void *hashtable_lookup( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj = hashtable_find (ht, index);
+
 	if (obj == NULL)
 		return NULL;
 	else
@@ -112,10 +117,11 @@ int hashtable_resize( hashtable_t *htold )
 	// in a hash table size the better. (Optimally, the number
 	// is prime, but calculating prime numbers runtime is expensive.)
         hashtable_t *htnew = hashtable_init (htold->size * 5);
+	struct hashtable_object *p;
+
         if (htnew == NULL)
                 return 0;
-        for (struct hashtable_object *p = &htold->table[0];
-             p < &htold->table[htold->size]; p++) {
+        for (p = &htold->table[0]; p < &htold->table[htold->size]; p++) {
                 if (p->status == IN_USE)
                         hashtable_insert (htnew, p->index, p->data);
         }
@@ -130,6 +136,7 @@ int hashtable_insert( hashtable_t *ht, int index, void *data )
 {
 	int probe = 0;
 	struct hashtable_object *obj;
+
 	while ((obj = hashtable_probe (ht, index, probe))->status == IN_USE)
 		if (obj->index == index) // object already existed. overwrite.
 			break;
@@ -156,6 +163,7 @@ int hashtable_insert( hashtable_t *ht, int index, void *data )
 int hashtable_delete( hashtable_t *ht, int index )
 {
 	struct hashtable_object *obj = hashtable_find (ht, index);
+
 	if (obj == NULL)
 		return 0;
 	else {
