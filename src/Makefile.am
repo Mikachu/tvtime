@@ -37,7 +37,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c ttfont.cpp efs.cpp osdtools.c \
 	credits.c credits.h xvoutput.h xvoutput.c display.h display.c \
 	wm_state.h wm_state.c
 
-bin_PROGRAMS = tvtime expandpng
+bin_PROGRAMS = tvtime
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
 
