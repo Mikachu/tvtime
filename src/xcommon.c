@@ -34,6 +34,10 @@
 #include <sys/shm.h>
 #include <sys/time.h>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
