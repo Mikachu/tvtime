@@ -51,8 +51,6 @@ static int timediff( struct timeval *large, struct timeval *small )
              - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
 }
 
-#if 0
-
 static void build_test_frames( unsigned char *oddframe, unsigned char *evenframe, int width, int height )
 {
     osd_string_t *test_string;
@@ -87,7 +85,7 @@ void build_colourbars( unsigned char *output, int width, int height )
     free( cb444 );
 }
 
-static void pngscreenshot( unsigned char *filename, unsigned char *frame422,
+static void pngscreenshot( const char *filename, unsigned char *frame422,
                            int width, int height, int stride )
 {
     pngoutput_t *pngout = pngoutput_new( filename, width, height, 0.45 );
@@ -110,8 +108,6 @@ static void pngscreenshot( unsigned char *filename, unsigned char *frame422,
     pngoutput_delete( pngout );
 }
 
-#endif
-
 int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
@@ -130,11 +126,9 @@ int main( int argc, char **argv )
     tvtime_osd_t *osd;
     int videohold = CHANNEL_HOLD;
     int i;
-/*
     unsigned char *testframe_odd;
     unsigned char *testframe_even;
     unsigned char *colourbars;
-*/
     config_t *ct;
     input_t *in;
 
@@ -180,7 +174,6 @@ int main( int argc, char **argv )
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
 
-/*  Screw this for now -- doug
     testframe_odd = (unsigned char *) malloc( width * height * 2 );
     testframe_even = (unsigned char *) malloc( width * height * 2 );
     colourbars = (unsigned char *) malloc( width * height * 2 );
@@ -190,7 +183,6 @@ int main( int argc, char **argv )
     }
     build_test_frames( testframe_odd, testframe_even, width, height );
     build_colourbars( colourbars, width, height );
-*/
 
     /* Setup OSD stuff. */
     osd = tvtime_osd_new( width, height, 4.0 / 3.0 );
