@@ -46,6 +46,7 @@ struct station_mgr_s
 {
     station_info_t *first;
     station_info_t *current;
+    int num_stations;
     int verbose;
     int us_cable_mode;
     int is_us_cable;
@@ -115,11 +116,13 @@ static station_info_t *newInfo( int pos, const char *name, const band_t *band, c
 
 static int insert( station_mgr_t *mgr, station_info_t *i )
 {
+    mgr->num_stations++;
+
     if( !mgr->first ) {
         mgr->first = i;
         mgr->first->next = mgr->first;
         mgr->first->prev = mgr->first;
-        mgr->current= i;
+        mgr->current = i;
     } else {
         station_info_t *rp = mgr->first;
 
@@ -142,7 +145,7 @@ static int insert( station_mgr_t *mgr, station_info_t *i )
         if( rp == mgr->first && i->pos < mgr->first->pos ) {
             mgr->first = i;
         }
-        mgr->current= i;
+        mgr->current = i;
     }
 
     return 1;
@@ -273,6 +276,7 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
     mgr->us_cable_mode = us_cable_mode;
     mgr->last_channel = 0;
     mgr->new_install = 0;
+    mgr->num_stations = 0;
     mgr->norm = strdup( norm );
     if( !mgr->norm ) {
         free( mgr );
@@ -357,6 +361,11 @@ int station_is_new_install( station_mgr_t *mgr )
     return mgr->new_install;
 }
 
+int station_get_num_stations( station_mgr_t *mgr )
+{
+    return mgr->num_stations;
+}
+
 int station_set( station_mgr_t *mgr, int pos )
 {
     station_info_t *rp = mgr->first;
@@ -383,7 +392,7 @@ void station_next( station_mgr_t *mgr )
     mgr->last_channel = station_get_current_id( mgr );
 
     if( mgr->current ) {
-        station_info_t *i= mgr->current;
+        station_info_t *i = mgr->current;
         do {
             mgr->current = mgr->current->next;
         } while ( !mgr->current->active && mgr->current != i ); 
@@ -423,6 +432,19 @@ int station_get_prev_id( station_mgr_t *mgr )
     } else {
         return mgr->last_channel;
     }
+}
+
+int station_get_current_pos( station_mgr_t *mgr )
+{
+    station_info_t *rp = mgr->first;
+    int i = 0;
+
+    while( rp && rp != mgr->current ) {
+        rp = rp->next;
+        i++;
+    }
+
+    return i;
 }
 
 const char *station_get_current_channel_name( station_mgr_t *mgr )
@@ -555,17 +577,17 @@ int station_get_current_active( station_mgr_t *mgr )
 
 int station_remove( station_mgr_t *mgr )
 { // untested
-    station_info_t *i= mgr->current;
+    station_info_t *i = mgr->current;
     if( !mgr->current ) return 0;
-    i->next->prev= i->prev;
-    i->prev->next= i->next;
+    i->next->prev = i->prev;
+    i->prev->next = i->next;
     
     if( i == mgr->first ) {
         mgr->first= i->next;
     }
     
     if( i == mgr->current ) {
-        mgr->current= i->next;
+        mgr->current = i->next;
     }
 
     if( i == i->next ) {

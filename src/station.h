@@ -57,6 +57,7 @@ void station_toggle_us_cable_mode( station_mgr_t *mgr );
  * Information about the current channel.
  */
 int station_get_current_id( station_mgr_t *mgr );
+int station_get_current_pos( station_mgr_t *mgr );
 const char *station_get_current_channel_name( station_mgr_t *mgr );
 const char *station_get_current_band( station_mgr_t *mgr );
 int station_get_current_frequency( station_mgr_t *mgr );
@@ -66,6 +67,11 @@ int station_get_current_active( station_mgr_t *mgr );
  * The last channel we were at, before the current one.
  */
 int station_get_prev_id( station_mgr_t *mgr );
+
+/**
+ * Returns how many stations there are in the list.
+ */
+int station_get_num_stations( station_mgr_t *mgr );
 
 /**
  * Add or update the channel list.

@@ -855,7 +855,7 @@ int main( int argc, char **argv )
     char number[4];
     int scanwait = scan_delay;
     int scanning = 0;
-    int firstscan = 0;
+    int numscanned = 0;
     int use_vgasync = 0;
     int framerate_mode = -1;
     int preset_mode = -1;
@@ -1444,7 +1444,7 @@ int main( int argc, char **argv )
 
         if( commands_scan_channels( commands ) && !scanning ) {
             scanning = 1;
-            firstscan = station_get_current_id( stationmgr );
+            numscanned = 0;
             scanwait = scan_delay;
         }
 
@@ -1452,16 +1452,23 @@ int main( int argc, char **argv )
             scanwait--;
 
             if( !scanwait ) {
+                int before_pos;
+                int after_pos;
+
                 scanwait = scan_delay;
                 if( tuner_state == TUNER_STATE_HAS_SIGNAL ) {
                     station_set_current_active( stationmgr, 1 );
                 } else {
                     station_set_current_active( stationmgr, 0 );
                 }
+                before_pos = station_get_current_pos( stationmgr );
                 commands_handle( commands, TVTIME_CHANNEL_UP, 0 );
+                after_pos = station_get_current_pos( stationmgr );
+
+                numscanned += (after_pos + station_get_num_stations( stationmgr ) - before_pos) % station_get_num_stations( stationmgr );
 
                 /* Stop when we loop around. */
-                if( station_get_current_id( stationmgr ) == firstscan ) {
+                if( numscanned > station_get_num_stations( stationmgr ) ) {
                     commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
                 }
             }
