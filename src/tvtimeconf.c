@@ -701,7 +701,7 @@ config_t *config_new( void )
     ct->keymap[ '*' ] = TVTIME_TOGGLE_MODE;
     ct->keymap[ '/' ] = TVTIME_AUTO_ADJUST_WINDOW;
     ct->keymap[ 'n' ] = TVTIME_TOGGLE_COMPATIBLE_NORM;
-    ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_LETTERBOX;
+    ct->keymap[ I_INSERT ] = TVTIME_TOGGLE_MATTE;
 
     memset( ct->buttonmap, 0, sizeof( ct->buttonmap ) );
     ct->buttonmap[ 1 ] = TVTIME_DISPLAY_INFO;

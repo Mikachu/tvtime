@@ -78,8 +78,8 @@ static int xcommon_exposed = 0;
 static int xcommon_colourkey = 0;
 static int motion_timeout = 0;
 static int fullscreen_position = 0;
-static int letterbox_ystart = 0;
-static int letterbox_height = 0;
+static int matte_width = 0;
+static int matte_height = 0;
 
 static int has_focus = 0;
 
@@ -128,13 +128,18 @@ static int xv_get_width_for_height( int window_height )
     int heightratio = output_aspect ? 9 : 3;
     int sar_frac_n, sar_frac_d;
 
+    if( matte_height ) {
+        heightratio = matte_height;
+        widthratio = matte_width;
+    }
+
     if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
         if( xcommon_verbose ) {
             fprintf( stderr, "xcommon: Sample aspect ratio %d/%d.\n",
                      sar_frac_n, sar_frac_d );
         }
     } else {
-        /* Assume 4:3 aspect ? */
+        /* Assume square pixels. */
         if( xcommon_verbose ) {
             fprintf( stderr, "xcommon: Assuming square pixel display.\n" );
         }
@@ -690,6 +695,11 @@ static void calculate_video_area( void )
     int widthratio = output_aspect ? 16 : 4;
     int heightratio = output_aspect ? 9 : 3;
     int sar_frac_n, sar_frac_d;
+
+    if( matte_height ) {
+        heightratio = matte_height;
+        widthratio = matte_width;
+    }
 
     if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
         if( xcommon_verbose ) {
@@ -1483,10 +1493,12 @@ void xcommon_set_fullscreen_position( int pos )
     fullscreen_position = pos;
 }
 
-void xcommon_set_letterbox( int ystart, int height )
+void xcommon_set_matte( int width, int height )
 {
-    letterbox_ystart = ystart;
-    letterbox_height = height;
-    fprintf( stderr, "xcommon: %d, %d\n", ystart, height );
+    matte_width = width;
+    matte_height = height;
+    calculate_video_area();
+    xcommon_clear_screen();
+    XSync( display, False );
 }
 

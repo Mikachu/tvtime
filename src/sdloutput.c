@@ -347,7 +347,7 @@ static void sdl_set_fullscreen_position( int pos )
 {
 }
 
-static void sdl_set_letterbox( int ystart, int height )
+static void sdl_set_matte( int width, int height )
 {
 }
 
@@ -381,7 +381,7 @@ static output_api_t sdloutput =
     sdl_set_window_position,
     sdl_set_window_height,
     sdl_set_fullscreen_position,
-    sdl_set_letterbox,
+    sdl_set_matte,
 
     sdl_poll_events,
     sdl_quit

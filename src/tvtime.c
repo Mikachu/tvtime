@@ -832,6 +832,26 @@ void osd_list_statistics( tvtime_osd_t *osd, performance_t *perf,
     tvtime_osd_show_list( osd, 1 );
 }
 
+void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
+{
+    tvtime_osd_list_set_lines( osd, 5 );
+    if( sixteennine ) {
+        tvtime_osd_list_set_text( osd, 0, "Matte setting (Anamorphic input)" );
+        tvtime_osd_list_set_text( osd, 1, "16:9 + Overscan" );
+        tvtime_osd_list_set_text( osd, 2, "1.85:1" );
+        tvtime_osd_list_set_text( osd, 3, "2.35:1" );
+        tvtime_osd_list_set_text( osd, 4, "4:3 centre" );
+    } else {
+        tvtime_osd_list_set_text( osd, 0, "Matte setting (4:3 input)" );
+        tvtime_osd_list_set_text( osd, 1, "4:3 + Overscan" );
+        tvtime_osd_list_set_text( osd, 2, "16:9" );
+        tvtime_osd_list_set_text( osd, 3, "1.85:1" );
+        tvtime_osd_list_set_text( osd, 4, "2.35:1" );
+    }
+    tvtime_osd_list_set_hilight( osd, mode + 1 );
+    tvtime_osd_show_list( osd, 1 );
+}
+
 int main( int argc, char **argv )
 {
     struct timeval startup_time;
@@ -842,6 +862,7 @@ int main( int argc, char **argv )
     int width = 720;
     int height = 480;
     int norm = 0;
+    int sixteennine = 0;
     int fieldtime;
     int safetytime;
     int fieldsavailable = 0;
@@ -888,9 +909,11 @@ int main( int argc, char **argv )
     unsigned int output_driver = 0;
     deinterlace_method_t *curmethod;
     int curmethodid;
-    int letterbox_y = 0;
-    int letterbox_h = 0;
-    int letterbox_mode = 0;
+    int matte_x = 0;
+    int matte_w = 0;
+    int matte_y = 0;
+    int matte_h = 0;
+    int matte_mode = 0;
     int i;
 
     gettimeofday( &startup_time, 0 );
@@ -1010,7 +1033,9 @@ int main( int argc, char **argv )
         output = get_xv_output();
     }
 
-    if( !output || !output->init( config_get_outputheight( ct ), config_get_aspect( ct ), verbose ) ) {
+    sixteennine = config_get_aspect( ct );
+
+    if( !output || !output->init( config_get_outputheight( ct ), sixteennine, verbose ) ) {
         fprintf( stderr, "tvtime: Output driver failed to initialize: "
                          "no video output available.\n" );
         /* FIXME: Delete everything here! */
@@ -1208,7 +1233,7 @@ int main( int argc, char **argv )
 
 
     /* Setup OSD stuff. */
-    pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) ) );
+    pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
     osd = tvtime_osd_new( width, height, pixel_aspect,
                           config_get_channel_text_rgb( ct ), config_get_other_text_rgb( ct ) );
     if( !osd ) {
@@ -1402,12 +1427,14 @@ int main( int argc, char **argv )
         int output_success = 1;
         int exposed = output->is_exposed();
 
-        output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
-        output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
-        if( letterbox_mode ) {
-            output_y = letterbox_y;
-            output_h = letterbox_h;
+        if( matte_mode ) {
+            output_x = matte_x;
+            output_w = matte_w;
+            output_y = matte_y;
+            output_h = matte_h;
         } else {
+            output_x = (int) ((((double) width) * commands_get_overscan( commands )) + 0.5);
+            output_w = (int) ((((double) width) - (((double) width) * commands_get_overscan( commands ) * 2.0)) + 0.5);
             output_y = (int) ((((double) height) * commands_get_overscan( commands )) + 0.5);
             output_h = (int) ((((double) height) - (((double) height) * commands_get_overscan( commands ) * 2.0)) + 0.5);
         }
@@ -1530,29 +1557,62 @@ int main( int argc, char **argv )
             }
         }
         if( commands_toggle_aspect( commands ) ) {
+            matte_mode = 0;
+            output->set_matte( 0, 0 );
             if( output->toggle_aspect() ) {
+                sixteennine = 1;
                 if( osd ) tvtime_osd_show_message( osd, "16:9 display mode active." );
                 config_save( ct, "WideScreen", "1" );
                 pixel_aspect = ( (double) width ) / ( ( (double) height ) * (16.0 / 9.0) );
             } else {
+                sixteennine = 0;
                 if( osd ) tvtime_osd_show_message( osd, "4:3 display mode active." );
                 config_save( ct, "WideScreen", "0" );
                 pixel_aspect = ( (double) width ) / ( ( (double) height ) * (4.0 / 3.0) );
             }
             if( osd ) {
+                tvtime_osd_show_list( osd, 0 );
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
         }
-        if( commands_toggle_letterbox( commands ) ) {
-            double letterbox = 4.0 / 3.0;
+        if( commands_toggle_matte( commands ) ) {
+            double matte = 4.0 / 3.0;
+            int sqwidth = sixteennine ? ((height * 16) / 9) : ((height * 4) / 3);
+            int sqheight = sixteennine ? ((width * 9) / 16) : ((width * 3) / 4);
 
-            letterbox_mode = (letterbox_mode + 1) % 2;
-            if( letterbox_mode == 1 ) {
-                letterbox = 2.35;
+            matte_x = 0;
+            matte_w = width;
+            matte_mode = (matte_mode + 1) % 4;
+            if( sixteennine ) {
+                if( matte_mode == 0 ) {
+                    matte = 16.0 / 9.0;
+                } else if( matte_mode == 1 ) {
+                    matte = 1.85;
+                } else if( matte_mode == 2 ) {
+                    matte = 2.35;
+                } else if( matte_mode == 3 ) {
+                    matte = 4.0 / 3.0;
+                    matte_w = (int) (((double) sqheight * matte) + 0.5);
+                    matte_x = (width - matte_w) / 2;
+                    matte_h = height;
+                    matte_y = 0;
+                    output->set_matte( (matte_h * 4) / 3, matte_h );
+                }
+            } else {
+                if( matte_mode == 1 ) {
+                    matte = 16.0 / 9.0;
+                } else if( matte_mode == 2 ) {
+                    matte = 1.85;
+                } else if( matte_mode == 3 ) {
+                    matte = 2.35;
+                }
             }
-            letterbox_h = (int) ((((((double) height) * 4.0)/3.0)/letterbox) + 0.5);
-            letterbox_y = (height - letterbox_h) / 2;
-            output->set_letterbox( letterbox_y, letterbox_h );
+            if( !matte_x ) {
+                matte_h = (int) ((((double) sqwidth)/matte) + 0.5);
+                matte_y = (height - matte_h) / 2;
+                output->set_matte( sqwidth, matte_h );
+            }
+            if( osd ) osd_list_matte( osd, matte_mode, sixteennine );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
             tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;

@@ -199,7 +199,7 @@ static void mga_set_fullscreen_position( int pos )
 {
 }
 
-static void mga_set_letterbox( int ystart, int height )
+static void mga_set_matte( int width, int height )
 {
 }
 
@@ -238,7 +238,7 @@ static output_api_t mgaoutput =
     mga_set_window_position,
     mga_set_window_height,
     mga_set_fullscreen_position,
-    mga_set_letterbox,
+    mga_set_matte,
 
     mga_poll_events,
     mga_shutdown

@@ -59,7 +59,7 @@ int xcommon_is_exposed( void );
 void xcommon_set_colourkey( int colourkey );
 void xcommon_frame_drawn( void );
 void xcommon_set_fullscreen_position( int pos );
-void xcommon_set_letterbox( int ystart, int height );
+void xcommon_set_matte( int ystart, int height );
 
 #ifdef __cplusplus
 };
