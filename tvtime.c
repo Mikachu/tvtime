@@ -357,8 +357,8 @@ int main( int argc, char **argv )
 
         gettimeofday( &curframetime, 0 );
         if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
-            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, fieldtime %dus\n",
-                     skipped++, timediff( &curframetime, &lastframetime ),
+            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, last blittime %dus, fieldtime %dus\n",
+                     skipped++, blittime, timediff( &curframetime, &lastframetime ),
                      (fieldtime*2) );
         }
         lastframetime = curframetime;
