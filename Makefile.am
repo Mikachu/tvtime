@@ -17,6 +17,6 @@
 
 AUTOMAKE_OPTIONS = 1.6
 SUBDIRS = intl m4 docs data plugins src po
-EXTRA_DIST = config.rpath
+EXTRA_DIST = config.rpath COPYING.LGPL
 
 ACLOCAL_AMFLAGS = -I m4

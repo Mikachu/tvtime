@@ -150,7 +150,7 @@ Packagers
   Simon Law <sfllaw@debian.org>
     - Work on the debian packages.
 
-Code we stole (well, used under the GPL)
+Code we stole (well, used under the GPL/LGPL)
 
   Lots of stuff from DScaler
     http://dscaler.sourceforge.net/
