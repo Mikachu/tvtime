@@ -20,6 +20,10 @@
 #include <stdlib.h>
 #include "videotools.h"
 
+/**
+ * You can comment this out to get better performance, but lose
+ * the luma correction feature.
+ */
 #define APPLY_CORRECTION
 
 struct video_correction_s
@@ -162,6 +166,7 @@ static inline void interpolate_scanline_packed_422( unsigned char *output,
         output[ (i*2) + 3 ] = ((topcr[ i/2 ] + botcr[ i/2 ] - 256) >> 1) + 128;
     }
 }
+
 
 void video_correction_planar422_field_to_packed422_frame( video_correction_t *vc,
                                                           unsigned char *output,

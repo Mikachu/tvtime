@@ -157,7 +157,6 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     if( ioctl( grab_fd, VIDIOCGCAP, &grab_cap ) < 0 ) {
         fprintf( stderr, "videoinput: No v4l device (%s).\n", v4l_device );
-        /* XXX */
         return 0;
     }
 
