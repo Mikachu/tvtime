@@ -1,8 +1,15 @@
-tvtime (0.9.12-1.1) experimental; urgency=low
+tvtime (0.9.12-2.1) experimental; urgency=low
 
   * Unofficial build from CVS.
 
- -- J. Random Hacker <jrhacker@example.com>  Sun, 30 Nov 2003 16:53:54 -0500
+ -- J. Random Hacker <jrhacker@example.com>  Tue, 13 Jan 2004 18:02:04 -0500
+
+tvtime (0.9.12-2) unstable; urgency=medium
+
+  * Add a Japanese translation of the debconf templates.  (Closes: Bug#224165)
+    Thanks to Hideki Yamane <henrich@samba.gr.jp>
+
+ -- Simon Law <sfllaw@debian.org>  Tue, 13 Jan 2004 18:00:36 -0500
 
 tvtime (0.9.12-1) unstable; urgency=low
 
