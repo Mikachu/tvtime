@@ -39,7 +39,6 @@ struct fifo_s {
 fifo_t *fifo_new( const char *filename )
 {
     fifo_t *fifo = malloc( sizeof( struct fifo_s ) );
-
     if( !fifo ) {
         return 0;
     }
@@ -48,23 +47,24 @@ fifo_t *fifo_new( const char *filename )
     fifo->bufpos = 0;
 
     fifo->fd = open( filename, O_RDONLY | O_NONBLOCK );
-    if( fifo->fd == -1 ) {
-        /* attempt to create it */
-        if( mkfifo( filename, S_IREAD | S_IWRITE ) == -1 ) {
-            /* failed */
-            fprintf( stderr, "fifo: Couldn't create %s as a fifo: %s\n",
+    if( fifo->fd < 0 ) {
+        /* Attempt to create it. */
+        if( mkfifo( filename, S_IREAD | S_IWRITE ) < 0 ) {
+            fprintf( stderr, "fifo: Cannot create %s: %s\n",
                      filename, strerror( errno ) );
             free( fifo );
             return 0;
         }
         fifo->fd = open( filename, O_RDONLY | O_NONBLOCK );
-        if( fifo->fd == -1 ) {
+        if( fifo->fd < 0 ) {
+            fprintf( stderr, "fifo: Cannot open %s: %s\n",
+                     filename, strerror( errno ) );
             free( fifo );
             return 0;
         }
     }
 
-    /* our fifo is open for reading */
+    /* Our fifo is open for reading. */
     return fifo;
 }
 

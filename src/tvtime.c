@@ -1195,7 +1195,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     ct = config_new();
     if( !ct ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
@@ -1210,10 +1210,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         cpuinfo_print_info();
     }
 
-    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0
-        && verbose ) {
-        fprintf( stderr, "tvtime: Cannot set priority to %d: %s.\n",
-                  config_get_priority( ct ), strerror( errno ) );
+    if( setpriority( PRIO_PROCESS, 0, config_get_priority( ct ) ) < 0 ) {
+        if( verbose ) {
+            fprintf( stderr, "%s: Cannot set priority to %d: %s.\n",
+                     argv[ 0 ], config_get_priority( ct ), strerror( errno ) );
+        }
     }
 
     send_fields = config_get_send_fields( ct );
@@ -1252,9 +1253,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     if( !output || !output->init( config_get_outputheight( ct ),
                                   sixteennine, verbose ) ) {
-        lfputs( _("tvtime: Output driver failed to initialize: "
-                  "no video output available.\n"), stderr );
-        /* FIXME: Delete everything here! */
+        /* Error messages are driver specific. */
         return 1;
     }
     if( config_get_useposition( ct ) ) {
@@ -1268,7 +1267,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     /* Setup the tvtime object. */
     tvtime = tvtime_new();
     if( !tvtime ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
     }
 
     if( !output->is_interlaced() ) {
@@ -1312,7 +1311,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
     if( !perf ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
@@ -1320,7 +1319,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                               config_get_v4l_freq( ct ),
                               config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
     station_set( stationmgr, config_get_prev_channel( ct ) );
@@ -1452,11 +1451,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         curmethod = 0;
     } else {
         filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
-        if( !output->is_interlaced() && !get_num_deinterlace_methods() ) {
-            fprintf( stderr, "tvtime: No deinterlacing methods available, "
-                             "exiting.\n" );
-            return 1;
-        }
         curmethodid = 0;
         curmethod = get_deinterlace_method( 0 );
         while( strcasecmp( config_get_deinterlace_method( ct ),
@@ -1474,7 +1468,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     fadeframe = malloc( width * height * 2 );
     blueframe = malloc( width * height * 2 );
     if( !colourbars || !saveframe || !fadeframe || !blueframe ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
     build_colourbars( colourbars, width, height );
@@ -1491,7 +1485,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                           config_get_channel_text_rgb( ct ),
                           config_get_other_text_rgb( ct ) );
     if( !osd ) {
-        lfputs( _("tvtime: OSD failed to initialize, disabled.\n"), stderr );
+        lfputs( _("On screen display failed to initialize, disabled.\n"),
+                stderr );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         if( curmethod ) {
@@ -1526,7 +1521,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
     build_deinterlacer_menu( commands_get_menu( commands, "deinterlacer" ),
@@ -1551,11 +1546,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     fifofile = get_tvtime_fifo_filename( config_get_uid( ct ) );
     if( !fifofile ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
     } else {
         fifo = fifo_new( fifofile );
-        if( !fifo && verbose ) {
-            lfputs( _("tvtime: Failed to create FIFO, disabled.\n"), stderr );
+        if( !fifo ) {
+            lfputs( _("Cannot create FIFO, "
+                      "remote control of tvtime disabled.\n"), stderr );
         }
     }
 
@@ -1584,7 +1580,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     in = input_new( ct, commands, con, verbose );
     if( !in ) {
-        lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
@@ -1595,13 +1591,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
-            lfputs( _("tvtime: Could not create vbiscreen, "
-                      "closed captions unavailable.\n"), stderr );
+            lfputs( _("Closed caption display failed to "
+                      "initialize, disabled.\n"), stderr );
         }
 
         vbidata = vbidata_new( config_get_vbi_device( ct ), vs, verbose );
         if( !vbidata ) {
-            lfputs( _("tvtime: Cannot allocate memory.\n"), stderr );
+            lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         } else {
             vbidata_capture_mode( vbidata, config_get_cc( ct )
                                   ? CAPTURE_CC1 : CAPTURE_OFF );
@@ -2233,7 +2229,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             int framesize = width * height * 2;
-            lfprintf( stderr, _("tvtime: Stats using '%s' at %dx%d%s.\n"), 
+            fprintf( stderr, "tvtime: Stats using '%s' at %dx%d%s.\n",
                       (curmethod) ? curmethod->name : "interlaced passthrough", 
                       width, height, realtime ? " [RT]" : "" );
             if( curmethod && curmethod->doscalerbob ) {
@@ -2727,9 +2723,9 @@ int main( int argc, char **argv )
          * error string, so that didn't really make sense, did it?
          */
         lfprintf( stderr, _("\n"
-       "    Failed to drop root privileges: %s.\n"
-       "    tvtime will exit now to avoid security problems resulting from\n"
-       "    an application running as root when it might not be allowed to.\n"),
+    "    Failed to drop root privileges: %s.\n"
+    "    tvtime will exit now to avoid security problems resulting from\n"
+    "    an application running as root when it might not be allowed to.\n\n"),
             strerror( errno ) );
         return 1;
     }
