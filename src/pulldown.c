@@ -436,34 +436,33 @@ int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat,
     return predicted;
 }
 
-int determine_pulldown_offset_dalias( pulldown_metrics_t *peak, pulldown_metrics_t *relative,
-                                      pulldown_metrics_t *mean )
+int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak,
+                                      pulldown_metrics_t *old_relative,
+                                      pulldown_metrics_t *old_mean,
+                                      pulldown_metrics_t *new_peak,
+                                      pulldown_metrics_t *new_relative,
+                                      pulldown_metrics_t *new_mean )
 {
-/*
     int laced = 0;
 
-    if (f[0].p.d > 360) {
-        if (3*f[0].r.e < f[0].r.o) laced=1;
-        if ((2*f[0].r.d < f[0].r.s) && (f[0].r.s > 600))
+    if (old_peak->d > 360) {
+        if (3*old_relative->e < old_relative->o) laced=1;
+        if ((2*old_relative->d < old_relative->s) && (old_relative->s > 600))
             laced=1;
     }
-    if (f[1].p.d > 360) {
-        //if (4*f[1].r.o < f[1].r.e) laced=1;
-        if ((2*f[1].r.t < f[1].r.p) && (f[1].r.p > 600))
+    if (new_peak->d > 360) {
+        if ((2*new_relative->t < new_relative->p) && (new_relative->p > 600))
             laced=1;
     }
-    if (!laced) return F_SHOW;
-    //if (4*f[1].r.s < f[1].r.d) return F_DROP;
-    if ((f[1].r.t < 2*f[1].r.p) || (f[1].r.t < 2*p->nl)) {
-        if ((3*f[0].r.e < f[0].r.o) || (2*f[1].r.t < f[1].r.p)) {
-            p->nl = f[1].r.t;
-            p->sync = 1;
-            return F_MERGE;
+    if (!laced) return PULLDOWN_ACTION_COPY1;
+
+    if (new_relative->t < 2*new_relative->p) {
+        if ((3*old_relative->e < old_relative->o) || (2*new_relative->t < new_relative->p)) {
+            // p->sync = 1;
+            return PULLDOWN_ACTION_MRGE3;
         }
     }
-    return F_DROP;
-*/
-    return 0;
+    return PULLDOWN_ACTION_DROP2;
 }
 
 #define MAXUP(a,b) ((a) = ((a)>(b)) ? (a) : (b))

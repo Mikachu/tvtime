@@ -24,8 +24,9 @@ int determine_pulldown_offset( int top_repeat, int bot_repeat, int tff, int last
 int determine_pulldown_offset_history( int top_repeat, int bot_repeat, int tff, int *realbest );
 int determine_pulldown_offset_history_new( int top_repeat, int bot_repeat, int tff, int predicted );
 int determine_pulldown_offset_short_history_new( int top_repeat, int bot_repeat, int tff, int predicted );
-int determine_pulldown_offset_dalias( pulldown_metrics_t *peak, pulldown_metrics_t *relative,
-                                      pulldown_metrics_t *mean );
+int determine_pulldown_offset_dalias( pulldown_metrics_t *old_peak, pulldown_metrics_t *old_relative,
+                                      pulldown_metrics_t *old_mean, pulldown_metrics_t *new_peak,
+                                      pulldown_metrics_t *new_relative, pulldown_metrics_t *new_mean );
 
 void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
                                   unsigned char *old, unsigned char *new, int w, int h, int os, int ns );
