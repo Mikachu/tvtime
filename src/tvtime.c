@@ -2707,7 +2707,7 @@ int main( int argc, char **argv )
      */
     setup_i18n();
 
-    fputs( _("tvtime: Running " PACKAGE_STRING ".\n"), stderr );
+    fprintf( stderr, _("tvtime: Running %s.\n"), PACKAGE_STRING );
 
     /* Disable this code for a release. */
     fputs( _("\n"
