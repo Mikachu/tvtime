@@ -1,4 +1,3 @@
-
 tvtimedatadir = $(datadir)/tvtime
 tvtimesysconfdir = $(sysconfdir)/tvtime
 pkgsysconfdir = $(sysconfdir)/tvtime
@@ -7,7 +6,7 @@ TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
 TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 
 PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
-PLUGINS_LIBS = -L$(top_builddir)/plugins -ltvtimeplugins
+PLUGINS_LIBS = -L$(top_builddir)/plugins
 
 # directfb output currently disabled
 # if HAVE_DIRECTFB
@@ -45,8 +44,16 @@ bin_PROGRAMS = tvtime
 EXTRA_PROGRAMS = expandpng timingtest
 
 tvtime_SOURCES = $(COMMON_SRCS) tvtime.c
+tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 expandpng_SOURCES = pnginput.h pnginput.c pngoutput.h pngoutput.c expandpng.c
+expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
+timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 
+CLEANFILES = expandpng timingtest
+
+.PHONY: ../plugins/libtvtimeplugins.la
+../plugins/libtvtimeplugins.la:
+	( $(MAKE) $(AM_MAKEFLAGS) -C `dirname "$@"` `basename "$@"` )
