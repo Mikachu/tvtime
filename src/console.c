@@ -118,6 +118,7 @@ console_t *console_new( int x, int y, int width, int height,
     con->coords = NULL;
     con->show_cursor = 1;
     con->drop_pos = 0;
+    con->font = 0;
 
 #if 0
     con->text = (char *)malloc( con->rows * con->cols ); 
@@ -231,7 +232,7 @@ void console_delete( console_t *con )
         free( con->line );
     }
 
-    osd_font_delete( con->font );
+    if( con->font ) osd_font_delete( con->font );
 
     if( con->text ) free( con->text );
     if( con->coords ) free( con->coords );

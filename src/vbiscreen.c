@@ -115,6 +115,7 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     memset( vs->hiddenbuf, 0, COLS );
     memset( vs->paintbuf, 0, ROWS * COLS );
     vs->scroll = 0;
+    vs->font = 0;
 
     vs->font = osd_font_new( vs->fontfile, fontsize, video_width, video_height, video_aspect );
     if( !vs->font ) {
@@ -264,7 +265,7 @@ void update_all_rows( vbiscreen_t *vs )
 
 void vbiscreen_delete( vbiscreen_t *vs )
 {
-    osd_font_delete( vs->font );
+    if( vs->font ) osd_font_delete( vs->font );
     free( vs );
 }
 
