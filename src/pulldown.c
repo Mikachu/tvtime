@@ -466,45 +466,10 @@ int determine_pulldown_offset_dalias( pulldown_metrics_t *peak, pulldown_metrics
     return 0;
 }
 
-#define ABS(a) (((a) < 0)?-(a):(a))
-
-void diff_packed422_block8x8( pulldown_metrics_t *m, unsigned char *old,
-                              unsigned char *new, int os, int ns )
-{
-    int x, y, e=0, o=0, s=0, p=0, t=0;
-    unsigned char *oldp, *newp;
-    unsigned char old0, old1, new0, new1;
-    m->s = m->p = m->t = 0;
-    for (x = 8; x; x--) {
-        oldp = old; old += 2;
-        newp = new; new += 2;
-        s = p = t = 0;
-        for (y = 4; y; y--) {
-            old0 = *(oldp);
-            old1 = *(oldp+os);
-            new0 = *(newp);
-            new1 = *(newp+ns);
-            e += ABS(new0-old0);
-            o += ABS(new1-old1);
-            s += new1-new0;
-            p += old1-old0;
-            t += old1-new0;
-            oldp += os<<1;
-            newp += ns<<1;
-        }
-        m->s += ABS(s);
-        m->p += ABS(p);
-        m->t += ABS(t);
-    }
-    m->e = e;
-    m->o = o;
-    m->d = e+o;
-}
-
 #define MAXUP(a,b) ((a) = ((a)>(b)) ? (a) : (b))
 
-void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
-                                  unsigned char *old, unsigned char *new, int w, int h, int os, int ns )
+void diff_factor_packed422_frame_ref( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
+                                      unsigned char *old, unsigned char *new, int w, int h, int os, int ns )
 {
     int x, y;
     pulldown_metrics_t l;
@@ -513,7 +478,47 @@ void diff_factor_packed422_frame( pulldown_metrics_t *peak, pulldown_metrics_t *
     memset(mean, 0, sizeof(pulldown_metrics_t));
     for (y = 0; y < h-7; y += 8) {
         for (x = 8; x < w-8-7; x += 8) {
-            diff_packed422_block8x8(&l, old+x+y*os, new+x+y*ns, os, ns);
+            diff_packed422_block8x8_c(&l, old+x+y*os, new+x+y*ns, os, ns);
+            mean->d += l.d;
+            mean->e += l.e;
+            mean->o += l.o;
+            mean->s += l.s;
+            mean->p += l.p;
+            mean->t += l.t;
+            MAXUP(peak->d, l.d);
+            MAXUP(peak->e, l.e);
+            MAXUP(peak->o, l.o);
+            MAXUP(peak->s, l.s);
+            MAXUP(peak->p, l.p);
+            MAXUP(peak->t, l.t);
+            MAXUP(rel->e, l.e-l.o);
+            MAXUP(rel->o, l.o-l.e);
+            MAXUP(rel->s, l.s-l.t);
+            MAXUP(rel->p, l.p-l.t);
+            MAXUP(rel->t, l.t-l.p);
+            MAXUP(rel->d, l.t-l.s); /* hack */
+        }
+    }
+    x = (w/8-2)*(h/8);
+    mean->d /= x;
+    mean->e /= x;
+    mean->o /= x;
+    mean->s /= x;
+    mean->p /= x;
+    mean->t /= x;
+}
+
+void diff_factor_packed422_frame_mmx( pulldown_metrics_t *peak, pulldown_metrics_t *rel, pulldown_metrics_t *mean,
+                                      unsigned char *old, unsigned char *new, int w, int h, int os, int ns )
+{
+    int x, y;
+    pulldown_metrics_t l;
+    memset(peak, 0, sizeof(pulldown_metrics_t));
+    memset(rel, 0, sizeof(pulldown_metrics_t));
+    memset(mean, 0, sizeof(pulldown_metrics_t));
+    for (y = 0; y < h-7; y += 8) {
+        for (x = 8; x < w-8-7; x += 8) {
+            diff_packed422_block8x8_mmx(&l, old+x+y*os, new+x+y*ns, os, ns);
             mean->d += l.d;
             mean->e += l.e;
             mean->o += l.o;

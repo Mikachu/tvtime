@@ -136,6 +136,19 @@ void cheap_packed422_to_packed444_scanline( unsigned char *output,
 void packed422_to_packed444_rec601_scanline( unsigned char *dest,
                                              unsigned char *src, int width );
 
+/* Struct for pulldown detection metrics. */
+typedef struct pulldown_metrics_s {
+    /* difference: total, even lines, odd lines */
+    int d, e, o;
+    /* noise: temporal, spacial (current), spacial (past) */
+    int t, s, p;
+} pulldown_metrics_t;
+
+void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
+                                unsigned char *new, int os, int ns );
+void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
+                                  unsigned char *new, int os, int ns );
+
 /**
  * Here are the function pointers which will be initialized to point at the
  * fastest available version of the above after a call to setup_speedy_calls().

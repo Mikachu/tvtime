@@ -286,6 +286,181 @@ unsigned int diff_factor_packed422_scanline_mmx( unsigned char *cur, unsigned ch
     return temp1;
 }
 
+#define ABS(a) (((a) < 0)?-(a):(a))
+
+void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, unsigned char *old,
+                                  unsigned char *new, int os, int ns )
+{
+    const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
+    short out[ 48 ]; /* Output buffer for the partial metrics from the mmx code. */
+    unsigned char *outdata = (unsigned char *) out;
+    unsigned char *oldp, *newp;
+    int i;
+
+    pxor_r2r( mm4, mm4 );  // 4 even difference sums.
+    pxor_r2r( mm5, mm5 );  // 4 odd difference sums.
+    pxor_r2r( mm7, mm7 );  // zeros
+
+    oldp = old; newp = new;
+    for( i = 4; i; --i ) {
+        // Even difference.
+        movq_m2r( oldp[0], mm0 );
+        movq_m2r( oldp[8], mm2 );
+        pand_m2r( ymask, mm0 );
+        pand_m2r( ymask, mm2 );
+        oldp += os;
+
+        movq_m2r( newp[0], mm1 );
+        movq_m2r( newp[8], mm3 );
+        pand_m2r( ymask, mm1 );
+        pand_m2r( ymask, mm3 );
+        newp += ns;
+
+        movq_r2r( mm0, mm6 );
+        psubusb_r2r( mm1, mm0 );
+        psubusb_r2r( mm6, mm1 );
+        movq_r2r( mm2, mm6 );
+        psubusb_r2r( mm3, mm2 );
+        psubusb_r2r( mm6, mm3 );
+
+        paddw_r2r( mm0, mm4 );
+        paddw_r2r( mm1, mm4 );
+        paddw_r2r( mm2, mm4 );
+        paddw_r2r( mm3, mm4 );
+
+        // Odd difference.
+        movq_m2r( oldp[0], mm0 );
+        movq_m2r( oldp[8], mm2 );
+        pand_m2r( ymask, mm0 );
+        pand_m2r( ymask, mm2 );
+        oldp += os;
+
+        movq_m2r( newp[0], mm1 );
+        movq_m2r( newp[8], mm3 );
+        pand_m2r( ymask, mm1 );
+        pand_m2r( ymask, mm3 );
+        newp += ns;
+
+        movq_r2r( mm0, mm6 );
+        psubusb_r2r( mm1, mm0 );
+        psubusb_r2r( mm6, mm1 );
+        movq_r2r( mm2, mm6 );
+        psubusb_r2r( mm3, mm2 );
+        psubusb_r2r( mm6, mm3 );
+
+        paddw_r2r( mm0, mm5 );
+        paddw_r2r( mm1, mm5 );
+        paddw_r2r( mm2, mm5 );
+        paddw_r2r( mm3, mm5 );
+    }
+    movq_r2m( mm4, outdata[0] );
+    movq_r2m( mm5, outdata[8] );
+
+    m->e = out[0] + out[1] + out[2] + out[3];
+    m->o = out[4] + out[5] + out[6] + out[7];
+    m->d = m->e + m->o;
+
+    pxor_r2r( mm4, mm4 );  // Past spacial noise.
+    pxor_r2r( mm5, mm5 );  // Temporal noise.
+    pxor_r2r( mm6, mm6 );  // Current spacial noise.
+
+    // First loop to measure first four columns
+    oldp = old; newp = new;
+    for( i = 4; i; --i ) {
+        movq_m2r( oldp[0], mm0 );
+        movq_m2r( oldp[os], mm1 );
+        pand_m2r( ymask, mm0 );
+        pand_m2r( ymask, mm1 );
+        oldp += (os*2);
+
+        movq_m2r( newp[0], mm2 );
+        movq_m2r( newp[ns], mm3 );
+        pand_m2r( ymask, mm2 );
+        pand_m2r( ymask, mm3 );
+        newp += (ns*2);
+
+        paddw_r2r( mm1, mm4 );
+        paddw_r2r( mm1, mm5 );
+        paddw_r2r( mm3, mm6 );
+        psubw_r2r( mm0, mm4 );
+        psubw_r2r( mm2, mm5 );
+        psubw_r2r( mm2, mm6 );
+    }
+    movq_r2m( mm4, outdata[0] );
+    movq_r2m( mm5, outdata[16] );
+    movq_r2m( mm6, outdata[32] );
+
+    pxor_r2r( mm4, mm4 );
+    pxor_r2r( mm5, mm5 );
+    pxor_r2r( mm6, mm6 );
+
+    // Second loop for the last four columns
+    oldp = old; newp = new;
+    for( i = 4; i; --i ) {
+        movq_m2r( oldp[8], mm0 );
+        movq_m2r( oldp[os+8], mm1 );
+        pand_m2r( ymask, mm0 );
+        pand_m2r( ymask, mm1 );
+        oldp += (os*2);
+
+        movq_m2r( newp[8], mm2 );
+        movq_m2r( newp[ns+8], mm3 );
+        pand_m2r( ymask, mm2 );
+        pand_m2r( ymask, mm3 );
+        newp += (ns*2);
+
+        paddw_r2r( mm1, mm4 );
+        paddw_r2r( mm1, mm5 );
+        paddw_r2r( mm3, mm6 );
+        psubw_r2r( mm0, mm4 );
+        psubw_r2r( mm2, mm5 );
+        psubw_r2r( mm2, mm6 );
+    }
+    movq_r2m( mm4, outdata[8] );
+    movq_r2m( mm5, outdata[24] );
+    movq_r2m( mm6, outdata[40] );
+
+    m->p = m->t = m->s = 0;
+    for (i=0; i<8; i++) {
+        // FIXME: move abs() into the mmx code!
+        m->p += ABS(out[i]);
+        m->t += ABS(out[8+i]);
+        m->s += ABS(out[16+i]);
+    }
+
+    emms();
+}
+
+void diff_packed422_block8x8_c( pulldown_metrics_t *m, unsigned char *old,
+                                unsigned char *new, int os, int ns )
+{
+    int x, y, e=0, o=0, s=0, p=0, t=0;
+    unsigned char *oldp, *newp;
+    m->s = m->p = m->t = 0;
+    for (x = 8; x; x--) {
+        oldp = old; old += 2;
+        newp = new; new += 2;
+        s = p = t = 0;
+        for (y = 4; y; y--) {
+            e += ABS(newp[0] - oldp[0]);
+            o += ABS(newp[ns] - oldp[os]);
+            s += newp[ns]-newp[0];
+            p += oldp[os]-oldp[0];
+            t += oldp[os]-newp[0];
+            oldp += os<<1;
+            newp += ns<<1;
+        }
+        m->s += ABS(s);
+        m->p += ABS(p);
+        m->t += ABS(t);
+    }
+    m->e = e;
+    m->o = o;
+    m->d = e+o;
+}
+
+
+
 void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width )
 {
