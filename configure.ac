@@ -137,7 +137,11 @@ dnl Test for directfb
 AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
 AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
 if test "$DIRECTFB_CONFIG" != "no" ; then
-   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
+  AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
+  CFLAGS="`directfb-config --cflags` $CFLAGS"
+  AC_CHECK_DECL(DLBM_TRIPLE, [AC_DEFINE([DIRECTFB_HAS_TRIPLE],,[DirectFB Supports triple buffering])],,[#include <directfb.h>])
+  AC_CHECK_DECL(DLCAPS_FIELD_PARITY, [AC_DEFINE([DIRECTFB_HAS_FIELD_PARITY],,[DirectFB Supports setting field parity])],,[#include <directfb.h>])
+  AC_CHECK_DECL(DLCAPS_FLICKER_FILTERING, [AC_DEFINE([DIRECTFB_HAS_FLICKER_FILTERING],,[DirectFB Supports setting flicker filtering])],,[#include <directfb.h>])
 fi
 
 dnl ---------------------------------------------
