@@ -65,9 +65,10 @@ void osd_shape_advance_frame( osd_shape_t *osds );
 
 
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
-                                int video_height, double aspect );
+                                int video_height, double aspect, int alpha );
 void osd_graphic_delete( osd_graphic_t *osdg );
-void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout, int alpha );
+void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout );
+void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
 int osd_graphic_visible( osd_graphic_t *osdg );
 void osd_graphic_advance_frame( osd_graphic_t *osdg );
 void osd_graphic_composite_packed444( osd_string_t *osds, 

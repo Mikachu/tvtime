@@ -63,7 +63,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
     osd->muted = 0;
 
     osd->channel_logo = osd_graphic_new( "testlogo.png", width, height, 
-                                         frameaspect );
+                                         frameaspect, 256 );
 
     return osd;
 }
@@ -102,7 +102,7 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
-    osd_graphic_show_graphic( osd->channel_logo, 80, 255 );
+    osd_graphic_show_graphic( osd->channel_logo, 80 );
 }
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )

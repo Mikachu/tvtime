@@ -20,13 +20,7 @@
 #ifndef INPUT_H_INCLUDED
 #define INPUT_H_INCLUDED
 
-#include "tvtimeosd.h"
-#include "videoinput.h"
-#include "videotools.h"
-#include "tvtimeconf.h"
-
 typedef struct input_s input_t;
-
 typedef enum InputEvent_e {
 
     I_NOOP                      = 0,
@@ -34,6 +28,12 @@ typedef enum InputEvent_e {
     I_QUIT                      = (1<<1)
 
 } InputEvent;
+
+#include "tvtimeosd.h"
+#include "videoinput.h"
+#include "videotools.h"
+#include "tvtimeconf.h"
+#include "menu.h"
 
 /* Modifiers */
 #define I_SHIFT                 (1<<16)
@@ -78,7 +78,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
                     tvtime_osd_t *osd, video_correction_t *vc );
 void input_delete( input_t *in );
 void input_callback( input_t *in, InputEvent command, int arg );
-int input_menu_callback( input_t *in, InputEvent command, int arg );
 
 int input_quit( input_t *in );
 int input_take_screenshot( input_t *in );
@@ -89,8 +88,10 @@ int input_show_test( input_t *in );
 int input_toggle_fullscreen( input_t *in );
 int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );
+int input_toggle_menu( input_t *in );
+
+void input_set_menu( input_t *in, menu_t *m );
 
 void input_next_frame( input_t *in );
-void input_menu_init( input_t *in );
 
 #endif /* INPUT_H_INCLUDED */

@@ -315,11 +315,15 @@ struct osd_graphic_s
     int image_height;
     double image_aspect;
     int image_adjusted_width;
+    int image_graphic_height;
     int alpha;
 };
 
+void osd_graphic_render_image4444( osd_graphic_t *osdg );
+
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
-                                int video_height, double video_aspect )
+                                int video_height, double video_aspect, 
+                                int alpha )
 {
     osd_graphic_t *osdg = (osd_graphic_t *) malloc( sizeof( struct osd_graphic_s ) );
     if( !osdg ) {
@@ -342,7 +346,9 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
     osdg->image_width = video_width;
     osdg->image_height = video_height;
     osdg->image_aspect = video_aspect / (double)(((double)osdg->image_width)/((double)osdg->image_height));
-    osdg->alpha = 255;
+
+    osdg->alpha = alpha;
+    osd_graphic_render_image4444( osdg );
 
     return osdg;
 }
@@ -432,6 +438,7 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
 
     width = pnginput_get_width( osdg->png );
     height = pnginput_get_height( osdg->png );
+    osdg->image_graphic_height = height;
 
     cb444 = (unsigned char *) malloc( (width * 3) );
     if( !cb444 ) return;
@@ -464,11 +471,14 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
     free( cb444 );
 }
 
-void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout, int alpha )
+void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout )
 {
     osdg->frames_left = timeout;
-    osdg->alpha = alpha;
-    osd_graphic_render_image4444( osdg );
+}
+
+void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout )
+{
+    osdg->frames_left = timeout;
 }
 
 int osd_graphic_visible( osd_graphic_t *osdg )
@@ -501,9 +511,9 @@ void osd_graphic_composite_packed422( osd_graphic_t *osdg,
     }
 
     composite_packed4444_alpha_to_packed422( output, width, height, stride,
-                                       osdg->image4444, 
-                                       osdg->image_adjusted_width,
-                                       pnginput_get_height( osdg->png ),
-                                       osdg->image_width*4,
-                                       xpos, ypos, alpha );
+                                             osdg->image4444, 
+                                             osdg->image_adjusted_width,
+                                             osdg->image_graphic_height,
+                                             osdg->image_width*4,
+                                             xpos, ypos, alpha );
 }

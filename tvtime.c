@@ -39,6 +39,7 @@
 #include "tvtimeconf.h"
 #include "input.h"
 #include "speedy.h"
+#include "menu.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -159,6 +160,7 @@ int main( int argc, char **argv )
     unsigned char *lastframe;
     config_t *ct;
     input_t *in;
+    menu_t *menu;
 
     setup_speedy_calls();
 
@@ -306,6 +308,14 @@ int main( int argc, char **argv )
         return 1;
     }
 
+    menu = menu_new( in, ct, width, height, 
+                     config_get_aspect( ct ) ? 16.0 / 9.0 : 4.0 / 3.0 );
+    if( !menu ) {
+        fprintf( stderr, "tvtime: Can't create menu.\n" );
+        return 1;
+    }
+
+    input_set_menu( in, menu );
 
     /* Steal system resources in the name of performance. */
     if( verbose ) {
@@ -456,6 +466,9 @@ int main( int argc, char **argv )
             tvtime_osd_volume_muted( osd, mixer_ismute() );
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
                                             height, width*2 );
+            menu_composite_packed422( menu, sdl_get_output(), width,
+                                      height, width*2 );
+
         }
         if( screenshot ) {
             char filename[ 256 ];
@@ -532,6 +545,9 @@ int main( int argc, char **argv )
             tvtime_osd_volume_muted( osd, mixer_ismute() );
             tvtime_osd_composite_packed422( osd, sdl_get_output(), width,
                                             height, width*2 );
+            menu_composite_packed422( menu, sdl_get_output(), width,
+                                      height, width*2 );
+
         }
         if( screenshot ) {
             char filename[ 256 ];

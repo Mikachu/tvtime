@@ -24,27 +24,13 @@
 #include "frequencies.h"
 #include "mixer.h"
 #include "input.h"
+#include "menu.h"
 
 /* Number of frames to wait for next channel digit. */
 #define CHANNEL_DELAY 100
 
 /* Number of frames to pause during channel change. */
 #define CHANNEL_HOLD 2
-
-typedef enum MenuScreen_e {
-    MENU_MAIN,
-    MENU_PICT,
-    MENU_AUDIO,
-    MENU_CHANNELS,
-    MENU_PARENTAL,
-    MENU_PVR,
-    MENU_SETUP,
-    MENU_TVGUIDE,
-    MENU_INPUT,
-    MENU_PREVIEW,
-
-    MENU_LAST
-} MenuScreen;
 
 
 struct input_s {
@@ -67,9 +53,7 @@ struct input_s {
     int toggledeinterlacingmode;
     
     int togglemenumode;
-    MenuScreen menu_screen;
-    MenuScreen menu_previous_screen;
-    unsigned int menu_state;
+    menu_t *menu;
 };
 
 input_t *input_new( config_t *cfg, videoinput_t *vidin,
@@ -98,7 +82,6 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglemenumode = 0;
-    in->menu_screen = MENU_MAIN;
 
     return in;
 }
@@ -106,6 +89,11 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
 void input_delete( input_t *in )
 {
     free( in );
+}
+
+void input_set_menu( input_t *in, menu_t *m )
+{
+    in->menu = m;
 }
 
 void input_callback( input_t *in, InputEvent command, int arg )
@@ -118,7 +106,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
     verbose = config_get_verbose( in->cfg );
 
     if( in->togglemenumode ) {
-        if( input_menu_callback( in, command, arg ) ) {
+        if( menu_callback( in->menu, command, arg ) ) {
             return;
         }
     }
@@ -139,7 +127,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_MENUMODE:
              in->togglemenumode = 1;
-             input_menu_init( in );
+             menu_init( in->menu );
              break;
 
          case TVTIME_DEBUG:
@@ -384,6 +372,12 @@ int input_toggle_deinterlacing_mode( input_t *in )
     return in->toggledeinterlacingmode;
 }
 
+int input_toggle_menu( input_t *in )
+{
+    in->togglemenumode = !in->togglemenumode;
+    return in->togglemenumode;
+}
+
 void input_next_frame( input_t *in )
 {
     /* Decrement the frame counter if user is typing digits */
@@ -412,181 +406,4 @@ void input_next_frame( input_t *in )
     in->toggledeinterlacingmode = 0;
 }
 
-void input_menu_init( input_t *in )
-{
-    in->menu_screen = MENU_MAIN;
-    in->menu_state = 0;
-    in->menu_previous_screen = MENU_MAIN;
-}
 
-void menu_main( input_t *in, int key )
-{
-    switch( key ) {
-    case I_UP:
-    case I_DOWN:
-        in->menu_state += ( key == I_UP ? -1 : 1 ) + MENU_LAST-1;
-        in->menu_state %= MENU_LAST - 1;
-        break;
-
-    case I_PGUP:
-    case I_PGDN:
-        in->menu_state += ( key == I_PGUP ? -4 : 4 ) + MENU_LAST-1;
-        in->menu_state %= MENU_LAST - 1;
-        break;
-
-    case I_LEFT:
-    case I_RIGHT:
-        break;
-
-    case I_ENTER:
-        in->menu_screen = in->menu_state + 1;
-        break;
-
-    default:
-        break;
-    }
-
-    /* draw osd reflecting current state */
-}
-
-void menu_pict( input_t *in, int key )
-{
-}
-
-void menu_audio( input_t *in, int key )
-{
-}
-
-void menu_channels( input_t *in, int key )
-{
-}
-
-void menu_parental( input_t *in, int key )
-{
-}
-
-void menu_pvr( input_t *in, int key )
-{
-}
-
-void menu_setup( input_t *in, int key )
-{
-}
-
-void menu_tvguide( input_t *in, int key )
-{
-}
-
-void menu_input( input_t *in, int key )
-{
-}
-
-void menu_preview( input_t *in, int key )
-{
-}
-
-int input_menu_callback( input_t *in, InputEvent command, int arg )
-{
-    int tvtime_cmd, verbose, fixed_arg = 0;
-
-    if( in->quit ) return 1;
-
-    verbose = config_get_verbose( in->cfg );
-
-    switch( command ) {
-    case I_KEYDOWN:
-
-        fixed_arg = arg & 0xFFFF;
-
-        switch( fixed_arg ) {
-
-        case I_ENTER:
-        case I_UP:
-        case I_DOWN:
-        case I_LEFT:
-        case I_RIGHT:   
-        case I_PGUP:
-        case I_PGDN:
-        case I_ESCAPE:
-            if( fixed_arg == I_ESCAPE ) {
-                MenuScreen tmp = in->menu_previous_screen;
-                in->menu_previous_screen = MENU_MAIN;
-                in->menu_screen = tmp;
-                in->menu_state = 0;
-            }
-
-            switch( in->menu_screen ) {
-            case MENU_MAIN:
-                menu_main( in, fixed_arg );
-                break;
-
-            case MENU_PICT:
-                menu_pict( in, fixed_arg );
-                break;
-
-            case MENU_AUDIO:
-                menu_audio( in, fixed_arg );
-                break;
-
-            case MENU_CHANNELS:
-                menu_channels( in, fixed_arg );
-                break;
-
-            case MENU_PARENTAL:
-                menu_parental( in, fixed_arg );
-                break;
-
-            case MENU_PVR:
-                menu_pvr( in, fixed_arg );
-                break;
-
-            case MENU_SETUP:
-                menu_setup( in, fixed_arg );
-                break;
-
-            case MENU_TVGUIDE:
-                menu_tvguide( in, fixed_arg );
-                break;
-
-            case MENU_INPUT:
-                menu_input( in, fixed_arg );
-                break;
-
-            case MENU_PREVIEW:
-                menu_preview( in, fixed_arg );
-                break;
-
-            default:
-                break;
-            }
-            return 1;
-            break;
-
-        default:
-            tvtime_cmd = config_key_to_command( in->cfg, arg );
-
-            switch( tvtime_cmd ) {
-
-            case TVTIME_MENUMODE:
-                in->togglemenumode = 0;
-                in->menu_screen = MENU_MAIN;
-                /* now remove OSD */
-                return 1;
-                break;
-
-            default:
-                /* cause input_callback to handle this */
-                return 0;
-                break;
-            }
-            break;
-        }
-
-    default:
-        /* cause input_callback to handle this */
-        return 0;
-        break;
-    }
-
-    return 1;
-}
