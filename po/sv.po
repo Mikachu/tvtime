@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.13\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-09-25 19:41+0200\n"
+"POT-Creation-Date: 2004-09-25 13:47-0400\n"
 "PO-Revision-Date: 2004-09-19 21:38+0200\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
@@ -746,22 +746,27 @@ msgid "Sleep in %d minutes."
 msgstr "Insomningstimer: %d minuter."
 
 #: src/commands.c:2163
+#, c-format
 msgid "Sleep off."
 msgstr "Insomningsfunktionen inaktiverad."
 
 #: src/commands.c:2202
+#, c-format
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Använder PAL-BG-avkodning för den här kanalens ljud."
 
 #: src/commands.c:2205
+#, c-format
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Använder PAL-DK-avkodning för den här kanalens ljud."
 
 #: src/commands.c:2234
+#, c-format
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "Avkodar ljud som PAL-DK som förval."
 
 #: src/commands.c:2237
+#, c-format
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "Avkodar ljud som PAL-BK som förval."
 
@@ -774,6 +779,7 @@ msgid "Channel disabled from the browse list."
 msgstr "Kanalen visas inte längre vid bläddring."
 
 #: src/commands.c:2298
+#, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr "Tvtime kommer inte ställa in capture-kortets ljudstyrka."
 
@@ -805,6 +811,7 @@ msgid "Television standard will be %s on restart."
 msgstr "Vald TV-standard blir %s efter omstart."
 
 #: src/commands.c:2440
+#, c-format
 msgid "Using default language for XMLTV data."
 msgstr "Använder förvalt språk för XMLTV-data."
 
@@ -1252,6 +1259,7 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
+#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1260,6 +1268,7 @@ msgstr ""
 "Tillgängliga kommandon:\n"
 
 #: src/tvtime-command.c:80
+#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime är inte igång.\n"
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-09-25 19:41+0200\n"
+"POT-Creation-Date: 2004-09-25 13:47-0400\n"
 "PO-Revision-Date: 2004-09-05 18:18+0300\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
@@ -742,22 +742,27 @@ msgid "Sleep in %d minutes."
 msgstr "Uniajastin: %d minuuttia."
 
 #: src/commands.c:2163
+#, c-format
 msgid "Sleep off."
 msgstr "Uniajastin sammutettu."
 
 #: src/commands.c:2202
+#, c-format
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Käytetään PAL B/G -äänikanavapurkua tällä kanavalla."
 
 #: src/commands.c:2205
+#, c-format
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Käytetään PAL D/K -äänikanavapurkua tällä kanavalla."
 
 #: src/commands.c:2234
+#, c-format
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "PAL D/K -äänikanavapurku valittu oletukseksi."
 
 #: src/commands.c:2237
+#, c-format
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "PAL B/G -äänikanavapurku valittu oletukseksi."
 
@@ -770,6 +775,7 @@ msgid "Channel disabled from the browse list."
 msgstr "Kanava merkitty pois käytöstä."
 
 #: src/commands.c:2298
+#, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr "Kaappauskortin äänilähdön tasoa ei muuteta."
 
@@ -801,6 +807,7 @@ msgid "Television standard will be %s on restart."
 msgstr "TV-standardi on %s uudelleenkäynnistyksen jälkeen."
 
 #: src/commands.c:2440
+#, c-format
 msgid "Using default language for XMLTV data."
 msgstr "Käytetään oletuskieltä XMLTV-tiedoille."
 
@@ -1252,6 +1259,7 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
+#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1260,6 +1268,7 @@ msgstr ""
 "Käytettävissä olevat komennot:\n"
 
 #: src/tvtime-command.c:80
+#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime ei ole käynnissä.\n"
 

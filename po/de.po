@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.12\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2004-09-25 19:41+0200\n"
+"POT-Creation-Date: 2004-09-25 13:47-0400\n"
 "PO-Revision-Date: 2004-09-19 19:56+0200\n"
 "Last-Translator: Ingo van Lil <inguin@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -742,22 +742,27 @@ msgid "Sleep in %d minutes."
 msgstr "Schlafmodus in %d Minuten."
 
 #: src/commands.c:2163
+#, c-format
 msgid "Sleep off."
 msgstr "Schlafmodus deaktiviert."
 
 #: src/commands.c:2202
+#, c-format
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "PAL-BG Audiodekodierung für diesen Kanal gewählt."
 
 #: src/commands.c:2205
+#, c-format
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "PAL-DK Audiodekodierung für diesen Kanal gewählt."
 
 #: src/commands.c:2234
+#, c-format
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "PAL-DK Audiodekodierung als Standard gewählt."
 
 #: src/commands.c:2237
+#, c-format
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "PAL-BG Audiodekodierung als Standard gewählt."
 
@@ -770,6 +775,7 @@ msgid "Channel disabled from the browse list."
 msgstr "Aus Liste aktiver Kanäle entfernt."
 
 #: src/commands.c:2298
+#, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr "Lautstärke der TV-Karte wird nicht durch tvtime gesetzt."
 
@@ -801,6 +807,7 @@ msgid "Television standard will be %s on restart."
 msgstr "Fernsehnorm beim nächsten Start: %s."
 
 #: src/commands.c:2440
+#, c-format
 msgid "Using default language for XMLTV data."
 msgstr "Verwende XMLTV-Daten in Standardsprache."
 
@@ -1250,6 +1257,7 @@ msgstr ""
 "\n"
 
 #: src/tvtime-command.c:61
+#, c-format
 msgid ""
 "\n"
 "Available commands:\n"
@@ -1258,6 +1266,7 @@ msgstr ""
 "Verfügbare Kommandos:\n"
 
 #: src/tvtime-command.c:80
+#, c-format
 msgid "tvtime not running.\n"
 msgstr "tvtime läuft nicht.\n"
 
