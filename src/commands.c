@@ -201,6 +201,41 @@ static void update_xmltv_channel( commands_t *cmd )
     }
 }
 
+static void display_xmltv_description( commands_t *cmd, const char *title,
+                                       const char *subtitle,
+                                       const char *l1, const char *l2,
+                                       const char *next_title )
+{
+    int cur = 0;
+
+    if( title ) {
+        tvtime_osd_list_set_text( cmd->osd, cur++, title );
+    } else {
+        tvtime_osd_list_set_text( cmd->osd, cur++, "No information available" );
+    }
+
+    if( subtitle ) {
+        tvtime_osd_list_set_text( cmd->osd, cur++, subtitle );
+    } else {
+        tvtime_osd_list_set_text( cmd->osd, cur++, "No information available" );
+    }
+
+    if( l1 || l2 ) {
+        tvtime_osd_list_set_text( cmd->osd, cur++, "" );
+
+        if( l1 ) tvtime_osd_list_set_text( cmd->osd, cur++, l1 );
+        if( l2 ) tvtime_osd_list_set_text( cmd->osd, cur++, l2 );
+    }
+
+    if( next_title ) {
+        tvtime_osd_list_set_text( cmd->osd, cur++, "" );
+        tvtime_osd_list_set_text( cmd->osd, cur++, next_title );
+    }
+    tvtime_osd_list_set_lines( cmd->osd, cur );
+    tvtime_osd_list_set_hilight( cmd->osd, -1 );
+    tvtime_osd_show_list( cmd->osd, 1 );
+}
+
 static void update_xmltv_listings( commands_t *cmd )
 {
     if( cmd->xmltv && cmd->osd && xmltv_needs_refresh( cmd->xmltv ) ) {
@@ -253,14 +288,22 @@ static void update_xmltv_listings( commands_t *cmd )
         if( xmltv_get_next_title( cmd->xmltv ) ) {
             snprintf( next_title_data, sizeof( next_title_data ),
                       _("Next: %s"), xmltv_get_next_title( cmd->xmltv ) );
-            truncate_string ( next_title, next_title_data,
-                              "...", sizeof( next_title ) );
+            truncate_string( next_title, next_title_data,
+                             "...", sizeof( next_title ) );
         } else {
             *next_title = '\0';
         }
 
-        tvtime_osd_show_program_info( cmd->osd, title, subtitle,
-                                      line1, line2, next_title );
+        // tvtime_osd_show_program_info( cmd->osd, title, subtitle,
+        //                              0, 0, next_title );
+
+        if( 0 || cmd->menuactive ) {
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle, 0, 0, next_title );
+        } else {
+            tvtime_osd_show_program_info( cmd->osd, 0, 0, 0, 0, 0 );
+            display_xmltv_description( cmd, title, subtitle, line1,
+                                       line2, next_title );
+        }
     }
 }
 
@@ -939,10 +982,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->curusermenu = 0;
     memset( cmd->menus, 0, sizeof( cmd->menus ) );
 
-
     if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
         cmd->apply_luma = 0;
-        lfputs( _("commands: Input isn't from a bt8x8, disabling luma correction.\n"), stderr );
+        lfputs( _("commands: Your capture card is not a BT878/BT848, "
+                  "disabling luma correction.\n"), stderr );
     }
 
     if( vidin && videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC &&
@@ -968,10 +1011,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
 
     if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
-        lfputs( _("commands: Luma correction value out of range. Using 1.0.\n"), stderr );
+        lfputs( _("commands: Luma correction value out of range. "
+                  "Using 1.0.\n"), stderr );
         cmd->luma_power = 1.0;
     }
-
 
     menu = menu_new( "root-tuner" );
     menu_set_back_command( menu, TVTIME_MENU_EXIT, 0 );
@@ -1055,8 +1098,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                              videoinput_get_norm( vidin ) == VIDEOINPUT_SECAM,
                              (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                               !strcasecmp( cmd->newfreqtable, "us-cable100" )),
-                             station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                             cmd->scan_channels );
+                             station_get_current_active( cmd->stationmgr ),
+                             cmd->checkfreq, cmd->scan_channels );
     }
 
     menu = menu_new( "frequencies" );
@@ -1067,7 +1110,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     commands_add_menu( cmd, menu );
     if( vidin ) {
         reset_frequency_menu( commands_get_menu( cmd, "frequencies" ),
-                              videoinput_get_norm( vidin ), config_get_v4l_freq( cfg ) );
+                              videoinput_get_norm( vidin ),
+                              config_get_v4l_freq( cfg ) );
     }
 
     menu = menu_new( "finetune" );
