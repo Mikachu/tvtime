@@ -20,48 +20,7 @@
 #define SDLOUTPUT_H_INCLUDED
 
 #include <SDL/SDL.h>
-
-/**
- * Input commands.
- */
-enum tvtime_commands
-{
-    TVTIME_NOCOMMAND     = 0,
-    TVTIME_QUIT          = (1<<0),
-    TVTIME_CHANNEL_UP    = (1<<1),
-    TVTIME_CHANNEL_DOWN  = (1<<2),
-    TVTIME_LUMA_UP       = (1<<3),
-    TVTIME_LUMA_DOWN     = (1<<4),
-    TVTIME_KP0           = (1<<5),
-    TVTIME_KP1           = (1<<6),
-    TVTIME_KP2           = (1<<7),
-    TVTIME_KP3           = (1<<8),
-    TVTIME_KP4           = (1<<9),
-    TVTIME_KP5           = (1<<10),
-    TVTIME_KP6           = (1<<11),
-    TVTIME_KP7           = (1<<12),
-    TVTIME_KP8           = (1<<13),
-    TVTIME_KP9           = (1<<14),
-    TVTIME_MIXER_MUTE    = (1<<15),
-    TVTIME_MIXER_UP      = (1<<16),
-    TVTIME_MIXER_DOWN    = (1<<17),
-    TVTIME_DIGIT         = (1<<18),
-    TVTIME_KP_ENTER      = (1<<19),
-    TVTIME_CHANNEL_CHAR  = (1<<20),
-
-    TVTIME_HUE_DOWN      = (1<<21),
-    TVTIME_HUE_UP        = (1<<22),
-    TVTIME_BRIGHT_DOWN   = (1<<23),
-    TVTIME_BRIGHT_UP     = (1<<24),
-    TVTIME_CONT_DOWN     = (1<<25),
-    TVTIME_CONT_UP       = (1<<26),
-    TVTIME_COLOUR_DOWN   = (1<<27),
-    TVTIME_COLOUR_UP     = (1<<28),
-
-    TVTIME_SHOW_BARS     = (1<<29),
-    TVTIME_SHOW_TEST     = (1<<30),
-    TVTIME_DEBUG         = (1<<31)
-};
+#include "input.h"
 
 /**
  * Returns a pointer to the next frame to be drawn.
@@ -96,6 +55,6 @@ void sdl_show_frame( void );
  * Perform the polling of events.  Returns a bitfield of the commands
  * listed above.
  */
-int sdl_poll_events( void );
+int sdl_poll_events( input_t *in );
 
 #endif /* SDLOUTPUT_H_INCLUDED */

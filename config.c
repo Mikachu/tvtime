@@ -20,8 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <getopt.h>
+#include <ctype.h>
 #include "parser.h"
 #include "config.h"
+#include "input.h"
 
 struct config_s
 {
@@ -41,9 +43,11 @@ struct config_s
     char *norm;
     char *freq;
     int tuner_number;
+    int *keymap;
 };
 
 void config_init( config_t *ct );
+void config_init_keymap( config_t *ct );
 
 static void print_usage( char **argv )
 {
@@ -108,6 +112,35 @@ config_t *config_new( int argc, char **argv )
     ct->v4ldev = strdup("/dev/video0");
     ct->norm = strdup("ntsc");
     ct->freq = strdup("us-cable");
+    ct->keymap = (int *)malloc( KEYMAP_SIZE * sizeof(int) );
+
+    if( !ct->keymap ) {
+        fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
+        return 0;
+    }
+
+    ct->keymap[ TVTIME_NOCOMMAND ]          = 0;
+    ct->keymap[ TVTIME_QUIT>>0 ]            = I_ESCAPE;
+    ct->keymap[ TVTIME_CHANNEL_UP>>1 ]      = I_UP;
+    ct->keymap[ TVTIME_CHANNEL_DOWN>>2 ]    = I_DOWN;
+    ct->keymap[ TVTIME_LUMA_UP>>3 ]         = 'j';
+    ct->keymap[ TVTIME_LUMA_DOWN>>4 ]       = 'h';
+    ct->keymap[ TVTIME_MIXER_MUTE>>5 ]      = 'm';
+    ct->keymap[ TVTIME_MIXER_UP>>6 ]        = '+';
+    ct->keymap[ TVTIME_MIXER_DOWN>>7 ]      = '-';
+    ct->keymap[ TVTIME_ENTER>>8 ]           = I_ENTER;
+    ct->keymap[ TVTIME_CHANNEL_CHAR>>9 ]    = 0; 
+    ct->keymap[ TVTIME_HUE_DOWN>>10 ]       = I_F1;
+    ct->keymap[ TVTIME_HUE_UP>>11 ]         = I_F2;
+    ct->keymap[ TVTIME_BRIGHT_DOWN>>12 ]    = I_F3; 
+    ct->keymap[ TVTIME_BRIGHT_UP>>13 ]      = I_F4;
+    ct->keymap[ TVTIME_CONT_DOWN>>14 ]      = I_F5;
+    ct->keymap[ TVTIME_CONT_UP>>15 ]        = I_F6;
+    ct->keymap[ TVTIME_COLOUR_DOWN>>16 ]    = I_F7;
+    ct->keymap[ TVTIME_COLOUR_UP>>17 ]      = I_F8;
+    ct->keymap[ TVTIME_SHOW_BARS>>18 ]      = I_F11;
+    ct->keymap[ TVTIME_SHOW_TEST>>19 ]      = I_F12;
+    ct->keymap[ TVTIME_DEBUG>>20 ]          = 'd';
 
     if( !configFile ) {
         strncpy( base, getenv("HOME"), 245 );
@@ -158,6 +191,11 @@ config_t *config_new( int argc, char **argv )
     if( configFile && configFile != base ) free( configFile );
 
     return ct;
+}
+
+void config_delete( config_t *ct )
+{
+    if( ct->keymap ) free( ct->keymap );
 }
 
 void config_init( config_t *ct )
@@ -220,7 +258,253 @@ void config_init( config_t *ct )
         ct->tuner_number = atoi( tmp );
     }
 
+    config_init_keymap( ct );
+
     config_dump( ct );
+}
+
+int string_to_key( const char *str )
+{
+    int key = 0;
+    const char *ptr;
+
+    if( !str ) return 0;
+
+    if( strlen( str ) == 1) return (int)(*str);
+
+    ptr = str;
+    while( *ptr ) {
+        int number, digits;
+
+        /* skip spaces */
+        while( *ptr == ' ' ) ptr++;
+
+        switch( *ptr ) {
+        case 'c':
+        case 'C':
+            if( *++ptr && *ptr == '+') {
+                key |= I_CTRL;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 'm':
+        case 'M':
+            if( *++ptr && *ptr == '+') {
+                key |= I_META;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 's':
+        case 'S':
+            if( *++ptr && *ptr == '+') {
+                key |= I_SHIFT;
+            } else {
+                key |= *ptr;
+            }
+            ptr++;
+            break;
+
+        case 'f':
+        case 'F':
+            ptr++;
+            if( *ptr && sscanf( ptr, "%d%n", &number, &digits ) ) {
+                if( number > 0 && number < 16 ) {
+                    key |= 281 + number;
+                    ptr += digits;
+                } else {
+                    fprintf( stderr, "config: Error parsing keybinding.\n" );
+                    return 0;
+                }
+            } else {
+                key |= *ptr;
+                ptr++;
+            }
+            break;
+
+        case '\\':
+            ptr++;
+            switch( *ptr ) {
+
+            case 'b':
+                key |= '\b';
+                ptr++;
+                break;
+                
+            case 't':
+                key |= '\t';
+                ptr++;
+                break;
+
+            case 's':
+                key |= ' ';
+                ptr++;
+                break;
+
+            case '0':
+                ptr++;
+                if( *ptr && sscanf( ptr, "%o%n", &number, &digits) ) {
+                    if( digits == 3 && number < 512 ) {
+                        key |= number;
+                        ptr += digits;
+                    } else {
+                        fprintf( stderr, "config: Invalid octal keycode.\n" );
+                        return 0;
+                    }
+                } else {
+                    fprintf( stderr, "config: Invalid escape sequence.\n" );
+                    return 0;
+                }
+                break;
+
+            default:
+                key |= *ptr;
+                ptr++;
+                break;
+            }
+            break;
+
+        default:
+            key |= *ptr;
+            ptr++;
+            break;
+        }
+    }
+    return key;
+}
+
+void config_init_keymap( config_t *ct )
+{
+    const char *tmp;
+    int key;
+    
+    if( !ct->keymap ) {
+        fprintf( stderr, "config: No keymap. No keybindings.\n" );
+        return;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_quit")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_QUIT>>0 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_channel_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_CHANNEL_UP>>1 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_channel_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_CHANNEL_DOWN>>2 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_luma_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_LUMA_UP>>3 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_luma_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_LUMA_DOWN>>4 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_mixer_mute")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_MIXER_MUTE>>5 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_mixer_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_MIXER_UP>>6 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_mixer_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_MIXER_DOWN>>7 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_hue_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_HUE_DOWN>>10 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_hue_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_HUE_UP>>11 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_bright_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_BRIGHT_DOWN>>12 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_bright_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_BRIGHT_UP>>13 ] = key;
+    }
+ 
+    if( (tmp = parser_get( &(ct->pf), "key_cont_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_CONT_DOWN>>14 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_cont_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_CONT_UP>>15 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_colour_down")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_COLOUR_DOWN>>16 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_colour_up")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_COLOUR_UP>>17 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_show_bars")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_SHOW_BARS>>18 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_show_test")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_SHOW_TEST>>19 ] = key;
+    }
+
+    if( (tmp = parser_get( &(ct->pf), "key_debug")) ) {
+        key = string_to_key( tmp );
+        ct->keymap[ TVTIME_DEBUG>>20 ] = key;
+    }
+   
+}
+
+int config_key_to_command( config_t *ct, int key )
+{
+    int i;
+
+    if( !ct || !ct->keymap ) {
+        fprintf( stderr, "config: key_to_command: Invalid config obj "
+                 "or no keymap.\n" );
+        return TVTIME_NOCOMMAND;
+    }
+
+    if( !key ) return TVTIME_NOCOMMAND;
+
+    for( i=0; i < KEYMAP_SIZE; i++ ) {
+        if( ct->keymap[i] == key ) return (1<<i);
+    }
+
+    if( isalnum(key) ) return TVTIME_CHANNEL_CHAR;
+    if( key == I_ENTER ) return TVTIME_ENTER;
+        
+    return TVTIME_NOCOMMAND;
 }
 
 int config_dump( config_t *ct )

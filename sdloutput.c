@@ -21,10 +21,13 @@
 #include <assert.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <SDL/SDL.h>
 #include "frequencies.h"
 #include "videoinput.h"
 #include "sdloutput.h"
+#include "input.h"
+#include "config.h"
 
 static SDL_Surface *screen = 0;
 static SDL_Overlay *frame = 0;
@@ -103,186 +106,118 @@ void sdl_show_frame( void )
     SDL_LockYUVOverlay( frame );
 }
 
-int sdl_poll_events( void )
+int sdl_poll_events( input_t *in )
 {
     SDL_Event event;
-    int curcommand = 0;
+    int curcommand = 0, arg = 0;
+    SDLMod mods;
 
-    SDL_PumpEvents();
-    if( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_KEYDOWNMASK ) > 0 ) {
-        if( event.key.keysym.mod & KMOD_SHIFT ) {
-            SDL_PollEvent( &event );
-            curcommand |= TVTIME_CHANNEL_CHAR;
-
-            curcommand = (curcommand & 0xFFFF0000) | (event.key.keysym.sym & 0xFF);            
-            return curcommand;
-        }
-    }
-
-    while( SDL_PollEvent( &event ) ) {
+    if( SDL_PollEvent( &event ) ) {
 
         if( event.type == SDL_QUIT ) {
-            curcommand |= TVTIME_QUIT;
+            if( fs ) {
+                SDL_WM_ToggleFullScreen( screen );
+                fs = 0;
+            }
+            SDL_UnlockYUVOverlay( frame );
+            SDL_FreeYUVOverlay( frame );
+            SDL_Quit();
+
+            curcommand = I_QUIT;
         }
 
         if( event.type == SDL_KEYDOWN ) {
+
+            curcommand = I_KEYDOWN;
+
+            mods = event.key.keysym.mod;
+            if( mods & KMOD_SHIFT ) arg |= I_SHIFT;
+            if( mods & KMOD_CTRL ) arg |= I_CTRL;
+            if( mods & (KMOD_META | KMOD_ALT) ) arg |= I_META;
+
             switch ( event.key.keysym.sym ) {
 
-            /* Escape and Q are our quit keys. */
-            case SDLK_ESCAPE:
-            case SDLK_q:
-                curcommand |= TVTIME_QUIT;
-                break;
-
-            /* f toggles fullscreen. */
-            case SDLK_f:
-                (void) SDL_WM_ToggleFullScreen( screen );
-                fs = !fs;
-                break;
-            
-            /* k decreases the amount of luma correction */
-            case SDLK_k:
-                curcommand |= TVTIME_LUMA_DOWN;
-                break;
-
-            /* l increases the amount of gamma correction */
-            case SDLK_l:
-                curcommand |= TVTIME_LUMA_UP;
-                break;
-
-            /* down arrows make the channel decrease */
-            case SDLK_DOWN:
-                curcommand |= TVTIME_CHANNEL_DOWN;
-                break;
-
-            /* up arrows make the channel increase */
-            case SDLK_UP:
-                curcommand |= TVTIME_CHANNEL_UP;
-                break;
-
-            case SDLK_m:
-                curcommand |= TVTIME_MIXER_MUTE;
-                break;
-
             case SDLK_KP_PLUS:
-                curcommand |= TVTIME_MIXER_UP;
+                arg |= '+';
                 break;
 
             case SDLK_KP_MINUS:
-                curcommand |= TVTIME_MIXER_DOWN;
+                arg |= '-';
+                break;
+
+            case SDLK_KP_DIVIDE:
+                arg |= '/';
+                break;
+
+            case SDLK_KP_PERIOD:
+                arg |= '.';
+                break;
+
+            case SDLK_KP_MULTIPLY:
+                arg |= '*';
+                break;
+
+            case SDLK_KP_EQUALS:
+                arg |= '=';
                 break;
 
             case SDLK_KP0:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP0;
+                arg |= '0';
                 break;
 
             case SDLK_KP1:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP1;
+                arg |= '1';
                 break;
 
             case SDLK_KP2:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP2;
+                arg |= '2';
                 break;
 
             case SDLK_KP3:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP3;
+                arg |= '3';
                 break;
 
             case SDLK_KP4:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP4;
+                arg |= '4';
                 break;
 
             case SDLK_KP5:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP5;
+                arg |= '5';
                 break;
 
             case SDLK_KP6:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP6;
+                arg |= '6';
                 break;
 
             case SDLK_KP7:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP7;
+                arg |= '7';
                 break;
 
             case SDLK_KP8:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP8;
+                arg |= '8';
                 break;
 
             case SDLK_KP9:
-                curcommand |= TVTIME_DIGIT;
-                curcommand |= TVTIME_KP9;
-                break;
-
-            case SDLK_d:
-                curcommand |= TVTIME_DEBUG;
+                arg |= '9';
                 break;
 
             case SDLK_KP_ENTER:
-                curcommand |= TVTIME_KP_ENTER;
-                break;
-
-            /* Picture controls */
-            case SDLK_F1:
-                curcommand |= TVTIME_HUE_DOWN;
-                break;
-            case SDLK_F2:
-                curcommand |= TVTIME_HUE_UP;
-                break;
-            case SDLK_F3:
-                curcommand |= TVTIME_BRIGHT_DOWN;
-                break;
-            case SDLK_F4:
-                curcommand |= TVTIME_BRIGHT_UP;
-                break;
-            case SDLK_F5:
-                curcommand |= TVTIME_CONT_DOWN;
-                break;
-            case SDLK_F6:
-                curcommand |= TVTIME_CONT_UP;
-                break;
-            case SDLK_F7:
-                curcommand |= TVTIME_COLOUR_DOWN;
-                break;
-            case SDLK_F8:
-                curcommand |= TVTIME_COLOUR_UP;
-                break;
-            case SDLK_F11:
-                curcommand |= TVTIME_SHOW_BARS;
-                break;
-            case SDLK_F12:
-                curcommand |= TVTIME_SHOW_TEST;
+                arg |= I_ENTER;
                 break;
 
             default:
-                break;
-            }
-            
-            /* just handle one digit at a time */
-            if( curcommand & TVTIME_DIGIT ) {
+                if( (mods & KMOD_SHIFT) || (mods & KMOD_CAPS) ) {
+                    arg |= toupper( event.key.keysym.sym );
+                } else {
+                    arg |= event.key.keysym.sym;
+                }
                 break;
             }
         }
-    }
 
-    if( curcommand & TVTIME_QUIT ) {
-        if( fs ) {
-            SDL_WM_ToggleFullScreen( screen );
-            fs = 0;
-        }
-        SDL_UnlockYUVOverlay( frame );
-        SDL_FreeYUVOverlay( frame );
-        SDL_Quit();
+        input_callback( in, curcommand, arg );
     }
-
-    return curcommand;
+    if( curcommand == I_QUIT ) return 0;
+    return 1;
 }
 

@@ -1,7 +1,7 @@
 
 # you know it, baby
-CC = gcc -O3 -funroll-loops -fomit-frame-pointer
-#CC = gcc -g
+#CC = gcc -O3 -funroll-loops -fomit-frame-pointer
+CC = gcc -g
 
 # libsdl because i'm too cheap to do it myself
 SDLFLAGS = `sdl-config --cflags`
@@ -19,7 +19,7 @@ LDFLAGS = $(SDLLIBS) $(TTFLIBS) $(PNGLIBS)
 
 OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
 	videotools.o ttfont.o efs.o osd.o parser.o config.o \
-	pngoutput.o tvtimeosd.o
+	pngoutput.o tvtimeosd.o input.o
 
 all: tvtime
 

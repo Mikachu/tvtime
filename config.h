@@ -21,8 +21,45 @@
 
 typedef struct config_s config_t;
 
+/**
+ * Input commands for keymap
+ */
+enum tvtime_commands
+{
+    TVTIME_NOCOMMAND     = 0,
+    TVTIME_QUIT          = (1<<0),
+    TVTIME_CHANNEL_UP    = (1<<1),
+    TVTIME_CHANNEL_DOWN  = (1<<2),
+    TVTIME_LUMA_UP       = (1<<3),
+    TVTIME_LUMA_DOWN     = (1<<4),
+    TVTIME_MIXER_MUTE    = (1<<5),
+    TVTIME_MIXER_UP      = (1<<6),
+    TVTIME_MIXER_DOWN    = (1<<7),
+    TVTIME_ENTER         = (1<<8),
+    TVTIME_CHANNEL_CHAR  = (1<<9),
+
+    TVTIME_HUE_DOWN      = (1<<10),
+    TVTIME_HUE_UP        = (1<<11),
+    TVTIME_BRIGHT_DOWN   = (1<<12),
+    TVTIME_BRIGHT_UP     = (1<<13),
+    TVTIME_CONT_DOWN     = (1<<14),
+    TVTIME_CONT_UP       = (1<<15),
+    TVTIME_COLOUR_DOWN   = (1<<16),
+    TVTIME_COLOUR_UP     = (1<<17),
+
+    TVTIME_SHOW_BARS     = (1<<18),
+    TVTIME_SHOW_TEST     = (1<<19),
+    TVTIME_DEBUG         = (1<<20)
+};
+/**
+ * Update this when adding to tvtime_commands
+ */
+#define KEYMAP_SIZE 22
+
+
 config_t *config_new( int argc, char **argv );
 int config_dump( config_t *ct );
+int config_key_to_command( config_t *ct, int key );
 
 int config_get_verbose( config_t *ct );
 int config_get_debug( config_t *ct );

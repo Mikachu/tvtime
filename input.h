@@ -23,13 +23,15 @@
 #include "osd.h"
 #include "videoinput.h"
 #include "config.h"
+#include "videotools.h"
 
 typedef struct input_s input_t;
 
 typedef enum InputEvent_e {
 
     I_NOOP                      = 0,
-    I_KEYDOWN                   = (1<<0)
+    I_KEYDOWN                   = (1<<0),
+    I_QUIT                      = (1<<1)
 
 } InputEvent;
 
@@ -67,14 +69,21 @@ typedef enum InputEvent_e {
 #define I_F15                   296
 
 /* Misc. */
+#define I_ESCAPE                27
 #define I_ENTER                 13
 #define I_PRINT                 316
 #define I_MENU                  319
 
-
-input_t *input_new( config_t *cfg, osd_t *osd, videoinput_t *vidin );
+input_t *input_new( config_t *cfg, 
+                    /* osd_t *osd, */
+                    videoinput_t *vidin, 
+                    video_correction_t *vc );
 void    input_delete( input_t *in );
 void    input_callback( input_t *in, InputEvent command, int arg );
-void    input_next_frame( input_*in );
+void    input_next_frame( input_t *in );
+
+/* XXX: these are temporary */
+int     input_get_videohold( input_t *in );
+void    input_dec_videohold( input_t *in );
 
 #endif

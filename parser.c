@@ -221,8 +221,10 @@ int parser_new( parser_file_t *pf, const char *filename )
                     pf->file_contents = NULL;
                     return 0;
                 }
+                pf->nv_pairs = tmp;
+                memset( (void*)tmp+(pf->num_pairs*sizeof(struct nv_pair)),
+                        0, sizeof(struct nv_pair)*25);
                 pf->num_pairs += 25;
-                memset( (void*)tmp, 0, sizeof(struct nv_pair)*25);
             }
 
             pf->nv_pairs[pairs].name = name;
