@@ -16,6 +16,11 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "config.h"
+#include "sdloutput.h"
+
+#ifdef HAVE_SDL
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -24,7 +29,6 @@
 #include <ctype.h>
 #include <SDL/SDL.h>
 #include "videoinput.h"
-#include "sdloutput.h"
 #include "input.h"
 
 const int resize_frame_delay = 10;
@@ -306,3 +310,11 @@ output_api_t *get_sdl_output( void )
     return &sdloutput;
 }
 
+#else
+
+output_api_t *get_sdl_output( void )
+{
+    return 0;
+}
+
+#endif

@@ -26,8 +26,13 @@ AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([atexit gettimeofday memset strerror])
 
-AM_PATH_SDL(1.2.2, , AC_MSG_ERROR([Requires SDL 1.2 or later]))
-
+dnl ---------------------------------------------
+dnl zlib
+dnl ---------------------------------------------
+dnl AM_PATH_SDL(1.2.2, , AC_MSG_ERROR([Requires SDL 1.2 or later]))
+if 0; then
+  AC_DEFINE([HAVE_SDL],,[Define this to include SDL support])
+fi
 
 
 dnl ---------------------------------------------
@@ -66,12 +71,14 @@ if test "$FREETYPE_CONFIG" = "no" ; then
 fi
 
 dnl ---------------------------------------------
-dnl directfb
+dnl directfb - currently disabled
 dnl ---------------------------------------------
 dnl Test for directfb
-AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
-AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
-if test "$DIRECTFB_CONFIG" != "no" ; then
+dnl AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no)
+dnl AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
+dnl if test "$DIRECTFB_CONFIG" != "no" ; then
+AM_CONDITIONAL(HAVE_DIRECTFB, 0)
+if 0; then
   AC_DEFINE([HAVE_DIRECTFB],,[Define this to include DirectFB support])
 fi
 
