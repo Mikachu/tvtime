@@ -56,23 +56,14 @@ const unsigned int height = 480;
 const unsigned int numruns = 512;
 
 static const char *tests[] = {
-   "blit_colour_packed422_scanline_c 720x480 frame",
-   "blit_colour_packed422_scanline_mmx 720x480 frame",
-   "blit_colour_packed422_scanline_mmxext 720x480 frame",
-   "blit_packed422_scanline_c 720x480 frame",
-   "blit_packed422_scanline_mmx 720x480 frame",
-   "blit_packed422_scanline_mmxext 720x480 frame",
-   "interpolate_packed422_scanline_c 720x480 frame",
-   "interpolate_packed422_scanline_mmx 720x480 frame",
-   "interpolate_packed422_scanline_mmxext 720x480 frame",
-   "blend_packed422_scanline_c 720x480 120/256 frame",
-   "blend_packed422_scanline_mmxext 720x480 120/256 frame",
+   "blit_colour_packed422_scanline 720x480 frame",
+   "blit_packed422_scanline 720x480 frame",
+   "interpolate_packed422_scanline 720x480 frame",
+   "blend_packed422_scanline 720x480 120/256 frame",
    "comb_factor_packed422_scanline 720x480 frame",
-   "diff_factor_packed422_scanline_c 720x480 frame",
-   "diff_factor_packed422_scanline_mmx 720x480 frame",
+   "diff_factor_packed422_scanline 720x480 frame",
    "leetft_render_test_string",
-   "packed444_to_rgb24_rec601_scanline",
-   "packed444_to_rgb24_rec601_reference_scanline"
+   "packed444_to_rgb24_rec601_scanline"
 };
 const int numtests = ( sizeof( tests ) / sizeof( char * ) );
 
@@ -162,90 +153,35 @@ int main( int argc, char **argv )
     for( i = 0; i < numruns; i++ ) {
         int j;
 
-        if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_c 720x480 frame" ) ) {
+        if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_c( dest422packed + (stride422*j), width, 128, 128, 128 );
+                blit_colour_packed422_scanline( dest422packed + (stride422*j), width, 128, 128, 128 );
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmx 720x480 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_mmx( dest422packed + (stride422*j), width, 128, 128, 128 );
+                blit_packed422_scanline( dest422packed + (stride422*j), source422packed + (stride422*j), width );
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_colour_packed422_scanline_mmxext 720x480 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                blit_colour_packed422_scanline_mmxext( dest422packed + (stride422*j), width, 128, 128, 128 );
+                interpolate_packed422_scanline( dest422packed + (stride422*j),
+                                                source422packed + (stride422*j),
+                                                source422packed2 + (stride422*j), width );
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_c 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                blit_packed422_scanline_c( dest422packed + (stride422*j), source422packed + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmx 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                blit_packed422_scanline_mmx( dest422packed + (stride422*j), source422packed + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blit_packed422_scanline_mmxext 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                blit_packed422_scanline_mmxext( dest422packed + (stride422*j), source422packed + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_c 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                interpolate_packed422_scanline_c( dest422packed + (stride422*j),
-                                                  source422packed + (stride422*j),
-                                                  source422packed2 + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmx 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                interpolate_packed422_scanline_mmx( dest422packed + (stride422*j),
-                                                    source422packed + (stride422*j),
-                                                    source422packed2 + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "interpolate_packed422_scanline_mmxext 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                interpolate_packed422_scanline_mmxext( dest422packed + (stride422*j),
-                                                       source422packed + (stride422*j),
-                                                       source422packed2 + (stride422*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_c 720x480 120/256 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "blend_packed422_scanline 720x480 120/256 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height/2; j++ ) {
-                blend_packed422_scanline_c( dest422packed + (stride422*j),
-                                            source422packed + (stride422*j),
-                                            source422packed2 + (stride422*j), width, 120 );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "blend_packed422_scanline_mmxext 720x480 120/256 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height/2; j++ ) {
-                blend_packed422_scanline_mmxext( dest422packed + (stride422*j),
-                                                 source422packed + (stride422*j),
-                                                 source422packed2 + (stride422*j), width, 120 );
+                blend_packed422_scanline( dest422packed + (stride422*j),
+                                          source422packed + (stride422*j),
+                                          source422packed2 + (stride422*j), width, 120 );
             }
             rdtscll( after );
             datasize += width * height * 2;
@@ -259,21 +195,12 @@ int main( int argc, char **argv )
             }
             rdtscll( after );
             datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "diff_factor_packed422_scanline_c 720x480 frame" ) ) {
+        } else if( !strcmp( tests[ testid ], "diff_factor_packed422_scanline 720x480 frame" ) ) {
             rdtscll( before );
             for( j = 0; j < height; j++ ) {
-                diff_factor_packed422_scanline_c( source422packed + (stride422*j),
-                                                  source422packed2 + (stride422*j),
-                                                  width );
-            }
-            rdtscll( after );
-            datasize += width * height * 2;
-        } else if( !strcmp( tests[ testid ], "diff_factor_packed422_scanline_mmx 720x480 frame" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                diff_factor_packed422_scanline_mmx( source422packed + (stride422*j),
-                                                    source422packed2 + (stride422*j),
-                                                    width );
+                diff_factor_packed422_scanline( source422packed + (stride422*j),
+                                                source422packed2 + (stride422*j),
+                                                width );
             }
             rdtscll( after );
             datasize += width * height * 2;
@@ -287,14 +214,6 @@ int main( int argc, char **argv )
             for( j = 0; j < height; j++ ) {
                 packed444_to_rgb24_rec601_scanline( dest444packed + (stride444*j),
                                                     source444packed + (stride444*j), width );
-            }
-            rdtscll( after );
-            datasize += width * height * 3;
-        } else if( !strcmp( tests[ testid ], "packed444_to_rgb24_rec601_reference_scanline" ) ) {
-            rdtscll( before );
-            for( j = 0; j < height; j++ ) {
-                packed444_to_rgb24_rec601_reference_scanline( dest444packed + (stride444*j),
-                                                              source444packed + (stride444*j), width );
             }
             rdtscll( after );
             datasize += width * height * 3;
