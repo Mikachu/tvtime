@@ -36,7 +36,7 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c \
 	videofilter.c station.h station.c bands.h configsave.h configsave.c \
 	x11tools.c x11tools.h debug_print.h tvtimeconf_xml.c vgasync.h vgasync.c \
 	dscalerplugin.h dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h \
-	diffcomp.h diffcomp.c
+	diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c
 
 OUTPUT_SRCS = display.c display.h wm_state.h wm_state.c outputapi.h xvoutput.h xvoutput.c
 
@@ -55,7 +55,7 @@ expandpng_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la
 timingtest_SOURCES = $(COMMON_SRCS) timingtest.c
 timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-rvr_SOURCES = $(COMMON_SRCS) reepktq.c ree.c rvrmain.c
+rvr_SOURCES = $(COMMON_SRCS) reepktq.c rvrmain.c
 rvr_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
 CLEANFILES = expandpng timingtest rvr
