@@ -1,5 +1,7 @@
 
 0.9.13 -
+  * vektor: Replaced the OutputHeight configuration with window geometry
+      support using the --geometry command line option.
   * vektor: Removed the tvtime console, it was not really useful and
       confusing users when it popped up.
   * vektor: Removed support for configurable "modes", which were used

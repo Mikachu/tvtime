@@ -249,23 +249,12 @@ name:channel name.  Valid channels are:
 This option enables 16:9 aspect ratio mode by default on startup.
 
 .TP
-<option name="OutputHeight" value="576"/>
-Default to a
+<option name="WindowGeometry" value="0x576"/>
+Sets the geometry of the window.  A width value of 0 signifies that the
+appropriate width for the given height will be used.  For 4:3 content
+on a square pixel display, this defaults to a 
 .RI 768\[mu] 576
 window.
-
-.TP
-<option name="UseWindowPosition" value="0"/>
-tvtime can be told to position its window on startup.  Setting
-UseWindowPosition to 1 instructs tvtime that it should read its position
-from the WindowX and WindowY config file parameters.
-
-.TP
-<option name="WindowX" value="320"/>
-.TP
-<option name="WindowY" value="240"/>
-Default to a window position of 320,240.  Only used if UseWindowPosition
-is set to 1.
 
 .TP
 <option name="Overscan" value="0.0"/>

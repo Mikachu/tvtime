@@ -766,7 +766,7 @@ static void calculate_video_area( void )
 }
 
 
-int xcommon_open_display( int aspect, int init_height, int verbose )
+int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
 {
     Pixmap curs_pix;
     XEvent xev;
@@ -777,12 +777,12 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     const char *hello = "tvtime";
     unsigned long mask;
     char *wmname;
+    int wx, wy;
+    unsigned int ww, wh;
+    int gflags;
 
     output_aspect = aspect;
-    output_height = init_height;
-    if( output_height < 0 ) {
-        output_height = 576;
-    }
+    output_height = 576;
 
     have_xtest = 0;
     output_on_root = 0;
@@ -895,13 +895,28 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     mask = (CWBackPixel | CWSaveUnder | CWBackingStore | CWEventMask);
 
+    gflags = XParseGeometry( user_geometry, &wx, &wy, &ww, &wh );
+    if( !(gflags & WidthValue) ) {
+        ww = output_width;
+    }
+    if( !(gflags & HeightValue) ) {
+        wh = output_height;
+    } else if( ww == 0 ) {
+        ww = xv_get_width_for_height( wh );
+    }
+
+    window_area.width = ww;
+    window_area.height = wh;
+    output_width = ww;
+    output_height = wh;
+
     wm_window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
-                               output_width, output_height, 0,
-                               CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
+                               ww, wh, 0, CopyFromParent, InputOutput,
+                               CopyFromParent, mask, &xswa);
 
     output_window = XCreateWindow( display, wm_window, 0, 0,
-                                   output_width, output_height, 0,
-                                   CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
+                                   ww, wh, 0, CopyFromParent, InputOutput,
+                                   CopyFromParent, mask, &xswa);
 
     xswa.override_redirect = True;
     xswa.border_pixel = 0;
@@ -1006,10 +1021,6 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
     calculate_video_area();
     x11_aspect_hint( display, wm_window, video_area.width, video_area.height );
 
-    if( init_height < 0 ) {
-        xcommon_resize_window_fullscreen();
-    }
-
     return 1;
 }
 
@@ -1062,22 +1073,6 @@ void xcommon_set_window_position( int x, int y )
 
     x11_northwest_gravity( display, wm_window );
     XMoveWindow( display, wm_window, x, y );
-}
-
-void xcommon_resize_window_fullscreen( void )
-{
-    int x, y, w, h;
-
-    if( output_fullscreen ) {
-        xcommon_toggle_fullscreen( 0, 0 );
-    }
-
-    xfullscreen_update( xf );
-    xfullscreen_get_position( xf, window_area.x, window_area.y, &x, &y, &w, &h );
-
-    /* Show our fullscreen window. */
-    x11_static_gravity( display, wm_window );
-    XMoveResizeWindow( display, wm_window, x, y, w, h );
 }
 
 void xcommon_set_window_height( int window_height )

@@ -51,7 +51,7 @@
 
 struct config_s
 {
-    int outputheight;
+    char *geometry;
     int verbose;
     int aspect;
     int debug;
@@ -61,10 +61,7 @@ struct config_s
     int send_fields;
     int apply_luma_correction;
     double luma_correction;
-    int useposition;
     int fspos;
-    int x;
-    int y;
     int picsaverestore;
     int brightness;
     int contrast;
@@ -177,24 +174,9 @@ static void parse_option( config_t *ct, xmlNodePtr node )
     if( name && value ) {
         char *curval = (char *) value;
 
-        if( !xmlStrcasecmp( name, BAD_CAST "OutputHeight" ) ) {
-            if( tolower( curval[ 0 ] ) == 'f' ) {
-                ct->outputheight = -1;
-            } else {
-                ct->outputheight = atoi( curval );
-            }
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "UseWindowPosition" ) ) {
-            ct->useposition = atoi( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "WindowX" ) ) {
-            ct->x = atoi( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "WindowY" ) ) {
-            ct->y = atoi( curval );
+        if( !xmlStrcasecmp( name, BAD_CAST "WindowGeometry" ) ) {
+            if( ct->geometry ) free( ct->geometry );
+            ct->geometry = strdup( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "InputWidth" ) ) {
@@ -695,7 +677,7 @@ config_t *config_new( void )
     }
 
     /* Default settings. */
-    ct->outputheight = 576;
+    ct->geometry = strdup( "0x576" );
     ct->verbose = 0;
     ct->aspect = 0;
     ct->debug = 0;
@@ -705,10 +687,7 @@ config_t *config_new( void )
     ct->send_fields = 0;
     ct->apply_luma_correction = 0;
     ct->luma_correction = 1.0;
-    ct->useposition = 0;
     ct->fspos = 0;
-    ct->x = 320;
-    ct->y = 240;
     ct->picsaverestore = 1;
     ct->brightness = -1;
     ct->contrast = -1;
@@ -871,7 +850,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     static struct option long_options[] = {
         { "help", 0, 0, 'h' },
         { "verbose", 0, 0, 'v' },
-        { "height", 1, 0, 'H' },
+        { "geometry", 1, 0, 'g' },
         { "saveoptions", 0, 0, 'S' },
         { "inputwidth", 1, 0, 'I' },
         { "driver", 1, 0, 'D' },
@@ -900,7 +879,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     char c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:H:I:d:b:i:c:n:D:f:x:p:X:t:l:Qg:",
+        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:p:X:t:l:Qg:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
@@ -927,12 +906,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                       ct->mixerdev = strdup( optarg ); break;
             case 'X': setenv( "DISPLAY", optarg, 1 ); break;
-            case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
-                          ct->outputheight = -1;
-                      } else {
-                          ct->outputheight = atoi( optarg );
-                      }
-                      break;
+            case 'g': if( ct->geometry ) { free( ct->geometry ); }
+                      ct->geometry = strdup( optarg ); break;
             case 'I': ct->inputwidth = atoi( optarg ); break;
             case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
             case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
@@ -985,8 +960,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             config_save( ct, "FullscreenPosition", "Bottom" );
         }
 
-        snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
-        config_save( ct, "OutputHeight", tempstring );
+        config_save( ct, "WindowGeometry", ct->geometry );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputwidth );
         config_save( ct, "InputWidth", tempstring );
@@ -1013,7 +987,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 {
     static struct option long_options[] = {
         { "help", 0, 0, 'h' },
-        { "height", 1, 0, 'H' },
+        { "geometry", 1, 0, 'g' },
         { "inputwidth", 1, 0, 'I' },
         { "driver", 1, 0, 'D' },
         { "input", 2, 0, 'i' },
@@ -1041,7 +1015,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:H:I:d:b:i:c:n:D:f:x:p:t:l:R:",
+    while( (c = getopt_long( argc, argv, "ahmMF:g:I:d:b:i:c:n:D:f:x:p:t:l:R:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
@@ -1058,12 +1032,8 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
                   break;
         case 'x': if( ct->mixerdev ) { free( ct->mixerdev ); }
                   ct->mixerdev = strdup( optarg ); break;
-        case 'H': if( tolower( optarg[ 0 ] ) == 'f' ) {
-                      ct->outputheight = -1;
-                  } else {
-                      ct->outputheight = atoi( optarg );
-                  }
-                  break;
+        case 'g': if( ct->geometry ) { free( ct->geometry ); }
+                  ct->geometry = strdup( optarg ); break;
         case 'I': ct->inputwidth = atoi( optarg ); break;
         case 'd': if( !optarg ) {
                       fprintf( stdout, "V4LDevice:%s\n",
@@ -1169,8 +1139,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
             config_save( ct, "FullscreenPosition", "Bottom" );
         }
 
-        snprintf( tempstring, sizeof( tempstring ), "%d", ct->outputheight );
-        config_save( ct, "OutputHeight", tempstring );
+        config_save( ct, "WindowGeometry", ct->geometry );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->inputwidth );
         config_save( ct, "InputWidth", tempstring );
@@ -1241,6 +1210,7 @@ int config_parse_tvtime_scanner_command_line( config_t *ct, int argc,
 void config_free_data( config_t *ct )
 {
     if( ct->doc ) xmlFreeDoc( ct->doc );
+    if( ct->geometry ) free( ct->geometry );
     if( ct->v4ldev ) free( ct->v4ldev );
     if( ct->norm ) free( ct->norm );
     if( ct->freq ) free( ct->freq );
@@ -1428,24 +1398,9 @@ int config_get_debug( config_t *ct )
     return ct->debug;
 }
 
-int config_get_outputheight( config_t *ct )
+const char *config_get_geometry( config_t *ct )
 {
-    return ct->outputheight;
-}
-
-int config_get_useposition( config_t *ct )
-{
-    return ct->useposition;
-}
-
-int config_get_output_x( config_t *ct )
-{
-    return ct->x;
-}
-
-int config_get_output_y( config_t *ct )
-{
-    return ct->y;
+    return ct->geometry;
 }
 
 int config_get_inputwidth( config_t *ct )

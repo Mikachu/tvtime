@@ -33,7 +33,7 @@ typedef struct {
     unsigned int height;
 } area_t;
 
-int xcommon_open_display( int aspect, int init_height, int verbose );
+int xcommon_open_display( const char *user_geometry, int aspect, int verbose );
 void xcommon_close_display( void );
 
 Display *xcommon_get_display( void );
@@ -57,7 +57,6 @@ void xcommon_poll_events( input_t *in );
 void xcommon_set_window_caption( const char *caption );
 void xcommon_set_window_position( int x, int y );
 void xcommon_set_window_height( int window_height );
-void xcommon_resize_window_fullscreen( void );
 int xcommon_is_exposed( void );
 void xcommon_set_colourkey( int colourkey );
 void xcommon_frame_drawn( void );

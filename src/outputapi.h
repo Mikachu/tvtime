@@ -28,7 +28,7 @@
 
 typedef struct output_api_s
 {
-    int (* init)( int outputheight, int aspect, int verbose );
+    int (* init)( const char *user_geometry, int aspect, int verbose );
 
     int (* set_input_size)( int inputwidth, int inputheight );
 
@@ -62,7 +62,6 @@ typedef struct output_api_s
     int (* toggle_aspect)( void );
     int (* toggle_alwaysontop)( void );
     int (* toggle_fullscreen)( int fullscreen_width, int fullscreen_height );
-    void (* resize_window_fullscreen)( void );
     void (* set_window_caption)( const char *caption );
 
     void (* set_window_position)( int x, int y );

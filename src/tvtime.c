@@ -1213,14 +1213,10 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     sixteennine = config_get_aspect( ct );
 
-    if( !output || !output->init( config_get_outputheight( ct ),
+    if( !output || !output->init( config_get_geometry( ct ),
                                   sixteennine, verbose ) ) {
         /* Error messages are driver specific. */
         return 1;
-    }
-    if( config_get_useposition( ct ) ) {
-        output->set_window_position( config_get_output_x( ct ),
-                                     config_get_output_y( ct ) );
     }
 
     /* Setup the speedy calls. */
