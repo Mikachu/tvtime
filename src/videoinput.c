@@ -1288,7 +1288,7 @@ int videoinput_freq_present( videoinput_t *vidin )
             tuner.index = vidin->tunerid;
             if( ioctl( vidin->grab_fd, VIDIOC_G_TUNER, &tuner ) < 0 ) {
                 if( vidin->verbose ) {
-                    fprintf( stderr, "videoinput: Can't detect signal from tuner: %s\n",
+                    fprintf( stderr, "videoinput: Cannot detect signal from tuner: %s\n",
                              strerror( errno ) );
                 }
             } else if( !tuner.signal ) {
@@ -1299,7 +1299,7 @@ int videoinput_freq_present( videoinput_t *vidin )
 
             if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &tuner ) < 0 ) {
                 if( vidin->verbose ) {
-                    fprintf( stderr, "videoinput: Can't detect signal from tuner: %s\n",
+                    fprintf( stderr, "videoinput: Cannot detect signal from tuner: %s\n",
                              strerror( errno ) );
                 }
             } else if( !tuner.signal ) {
