@@ -262,8 +262,13 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     videoinput_t *vidin = (videoinput_t *) malloc( sizeof( videoinput_t ) );
     struct video_capability grab_cap;
     struct video_picture grab_pict;
-    /* struct video_buffer fbuf; */
     int i;
+
+    if( capwidth & 1 ) {
+        capwidth -= 1;
+        fprintf( stderr, "videoinput: Odd values for input width not allowed, "
+                         "using %d instead.\n", capwidth );
+    }
 
     if( !vidin ) {
         fprintf( stderr, "videoinput: Can't allocate memory.\n" );
