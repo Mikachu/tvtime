@@ -27,6 +27,11 @@ const band_entry_t band_data_vhf_italy[] = {
     { "G",  201250 }, { "H", 210250 }, { "H1", 217250 },
     { "H2", 224250 }
 };
+const band_entry_t band_data_vhf_ireland[] = {
+    { "1",  45750 }, { "2",  53750 }, { "3",  61750 },
+    { "4", 175250 }, { "5", 183250 }, { "6", 191250 },
+    { "7", 299250 }, { "8", 207250 }, { "9", 215250 }
+};
 const band_entry_t band_data_vhf_australia[] = {
     { "AS1",   57250 }, { "AS2",   64250 }, { "AS3",   86250 },
     { "AS4",   95250 }, { "AS5",  102250 }, { "AS5A", 138250 },
@@ -38,15 +43,15 @@ const band_entry_t band_data_vhf_australia[] = {
 /**
  * General PAL/SECAM VHF bands.
  */
-const band_entry_t band_data_vhf_e2_e12[] = {
-    { "E2",   48250 }, { "E3",   55250 }, { "E4",   62250 },
-    { "E5",  175250 }, { "E6",  182250 }, { "E7",  189250 },
-    { "E8",  196250 }, { "E9",  203250 }, { "E10", 210250 },
-    { "E11", 217250 }, { "E12", 224250 }
+const band_entry_t band_data_vhf_e1_e12[] = {
+    { "E1",   45250 }, { "E2",   48250 }, { "E3",   55250 },
+    { "E4",   62250 }, { "E5",  175250 }, { "E6",  182250 },
+    { "E7",  189250 }, { "E8",  196250 }, { "E9",  203250 },
+    { "E10", 210250 }, { "E11", 217250 }, { "E12", 224250 }
 };
 const band_entry_t band_data_vhf_misc[] = {
-    { "E1", 45250 }, { "X",   69250 }, { "Y",   76250 },
-    { "Z",  83250 }, { "Z+1", 90250 }, { "Z+2", 97250 }
+    { "X",   69250 }, { "Y",   76250 }, { "Z", 83250 },
+    { "Z+1", 90250 }, { "Z+2", 97250 }
 };
 const band_entry_t band_data_vhf_s1_s41[] = {
     { "S1",  105250 }, { "S2",  112250 }, { "S3",  119250 },
@@ -246,13 +251,14 @@ const band_entry_t band_data_japan_catv[] = {
 };
 
 const band_t bands[] = {
-    { "VHF E2-E12", band_data_vhf_e2_e12, sizeof( band_data_vhf_e2_e12 ) / sizeof( band_entry_t ) },
+    { "VHF E2-E12", band_data_vhf_e1_e12, sizeof( band_data_vhf_e1_e12 ) / sizeof( band_entry_t ) },
     { "VHF S1-S41", band_data_vhf_s1_s41, sizeof( band_data_vhf_s1_s41 ) / sizeof( band_entry_t ) },
     { "VHF Misc", band_data_vhf_misc, sizeof( band_data_vhf_misc ) / sizeof( band_entry_t ) },
     { "VHF France", band_data_vhf_france, sizeof( band_data_vhf_france ) / sizeof( band_entry_t ) },
     { "VHF Russia", band_data_vhf_russia, sizeof( band_data_vhf_russia ) / sizeof( band_entry_t ) },
     { "VHF Australia", band_data_vhf_australia, sizeof( band_data_vhf_australia ) / sizeof( band_entry_t ) },
     { "VHF Italy", band_data_vhf_italy, sizeof( band_data_vhf_italy ) / sizeof( band_entry_t ) },
+    { "VHF Ireland", band_data_vhf_ireland, sizeof( band_data_vhf_ireland ) / sizeof( band_entry_t ) },
     { "UHF", band_data_uhf, sizeof( band_data_uhf ) / sizeof( band_entry_t ) },
     { "US Cable", band_data_us_catv, sizeof( band_data_us_catv ) / sizeof( band_entry_t ) },
     { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
@@ -261,5 +267,18 @@ const band_t bands[] = {
     { "Japan Cable", band_data_japan_catv, sizeof( band_data_japan_catv ) / sizeof( band_entry_t ) },
 };
 const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
+
+/*
+ UK         VHF Ireland, VHF Misc, UHF
+ Europe     VHF Italy, VHF E1-E12, VHF S1-S41, UHF
+ France     VHF France, UHF
+ East       VHF Russia, UHF
+ Australia  VHF Australia, UHF
+ NZ         VHF E1-E12, UHF
+ US Cable   US CATV
+ US Air     US Bcast
+ JP Cable   JP Cable
+ JP Air     JP Bcast
+*/
 
 #endif /* BANDS_H_INCLUDED */
