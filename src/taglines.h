@@ -20,7 +20,8 @@ static const char *taglines[] = {
 "one small step for man... one giant leap for tvtime",
 "tvtime: the deinterlacer kids ask for by name",
 "tvtime: sweetened with sorbitol",
-"tvtime: mark mcguire's best friend", };
+"tvtime: mark mcguire's best friend",
+"tvtime: the snack that smiles back", };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
 

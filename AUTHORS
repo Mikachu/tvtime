@@ -8,6 +8,10 @@ Authors and contributors
     - Tuner, audio mixer, OSD and menu haxor
     - Configuration and input management
 
+  David I. Lehn <dlehn@users.sourceforge.net>
+    - autoconf setup, taken from his autoconf'ing of movietime
+
+
 Code we stole (well, used under the GPL)
 
   Lots of stuff from DScaler
