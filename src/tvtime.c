@@ -110,6 +110,7 @@ enum {
 enum {
     OUTPUT_XV,
     OUTPUT_DIRECTFB,
+    OUTPUT_DIRECTFB_MATROXTV,
     OUTPUT_MGA,
     OUTPUT_XMGA,
     OUTPUT_SDL
@@ -1218,8 +1219,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     if( config_get_output_driver( ct ) ) {
         if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
-            fprintf( stderr, "tvtime: Using DirectFB output driver.\n" );
             output_driver = OUTPUT_DIRECTFB;
+        } else if( !strcasecmp( config_get_output_driver( ct ), "matroxtv" ) ) {
+            output_driver = OUTPUT_DIRECTFB_MATROXTV;
         } else if( !strcasecmp( config_get_output_driver( ct ), "mga" ) ) {
             output_driver = OUTPUT_MGA;
         } else if( !strcasecmp( config_get_output_driver( ct ), "xmga" ) ) {
@@ -1236,6 +1238,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     /* Setup the output. */
     if( output_driver == OUTPUT_DIRECTFB ) {
         output = get_dfb_output();
+    } else if( output_driver == OUTPUT_DIRECTFB_MATROXTV ) {
+        output = get_dfb_matroxtv_output();
     } else if( output_driver == OUTPUT_MGA ) {
         output = get_mga_output();
     } else if( output_driver == OUTPUT_XMGA ) {

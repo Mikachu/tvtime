@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2003 Ville Syrjala <syrjala@sci.fi>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,524 +16,508 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
+#include "config.h"
 #include "dfboutput.h"
 
 #ifdef HAVE_DIRECTFB
-/* directfb includes */
-#include <directfb.h>
-#define DIRECTFB_RUNTIME_VERSION (directfb_major_version*100+directfb_minor_version)*100+directfb_micro_version
-#define DIRECTFB_COMPILE_VERSION (DIRECTFB_MAJOR*100+DIRECTFB_MINOR)*100+DIRECTFB_MICRO
-#define DIRECTFB_VERSION DIRECTFB_RUNTIME_VERSION
 
-/* other things */
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <assert.h>
+#include <directfb.h>
 
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <sys/kd.h>
-#include <linux/fb.h>
+#include "input.h"
 
-static IDirectFB             *dfb;
-static IDirectFBDisplayLayer *crtc2;
-static IDirectFBSurface      *c2frame;
-static IDirectFBSurface      *current_frame;
-static DFBSurfacePixelFormat  frame_format;
-static IDirectFBInputDevice  *keyboard;
-static IDirectFBEventBuffer  *buffer = NULL;
+static void *image_data;
+static int image_pitch;
 
-static unsigned int output_width = 0;
-static unsigned int output_height = 0;
-static int input_width = 0;
-static int input_height = 0;
+static IDirectFB *dfb;
+static IDirectFBDisplayLayer *primary;
+static IDirectFBDisplayLayer *video;
+static IDirectFBWindow *window;
+static IDirectFBSurface *wsurface;
+static IDirectFBSurface *surface;
+static IDirectFBEventBuffer *buffer;
 
-static int parity = 0;
+static DFBColor colorkey;
 
-static void *screen_framebuffer = 0;
-static int screen_pitch = 0;
+static int input_width, input_height;
+static int output_aspect = 0;
+static int output_fullscreen = 0;
+static int deinterlacing = 0;
+static int alwaysontop = 0;
+
+static DFBRectangle *current_rect;
+static DFBRectangle fullscreen_rect;
+static DFBRectangle window_rect;
+
+static void resize_video( void )
+{
+     DFBDisplayLayerConfig dlc;
+
+     primary->GetConfiguration( primary, &dlc );
+
+     video->SetScreenLocation( video,
+                               (float) current_rect->x / (float) dlc.width,
+                               (float) current_rect->y / (float) dlc.height,
+                               (float) current_rect->w / (float) dlc.width,
+                               (float) current_rect->h / (float) dlc.height );
+}
+
+static void resize_window( void )
+{
+     window->Resize( window, current_rect->w, current_rect->h );
+     wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
+     wsurface->Flip( wsurface, NULL, 0 );
+}
+
+static void move_window( void )
+{
+     window->MoveTo( window, current_rect->x, current_rect->y );
+}
+
+static void window_alwaysontop( void )
+{
+     if (alwaysontop) {
+          window->SetOptions( window, DWOP_KEEP_STACKING );
+          window->SetStackingClass( window, DWSC_UPPER );
+          window->RaiseToTop( window );
+     } else {
+          window->SetOptions( window, DWOP_NONE );
+          window->SetStackingClass( window, DWSC_MIDDLE );
+     }
+}
+
+static void calc_size( DFBRectangle *rect, int height, int aspect )
+{
+     int widthratio = aspect ? 16 : 4;
+     int heightratio = aspect ? 9 : 3;
+     int width = height * widthratio / heightratio;
+     output_aspect = aspect;
+
+     rect->w = width;
+     rect->h = height;
+}
+
+/* public */
+
+static int dfb_init( int outputheight, int aspect, int verbose )
+{
+     DFBDisplayLayerConfig dlc;
+     DFBWindowDescription wd;
+
+     DirectFBInit( NULL, NULL );
+     DirectFBCreate( &dfb );
+
+     current_rect = &window_rect;
+
+     calc_size( current_rect, outputheight, aspect );
+
+     /* Get the primary layer */
+     if (dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &primary ))
+          return 0;
+     if (primary->SetCooperativeLevel( primary, DLSCL_SHARED ))
+          return 0;
+     primary->GetConfiguration( primary, &dlc );
+     colorkey.r = 0x01;
+     colorkey.g = 0x01;
+     colorkey.b = 0xfe;
+     switch (dlc.pixelformat) {
+     case DSPF_ARGB1555:
+          colorkey.r <<= 3;
+          colorkey.g <<= 3;
+          colorkey.b <<= 3;
+          break;
+     case DSPF_RGB16:
+          colorkey.r <<= 3;
+          colorkey.g <<= 2;
+          colorkey.b <<= 3;
+          break;
+     default:
+          ;
+     }
+
+     /* Create a window to house the video layer */
+     wd.flags = DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
+     wd.posx = current_rect->x;
+     wd.posy = current_rect->y;
+     wd.width = current_rect->w;
+     wd.height = current_rect->h;
+     primary->CreateWindow( primary, &wd, &window );
+
+     window->GetSurface( window, &wsurface );
+     wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
+     wsurface->Flip( wsurface, NULL, 0 );
+     window->SetOpacity( window, 0xff );
+
+     /* Select events */
+     window->DisableEvents( window, DWET_ALL );
+     window->EnableEvents( window, DWET_BUTTONDOWN | DWET_KEYDOWN | DWET_WHEEL  | DWET_POSITION | DWET_SIZE );
+     window->CreateEventBuffer( window, &buffer );
+
+     /* Get the video layer */
+     if (dfb->GetDisplayLayer( dfb, 1, &video ))
+          return 0;
+     if (video->SetCooperativeLevel( video, DLSCL_EXCLUSIVE ))
+          return 0;
+
+     video->SetDstColorKey( video, colorkey.r, colorkey.g, colorkey.b );
+
+     return 1;
+}
+
+
+
+static int dfb_set_input_size( int inputwidth, int inputheight )
+{
+     DFBDisplayLayerConfig dlc;
+     DFBDisplayLayerConfigFlags failed;
+
+     input_width = inputwidth;
+     input_height = inputheight;
+
+     /* Set configuration accroding to input data */
+     dlc.flags = DLCONF_BUFFERMODE | DLCONF_WIDTH | DLCONF_HEIGHT | DLCONF_PIXELFORMAT | DLCONF_OPTIONS;
+     dlc.width = input_width;
+     dlc.height = input_height;
+     dlc.pixelformat = DSPF_YUY2;
+     dlc.options = DLOP_DST_COLORKEY;
+     if (deinterlacing) {
+          dlc.buffermode = DLBM_TRIPLE;
+          dlc.options |= DLOP_DEINTERLACING;
+     } else {
+          dlc.buffermode = DLBM_BACKVIDEO;
+     }
+     if (video->TestConfiguration( video, &dlc, &failed ))
+          return 0;
+     if (video->SetConfiguration( video, &dlc ))
+          return 0;
+     video->GetSurface( video, &surface );
+     surface->Clear( surface, 0, 0, 0, 0xff );
+     surface->Flip( surface, NULL, 0 );
+     surface->Clear( surface, 0, 0, 0, 0xff );
+     surface->Flip( surface, NULL, 0 );
+     surface->Clear( surface, 0, 0, 0, 0xff );
+     video->SetOpacity( video, 0xff );
+
+     resize_video();
+
+     return 1;
+}
+
+
 
 static void dfb_lock_output_buffer( void )
 {
-    current_frame->Lock( current_frame, DSLF_WRITE|DSLF_READ, 
-                         &screen_framebuffer, &screen_pitch );
+     surface->Lock( surface, DSLF_WRITE,
+                    &image_data, &image_pitch );
 }
 
-static void dfb_unlock_output_buffer( void )
+static uint8_t *dfb_get_output_buffer( void )
 {
-    current_frame->Unlock( current_frame );
-}
-
-static unsigned char *dfb_get_output_buffer( void )
-{
-    return (unsigned char *) screen_framebuffer;
-}
-
-static int dfb_get_current_output_field( void )
-{
-    int fieldid = 0;
-#if DIRECTFB_COMPILE_VERSION >= 914
-    crtc2->GetCurrentOutputField( crtc2, &fieldid );
-#endif
-    return fieldid;
+     return image_data;
 }
 
 static int dfb_get_output_stride( void )
 {
-    return screen_pitch;
+     return image_pitch;
 }
 
-static void dfb_shutdown( void )
+static int dfb_can_read_from_buffer( void )
 {
-    if( buffer ) {
-        buffer->Release( buffer );
-    }
-    if( keyboard ) {
-        keyboard->Release( keyboard );
-    }
-
-    if( current_frame ) {
-        current_frame->Release( current_frame );
-    }
-    
-    if( c2frame ) {
-        c2frame->Release( c2frame );
-    }
-    if( crtc2 ) {
-        crtc2->Release( crtc2 );
-    }
-
-    if( dfb ) {
-        dfb->Release( dfb );
-    }
+     return 1;
 }
 
-static const char *fb_dev_name = "/dev/fb0";
-
-static int dfb_setup_temp_buffer()
+static void dfb_unlock_output_buffer( void )
 {
-  int res;
-
-  /* Draw to a temporary surface */
-  DFBSurfaceDescription dsc;
-
-  dsc.flags       = DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT;
-  dsc.width       = input_width;
-  dsc.height      = input_height;
-  dsc.pixelformat = DSPF_YUY2;
-
-  if ((res = dfb->CreateSurface( dfb, &dsc, &current_frame )) != DFB_OK) {
-      fprintf(stderr,"dgboutput: Can't create surfaces - %s!\n",
-              DirectFBErrorString( res ) );
-      return -1;
-  }
-
-  return 0;
+     surface->Unlock( surface );
 }
 
-static int dfb_init( int outputheight, int aspect, int verbose )
+static int dfb_is_exposed( void )
 {
-    DFBDisplayLayerConfig dlc;
-    DFBDisplayLayerConfigFlags failed;
+     return 1;
+}
 
-    if( verbose ) {
-        fprintf( stderr, "Using directfb version: %d\n", DIRECTFB_VERSION );
-        fprintf( stderr, "Compiled with directfb version: %d\n", DIRECTFB_COMPILE_VERSION );
-    }
-    if( DIRECTFB_VERSION < 918 ) {
-        fprintf( stderr, "\n*** WARNING: You are using a DirectFB version less than 0.9.18\n"
-                 "*** this may lead to less than optimal output\n" );
-    }
-    
-    DirectFBInit( 0, 0 );
+static int dfb_get_visible_width( void )
+{
+     return current_rect->w;
+}
 
-    DirectFBSetOption( "fbdev", fb_dev_name );
-    DirectFBSetOption( "no-cursor", "" );
-    DirectFBSetOption( "bg-color", "00000000" );
-    DirectFBSetOption( "matrox-crtc2", "" );
-    DirectFBSetOption( "matrox-tv-standard", (outputheight == 576) ? "pal" : "ntsc" );
+static int dfb_get_visible_height( void )
+{
+     return current_rect->h;
+}
 
-    DirectFBCreate( &dfb );
-    dfb->GetDisplayLayer( dfb, 2, &crtc2 );
-    if( !crtc2 ) {
-        fprintf( stderr, "dfboutput: Failed to initialize DirectFB.\n"
-                         "dfboutput: (tvtime DirectFB driver requires a Matrox card), exiting.\n" );
-        dfb_shutdown();
-        return 0;
-    }
-    crtc2->SetCooperativeLevel( crtc2, DLSCL_EXCLUSIVE );
-    dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard );
-
-    keyboard->CreateEventBuffer( keyboard, &buffer );
-    buffer->Reset( buffer );
-
-    dlc.flags      = DLCONF_PIXELFORMAT | DLCONF_BUFFERMODE | DLCONF_OPTIONS;
-
-#ifdef DIRECTFB_HAS_TRIPLE
-    if (verbose)
-        fprintf(stderr,"Using triple buffering\n");
-    dlc.buffermode = DLBM_TRIPLE;/*DLBM_BACKVIDEO;DLBM_FRONTONLY;*/
-#else
-    if (verbose)
-        fprintf(stderr,"Using double buffering\n");
-    dlc.buffermode = DLBM_BACKVIDEO;
-#endif
-    
-    dlc.pixelformat = DSPF_YUY2; 
-    dlc.options = 0;
-    
-#ifdef DIRECTFB_HAS_FLICKER_FILTERING
-    dlc.options = DLOP_FLICKER_FILTERING;
-#endif
-
-#ifdef DIRECTFB_HAS_FIELD_PARITY
-    dlc.options |=  DLOP_FIELD_PARITY;
-#endif
-
-    if( crtc2->TestConfiguration( crtc2, &dlc, &failed ) != DFB_OK ) {
-        fprintf( stderr, "config tested and failed.\n" );
-        dfb_shutdown();
-        return 0;
-    }
-    crtc2->SetConfiguration( crtc2, &dlc );
-
-    if (DIRECTFB_VERSION > 917)
-    {
-        parity = 0;
-    }
-    else
-    {
-        parity = 1;
-    }
-    
-    if (verbose)
-        fprintf(stderr,"Using initial field parity:%d\n",parity);
-#ifdef DIRECTFB_HAS_FIELD_PARITY
-    crtc2->SetFieldParity( crtc2, parity );
-#endif
-    crtc2->GetSurface( crtc2, &c2frame );
-
-    c2frame->SetBlittingFlags( c2frame, DSBLIT_NOFX );
-    c2frame->GetSize( c2frame, &output_width, &output_height );
-    
-    fprintf( stderr, "DirectFB: Screen is %d x %d\n", 
-             output_width, output_height );
-
-    /* Make sure we clear all buffers */
-    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
-    c2frame->Flip( c2frame, NULL, 0 );
-    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
-    c2frame->Flip( c2frame, NULL, 0 );
-    c2frame->Clear( c2frame, 0, 0, 0, 0xff );
-
-    if( output_width < input_width ) {
-        fprintf( stderr, "dfboutput: Screen width not big enough!\n" );
-        return 0;
-    }
-
-    c2frame->GetPixelFormat( c2frame, &frame_format );
-
-    /* Disabled, seems like some of these aren't in older
-     * versions of DirectFB, and we don't really care.
-    fprintf( stderr, "DirectFB: Frame format = " );
-    switch (frame_format) {
-    case DSPF_ARGB:
-         fprintf( stderr, "ARGB\n" );
-         break;
-    case DSPF_RGB32:
-         fprintf( stderr, "RGB32\n" );
-         break;
-    case DSPF_RGB24:
-         fprintf( stderr, "RGB24\n" );
-         break;
-    case DSPF_RGB16:
-         fprintf( stderr, "RGB16\n" );
-         break;
-    case DSPF_RGB15:
-         fprintf( stderr, "RGB15\n" );
-         break;
-    case DSPF_YUY2:
-         fprintf( stderr, "YUY2\n" );
-         break;
-    case DSPF_UYVY:
-         fprintf( stderr, "UYVY\n" );
-         break;
-    case DSPF_YV12:
-         fprintf( stderr, "YV12\n" );
-         break;
-    case DSPF_I420:
-         fprintf( stderr, "I420\n" );
-         break;
-    default:
-         fprintf( stderr, "unknown\n" );
-    }
-     */
-
-    crtc2->SetOpacity( crtc2, 0xff );
-    return 1;
+static int dfb_is_fullscreen( void )
+{
+     return output_fullscreen;
 }
 
 static int dfb_is_interlaced( void )
 {
-    return 1;
+     return deinterlacing;
 }
 
 static void dfb_wait_for_sync( int field )
 {
-    while( dfb_get_current_output_field() != field ) {
-    /*do { */
-#if DIRECTFB_COMPILE_VERSION >= 916
-        crtc2->WaitForSync( crtc2 );
-#endif
-    /*} while( dfb_get_current_output_field() != field ); */
+    if( deinterlacing ) {
+        surface->SetField( surface, field );
     }
 }
 
 static int dfb_show_frame( int x, int y, int width, int height )
 {
-
-    IDirectFBSurface *blitsrc = current_frame;
-    /* Allow for input versus output height here later FIX */
-    /* c2frame->StretchBlit( c2frame, blitsrc, NULL, NULL); */
-    c2frame->Blit( c2frame, blitsrc, NULL, 0,0);
-    
-#ifdef DIRECTFB_HAS_TRIPLE
-    c2frame->Flip( c2frame, NULL,0);
-#else
-    c2frame->Flip( c2frame, NULL,DSFLIP_WAITFORSYNC );
-#endif
-    
-    return 1;
+     surface->Flip( surface, NULL, DSFLIP_ONSYNC );
+     return 1;
 }
+
+
 
 static int dfb_toggle_aspect( void )
 {
-    /* Not supported yet */
-    return 0;
+     calc_size( &window_rect, window_rect.h, !output_aspect );
+     calc_size( &fullscreen_rect, fullscreen_rect.h, output_aspect );
+
+     move_window();
+     resize_window();
+     resize_video();
+
+     return output_aspect;
+}
+
+static int dfb_toggle_alwaysontop( void )
+{
+     alwaysontop = !alwaysontop;
+
+     if (!output_fullscreen)
+          window_alwaysontop();
+
+     return alwaysontop;
 }
 
 static int dfb_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
-    /* Doesn't make sense for tv-output */
-    return 1;
-}
+     output_fullscreen = !output_fullscreen;
 
-static void dfb_poll_events( input_t *in )
-{
-    DFBInputEvent event;
-    int curcommand = 0, arg = 0;
+     if( output_fullscreen ) {
+          current_rect = &fullscreen_rect;
 
-    if( buffer->GetEvent( buffer, DFB_EVENT( &event ) ) == DFB_OK ) {
-        if( event.type == DIET_KEYPRESS ) {
-            char cur;
+          window->SetOptions( window, DWOP_KEEP_POSITION | DWOP_KEEP_SIZE |
+                              DWOP_KEEP_STACKING );
+          window->SetStackingClass( window, DWSC_UPPER );
+          window->RaiseToTop( window );
 
-            curcommand = I_KEYDOWN;
+          window->GrabPointer( window );
+          window->GrabKeyboard( window );
+     } else {
+          current_rect = &window_rect;
 
-            if( event.flags & DIEF_MODIFIERS ) {
-                /* event.modifiers */
-            }
+          window->SetOptions( window, DWOP_NONE );
+          window->SetStackingClass( window, DWSC_MIDDLE );
 
-            switch( event.key_id ) {
-                case DIKI_ESCAPE:     arg |= I_ESCAPE; break;
-                case DIKI_KP_PLUS:    arg |= '+'; break;
-                case DIKI_KP_MINUS:   arg |= '-'; break;
-                case DIKI_KP_DIV:     arg |= '/'; break;
-                case DIKI_KP_DECIMAL: arg |= '.'; break;
-                case DIKI_KP_MULT:    arg |= '*'; break;
-                case DIKI_KP_EQUAL:   arg |= '='; break;
+          window->UngrabPointer( window );
+          window->UngrabKeyboard( window );
+     }
 
-                case DIKI_KP_0:  arg |= '0'; break;
-                case DIKI_KP_1:  arg |= '1'; break;
-                case DIKI_KP_2:  arg |= '2'; break;
-                case DIKI_KP_3:  arg |= '3'; break;
-                case DIKI_KP_4:  arg |= '4'; break;
-                case DIKI_KP_5:  arg |= '5'; break;
-                case DIKI_KP_6:  arg |= '6'; break;
-                case DIKI_KP_7:  arg |= '7'; break;
-                case DIKI_KP_8:  arg |= '8'; break;
-                case DIKI_KP_9:  arg |= '9'; break;
+     move_window();
+     resize_window();
+     resize_video();
 
-                case DIKI_KP_ENTER:  arg |= I_ENTER; break;
-
-                case DIKI_F1:  arg |= I_F1; break;
-                case DIKI_F2:  arg |= I_F2; break;
-                case DIKI_F3:  arg |= I_F3; break;
-                case DIKI_F4:  arg |= I_F4; break;
-                case DIKI_F5:  arg |= I_F5; break;
-                case DIKI_F6:  arg |= I_F6; break;
-                case DIKI_F7:  arg |= I_F7; break;
-                case DIKI_F8:  arg |= I_F8; break;
-                case DIKI_F9:  arg |= I_F9; break;
-                case DIKI_F10: arg |= I_F10; break;
-                case DIKI_F11: arg |= I_F11; break;
-                case DIKI_F12: arg |= I_F12; break;
-
-                case DIKI_LEFT:  arg |= I_LEFT; break;
-                case DIKI_UP:    arg |= I_UP; break;
-                case DIKI_DOWN:  arg |= I_DOWN; break;
-                case DIKI_RIGHT: arg |= I_RIGHT; break;
-
-
-                case DIKI_INSERT: 
-#ifdef DIRECTFB_HAS_FIELD_PARITY
-                    if (parity == 0) parity = 1; else parity = 0;
-                    fprintf(stderr,"Setting parity to:%d\n",parity);
-                    crtc2->SetFieldParity( crtc2, parity );
-#endif
-                    break;
-                default:
-                    cur = 'a' + ( event.key_id - DIKI_A );
-                    arg |= cur;
-                    break;
-            }
-            input_callback( in, curcommand, arg );
-        }
-    }
-
-    /*
-     * empty buffer, because of repeating
-     * keyboard repeat is faster than key handling and this 
-     * causes problems during seek
-     * temporary workabout. should be solved in the future
-     */
-    buffer->Reset( buffer );
-    return;
-}
-
-static void dfb_set_window_caption( const char *caption )
-{
-    /* Doesn't make sense for tv-out */
-}
-
-static int dfb_is_exposed( void ) 
-{ 
-    /* Always exposed for tv-out */
-    return 1; 
-} 
- 
-static int dfb_get_visible_width( void ) 
-{ 
-    return output_width; 
-} 
- 
-static int dfb_get_visible_height( void ) 
-{ 
-    return output_height; 
-} 
-
-static int dfb_set_input_size( int inputwidth, int inputheight )
-{
-    int need_input_resize = (current_frame == NULL ||
-                            (input_width != inputwidth) || (input_height != inputheight));
-
-    input_width = inputwidth;
-    input_height = inputheight;
-    fprintf(stderr,"Set input size: %dx%d\n",inputwidth,inputheight);
-    if( need_input_resize ) {
-        dfb_setup_temp_buffer();
-    }
-    return 1;
-}
-
-static int dfb_is_fullscreen( void )
-{
-    /* Tv-out is always full screen */
-    return 1;
-}
-
-static int dfb_is_alwaysontop( void )
-{
-    return 0;
+     return output_fullscreen;
 }
 
 static void dfb_resize_window_fullscreen( void )
 {
-    /* Tv-out is always full screen */
 }
+
+static void dfb_set_window_caption( const char *caption )
+{
+}
+
+
 
 static void dfb_set_window_position( int x, int y )
 {
-    /* This has no meaning since we're always fullscreen */
+     window_rect.x = x;
+     window_rect.y = y;
+
+     if (!output_fullscreen) {
+          move_window();
+          resize_video();
+     }
 }
 
 static void dfb_set_window_height( int window_height )
 {
-    /* Dfb Tv-out does not support height modifications */
-}
+     calc_size( &window_rect, window_height, output_aspect );
 
-static int dfb_can_read_from_buffer( void )
-{
-    return 0;
+     if (!output_fullscreen) {
+          resize_window();
+          resize_video();
+     }
 }
 
 static void dfb_set_fullscreen_position( int pos )
 {
+     DFBDisplayLayerConfig dlc;
+
+     primary->GetConfiguration( primary, &dlc );
+
+     calc_size( &fullscreen_rect, dlc.height, output_aspect );
+     switch (pos) {
+          case 0:
+               fullscreen_rect.x = 0;
+               fullscreen_rect.y = (dlc.height - fullscreen_rect.h) / 2;
+               break;
+          case 1:
+               fullscreen_rect.x = 0;
+               fullscreen_rect.y = 0;
+               break;
+          case 2:
+               fullscreen_rect.x = 0;
+               fullscreen_rect.y = dlc.height - fullscreen_rect.h;
+               break;
+     }
+     if (output_fullscreen) {
+          move_window();
+          resize_video();
+     }
 }
 
 static void dfb_set_matte( int width, int height )
 {
 }
 
-static int dfb_toggle_alwaysontop( void )
+
+
+static void dfb_poll_events( input_t *in )
 {
-    return 0;
+     DFBWindowEvent event;
+
+     while (buffer->GetEvent( buffer, DFB_EVENT( &event ) ) == DFB_OK) {
+          int arg = 0;
+
+          switch( event.type ) {
+          case DWET_KEYDOWN:
+               if( event.modifiers & DIMM_SHIFT ) arg |= I_SHIFT;
+               if( event.modifiers & DIMM_CONTROL ) arg |= I_CTRL;
+               if( event.modifiers & DIMM_META ) arg |= I_META;
+
+               switch( event.key_symbol ) {
+               case DIKS_CURSOR_UP: arg |= I_UP; break;
+               case DIKS_CURSOR_DOWN: arg |= I_DOWN; break;
+               case DIKS_CURSOR_RIGHT: arg |= I_RIGHT; break;
+               case DIKS_CURSOR_LEFT: arg |= I_LEFT; break;
+               case DIKS_INSERT: arg |= I_INSERT; break;
+               case DIKS_HOME: arg |= I_HOME; break;
+               case DIKS_END: arg |= I_END; break;
+               case DIKS_PAGE_UP: arg |= I_PGUP; break;
+               case DIKS_PAGE_DOWN: arg |= I_PGDN; break;
+               case DIKS_F1: arg |= I_F1; break;
+               case DIKS_F2: arg |= I_F2; break;
+               case DIKS_F3: arg |= I_F3; break;
+               case DIKS_F4: arg |= I_F4; break;
+               case DIKS_F5: arg |= I_F5; break;
+               case DIKS_F6: arg |= I_F6; break;
+               case DIKS_F7: arg |= I_F7; break;
+               case DIKS_F8: arg |= I_F8; break;
+               case DIKS_F9: arg |= I_F9; break;
+               case DIKS_F10: arg |= I_F10; break;
+               case DIKS_F11: arg |= I_F11; break;
+               case DIKS_F12: arg |= I_F12; break;
+               case DIKS_PRINT: arg |= I_PRINT; break;
+               case DIKS_MENU: arg |= I_MENU; break;
+               default:
+                    if (DFB_KEY_IS_ASCII(event.key_symbol))
+                         arg |= event.key_symbol;
+                    break;
+               }
+               input_callback( in, I_KEYDOWN, arg );
+               break;
+          case DWET_BUTTONDOWN:
+               input_callback( in, I_BUTTONPRESS, event.button );
+               break;
+          case DWET_WHEEL:
+               input_callback( in, I_BUTTONPRESS, event.step > 0 ? 4 : 5 );
+               break;
+          case DWET_POSITION:
+               current_rect->x = event.x;
+               current_rect->y = event.y;
+               resize_video();
+               break;
+          case DWET_SIZE:
+               current_rect->w = event.w;
+               current_rect->h = event.h;
+               wsurface->Clear( wsurface, colorkey.r, colorkey.g, colorkey.b, 0xff );
+               wsurface->Flip( wsurface, NULL, 0 );
+               resize_video();
+               break;
+          default:
+               break;
+          }
+     }
 }
+
+static void dfb_shutdown( void )
+{
+     /* Hide the video layer */
+     video->SetOpacity( video, 0 );
+
+     buffer->Release( buffer );
+     surface->Release( surface );
+     wsurface->Release( wsurface );
+     window->Release( window );
+     video->Release( video );
+     primary->Release( primary );
+     dfb->Release( dfb );
+}
+
+
 
 static output_api_t dfboutput =
 {
-    dfb_init,
+     dfb_init,
 
-    dfb_set_input_size,
+     dfb_set_input_size,
 
-    dfb_lock_output_buffer,
-    dfb_get_output_buffer,
-    dfb_get_output_stride,
-    dfb_can_read_from_buffer,
-    dfb_unlock_output_buffer,
+     dfb_lock_output_buffer,
+     dfb_get_output_buffer,
+     dfb_get_output_stride,
+     dfb_can_read_from_buffer,
+     dfb_unlock_output_buffer,
 
-    dfb_is_exposed, 
-    dfb_get_visible_width, 
-    dfb_get_visible_height, 
-    dfb_is_fullscreen,
-    dfb_is_alwaysontop,
+     dfb_is_exposed,
+     dfb_get_visible_width,
+     dfb_get_visible_height,
+     dfb_is_fullscreen,
 
-    dfb_is_interlaced,
-    dfb_wait_for_sync,
-    dfb_show_frame,
+     dfb_is_interlaced,
+     dfb_wait_for_sync,
+     dfb_show_frame,
 
-    dfb_toggle_aspect,
-    dfb_toggle_alwaysontop,
-    dfb_toggle_fullscreen,
-    dfb_resize_window_fullscreen,
-    dfb_set_window_caption,
+     dfb_toggle_aspect,
+     dfb_toggle_alwaysontop,
+     dfb_toggle_fullscreen,
+     dfb_resize_window_fullscreen,
+     dfb_set_window_caption,
 
-    dfb_set_window_position,
-    dfb_set_window_height,
-    dfb_set_fullscreen_position,
-    dfb_set_matte,
+     dfb_set_window_position,
+     dfb_set_window_height,
+     dfb_set_fullscreen_position,
+     dfb_set_matte,
 
-    dfb_poll_events,
-    dfb_shutdown
+     dfb_poll_events,
+     dfb_shutdown
 };
 
 output_api_t *get_dfb_output( void )
 {
-    return &dfboutput;
+     return &dfboutput;
 }
 
-#else /* no DirectFB support */
+#else
 
 output_api_t *get_dfb_output( void )
 {
-    return 0;
+     return NULL;
 }
 
 #endif

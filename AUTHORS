@@ -9,6 +9,10 @@ Authors and contributors
     - Configuration and input management
     - Closed Captioning support
 
+  Achim Schneider <batchall@mordor.ch>
+    - Station list management code
+    - Frequency table conversion script from xawtv's file format
+
   David I. Lehn <dlehn@users.sourceforge.net>
     - autoconf setup, taken from his autoconf'ing of movietime
 
@@ -29,9 +33,6 @@ Authors and contributors
   Nicolas Boos <nicolaxx@free.fr>
   Simon Law <sfllaw@debian.org>
     - Work on the debian packages
-
-  Achim Schneider <batchall@mordor.ch>
-    - Frequency table conversion script from xawtv's file format
 
   Mark Trolley <mtrolley@scs.carleton.ca>
     - Added the numeric channel commands for better lirc support
@@ -64,6 +65,9 @@ Authors and contributors
   Richard Jones <richard@earthmen.com>
     - Work on the DirectFB output driver for the Matrox G400-style
       TV output drivers
+
+  Ville Syrjala <syrjala@sci.fi>
+    - Wrote our DirectFB output layer.
 
   David Atkinson <psykax@psykax.com>
     - Updates for Australian frequencies
