@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <libxml/tree.h>
 #include "station.h"
 #include "bands.h"
@@ -172,7 +175,7 @@ int station_readconfig( station_mgr_t *mgr )
     }
 
     if( xmlStrcmp( cur->name, BAD_CAST "stationlist" ) ) {
-        fprintf( stderr, "station: %s: document of the wrong type", mgr->stationrc );
+        fprintf( stderr, "station: %s: document not a stationlist.", mgr->stationrc );
         xmlFreeDoc( doc );
         return 0;
     }
@@ -180,36 +183,34 @@ int station_readconfig( station_mgr_t *mgr )
     station = cur->xmlChildrenNode;
     while( station ) {
         if( !xmlStrcmp( station->name, BAD_CAST "station" ) ) {
-            xmlChar *name = 0;
-            xmlChar *active_s = 0;
-            xmlChar *pos_s = 0;
-            xmlChar *band = 0;
-            xmlChar *channel = 0;
-            int pos;
+            xmlChar *name = xmlGetProp( station, BAD_CAST "name" );
+            xmlChar *active_s = xmlGetProp( station, BAD_CAST "active" );
+            xmlChar *pos_s = xmlGetProp( station, BAD_CAST "position" );
+            xmlChar *band = xmlGetProp( station, BAD_CAST "band" );
+            xmlChar *channel = xmlGetProp( station, BAD_CAST "channel" );
 
-            cur = station->xmlChildrenNode;
-            while( cur ) {
-                if( !xmlStrcmp( cur->name, BAD_CAST "name" ) ) {
-                    name = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, BAD_CAST "active" ) ) {
-                    active_s = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, BAD_CAST "pos" ) ) {
-                    pos_s = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !xmlStrcmp( cur->name, BAD_CAST "band" ) ) {
-                    band = xmlNodeGetContent( cur->xmlChildrenNode );
-                } else if( !strcmp( cur->name, BAD_CAST "channel" ) ) {
-                    channel = xmlNodeGetContent( cur->xmlChildrenNode );
+            /* Only band and channel are required. */
+            if( band && channel ) {
+                int pos, active;
+
+                if( !name ) name = channel;
+                if( !pos_s || ( 1 != sscanf( (char *) pos_s, "%d", &pos ) ) ) {
+                    pos = 0;
                 }
-
-                cur = cur->next;
+                if( active_s ) {
+                    active = atoi( (char *) active_s );
+                } else {
+                    active = 1;
+                }
+                station_add( mgr, pos, (char *) band, (char *) channel, (char *) name );
+                station_set_current_active( mgr, active );
             }
-             
-            if( pos_s && ( 1 != sscanf( (char *) pos_s, "%d", &pos ) ) ) {
-                pos = 0;
-            }
 
-            station_add( mgr, pos, (char *) band, (char *) channel, (char *) name );
-            station_set_current_active( mgr, !( active_s && ( !xmlStrcmp( active_s, BAD_CAST "false" ) ) ) );
+            if( name ) xmlFree( name );
+            if( active_s ) xmlFree( active_s );
+            if( pos_s ) xmlFree( pos_s );
+            if( band ) xmlFree( band );
+            if( channel ) xmlFree( channel );
         }
         station = station->next;
     }
@@ -562,41 +563,105 @@ int station_remap( station_mgr_t *mgr, int pos )
     return res;
 }
 
+static xmlNodePtr find_station( xmlNodePtr node, const char *stationname )
+{
+    while( node ) {
+        if( !xmlStrcasecmp( node->name, BAD_CAST "station" ) ) {
+            xmlChar *name = xmlGetProp( node, BAD_CAST "name" );
+
+            if( name && !xmlStrcasecmp( name, BAD_CAST stationname ) ) {
+                xmlFree( name );
+                return node;
+            }
+            if( name ) xmlFree( name );
+        }
+
+        node = node->next;
+    }
+
+    return 0;
+}
+
+/**
+ * This should be moved elsewhere.
+ */
+static int file_is_openable_for_read( const char *filename )
+{
+    int fd;
+    fd = open( filename, O_RDONLY );
+    if( fd < 0 ) {
+        return 0;
+    } else {
+        close( fd );
+        return 1;
+    }
+}
+
 int station_writeconfig( station_mgr_t *mgr)
 {
     xmlDocPtr doc;
-    xmlNodePtr tree, subtree;
-    char buf[ 255 ];
+    xmlNodePtr top;
+    char filename[ 255 ];
     station_info_t *rp = mgr->first;
 
-    if( !rp ) {
-        return 1;
+    if( !rp ) return 0;
+
+    strncpy( filename, getenv( "HOME" ), 235 );
+    strncat( filename, "/.tvtime/stationlist.xml", 255 );
+
+    doc = xmlParseFile( filename );
+    if( !doc ) {
+        if( file_is_openable_for_read( filename ) ) {
+            fprintf( stderr, "station: Config file exists, but cannot be parsed.\n" );
+            fprintf( stderr, "station: Stations will NOT be saved.\n" );
+            return 0;
+        } else {
+            /* Config file doesn't exist, create a new one. */
+            fprintf( stderr, "station: No station file found, creating a new one.\n" );
+            doc = xmlNewDoc( BAD_CAST "1.0" );
+            if( !doc ) {
+                fprintf( stderr, "configsave: Could not create new config file.\n" );
+                return 0;
+            }
+        }
     }
 
-    doc = xmlNewDoc( BAD_CAST "1.0" );
-    doc->children = xmlNewDocNode( doc, 0, BAD_CAST "stationlist", 0 );
-
-    sprintf( buf, "%d", mgr->current->pos );
+    top = xmlDocGetRootElement( doc );
+    if( !top ) {
+        top = xmlNewDocNode( doc, 0, BAD_CAST "stationlist", 0 );
+        if( !top ) {
+            fprintf( stderr, "station: Could not create toplevel element 'stationlist'.\n" );
+            xmlFreeDoc( doc );
+            return 0;
+        } else {
+            xmlDocSetRootElement( doc, top );
+            xmlNewProp( top, BAD_CAST "xmlns", BAD_CAST "http://tvtime.sourceforge.net/DTD/" );
+        }
+    }
 
     do {
-        tree = xmlNewChild( doc->children, 0, BAD_CAST "station", 0 );
-
-        subtree = xmlNewChild( tree, 0, BAD_CAST "name", BAD_CAST rp->name );
-
-        subtree = xmlNewChild( tree, 0, BAD_CAST "active", BAD_CAST (rp->active ? "true" : "false") );
+        xmlNodePtr node = find_station( top, rp->name );
+        char buf[ 255 ];
 
         sprintf( buf, "%d", rp->pos );
-        subtree = xmlNewChild( tree, 0, BAD_CAST "pos", BAD_CAST buf );
+        if( !node ) {
+            node = xmlNewTextChild( top, 0, BAD_CAST "station", 0 );
+        }
+        xmlNewProp( node, BAD_CAST "name", BAD_CAST rp->name );
+        xmlNewProp( node, BAD_CAST "active", BAD_CAST (rp->active ? "1" : "0") );
 
-        subtree = xmlNewChild( tree, 0, BAD_CAST "band", BAD_CAST rp->band->name );
-        subtree = xmlNewChild( tree, 0, BAD_CAST "channel", BAD_CAST rp->channel->name );
+        sprintf( buf, "%d", rp->pos );
+        xmlNewProp( node, BAD_CAST "position", BAD_CAST buf );
+        xmlNewProp( node, BAD_CAST "band", BAD_CAST rp->band->name );
+        xmlNewProp( node, BAD_CAST "channel", BAD_CAST rp->channel->name );
+
         rp = rp->next;
     } while( rp != mgr->first );
 
-    strncpy( buf, getenv( "HOME" ), 235 );
-    strncat( buf, "/.tvtime/stationrc", 255 );
-
-    return xmlSaveFormatFile( buf, doc, 1);
+    xmlKeepBlanksDefault( 0 );
+    xmlSaveFormatFile( filename, doc, 1);
+    xmlFreeDoc( doc );
+    return 1;
 }
 
 // vim: set et
