@@ -22,8 +22,7 @@ EXTRA_DIST = default.tvtime.xml example.lircrc quotes.txt $(man_MANS)
 
 .PHONY: install-exec-hook
 install-exec-hook:
-	-$(INSTALL) -d -m 'u=rwx,go=rx' '$(DESTDIR)$(pkgsysconfdir)'         \
-	   || touch noconfdir
+	-mkdir -p -- '$(DESTDIR)$(pkgsysconfdir)' || touch noconfdir
 	@if [ -f noconfdir ]; then (                                         \
 	  echo 'Warning: I could not create the directory'                   \
 	       '`$(DESTDIR)$(pkgsysconfdir)'"'"                             ;\
