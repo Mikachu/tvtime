@@ -29,6 +29,9 @@
 #endif
 
 #include "copyfunctions.h"
+#include "attributes.h"
+#include "mmx.h"
+#include "mm_accel.h"
 
 /* Function pointer definitions. */
 void (*interpolate_packed422_scanline)( uint8_t *output, uint8_t *top,
@@ -314,11 +317,11 @@ void setup_copyfunctions( uint32_t accel )
     fast_memcpy = fast_memcpy_c;
 
 #ifdef ARCH_X86
-    if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
+    if( copy_accel & MM_ACCEL_X86_MMXEXT ) {
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_packed422_scanline = blit_packed422_scanline_mmxext;
         fast_memcpy = fast_memcpy_mmxext;
-    } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
+    } else if( copy_accel & MM_ACCEL_X86_MMX ) {
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmx;
         blit_packed422_scanline = blit_packed422_scanline_mmx;
         fast_memcpy = fast_memcpy_mmx;
