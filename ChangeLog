@@ -1,5 +1,6 @@
 
 0.9.7
+  * (vektor) Moved fonts and graphics into the data directory.
   * (vektor) Increased the version number of the deinterlace plugin API.
   * (vektor) Removed the mlockall() call, I don't want to bother with
     that right now.
