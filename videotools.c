@@ -142,7 +142,7 @@ static inline void interpolate_scanline_packed_422( unsigned char *output,
 {
     int i;
 
-    for( i = 0; i < width*2; i += 2 ) {
+    for( i = 0; i < width; i += 2 ) {
         output[ (i*2)     ] = (topluma[ i ] + botluma[ i ]) >> BRIGHT_FACTOR;
         output[ (i*2) + 1 ] = ((topcb[ i/2 ] + botcb[ i/2 ] - 256) >> BRIGHT_FACTOR) + 128;
         output[ (i*2) + 2 ] = (topluma[ i+1 ] + botluma[ i+1 ]) >> BRIGHT_FACTOR;
