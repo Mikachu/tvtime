@@ -1074,7 +1074,7 @@ int config_get_output_x( config_t *ct )
 
 int config_get_output_y( config_t *ct )
 {
-    return ct->x;
+    return ct->y;
 }
 
 int config_get_inputwidth( config_t *ct )
