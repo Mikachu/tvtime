@@ -165,9 +165,10 @@ static void commands_station_change( commands_t *in )
     int verbose = config_get_verbose( in->cfg );
 
     if( !videoinput_has_tuner( in->vidin ) ) {
-        if( verbose )
+        if( verbose ) {
             fprintf( stderr, "tvtime: Can't change channel, "
                      "no tuner available on this input!\n" );
+        }
     } else {
 
         videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
@@ -276,12 +277,14 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_CHAR:
-        /* decode the input char from commands  */
-        if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-        in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
-        in->digit_counter++;
-        in->digit_counter %= 4;
-        in->frame_counter = CHANNEL_DELAY;
+        if( videoinput_has_tuner( in->vidin ) ) {
+            /* decode the input char from commands  */
+            if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
+            in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
+            in->digit_counter++;
+            in->digit_counter %= 4;
+            in->frame_counter = CHANNEL_DELAY;
+        }
         break;
 
     case TVTIME_LUMA_CORRECTION_TOGGLE:
@@ -340,8 +343,10 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
-	station_toggle_us_cable_mode( in->stationmgr );
-	commands_station_change( in );
+        if( videoinput_has_tuner( in->vidin ) ) {
+	    station_toggle_us_cable_mode( in->stationmgr );
+	    commands_station_change( in );
+        }
         break;
 
     case TVTIME_FINETUNE_DOWN:
@@ -367,12 +372,16 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_UP: 
-        station_next( in->stationmgr );
-        commands_station_change( in );
+        if( videoinput_has_tuner( in->vidin ) ) {
+            station_next( in->stationmgr );
+            commands_station_change( in );
+        }
         break;
     case TVTIME_CHANNEL_DOWN:
-        station_prev( in->stationmgr );
-        commands_station_change( in );
+        if( videoinput_has_tuner( in->vidin ) ) {
+            station_prev( in->stationmgr );
+            commands_station_change( in );
+        }
         break;
 
     case TVTIME_CHANNEL_PREV:
@@ -400,6 +409,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TV_VIDEO:
+        in->frame_counter = 0;
         videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
         tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
         reinit_tuner( in );
@@ -508,7 +518,6 @@ void commands_next_frame( commands_t *in )
     if( in->frame_counter == 0 ) {
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
-        tvtime_osd_set_channel_number( in->osd, station_get_current_channel_name( in->stationmgr ) );
     }
 
     if( in->frame_counter > 0 && !(in->frame_counter % 5)) {

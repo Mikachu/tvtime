@@ -381,12 +381,16 @@ void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
 
 void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
 {
-    if( osd->freqtable_text ) snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
+    if( osd->freqtable_text ) {
+        snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
+    }
 }
 
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
 {
-    if( osd->channel_number_text ) snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
+    if( osd->channel_number_text ) {
+        snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
+    }
 }
 
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method )
@@ -427,8 +431,9 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
      *osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
      */
 
-    for( i=OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ )
+    for( i = OSD_SHOW_NAME; i <= OSD_SHOW_LENGTH; i++ ) {
         osd_string_set_timeout( osd->strings[ i ].string, OSD_FADE_DELAY );
+    }
 }
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
