@@ -64,6 +64,7 @@ ings in this Software without prior written authorization from him.
 #ifdef ENABLE_NLS
 # define _(string) gettext (string)
 # include "gettext.h"
+# include <locale.h>
 # include <langinfo.h>
 # include <iconv.h>
 #endif
@@ -643,7 +644,9 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION);
 }
 
+#ifdef ENABLE_NLS
 static iconv_t cd = 0;
+#endif
 
 void setup_i18n( void )
 {
