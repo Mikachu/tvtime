@@ -56,17 +56,20 @@ Authors and contributors
     - Bugfixes
 
   Per von Zweigbergk <pvz@e.kth.se>
-    - Work on making tvtime fully UTF-8 aware.
+    - Work on making tvtime fully UTF-8 aware
 
   Richard Jones <richard@earthmen.com>
-    - Work on the DirectFB output driver for the Matrox G400 style
-      TV output drivers.
+    - Work on the DirectFB output driver for the Matrox G400-style
+      TV output drivers
 
   David Atkinson <psykax@psykax.com>
     - Updates for Australian frequencies
 
   Mike Bourgeous <nitrogen@slimetech.com>
     - Compile fixes and some autoconf work for DirectFB
+
+  Merlin Ma <softlib@turbolinux.com.cn>
+    - Updates for China broadcast frequencies 
 
 Code we stole (well, used under the GPL)
 

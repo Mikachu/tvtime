@@ -1,5 +1,7 @@
 
 0.9.8.6 -
+  * vektor: Added China broadcast frequencies (thanks to
+      Merlin Ma).
   * vektor: Renamed, rearranged, and cleaned up the available
       deinterlacers, making some of them unavailable.  This
       should improve our usability.  Deinterlacers will be

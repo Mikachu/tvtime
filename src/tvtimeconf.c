@@ -535,6 +535,7 @@ static void print_usage( char **argv )
              "                             Valid values are:\n"
              "                                 us-cable\n"
              "                                 us-broadcast\n"
+             "                                 china-broadcast\n"
              "                                 japan-cable\n"
              "                                 japan-broadcast\n"
              "                                 europe\n"

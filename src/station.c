@@ -337,6 +337,8 @@ station_mgr_t *station_new( const char *norm, const char *table, int us_cable_mo
             station_add_band( mgr, "us cable" );
         } else if( !strcasecmp( frequencies, "us-broadcast" ) ) {
             station_add_band( mgr, "us broadcast" );
+        } else if( !strcasecmp( frequencies, "china-broadcast" ) ) {
+            station_add_band( mgr, "china broadcast" );
         } else if( !strcasecmp( frequencies, "japan-cable" ) ) {
             station_add_band( mgr, "japan cable" );
         } else if( !strcasecmp( frequencies, "japan-broadcast" ) ) {
