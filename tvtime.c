@@ -48,6 +48,13 @@
  */
 static int tolerance = 2000;
 
+/**
+ * Current deinterlacing method.
+ */
+static deinterlace_method_t *curmethod;
+static int curmethodid;
+static deinterlace_scanline_t deinterlace_scanline;
+
 static int timediff( struct timeval *large, struct timeval *small )
 {
     return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
@@ -115,13 +122,6 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
 
     pngoutput_delete( pngout );
 }
-
-/**
- * Current deinterlacing method.
- */
-static deinterlace_method_t *curmethod;
-static int curmethodid;
-static deinterlace_scanline_t deinterlace_scanline;
 
 /**
  * Explination of the loop:
@@ -232,11 +232,7 @@ static void tvtime_build_frame( unsigned char *output,
             mid0 = secondlastframe + instride;
         }
 
-        if( curmethod ) {
-            deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
-        } else {
-            blit_packed422_scanline( output, top1, width );
-        }
+        deinterlace_scanline( output, top1, mid1, bot1, top0, mid0, bot0, width );
         tvtime_osd_composite_packed422_scanline( osd, output, width, 0, scanline );
         output += outstride;
         scanline++;

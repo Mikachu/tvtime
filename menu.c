@@ -296,5 +296,10 @@ void menu_composite_packed422( menu_t *m, unsigned char *output,
                                        width, height, stride,
                                        m->circle_x, m->circle_y );
     }
-
 }
+
+void menu_composite_packed422_scanline( menu_t *m, unsigned char *output,
+                                        int width, int xpos, int scanline )
+{
+}
+

@@ -78,6 +78,8 @@ void osd_shape_composite_packed422( osd_shape_t *osds,
 osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
                                 int video_height, double aspect, int alpha );
 void osd_graphic_delete( osd_graphic_t *osdg );
+int osd_graphic_get_width( osd_graphic_t *osdg );
+int osd_graphic_get_height( osd_graphic_t *osdg );
 void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout );
 void osd_graphic_set_timeout( osd_graphic_t *osdg, int timeout );
 int osd_graphic_visible( osd_graphic_t *osdg );
@@ -86,5 +88,9 @@ void osd_graphic_composite_packed422( osd_graphic_t *osdg,
                                       unsigned char *output,
                                       int width, int height, int stride,
                                       int xpos, int ypos );
+void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
+                                               unsigned char *output,
+                                               int width, int xpos,
+                                               int scanline );
 
 #endif /* OSD_H_INCLUDED */

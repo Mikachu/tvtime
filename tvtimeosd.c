@@ -234,6 +234,26 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
         }
     }
 
+    if( osd_graphic_visible( osd->channel_logo ) ) {
+        if( scanline >= osd->channel_logo_ypos &&
+            scanline < osd->channel_logo_ypos + osd_graphic_get_height( osd->channel_logo ) ) {
+
+            int startx = osd->channel_logo_xpos - xpos;
+            int strx = 0;
+            if( startx < 0 ) {
+                strx = -startx;
+                startx = 0;
+            }
+            if( startx < width ) {
+                osd_graphic_composite_packed422_scanline( osd->channel_logo,
+                                                          output + (startx*2),
+                                                          width - startx,
+                                                          strx,
+                                                          scanline - osd->channel_logo_ypos );
+            }
+        }
+    }
+
     /**
      * For the bottom info, the data bar has priority over the
      * muted indicator which has priority over the volume bar.

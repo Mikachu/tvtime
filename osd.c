@@ -198,6 +198,11 @@ void osd_string_composite_packed422_scanline( osd_string_t *osds,
     if( !osds->efs || !osds->frames_left ) return;
 
     if( scanline < osds->image_textheight && xpos < osds->image_textwidth ) {
+
+        if( (xpos+width) > osds->image_textwidth ) {
+            width = osds->image_textwidth - xpos;
+        }
+
         if( osds->frames_left < 50 ) {
             int alpha;
             alpha = (int) (((((double) osds->frames_left) / 50.0) * 256.0) + 0.5);
@@ -324,8 +329,8 @@ void osd_shape_advance_frame( osd_shape_t *osds )
 
 void osd_shape_render_image4444( osd_shape_t *osds )
 {
-    double radius_sqrd,x0;
-    int x,y;
+    double radius_sqrd, x0, y0;
+    int x, y;
     int width = osds->shape_width/osds->aspect_ratio;
     int height = osds->shape_height;
 
@@ -344,14 +349,17 @@ void osd_shape_render_image4444( osd_shape_t *osds )
                                 osds->shape_height, osds->image_width * 4,
                                 0, 16, 128, 128 );
 
-        x0 = osds->shape_width>>1;
+        x0 = osds->shape_width / 2.0;
+        y0 = osds->shape_height / 2.0;
         radius_sqrd = x0*x0;
-        for( x = 0; x < osds->shape_width; x++ ) {
+
+        for( x = 0; x < width; x++ ) {
             for( y = 0; y < osds->shape_height; y++ ) {
+                double curx = x*osds->aspect_ratio;
                 int xoffset = x*4;
-                if( (x-x0)*(x-x0) + (y-x0)*(y-x0) <= radius_sqrd ) {
-                    int offset = y*osds->image_width + xoffset;
-                    osds->image4444[ offset ] = osds->alpha;
+                if( ((curx-x0)*(curx-x0) + (y-y0)*(y-y0)) <= radius_sqrd ) {
+                    int offset = y*osds->image_width*4 + xoffset;
+                    osds->image4444[ offset + 0 ] = osds->alpha;
                     osds->image4444[ offset + 1 ] = osds->shape_luma;
                     osds->image4444[ offset + 2 ] = osds->shape_cb;
                     osds->image4444[ offset + 3 ] = osds->shape_cr;
@@ -557,6 +565,16 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
     free( cb444 );
 }
 
+int osd_graphic_get_width( osd_graphic_t *osdg )
+{
+    return osdg->image_adjusted_width;
+}
+
+int osd_graphic_get_height( osd_graphic_t *osdg )
+{
+    return osdg->image_graphic_height;
+}
+
 void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout )
 {
     osdg->frames_left = timeout;
@@ -578,7 +596,31 @@ void osd_graphic_advance_frame( osd_graphic_t *osdg )
         osdg->frames_left--;
 }
 
+void osd_graphic_composite_packed422_scanline( osd_graphic_t *osdg,
+                                               unsigned char *output,
+                                               int width, int xpos,
+                                               int scanline )
+{
+    if( !osdg->png || !osdg->frames_left ) return;
 
+    if( scanline < osdg->image_graphic_height && xpos < osdg->image_adjusted_width ) {
+        int alpha;
+
+        if( (xpos+width) > osdg->image_adjusted_width ) {
+            width = osdg->image_adjusted_width - xpos;
+        }
+
+        if( osdg->frames_left < 50 ) {
+            alpha = (int) ( ( ( ( (double) osdg->frames_left ) / 50.0 ) * osdg->alpha ) + 0.5 );
+        } else {
+            alpha = osdg->alpha;
+        }
+
+        composite_packed4444_alpha_to_packed422_scanline( output, output,
+            osdg->image4444 + (osdg->image_width*4*scanline) + (xpos*4),
+            width, alpha );
+    }
+}
 
 void osd_graphic_composite_packed422( osd_graphic_t *osdg, 
                                       unsigned char *output,
@@ -603,3 +645,4 @@ void osd_graphic_composite_packed422( osd_graphic_t *osdg,
                                              osdg->image_width*4,
                                              xpos, ypos, alpha );
 }
+
