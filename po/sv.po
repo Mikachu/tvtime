@@ -94,7 +94,7 @@ msgstr "Avflätare (Deinterlacer)"
 #: src/tvtime.c:1018
 #, c-format
 msgid "Input: %s at %dx%d pixels"
-msgstr "Signal: %s vid %dx%d pixlar"
+msgstr "Signal: %s vid %dx%d bildpunkter"
 
 #: src/tvtime.c:1022
 #, c-format
@@ -174,7 +174,7 @@ msgstr "Kan inte öppna RVR-filen %s."
 #: src/tvtime.c:1358
 #, c-format
 msgid "Cannot open capture device %s."
-msgstr "Kan inte öppna capture-enheten %s."
+msgstr "Kan inte öppna videofångarenheten %s."
 
 #: src/tvtime.c:1363
 #, c-format
@@ -209,8 +209,8 @@ msgstr ""
 "    tillräckligt många buffrar för att tvtime:s videobehandling\n"
 "    ska fungera optimalt. Ifall du kör en version av Linux äldre\n"
 "    än 2.4.21, är de förvalda inställningarna för låga. För att\n"
-"    lösa problemet, specifiera inställningen gbuffers=4 när du\n"
-"    laddar bttv-modulen. För mer information, se vår hjälpsida:\n"
+"    lösa problemet, välj inställningen gbuffers=4 när du laddar\n"
+"    bttv-modulen. För mer information, se vår hjälpsida:\n"
 "    %s\n"
 "\n"
 
@@ -230,7 +230,7 @@ msgstr ""
 "    många buffrar för att tvtime ska kunna behandla bilden. Kontrollera\n"
 "    drivrutinens dokumentation, för att se om du kan öka antalet buffrar\n"
 "    som drivrutinen låter program hantera, och rapportera den här\n"
-"    incidenten via tvtimes bugg-system på %s.\n"
+"    incidenten via tvtimes buggrapporteringssystem på %s.\n"
 "\n"
 
 #: src/tvtime.c:1486
@@ -364,7 +364,7 @@ msgstr "Ingen programinformation tillgänglig"
 #: src/commands.c:265
 #, c-format
 msgid "Next: %s"
-msgstr "Härnäst: %s"
+msgstr "Nästa program: %s"
 
 #: src/commands.c:306
 msgid "Renumber current channel"
@@ -461,23 +461,23 @@ msgstr "Egen (kör tvtime-scanner först)"
 #: src/commands.c:648
 #, c-format
 msgid "%s  Current: %d pixels"
-msgstr "%s  Aktuell: %d pixlar"
+msgstr "%s  Aktuell: %d bildpunkter"
 
 #: src/commands.c:655
 msgid "Low (360 pixels)"
-msgstr "Låg (360 pixlar)"
+msgstr "Låg (360 bildpunkter)"
 
 #: src/commands.c:661
 msgid "Moderate (576 pixels)"
-msgstr "Medel (576 pixlar)"
+msgstr "Medel (576 bildpunkter)"
 
 #: src/commands.c:667
 msgid "Standard (720 pixels)"
-msgstr "Standard (720 pixlar)"
+msgstr "Standard (720 bildpunkter)"
 
 #: src/commands.c:673
 msgid "High (768 pixels)"
-msgstr "Hög (768 pixlar)"
+msgstr "Hög (768 bildpunkter)"
 
 #: src/commands.c:678 src/commands.c:1236
 msgid "Restart with new settings"
@@ -519,7 +519,7 @@ msgstr "Luma-korrigering för BT8x8"
 
 #: src/commands.c:832
 msgid "2-3 pulldown inversion"
-msgstr "Kompensering för 2:3-matning"
+msgstr "2:3-matnings-kompensering"
 
 #: src/commands.c:841
 msgid "Colour invert"
@@ -694,7 +694,7 @@ msgstr "Insomningstimer: %d minuter."
 
 #: src/commands.c:1983
 msgid "Sleep off."
-msgstr "Insomningsfuktionen inaktiverad."
+msgstr "Insomningsfunktionen inaktiverad."
 
 #: src/commands.c:2041
 msgid "Channel marked as active in the browse list."
@@ -719,7 +719,7 @@ msgstr "Behandlar endast undre bildfälten."
 #: src/commands.c:2108
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
-msgstr "Den vågräta upplösningen kommer vara %d pixlar vid omstart."
+msgstr "Den vågräta upplösningen kommer vara %d bildpunkter vid omstart."
 
 #: src/commands.c:2154
 #, c-format
@@ -888,7 +888,7 @@ msgstr "Kunde inte skapa ny inställningsfil.\n"
 msgid "Error creating configuration file.\n"
 msgstr "Fel vid skapande av inställningsfil.\n"
 
-#: src/tvtimeconf.c:622 src/utils.c:131
+#: src/tvtimeconf.c:622 src/utils.c:133
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
 msgstr "Kan inte byta ägare för %s: %s.\n"
@@ -926,20 +926,17 @@ msgstr "  -a, --widescreen           16:9-läge.\n"
 
 #: src/tvtimeconf.c:644 src/tvtimeconf.c:697
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
-msgstr ""
-"  -b, --vbidevice=ENHET      VBI-enhet (/dev/vbi0 om ej specifierad).\n"
+msgstr "  -b, --vbidevice=ENHET      VBI-enhet (/dev/vbi0 om ej vald).\n"
 
 #: src/tvtimeconf.c:645 src/tvtimeconf.c:698
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
-msgstr "  -c, --channel=KANAL        Välj specifierad kanal vid uppstart.\n"
+msgstr "  -c, --channel=KANAL        Välj kanal vid uppstart.\n"
 
 #: src/tvtimeconf.c:646 src/tvtimeconf.c:699 src/tvtimeconf.c:746
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-msgstr ""
-"  -d, --device=ENHET         video4linux-enhet (/dev/video0 om ej "
-"specifierad)\n"
+msgstr "  -d, --device=ENHET         video4linux-enhet (/dev/video0 om ej vald)\n"
 
 #: src/tvtimeconf.c:647 src/tvtimeconf.c:700
 msgid ""
@@ -947,7 +944,7 @@ msgid ""
 "                             matroxtv or SDL (defaults to Xv).\n"
 msgstr ""
 "  -D, --driver=NAMN          Välj visningsdrivrutin: Xv, DirectFB, mga,\n"
-"                             matroxtv eller SDL (Xv om ej specifierad).\n"
+"                             matroxtv eller SDL (Xv om ej vald).\n"
 
 #: src/tvtimeconf.c:649 src/tvtimeconf.c:702
 msgid ""
@@ -971,7 +968,7 @@ msgid ""
 "\n"
 msgstr ""
 "  -f, --frequencies=NAMN     Vilken frekvenstabell som ska användas för den\n"
-"                             här mottagaren. (us-cable om ej specifierad).\n"
+"                             här kanalväljaren. (us-cable om ej vald).\n"
 "\n"
 "                             Giltiga värden är:\n"
 "                                 us-cable \n"
@@ -1003,22 +1000,21 @@ msgstr "  -h, --help                 Visa det här hjälpmeddelandet.\n"
 msgid ""
 "  -H, --height=HEIGHT        Output window height (defaults to 576 pixels).\n"
 msgstr ""
-"  -H, --height=HÖJD          Visningsfönstrets höjd (576 om ej "
-"specifierad).\n"
+"  -H, --height=HÖJD          Visningsfönstrets höjd (576 bildpunkter om ej\n"
+"                             vald).\n"
 
 #: src/tvtimeconf.c:668 src/tvtimeconf.c:721 src/tvtimeconf.c:749
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
-msgstr ""
-"  -i, --input=SIGNALNUMMER   video4linux signalnummer (0 om ej "
-"specifierad).\n"
+msgstr "  -i, --input=SIGNALNUMMER   video4linux signalnummer (0 om ej vald).\n"
 
 #: src/tvtimeconf.c:669 src/tvtimeconf.c:722
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
 msgstr ""
-"  -I, --inputwidth=SAMPLING  Vågrät bildupplösning (720 om ej specifierad).\n"
+"  -I, --inputwidth=SAMPLING  Vågrät bildupplösning (720 bildpunkter om ej\n"
+"                             vald).\n"
 
 #: src/tvtimeconf.c:671
 msgid ""
@@ -1041,9 +1037,9 @@ msgid ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
-"  -n, --norm=NORM            Specifierar tv-standard. tvtime stödjer:\n"
+"  -n, --norm=NORM            Välj tv-standard. tvtime stödjer:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N och PAL-60 (NTSC om ej specifierad).\n"
+"                             PAL-N och PAL-60 (NTSC om ej vald).\n"
 "\n"
 
 #: src/tvtimeconf.c:677 src/tvtimeconf.c:729
@@ -1051,8 +1047,10 @@ msgid ""
 "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
 "                             centre (default).\n"
 msgstr ""
-"  -p, --fspos=POS            Ställ in helskärmsposition: top, bottom, eller\n"
-"                             centre (centre om ej specifierad).\n"
+"  -p, --fspos=POS            Ställ in helskärmsposition: top [uppe],\n"
+"                             bottom [nere], eller centre [i mitten]\n"
+"                             (centre om ej vald. Du måste använda det\n"
+"                             engelska namnet.)\n"
 
 #: src/tvtimeconf.c:679
 msgid ""
@@ -1096,15 +1094,12 @@ msgid ""
 "                                 video, radio, monitor\n"
 msgstr ""
 "  -x, --mixer=ENHET[:KANAL]  Mixer-enhet och -kanal att styra.\n"
-"                             (/dev/mixer:line om ej specifierad)\n"
+"                             (/dev/mixer:line om ej vald)\n"
 "\n"
-"                             Giltiga kanaler är:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, "
-"line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
-"line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, "
-"phout,\n"
+"                             Giltiga kanaler:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
 "                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:731
@@ -1114,7 +1109,7 @@ msgstr "  -R, --prioritet=PRI        Ställ in tvtime-processens prioritet.\n"
 
 #: src/tvtimeconf.c:733
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
-msgstr "  -X, --display=DISPLAY      Anslut till specifierad X-server.\n"
+msgstr "  -X, --display=DISPLAY      Anslut till vald X-server.\n"
 
 #: src/tvtimeconf.c:928 src/tvtimeconf.c:937 src/tvtimeconf.c:997
 #: src/tvtimeconf.c:1135 src/tvtimeconf.c:1298
@@ -1134,21 +1129,21 @@ msgstr "Ingen signal"
 msgid "Mute"
 msgstr "Ljud avstängt"
 
-#: src/utils.c:115
+#: src/utils.c:117
 #, c-format
 msgid "Cannot create %s: %s\n"
 msgstr "Kan inte skapa %s: %s\n"
 
-#: src/utils.c:121
+#: src/utils.c:123
 #, c-format
 msgid "Cannot open %s: %s\n"
 msgstr "Kan inte öppna %s: %s\n"
 
-#: src/utils.c:610
+#: src/utils.c:612
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
-"Fel vid initiering av konverterare från UTF-8 till %s:\n"
+"Kan ej initiera teckenkonverterare (från UTF-8 till %s):\n"
 "fel vid iconv_open (%s).\n"
 
 #: src/utils.c:621
@@ -1214,7 +1209,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Ingen tv-mottagare funnen på källa %d. Om du har en mottagare,\n"
+"    Ingen kanalväljare funnen på källa %d. Om du har en kanalväljare,\n"
 "    välj en annan källa med hjälp av --input=<num>.\n"
 "\n"
 
@@ -1238,7 +1233,3 @@ msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
 "Fann en kanal vid %6.2f MHz (%.2f - %.2f MHz), lägger till i kanallistan.\n"
-
-# Den engelska strängen i det här fallet är ganska förvirrande.
-#~ msgid "Frame drop setting"
-#~ msgstr "Bildfrekvens vid videofångande"
