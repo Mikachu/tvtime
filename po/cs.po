@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2003-10-30 21:12+0100\n"
-"PO-Revision-Date: 2003-11-01 15:58+0100\n"
+"POT-Creation-Date: 2003-11-01 19:49+0100\n"
+"PO-Revision-Date: 2003-11-02 19:06+0100\n"
 "Last-Translator: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "Language-Team: Lukáš Slánský <lukas@schnauzer.cz>\n"
 "MIME-Version: 1.0\n"
@@ -78,9 +78,9 @@ msgstr "Nahoře"
 msgid "Bottom"
 msgstr "Dole"
 
-#: src/tvtime.c:987
-msgid "Frame drop setting"
-msgstr "Nastavení zahazování snímků"
+#: src/tvtime.c:987 src/commands.c:1305 src/commands.c:1335
+msgid "Attempted framerate"
+msgstr "Zkoušená obnovovací frekvence"
 
 #: src/tvtime.c:1014
 msgid "Performance estimates"
@@ -146,7 +146,7 @@ msgstr "16:9"
 
 #: src/tvtime.c:1112
 msgid "Matte setting (Anamorphic input)"
-msgstr "Nastavení ořezání (Anamorphic input)"
+msgstr "Nastavení ořezání (Anamorfický vstup)"
 
 #: src/tvtime.c:1118
 msgid "Matte setting (4:3 input)"
@@ -211,7 +211,6 @@ msgstr ""
 "    dostanete na našich stránkách podpory %s\n"
 "\n"
 
-
 #: src/tvtime.c:1436
 #, c-format
 msgid ""
@@ -264,15 +263,15 @@ msgstr "Obrazový mód 4:3 zapnut."
 
 #: src/tvtime.c:1991
 msgid "2-3 pulldown inversion disabled."
-msgstr ""
+msgstr "2-3 pulldown inverze vypnuta."
 
 #: src/tvtime.c:1994
 msgid "2-3 pulldown inversion enabled."
-msgstr ""
+msgstr "2-3 pulldown inverze zapnuta."
 
 #: src/tvtime.c:2000
 msgid "2-3 pulldown inversion is not valid with your TV norm."
-msgstr ""
+msgstr "2-3 pulldown inverze s vaší TV normou nefunguje."
 
 #: src/tvtime.c:2385 src/tvtime.c:2526
 #, c-format
@@ -515,7 +514,7 @@ msgstr "Korekce barev BT8x8"
 
 #: src/commands.c:832
 msgid "2-3 pulldown inversion"
-msgstr ""
+msgstr "2-3 pulldown inverze"
 
 #: src/commands.c:841
 msgid "Colour invert"
@@ -593,7 +592,7 @@ msgstr "Preferovaný mód audia"
 msgid "Television standard"
 msgstr "Televizní standard"
 
-#: src/commands.c:1150 src/commands.c:1197
+#: src/commands.c:1150 src/commands.c:1197 src/commands.c:1210
 msgid "Horizontal resolution"
 msgstr "Horizontální rozlišení"
 
@@ -604,10 +603,6 @@ msgstr "Zapnout/vypnout titulky"
 #: src/commands.c:1160
 msgid "Toggle XDS decoding"
 msgstr "Zapnout/vypnout dekódování XDS"
-
-#: src/commands.c:1210
-msgid "Horizontal Resolution"
-msgstr "Horizontální rozlišení"
 
 #: src/commands.c:1279
 msgid "Overscan"
@@ -624,10 +619,6 @@ msgstr "Nastavení prokládače"
 #: src/commands.c:1301
 msgid "Current deinterlacer description"
 msgstr "Popis současného prokládače"
-
-#: src/commands.c:1305 src/commands.c:1335
-msgid "Attempted framerate"
-msgstr "Zkoušená obnovovací frekvence"
 
 #: src/commands.c:1309 src/commands.c:1341
 msgid "Input filters"
@@ -833,15 +824,15 @@ msgstr "Nastavení obrazu nastaveno na předdefinované hodnoty."
 
 #: src/commands.c:2648
 msgid "Using nominal NTSC cable frequencies."
-msgstr ""
+msgstr "Používat nominální frekvence NTSC cable."
 
 #: src/commands.c:2654
 msgid "Using IRC cable frequencies."
-msgstr ""
+msgstr "Používat frekvence IRC cable."
 
 #: src/commands.c:2660
 msgid "Using HRC cable frequencies."
-msgstr ""
+msgstr "Používat frekvence HRC cable."
 
 #: src/commands.c:2744 src/commands.c:2758
 msgid "Volume"
@@ -849,7 +840,8 @@ msgstr "Hlasitost"
 
 #: src/commands.c:2908
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Nastavení obrazu bylo uloženo jako globální předdefinované nastavení.\n"
+msgstr ""
+"Nastavení obrazu bylo uloženo jako globální předdefinované nastavení.\n"
 
 #: src/commands.c:2921
 #, c-format
@@ -939,7 +931,8 @@ msgstr "  -c, --channel=KANÁL        Naladit určený kanál při zapnutí.\n"
 #: src/tvtimeconf.c:646 src/tvtimeconf.c:699 src/tvtimeconf.c:746
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
-msgstr "  -d, --device=ZAŘÍZENÍ      zařízení video4linux (standardně /dev/video0).\n"
+msgstr ""
+"  -d, --device=ZAŘÍZENÍ      zařízení video4linux (standardně /dev/video0).\n"
 
 #: src/tvtimeconf.c:647 src/tvtimeconf.c:700
 msgid ""
@@ -1021,9 +1014,11 @@ msgstr ""
 
 #: src/tvtimeconf.c:671
 msgid ""
-"  -k, --slave                Disables input handling in tvtime (slave mode).\n"
+"  -k, --slave                Disables input handling in tvtime (slave "
+"mode).\n"
 msgstr ""
-"  -k, --slave                Vypnout zpracování vstupu v tvtime (podřízený mód).\n"
+"  -k, --slave                Vypnout zpracování vstupu v tvtime (podřízený "
+"mód).\n"
 
 #: src/tvtimeconf.c:672 src/tvtimeconf.c:724
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
@@ -1035,7 +1030,8 @@ msgstr "  -M, --window               Zapnout tvtime v okenním módu.\n"
 
 #: src/tvtimeconf.c:674 src/tvtimeconf.c:726 src/tvtimeconf.c:750
 msgid ""
-"  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
+"  -n, --norm=NORM            The norm to use for the input.  tvtime "
+"supports:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
@@ -1048,26 +1044,31 @@ msgid ""
 "  -p, --fspos=POS            Set the fullscreen position: top, bottom or\n"
 "                             centre (default).\n"
 msgstr ""
-"  -p, --fspos=POZICE         Nastavit pozici pro celoobrazovkový mód: top (nahoře),\n"
-"                             bottom (dole) nebo centre (střed - standardně).\n"
+"  -p, --fspos=POZICE         Nastavit pozici pro celoobrazovkový mód: top "
+"(nahoře),\n"
+"                             bottom (dole) nebo centre (střed - "
+"standardně).\n"
 
 #: src/tvtimeconf.c:679
 msgid ""
 "  -r, --rvr=FILE             RVR recorded file to play (for debugging).\n"
 msgstr ""
-"  -r, --rvr=SOUBOR           Zaznamenaný soubor RVR na přehrání (pro ladění).\n"
+"  -r, --rvr=SOUBOR           Zaznamenaný soubor RVR na přehrání (pro "
+"ladění).\n"
 
 #: src/tvtimeconf.c:680
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
-"  -s, --showdrops            Zobrazovat statistiky zahozených snímků (pro ladění).\n"
+"  -s, --showdrops            Zobrazovat statistiky zahozených snímků (pro "
+"ladění).\n"
 
 #: src/tvtimeconf.c:681
 msgid ""
 "  -S, --saveoptions          Save command line options to the config file.\n"
 msgstr ""
-"  -S, --saveoptions          Uložit volby z příkazové řádky do konfiguračního souboru.\n"
+"  -S, --saveoptions          Uložit volby z příkazové řádky do "
+"konfiguračního souboru.\n"
 
 #: src/tvtimeconf.c:682 src/tvtimeconf.c:732
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
@@ -1083,18 +1084,24 @@ msgid ""
 "                             (defaults to /dev/mixer:line)\n"
 "\n"
 "                             Valid channels are:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
 "                                 video, radio, monitor\n"
 msgstr ""
 "  -x, --mixer=ZAŘÍZENÍ[:K]   Zařízení a kanál pro ovládání mixáže audia.\n"
 "                             (standardně /dev/mixer:line)\n"
 "\n"
 "                             Platné kanály jsou:\n"
-"                                 vol, bass, treble, synth, pcm, speaker, line,\n"
-"                                 mic, cd, mix, pcm2, rec, igain, ogain, line1,\n"
-"                                 line2, line3, dig1, dig2, dig3, phin, phout,\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
 "                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:731
@@ -1138,7 +1145,8 @@ msgstr "Nelze otevřít %s: %s\n"
 #: src/utils.c:603
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
-msgstr "Nelze inicializovat konvertor z UTF-8 do %s: iconv_open zklamal (%s).\n"
+msgstr ""
+"Nelze inicializovat konvertor z UTF-8 do %s: iconv_open zklamal (%s).\n"
 
 #: src/utils.c:614
 #, c-format
@@ -1226,4 +1234,5 @@ msgstr "Detekce signálu"
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
-"Nalezen kanál na %6.2f MHz (%.2f - %.2f MHz). Přidávám ho do seznamu kanálů.\n"
+"Nalezen kanál na %6.2f MHz (%.2f - %.2f MHz). Přidávám ho do seznamu "
+"kanálů.\n"
