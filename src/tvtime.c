@@ -397,6 +397,7 @@ static int last_topdiff = 0;
 static int last_botdiff = 0;
 
 static videofilter_t *filter = 0;
+static int filtered_cur = 0;
 
 static void tvtime_build_deinterlaced_frame( unsigned char *output,
                                              unsigned char *curframe,
@@ -603,7 +604,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         }
 
         /* Copy a scanline. */
-        if( filter && videofilter_active_on_scanline( filter, scanline ) ) {
+        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline ) ) {
             videofilter_packed422_scanline( filter, curframe, width, 0, scanline );
         }
         blit_packed422_scanline( output, curframe, width );
@@ -620,7 +621,7 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
             data.t0 = curframe;
             data.b0 = curframe + (instride*2);
 
-            if( filter && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
+            if( filter && !filtered_cur && videofilter_active_on_scanline( filter, scanline + 1 ) ) {
                 videofilter_packed422_scanline( filter, data.b0, width, 0, scanline + 1 );
             }
 
@@ -1290,6 +1291,7 @@ int main( int argc, char **argv )
             if( was_paused ) videoinput_free_frame( vidin, curframeid );
             curframe = videoinput_next_frame( vidin, &curframeid );
             aquired = 1;
+            filtered_cur = 0;
         }
 
         if( tuner_state != TUNER_STATE_HAS_SIGNAL ) {
@@ -1525,6 +1527,7 @@ int main( int argc, char **argv )
             tvtime_osd_advance_frame( osd );
         }
         was_paused = paused;
+        filtered_cur = 1;
     }
 
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
