@@ -139,7 +139,12 @@ static void pngscreenshot( const char *filename, unsigned char *frame422,
     int i;
 
     if( !tempscanline ) {
-        pngoutput_delete( pngout );
+        if( pngout ) pngoutput_delete( pngout );
+        return;
+    }
+
+    if( !pngout ) {
+        free( tempscanline );
         return;
     }
 
