@@ -8,7 +8,6 @@
 #include <libxml/xmlmemory.h>
 
 #include "tvtimeconf.h"
-#include "videotools.h"
 #include "parser.h"
 #include "input.h"
 

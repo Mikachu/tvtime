@@ -26,7 +26,6 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <langinfo.h>
-#include "videotools.h"
 #include "parser.h"
 #include "tvtimeconf.h"
 #include "input.h"
