@@ -472,7 +472,7 @@ static void print_usage( char **argv )
 {
     fprintf( stderr, "usage: %s [-ahkmsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
-                     "\t\t[-n <norm>] [-f <frequencies>]\n", argv[ 0 ] );
+                     "\t\t[-n <norm>] [-f <frequencies>] [-c <channel>]\n", argv[ 0 ] );
 
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-h\tShow this help message.\n" );
@@ -494,6 +494,8 @@ static void print_usage( char **argv )
     fprintf( stderr, "\t-d\tvideo4linux device (defaults to /dev/video0).\n" );
     fprintf( stderr, "\t-b\tVBI device (defaults to /dev/vbi0).\n" );
     fprintf( stderr, "\t-i\tvideo4linux input number (defaults to 0).\n" );
+
+    fprintf( stderr, "\t-c\tTune to this channel on startup.\n" );
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
@@ -701,7 +703,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int saveoptions = 0;
     char c;
 
-    while( (c = getopt( argc, argv, "ahkmsSvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahkmsSvF:r:H:I:d:b:i:c:n:f:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
         case 'k': ct->slave_mode = 1; break;
@@ -718,6 +720,8 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         case 'd': free( ct->v4ldev ); ct->v4ldev = strdup( optarg ); break;
         case 'b': free( ct->vbidev ); ct->vbidev = strdup( optarg ); break;
         case 'i': ct->inputnum = atoi( optarg ); break;
+        case 'c': ct->prev_channel = ct->start_channel;
+                  ct->start_channel = atoi( optarg ); break;
         case 'n': free( ct->norm ); ct->norm = strdup( optarg ); break;
         case 'f': free( ct->freq ); ct->freq = strdup( optarg ); break;
         default:
