@@ -1018,7 +1018,6 @@ void xcommon_resize_window_fullscreen( void )
 {
     XWindowAttributes attrs;
     int x, y, w, h;
-    double refresh;
 
     if( output_fullscreen ) {
         xcommon_toggle_fullscreen( 0, 0 );
@@ -1026,7 +1025,7 @@ void xcommon_resize_window_fullscreen( void )
 
     XGetWindowAttributes( display, wm_window, &attrs );
     DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
-    DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
+    DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h );
 
     /* Show our fullscreen window. */
     x11_static_gravity( display, wm_window );
@@ -1110,11 +1109,10 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
     output_fullscreen = !output_fullscreen;
     if( output_fullscreen ) {
         int x, y, w, h;
-        double refresh;
   
         DpyInfoUpdateResolution( display, screen, window_area.x, window_area.y );
         DpyInfoGetScreenOffset( display, screen, &x, &y );
-        DpyInfoGetResolution( display, screen, &w, &h, &refresh );
+        DpyInfoGetResolution( display, screen, &w, &h );
 
         output_width = w;
         output_height = h;
@@ -1191,10 +1189,9 @@ int xcommon_toggle_root( int fullscreen_width, int fullscreen_height )
     output_fullscreen = !output_fullscreen;
     if( output_fullscreen ) {
         int x, y, w, h;
-        double refresh;
 
         DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
-        DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
+        DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h );
 
         // windowed_output_window = output_window;
         // fs_window = RootWindow( display, screen );

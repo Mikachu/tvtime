@@ -61,8 +61,7 @@ int DpyInfoGetScreenOffset(Display *dpy, int screen_nr, int *x, int *y);
 
 int DpyInfoGetResolution(Display *dpy, int screen_nr,
 			 int *horizontal_pixels,
-			 int *vertical_pixels,
-			 double *refresh_rate);
+			 int *vertical_pixels);
 
 int DpyInfoGetGeometry(Display *dpy, int screen_nr,
 		       int *width,

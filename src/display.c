@@ -21,9 +21,6 @@
 #endif
 
 #include <X11/Xlib.h>
-#ifdef HAVE_XF86VIDMODE
-#include <X11/extensions/xf86vmode.h>
-#endif
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -34,7 +31,6 @@
 typedef struct {
   int horizontal_pixels;
   int vertical_pixels;
-  double refresh_rate;
 } resolution_t;
 
 typedef struct {
@@ -84,12 +80,10 @@ int DpyInfoGetScreenOffset(Display *dpy, int screen_nr,
 
 int DpyInfoGetResolution(Display *dpy, int screen_nr,
 			 int *horizontal_pixels,
-			 int *vertical_pixels,
-			 double *refresh_rate)
+			 int *vertical_pixels)
 {
   *horizontal_pixels = dpyinfo.resolution.horizontal_pixels;
   *vertical_pixels = dpyinfo.resolution.vertical_pixels;
-  *refresh_rate = dpyinfo.resolution.refresh_rate;
 
   return 1;
 }
@@ -353,7 +347,6 @@ int DpyInfoInit(Display *dpy, int screen_nr)
   dpyinfo.screen_offset.y = 0;
   dpyinfo.resolution.horizontal_pixels = 0;
   dpyinfo.resolution.vertical_pixels = 0;
-  dpyinfo.resolution.refresh_rate = 0.0;
   dpyinfo.geometry.width = 0;
   dpyinfo.geometry.height = 0;
 
