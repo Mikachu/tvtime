@@ -37,7 +37,7 @@ int main( int argc, char **argv )
     int i;
 
     if( !cfg ) {
-        fputs( "tvtime-command: Cannot allocate memory.\n", stderr );
+        fprintf( stderr, "%s: Cannot allocate memory.\n", argv[ 0 ] );
         return 1;
     }
 
@@ -52,7 +52,7 @@ int main( int argc, char **argv )
 
     fifofile = get_tvtime_fifo_filename( config_get_uid( cfg ) );
     if( !fifofile ) {
-        fputs( "tvtime-command: Cannot allocate memory.\n", stderr );
+        fprintf( stderr, "%s: Cannot allocate memory.\n", argv[ 0 ] );
         config_delete( cfg );
         return 1;
     }
@@ -60,9 +60,12 @@ int main( int argc, char **argv )
     /* Check if fifo can be written (tvtime running). */
     i = open( fifofile, O_WRONLY | O_NONBLOCK );
     if( i < 0 ) {
-        fprintf( stderr, "tvtime-command: Cannot open %s: %s\n",
-                 fifofile, strerror( errno ) );
-        fprintf( stderr, "tvtime-command: tvtime not running?\n" );
+        if( errno == ENXIO || errno == ENODEV ) {
+            fprintf( stderr, "tvtime not running.\n" );
+        } else {
+            fprintf( stderr, "%s: Cannot open %s: %s\n",
+                     argv[ 0 ], fifofile, strerror( errno ) );
+        }
         config_delete( cfg );
         free( fifofile );
         return 1;
@@ -70,8 +73,8 @@ int main( int argc, char **argv )
 
     fifo = fdopen( i, "w" );
     if( !fifo ) {
-        fprintf( stderr, "tvtime-command: Cannot open %s: %s\n",
-                 fifofile, strerror( errno ) );
+        fprintf( stderr, "%s: Cannot open %s: %s\n",
+                 argv[ 0 ], fifofile, strerror( errno ) );
         close( i );
         config_delete( cfg );
         free( fifofile );
