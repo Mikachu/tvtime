@@ -36,6 +36,7 @@ struct osd_string_s
     efont_t *font;
     efont_string_t *efs;
     int frames_left;
+    int hold;
 
     int text_luma;
     int text_cb;
@@ -83,6 +84,7 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
     }
 
     osds->frames_left = 0;
+    osds->hold = 0;
 
     osds->text_luma = 16;
     osds->text_cb = 128;
@@ -106,6 +108,11 @@ void osd_string_delete( osd_string_t *osds )
     efs_delete( osds->efs );
     efont_delete( osds->font );
     free( osds );
+}
+
+void osd_string_set_hold( osd_string_t *osds, int hold )
+{
+    osds->hold = hold;
 }
 
 void osd_string_set_colour( osd_string_t *osds, int luma, int cb, int cr )
@@ -191,12 +198,12 @@ void osd_string_set_timeout( osd_string_t *osds, int timeout )
 
 int osd_string_visible( osd_string_t *osds )
 {
-    return ( osds->efs && (osds->frames_left != 0) );
+    return ( osds->efs && (osds->frames_left > 0) );
 }
 
 void osd_string_advance_frame( osd_string_t *osds )
 {
-    if( osds->frames_left > 0 ) {
+    if( !osds->hold && osds->frames_left > 0 ) {
         osds->frames_left--;
     }
 }

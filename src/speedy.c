@@ -690,6 +690,7 @@ void composite_packed4444_to_packed422_scanline_mmxext( unsigned char *output,
             packuswb_r2r( mm3, mm3 );
             movd_r2m( mm3, *output );
         } else if( fg1 || fg2 ) {
+
             // mm1 = [ cr ][ y ][ cb ][ y ]
             movd_m2r( *input, mm1 );
             punpcklbw_r2r( mm7, mm1 );

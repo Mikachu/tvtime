@@ -77,11 +77,6 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message );
 void tvtime_osd_advance_frame( tvtime_osd_t *osd );
 
 /**
- * Returns true if there is anything to composite on this scanline.
- */
-int tvtime_osd_active_on_scanline( tvtime_osd_t *osd, int scanline );
-
-/**
  * Asks the OSD object to composite itself onto the given scanline.
  * xpos indicates the x position that the output pointer points at,
  * width is the maximum width we should composite to, and scanline
