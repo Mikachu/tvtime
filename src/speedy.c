@@ -169,10 +169,10 @@ static inline __attribute__ ((always_inline,const)) uint8_t clip255( int x )
 
 unsigned long CombJaggieThreshold = 73;
 
+#ifdef ARCH_X86
 static unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *mid,
                                                         uint8_t *bot, int width )
 {
-#ifdef ARCH_X86
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     const mmx_t qwOnes = { 0x0001000100010001ULL };
     mmx_t qwThreshold;
@@ -248,10 +248,8 @@ static unsigned int comb_factor_packed422_scanline_mmx( uint8_t *top, uint8_t *m
     emms();
 
     return temp1;
-#else
-    return 0;
-#endif
 }
+#endif
 
 static unsigned long BitShift = 6;
 
@@ -275,6 +273,7 @@ static unsigned int diff_factor_packed422_scanline_c( uint8_t *cur, uint8_t *old
     return ret;
 }
 
+/*
 static unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t *old, int width )
 {
     unsigned int ret = 0;
@@ -294,10 +293,11 @@ static unsigned int diff_factor_packed422_scanline_test_c( uint8_t *cur, uint8_t
 
     return ret;
 }
+*/
 
+#ifdef ARCH_X86
 static unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *old, int width )
 {
-#ifdef ARCH_X86
     const mmx_t qwYMask = { 0x00ff00ff00ff00ffULL };
     unsigned int temp1, temp2;
 
@@ -331,17 +331,15 @@ static unsigned int diff_factor_packed422_scanline_mmx( uint8_t *cur, uint8_t *o
     emms();
 
     return temp1;
-#else
-    return 0;
-#endif
 }
+#endif
 
 #define ABS(a) (((a) < 0)?-(a):(a))
 
+#ifdef ARCH_X86
 static void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
                                          uint8_t *new, int os, int ns )
 {
-#ifdef ARCH_X86
     const mmx_t ymask = { 0x00ff00ff00ff00ffULL };
     short out[ 24 ]; /* Output buffer for the partial metrics from the mmx code. */
     uint8_t *outdata = (uint8_t *) out;
@@ -480,8 +478,8 @@ static void diff_packed422_block8x8_mmx( pulldown_metrics_t *m, uint8_t *old,
     }
 
     emms();
-#endif
 }
+#endif
 
 static void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
                                        uint8_t *new, int os, int ns )
@@ -2038,6 +2036,7 @@ static void packed444_to_rgb24_rec601_scanline_c( uint8_t *output, uint8_t *inpu
  * B-Y' = -0.299*R' - 0.587*G' + 0.886*B'
  * R-Y' =  0.701*R' - 0.587*G' - 0.114*B'
  */
+/*
 static void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8_t *input, int width )
 {
     while( width-- ) {
@@ -2062,6 +2061,7 @@ static void packed444_to_rgb24_rec601_reference_scanline( uint8_t *output, uint8
         input += 3;
     }
 }
+*/
 
 static void packed444_to_nonpremultiplied_packed4444_scanline_c( uint8_t *output, 
                                                                  uint8_t *input,
