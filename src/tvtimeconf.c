@@ -897,6 +897,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     };
     int option_index = 0;
     int saveoptions = 0;
+    int filename_specified = 0;
     char c;
 
     if( argc ) {
@@ -915,6 +916,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 'l': if( ct->xmltvlanguage ) { free( ct->xmltvlanguage ); }
                       ct->xmltvlanguage = strdup( optarg ); break;
             case 'F': if( ct->config_filename ) free( ct->config_filename );
+                      filename_specified = 1;
                       ct->config_filename = expand_user_path( optarg );
                       if( ct->config_filename ) {
                           lfprintf
@@ -944,6 +946,25 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             }
         }
     }
+
+    if( !filename_specified ) {
+        char *fifofile = get_tvtime_fifo_filename( config_get_uid( ct ) );
+        int fifofd;
+
+        if( !fifofile ) {
+            lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
+            return 0;
+        }
+
+        fifofd = open( fifofile, O_WRONLY | O_NONBLOCK );
+        if( fifofd >= 0 ) {
+            lfprintf( stderr,
+                      _("Cannot run two instances of tvtime with the same configuration.\n") );
+            return 0;
+        }
+        close( fifofd );
+    }
+
 
     ct->doc = configsave_open( ct->config_filename );
 
