@@ -164,20 +164,6 @@ fi
 AM_CONDITIONAL(HAVE_DIRECTFB, [test "$DIRECTFB_CONFIG" != "no"])
 
 dnl ---------------------------------------------
-dnl LIRC
-dnl ---------------------------------------------
-
-dnl have_lirc=yes
-dnl AC_REQUIRE_CPP
-dnl AC_CHECK_HEADER(lirc/lirc_client.h,
-dnl   [AC_CHECK_LIB(lirc_client,lirc_init,,have_lirc=no)],have_lirc=no)
-dnl if test "$have_lirc" = "yes"; then
-dnl   AC_DEFINE(HAVE_LIRC,,[LIRC support])
-dnl fi
-
-AM_CONDITIONAL(DISABLE_DSCALER_LOADER, [test x"$USE_DSCALER" != "xyes"])
-
-dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension
 dnl ---------------------------------------------
 AC_PATH_XTRA
