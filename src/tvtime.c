@@ -310,6 +310,10 @@ static void calculate_pulldown_score_vektor( uint8_t *curframe,
     last_botdiff = 0;
 
     for( i = 0; i < frame_height; i++ ) {
+        if( filter && !filtered_cur && videofilter_active_on_scanline( filter, i ) ) {
+            videofilter_packed422_scanline( filter, curframe + (i*instride), width, 0, i );
+        }
+
         if( i > 40 && (i & 3) == 0 && i < frame_height - 40 ) {
             last_topdiff += diff_factor_packed422_scanline( curframe + (i*instride),
                                                             lastframe + (i*instride), width );
@@ -318,6 +322,8 @@ static void calculate_pulldown_score_vektor( uint8_t *curframe,
                                                             width );
         }
     }
+
+    filtered_cur = 1;
 }
 
 static void tvtime_build_deinterlaced_frame( uint8_t *output,
