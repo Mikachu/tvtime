@@ -1101,7 +1101,6 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
   }
   
   return 1;
-  
 }
 
 

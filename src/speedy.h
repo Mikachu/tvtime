@@ -147,6 +147,7 @@ extern void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *
 extern void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 extern void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                          unsigned char *src2, int width, int pos );
+extern void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
 
 /**
  * Sets up the function pointers to point at the fastest function available.

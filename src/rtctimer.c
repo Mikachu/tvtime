@@ -147,7 +147,7 @@ int rtctimer_start_clock( rtctimer_t *rtctimer )
     }
     return rtctimer->rtc_running;
 }
-    
+
 int rtctimer_stop_clock( rtctimer_t *rtctimer )
 {
     int was_running = rtctimer->rtc_running;

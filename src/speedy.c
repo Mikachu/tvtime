@@ -53,6 +53,7 @@ void (*composite_alphamask_alpha_to_packed4444_scanline)( unsigned char *output,
 void (*premultiply_packed4444_scanline)( unsigned char *output, unsigned char *input, int width );
 void (*blend_packed422_scanline)( unsigned char *output, unsigned char *src1,
                                   unsigned char *src2, int width, int pos );
+void (*filter_luma_11_packed422_scanline)( unsigned char *output, unsigned char *input, int width );
 
 
 static unsigned int speedy_time = 0;
@@ -142,7 +143,38 @@ void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
     SPEEDY_END();
 }
 
+/*
+void filter_luma_14641_packed422_scanline_c( unsigned char *output, unsigned char *input, int width )
+{
+    SPEEDY_START();
 
+    if( width >= 4 ) {
+        
+        width -= 4;
+        while( width-- ) {
+            *output = input[ 0 ] + ((input[ 2 ] + input[ 6 ])<<2) + (input[ 4 ] * 6) + input[ 8 ];
+            output += 2;
+        }
+    }
+
+    SPEEDY_END();
+}
+*/
+
+void filter_luma_11_packed422_scanline_c( unsigned char *output, unsigned char *input, int width )
+{
+    int delay = 0;
+
+    SPEEDY_START();
+    while( width-- ) {
+        int cur = input[ 0 ];
+        *((unsigned short *) output) = (input[ 1 ] << 8) | ((cur + delay + 1)>>1);
+        delay = cur;
+        input += 2;
+        output += 2;
+    }
+    SPEEDY_END();
+}
 
 void interpolate_packed422_scanline_c( unsigned char *output,
                                        unsigned char *top,
@@ -1001,6 +1033,7 @@ void setup_speedy_calls( void )
     composite_alphamask_alpha_to_packed4444_scanline = composite_alphamask_alpha_to_packed4444_scanline_c;
     premultiply_packed4444_scanline = premultiply_packed4444_scanline_c;
     blend_packed422_scanline = blend_packed422_scanline_c;
+    filter_luma_11_packed422_scanline = filter_luma_11_packed422_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
