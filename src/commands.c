@@ -142,6 +142,10 @@ enum menu_type
     MENU_REDIRECT,
     MENU_FAVORITES,
     MENU_DEINTERLACER,
+    MENU_BRIGHTNESS,
+    MENU_CONTRAST,
+    MENU_COLOUR,
+    MENU_HUE,
     MENU_USER
 };
 
@@ -154,7 +158,12 @@ typedef struct menu_names_s {
 static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
     { "favorites", MENU_FAVORITES, 0 },
-    { "deinterlacer", MENU_DEINTERLACER, 0 }
+    { "deinterlacer", MENU_DEINTERLACER, 0 },
+    { "brightness", MENU_BRIGHTNESS, 0 },
+    { "contrast", MENU_CONTRAST, 0 },
+    { "colour", MENU_COLOUR, 0 },
+    { "color", MENU_COLOUR, 0 },
+    { "hue", MENU_HUE, 0 }
 };
 
 static int tvtime_num_builtin_menus( void )
@@ -429,6 +438,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, 5, "Exit" );
     menu_set_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_command( menu, 0, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "root-notuner" );
@@ -441,6 +451,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, 4, "Exit" );
     menu_set_command( menu, 4, TVTIME_MENU_EXIT, 0 );
+    menu_set_command( menu, 0, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations" );
@@ -454,6 +465,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 4, "Scan channels for frequency" );
     menu_set_text( menu, 4, "Back" );
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input" );
@@ -464,6 +476,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
     menu_set_text( menu, 3, "Back" );
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
@@ -476,6 +489,22 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
     menu_set_text( menu, 4, "Back" );
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "picture" );
+    menu_set_text( menu, 0, "Setup - Picture" );
+    menu_set_text( menu, 1, "Brightness" );
+    menu_set_command( menu, 1, TVTIME_SHOW_MENU, "brightness" );
+    menu_set_text( menu, 2, "Contrast" );
+    menu_set_command( menu, 2, TVTIME_SHOW_MENU, "contrast" );
+    menu_set_text( menu, 3, "Colour" );
+    menu_set_command( menu, 3, TVTIME_SHOW_MENU, "colour" );
+    menu_set_text( menu, 4, "Hue" );
+    menu_set_command( menu, 4, TVTIME_SHOW_MENU, "hue" );
+    menu_set_text( menu, 5, "Back" );
+    menu_set_command( menu, 5, TVTIME_SHOW_MENU, "root" );
+    menu_set_command( menu, 0, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     reinit_tuner( cmd );
@@ -553,6 +582,11 @@ static void menu_enter( commands_t *cmd )
             }
         }
         menu_off( cmd );
+    } else if( cmd->curmenu == MENU_BRIGHTNESS || cmd->curmenu == MENU_CONTRAST ||
+               cmd->curmenu == MENU_COLOUR || cmd->curmenu == MENU_HUE ) {
+        if( cmd->curmenupos == 1 ) {
+            commands_handle( cmd, TVTIME_SHOW_MENU, "picture" );
+        }
     } else if( cmd->curmenu == MENU_USER ) {
         int command = menu_get_command( cmd->curusermenu, cmd->curmenupos + 1 );
         const char *argument = menu_get_argument( cmd->curusermenu, cmd->curmenupos + 1 );
@@ -561,6 +595,76 @@ static void menu_enter( commands_t *cmd )
         if( command != TVTIME_MENU_ENTER ) {
             commands_handle( cmd, command, argument );
         }
+    }
+}
+
+static void menu_left( commands_t *cmd )
+{
+    if( cmd->curmenu == MENU_FAVORITES ) {
+        commands_handle( cmd, TVTIME_SHOW_MENU, "stations" );
+    } else if( cmd->curmenu == MENU_BRIGHTNESS ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_BRIGHTNESS_DOWN, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_CONTRAST ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_CONTRAST_DOWN, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_COLOUR ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_COLOUR_DOWN, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_HUE ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_HUE_DOWN, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_USER ) {
+        int command = menu_get_command( cmd->curusermenu, 0 );
+        const char *argument = menu_get_argument( cmd->curusermenu, 0 );
+
+        /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
+        if( command != TVTIME_MENU_ENTER ) {
+            commands_handle( cmd, command, argument );
+        }
+    }
+}
+
+static void menu_right( commands_t *cmd )
+{
+    if( cmd->curmenu == MENU_BRIGHTNESS ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_BRIGHTNESS_UP, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_CONTRAST ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_CONTRAST_UP, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_COLOUR ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_COLOUR_UP, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_HUE ) {
+        if( cmd->curmenupos == 0 ) {
+            commands_handle( cmd, TVTIME_HUE_UP, "" );
+        } else {
+            menu_enter( cmd );
+        }
+    } else if( cmd->curmenu == MENU_FAVORITES || cmd->curmenu == MENU_USER ) {
+        menu_enter( cmd );
     }
 }
 
@@ -579,6 +683,21 @@ static void display_current_menu( commands_t *cmd )
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, "Add current station" );
         tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, "Exit" );
         cmd->curmenusize = cmd->numfavorites + 2;
+    } else if( cmd->curmenu == MENU_BRIGHTNESS || cmd->curmenu == MENU_CONTRAST ||
+               cmd->curmenu == MENU_COLOUR || cmd->curmenu == MENU_HUE ) {
+        tvtime_osd_list_set_lines( cmd->osd, 3 );
+        if( cmd->curmenu == MENU_BRIGHTNESS ) {
+            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Brightness" );
+        } else if( cmd->curmenu == MENU_CONTRAST ) {
+            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Contrast" );
+        } else if( cmd->curmenu == MENU_COLOUR ) {
+            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Colour" );
+        } else if( cmd->curmenu == MENU_HUE ) {
+            tvtime_osd_list_set_text( cmd->osd, 0, "Setup - Picture - Hue" );
+        }
+        tvtime_osd_list_set_text( cmd->osd, 1, "< Adjust >" );
+        tvtime_osd_list_set_text( cmd->osd, 2, "Back" );
+        cmd->curmenusize = 2;
     } else if( cmd->curmenu == MENU_USER && cmd->curusermenu ) {
         tvtime_osd_list_set_lines( cmd->osd, menu_get_num_lines( cmd->curusermenu ) );
         for( i = 0; i < menu_get_num_lines( cmd->curusermenu ); i++ ) {
@@ -653,6 +772,19 @@ void commands_add_menu( commands_t *cmd, menu_t *menu )
     }
 }
 
+void commands_clear_menu_positions( commands_t *cmd )
+{
+    int i;
+
+    for( i = 0; i < MAX_USER_MENUS; i++ ) {
+        if( cmd->menus[ i ] ) {
+            menu_set_cursor( cmd->menus[ i ], 0 );
+        } else {
+            return;
+        }
+    }
+}
+
 int commands_in_menu( commands_t *cmd )
 {
     return cmd->menuactive;
@@ -662,11 +794,13 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 {
     int volume;
 
-    if( cmd->menuactive && !tvtime_is_menu_command( tvtime_cmd ) ) {
+    if( tvtime_cmd == TVTIME_NOCOMMAND ) return;
+
+    if( cmd->menuactive && !tvtime_is_menu_command( tvtime_cmd ) && cmd->curusermenu ) {
         menu_off( cmd );
     }
 
-    if( cmd->menuactive ) {
+    if( cmd->menuactive && tvtime_is_menu_command( tvtime_cmd ) ) {
         int x, y, line;
         switch( tvtime_cmd ) {
         case TVTIME_MENU_EXIT:
@@ -682,9 +816,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             if( cmd->curusermenu ) menu_set_cursor( cmd->curusermenu, cmd->curmenupos );
             display_current_menu( cmd );
             break;
-        case TVTIME_MENU_ENTER:
-            menu_enter( cmd );
-            break;
+        case TVTIME_MENU_LEFT: menu_left( cmd ); break;
+        case TVTIME_MENU_RIGHT: menu_right( cmd ); break;
+        case TVTIME_MENU_ENTER: menu_enter( cmd ); break;
         case TVTIME_SHOW_MENU:
             if( set_menu( cmd, arg ) ) {
                 display_current_menu( cmd );
@@ -711,6 +845,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_SHOW_MENU:
+        commands_clear_menu_positions( cmd );
         if( set_menu( cmd, arg ) || set_menu( cmd, "root" ) ) {
             display_current_menu( cmd );
         }

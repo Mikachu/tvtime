@@ -122,8 +122,6 @@ enum tvtime_commands
 
     TVTIME_DISPLAY_MESSAGE,
 
-    TVTIME_SHOW_MENU,
-
     /* Everything below here is a menu-mode command. */
     TVTIME_MENU_UP,
     TVTIME_MENU_DOWN,
@@ -131,6 +129,7 @@ enum tvtime_commands
     TVTIME_MENU_RIGHT,
     TVTIME_MENU_ENTER,
     TVTIME_MENU_EXIT,
+    TVTIME_SHOW_MENU,
 
     /* This is a 'menu-mode' command, but kinda not. */
     TVTIME_MOUSE_MOVE
