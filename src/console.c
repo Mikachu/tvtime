@@ -221,10 +221,10 @@ console_t *console_new( int x, int y, int width, int height,
 
 void console_delete( console_t *con )
 {
-    int i=0;
+    int i = 0;
 
     if( con->line ) {
-        for( i=0; i < con->num_lines; i++ ) {
+        for( i = 0; i < con->num_lines; i++ ) {
             if( con->line[ i ] ) {
                 osd_string_delete( con->line[ i ] );
             }
@@ -250,10 +250,9 @@ void update_osd_strings( console_t *con )
     int maxwidth = con->width - ( ( con->frame_width * 1 ) / 100 );
     int needtoscroll = 0;
 
-    if( !con ) return;
-
-    if( con->cury <= con->first_line + con->rows )
+    if( con->cury <= con->first_line + con->rows ) {
         needtoscroll = 1;
+    }
 
     ptr = con->text + con->curx;
     tmpstr[0] = '\0';
@@ -400,10 +399,7 @@ void console_printf( console_t *con, char *format, ... )
     int n=0, size;
     char *str = NULL;
     
-    if( !con ) return;
-    if( !format ) return;
-
-    size = strlen(format)*3;
+    size = strlen( format ) * 3;
 
     va_start( ap, format );
     str = (char *)malloc( size );
@@ -508,7 +504,7 @@ void console_printf( console_t *con, char *format, ... )
 void console_gotoxy( console_t *con, int x, int y )
 {
     return;
-    if( !con ) return;
+
     if( x < 0 ) x *= -1;
     if( y < 0 ) y *= -1;
 
@@ -518,22 +514,16 @@ void console_gotoxy( console_t *con, int x, int y )
 
 void console_setfg( console_t *con, unsigned int fg )
 {
-    if( !con ) return;
-
     con->fgcolour = fg;
 }
 
 void console_setbg( console_t *con, unsigned int bg )
 {
-    if( !con ) return;
-
     con->bgcolour = bg;
 }
 
 void console_scroll_n( console_t *con, int n )
 {
-    if( !con ) return;
-
     if( n > 0) {
         con->first_line = (con->num_lines-1 > con->first_line + n) ? con->first_line + n : con->num_lines - 1;
     } else {
@@ -543,8 +533,8 @@ void console_scroll_n( console_t *con, int n )
 
 void console_toggle_console( console_t *con )
 {
-    if( !con ) return;
     con->visible = !con->visible;
+
     if( con->visible ) {
         con->dropdown = 1;
         con->drop_pos = con->y;
@@ -556,14 +546,10 @@ void console_pipe_printf( console_t *con, char * format, ... )
     va_list ap;
     int ret;
     
-    if( !con ) return;
-    if( !format ) return;
-
     va_start( ap, format );
     ret = vfprintf( con->out, format, ap );
     va_end( ap );
     fflush( con->out );
-    return;
 }
 
 int console_scanf( console_t *con, char *format, ... )
@@ -572,9 +558,6 @@ int console_scanf( console_t *con, char *format, ... )
     fd_set rfds;
     struct timeval tv;
     int ret = 0;
-
-    if( !con ) return 0;
-    if( !format ) return 0;
 
     FD_ZERO( &rfds );
     FD_SET( fileno( con->in ), &rfds );
@@ -593,8 +576,6 @@ int console_scanf( console_t *con, char *format, ... )
 void console_setup_pipe( console_t *con, const char *pipename )
 {
     int fd;
-
-    if( !con ) return;
 
     if( ( fd = open( pipename, O_WRONLY | O_NONBLOCK ) ) == -1 ) {
         perror("console: Error opening pipe");
@@ -615,10 +596,7 @@ void console_composite_packed422_scanline( console_t *con,
 {
     int i;
 
-    if( !con ) return;
-
-    if( scanline <= con->drop_pos &&
-        con->visible && scanline >= con->y && 
+    if( scanline <= con->drop_pos && con->visible && scanline >= con->y && 
         scanline < con->y + con->height ) {
 
         blit_colour_packed422_scanline( output + (con->x*2), con->width,
@@ -649,6 +627,9 @@ void console_composite_packed422_scanline( console_t *con,
             }
         }
     }
-    if( scanline == con->frame_height-1 ) con->drop_pos+=4;
+
+    if( scanline == con->frame_height-1 ) {
+        con->drop_pos+=4;
+    }
 }
 
