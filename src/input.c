@@ -82,23 +82,27 @@ static int get_current_frequency( void )
 
 static int frequencies_find_current_index( videoinput_t *vidin )
 {
-    int curfreq = videoinput_get_tuner_freq( vidin );
+    int tunerfreq = videoinput_get_tuner_freq( vidin );
+    int closest = -1;
+    int closesti = 0;
     int i;
 
-    if( curfreq == 0 ) {
+    if( tunerfreq == 0 ) {
         /* Probably no tuner present */
         return 0;
     }
 
     for( i = 0; i < CHAN_ENTRIES; i++ ) {
-        if( curfreq < (tvtuner[ i ].freq[ cur_freq_table ] + 500) &&
-            curfreq > (tvtuner[ i ].freq[ cur_freq_table ] - 500) ) {
-            cur_channel = i;
-            return 1;
+        int curfreq = tvtuner[ i ].freq[ cur_freq_table ];
+
+        if( curfreq && ((closest < 0) || (abs( curfreq - tunerfreq ) < abs( closest - tunerfreq ))) ) {
+            closest = curfreq;
+            closesti = i;
         }
     }
+    cur_channel = closesti;
 
-    return 0;
+    return 1;
 }
 
 static void frequencies_choose_first_frequency( void )
