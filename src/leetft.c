@@ -345,7 +345,7 @@ static void blit_glyph_subpix( uint8_t *dst, int dst_width, int dst_height,
 }
 
 void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
-                     int subpix_pos, int *width, int *height, int outsize )
+                     int subpix_pos, int *ascent, int *width, int *height, int outsize )
 {
     FT_BBox string_bbox;
     int push_x, i;
@@ -398,6 +398,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *ntext,
 
     /* The numbers I get for a height all seem to make sense. */
     *height = font->fontsize - ((string_bbox.yMin + 32) >> 6);
+    *ascent = font->fontsize - ((string_bbox.yMax + 32) >> 6);
 
     if( *width * *height > outsize ) {
         *width = *height = 0;
@@ -427,6 +428,7 @@ struct ft_string_s
     ft_font_t *font;
     int width;
     int height;
+    int ascent;
     int datasize;
     uint8_t data[ 256 * 1024 ];
 };
@@ -450,7 +452,12 @@ void ft_string_delete( ft_string_t *fts )
 void ft_string_set_text( ft_string_t *fts, const char *text, int subpix_pos )
 {
     ft_font_render( fts->font, fts->data, text, subpix_pos,
-                    &fts->width, &fts->height, fts->datasize );
+                    &fts->ascent, &fts->width, &fts->height, fts->datasize );
+}
+
+int ft_string_get_ascent( ft_string_t *fts )
+{
+    return fts->ascent;
 }
 
 int ft_string_get_width( ft_string_t *fts )

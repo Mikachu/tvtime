@@ -70,6 +70,7 @@ void osd_string_show_text( osd_string_t *osds, const char *text, int timeout );
 int osd_string_visible( osd_string_t *osds );
 int osd_string_get_width( osd_string_t *osds );
 int osd_string_get_height( osd_string_t *osds );
+int osd_string_get_ascent( osd_string_t *osds );
 void osd_string_set_hold( osd_string_t *osds, int hold );
 void osd_string_set_timeout( osd_string_t *osds, int timeout );
 int osd_string_get_frames_left( osd_string_t *osds );

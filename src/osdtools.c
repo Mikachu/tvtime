@@ -349,6 +349,11 @@ void osd_string_rerender( osd_string_t *osds )
     }
 }
 
+int osd_string_get_ascent( osd_string_t *osds )
+{
+    return ft_string_get_ascent( osds->fts );
+}
+
 int osd_string_get_width( osd_string_t *osds )
 {
     return osds->image_textwidth;

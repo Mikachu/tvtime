@@ -74,7 +74,8 @@ int ft_font_points_to_subpix_width( ft_font_t *font, int points );
  * Renders a given string with this font to the given buffer.
  */
 void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
-                     int subpix_pos, int *width, int *height, int outsize );
+                     int subpix_pos, int *ascent, int *width,
+                     int *height, int outsize );
 
 /**
  * Creates a new string object for the given font.  You can reset the
@@ -85,33 +86,38 @@ ft_string_t *ft_string_new( ft_font_t *font );
 /**
  * Deletes the string object.
  */
-void ft_string_delete( ft_string_t *efs );
+void ft_string_delete( ft_string_t *fts );
 
 /**
  * Sets the text of the string object.
  */
-void ft_string_set_text( ft_string_t *efs, const char *text, int subpix_pos );
+void ft_string_set_text( ft_string_t *fts, const char *text, int subpix_pos );
 
 /**
  * Returns the width in pixels.
  */
-int ft_string_get_width( ft_string_t *efs );
+int ft_string_get_width( ft_string_t *fts );
 
 /**
  * Returns the height in pixels.
  */
-int ft_string_get_height( ft_string_t *efs );
+int ft_string_get_height( ft_string_t *fts );
 
 /**
  * Returns the number of bytes per scanline.
  */
-int ft_string_get_stride( ft_string_t *efs );
+int ft_string_get_stride( ft_string_t *fts );
+
+/**
+ * Returns the ascent in this string.
+ */
+int ft_string_get_ascent( ft_string_t *fts );
 
 /**
  * Returns the buffer.  The buffer is a 1-byte-per-pixel alphamap with
  * values from 0-255.
  */
-uint8_t *ft_string_get_buffer( ft_string_t *efs );
+uint8_t *ft_string_get_buffer( ft_string_t *fts );
 
 #ifdef __cplusplus
 };
