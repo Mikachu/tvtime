@@ -826,7 +826,7 @@ int main( int argc, char **argv )
     }
 
     /* Field display in microseconds. */
-    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP ) {
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
         fieldtime = 16683;
     } else {
         fieldtime = 20000;
