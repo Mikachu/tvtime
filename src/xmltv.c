@@ -22,6 +22,8 @@
 #include <libxml/tree.h>
 #include "xmltv.h"
 
+typedef struct program_s program_t;
+
 struct xmltv_s
 {
     xmlDocPtr doc;
