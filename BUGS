@@ -1,3 +1,4 @@
+
 tvtime 0.9.8
 
 http://bugs.debian.org/cgi-bin/bugreport.cgi?archive=no&bug=171480
@@ -7,76 +8,97 @@ Known bugs
 Bugs can be checked on the tvtime sourceforge page:
 http://sourceforge.net/projects/tvtime/
 
-
-Fullscreen bugs
----------------
-
-693337 Fullscreen problems with icewm
-693329 Fullscreen problem with fvwm 2.4.0
-692137 full screen problem on kwin
-691892 Fullscreen doesn't follow virtual desktop position
-683283 Fullscreen broken with metacity from RH 8.0
-
-
-General bugs
-------------
-
-692392 XVideo problems with two X servers
+725162 tvtime.xml needs a man page
+725145 No man page for tvtime-command
+725163 stationlist.xml needs a man page
+716843 GPL exception needed to ship DScaler DLLs
+710430 RPMs don't depend on lirc package
+669826 debian packaging issues
+633042 No man page
+694544 linux-dvb driver broken and CVS version needs V4L2 support
+725830 BadAtom errors from something
+723926 icons should be installed by the source distribution
+717289 OSD fadeout time should depend on TV norm
+720075 client / server mode
+720072 Closed Caption text messed up
+721200 Numeral feedback for V4L settings
+721203 Single-press should display settings
+722855 SRPM dependency on glibc-debug
+715054 screenshot too slow
+711336 [Debian] Don't ship with fonts
+711330 Debconfiscate /etc/tvtime/tvtimerc
+709500 Text shadow not sub-pixel position correct
 691857 tvtime ignores wss signals
-691797 rivatv requires UYVY support
-691315 i845G XVideo crashes
-690473 Blue frame shown on channel change
-692392 XVideo problems with two X servers and X4.2.1 mga driver
-690473 Blue frame shown on channel change when gbuffers=2
-672810 g400 marvel
-
-
-626927 Slow compositing routines
- * The compositing routines are slow and cause framedrops on slower
-   machines.  We need to do MMX versions.
-
 628943 Font aspect not updated with output
  * If you start tvtime in 16:9 or 4:3 mode and switch using the 'a'
    key, then the OSD fonts aren't updated for the new aspect ratio.
-
+692392 XVideo problems with two X servers and X4.2.1 mga driver
+634674 tvtime drops frames when gkrellm running
+ * On one user's system, gkrellm was polling an ntfs partition.  There
+   may be some kernel driver that is blocking for a really long time,
+   and screwing up our captures.
+694681 No way to change deinterlacer settings
+650218 No way to disable deinterlacing algs
+690473 Blue frame shown on channel change when gbuffers=2
+696107 rtc error should indicate if permissions wrong
+696517 Scanner poorly documented
+707738 No way to disable signal detection at runtime
+704780 greedy2frame and twoframe ports busted
+698201 XVideo output failed to initialize
+720432 Bring back the tvtime logo
+725194 tvtime show gently poke xscreensaver instead of killing it.
+720300 ontop feature
 630236 No MMX versions of MMXEXT functions
  * While it would be easy to provide MMX versions of the DScaler-ported
    deinterlacing algorithms, we currently only have MMXEXT versions.
    Shouldn't take long just haven't bothered yet.
-
 633235 No on-frame indication of dropped frames
  * You can use the -s switch to see when you drop frames, but it would
    be nice to be told somehow using the OSD or something...
+691797 rivatv requires UYVY support
+725864 videobob port is broken
+724354 tvtime should not clobber settings as aggressively
+705179 tvtime help.html page not 4.01 strict
+
+
+Fullscreen bugs
+---------------
+There have been some updates to our fullscreen code, however,
+we still very much fear some of these fullscreen issues.  Please,
+if you can test or provide fixes for your window manager, it would
+be very much appreciated.  Some problems are known but not
+reproducable by the authors.
+
+716301 Start on fullscreen busted with e17
+694282 root fullscreen problem
+707615 full-screen + no window manager == X restart
+691892 Fullscreen doesn't follow virtual desktop position
+693337 Fullscreen problems with icewm
+683283 Fullscreen broken with metacity from RH 8.0
+693329 Fullscreen problem with fvwm 2.4.0
+694455 kwin still broken with Seli's proposed fix
 
 
 Known incompatibility problems
 ------------------------------
 
+711966 Mute/Unmute while in Comp/S-Video switches sound to tuner
+711428 Tuner type=2 almost always misdetected
+694870 Capture timed out after deinterlace mode change on saa7134
 630585 blits are still taking waaay too long
- * We've had alot of reports about Geforce2 users having really poor
-   blit performance.  See the bug report for more details.  We
-   suspect this may have to do with slow AGP on some crappy
-   motherboards.
-
-636338 XVideo extremely slow on sis
- * The SiS drivers currently in X have really slow XVideo (it polls
-   waiting for the retrace every upload).  Apparently these drivers
-   will be put in X soon and have much better performance:
+ * We've had bad problems with crappy AGP chipsets causing absolutely
+   terrible performance.
+694144 Overscan feature vs nvidia driver: corrupted borders
+672810 g400 marvel
+636338 SiS XVideo driver unusably slow in XFree86 4.2.1 and earlier
+ * This is fixed in the drivers included in X 4.3.  You can also get
+   the latest drivers from here:
 
    http://www.winischhofer.net/linuxsis630.shtml
 
-628292 Voodoo 3500 TV card.
- * This card has minimal V4L support but no support for capturing
-   it seems, which is required for tvtime.
-
-630198 preemptive kernel from gentoo
- * The preemptive kernel patches backport to 2.4.19 in gentoo apparently
-   break the bttv driver.  I'd like this to be confirmed elsewhere.
-
-634674 tvtime drops frames when gkrellm running
- * On one user's system, gkrellm was polling an ntfs partition.  There
-   may be some kernel driver that is blocking for a really long time,
-   and screwing up our captures.
+691315 i845G XVideo crashes
+702539 Using overlay mode in xawtv/zapping causes system crashes
+628292 Voodoo 3500 driver does not support capture
 
 
 General Info for improving video quality
