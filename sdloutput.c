@@ -1,0 +1,183 @@
+/**
+ * Copyright (C) 2001 Billy Biggs <vektor@dumbterm.net>.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <SDL/SDL.h>
+#include "frequencies.h"
+#include "videoinput.h"
+#include "sdloutput.h"
+
+static SDL_Surface *screen = 0;
+static SDL_Overlay *frame = 0;
+static int fs = 0;
+
+unsigned char *sdl_get_output( void )
+{
+    return frame->pixels[ 0 ];
+}
+
+unsigned char *sdl_get_cb( void )
+{
+    return frame->pixels[ 2 ];
+}
+
+unsigned char *sdl_get_cr( void )
+{
+    return frame->pixels[ 1 ];
+}
+
+int sdl_init( int width, int height, int use420, int outputwidth, int aspect )
+{
+    SDL_Rect **modes;
+    int ret, i;
+
+    /* Initialize SDL. */
+    ret = SDL_Init( SDL_INIT_VIDEO );
+    if( ret < 0 ) {
+        fprintf( stderr, "sdloutput: SDL_Init failed.\n" );
+        return 0;
+    } 
+
+    if( !outputwidth ) {
+        /* Get available fullscreen/hardware modes, choose largest. */
+        modes = SDL_ListModes( 0, SDL_FULLSCREEN | SDL_HWSURFACE );
+
+        if( modes == (SDL_Rect **) 0 || modes == (SDL_Rect **) -1 ) {
+            fprintf( stderr, "sdloutput: No mode information available. "
+                             "Assuming width of 800.\n" );
+        } else {
+            /* Find largest mode. */
+            for( i = 0; modes[ i ]; ++i ) {
+                if( modes[ i ]->w > outputwidth ) outputwidth = modes[ i ]->w;
+            }
+        }
+    }
+
+    /* Create screen surface. */
+    /* Unfortunately, we always assume square pixels for now. */
+    if( aspect ) {
+        /* Run in 16:9 mode. */
+        screen = SDL_SetVideoMode( outputwidth, outputwidth / 16 * 9, 0, 0 );
+    } else {
+        screen = SDL_SetVideoMode( outputwidth, outputwidth / 4 * 3, 0, 0 );
+    }
+    if( !screen ) {
+        fprintf( stderr, "sdloutput: Can't open output!\n" );
+        return 0;
+    }
+
+    /* Create overlay surface. */
+    if( use420 ) {
+        frame = SDL_CreateYUVOverlay( width, height, SDL_YV12_OVERLAY, screen );
+    } else {
+        frame = SDL_CreateYUVOverlay( width, height, SDL_YUY2_OVERLAY, screen );
+    }
+    if( !frame ) {
+        fprintf( stderr, "sdloutput: Couldn't create overlay surface.\n" );
+        return 0;
+    }
+    SDL_LockYUVOverlay( frame );
+
+    SDL_WM_SetCaption( "tvtime: ... smooth like that ...", 0 );
+    SDL_ShowCursor( 0 );
+    return 1;
+}
+
+void sdl_show_frame( void )
+{
+    SDL_Rect r;
+
+    r.x = 0;
+    r.y = 0;
+    r.w = screen->w;
+    r.h = screen->h;
+
+    SDL_UnlockYUVOverlay( frame );
+    SDL_DisplayYUVOverlay( frame, &r );
+    SDL_LockYUVOverlay( frame );
+}
+
+int sdl_poll_events( void )
+{
+    SDL_Event event;
+    int curcommand = 0;
+
+    while( SDL_PollEvent( &event ) ) {
+
+        if( event.type == SDL_QUIT ) {
+            curcommand |= TVTIME_QUIT;
+        }
+
+        if( event.type == SDL_KEYDOWN ) {
+            switch ( event.key.keysym.sym ) {
+
+            /* Escape and Q are our quit keys. */
+            case SDLK_ESCAPE:
+            case SDLK_q:
+                curcommand |= TVTIME_QUIT;
+                break;
+
+            /* f toggles fullscreen. */
+            case SDLK_f:
+                (void) SDL_WM_ToggleFullScreen( screen );
+                fs = !fs;
+                break;
+            
+            /* k decreases the amount of luma correction */
+            case SDLK_k:
+                curcommand |= TVTIME_LUMA_DOWN;
+                break;
+
+            /* l increases the amount of gamma correction */
+            case SDLK_l:
+                curcommand |= TVTIME_LUMA_UP;
+                break;
+
+            /* down arrows make the channel decrease */
+            case SDLK_DOWN:
+                curcommand |= TVTIME_CHANNEL_DOWN;
+                break;
+
+            /* up arrows make the channel increase */
+            case SDLK_UP:
+                curcommand |= TVTIME_CHANNEL_UP;
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+
+    if( curcommand & TVTIME_QUIT ) {
+        if( fs ) {
+            SDL_WM_ToggleFullScreen( screen );
+            fs = 0;
+        }
+        SDL_UnlockYUVOverlay( frame );
+        SDL_FreeYUVOverlay( frame );
+        SDL_Quit();
+    }
+
+    return curcommand;
+}
+
