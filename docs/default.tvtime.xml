@@ -56,6 +56,10 @@
   <option name="CheckForSignal" value="1"/>
   <option name="Overscan" value="0.0"/>
 
+  <mode name="Fullscreen" deinterlacer="GreedyH" fullscreen="1" framerate_mode="0"/>
+  <mode name="Window" deinterlacer="Vertical" fullscreen="0" window_height="600" framerate_mode="0"/>
+  <mode name="SmallWindow" deinterlacer="OverlayBob" fullscreen="0" window_height="288" framerate_mode="1"/>
+
   <bind command="quit">
     <keyboard key="escape"/>
     <keyboard key="q"/>
