@@ -101,7 +101,8 @@ static int getNextPos( station_mgr_t *mgr )
     return mgr->first->prev->pos + 1;
 }
 
-static station_info_t *station_info_new( int pos, const char *name, const band_t *band,
+static station_info_t *station_info_new( int pos, const char *name,
+                                         const band_t *band,
                                          const band_entry_t *channel )
 {
     station_info_t *i = malloc( sizeof( station_info_t ) );
@@ -189,7 +190,8 @@ static int insert( station_mgr_t *mgr, station_info_t *i, int allowdup )
     return 1;
 }
 
-static xmlNodePtr find_list( xmlNodePtr node, const char *normname, const char *tablename )
+static xmlNodePtr find_list( xmlNodePtr node, const char *normname,
+                             const char *tablename )
 {
     while( node ) {
         if( !xmlStrcasecmp( node->name, BAD_CAST "list" ) ) {

@@ -666,7 +666,6 @@ int lfputs( const char *s, FILE *stream )
                 /* ... and rewind it */
                 outbuf = outbufstart;
                 outbytesleft = BUFSIZ;
-                
                 break;
             case EILSEQ: /* Invalid multibyte sequence */
             case EINVAL: /* Incomplete multibyte sequence */
@@ -676,7 +675,7 @@ int lfputs( const char *s, FILE *stream )
                 /* ... and rewind it */
                 outbuf = outbufstart;
                 outbytesleft = BUFSIZ;
-                
+
                 /* To my knowledge, we cannot recover here,
                    we must truncate the string. */
                 fputs( "[Truncated: Illegal sequence]\n", stream );
@@ -690,7 +689,7 @@ int lfputs( const char *s, FILE *stream )
     /* ... and rewind it */
     outbuf = outbufstart;
     outbytesleft = BUFSIZ;
-    
+
     return nonreversible;
 #else /* no ENABLE_NLS */
     return fputs( s, stream );

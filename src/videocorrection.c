@@ -140,7 +140,9 @@ void video_correction_set_luma_power( video_correction_t *vc, double power )
     video_correction_update_table( vc );
 }
 
-void video_correction_correct_luma_scanline( video_correction_t *vc, uint8_t *output, uint8_t *luma, int width )
+void video_correction_correct_luma_scanline( video_correction_t *vc,
+                                             uint8_t *output, uint8_t *luma,
+                                             int width )
 {
     while( width-- ) {
         *output++ = vc->luma_table[ *luma++ ];
@@ -148,7 +150,8 @@ void video_correction_correct_luma_scanline( video_correction_t *vc, uint8_t *ou
 }
 
 void video_correction_correct_packed422_scanline( video_correction_t *vc,
-                                                  uint8_t *output, uint8_t *input, int width )
+                                                  uint8_t *output,
+                                                  uint8_t *input, int width )
 {
     unsigned int *table = vc->luma_table;
     while( width-- ) {
