@@ -20,7 +20,7 @@ static const char *taglines[] = {
 "tvtime: the deinterlacer kids ask for by name",
 "tvtime: sweetened with sorbitol",
 "tvtime: mark mcguire's best friend",
-"tvtime: the snack that smiles back, until you bite its head off",
+"tvtime: the wholesome snack that smiles back, until you bite its head off",
 "tvtime: because i'm worth it",
 "tvtime: for all your 2000 parts",
 "tvtime: more than meets the eye",

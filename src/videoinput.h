@@ -40,9 +40,13 @@ typedef struct videoinput_s videoinput_t;
 /**
  * Possible TV norms we support.
  */
-#define VIDEOINPUT_NTSC   0
-#define VIDEOINPUT_PAL    1
-#define VIDEOINPUT_SECAM  2
+#define VIDEOINPUT_NTSC    0
+#define VIDEOINPUT_PAL     1
+#define VIDEOINPUT_SECAM   2
+#define VIDEOINPUT_PAL_NC  3
+#define VIDEOINPUT_PAL_M   4
+#define VIDEOINPUT_PAL_N   5
+#define VIDEOINPUT_NTSC_JP 6
 
 /**
  * Create a new input device from the given device name and which input

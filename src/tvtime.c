@@ -370,6 +370,14 @@ int main( int argc, char **argv )
         norm = VIDEOINPUT_PAL;
     } else if( !strcasecmp( config_get_v4l_norm( ct ), "secam" ) ) {
         norm = VIDEOINPUT_SECAM;
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "pal-nc" ) ) {
+        norm = VIDEOINPUT_PAL_NC;
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "pal-m" ) ) {
+        norm = VIDEOINPUT_PAL_M;
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "pal-n" ) ) {
+        norm = VIDEOINPUT_PAL_N;
+    } else if( !strcasecmp( config_get_v4l_norm( ct ), "ntsc-jp" ) ) {
+        norm = VIDEOINPUT_NTSC_JP;
     } else {
         /* Only allow NTSC otherwise. */
         norm = VIDEOINPUT_NTSC;
@@ -646,6 +654,7 @@ int main( int argc, char **argv )
         /* Aquire the next frame. */
         curframe = videoinput_next_frame( vidin, &curframeid );
 
+/*
         if( screenshot ) {
             char filename[ 256 ];
             sprintf( filename, "tvtime-shot-input-%d-%d.png",
@@ -653,6 +662,7 @@ int main( int argc, char **argv )
                      (int) checkpoint[ 0 ].tv_usec );
             pngscreenshot( filename, curframe, width, height, width * 2 );
         }
+*/
 
         /* CHECKPOINT2 : Got the frame */
         gettimeofday( &(checkpoint[ 1 ]), 0 );

@@ -223,9 +223,9 @@ void videoinput_find_and_set_tuner( videoinput_t *vidin )
         vidin->tuner.tuner = i;
 
         if( ioctl( vidin->grab_fd, VIDIOCGTUNER, &(vidin->tuner) ) >= 0 ) {
-            if( (vidin->norm == VIDEOINPUT_PAL && vidin->tuner.flags & VIDEO_TUNER_PAL) ||
+            if( ((vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_M || vidin->norm == VIDEOINPUT_PAL_N) && vidin->tuner.flags & VIDEO_TUNER_PAL) ||
                 (vidin->norm == VIDEOINPUT_SECAM && vidin->tuner.flags & VIDEO_TUNER_SECAM) ||
-                (vidin->norm == VIDEOINPUT_NTSC && vidin->tuner.flags & VIDEO_TUNER_NTSC) ) {
+                ((vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP) && vidin->tuner.flags & VIDEO_TUNER_NTSC) ) {
                 found = 1;
                 vidin->tuner_number = i;
                 break;
@@ -236,7 +236,7 @@ void videoinput_find_and_set_tuner( videoinput_t *vidin )
     if( found ) {
         vidin->tuner.tuner = vidin->tuner_number;
 
-        if( vidin->norm == VIDEOINPUT_PAL ) {
+        if( vidin->norm == VIDEOINPUT_PAL || vidin->norm == VIDEOINPUT_PAL_NC || vidin->norm == VIDEOINPUT_PAL_M || vidin->norm == VIDEOINPUT_PAL_N ) {
             vidin->tuner.mode = VIDEO_MODE_PAL;
         } else if( vidin->norm == VIDEOINPUT_SECAM ) {
             vidin->tuner.mode = VIDEO_MODE_SECAM;
@@ -271,7 +271,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curframe = 0;
     vidin->verbose = verbose;
     vidin->norm = norm;
-    vidin->height = ( vidin->norm == VIDEOINPUT_NTSC ) ? 480 : 576;
+    vidin->height = ( vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP ) ? 480 : 576;
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
@@ -365,7 +365,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                  grab_pict.contrast );
     }
 
-    if( vidin->norm != VIDEOINPUT_NTSC ) {
+    if( vidin->norm != VIDEOINPUT_NTSC && vidin->norm != VIDEOINPUT_NTSC_JP ) {
         grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
         grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
         grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
@@ -680,8 +680,16 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                 vidin->grab_chan.norm = VIDEO_MODE_NTSC;
             } else if( vidin->norm == VIDEOINPUT_PAL ) {
                 vidin->grab_chan.norm = VIDEO_MODE_PAL;
-            } else {
+            } else if( vidin->norm == VIDEOINPUT_SECAM ) {
                 vidin->grab_chan.norm = VIDEO_MODE_SECAM;
+            } else if( vidin->norm == VIDEOINPUT_PAL_NC ) {
+                vidin->grab_chan.norm = 3;
+            } else if( vidin->norm == VIDEOINPUT_PAL_M ) {
+                vidin->grab_chan.norm = 4;
+            } else if( vidin->norm == VIDEOINPUT_PAL_N ) {
+                vidin->grab_chan.norm = 5;
+            } else if( vidin->norm == VIDEOINPUT_NTSC_JP ) {
+                vidin->grab_chan.norm = 6;
             }
 
             if( ioctl( vidin->grab_fd, VIDIOCSCHAN, &(vidin->grab_chan) ) < 0 ) {
