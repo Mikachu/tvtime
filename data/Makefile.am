@@ -33,7 +33,8 @@ dist_tvtimedata_DATA = FreeMonoBold.ttf tvtimeSansBold.ttf \
 	filmstrip_0000.png filmstrip_0001.png filmstrip_0002.png \
 	filmstrip_0003.png filmstrip_0004.png
 
-EXTRA_DIST = COPYING.DScaler COPYING.tvtimeSansBold tvtimeSansBold.sfd
+EXTRA_DIST = COPYING.DScaler COPYING.tvtimeSansBold COPYING.FreeMonoBold \
+	tvtimeSansBold.sfd FreeMonoBold.sfd
 
 .PHONY: uninstall-hook
 uninstall-hook:
