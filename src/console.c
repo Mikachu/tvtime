@@ -120,15 +120,15 @@ console_t *console_new( int x, int y, int width, int height,
     con->drop_pos = 0;
     con->font = 0;
 
-#if 0
+    /*
     con->text = (char *)malloc( con->rows * con->cols ); 
     if( !con->text ) {
         console_delete( con );
-        return NULL;
+        return 0;
     }
-#endif
+    */
 
-    con->line = (osd_string_t **)malloc( 1 * sizeof( osd_string_t * ) );
+    con->line = (osd_string_t **) malloc( 1 * sizeof( osd_string_t * ) );
     if( !con->line ) {
         console_delete( con );
         return 0;
@@ -143,17 +143,16 @@ console_t *console_new( int x, int y, int width, int height,
         return 0;
     }
 
-#if 0
+    /*
     memset( con->text, 0, con->cols * con->rows );
-#endif
+    */
 
     con->width = width;
     con->height = height;
 
     con->line[0] = osd_string_new( con->font, video_width );
     if( !con->line[0] ) {
-        fprintf( stderr, "console: Could not find my font (%s)!\n", 
-                 con->fontfile );
+        fprintf( stderr, "console: Could not create string.\n" );
         console_delete( con );
         return 0;
     }
@@ -168,7 +167,7 @@ console_t *console_new( int x, int y, int width, int height,
     free( con->line );
     con->line = NULL;
 
-    con->coords = (struct console_line_coords *)malloc( con->rows * sizeof( struct console_line_coords ) );
+    con->coords = (struct console_line_coords *) malloc( con->rows * sizeof( struct console_line_coords ) );
     if( !con->coords ) {
         console_delete( con );
         return NULL;
@@ -191,8 +190,7 @@ console_t *console_new( int x, int y, int width, int height,
     if( !con->line ) {
         con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
         if( !con->line ) {
-            fprintf(stderr, 
-                    "console: Couldn't add a line.\n" );
+            fprintf( stderr, "console: Couldn't add a line.\n" );
 
             console_delete( con );
             return NULL;
@@ -260,15 +258,13 @@ void update_osd_strings( console_t *con )
     if( !con->line && con->maxrows ) {
         con->line = (osd_string_t**)malloc(sizeof(osd_string_t*));
         if( !con->line ) {
-            fprintf(stderr, 
-                    "console: Couldn't add a line.\n" );
+            fprintf( stderr, "console: Couldn't add a line.\n" );
 
             return;
         }
         con->line[0] = osd_string_new( con->font, con->frame_width );
         if( !con->line[ 0 ] ) {
-            fprintf( stderr, 
-                     "console: Could not create new string.\n" );
+            fprintf( stderr, "console: Could not create new string.\n" );
             return;
         }
         osd_string_set_colour_rgb( con->line[ 0 ], 
@@ -332,8 +328,7 @@ void update_osd_strings( console_t *con )
                     con->num_lines++;
                     con->line = hmm;
                 } else {
-                    fprintf(stderr, 
-                            "console: Couldn't add another line.\n" );
+                    fprintf( stderr, "console: Couldn't add another line.\n" );
                     return;
                 }
             }
@@ -365,8 +360,7 @@ void update_osd_strings( console_t *con )
 
             con->line[ con->cury ] = osd_string_new( con->font, con->frame_width );
             if( !con->line[ con->cury ] ) {
-                fprintf( stderr, 
-                         "console: Could not create new string.\n" );
+                fprintf( stderr, "console: Could not create new string.\n" );
                 con->cury--;
                 return;
             }
