@@ -119,7 +119,8 @@ static const char *taglines[] = {
 "tvtime: like a rock",
 "tvtime: i know something you don't know",
 "tvtime; Mikey likes it!",
-"tvtime: can you see the difference?"
+"tvtime: can you see the difference?",
+"tvtime: Trusted.  Connected.  Canadian."
 };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
