@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2004 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,35 +20,21 @@
 #define TVTIME_PLUGINS_H_INCLUDED
 
 /**
- * tvtime has a plugin system for deinterlacer plugins.
- * However, at this point it's a bit silly to bother using
- * them as 'dynamic' plugins.  So, for the standard plugins,
- * we allow them to be built into the executable, and their
- * initializer methods go here.
+ * tvtime was going to have a plugin system, but there
+ * was never any interest in it outside of tvtime, so instead
+ * we include all deinterlacer methods right in the tvtime
+ * executable.
  */
 
-void greedy_plugin_init( void );
-void greedy2frame_plugin_init( void );
-void twoframe_plugin_init( void );
 void linear_plugin_init( void );
+void scalerbob_plugin_init( void );
+void linearblend_plugin_init( void );
+void vfir_plugin_init( void );
+void dscaler_tomsmocomp_plugin_init( void );
+void dscaler_greedyh_plugin_init( void );
+void greedy_plugin_init( void );
 void weave_plugin_init( void );
 void weavetff_plugin_init( void );
 void weavebff_plugin_init( void );
-void videobob_plugin_init( void );
-void double_plugin_init( void );
-void linearblend_plugin_init( void );
-void scalerbob_plugin_init( void );
-void simplemo_plugin_init( void );
-void gamedither_plugin_init( void );
-void vfir_plugin_init( void );
-
-void dscaler_greedy2frame_plugin_init( void );
-void dscaler_twoframe_plugin_init( void );
-void dscaler_greedyh_plugin_init( void );
-void dscaler_greedy_plugin_init( void );
-void dscaler_videobob_plugin_init( void );
-void dscaler_videoweave_plugin_init( void );
-void dscaler_oldgame_plugin_init( void );
-void dscaler_tomsmocomp_plugin_init( void );
 
 #endif /* TVTIME_PLUGINS_H_INCLUDED */
