@@ -202,6 +202,15 @@ static int videoinput_get_norm_height( int norm )
     }
 }
 
+int videoinput_get_time_per_field( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_60 ) {
+        return 16683;
+    } else {
+        return 20000;
+    }
+}
+
 static int videoinput_next_compatible_norm( int norm, int isbttv )
 {
     int height = videoinput_get_norm_height( norm );

@@ -1134,11 +1134,7 @@ int main( int argc, char **argv )
     }
 
     /* Field display in microseconds. */
-    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M || norm == VIDEOINPUT_PAL_60 ) {
-        fieldtime = 16683;
-    } else {
-        fieldtime = 20000;
-    }
+    fieldtime = videoinput_get_time_per_field( norm );
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
     if( !perf ) {
@@ -1279,7 +1275,7 @@ int main( int argc, char **argv )
 
     /* Setup OSD stuff. */
     pixel_aspect = ( (double) width ) / ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
-    osd = tvtime_osd_new( width, height, pixel_aspect,
+    osd = tvtime_osd_new( width, height, pixel_aspect, fieldtime,
                           config_get_channel_text_rgb( ct ), config_get_other_text_rgb( ct ) );
     if( !osd ) {
         fprintf( stderr, "tvtime: OSD initialization failed, OSD disabled.\n" );
@@ -1307,7 +1303,7 @@ int main( int argc, char **argv )
         }
     }
 
-    commands = commands_new( ct, vidin, stationmgr, osd );
+    commands = commands_new( ct, vidin, stationmgr, osd, fieldtime );
     if( !commands ) {
         fprintf( stderr, "tvtime: Can't create command handler.\n" );
         return 1;

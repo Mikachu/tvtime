@@ -82,6 +82,11 @@ const char *videoinput_get_norm_name( int norm );
 int videoinput_get_norm_number( const char *name );
 
 /**
+ * Returns the time per field in microseconds.
+ */
+int videoinput_get_time_per_field( int norm );
+
+/**
  * Returns a text version of the audio mode.
  */
 const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode );

@@ -33,12 +33,6 @@
 #include "commands.h"
 #include "console.h"
 
-/* Number of frames to wait for next channel digit. */
-#define CHANNEL_DELAY 100
-
-/* Number of frames to wait until trying stereo mode. */
-#define CHANNEL_STEREO_DELAY 30
-
 typedef struct {
     const char *name;
     int command;
@@ -221,6 +215,8 @@ struct commands_s {
     int pause;
     int resizewindow;
 
+    int delay;
+
     int change_channel;
 
     int renumbering;
@@ -299,13 +295,17 @@ static void reinit_tuner( commands_t *in )
 }
 
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
-                          station_mgr_t *mgr, tvtime_osd_t *osd )
+                          station_mgr_t *mgr, tvtime_osd_t *osd,
+                          int fieldtime )
 {
     commands_t *in = malloc( sizeof( struct commands_s ) );
 
     if( !in ) {
         return NULL;
     }
+
+    /* Number of frames to wait for next channel digit. */
+    in->delay = 1000000 / fieldtime;
 
     in->cfg = cfg;
     in->vidin = vidin;
@@ -573,7 +573,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
 
             /* Accept input of the destination channel. */
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-            in->frame_counter = CHANNEL_DELAY;
+            in->frame_counter = in->delay;
             in->renumbering = 1;
             if( in->osd ) {
                 char message[ 256 ];
@@ -705,7 +705,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
             in->next_chan_buffer[ in->digit_counter ] = arg[ 0 ];
             in->digit_counter++;
-            in->frame_counter = CHANNEL_DELAY;
+            in->frame_counter = in->delay;
 
             /**
              * Send an enter command if we type more

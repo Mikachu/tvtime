@@ -26,9 +26,6 @@
 #include "commands.h"
 #include "pulldown.h"
 
-#define MENU_FADE_DELAY  100
-#define OSD_FADE_DELAY  60
-
 typedef struct string_object_s
 {
     osd_string_t *string;
@@ -116,6 +113,9 @@ struct tvtime_osd_s
     int margin_right;
     int margin_top;
     int margin_bottom;
+
+    int delay;
+    int menudelay;
 };
 
 const int top_size = 7;
@@ -127,7 +127,8 @@ const int med_size_576 = 25;
 const int big_size_576 = 80;
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
-                              unsigned int channel_rgb, unsigned int other_rgb )
+                              int fieldtime, unsigned int channel_rgb,
+                              unsigned int other_rgb )
 {
     int channel_r = (channel_rgb >> 16) & 0xff;
     int channel_g = (channel_rgb >>  8) & 0xff;
@@ -161,6 +162,12 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->listpos_x = width / 2;
     osd->listpos_y = (height * 30) / 100;
     osd->databar_xend = osd->margin_right;
+
+    /* OSD messages hold for 1 second. */
+    osd->delay = 1000000 / fieldtime;
+
+    /* Menu stuff holds for 1 second and a half. */
+    osd->menudelay = 1500000 / fieldtime;
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
@@ -569,40 +576,39 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     char timestamp[ 50 ];
     time_t tm = time( 0 );
     char text[ 200 ];
-    int delay = OSD_FADE_DELAY;
     struct tm *curtime = localtime( &tm );
     struct timeval tv;
 
     strftime( timestamp, 50, osd->timeformat, curtime );
-    osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, delay );
+    osd_string_show_text( osd->strings[ OSD_TIME_STRING ].string, timestamp, osd->delay );
 
     gettimeofday( &tv, 0 );
     if( osd->channel_logo ) osd_animation_seek( osd->channel_logo, ((double) tv.tv_usec) / (1000.0 * 1000.0) );
 
-    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, delay );
-    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, osd->network_name, delay );
-    osd_string_set_timeout( osd->strings[ OSD_SHOW_INFO ].string, delay );
+    osd_string_show_text( osd->strings[ OSD_CHANNEL_NUM ].string, osd->channel_number_text, osd->delay );
+    osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, osd->network_name, osd->delay );
+    osd_string_set_timeout( osd->strings[ OSD_SHOW_INFO ].string, osd->delay );
 
     if( *(osd->channel_name_text) && strcmp( osd->channel_number_text, osd->channel_name_text ) ) {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, delay );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->channel_name_text, osd->delay );
     } else if( *(osd->network_call) ) {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->network_call, delay );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, osd->network_call, osd->delay );
     } else {
-        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "", delay );
+        osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "", osd->delay );
     }
 
     if( *(osd->freqtable_text) ) {
         snprintf( text, sizeof( text ), "%s", osd->freqtable_text );
-        osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, delay );
+        osd_string_show_text( osd->strings[ OSD_TUNER_INFO ].string, text, osd->delay );
     } else {
         osd_string_set_timeout( osd->strings[ OSD_TUNER_INFO ].string, 0 );
     }
     snprintf( text, sizeof( text ), "%s", osd->input_text );
-    osd_string_show_text( osd->strings[ OSD_INPUT_NAME ].string, text, delay );
+    osd_string_show_text( osd->strings[ OSD_INPUT_NAME ].string, text, osd->delay );
 
     if( *(osd->hold_message) ) {
         snprintf( text, sizeof( text ), "%s", osd->hold_message );
-        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, text, delay );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, text, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
         osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
         osd_rect_set_timeout( osd->databar, 0 );
@@ -610,10 +616,10 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     }
 
     /* Billy: What's up?  Are we ditching the logo for XDS? */
-    if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, delay );
-    if( osd->film_logo && osd->pulldown_mode ) osd_animation_set_timeout( osd->film_logo, delay );
+    if( osd->channel_logo ) osd_animation_set_timeout( osd->channel_logo, osd->delay );
+    if( osd->film_logo && osd->pulldown_mode ) osd_animation_set_timeout( osd->film_logo, osd->delay );
 
-    osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? delay : 0 );
+    osd_string_set_timeout( osd->strings[ OSD_MUTED ].string, osd->mutestate ? osd->delay : 0 );
 }
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
@@ -629,11 +635,11 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
         int maxwidth;
 
         sprintf( bar, "%s", barname );
-        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, OSD_FADE_DELAY );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, bar, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
 
         sprintf( bar, " %d", percentage );
-        osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, OSD_FADE_DELAY );
+        osd_string_show_text( osd->strings[ OSD_DATA_VALUE ].string, bar, osd->delay );
 
         osd->databar_xstart = osd->strings[ OSD_MESSAGE2_BAR ].xpos;
         osd->databar_ypos = osd->strings[ OSD_MESSAGE2_BAR ].ypos + 4;
@@ -641,17 +647,17 @@ void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                  - osd_string_get_width( osd->strings[ OSD_DATA_VALUE ].string ) - osd->databar_xstart;
         osd_rect_set_colour( osd->databar, 255, 255, 128, 128 );
         osd_rect_set_size( osd->databar, (maxwidth * percentage) / 100, 18 );
-        osd_rect_set_timeout( osd->databar, OSD_FADE_DELAY );
+        osd_rect_set_timeout( osd->databar, osd->delay );
         osd_rect_set_colour( osd->databarbg, 80, 80, 40, 40 );
         osd_rect_set_size( osd->databarbg, maxwidth, 18 );
-        osd_rect_set_timeout( osd->databarbg, OSD_FADE_DELAY );
+        osd_rect_set_timeout( osd->databarbg, osd->delay );
     }
 }
 
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 {
     if( !*(osd->hold_message) ) {
-        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, message, OSD_FADE_DELAY );
+        osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, message, osd->delay );
         osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
         osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
         osd_rect_set_timeout( osd->databar, 0 );
@@ -662,7 +668,7 @@ void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
 void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 {
     if( osd->channel_logo ) {
-        osd_animation_set_timeout( osd->channel_logo, OSD_FADE_DELAY );
+        osd_animation_set_timeout( osd->channel_logo, osd->delay );
     }
 }
 
@@ -682,7 +688,7 @@ void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
 void tvtime_osd_show_list( tvtime_osd_t *osd, int showlist )
 {
     if( showlist ) {
-        osd_list_set_timeout( osd->list, MENU_FADE_DELAY );
+        osd_list_set_timeout( osd->list, osd->menudelay );
     } else {
         osd_list_set_timeout( osd->list, 0 );
     }
