@@ -23,6 +23,10 @@
 // CVS Log
 //
 // $Log$
+// Revision 1.2  2003/01/07 15:25:44  vektor
+// Added some missing debian files, and removed ^M's from the DScaler
+// header files.
+//
 // Revision 1.1  2003/01/07 15:18:46  vektor
 // Added the required DScaler header files.
 //
