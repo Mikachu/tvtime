@@ -541,12 +541,14 @@ int tvtime_osd_data_bar_visible( tvtime_osd_t *osd )
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
                                int percentage )
 {
-    char bar[ 108 ];
-    memset( bar, 0, 108 );
-    strcpy( bar, barname );
-    memset( bar + 7, '|', percentage );
-    osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, bar, OSD_FADE_DELAY );
-    osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    if( !*(osd->hold_message ) ) {
+        char bar[ 108 ];
+        memset( bar, 0, 108 );
+        strcpy( bar, barname );
+        memset( bar + 7, '|', percentage );
+        osd_string_show_text( osd->strings[ OSD_DATA_BAR ].string, bar, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ OSD_VOLUME_BAR ].string, 0 );
+    }
 }
 
 void tvtime_osd_show_message( tvtime_osd_t *osd, const char *message )
@@ -566,12 +568,14 @@ void tvtime_osd_show_channel_logo( tvtime_osd_t *osd )
 
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage )
 {
-    char bar[ 108 ];
-    memset( bar, 0, 108 );
-    strcpy( bar, "Volume " );
-    memset( bar + 7, '|', percentage );
-    osd_string_show_text( osd->strings[ OSD_VOLUME_BAR ].string, bar, OSD_FADE_DELAY );
-    osd_string_set_timeout( osd->strings[ OSD_DATA_BAR ].string, 0 );
+    if( !*(osd->hold_message ) ) {
+        char bar[ 108 ];
+        memset( bar, 0, 108 );
+        strcpy( bar, "Volume " );
+        memset( bar + 7, '|', percentage );
+        osd_string_show_text( osd->strings[ OSD_VOLUME_BAR ].string, bar, OSD_FADE_DELAY );
+        osd_string_set_timeout( osd->strings[ OSD_DATA_BAR ].string, 0 );
+    }
 }
 
 void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate )
