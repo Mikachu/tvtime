@@ -8,12 +8,21 @@ Setup
     Current channel active in list
     Scan channels for signal
     Reset all channels as active
+    Toggle current channel colour SECAM/PAL [PAL or SECAM only]
+    Toggle NTSC cable mode [NTSC + US Cable only]
+    Finetune current channel
+      Current: %d
+      Decrease
+      Increase
+      Back
     Back
   Input configuration
     Audio mode
       Mono
       Stereo
-      SAP
+      SAP [NTSC only]
+      Primary Language [non-NTSC only]
+      Secondary Language [non-NTSC only]
       Back
     Television standard
       NTSC
@@ -33,7 +42,7 @@ Setup
       Standard (720 pixels)
       High (768 pixels)
       Back
-    Toggle closed captions
+    Toggle closed captions [NTSC only]
     Restart with new settings
     Back
   Picture
@@ -57,7 +66,9 @@ Setup
       Decrease
       Increase
       Back
-    Reset to defaults
+    Save current settings as global defaults [SaveRestore only]
+    Save current settings as channel defaults [SaveRestore + Tuner only]
+    Reset to global defaults
     Back
   Video processing
     Deinterlacer configuration
@@ -66,13 +77,20 @@ Setup
       Full rate: %.2ffps
       Half rate, deinterlace top fields: %.2ffps
       Half rate, deinterlace bottom field, %.2ffps
+      Back
     Input filters
       BT8x8 luma correction
       Colour invert
       Mirror
+      2-3 Pulldown Inversion [NTSC only]
       Back
     Back
   Output configuration
+    Overscan setting
+      Current: %d
+      Decrease
+      Increase
+      Back
     16:9 output
     Fullscreen
     Always On Top
@@ -87,65 +105,83 @@ should be in the menu, and not using up keys.
 
 Our core keys are:
 
-  esc   Quit
-  i     Change input
-  m     Mute
-  +     Volume up
-  -     Volume down
-  f     Fullscreen
-  s     Screenshot
-  d     Show stats
-  bs    Previous channel
+  esc/q     Quit
+  F1/tab/B3 Show menu
+  up/B4     Channel up
+  down/B5   Channel down
+  bs        Previous channel
+  i         Change input
+  m/B2      Mute
+  -         Volume down
+  +         Volume up
+  f         Fullscreen
+  s         Screenshot
+  ?/B1      Display info
+  d         Display debug statistics
+  enter     Enter
+  0-9       Channel change input
 
-No need to mention these, they should be obvious:
+Our keys in menu mode:
 
-  up    Channel up
-  down  Channel down
-  ent   Enter
-  0-9   Channel change input
+  esc/q/F1/tab/B3  Exit menu
+  down/B5          Menu down
+  up/B4            Menu up
+  left             Menu left
+  right            Menu right
+  enter/B1         Menu enter
 
-Commands that are in the menu (which should lose keystrokes?):
+Commands in the menu that also deserve keystrokes:
 
-  t     Deinterlacer
-  y     Deinterlacer description
-  p     Pulldown detection
-  v     Always-on-top
-  r     Renumber
-  F10   Scan
-  F11   Activate all
-  F12   Skip
-  w     Toggle CC
-  =     Toggle framerate
-  ' '   Reset picture settings
-  a     Aspect ratio
-  F1/F2 Brightness
-  F3/F4 Contrast
-  F5/F6 colour
-  F7/F8 Hue
-  c     Luma correction
-  e     Audio mode
+  left  Finetune down
+  right Finetune up
   <     Overscan down
   >     Overscan up
-  n     PAL/SECAM
-  o     NTSC Cable Mode
+  e     Audio mode
+  a     Aspect ratio
+  r     Renumber
+  v     Always-on-top
+  p     Pulldown detection
+  t     Deinterlacer
+  =     Toggle framerate
+  F5    Picture
+  F6    Picture up
+  F7    Picture down
+  c     Toggle CC
+  ins   Matte mode
 
-Commands you can only do via keystrokes:
+Commands just for the menu:
+
+        Reset picture settings
+        Brightness down
+        Brightness up
+        Contrast down
+        Contrast up
+        Colour down
+        Colour up
+        Hue down
+        Hue up
+        Scan
+        Activate all
+        Skip
+        Luma correction
+        Deinterlacer description
+        PAL/SECAM
+        NTSC Cable Mode
+
+"Hidden" or debug commands you can only do via keystrokes:
 
   /     Adjust window
-  ins   Matte mode
   b     Colour bars
   *     Mode
-  F9    Save tuning
   END   Pause
   `     Console
   pgup  Scroll console up
   pgdn  Scroll console down
-  ,     Mixer mute
-  z x   Luma up/down
 
-These we need to decide on:
+Commands with no menu entries or default key bindings
 
-  left  Finetune down
-  right Finetune up
-  u     Show menu
+        Mixer mute
+        Save tuning
+        Luma down
+        Luma up
 
