@@ -143,6 +143,10 @@ static int mga_show_frame( int x, int y, int width, int height )
     area_t newvidarea = xcommon_get_video_area();
     area_t newwinarea = xcommon_get_window_area();
 
+    if( height != mga_height ) {
+        mga_height = height;
+        mga_reconfigure();
+    }
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
 

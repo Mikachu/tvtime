@@ -147,6 +147,10 @@ static void mga_wait_for_sync( int field )
 
 static int mga_show_frame( int x, int y, int width, int height )
 {
+    if( height != mga_height ) {
+        mga_height = height;
+        mga_reconfigure();
+    }
     ioctl( mga_fd, MGA_VID_FSEL, &curframe );
     curframe = (curframe + 1) % mga_config.num_frames;
     return 1;
