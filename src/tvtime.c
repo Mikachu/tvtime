@@ -1004,7 +1004,7 @@ int main( int argc, char **argv )
                                "*** on how to increase your gbuffers setting.\n\n" );
         }
     } else {
-        fieldsavailable = 1;
+        fieldsavailable = 5;
     }
 
     filter_deinterlace_methods( speedy_get_accel(), fieldsavailable );
@@ -1033,6 +1033,7 @@ int main( int argc, char **argv )
     build_colourbars( colourbars, width, height );
     build_blue_frame( blueframe, width, height );
     blit_packed422_scanline( saveframe, blueframe, width * height );
+    secondlastframe = lastframe = blueframe;
 
 
     /* Setup OSD stuff. */
