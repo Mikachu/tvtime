@@ -59,6 +59,7 @@ menu_t *menu_new( const char *name )
 
 void menu_delete( menu_t *menu )
 {
+    free( menu->name );
     free( menu );
 }
 

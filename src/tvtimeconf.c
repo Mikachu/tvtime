@@ -701,6 +701,7 @@ config_t *config_new( void )
     ct->y = 240;
     ct->inputwidth = 720;
     ct->verbose = 0;
+    ct->slave_mode = 0;
     ct->send_fields = 0;
     ct->output_driver = strdup( "xv" );
     ct->fspos = 0;

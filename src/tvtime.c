@@ -1124,11 +1124,9 @@ static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
     tvtime_osd_show_list( osd, 1 );
 }
 
-int main( int argc, char **argv )
+int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 {
-    struct timeval startup_time;
     videoinput_t *vidin = 0;
-    rtctimer_t *rtctimer = 0;
     station_mgr_t *stationmgr = 0;
     rvrreader_t *rvrreader = 0;
     int width = 720;
@@ -1174,7 +1172,6 @@ int main( int argc, char **argv )
     int kbd_pos = 0;
     int kbd_available;
     char *error_string = 0;
-    int read_stdin = 1;
     double pixel_aspect;
     char number[ 4 ];
     tvtime_t *tvtime;
@@ -1188,63 +1185,6 @@ int main( int argc, char **argv )
     int matte_mode = 0;
     int restarttvtime = 0;
     int i;
-
-    gettimeofday( &startup_time, 0 );
-
-    fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
-
-    /* Disable this code for a release. */
-    fprintf( stderr, "\n*** WARNING: you are running a DEVELOPMENT version of tvtime.\n" );
-    fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
-                       "*** based on released versions only!!\n\n" );
-
-    /* Steal system resources in the name of performance. */
-    setpriority( PRIO_PROCESS, 0, -19 );
-    if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "tvtime: Can't get realtime priority for better performance, need root access.\n" );
-    }
-
-    rtctimer = rtctimer_new( 1 );
-    if( !rtctimer ) {
-        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
-                         "*** that you load the 'rtc' kernel module before starting tvtime,\n"
-                         "*** and make sure that your user has access to the device file.\n"
-                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
-    } else {
-        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
-            rtctimer_delete( rtctimer );
-            rtctimer = 0;
-        } else {
-            rtctimer_start_clock( rtctimer );
-
-            if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "\n*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
-                         "*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
-                         "*** linux kernel version 2.4.19 or later, please run:\n"
-                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
-            }
-        }
-    }
-
-
-    /* We've now stolen all our root-requiring resources, drop to a user. */
-#ifdef _POSIX_SAVED_IDS
-    if( seteuid( getuid() ) == -1 ) {
-#else
-    if( setreuid( -1, getuid() ) == -1 ) {
-#endif
-        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", 
-                 strerror( errno ) );
-        return 1;
-    }
-
-
-    /* Ditch stdin early. */
-    if( isatty( STDIN_FILENO ) ) {
-        read_stdin = 0;
-        close( STDIN_FILENO );
-    }
 
     ct = config_new();
     if( !ct ) {
@@ -1337,8 +1277,8 @@ int main( int argc, char **argv )
         linearblend_plugin_init();
         vfir_plugin_init();
 
-        dscaler_tomsmocomp_plugin_init();
-        dscaler_greedyh_plugin_init();
+        // dscaler_tomsmocomp_plugin_init();
+        // dscaler_greedyh_plugin_init();
         greedy_plugin_init();
 
         weavetff_plugin_init();
@@ -2460,9 +2400,6 @@ int main( int argc, char **argv )
     if( vbidata ) {
         vbidata_delete( vbidata );
     }
-    if( rtctimer ) {
-        rtctimer_delete( rtctimer );
-    }
     if( con ) {
         console_delete( con );
     }
@@ -2485,17 +2422,90 @@ int main( int argc, char **argv )
     xmlCleanupParser();
 
     if( restarttvtime ) {
-        char *newargv[ 2 ];
-
-        /* I think I'm doing this correctly... ?? */
-        newargv[ 0 ] = argv[ 0 ];
-        newargv[ 1 ] = 0;
-
         fprintf( stderr, "tvtime: Restarting.\n" );
-        execve( argv[ 0 ], newargv, environ );
+        return 2;
     }
 
     fprintf( stderr, "tvtime: Thank you for using tvtime.\n" );
     return 0;
+}
+
+int main( int argc, char **argv )
+{
+    rtctimer_t *rtctimer = 0;
+    int read_stdin = 1;
+    int result = 0;
+
+    fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
+
+    /* Disable this code for a release. */
+    fprintf( stderr, "\n*** WARNING: you are running a DEVELOPMENT version of tvtime.\n" );
+    fprintf( stderr,   "*** We often break stuff during development.  Please submit bug reports\n"
+                       "*** based on released versions only!!\n\n" );
+
+    /* Steal system resources in the name of performance. */
+    setpriority( PRIO_PROCESS, 0, -19 );
+    if( !set_realtime_priority( 0 ) ) {
+        fprintf( stderr, "tvtime: Can't get realtime priority for better performance, need root access.\n" );
+    }
+
+    rtctimer = rtctimer_new( 1 );
+    if( !rtctimer ) {
+        fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+                         "*** that you load the 'rtc' kernel module before starting tvtime,\n"
+                         "*** and make sure that your user has access to the device file.\n"
+                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
+    } else {
+        if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
+            rtctimer_delete( rtctimer );
+            rtctimer = 0;
+        } else {
+            rtctimer_start_clock( rtctimer );
+
+            if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
+                fprintf( stderr, "\n*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
+                         "*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
+                         "*** linux kernel version 2.4.19 or later, please run:\n"
+                         "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                         "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
+            }
+        }
+    }
+
+
+    /* We've now stolen all our root-requiring resources, drop to a user. */
+#ifdef _POSIX_SAVED_IDS
+    if( seteuid( getuid() ) == -1 ) {
+#else
+    if( setreuid( -1, getuid() ) == -1 ) {
+#endif
+        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", 
+                 strerror( errno ) );
+        return 1;
+    }
+
+
+    /* Ditch stdin early. */
+    if( isatty( STDIN_FILENO ) ) {
+        read_stdin = 0;
+        close( STDIN_FILENO );
+    }
+
+    /* Run tvtime. */
+    for(;;) {
+        char *new_argv[ 2 ];
+
+        new_argv[ 0 ] = "tvtime";
+        new_argv[ 1 ] = 0;
+
+        result = tvtime_main( rtctimer, read_stdin, result == 2 ? 1 : argc, result == 2 ? new_argv : argv );
+        if( result != 2 ) break;
+    }
+
+    if( rtctimer ) {
+        rtctimer_delete( rtctimer );
+    }
+
+    return result;
 }
 

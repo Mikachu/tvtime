@@ -1218,7 +1218,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 5, TVTIME_RESTART, "" );
     menu_set_right_command( menu, 5, TVTIME_RESTART, "" );
     menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "root" );
@@ -1248,7 +1247,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_RESTART, "" );
     menu_set_right_command( menu, 4, TVTIME_RESTART, "" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( cmd, menu );
     sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
     menu_set_text( menu, 5, string );
     menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "root" );
@@ -1832,6 +1830,10 @@ void commands_add_menu( commands_t *cmd, menu_t *menu )
     int i;
 
     for( i = 0; i < MAX_USER_MENUS; i++ ) {
+        if( cmd->menus[ i ] && !strcasecmp( menu_get_name( cmd->menus[ i ] ), menu_get_name( menu ) ) ) {
+            fprintf( stderr, "commands: Adding duplicate menu %s!\n",
+                     menu_get_name( menu ) );
+        }
         if( !cmd->menus[ i ] ) {
             cmd->menus[ i ] = menu;
             return;
