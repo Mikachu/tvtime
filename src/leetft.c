@@ -238,7 +238,7 @@ static FT_BBox prerender_text( FT_Face face, hashtable_t *glyphdata, FT_UInt *gl
 
     for( i = 0; i < len; i++ ) {
         int cur = text[ i ];
-        ft_glyph_data *curdata;
+        ft_glyph_data_t *curdata;
 
         curdata = hashtable_lookup( glyphdata, cur );
         if( curdata ) {
@@ -370,7 +370,7 @@ void ft_font_render( ft_font_t *font, uint8_t *output, const char *text,
 
         curdata = hashtable_lookup( font->glyphdata, cur );
         if( curdata ) {
-            FT_BitmapGlyph curglyph = curdata->bitmap;
+            FT_BitmapGlyph curglyph = (FT_BitmapGlyph) curdata->bitmap;
 
             blit_glyph_subpix( output, *width, *height, *width,
                                curglyph->bitmap.buffer, curglyph->bitmap.width,
