@@ -1,3 +1,4 @@
+#! /bin/sh
 # autogen.sh is used to re-generate the Autotools scripts.
 # Copyright (C) 2002, 2003  Billy Biggs
 #
