@@ -140,7 +140,10 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     vidin->maxbufs = 16;
     vidin->curframe = 0;
-    vidin->gb_buffers = (struct video_mbuf){ 2*0x151000, 0, {0,0x151000 }};
+
+    /* I don't actually know what these numbers mean, I stole this from someone
+     * else's code. */
+    vidin->gb_buffers = (struct video_mbuf) { 2*0x151000, 0, { 0, 0x151000 } };
 
     vidin->width = capwidth;
     vidin->height = capheight;
@@ -176,13 +179,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         return 0;
     }
 
+    /* Upon creation, unmute the audio from the card. */
     if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCGAUDIO" );
         return 0;
     }
-
     vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
-
     if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
         perror( "VIDIOCGAUDIO" );
         return 0;
@@ -260,22 +262,16 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
 
     /* Try to setup mmap-based capture. */
     for( i = 0; i < vidin->numframes; i++ ) {
-        vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422P; /* Y'CbCr 4:2:0 Planar */
+        vidin->grab_buf[ i ].format = VIDEO_PALETTE_YUV422P; /* Y'CbCr 4:2:2 Planar */
         vidin->grab_buf[ i ].frame = i;
         vidin->grab_buf[ i ].width = vidin->width;
         vidin->grab_buf[ i ].height = vidin->height;
     }
 
-    vidin->map = (unsigned char *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE, MAP_SHARED, vidin->grab_fd, 0 );
+    vidin->map = (unsigned char *) mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
+                                         MAP_SHARED, vidin->grab_fd, 0 );
     if( (int) (vidin->map) != -1 ) {
         vidin->have_mmap = 1;
-        //for( i = 0; i < numframes - 1; i++ ) {
-            //grab_wait();
-        //}
-        //for( i = 0; i < numframes - 2; i++ ) {
-            //grab_next();
-        //}
-
         return vidin;
     }
 
@@ -283,38 +279,35 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
     fprintf( stderr, "videoinput: No mmap support available, using read().\n" );
     vidin->have_mmap = 0;
 
+    /* Set the format using the SPICT ioctl. */
     grab_pict.depth = 16;
     grab_pict.palette = VIDEO_PALETTE_YUV422P;
     if( ioctl( vidin->grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
         return 0;
     }
-    if( ioctl( vidin->grab_fd, VIDIOCGPICT, &grab_pict ) < 0 ) {
-        perror("ioctl VIDIOCGPICT");
-        return 0;
-    }
-    fprintf( stderr, "\n\nbright %d, hue %d, colour %d, contrast %d, whiteness %d\n\n",
-             grab_pict.brightness, grab_pict.hue, grab_pict.colour,
-             grab_pict.contrast, grab_pict.whiteness );
 
+    /* Set and get the window settings. */
     memset( &(vidin->grab_win), 0, sizeof( struct video_window ) );
     vidin->grab_win.width = vidin->width;
     vidin->grab_win.height = vidin->height;
-
     if( ioctl( vidin->grab_fd, VIDIOCSWIN, &(vidin->grab_win) ) < 0 ) {
         perror( "ioctl VIDIOCSWIN" );
         return 0;
     }
-
     if( ioctl( vidin->grab_fd, VIDIOCGWIN, &(vidin->grab_win) ) < 0 ) {
         perror( "ioctl VIDIOCGWIN" );
         return 0;
     }
-
     vidin->grab_size = vidin->grab_win.width * vidin->grab_win.height * 3;
     vidin->grab_data = (unsigned char *) malloc( vidin->grab_size );
 
     return vidin;
+}
+
+int videoinput_has_tuner( videoinput_t *vidin )
+{
+    return (vidin->tuner.tuner > -1);
 }
 
 void videoinput_set_tuner( videoinput_t *vidin, int tuner_number, int mode )

@@ -19,23 +19,28 @@
 #ifndef VIDEOINPUT_H_INCLUDED
 #define VIDEOINPUT_H_INCLUDED
 
-// 10/19/2000 Mark Rejhon
-// Better NTSC defaults
+/**
+ * Default values below for bttv from dScaler.  See http://deinterlace.sf.net/
+ */
 
-// range -128,127
+/* 10/19/2000 Mark Rejhon
+ * Better NTSC defaults
+ */
+
+/* range -128,127 */
 #define DEFAULT_HUE_NTSC 0
 
-// range -128,127
+/* range -128,127 */
 #define DEFAULT_BRIGHTNESS_NTSC 20
 
-// range 0,511
+/* range 0,511 */
 #define DEFAULT_CONTRAST_NTSC 207
 
-// range 0,511
+/* range 0,511 */
 #define DEFAULT_SAT_U_NTSC 254
 #define DEFAULT_SAT_V_NTSC 219
 
-// PAL defaults these work for OTA PAL signals
+/* PAL defaults these work for OTA PAL signals */
 #define DEFAULT_HUE_PAL 0
 #define DEFAULT_BRIGHTNESS_PAL 0
 #define DEFAULT_CONTRAST_PAL 219
@@ -83,6 +88,11 @@ unsigned char *videoinput_next_image( videoinput_t *vidin );
  * Returns the number of buffers we've got.
  */
 int videoinput_get_num_frames( videoinput_t *vidin );
+
+/**
+ * Returns true if this input has a tuner.
+ */
+int videoinput_has_tuner( videoinput_t *vidin );
 
 /**
  * Sets the tuner to tuner_number for the current channel. Also sets the tuners

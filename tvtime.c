@@ -32,6 +32,7 @@
 #include "sdloutput.h"
 #include "videotools.h"
 #include "mixer.h"
+#include "osd.h"
 
 /**
  * Warning tolerance, just for debugging.
@@ -46,9 +47,10 @@ static int timediff( struct timeval *large, struct timeval *small )
 
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-as] [-w <width>] [-o <mode>] "
+    fprintf( stderr, "usage: %s [-vas] [-w <width>] [-o <mode>] "
                      "[-d <device> [-i <input>] [-n <norm>] "
                      "[-f <frequencies>] [-t <tuner>]\n"
+                     "\t-v\tShow verbose messages.\n"
                      "\t-a\t16:9 mode.\n"
                      "\t-s\tPrint frame skip information (for debugging).\n"
                      "\t-w\tOutput window width, defaults to 800.\n"
@@ -88,16 +90,10 @@ int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
     struct timeval lastframetime;
-    struct timeval checkpoint1;
-    struct timeval checkpoint2;
-    struct timeval checkpoint3;
-    struct timeval checkpoint4;
-    struct timeval checkpoint5;
-    struct timeval checkpoint6;
-    struct timeval checkpoint7;
+    struct timeval checkpoint[ 7 ];
     double luma_correction = 1.0;
     int apply_luma_correction = 0;
-    video_correction_t *vc;
+    video_correction_t *vc = 0;
     videoinput_t *vidin;
     rtctimer_t *rtctimer;
     char v4ldev[ 256 ];
@@ -106,19 +102,28 @@ int main( int argc, char **argv )
     int width, height;
     int output420 = 0;
     int palmode = 0;
+    int secam = 0;
     int inputnum = 0;
     int aspect = 0;
     int outputwidth = 800;
     int fieldtime;
     int tuner_number = 0;
-    int secam = 0;
     int blittime = 0;
     int skipped = 0;
-    int c;
+    int verbose = 0;
     long last_chan_time = 0;
     int volume;
     int debug = 0;
     int muted = 0;
+    osd_font_t *osdf;
+    osd_string_t *osds;
+    int c, i;
+
+
+    osdf = osd_font_new( "helr.ttf" );
+    osds = osd_string_new( osdf );
+    osd_string_show_text( osds, "this sucks", -1 );
+
 
     /* Default device. */
     strcpy( v4ldev, "/dev/video0" );
@@ -129,9 +134,10 @@ int main( int argc, char **argv )
     /* Default freq */
     strcpy( freq, "us-cable" );
 
-    while( (c = getopt( argc, argv, "hw:acso:d:i:l:n:f:t:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "hw:avcso:d:i:l:n:f:t:" )) != -1 ) {
         switch( c ) {
         case 'w': outputwidth = atoi( optarg ); break;
+        case 'v': verbose = 1; break;
         case 'a': aspect = 1; break;
         case 's': debug = 1; break;
         case 'c': apply_luma_correction = 1; break;
@@ -172,104 +178,90 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    /* Setup the tuner now */
-    if( palmode ) {
-        if( secam ) {
-            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_SECAM );
+    /* Setup the tuner if available. */
+    if( videoinput_has_tuner( vidin ) ) {
+        if( palmode ) {
+            if( secam ) {
+                videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_SECAM );
+            } else {
+                videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_PAL );
+            }
         } else {
-            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_PAL );
+            videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_NTSC );
         }
-    } else {
-        videoinput_set_tuner( vidin, tuner_number, VIDEO_MODE_NTSC );
+        /* Set to the current channel, or the first channel in our frequency list. */
+        if( !frequencies_set_chanlist( freq ? freq : "us-cable" ) ) {
+            fprintf( stderr, "tvtime: Invalid channel/frequency region: %s.", freq ? freq : "us-cable" );
+            /* XXX: Print valid frequency regions here. */
+            return 1;
+        } else {
+            if( frequencies_find_current_index( vidin ) == -1 ) {
+                videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+            }
+            if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s.\n", chanlist[ chanindex ].name );
+        }
     }
 
-    /* Set to the first channel in our frequency list */
-    if( !frequencies_set_chanlist( freq ? freq : "us-cable" ) ) {
-        fprintf( stderr, "tvtime: Invalid channel/frequency region." );
-
-        return 1;
-    } else {
-        if( frequencies_find_current_index( vidin ) == -1 ) {
-            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+    /* Setup the video correction tables. */
+    if( apply_luma_correction ) {
+        vc = video_correction_new();
+        if( !vc ) {
+            fprintf( stderr, "tvtime: Can't initialize luma and chroma correction tables.\n" );
+            return 1;
         }
-        fprintf( stderr, "tvtime: Changing to channel %s\n", 
-                 chanlist[ chanindex ].name );
+        if( luma_correction < 0.0 || luma_correction > 10.0 ) {
+            fprintf( stderr, "tvtime: Luma correction value out of range. Using 1.0.\n" );
+            luma_correction = 1.0;
+        }
+        if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n", luma_correction );
+        video_correction_set_luma_power( vc, luma_correction );
+    } else {
+        if( verbose ) fprintf( stderr, "tvtime: Luma correction disabled.\n" );
     }
 
-    fprintf( stderr, "tvtime: Attempting to aquire performance-enhancing features.\n" );
+    /* Steal system resources in the name of performance. */
+    if( verbose ) fprintf( stderr, "tvtime: Attempting to aquire performance-enhancing features.\n" );
     if( setpriority( 0, 0, -19 ) < 0 ) {
-        fprintf( stderr, "tvtime: Can't renice to -19.\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't renice to -19.\n" );
     }
     if( mlockall( MCL_CURRENT | MCL_FUTURE ) ) {
-        fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't use mlockall() to lock memory.\n" );
     }
     if( !set_realtime_priority( 0 ) ) {
-        fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't set realtime priority (need root).\n" );
     }
-
     rtctimer = rtctimer_new();
     if( !rtctimer ) {
-        fprintf( stderr, "tvtime: Can't open /dev/rtc "
-                         "(for my wakeup call).\n" );
+        if( verbose ) fprintf( stderr, "tvtime: Can't open /dev/rtc (for my wakeup call).\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) ) {
-            fprintf( stderr, "tvtime: Can't set 1024hz from /dev/rtc (need root).\n" );
+            if( verbose ) fprintf( stderr, "tvtime: Can't set 1024hz from /dev/rtc (need root).\n" );
             rtctimer_delete( rtctimer );
             rtctimer = 0;
         } else {
             rtctimer_start_clock( rtctimer );
         }
     }
-    fprintf( stderr, "tvtime: Done stealing resources.\n" );
+    if( verbose ) fprintf( stderr, "tvtime: Done stealing resources.\n" );
 
+    /* Setup the output. */
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
 
-    /* Announce our resolution. */
-    fprintf( stderr, "tvtime: Input is %dx%d.\n", width, height );
-
-    /* Initialize output. */
     if( !sdl_init( width, height, output420, outputwidth, aspect ) ) {
-        fprintf( stderr, "tvtime: Can't open video output.\n" );
+        fprintf( stderr, "tvtime: SDL failed to initialize: no video output available.\n" );
         return 1;
     }
-    fprintf( stderr, "tvtime: Output to Y'CbCr at %s sampling.\n",
-             output420 ? "4:2:0" : "4:2:2" );
+    if( verbose ) fprintf( stderr, "tvtime: Output is Y'CbCr at %s sampling.\n", output420 ? "4:2:0" : "4:2:2" );
 
-    vc = video_correction_new();
-    if( !vc ) {
-        fprintf( stderr, "tvtime: Can't initialize luma and chroma "
-                         "correction tables.\n" );
-        return 1;
-    }
-
-    if( luma_correction < 0.0 || luma_correction > 10.0 ) {
-        fprintf( stderr, "tvtime: Luma correction value out of range. "
-                         "Using 1.0.\n" );
-        luma_correction = 1.0;
-    }
-    if( apply_luma_correction ) {
-        fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                 luma_correction );
-        video_correction_set_luma_power( vc, luma_correction );
-    } else {
-        fprintf( stderr, "tvtime: Luma correction disabled.\n" );
-    }
-
-    /* Setup the video input. */
-    videoinput_free_all_frames( vidin );
-
-    /* Setup the mixer */
+    /* Set the mixer volume. */
     mixer_set_volume( mixer_get_volume() );
 
-    gettimeofday( &checkpoint1, 0 );
-    gettimeofday( &checkpoint2, 0 );
-    gettimeofday( &checkpoint3, 0 );
-    gettimeofday( &checkpoint4, 0 );
-    gettimeofday( &checkpoint5, 0 );
-    gettimeofday( &checkpoint6, 0 );
-    gettimeofday( &checkpoint7, 0 );
+    /* Begin capturing frames. */
+    videoinput_free_all_frames( vidin );
 
+    /* Initialize our timestamps. */
+    for( i = 0; i < 7; i++ ) gettimeofday( &(checkpoint[ i ]), 0 );
     gettimeofday( &lastframetime, 0 );
     gettimeofday( &lastfieldtime, 0 );
     for(;;) {
@@ -287,59 +279,36 @@ int main( int argc, char **argv )
         if( commands & TVTIME_QUIT ) {
             break;
         }
-        if( commands & TVTIME_LUMA_UP ) {
+        if( commands & TVTIME_DEBUG ) {
+            printdebug = 1;
+        }
+        if( commands & TVTIME_LUMA_UP || commands & TVTIME_LUMA_DOWN ) {
             if( !apply_luma_correction ) {
                 fprintf( stderr, "tvtime: Luma correction disabled.  Run with -c to use it.\n" );
             } else {
-                if( luma_correction < 10.0 ) {
-                    luma_correction += 0.1;
-                    fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                             luma_correction );
-                    video_correction_set_luma_power( vc, luma_correction );
-                }
+                luma_correction += ( (commands & TVTIME_LUMA_UP) ? 0.1 : -0.1 );
+                if( luma_correction > 10.0 ) luma_correction = 10.0;
+                if( luma_correction <  0.0 ) luma_correction =  0.0;
+                if( verbose ) fprintf( stderr, "tvtime: Luma correction value: %.1f\n", luma_correction );
+                video_correction_set_luma_power( vc, luma_correction );
             }
         }
-        if( commands & TVTIME_LUMA_DOWN ) {
-            if( !apply_luma_correction ) {
-                fprintf( stderr, "tvtime: Luma correction disabled.  Run with -c to use it.\n" );
+        if( commands & TVTIME_CHANNEL_UP || commands & TVTIME_CHANNEL_DOWN ) {
+            if( !videoinput_has_tuner( vidin ) ) {
+                fprintf( stderr, "tvtime: Can't change channel, no tuner present!\n" );
             } else {
-                if( luma_correction > 0.0 ) {
-                    luma_correction -= 0.1;
-                    fprintf( stderr, "tvtime: Luma correction value: %.1f\n",
-                             luma_correction );
-                    video_correction_set_luma_power( vc, luma_correction );
-                }
+                chanindex = (chanindex + ( (commands & TVTIME_CHANNEL_UP) ? 1 : -1) + chancount) % chancount;
+                last_chan_time = 0;
+                videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
+                if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
             }
         }
-        if( commands & TVTIME_CHANNEL_UP ) {
-            chanindex++;
-            chanindex %= chancount;
-            last_chan_time = 0;
-
-            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
-
-            fprintf( stderr, "tvtime: Changing to channel %s\n", 
-                     chanlist[ chanindex ].name );
-        }
-        if( commands & TVTIME_CHANNEL_DOWN ) {
-            chanindex--;
-            chanindex %= chancount;
-            last_chan_time = 0;
-
-            videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
-
-            fprintf( stderr, "tvtime: Changing to channel %s\n", 
-                     chanlist[ chanindex ].name );
-        }
-        if( commands & TVTIME_MIXER_UP ) {
-            volume = mixer_set_volume(3);
-        }
-        if( commands & TVTIME_MIXER_DOWN ) {
-            volume = mixer_set_volume(-3);
+        if( commands & TVTIME_MIXER_UP || commands & TVTIME_MIXER_DOWN ) {
+            volume = mixer_set_volume( ( (commands & TVTIME_MIXER_UP) ? 3 : -3 ) );
         }
         if( commands & TVTIME_MIXER_MUTE ) {
             muted = ~muted;
-            mixer_mute(muted);
+            mixer_mute( muted );
         }
         if( commands & TVTIME_DIGIT ) {
             int digit = 0;
@@ -365,8 +334,7 @@ int main( int argc, char **argv )
 
                     videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
-                    fprintf( stderr, "tvtime: Changing to channel %s\n",
-                             chanlist[ chanindex ].name );
+                    if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
 
                 }
             } else {
@@ -379,37 +347,35 @@ int main( int argc, char **argv )
 
                 videoinput_set_tuner_freq( vidin, chanlist[ chanindex ].freq );
 
-                fprintf( stderr, "tvtime: Changing to channel %s\n", 
-                         chanlist[ chanindex ].name );                    
+                if( verbose ) fprintf( stderr, "tvtime: Changing to channel %s\n", chanlist[ chanindex ].name );
             }
         }
-        if( commands & TVTIME_DEBUG ) {
-            printdebug = 1;
-        }
 
-/* CHECKPOINT1 : Blit the second field */
-        gettimeofday( &checkpoint1, 0 );
+
+        /* CHECKPOINT1 : Blit the second field */
+        gettimeofday( &(checkpoint[ 0 ]), 0 );
 
         /* Aquire the next frame. */
         curluma  = videoinput_next_image( vidin );
         curcb422 = curluma  + ( width   * height );
         curcr422 = curcb422 + ( width/2 * height );
 
-/* CHECKPOINT2 : Got the frame */
-        gettimeofday( &checkpoint2, 0 );
+        /* CHECKPOINT2 : Got the frame */
+        gettimeofday( &(checkpoint[ 1 ]), 0 );
 
+        /* Print statistics and check for missed frames. */
         gettimeofday( &curframetime, 0 );
         if( printdebug ) {
             fprintf( stderr, "tvtime: aquire %d, build top %d "
                              "blit top %d built bot %d free input %d "
                              "wait bot %d blit bot %d\n",
-                     timediff( &checkpoint2, &checkpoint1 ),
-                     timediff( &checkpoint3, &lastframetime ),
-                     timediff( &checkpoint4, &checkpoint3 ),
-                     timediff( &checkpoint5, &checkpoint4 ),
-                     timediff( &checkpoint6, &checkpoint5 ),
-                     timediff( &checkpoint7, &checkpoint6 ),
-                     timediff( &checkpoint1, &checkpoint7 ) );
+                     timediff( &(checkpoint[ 1 ]), &(checkpoint[ 0 ]) ),
+                     timediff( &(checkpoint[ 2 ]), &lastframetime ),
+                     timediff( &(checkpoint[ 3 ]), &(checkpoint[ 2 ]) ),
+                     timediff( &(checkpoint[ 4 ]), &(checkpoint[ 3 ]) ),
+                     timediff( &(checkpoint[ 5 ]), &(checkpoint[ 4 ]) ),
+                     timediff( &(checkpoint[ 6 ]), &(checkpoint[ 5 ]) ),
+                     timediff( &(checkpoint[ 0 ]), &(checkpoint[ 6 ]) ) );
         }
         if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
             fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
@@ -418,7 +384,8 @@ int main( int argc, char **argv )
         }
         lastframetime = curframetime;
 
-        /* Build our frame, pivot on the top field. */
+
+        /* Build the output from the top field. */
         if( output420 ) {
             luma_plane_field_to_frame( sdl_get_output(), curluma,
                                        width, height, width*2, 0 );
@@ -439,10 +406,13 @@ int main( int argc, char **argv )
                                                     curcb422, curcr422, 0, width * 2,
                                                     width, width, height );
             }
+            osd_string_composite_packed422( osds, sdl_get_output(), width, height, width*2, 50, 50, 0 );
         }
 
-/* CHECKPOINT3 : Constructed the first field */
-        gettimeofday( &checkpoint3, 0 );
+
+        /* CHECKPOINT3 : Constructed the top field. */
+        gettimeofday( &(checkpoint[ 2 ]), 0 );
+
 
         /* Wait for the next field time and display. */
         gettimeofday( &curfieldtime, 0 );
@@ -462,10 +432,12 @@ int main( int argc, char **argv )
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
 
-/* CHECKPOINT4 : Blit the first field */
-        gettimeofday( &checkpoint4, 0 );
 
-        /* Build our frame, pivot on the top field. */
+        /* CHECKPOINT4 : Blit the first field */
+        gettimeofday( &(checkpoint[ 3 ]), 0 );
+
+
+        /* Build the output from the bottom field. */
         if( output420 ) {
             luma_plane_field_to_frame( sdl_get_output(), curluma + width,
                                        width, height, width*2, 1 );
@@ -487,18 +459,23 @@ int main( int argc, char **argv )
                                                     curcr422 + (width / 2),
                                                     1, width * 2, width, width, height );
             }
+            osd_string_composite_packed422( osds, sdl_get_output(), width, height, width*2, 50, 50, 0 );
         }
 
-/* CHECKPOINT5 : Built the second field */
-        gettimeofday( &checkpoint5, 0 );
+
+        /* CHECKPOINT5 : Built the second field */
+        gettimeofday( &(checkpoint[ 4 ]), 0 );
+
 
         /* We're done with the input now. */
         videoinput_free_last_frame( vidin );
 
-/* CHECKPOINT6 : Free'd the input */
-        gettimeofday( &checkpoint6, 0 );
 
-        /* Wait for the next field time and display. */
+        /* CHECKPOINT6 : Released a frame to V4L. */
+        gettimeofday( &(checkpoint[ 5 ]), 0 );
+
+
+        /* Wait for the next field time. */
         gettimeofday( &curfieldtime, 0 );
         while( timediff( &curfieldtime, &lastfieldtime ) < (fieldtime-blittime) ) {
             if( rtctimer ) {
@@ -508,9 +485,12 @@ int main( int argc, char **argv )
             }
             gettimeofday( &curfieldtime, 0 );
         }
-/* CHECKPOINT7 : Wait to blit bot */
-        gettimeofday( &checkpoint7, 0 );
 
+        /* CHECKPOINT7 : Done waiting to blit the bottom field. */
+        gettimeofday( &(checkpoint[ 6 ]), 0 );
+
+
+        /* Display the bottom field. */
         gettimeofday( &blitstart, 0 );
         sdl_show_frame();
         gettimeofday( &blitend, 0 );
@@ -518,8 +498,11 @@ int main( int argc, char **argv )
         blittime = timediff( &blitend, &blitstart );
     }
 
-    fprintf( stderr, "tvtime: Cleaning up.\n" );
+    if( verbose ) fprintf( stderr, "tvtime: Cleaning up.\n" );
     videoinput_delete( vidin );
+    if( vc ) {
+        video_correction_delete( vc );
+    }
     if( rtctimer ) {
         rtctimer_delete( rtctimer );
     }

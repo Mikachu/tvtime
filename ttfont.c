@@ -58,8 +58,6 @@ static TT_Engine    engine;
 
 #define TT_VALID(handle) ((handle).z != NULL)
 
-static unsigned char alpha_lut[5] =
-{0, 64, 128, 196, 255};
 static unsigned char bounded_palette[9] =
 {0, 1, 2, 3, 4, 4, 4, 4, 4};
 

@@ -6,18 +6,19 @@ CC = gcc -O3 -funroll-loops -fomit-frame-pointer
 SDLFLAGS = `sdl-config --cflags`
 SDLLIBS = `sdl-config --libs`
 
-CFLAGS = -Wall -I. $(SDLFLAGS)
-LDFLAGS = $(SDLLIBS)
+TTFFLAGS =
+TTFLIBS = -lttf
 
-OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o videotools.o
-OSDOBJS = ttfont.o osd.o
+CFLAGS = -Wall -I. $(SDLFLAGS) $(TTFFLAGS)
+LDFLAGS = $(SDLLIBS) $(TTFLIBS)
+
+OBJS = frequencies.o mixer.o videoinput.o sdloutput.o rtctimer.o \
+	videotools.o ttfont.o osd.o
 
 all: tvtime
 
 tvtime: $(OBJS) tvtime.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-osdtest: $(OSDOBJS)
 
 timingtest: $(OBJS) timingtest.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
