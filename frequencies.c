@@ -1331,6 +1331,8 @@ int frequencies_find_current_index()
     int i;
     fprintf( stderr, "frequencies: current frequency %d\n", curfreq);
 
+    if( curfreq == 0 ) return -1; /* Probably no tuner present */
+
     for( i=0; i < chancount; i++ ) {
         if( curfreq < chanlist[i].freq+500 && 
             curfreq > chanlist[i].freq-500 ) 

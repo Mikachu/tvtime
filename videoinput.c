@@ -243,12 +243,12 @@ videoinput_t *videoinput_new( const char *v4l_device, int inputnum,
         grab_pict.hue = (int) (((((double) DEFAULT_HUE_PAL) + 128.0) / 255.0) * 65535.0);
         grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_PAL) + 128.0) / 255.0) * 65535.0);
         grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_PAL) / 511.0) * 65535.0);
-        grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_PAL) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_PAL + DEFAULT_SAT_V_PAL)/2) / 511.0) * 65535.0);
     } else {
         grab_pict.hue = (int) (((((double) DEFAULT_HUE_NTSC) + 128.0) / 255.0) * 65535.0);
         grab_pict.brightness = (int) (((((double) DEFAULT_BRIGHTNESS_NTSC) + 128.0) / 255.0) * 65535.0);
         grab_pict.contrast = (int) ((((double) DEFAULT_CONTRAST_NTSC) / 511.0) * 65535.0);
-        grab_pict.colour = (int) ((((double) DEFAULT_SAT_U_NTSC) / 511.0) * 65535.0);
+        grab_pict.colour = (int) ((((double) (DEFAULT_SAT_U_NTSC + DEFAULT_SAT_V_NTSC)/2) / 511.0) * 65535.0);
     }
     if( ioctl( grab_fd, VIDIOCSPICT, &grab_pict ) < 0 ) {
         perror( "ioctl VIDIOCSPICT" );
@@ -354,17 +354,21 @@ void videoinput_set_tuner_freq( int freqKHz )
 {
     unsigned long frequency = freqKHz;
 
-    if (frequency < 0) return;
+    if (tuner.tuner > -1) {
+        if (frequency < 0) return;
 
-    if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
-        frequency /= 1000; // switch to MHz
-    }
+        if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
+            frequency /= 1000; // switch to MHz
+        }
 
-    frequency *= 16;
+        frequency *= 16;
 
-    if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
-        perror( "ioctl VIDIOCSFREQ" );
-        return;
+        if( ioctl( grab_fd, VIDIOCSFREQ, &frequency ) < 0 ) {
+            perror( "ioctl VIDIOCSFREQ" );
+            return;
+        }
+    } else {
+        fprintf( stderr, "videoinput: cannot set tuner freq on a channel without a tuner\n" );
     }
 }
 
@@ -380,16 +384,23 @@ void videoinput_mute( int mute )
 int videoinput_get_tuner_freq( void ) 
 {
     unsigned long frequency;
-    if( ioctl( grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
-        perror( "ioctl VIDIOCSFREQ" );
+
+    if (tuner.tuner > -1) {
+
+        if( ioctl( grab_fd, VIDIOCGFREQ, &frequency ) < 0 ) {
+            perror( "ioctl VIDIOCSFREQ" );
+            return 0;
+        }
+
+        if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
+            frequency *= 1000; // switch from MHz to KHz
+        }
+
+        return frequency/16;
+    } else {
+        fprintf( stderr, "videoinput: cannot get tuner freq on a channel without a tuner\n" );
         return 0;
     }
-
-    if ( !(tuner.flags & VIDEO_TUNER_LOW) ) {
-        frequency *= 1000; // switch from MHz to KHz
-    }
-
-    return frequency/16;
 }
 
 void videoinput_delete( videoinput_t *vidin )
