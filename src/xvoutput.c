@@ -762,6 +762,45 @@ int xv_get_visible_height( void )
     return video_area.height;
 }
 
+void xv_set_window_height( int window_height )
+{
+    XWindowChanges win_changes;
+    int widthratio = output_aspect ? 16 : 4;
+    int heightratio = output_aspect ? 9 : 3;
+    int sar_frac_n, sar_frac_d;
+    int window_width;
+
+    if( output_fullscreen ) {
+        xv_toggle_fullscreen( 0, 0 );
+    }
+
+    if( DpyInfoGetSAR( display, screen, &sar_frac_n, &sar_frac_d ) ) {
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Sample aspect ratio %d/%d.\n",
+                     sar_frac_n, sar_frac_d );
+        }
+    } else {
+        /* Assume 4:3 aspect ? */
+        if( xvoutput_verbose ) {
+            fprintf( stderr, "xvoutput: Assuming square pixel display.\n" );
+        }
+        sar_frac_n = 1;
+        sar_frac_d = 1;
+    }
+
+    /* Correct for our non-square pixels, and for current aspect ratio (4:3 or 16:9). */
+    window_width = ( window_height * sar_frac_n * widthratio ) / ( sar_frac_d * heightratio );
+
+    if( xvoutput_verbose ) {
+        fprintf( stderr, "xvoutput: Target window size %dx%d.\n", window_width, window_height );
+    }
+
+    win_changes.width = window_width;
+    win_changes.height = window_height;
+
+    XReconfigureWMWindow( display, window, 0, CWWidth | CWHeight, &win_changes );
+}
+
 static output_api_t xvoutput =
 {
     xv_init,
@@ -782,6 +821,8 @@ static output_api_t xvoutput =
     xv_toggle_aspect,
     xv_toggle_fullscreen,
     xv_set_window_caption,
+
+    xv_set_window_height,
 
     xv_poll_events,
     xv_quit

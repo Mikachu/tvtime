@@ -48,6 +48,8 @@ typedef struct output_api_s
     int (* toggle_fullscreen)( int fullscreen_width, int fullscreen_height );
     void (* set_window_caption)( const char *caption );
 
+    void (* set_window_height)( int window_height );
+
     void (* poll_events)( input_t *in );
     void (* shutdown)( void );
 } output_api_t;
