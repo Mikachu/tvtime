@@ -95,6 +95,9 @@ Authors and contributors
   Corey Quilliam <tourettes@users.sourceforge.net>
     - Fixed the mixer commands to allow changing by percentages.
 
+  Than Ngo <than@redhat.com>
+    - Fixed for compiling with gcc-3.4 and -fPIC
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>

@@ -2611,7 +2611,7 @@ static int WINAPI expGetWindowThreadProcessId(HWND win, int *pid_data)
     dbgprintf("GetWindowThreadProcessId(0x%x, 0x%x) => %d\n",
 	win, pid_data, tid);
     if (pid_data)
-	(int)*pid_data = tid;
+	*pid_data = tid;
     return tid;
 }
 
