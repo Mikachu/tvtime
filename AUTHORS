@@ -39,7 +39,7 @@ Authors and contributors
   Joachim Koenig <Joachim.Koenig@tecnomen.fi>
     - Wrote the dscaler plugin loader using the wine code
 
-  Stewart Allen <mrallen@users.sourceforge.net>
+  Stewart Allen <stewart@neuron.com>
     - Cleanup of the command names, various bugfixes
 
 Code we stole (well, used under the GPL)
