@@ -960,7 +960,7 @@ int videoinput_get_hue( videoinput_t *vidin )
 void videoinput_set_hue( videoinput_t *vidin, int newhue )
 {
     if( newhue > 100 ) newhue = 100;
-    if( newhue <   0 ) newhue = 0;
+    if( newhue <   0 ) newhue = 50;
 
     if( vidin->isv4l2 ) {
         videoinput_set_control_v4l2( vidin, V4L2_CID_HUE, ((double) newhue) / 100.0 );
@@ -976,7 +976,10 @@ void videoinput_set_hue( videoinput_t *vidin, int newhue )
 
 void videoinput_set_hue_relative( videoinput_t *vidin, int offset )
 {
-    videoinput_set_hue( vidin, videoinput_get_hue( vidin ) + offset );
+    int hue = videoinput_get_hue( vidin );
+    if( hue + offset >= 0 ) {
+        videoinput_set_hue( vidin, hue + offset );
+    }
 }
 
 int videoinput_get_brightness( videoinput_t *vidin )
@@ -997,7 +1000,7 @@ int videoinput_get_brightness( videoinput_t *vidin )
 void videoinput_set_brightness( videoinput_t *vidin, int newbright )
 {
     if( newbright > 100 ) newbright = 100;
-    if( newbright <   0 ) newbright = 0;
+    if( newbright <   0 ) newbright = 50;
 
     if( vidin->isv4l2 ) {
         videoinput_set_control_v4l2( vidin, V4L2_CID_BRIGHTNESS, ((double) newbright) / 100.0 );
@@ -1013,7 +1016,10 @@ void videoinput_set_brightness( videoinput_t *vidin, int newbright )
 
 void videoinput_set_brightness_relative( videoinput_t *vidin, int offset )
 {
-    videoinput_set_brightness( vidin, videoinput_get_brightness( vidin ) + offset );
+    int brightness = videoinput_get_brightness( vidin );
+    if( brightness + offset >= 0 ) {
+        videoinput_set_brightness( vidin, brightness + offset );
+    }
 }
 
 int videoinput_get_contrast( videoinput_t *vidin )
@@ -1034,7 +1040,7 @@ int videoinput_get_contrast( videoinput_t *vidin )
 void videoinput_set_contrast( videoinput_t *vidin, int newcont )
 {
     if( newcont > 100 ) newcont = 100;
-    if( newcont <   0 ) newcont = 0;
+    if( newcont <   0 ) newcont = 50;
 
     if( vidin->isv4l2 ) {
         videoinput_set_control_v4l2( vidin, V4L2_CID_CONTRAST, ((double) newcont) / 100.0 );
@@ -1050,7 +1056,10 @@ void videoinput_set_contrast( videoinput_t *vidin, int newcont )
 
 void videoinput_set_contrast_relative( videoinput_t *vidin, int offset )
 {
-    videoinput_set_contrast( vidin, videoinput_get_contrast( vidin ) + offset );
+    int contrast = videoinput_get_contrast( vidin );
+    if( contrast + offset >= 0 ) {
+        videoinput_set_contrast( vidin, contrast + offset );
+    }
 }
 
 int videoinput_get_saturation( videoinput_t *vidin )
@@ -1071,7 +1080,7 @@ int videoinput_get_saturation( videoinput_t *vidin )
 void videoinput_set_saturation( videoinput_t *vidin, int newsaturation )
 {
     if( newsaturation > 100 ) newsaturation = 100;
-    if( newsaturation <   0 ) newsaturation = 0;
+    if( newsaturation <   0 ) newsaturation = 50;
 
     if( vidin->isv4l2 ) {
         videoinput_set_control_v4l2( vidin, V4L2_CID_SATURATION, ((double) newsaturation) / 100.0 );
@@ -1087,7 +1096,10 @@ void videoinput_set_saturation( videoinput_t *vidin, int newsaturation )
 
 void videoinput_set_saturation_relative( videoinput_t *vidin, int offset )
 {
-    videoinput_set_saturation( vidin, videoinput_get_saturation( vidin ) + offset );
+    int saturation = videoinput_get_saturation( vidin );
+    if( saturation + offset >= 0 ) {
+        videoinput_set_saturation( vidin, saturation + offset );
+    }
 }
 
 static void videoinput_do_mute( videoinput_t *vidin, int mute )
