@@ -109,6 +109,22 @@
         <h3><a name="summary">2. Summary of new features by release</a></h3>
 
         <table border="0" width="100%">
+        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.9</b></th></tr>
+        <tr><td>
+            <ol>
+            <li>Added a full menu system for configuring tvtime.
+            <li>Simplified deinterlacer names and provide online help for them.
+            <li>Unified OSD appearance across all television standards.
+            <li>Support for saving picture settings both globally and per-channel.
+            <li>Finetune settings saved per-channel.
+            <li>Support for the V4L2 DVB driver and bttv9 for PAL-60 support.
+            <li>Added a channel scanner application 'tvtime-scanner' that outputs
+                to the 'Custom' frequency table.
+            <li>Native support for UYVY input from the rivatv driver.
+            <li>Removed lirc support in favour of using tvtime-command.
+            <li>Fixed remaining screensaver, Xinerama and fullscreen issues.
+            <li>Many other new features and bugfixes.
+            </ol></td></tr>
         <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.5</b></th></tr>
         <tr><td>
             <ol>
@@ -180,23 +196,6 @@
                 <li>Included a bunch of fixes for PAL-M support.
                 <li>Added a slave mode for freevo integration.
                 <li>Various speedups, quality improvements, and bugfixes.
-            </ol></td></tr>
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.7</b></td></tr>
-        <tr><td>
-            <ol>
-                <li>Moved config files into a new config file directory
-                    ~/.tvtime
-                <li>Reworked the frequency tables, merging europe-cable,
-                    europe-west, europe-east all into 'europe'.  Added
-                    the'russia' frequency table.
-                <li>Added a channel scanner.  <b>F10</b> walks through
-                    the channel list and disables inactive channels.
-                <li>Added the 'XVideo Bob' deinterlacer filter.
-                <li>Added lirc support.
-                <li>Added the overscan feature.
-                <li>Added hardware support webpage.
-                <li>Added a half-framerate mode ('=' to activate it).
-                <li>Fixed alot of bug reports.
             </ol></td></tr>
         </table>
 
@@ -286,66 +285,6 @@ switching)
 <li>tvtime does not notify the user when frames are being dropped
 (<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
 </ol>
-<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.7</b>
-<tr><td>
-<ol>
-<li>greedy2frame and twoframe deinterlacer ports are buggy and show
-    splotchy pixels all over the place and should not be used
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=704780&amp;group_id=64301&amp;atid=506987">bug 704780</a>).
-<li>The <b>FineTuneOffset</b> configuration file parameter is completely ignored
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=707278&amp;group_id=64301&amp;atid=506987">bug 707278</a>).
-<li>configure does not fail if gcc, g++, or X libraries/development
-    headers are not found
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=696067&amp;group_id=64301&amp;atid=506987">bug 696067</a>).
-<li>"enter" mistakenly missing from command list, can't be sent using
-    the fifo
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=708596&amp;group_id=64301&amp;atid=506987">bug 708596</a>).
-<li>There are many known issues with fullscreen support under various
-    (buggy) window managers.  See <a href="#fullscreen">section 5, <b>Window manager issues with fullscreen mode</b></a>.
-<li>tvtime does not resize properly to compensate for of
-    non-square-pixel displays
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690428&amp;group_id=64301&amp;atid=506987">bug 690428</a>).
-<li>tvtime does not resize properly to compensate for 16:9 aspect ratio
-    monitors
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=636423&amp;group_id=64301&amp;atid=506987">bug 636423</a>).
-<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
-    change channels
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
-<li>font aspect ratio is not updated if you toggle the aspect ratio at
-    runtime
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
-<li>We have not written MMX versions of many functions that we do have
-    MMXEXT versions of, as such, performance is much worse than it
-    should be on older CPUs
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
-<li>If not using 720 pixels/scanline input sampling, tvtime does not
-    render volume/data bars correctly
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=632781&amp;group_id=64301&amp;atid=506987">bug 632781</a>).
-<li>tvtime does not notify the user when frames are being dropped
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
-<li>tvtime renders the output even when the window isn't visible, keeping the CPU usage
-high even if it's on another desktop or minimized
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=705989&amp;group_id=64301&amp;atid=506987">bug 705989</a>).
-<li>Rendered strings in the OSD seem to have some pixels missing from the right
-hand size
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693642&amp;group_id=64301&amp;atid=506987">bug 693642</a>).
-<li>No way to set the audio mode (mono, stereo, SAP, etc)
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=709505&amp;group_id=64301&amp;atid=506987">bug 709505</a>).
-<li>tvtime ignores locale information for time format
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=710875&amp;group_id=64301&amp;atid=506987">bug 710875</a>).
-<li>tvtime does not support frequencies used by the UPC cable provider
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711434&amp;group_id=64301&amp;atid=506987">bug 711434</a>).
-<li>tvtime cannot renumber channels
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711431&amp;group_id=64301&amp;atid=506987">bug 711431</a>).
-<li><b>tvtime does not clean up its shared memory segments, eating memory</b>
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711470&amp;group_id=64301&amp;atid=506987">bug 711470</a>).
-<li>XDS information remains on-screen when you switch to an input with no tuner
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=699810&amp;group_id=64301&amp;atid=506987">bug 699810</a>).
-<li>Time and network information is not right justified
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=711654&amp;group_id=64301&amp;atid=506987">bug 711654</a>).
-<li>tvtime prints errors on change of deinterlacer
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=715997&amp;group_id=64301&amp;atid=506987">bug 715997</a>).
-</ol>
 </table>
 
 <hr>
@@ -400,39 +339,6 @@ the rtc device by executing the following command:<p>
 Note that this setting is lost on reboot, so this should be added into
 your system startup scripts.  Consult your Linux distribution
 documentation for how to do this correctly on your system.<p>
-
-<hr>
-<h3><a name="fullscreen">5. Window manager issues with fullscreen mode</a></h3>
-
-<p>Like many other video applications, we have been plagued with problems
-due to fullscreen support in various window managers, and would be
-anxious to hear about any problems or suggestions.  Known problems at
-this time are:</p>
-
-<ol>
-<li>
-<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=692137&amp;group_id=64301&amp;atid=506987">
-kwin from KDE 3.1</a>: kwin has a nasty bug, we have a workaround, but
-the workaround is failing sometimes when running as root at high
-priority.
-<li>
-<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=683283&amp;group_id=64301&amp;atid=506987">
-FS broken with metacity in RH 8.0</a>: The metacity shipped with RH 8.0
-had bugs which have been fixed in later versions of metacity.
-<li>
-<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=691892&amp;group_id=64301&amp;atid=506987">
-FS goes off centre when mouse moves</a>: If you're fullscreen at a lower
-resolution than your root window, moving the mouse causes the virtual to
-scroll, leaving the window off-centered.
-<li>
-<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693337&amp;group_id=64301&amp;atid=506987">
-FS problems with icewm</a>: We still seem to have some minor problems with
-current versions of icewm.
-<li>
-<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=693329&amp;group_id=64301&amp;atid=506987">
-Problems with fvwm 2.4.0</a>:  A user has reported some weird X errors
-using fvwm 2.4.0, I have not reproduced them using fvwm 2.4.10.
-</ol><p>
 
 <hr>
 <h3><a name="nodeint">6. FAQ: How do I disable deinterlacing?</a></h3>
@@ -516,12 +422,11 @@ fields are shown in the right order.</p>
 <p>There are two possible solutions.  I have been told that with the
 NVIDIA TV output drivers, when using XVIDEO, if you supply them with
 <b>top-field-first</b> frames, they will display the fields correctly.
-To experiment, try tvtime using the <b>Weave</b> deinterlacer, and
-select half framerate in <b>TFF</b> mode.  This may give good
-results.  The second option would be using a card with a TV output
-driver that gives field information.  An example is the Matrox
-G400/G450/G550 driver in <b>DirectFB</b>.  We are working on native
-support for TV output in this setting.</p>
+To experiment, try tvtime using the <b>Progressive: Top Field First</b>
+deinterlacer.  This may give good results.  The second option would be
+using a card with a TV output driver that gives field information.
+An example is the Matrox G400/G450/G550 driver in <b>DirectFB</b>.
+We are working on native support for TV output in this setting.</p>
 
 <hr>
 <h3><a name="bsd">12. FAQ: Does tvtime support FreeBSD or NetBSD?</a></h3>

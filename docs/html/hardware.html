@@ -447,38 +447,11 @@ us from using XVideo.</p>
 <hr>
 <h3><a name="rivatv">10. Information for users of the rivatv capture driver</a></h3>
 
-<p>Like the <b>bttv</b> driver, the rivatv capture driver defaults to only 2
-buffers for frames.</p>
-
-<p>Ensuring that your driver provides four buffers will give you access
-to all of the available deinterlacing methods.  To do this you must
-provide the following option when installing the rivatv driver:</p>
-
-<pre>
-    modprobe rivatv capbuffers=4
-</pre>
-
-<p>To make this change automatic, in your <b>modules.conf</b> file,
-add the following line:</p>
-
-<pre>
-    options rivatv capbuffers=4
-</pre>
-
-<p>There have been reports of performance problems with the rivatv driver.  There
-are two reasons for this.</p>
-
-<ol>
-<li>The driver does <b>format conversion</b> as it gives the frames.  It does not
-support <b>YUY2</b> capture, only a variant called <b>UYVY</b>.  It will not
-be difficult for tvtime to support this directly, but it is annoying that the
-driver claims to support <b>YUY2</b> when really it is being slowed down by this
-conversion process.
-<li>By default the driver copies frames from video memory into system memory.
-Performance can be improved by using <b>DMA</b> to transfer the frames, however,
-this option only works when using the open-source <b>"nv"</b> driver in X, not
-with the NVIDIA binary drivers.
-</ol>
+<p>By default, the rivatv the driver copies frames from video memory into
+system memory, which can harm performance.  Performance can be improved by
+using <b>DMA</b> to transfer the frames, however, this option only works when
+using the open-source <b>"nv"</b> driver in X, not with the NVIDIA binary
+drivers.</p>
 
 <p>You can turn on dma support as follows in your <b>modules.conf</b> file:</p>
 
@@ -614,7 +587,7 @@ should use <tt>card=70</tt> and not <tt>card=72</tt>.</p>
 <a href="http://linuxtv.org/">linuxtv.org</a> page.  This supports, among
 other things, the Hauppauge Nexus-S cards.</p>
 
-<p>The 0.9.7 release of tvtime fails on the current released stable driver, as it
+<p>The 0.9.8 release of tvtime fails on the current released stable driver, as it
 does not properly indicate what it supports.  As well, there are performance
 difficulties.  From Michael Hunold, the driver author:</p>
 
@@ -629,10 +602,8 @@ capture performance problems should be gone, because I use Gerd Knorr's
 should be equal to the bttv / saa7134 driver.
 </pre>
 
-<p>For technical reasons relating to V4L1 and V4L2, it is impossible to provide a
-driver under the V4L1 API for this card, and so in order to get everything working,
-tvtime will have to support the new V4L2 API, and also support the UYUV byte
-ordering of the card.  These features are planned, but not complete.</p>
+<p>tvtime 0.9.9 will work fine with this new V4L2 driver, and we recommend
+that users of this card get the dvb-kernel driver and use that with tvtime.</p>
 
 <p>For reference, the original project page for this driver is at
 <a

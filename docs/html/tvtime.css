@@ -19,14 +19,16 @@ td.navbar {
 td.hangspace {
   width: 24px;
 }
-td.reason {
+.bargraph {
+  background: #ddddee;
+  border: 1px solid #7777aa;
+}
+.reason {
   background: #ddddee;
   color: #000000;
-}
-.whyuse {
   text-align: center;
-  vertical-align: top;
   border: solid 1px;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
 }

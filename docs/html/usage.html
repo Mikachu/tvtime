@@ -73,26 +73,27 @@
         <table class="centered">
         <tr><td>
             <ol>
-            <li><a href="#resources">Support resources</a><br>
-            <li><a href="#features">tvtime features</a><br>
+            <li><a href="#resources">Support resources</a>
+            <li><a href="#configure">How to configure tvtime</a>
+            <li><a href="#features">tvtime features</a>
                 <ol>
-                <li>Deinterlacing modes<br>
-                <li>Using 16:9 mode<br>
-                <li>What is luma correction?<br>
+                <li>Deinterlacing modes
+                <li>Using 16:9 mode
                 </ol>
-            <li><a href="#keybindings">Key bindings</a><br>
-            <li><a href="#channels">Setting up your channel list in tvtime</a><br>
+            <li><a href="#keybindings">Key bindings</a>
+            <li><a href="#channels">Setting up your channel list in tvtime</a>
                 <ol>
-                <li>Channel list management<br>
-                <li>stationlist.xml<br>
-                <li>Non-English characters in channel names<br>
-                <li>Future enhancements<br>
+                <li>Channel list management
+                <li>stationlist.xml
+                <li>Non-English characters in channel names
+                <li>Future enhancements
                 </ol>
-            <li><a href="#configfile">tvtime.xml config file reference</a><br>
-            <li><a href="#tvtimecommand">Controlling tvtime via the tvtime-command</a><br>
-            <li><a href="#lirc">Configuring LIRC for tvtime</a><br>
-            <li><a href="#savetuning">Case study: How to save fine tuning settings on a channel</a><br>
-            <li><a href="#progressivedv">Case study: Progressive content from a DV camera</a><br>
+            <li><a href="#configfile">tvtime.xml config file reference</a>
+            <li><a href="#tvtimecommand">Controlling tvtime via the tvtime-command</a>
+            <li><a href="#lirc">Configuring LIRC for tvtime</a>
+            <li><a href="#lircpower">Case study: Configuring the power button as both tvtime start and exit using LIRC</a>
+            <li><a href="#savetuning">Case study: How to save fine tuning settings on a channel</a>
+            <li><a href="#progressivedv">Case study: Progressive content from a DV camera</a>
             </ol>
         </td></tr></table>
 
@@ -109,32 +110,181 @@ out with us on <b>IRC</b> at
 which you can subscribe to, or read on the web.</p>
 
 <hr>
-<h3><a name="features">2. tvtime features</a></h3>
+<h3><a name="configure">2. How to configure tvtime</a></h3>
 
-<h3>2.1. Deinterlacing modes</h3>
+<p>Almost all features of tvtime can be configured through the menu system.
+Click the right mouse button, or hit tab when you run tvtime to bring up the
+menu.  As well, many features can be configured through the command line
+parameters.  Run '<b>tvtime --help</b>' to get a list of command line
+arguments.  You can also save command line arguments to the config file
+using <b>--saveoptions</b>.  For example:
 
-<p>The following deinterlacing modes are currently available in <b>tvtime</b>:</p>
+<pre>
+     tvtime --saveoptions --norm=pal --frequencies=europe
+</pre>
+
+<p>This will save to your config file the norm PAL and frequency table
+Europe as your defaults.  See docs/default.tvtime.xml for a default
+configuration file and the default runtime keybindings.</p>
+
+<hr>
+<h3><a name="features">3. tvtime features</a></h3>
+
+<h3>3.1. Deinterlacing modes</h3>
+
+<p>tvtime includes different deinterlacing modes for different types of
+content as well as different output refresh rates or CPU constraints.
+Below we have separated out our modes based on their content, and
+provide a description of each.</p>
+
+<h4>3.1.1 Modes built for video content</h4>
+
+    <ul>
+    <li>News shows and information channels.
+    <li>Most live-action television dramas.
+    <li>Sports broadcasts.
+    <li>Most video gaming consoles.
+    </ul>
+
+    <ol>
+
+    <li><h4>Television</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+               <p>tvtime expands each field to full resolution,
+                  without ever blurring in time or copying in time.
+                  this effectively simulates a television.</p>
+        <li><h5>When do I use it?</h5>
+               <p>You want TV-quality with low CPU, and you have
+                  configured your monitor to run at the refresh
+                  rate of the video signal (59.94 Hz or 50 Hz).</p>
+        <li><h5>Modes available</h5>
+               <ul>
+               <li>Full Resolution: High quality for fullscreen use.
+               <li>Half Resolution: Poor quality for watching
+                   TV in a small window.
+               </ul>
+        </ul>
+
+    <li><h4>Blur</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+            <p>tvtime avoids flicker by blurring together
+               consecutive frames of input.</p>
+        <li><h5>When do I use it?</h5>
+            <p>You want to run your monitor at an arbitrary
+               refresh rate, and have tvtime not use much CPU.</p>
+        <li><h5>Modes available</h5>
+            <ul>
+            <li>Vertical: Blur vertically more than temporally,
+                better for high motion content like sports.
+            <li>Temporal: Evenly blur in time, low CPU mode for
+                less flicker, but visible trails on fast motion.
+            </ul>
+        </ul>
+
+    <li><h4>Motion adaptive</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+            <p>tvtime tries to detect motion in the input
+               frames, reconstructing detail where possible.</p>
+        <li><h5>When do I use it?</h5>
+            <p>You want to run your monitor at an arbitrary
+               refresh rate, and don't mind using a lot of CPU.</p>
+        <li><h5>Modes available:</h5>
+            <ul>
+            <li>Simple and Advanced detection: Linear
+                interpolation where motion is detected, copy
+                where no motion.  Simple and advanced versions
+                are provided to give small or moderate CPU
+                requirements with high quality output.
+                These are the greedy low motion and high motion
+                deinterlacers from <a href="http://dscaler.org/">DScaler</a>.
+            <li>Motion search: Follow motion vectors for more
+                accurate interpolation.  High quality with high
+                CPU requirements.  This is the TomsMoComp
+                deinterlacer from <a href="http://dscaler.org/">DScaler</a>.
+            </ul>
+        </ul>
+    </ol>
+
+
+<h4>3.1.2 Modes built for film content</h4>
+
+    <ul>
+    <li>Films broadcast on TV or from a DVD player.
+    <li>Cartoons and most anime.
+    <li>Some higher budget television dramas
+    <li>Older video gaming consoles.
+    </ul>
+
+    <ol>
+    <li><h4>Progressive (top or bottom field first)</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+            <p>tvtime constructs frames from pairs of fields.</p>
+        <li><h5>When do I use it?</h5>
+            <p>Using a video game from a console system which
+               sends a progressive signal.</p>
+            <p>Watching a film broadcast or DVD in a PAL area.</p>
+        <li><h5>Modes available:</h5>
+            <ul>
+            <li>Top Field First and Bottom Field first.  You
+                must experiment with your content and see how
+                it is being sent, and select the appropriate
+                mode in tvtime to match it.
+            </ul>
+        </ul>
+
+    <li><h4>Progressive Detection</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+             <p>While not currently available in tvtime, this
+                option would allow us to detect progressive
+                content, and whether it is top or bottom field
+                first, rather than manually setting this option.</p>
+        <li><h5>When do I use it?</h5>
+            <p>Using a video game from a console system which
+               sends a progressive signal.</p>
+            <p>Watching a film broadcast or DVD in a PAL area.</p>
+        </ul>
+
+
+    <li><h4>NTSC Film Mode</h4>
+        <ul>
+        <li><h5>What does it do?</h5>
+            <p>tvtime detects a 2-3 pulldown sequence in the
+               video stream and uses this information to
+               intelligently reconstruct frames.</p>
+        <li><h5>When do I use it?</h5>
+            <p>Watching an NTSC broadcast of a cartoon,
+               film, or television program shot on film.</p>
+        <li><h5>How do I use it?</h5>
+            <p>NTSC film detection can be enabled at any
+               time.  This will use more CPU to analyze
+               the input and detect pulldown, entering film
+               mode when detection is successful.</p>
+        </ul>
+    </ol>
+
+<p>The following is a table of the available deinterlacing modes and their
+names in the config file.</p>
 
 <table border="0" width="70%" class="box">
 <tr><th class="doctable">Short name
     <th class="doctable">Long name
-<tr><td>LineDoubler
-    <td>Line Doubler
-<tr><td>Greedy       <td>Dscaler: Greedy - Low Motion
-<tr><td>Greedy2Frame <td>DScaler: Greedy - 2-frame
-<tr><td>GreedyH      <td>DScaler: Greedy - High Motion
-<tr><td>TomsMoComp   <td>DScaler: TomsMoComp
-<tr><td>TwoFrame     <td>DScaler: TwoFrame
-<tr><td>VideoBob     <td>DScaler: Video Bob
-<tr><td>VideoWeave   <td>DScaler: Video Weave
-<tr><td>Linear       <td>Linear Interpolation
-<tr><td>LinearBlend  <td>mplayer: Linear Blend
-<tr><td>OverlayBob   <td>Overlay Bob
-<tr><td>Vertical     <td>ffmpeg: Vertical Deinterlace Filter
-<tr><td>Weave        <td>Weave Last Field
+<tr><td>TelevisionFull    <td>Television: Full Resolution
+<tr><td>TelevisionHalf    <td>Television: Half Resolution
+<tr><td>BlurVertical      <td>Blur: Vertical
+<tr><td>BlurTemporal      <td>Blur: Temporal
+<tr><td>AdaptiveSearch    <td>Motion Adaptive: Motion Search
+<tr><td>AdaptiveAdvanced  <td>Motion Adaptive: Advanced Detection
+<tr><td>AdaptiveSimple    <td>Motion Adaptive: Simple Detection
+<tr><td>ProgressiveTFF    <td>Progressive: Top Field First
+<tr><td>ProgressiveBFF    <td>Progressive: Bottom Field First
 </table>
 
-<h3>2.2. Using 16:9 mode</h3>
+<h3>3.2. Using 16:9 mode</h3>
 
 <p>In 16:9 mode we treat the incoming signal as if it were 16:9 aspect
 ratio.  If you're using a hardware DVD player, you should tell it that
@@ -150,21 +300,11 @@ DVD content.</p>
 
 <img src="wsshot-small.jpg" alt="An anamorphic DVD viewed in tvtime">
 
-<h3>2.3. What is luma correction?</h3>
-
-<p>The luma correction applies a non-linear correction function to the luma
-signal of the incoming video.  This allows the user to attempt to increase
-the brightness of the signal in a way which preserves the low as well as the
-high end of the brightness scale.  This feature also allows to correct
-for odd values from capture cards, such as those based on the popular
-<b>bt8x8</b> chip.</p>
-
-
 <hr>
-<h3><a name="keybindings">3. Key bindings</a></h3>
+<h3><a name="keybindings">4. Key bindings</a></h3>
 
-<p>Below is a table of the default key bindings in tvtime.  Listed in
-the right hand column is the name of the setting in the
+<p>Below is a table of the default key bindings in tvtime.  Listed
+in the right hand column is the name of the setting in the
 <b>tvtime.xml</b> configuration file.  See <a
 href="default.tvtime.xml">default.tvtime.xml</a> file on the web or
 included with the tvtime distribution.</p>
@@ -174,96 +314,54 @@ included with the tvtime distribution.</p>
 <tr><th class="doctable">Key
     <th class="doctable">Description
 
-<tr><th class="doctable">General
-    <th class="doctable">&nbsp;
+<tr><th class="doctable">&nbsp;
+    <th class="doctable">General use
 
-<tr><td><b>escape</b> or <b>q</b>
-    <td>Quit tvtime
-<tr><td><b>Arrow keys</b>, <b>vi movement keys</b> or the <b>mouse wheel</b>
-    <td>Channel up/down and fine tuning
-<tr><td><b>Backspace</b>
-    <td>Previous channel
-<tr><td><b>Number keys</b> and <b>enter</b>
-    <td>Channel access
-<tr><td><b>m</b> and <b>middle mouse button</b>
-    <td>Mute capture card
-<tr><td><b>+</b>/<b>-</b>
-    <td>Volume control (changes Line Input via /dev/mixer)
-<tr><td><b>t</b>
-    <td>Switch deinterlacer
-<tr><td><b>=</b>
-    <td>Switch framerate mode
-<tr><td><b>p</b>
-    <td>Toggle pulldown detection mode
-<tr><td><b>f</b>
-    <td>Fullscreen toggle
-<tr><td><b>a</b>
-    <td>Aspect ratio toggle
-<tr><td><b>s</b>
-    <td>Take a screenshot
-<tr><td><b>&lt;</b> and <b>&gt;</b>
-    <td>Change overscan compensation
-<tr><td><b>*</b>
-    <td>Load next preset settings mode
+<tr><td><b>Escape</b> or <b>q</b>     <td>Quit
+<tr><td><b>F1</b> or <b>Tab</b>       <td>Show menu
+<tr><td><b>up/down</b>                <td>Change channels
+<tr><td><b>0-9</b> and <b>Enter</b>   <td>Change channels
+<tr><td><b>Backspace</b>              <td>Jump to previous channel
+<tr><td><b>i</b>                      <td>Change input
+<tr><td><b>m</b>                      <td>Mute
+<tr><td><b>+/-</b>                    <td>Volume control
+<tr><td><b>f</b>                      <td>Fullscreen
+<tr><td><b>s</b>                      <td>Take a screenshot
+<tr><td><b>d</b>                      <td>Display debug statistics
 
-<tr><th class="doctable">Video input keys
-    <th class="doctable">&nbsp;
+<tr><th class="doctable">&nbsp;
+    <th class="doctable">Advanced
 
-<tr><td><b>i</b> and <b>right mouse button</b>
-    <td>Switch input (Tuner, S-Video, ...)
-<tr><td><b>e</b>
-    <td>Toggle audio mode (Stereo, Mono, SAP)
-<tr><td><b>w</b>
-    <td>Enable closed caption decoding
-<tr><td><b>F1</b>-<b>F8</b>
-    <td>Brightness/Contrast/Colour/Hue
-<tr><td><b>Spacebar</b>
-    <td>Reset default colour settings
-<tr><td><b>b</b>
-    <td>Show colourbars
+<tr><td><b>left/right</b>      <td>Channel finetuning
+<tr><td><b>< / ></b>           <td>Overscan setting
+<tr><td><b>e</b>               <td>Toggle audio mode (stereo/mono/SAP)
+<tr><td><b>a</b>               <td>Change output aspect ratio
+<tr><td><b>r</b>               <td>Renumber current channel
+<tr><td><b>v</b>               <td>Toggle always-on-top with supporting window managers
+<tr><td><b>p</b>               <td>Toggle pulldown detection (NTSC only)
+<tr><td><b>t</b>               <td>Change deinterlacer
+<tr><td><b>=</b>               <td>Change attempted output framerate
+<tr><td><b>F5/F6/F7</b>        <td>Picture settings
+<tr><td><b>c</b>               <td>Toggle closed caption decoding (NTSC only)
+<tr><td><b>ins</b>             <td>Change matte mode
 </table>
 
 <hr>
-<h3><a name="channels">4. Setting up your channel list in tvtime</a></h3>
+<h3><a name="channels">5. Setting up your channel list in tvtime</a></h3>
 
-<h3>4.1. Channel list management</h3>
+<h3>5.1. Channel list management</h3>
 
 <p>tvtime supports a channel scanner, channel renumbering, channel names,
-and a list of active channels for browsing.  Below are the commands
-available for input bindings and through tvtime-command, along with
-their default key bindings.</p>
+and a list of active channels for browsing.  All of these features are
+available within the OSD menu system itself.  Here we present some of
+the details for users that wish to configure their stations
+directly.</p>
 
-<table border="0" width="70%" class="box">
-<tr><th class="doctable">Command
-    <th class="doctable">Description
+<p>European users of cable providers that do not use standard frequencies
+can use our channel scanner: tvtime-scanner.  This outputs to the
+'Custom' frequency table, selectable in the OSD menu.</p>
 
-<tr><td><b>CHANNEL_SAVE_TUNING (F9)</b>
-    <td>Saves the current fine tuning settings as a custom channel in the
-        station list.
-
-<tr><td><b>CHANNEL_SCAN (F10)</b>
-    <td>Walks from the current position through the channel list,
-        disabling any channels for which no signal is detected.  This
-        command is only available if signal checking is enabled.
-
-<tr><td><b>CHANNEL_ACTIVATE_ALL (F11)</b>
-    <td>Re-activates all channels in the list.  Use this to re-initialize
-        the channel list before running the scanner if you believe some
-        channels are missing, or if new channels have become available.
-
-<tr><td><b>CHANNEL_SKIP (F12)</b>
-    <td>Toggles the current channel as being active or disabled in the
-        station list.  You can use this to manually scan your channels and
-        enable those with signal or disable duplicate stations.
-
-<tr><td><b>CHANNEL_RENUMBER (r)</b>
-    <td>Renumbers the current channel.  This will swap the current channel
-        with the number you type in.  Use this to configure your station
-        list to suit preference or locality.
-</table>
-
-
-<h3>4.2. stationlist.xml</h3>
+<h3>5.2. stationlist.xml</h3>
 
 <p>The station listing is read in from the ~/.tvtime/stationlist.xml.
 Channel settings are saved specific to norm and frequency table.
@@ -284,6 +382,7 @@ Entries in a list are in the following form:</p>
 <tr><td>US Cable            <td>1 - 125
 <tr><td>US Two-Way          <td>T7, T8, T9, T10, T11, T12 T13, T14
 <tr><td>US Broadcast        <td>2 - 83
+<tr><td>China Broadcast     <td>1 - 68, A1 - A7, B1 - B31, C1 - C5
 <tr><td>Japan Broadcast     <td>1 - 62
 <tr><td>Japan Cable         <td>13 - 63
 <tr><td>VHF E2-E12          <td>E1 - E12
@@ -295,6 +394,7 @@ Entries in a list are in the following form:</p>
 <tr><td>VHF Italy           <td>A - H, H1, H2
 <tr><td>VHF Ireland         <td>I1 - I9
 <tr><td>UHF                 <td>U21 - U69
+<tr><td>UHF Australia       <td>AU28 - AU69
 <tr><td>Australia Optus     <td>01 - 058
 </table>
 
@@ -305,7 +405,7 @@ Entries in a list are in the following form:</p>
                 band="Custom" channel="55.69MHz"/&gt;
 </pre>
 
-<h4>4.3. Non-English characters in channel names</h4>
+<h4>5.3. Non-English characters in channel names</h4>
 
 <p>
 Since 0.9.8.2 it is possible to use non-English characters in channel
@@ -331,14 +431,13 @@ with accents and Cyrillic (Greek should work, but is untested).
 In 0.9.8.2, only glyphs that are also in ISO-8859-1 are supported!
 </p>
 
-<h3>4.4. Future enhancements</h3>
+<h3>5.4. Future enhancements</h3>
 
 <p>tvtime still needs a method of editing channel names at runtime
-(should not be hard), a full frequency band scanner, native support for
-the weird frequencies used by some cable providers such as UPC.</p>
+(should not be hard).</p>
 
 <hr>
-<h3><a name="configfile">5. tvtime.xml config file reference</a></h3>
+<h3><a name="configfile">6. tvtime.xml config file reference</a></h3>
 
 <p>The <a href="default.tvtime.xml">default <b>tvtime.xml</b></a> file is installed
 to /etc/tvtime/tvtime.xml and documents each of the parameters.  As well, there is
@@ -346,7 +445,7 @@ a man page installed (<b>man tvtime.xml</b>) which also gives help for each of
 the parameters.  We will reproduce it here soon.</p>
 
 <hr>
-<h3><a name="tvtimecommand">6. Controlling tvtime via tvtime-command</a></h3>
+<h3><a name="tvtimecommand">7. Controlling tvtime via tvtime-command</a></h3>
 
 <p>With the advent of custom input devices for PCs (i.e. remotes, keyboards
 with multimedia keys, voice recognition microphones) people have started to
@@ -375,6 +474,11 @@ following is a list of commands known to tvtime:</p>
     <td>Restores the picture settings (brightness, contrast, hue, colour) to
         their default values.
 
+<tr><td><b>AUTO_ADJUST_WINDOW</b>
+    <td>Automatically resize the window to match the content inside it.  This
+        is for when you resize tvtime into, say, a long rectangle, and want it
+        to jump back to being a perfect 4:3 box around the content.
+
 <tr><td><b>BRIGHTNESS_DOWN</b>
     <td>Lowers the brightness setting on the input.
 
@@ -389,7 +493,7 @@ following is a list of commands known to tvtime:</p>
         channel list before running the scanner if you believe some channels
         are missing, or if new channels have become available.
 
-<tr><td><b>CHANNEL_DOWN</b>
+<tr><td><b>CHANNEL_DEC / CHANNEL_DOWN</b>
     <td>Move one channel down in the channel list.
 
 <tr><td><b>CHANNEL_PREV</b>
@@ -415,7 +519,7 @@ following is a list of commands known to tvtime:</p>
         list.  You can use this to manually scan your channels and enable those
         with signal or disable duplicate stations.
 
-<tr><td><b>CHANNEL_UP</b>
+<tr><td><b>CHANNEL_INC / CHANNEL_UP</b>
     <td>Move one channel up in the channel list.
 
 <tr><td><b>COLOUR_DOWN / COLOR_DOWN</b>
@@ -461,11 +565,35 @@ following is a list of commands known to tvtime:</p>
 <tr><td><b>LUMA_UP</b>
     <td>Increases the luma correction value.
 
+<tr><td><b>MENU_DOWN</b>
+    <td>In menu mode, this command moves the cursor down one entry in the menu.
+
+<tr><td><b>MENU_ENTER</b>
+    <td>In menu mode, this command selects the current entry or moves forward
+        one level in the menu.
+
+<tr><td><b>MENU_EXIT</b>
+    <td>In menu mode, this command shuts off the menu.
+
+<tr><td><b>MENU_LEFT</b>
+    <td>In menu mode, this command moves back one level in the menu.
+
+<tr><td><b>MENU_RIGHT</b>
+    <td>In menu mode, this command selects the current entry or moves forward
+        one level in the menu.
+
+<tr><td><b>MENU_UP</b>
+    <td>In menu mode, this command moves the cursor up one entry in the menu.
+
 <tr><td><b>MIXER_DOWN</b>
     <td>Decreases the volume setting for the Line In device from /dev/mixer.
 
 <tr><td><b>MIXER_UP</b>
     <td>Increases the volume setting for the Line In device from /dev/mixer.
+
+<tr><td><b>MIXER_TOGGLE_MUTE</b>
+    <td>Toggles the mute status with the mixer, and not with the capture card
+        like <b>TOGGLE_MUTE</b> does.
 
 <tr><td><b>OVERSCAN_DOWN</b>
     <td>Decreases the overscan compensation amount.  This will show more of the
@@ -474,6 +602,27 @@ following is a list of commands known to tvtime:</p>
 <tr><td><b>OVERSCAN_UP</b>
     <td>Increases the overscan compensation amount.  This will show less of the
         captured input.
+
+<tr><td><b>PICTURE</b>
+    <td>Selects which picture setting (brightness/contrast/colour/hue) to change
+        using the PICTURE_UP and PICTURE_DOWN commands.
+
+<tr><td><b>PICTURE_UP</b>
+    <td>Increases the current picture setting value (brightness/contrast/colour/hue).
+
+<tr><td><b>PICTURE_DOWN</b>
+    <td>Decreases the current picture setting value (brightness/contrast/colour/hue).
+
+<tr><td><b>RESTART</b>
+    <td>Asks tvtime to restart itself.  This is used in the menu when we have changed
+        a value that we can't yet change at runtime.
+
+<tr><td><b>SAVE_PICTURE_GLOBAL</b>
+    <td>Saves the current picture settings as the global defaults.
+
+<tr><td><b>SAVE_PICTURE_CHANNEL</b>
+    <td>Saves the current picture settings as the defaults for the current channel
+        on the tuner.
 
 <tr><td><b>SCREENSHOT</b>
     <td>Asks tvtime to take a screenshot.  Screenshots are saved to the
@@ -486,8 +635,36 @@ following is a list of commands known to tvtime:</p>
 <tr><td><b>SCROLL_CONSOLE_UP</b>
     <td>Scrolls up in the console's history buffer.
 
+<tr><td><b>SET_AUDIO_MODE</b>
+    <td>This command takes a parameter and sets the current audio mode.  Valid
+        options are "mono", "stereo", "sap", "lang1" or "lang2".
+
+<tr><td><b>SET_DEINTERLACER</b>
+    <td>This command takes a parameter and sets the current deinterlacer.  Valid
+        options are the short name of any of the deinterlacers available in tvtime.
+
+<tr><td><b>SET_FRAMERATE</b>
+    <td>This command takes a parameter and sets the current framerate.  Valid
+        options are "full", "top" and "bottom".
+
+<tr><td><b>SET_FREQUENCY_TABLE</b>
+    <td>This command takes a parameter and sets the current frequency table.
+
+<tr><td><b>SET_NORM</b>
+    <td>This command takes a parameter and sets the current television standard.
+        It will be used in tvtime after a restart.
+
+<tr><td><b>SET_SHARPNESS</b>
+    <td>This command takes a parameter and sets the current sharpness in pixels.
+        It will be used in tvtime after a restart.
+
 <tr><td><b>SHOW_STATS</b>
     <td>This command asks tvtime to output debugging statistics to stderr.
+
+<tr><td><b>TOGGLE_ALWAYSONTOP</b>
+    <td>If supported by your window manager, this command will ask to have the
+        window be put into an "always on top" state, where no other window can
+        be stacked above it.
 
 <tr><td><b>TOGGLE_ASPECT</b>
     <td>Toggles the display between 4:3 and 16:9 mode.  Use 16:9 mode if you
@@ -509,6 +686,11 @@ following is a list of commands known to tvtime:</p>
     <td>Enables closed caption information to be displayed in the tvtime
         window.  Closed captioning is only available if you have enabled VBI
         reading in your <b>tvtime.xml</b> configuration file.
+
+<tr><td><b>TOGGLE_COLOR_INVERT / TOGGLE_COLOUR_INVERT</b>
+    <td>Turns on or off the colour invert filter.  This is (apparently) useful
+        for users of the Australian cable company Optus who want to avoid using
+        the decryption boxes and tune using their capture card directly.
 
 <tr><td><b>TOGGLE_CONSOLE</b>
     <td>Shows or hides the tvtime console window.  Using the tvtime console,
@@ -535,6 +717,17 @@ following is a list of commands known to tvtime:</p>
         When enabled, this will try to correct for the incorrect colour space
         provided by bt848 and bt878 based capture cards.
 
+<tr><td><b>TOGGLE_MATTE</b>
+    <td>Switches between the available mattes.  This cuts off the top and
+        bottom of the input picture to help fit the window to the image
+        content.
+
+<tr><td><b>TOGGLE_MIRROR</b>
+    <td>Turns on or off the mirror filter, which flips the input.  This is
+        useful for using tvtime with mirroring projectors, although I don't
+        think it will actually work as intended yet since we don't mirror
+        the OSD output.  :)  Comments appreciated.
+
 <tr><td><b>TOGGLE_MODE</b>
     <td>Loads the next saved mode settings.  tvtime's default configuration
         file defines two modes: a small window mode with a low quality
@@ -548,6 +741,11 @@ following is a list of commands known to tvtime:</p>
 <tr><td><b>TOGGLE_NTSC_CABLE_MODE</b>
     <td>Toggles the NTSC cable mode settings: Standard, IRC, and HRC are
         available.
+
+<tr><td><b>TOGGLE_PAL_SECAM</b>
+    <td>Toggles between PAL and SECAM on the current channel.  This feature is
+        useful for regions which receive both PAL and SECAM channels, such that
+        tvtime can be configured on a per-channel basis for the correct norm.
 
 <tr><td><b>TOGGLE_PAUSE</b>
     <td>Enters tvtime's pause mode.  Pause mode is a debugging feature used to
@@ -564,55 +762,71 @@ following is a list of commands known to tvtime:</p>
 </table><p>
 
 <hr>
-<h3><a name="lirc">7. Configuring LIRC for tvtime</a></h3>
+<h3><a name="lirc">8. Configuring LIRC for tvtime</a></h3>
 
 <p>If you have lirc (Linux Infrared Remote Control) installed on your system 
 you can control tvtime with your remote control. Everything you can do 
 with the keyboard should be possible to do with your remote control.</p>
 
-<p>For .lircrc you need to know that the program name to use is tvtime and 
-the configuration lines that you can use are the commands listed in the 
-<a href="#tvtimecommand">previous section</a>.</p>
+<p>For .lircrc you need to know that the program name to use is
+<b>irexec</b> and it should be told to run <b>tvtime-command</b> with
+the appropriate tvtime command to execute.  The commands are those listed
+in the <a href="#tvtimecommand">previous section</a>.</p>
 
 <p>So, to be able to turn off tvtime with your remote you have to edit your 
 ~/.lircrc to include the following:</p>
 
 <pre>
 begin
-  prog = tvtime
+  prog = irexec
   button = the_one_you_want_on_your_remote
-  config = quit
+  config = tvtime-command quit
 end
 </pre>
 
 <hr>
-<h3><a name="savetuning">8. Case study: How to save fine tuning settings on a channel</a></h3>
+<h3><a name="lircpower">9. Case study: Configuring the power button as both tvtime start and exit using LIRC</a></h3>
+
+<p>Some users like the ability to turn on tvtime both on and off using their
+remote controls.  This can be configured using lirc by adding the following
+to your <b>~/.lircrc</b> file:</p>
+
+<pre>
+begin
+  prog = irexec
+  button = POWER
+  config = tvtime &amp;
+  config = tvtime-command QUIT
+end
+</pre>
+
+<p>This works such that when pressed once, tvtime starts, and on the second
+press, tvtime will exit.</p>
+
+<hr>
+<h3><a name="savetuning">10. Case study: How to save fine tuning settings on a channel</a></h3>
 
 <p><b>Problem:</b> <i>Channel 13 has poor reception, but if I fine tune it up by
 three notches, the picture is much clearer.  How do I save this setting?</i></p>
 
-<p>Saving fine tuning settings is performed in three stages.  First,
-tune tvtime such that the picture is clearest.  Then, hit '<b>F9</b>'
-(<b>CHANNEL_SAVE_TUNING</b>).  This creates a custom frequency entry in
-your station list, and the display will read its new number.  We then
-have to map this new channel back to <b>13</b>.  To do this, hit
-'<b>r</b>' (<b>CHANNEL_RENUMBER</b>), type in '<b>13</b>', and hit enter.
-This will renumber the new tuned channel as if it were <b>13</b>.</p>
+<p>Saving fine tuning settings is done automatically in tvtime.  When
+you fine tune a station, the fine tuning is remembered as the default in
+that menu.  The current fine tune setting can be discovered through the
+menu system.</p>
 
 <hr>
-<h3><a name="progressivedv">9. Case study: Progressive content from a DV camera</a></h3>
+<h3><a name="progressivedv">11. Case study: Progressive content from a DV camera</a></h3>
 
 <p><b>Problem:</b> <i>I have a Canon GL-1 DV camera with a
 progressive-scan mode (called frame movie mode).  How do I get the best
 quality with this in tvtime?</i></p>
 
-<p>First, set your deinterlacer to <b>Weave</b> using the '<b>t</b>' key
-(<b>TOGGLE_DEINTERLACER</b>).  In <b>Weave</b> mode, tvtime copies the
-last two fields it received together as a frame.  Next, set the
-framerate using '<b>=</b>' (<b>TOGGLE_FRAMERATE</b>) to either half-rate
-<b>TFF</b> or <b>BFF</b>, whichever removes the combing artifacts.  In
-this mode, you will see the progressive frames as captured by the DV
-camera.</p>
+<p>First, set your deinterlacer to <b>Progressive: Top Field First</b>
+using the '<b>t</b>' key (<b>TOGGLE_DEINTERLACER</b>).  In this mode,
+tvtime copies the last two fields it received together as a frame.  If
+the video does not look correct, try <b>Progressive: Bottom Field
+First</b>.  In the correct mode, you will see the progressive frames as
+captured by the DV camera.</p>
 
         </td></tr>
     </table>
