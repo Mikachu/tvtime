@@ -1114,11 +1114,18 @@ int xcommon_toggle_alwaysontop( void )
 
 int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
-    XWindowAttributes attrs;
-    XGetWindowAttributes( display, wm_window, &attrs );
-
     output_fullscreen = !output_fullscreen;
     if( output_fullscreen ) {
+        int x, y, w, h;
+        double refresh;
+  
+        DpyInfoUpdateResolution( display, screen, window_area.x, window_area.y );
+        DpyInfoGetScreenOffset( display, screen, &x, &y );
+        DpyInfoGetResolution( display, screen, &w, &h, &refresh );
+
+        output_width = w;
+        output_height = h;
+
         if( has_ewmh_state_fullscreen ) {
             XEvent ev;
 
@@ -1132,14 +1139,6 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 
             XSendEvent( display, DefaultRootWindow( display ), False, SubstructureNotifyMask|SubstructureRedirectMask, &ev );
         } else {
-            int x, y, w, h;
-            double refresh;
-  
-            DpyInfoUpdateResolution( display, XScreenNumberOfScreen( attrs.screen ),
-                                     window_area.x, window_area.y );
-            DpyInfoGetScreenOffset( display, XScreenNumberOfScreen( attrs.screen ), &x, &y );
-            DpyInfoGetResolution( display, XScreenNumberOfScreen( attrs.screen ), &w, &h, &refresh );
-
             /* Show our fullscreen window. */
             XMoveResizeWindow( display, fs_window, x, y, w, h );
             XMapRaised( display, fs_window );
@@ -1151,8 +1150,6 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             xcommon_exposed = 1;
 
             XReparentWindow( display, output_window, fs_window, 0, 0);
-            output_width = w;
-            output_height = h;
 
             /* Grab the pointer, grab input focus, then ungrab. */
             x11_grab_fullscreen_input( display, fs_window );
@@ -1160,6 +1157,12 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             x11_ungrab_fullscreen_input( display );
         }
     } else {
+        XWindowAttributes attrs;
+        XGetWindowAttributes( display, wm_window, &attrs );
+
+        output_width = attrs.width;
+        output_height = attrs.height;
+
         if( has_ewmh_state_fullscreen ) {
             XEvent ev;
 
@@ -1176,8 +1179,6 @@ int xcommon_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
             XReparentWindow( display, output_window, wm_window, 0, 0);
             XUnmapWindow( display, fs_window );
             x11_wait_unmapped( display, fs_window );
-            output_width = attrs.width;
-            output_height = attrs.height;
         }
     }
     XResizeWindow( display, output_window, output_width, output_height );
