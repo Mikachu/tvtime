@@ -176,7 +176,7 @@ struct commands_s {
     int toggleaspect;
     int toggledeinterlacingmode;
     int togglepulldowndetection;
-    int halfrate;
+    int framerate;
     int scan_channels;
     int pause;
 
@@ -270,7 +270,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->toggleaspect = 0;
     in->toggledeinterlacingmode = 0;
     in->togglepulldowndetection = 0;
-    in->halfrate = 0;
+    in->framerate = FRAMERATE_FULL;
     in->menu_on = 0;
     in->console_on = 0;
     in->scrollconsole = 0;
@@ -396,7 +396,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
             
     case TVTIME_TOGGLE_HALF_FRAMERATE:
-        in->halfrate = !in->halfrate;
+        in->framerate = (in->framerate + 1) % FRAMERATE_MAX;
         break;
 
     case TVTIME_TOGGLE_CONSOLE:
@@ -765,9 +765,9 @@ int commands_toggle_fullscreen( commands_t *in )
     return in->togglefullscreen;
 }
 
-int commands_half_framerate( commands_t *in )
+int commands_get_framerate( commands_t *in )
 {
-    return in->halfrate;
+    return in->framerate;
 }
 
 int commands_toggle_aspect( commands_t *in )

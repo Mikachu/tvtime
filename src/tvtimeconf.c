@@ -72,7 +72,7 @@ struct config_s
 
     int start_channel;
     int prev_channel;
-    int halfrate;
+    int framerate;
 
     double hoverscan;
     double voverscan;
@@ -334,8 +334,8 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->fullscreen = atoi( tmp );
     }
 
-    if( (tmp = parser_get( pf, "HalfFramerate", 1 )) ) {
-        ct->halfrate = atoi( tmp );
+    if( (tmp = parser_get( pf, "FramerateMode", 1 )) ) {
+        ct->framerate = atoi( tmp );
     }
 
     if( (tmp = parser_get( pf, "Norm", 1 )) ) {
@@ -516,7 +516,7 @@ config_t *config_new( int argc, char **argv )
     ct->hoverscan = 0.0;
     ct->voverscan = 0.0;
     ct->rvr_filename = 0;
-    ct->halfrate = 0;
+    ct->framerate = FRAMERATE_FULL;
 
     if( !ct->keymap ) {
         fprintf( stderr, "config: Could not aquire memory for keymap.\n" );
@@ -878,8 +878,8 @@ const char *config_get_rvr_filename( config_t *ct )
     return ct->rvr_filename;
 }
 
-int config_get_half_framerate( config_t *ct )
+int config_get_framerate_mode( config_t *ct )
 {
-    return ct->halfrate;
+    return ct->framerate;
 }
 

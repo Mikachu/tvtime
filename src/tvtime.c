@@ -765,7 +765,8 @@ int main( int argc, char **argv )
     int scanning = 0;
     int firstscan = 0;
     int use_vgasync = 0;
-    int half_framerate = -1;
+    int framerate_mode = -1;
+    int i;
 
     fprintf( stderr, "tvtime: Running %s.\n", PACKAGE_STRING );
 
@@ -1118,7 +1119,7 @@ int main( int argc, char **argv )
         commands_handle( commands, TVTIME_TOGGLE_FULLSCREEN, 0 );
     }
     /* If we start half-framerate, toggle that now. */
-    if( config_get_half_framerate( ct ) ) {
+    for( i = 0; i < config_get_framerate_mode( ct ); i++ ) {
         commands_handle( commands, TVTIME_TOGGLE_HALF_FRAMERATE, 0 );
     }
 
@@ -1166,13 +1167,13 @@ int main( int argc, char **argv )
         showbars = commands_show_bars( commands );
         screenshot = commands_take_screenshot( commands );
         paused = commands_pause( commands );
-        if( half_framerate < 0 || half_framerate != commands_half_framerate( commands ) ) {
-            half_framerate = commands_half_framerate( commands );
+        if( framerate_mode < 0 || framerate_mode != commands_get_framerate( commands ) ) {
+            framerate_mode = commands_get_framerate( commands );
             if( osd ) {
-                if( half_framerate ) {
-                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) (fieldtime*2)) );
+                if( framerate_mode ) {
+                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) (fieldtime*2)), framerate_mode );
                 } else {
-                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) fieldtime) );
+                    tvtime_osd_set_framerate( osd, 1000000.0 / ((double) fieldtime), framerate_mode );
                 }
                 tvtime_osd_show_info( osd );
             }
@@ -1318,7 +1319,7 @@ int main( int argc, char **argv )
         }
         speedy_reset_timer();
 
-        if( output->is_exposed() ) {
+        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the even field. */
                 output->wait_for_sync( 0 );
@@ -1414,7 +1415,7 @@ int main( int argc, char **argv )
         }
         performance_checkpoint_blit_top_field_end( perf );
 
-        if( output->is_exposed() && !half_framerate ) {
+        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF) ) {
             if( output->is_interlaced() ) {
                 /* Wait until we can draw the odd field. */
                 output->wait_for_sync( 1 );
@@ -1466,7 +1467,7 @@ int main( int argc, char **argv )
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
-        if( !half_framerate && !output->is_interlaced() ) {
+        if( (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_BFF)  && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 
@@ -1507,8 +1508,8 @@ int main( int argc, char **argv )
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
     configsave( "StartChannel", number, 1 );
 
-    snprintf( number, 3, "%d", half_framerate );
-    configsave( "HalfFramerate", number, 1 );
+    snprintf( number, 3, "%d", framerate_mode );
+    configsave( "FramerateMode", number, 1 );
 
     if( vidin ) {
         snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );

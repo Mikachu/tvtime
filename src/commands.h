@@ -114,6 +114,14 @@ enum tvtime_commands
     TVTIME_TOGGLE_PAUSE
 };
 
+enum framerate_mode
+{
+    FRAMERATE_FULL = 0,
+    FRAMERATE_HALF_TFF = 1,
+    FRAMERATE_HALF_BFF = 2,
+    FRAMERATE_MAX = 3
+};
+
 int tvtime_string_to_command( const char *str );
 const char *tvtime_command_to_string( int command );
 int tvtime_num_commands( void );
@@ -139,7 +147,7 @@ int commands_update_luma_power( commands_t *in );
 double commands_get_luma_power( commands_t *in );
 double commands_get_horizontal_overscan( commands_t *in );
 double commands_get_vertical_overscan( commands_t *in );
-int commands_half_framerate( commands_t *in );
+int commands_get_framerate( commands_t *in );
 int commands_scan_channels( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
