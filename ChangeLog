@@ -1,5 +1,6 @@
 
 0.9.7
+  * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576.
   * (vektor) You can now change the default process priority in the .tvtimerc
     using the ProcessPriority value.
 
