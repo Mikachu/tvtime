@@ -123,6 +123,7 @@ static void sigalarm( int signal )
 {
     alarms++;
     fprintf( stderr, "videoinput: Frame capture timed out (got SIGALRM), hardware/driver problems?\n" );
+    fprintf( stderr, "videoinput: Please report this on our bugs page: http://tvtime.sourceforge.net/\n" );
 }
 
 static void siginit( void )
@@ -164,7 +165,8 @@ unsigned char *videoinput_next_frame( videoinput_t *vidin, int *frameid )
     } else {
         int rc = read( vidin->grab_fd, vidin->grab_data, vidin->grab_size );
         if( vidin->grab_size != rc ) {
-            fprintf( stderr, "videoinput: grabber read error (rc=%d).\n", rc );
+            fprintf( stderr, "videoinput: Can't read frame. Returned %d, error: %s.\n",
+                     rc, strerror( errno ) );
             return 0;
         } else {
             return vidin->grab_data;
@@ -289,7 +291,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* The capabilities should tell us how many inputs this card has. */
     vidin->numinputs = grab_cap.channels;
     if( vidin->numinputs == 0 ) {
-        fprintf( stderr, "videoinput: No input channels available on "
+        fprintf( stderr, "videoinput: No inputs available on "
                  "video4linux device '%s'.\n", v4l_device );
         close( vidin->grab_fd );
         free( vidin );
@@ -319,7 +321,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     /* Test for audio support. */
     if( ( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) && vidin->verbose ) {
         vidin->has_audio = 0;
-        fprintf( stderr, "videoinput: No audio detected (asked for audio, got '%s').\n",
+        fprintf( stderr, "videoinput: No audio capability detected (asked for audio, got '%s').\n",
                  strerror( errno ) );
     }
 
