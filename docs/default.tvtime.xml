@@ -451,7 +451,7 @@
   </bind>
 
   <bind command="toggle_ntsc_cable_mode">
-    <keyboard key="n"/>
+    <keyboard key="o"/>
   </bind>
 
   <bind command="auto_adjust_pict">
@@ -506,7 +506,7 @@
   </bind>
 
   <bind command="toggle_compatible_norm">
-    <keyboard key="o"/>
+    <keyboard key="n"/>
   </bind>
 
   <bind command="mixer_toggle_mute">
