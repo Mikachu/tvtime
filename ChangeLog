@@ -1,5 +1,7 @@
 
 0.9.7
+  * (batchall) Added a more flexible station subsystem. Deactivated channels
+    are saved now, more to come.
   * (vektor) Moved fonts and graphics into the data directory.
   * (vektor) Increased the version number of the deinterlace plugin API.
   * (vektor) Removed the mlockall() call, I don't want to bother with
@@ -17,8 +19,6 @@
   * (vektor) Fixed the input frame height for PAL-M, should be 480 not 576.
   * (vektor) You can now change the default process priority in the .tvtimerc
     using the ProcessPriority value.
-  * (batchall) Added a more flexible station subsystem. Deactivated channels
-    are saved now, more to come.
 
 0.9.6 - Thu Nov 14 16:37:25 AST 2002
   * (bitstream) Added the -m switch to start fullscreen (bug 636044)
