@@ -28,7 +28,8 @@ typedef enum InputEvent_e {
 
     I_NOOP                      = 0,
     I_KEYDOWN                   = (1<<0),
-    I_QUIT                      = (1<<1)
+    I_QUIT                      = (1<<1),
+    I_CHANNEL_CHANGE_RELATIVE   = (1<<2)
 
 } InputEvent;
 
@@ -91,6 +92,8 @@ int input_toggle_fullscreen( input_t *in );
 int input_toggle_aspect( input_t *in );
 int input_toggle_deinterlacing_mode( input_t *in );
 int input_toggle_menu( input_t *in );
+
+void input_channel_change_relative( input_t *in, int offset );
 
 void input_set_menu( input_t *in, menu_t *m );
 

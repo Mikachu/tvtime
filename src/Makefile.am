@@ -2,8 +2,8 @@
 tvtimedatadir = $(datadir)/tvtime
 dist_tvtimedata_DATA = menubg.png testlogo.png FreeSansBold.ttf
 
-TTF_CFLAGS = `$FREETYPE_CONFIG --cflags`
-TTF_LIBS = `$FREETYPE_CONFIG --libs`
+TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
+TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
 
 PLUGINS_CFLAGS = -I$(top_srcdir)/plugins
 PLUGINS_LIBS = -L$(top_builddir)/plugins -ltvtimeplugins

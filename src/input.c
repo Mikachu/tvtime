@@ -95,6 +95,33 @@ void input_set_menu( input_t *in, menu_t *m )
     in->menu = m;
 }
 
+void input_channel_change_relative( input_t *in, int offset )
+{
+    int verbose = config_get_verbose( in->cfg );
+
+    if( !videoinput_has_tuner( in->vidin ) ) {
+        if( verbose )
+            fprintf( stderr, 
+                     "tvtime: Can't change channel, "
+                     "no tuner available on this input!\n" );
+    } else {
+        chanindex = (chanindex + offset + chancount) % chancount;
+
+        videoinput_set_tuner_freq( in->vidin, 
+                                   chanlist[ chanindex ].freq +
+                                   config_get_finetune( in->cfg ) );
+        in->videohold = CHANNEL_HOLD;
+
+        if( verbose ) fprintf( stderr, "tvtime: Changing to "
+                               "channel %s\n", 
+                               chanlist[ chanindex ].name );
+        if( in->osd ) {
+            tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
+            tvtime_osd_show_info( in->osd );
+        }
+    }
+}
+
 void input_callback( input_t *in, InputEvent command, int arg )
 {
     int tvtime_cmd, verbose;
@@ -113,6 +140,10 @@ void input_callback( input_t *in, InputEvent command, int arg )
     switch( command ) {
     case I_QUIT:
         in->quit = 1;
+        break;
+
+    case I_CHANNEL_CHANGE_RELATIVE:
+        input_channel_change_relative( in, arg );
         break;
 
     case I_KEYDOWN:
@@ -225,35 +256,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
 
          case TVTIME_CHANNEL_UP: 
          case TVTIME_CHANNEL_DOWN:
-             if( !videoinput_has_tuner( in->vidin ) ) {
-                 if( verbose )
-                     fprintf( stderr, 
-                              "tvtime: Can't change channel, "
-                              "no tuner available on this input!\n" );
-             } else {
-                 int start_index = chanindex;
-
-                 do {
-                     chanindex = (chanindex + 
-                                  ( (tvtime_cmd == TVTIME_CHANNEL_UP) ? 
-                                    1 : -1) + chancount) % chancount;
-
-                     if( chanindex == start_index ) break;
-
-                     videoinput_set_tuner_freq( in->vidin, 
-                                                chanlist[ chanindex ].freq +
-                                                config_get_finetune( in->cfg ) );
-                     in->videohold = CHANNEL_HOLD;
-                 } while( !videoinput_freq_present( in->vidin ) );
-
-                 if( verbose ) fprintf( stderr, "tvtime: Changing to "
-                                        "channel %s\n", 
-                                        chanlist[ chanindex ].name );
-                 if( in->osd ) {
-                     tvtime_osd_set_channel_number( in->osd, chanlist[ chanindex ].name );
-                     tvtime_osd_show_info( in->osd );
-                 }
-             }
+             input_channel_change_relative( in, (tvtime_cmd == TVTIME_CHANNEL_UP) ?  1 : -1 );
              break;
 
          case TVTIME_MIXER_UP: 

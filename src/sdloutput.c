@@ -215,6 +215,14 @@ void sdl_poll_events( input_t *in )
 
             input_callback( in, curcommand, arg );
         }
+
+        if( event.type == SDL_MOUSEBUTTONDOWN ) {
+            if( event.button.button == 4 ) {
+                input_callback( in, I_CHANNEL_CHANGE_RELATIVE, 1 );
+            } else if( event.button.button == 5 ) {
+                input_callback( in, I_CHANNEL_CHANGE_RELATIVE, -1 );
+            }
+        }
     }
 }
 
@@ -251,7 +259,6 @@ void sdl_unlock_output( void )
 {
     SDL_UnlockYUVOverlay( frame );
 }
-
 
 static output_api_t sdloutput =
 {
