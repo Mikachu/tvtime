@@ -126,7 +126,7 @@ static int xv_check_extension( void )
          ( version < 2 ) || ( ( version == 2 ) && ( release < 2 ) ) ) {
 
         fprintf( stderr, "xvoutput: xv extension not found.\n");
-        return 1;
+        return 0;
     }
 
     XvQueryAdaptors( display, window, &adaptors, &adaptorInfo );
@@ -146,7 +146,7 @@ static int xv_check_extension( void )
     }
 
     XvFreeAdaptorInfo( adaptorInfo );
-    fprintf( stderr, "Cannot find xv port\n" );
+    fprintf( stderr, "xvoutput: Cannot find xv port.\n" );
     return 0;
 }
 
@@ -165,13 +165,13 @@ static int open_display( void )
 
     display = XOpenDisplay( 0 );
     if( !display ) {
-        fprintf( stderr, "Can not open display\n" );
+        fprintf( stderr, "xvoutput: Cannot open display '%s'.\n", getenv( "DISPLAY" ) );
         return 0;
     }
 
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
          (major < 1) || ((major == 1) && (minor < 1))) {
-        fprintf (stderr, "No xshm extension\n");
+        fprintf (stderr, "xvoutput: No xshm extension available.\n");
         return 0;
     }
 
@@ -230,7 +230,6 @@ static int open_display( void )
     /* collaborate with the window manager for close requests */
     XSetWMProtocols( display, window, &wmDeleteAtom, 1 );
 
-
     return 1;
 }
 
@@ -265,7 +264,7 @@ static void *create_shm( int size )
     }
 
     if( error ) {
-        fprintf( stderr, "cannot create shared memory\n" );
+        fprintf( stderr, "xvoutput: Cannot create shared memory.\n" );
         return 0;
     } else {
         return shminfo.shmaddr;
