@@ -86,7 +86,6 @@ const char *input_special_key_to_string( int key );
 input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose );
 void input_delete( input_t *in );
 void input_callback( input_t *in, int command, int arg );
-void input_next_frame( input_t *in );
 
 #ifdef __cplusplus
 };

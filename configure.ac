@@ -152,13 +152,13 @@ dnl ---------------------------------------------
 dnl LIRC
 dnl ---------------------------------------------
 
-have_lirc=yes
-AC_REQUIRE_CPP
-AC_CHECK_HEADER(lirc/lirc_client.h,
-  [AC_CHECK_LIB(lirc_client,lirc_init,,have_lirc=no)],have_lirc=no)
-if test "$have_lirc" = "yes"; then
-  AC_DEFINE(HAVE_LIRC,,[LIRC support])
-fi
+dnl have_lirc=yes
+dnl AC_REQUIRE_CPP
+dnl AC_CHECK_HEADER(lirc/lirc_client.h,
+dnl   [AC_CHECK_LIB(lirc_client,lirc_init,,have_lirc=no)],have_lirc=no)
+dnl if test "$have_lirc" = "yes"; then
+dnl   AC_DEFINE(HAVE_LIRC,,[LIRC support])
+dnl fi
 
 dnl ---------------------------------------------
 dnl check for X11, Xv and XF86VidModeExtension

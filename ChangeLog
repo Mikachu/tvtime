@@ -1,5 +1,8 @@
 
 0.9.9 -
+  * vektor: Removed lirc support in favour of just using
+      tvtime-command.  lirc is too difficult for tvtime
+      packages and configuration seems difficult.
   * vektor: Added a tvtime-configure command to reconfigure
       tvtime's config file from the command line.
   * vektor: Display command now holds the information on

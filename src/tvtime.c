@@ -1746,7 +1746,6 @@ int main( int argc, char **argv )
             output->set_window_height( output->get_visible_height() );
         }
         commands_next_frame( commands );
-        input_next_frame( in );
 
         /* Notice this because it's cheap. */
         videofilter_set_bt8x8_correction( tvtime->inputfilter, commands_apply_luma_correction( commands ) );

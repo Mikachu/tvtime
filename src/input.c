@@ -21,16 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#ifdef HAVE_LIRC
-#include <fcntl.h>
-#include <lirc/lirc_client.h>
-#endif
-
 #include "input.h"
 
 /* Number of frames to wait for next channel digit. */
@@ -114,19 +107,10 @@ const char *input_special_key_to_string( int key )
 struct input_s {
     config_t *cfg;
     commands_t *com;
-    
     int console_on;
     console_t *console;
-
     int slave_mode;
-
     int quit;
-
-    int lirc_used;
-#ifdef HAVE_LIRC
-    int lirc_fd;
-    struct lirc_config *lirc_conf;
-#endif
 };
 
 input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose )
@@ -145,42 +129,11 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose 
     in->quit = 0;
     in->slave_mode = config_get_slave_mode( cfg );
 
-    in->lirc_used = 0;
-
-#ifdef HAVE_LIRC
-    if( verbose ) {
-        fprintf( stderr, "tvtime: Looking for lirc ...\n" );
-    }
-    in->lirc_fd = lirc_init( "tvtime", verbose );
-    if( in->lirc_fd < 0 ) {
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Can't connect to lircd. Lirc disabled.\n" );
-        }
-    } else {
-        fcntl( in->lirc_fd, F_SETFL, O_NONBLOCK );
-        if( lirc_readconfig( 0, &in->lirc_conf, 0 ) == 0 ) {
-            in->lirc_used = 1;
-        } else {
-            if( verbose ) {
-                fprintf( stderr, "tvtime: Can't read lirc config file. Lirc disabled.\n" );
-            }
-        }
-    }
-    if( verbose ) {
-        fprintf( stderr, "tvtime: Finished lirc setup.\n" );
-    }
-#endif
-
     return in;
 }
 
 void input_delete( input_t *in )
 {
-#ifdef HAVE_LIRC
-    if( in->lirc_used ) {
-        lirc_freeconfig( in->lirc_conf );
-    }
-#endif
     free( in );
 }
 
@@ -271,44 +224,5 @@ void input_callback( input_t *in, int command, int arg )
     argument[ 1 ] = '\0';
     argument[ 0 ] = arg;
     commands_handle( in->com, tvtime_cmd, argument );
-}
-
-#ifdef HAVE_LIRC
-static void poll_lirc( input_t *in, struct lirc_config *lirc_conf )
-{
-    char *code;
-    char *string;
-    int cmd;
-
-    if( lirc_nextcode( &code ) != 0 ) {
-        /* Can not connect to lircd. */
-        return;
-    }
-
-    if( !code ) {
-        /* No remote control code available. */
-        return;
-    }
-
-    while( !lirc_code2char( lirc_conf, code, &string ) && string ) {
-        cmd = tvtime_string_to_command( string );                                                               
-
-        if( cmd != -1 ) {
-            input_callback( in, I_REMOTE, cmd );
-        } else {
-            fprintf( stderr, "tvtime: Unknown lirc command: %s\n", string );
-        }
-    }
-    free( code );
-}
-#endif
-
-void input_next_frame( input_t *in )
-{
-    if( in->lirc_used ) {
-#ifdef HAVE_LIRC
-        poll_lirc( in, in->lirc_conf );
-#endif
-    }
 }
 

@@ -6,6 +6,9 @@ For news and updates on tvtime, please visit our website at:
 
 News for 0.9.9
 
+  * Removed lirc support in favour of using tvtime-command
+    exclusively.
+
 News for 0.9.8.5
 
   * Some root safety improvements.
