@@ -153,6 +153,7 @@ struct commands_s {
 
     int change_channel;
     int renumbering;
+    int xmltvupdated;
 
     int apply_invert;
     int apply_mirror;
@@ -288,6 +289,7 @@ static void update_xmltv_listings( commands_t *cmd )
 
         xmltv_refresh( cmd->xmltv );
         update_xmltv_display( cmd );
+        cmd->xmltvupdated = 1;
     }
 }
 
@@ -1023,6 +1025,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
 
     cmd->change_channel = 0;
     cmd->renumbering = 0;
+    cmd->xmltvupdated = 0;
 
     cmd->apply_invert = config_get_invert( cfg );
     cmd->apply_mirror = config_get_mirror( cfg );
@@ -3225,6 +3228,7 @@ void commands_next_frame( commands_t *cmd )
         }
     }
 
+    cmd->xmltvupdated = 0;
     cmd->printdebug = 0;
     cmd->showdeinterlacerinfo = 0;
     cmd->screenshot = 0;
@@ -3504,5 +3508,19 @@ const char *commands_get_fs_pos( commands_t *cmd )
 int commands_get_audio_boost( commands_t *cmd )
 {
     return cmd->boost;
+}
+
+int commands_xmltv_updated( commands_t *cmd )
+{
+    return cmd->xmltvupdated;
+}
+
+const char *commands_get_xmltv_title( commands_t *cmd )
+{
+    if( cmd->xmltv ) {
+        return xmltv_get_title( cmd->xmltv );
+    } else {
+        return 0;
+    }
 }
 

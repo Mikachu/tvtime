@@ -1182,6 +1182,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int matte_mode = 0;
     int restarttvtime = 0;
     int return_value = 0;
+    int last_current_id = -1;
     int i;
 
     ct = config_new();
@@ -1602,12 +1603,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         int output_success = 1;
         int exposed = output->is_exposed();
         int current_id;
-        int last_current_id = -1;
 
-        if( videoinput_has_tuner( vidin ) )
+        if( videoinput_has_tuner( vidin ) ) {
             current_id = station_get_current_id( stationmgr );
-        else
+        } else {
             current_id = 0;
+        }
 
         if( matte_mode ) {
             output_x = matte_x;
@@ -2010,14 +2011,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         if( commands_resize_window( commands ) ) {
             output->set_window_height( output->get_visible_height() );
         }
-        if( current_id != last_current_id ) {
-            char caption[256];
+        if( current_id != last_current_id || commands_xmltv_updated( commands ) ) {
+            const char *curline = commands_get_xmltv_title( commands );
+            char caption[ 256 ];
+            if( !curline ) {
+                curline = tagline;
+            }
             if( current_id ) {
                 snprintf( caption, sizeof( caption ), "tvtime [%d]: %s",
-                          current_id, tagline );
+                          current_id, curline );
             } else {
                 snprintf( caption, sizeof( caption ), "tvtime: %s",
-                          tagline );
+                          curline );
             }
             output->set_window_caption( caption );
             last_current_id = current_id;

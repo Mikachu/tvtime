@@ -1,6 +1,8 @@
 
 0.9.13 -
-  * pv2b: Show the channel number in the title bar if available.
+  * vektor: Show the title of the current show from the XMLTV information
+      in the window title bar if available.
+  * pv2b: Show the channel number in the window title bar if available.
   * vektor: Added code for reading localized descriptions from the XMLTV
       file.  Thanks to Ingo van Lil for the patch.
   * vektor: Fixed an insanely bad race condition in the not-using-RTC
