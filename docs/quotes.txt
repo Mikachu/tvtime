@@ -8,3 +8,7 @@ Thu Oct 24 19:50:20 ADT 2002
 <bitstream> i think we should get magic pixies to do the compositing.
             i bet they could do it fast!
 
+Thu Aug 28 14:26:31 ADT 2003
+<aleni> how do i remove xawtv?
+
+

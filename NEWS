@@ -1,20 +1,23 @@
 
 For news and updates on tvtime, please visit our website at:
 
-  http://tvtime.ca/
+  http://tvtime.net/
 
 
 News for 0.9.9
 
-  * Removed lirc support in favour of using tvtime-command
-    exclusively.
+  *  Added a menu system.
+  *  Support for the V4L2 DVB driver and PAL-60.
+  *  Removed lirc support in favour of using tvtime-command
+     exclusively.
+  *  Fixed remaining screensaver, Xinerama and fullscreen issues.
 
 News for 0.9.8.5
 
-  * Some root safety improvements.
-  * Added support for long-format command line arguments.
-  * Added config file options to set startup window position.
-  * Compile fixes for non-C99 compilers and older DirectFB versions.
+  *  Some root safety improvements.
+  *  Added support for long-format command line arguments.
+  *  Added config file options to set startup window position.
+  *  Compile fixes for non-C99 compilers and older DirectFB versions.
 
 News for 0.9.8.4
 
@@ -22,19 +25,16 @@ News for 0.9.8.4
 
 News for 0.9.8.3
 
-  *  Support for norm switching between "compatible" norms
-     for areas which receive both SECAM and PAL format
-     stations.
-  *  Added support for the mga_vid driver for the Matrox
-     G200/G400 series cards from mplayer.
-  *  Semi-experimental of the X code for better fullscreen
-     support under many window managers.  Testing
-     appreciated.
-  *  Support for changing the mixer device and channel
-     (see 'man tvtime' and the config file documentation).
-  *  Slightly less partial experimental UTF-8 support. Now
-     works with any simple left-to-right scripts which are
-     in FreeSansBold.ttf .
+  *  Support for norm switching between "compatible" norms for areas
+     which receive both SECAM and PAL format stations.
+  *  Added support for the mga_vid driver for the Matrox G200/G400
+     series cards from mplayer.
+  *  Semi-experimental of the X code for better fullscreen support under
+     many window managers.  Testing appreciated.
+  *  Support for changing the mixer device and channel (see 'man tvtime'
+     and the config file documentation).
+  *  Slightly less partial experimental UTF-8 support. Now works with
+     any simple left-to-right scripts which are in FreeSansBold.ttf .
 
 News for 0.9.8.2
 

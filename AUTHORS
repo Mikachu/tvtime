@@ -52,7 +52,10 @@ Authors and contributors
     - Support for reading commands on stdin
 
   Scott Van Wart <silvaran@users.sourceforge.net>
+    - Awesome menu icon font work, bugfixes
+
   Adrian Minta <gygy@rdslink.ro>
+  Jindrich Makovicka <makovick@users.sourceforge.net>
     - Bugfixes
 
   Per von Zweigbergk <pvz@e.kth.se>
