@@ -303,6 +303,16 @@ static int dfb_is_alwaysontop( void )
     return alwaysontop;
 }
 
+static int dfb_is_fullscreen_supported( void )
+{
+    return 1;
+}
+
+static int dfb_is_alwaysontop_supported( void )
+{
+    return 1;
+}
+
 static int dfb_is_interlaced( void )
 {
      return deinterlacing;
@@ -534,6 +544,9 @@ static output_api_t dfboutput =
      dfb_get_visible_height,
      dfb_is_fullscreen,
      dfb_is_alwaysontop,
+
+     dfb_is_fullscreen_supported,
+     dfb_is_alwaysontop_supported,
 
      dfb_is_interlaced,
      dfb_wait_for_sync,

@@ -46,6 +46,10 @@ typedef struct output_api_s
     int (* is_fullscreen)( void );
     int (* is_alwaysontop)( void );
 
+    /* Some support questions. */
+    int (* is_fullscreen_supported)( void );
+    int (* is_alwaysontop_supported)( void );
+
     /* Output API for interlaced displays. */
     int (* is_interlaced)( void );
     void (* wait_for_sync)( int field );

@@ -179,6 +179,16 @@ static void mga_resize_window_fullscreen( void )
 {
 }
 
+static int mga_is_fullscreen_supported( void )
+{
+    return 0;
+}
+
+static int mga_is_alwaysontop_supported( void )
+{
+    return 0;
+}
+
 static void mga_set_window_caption( const char *caption )
 {
 }
@@ -236,6 +246,9 @@ static output_api_t mgaoutput =
     mga_get_visible_height, 
     mga_is_fullscreen,
     mga_is_alwaysontop,
+
+    mga_is_fullscreen_supported,
+    mga_is_alwaysontop_supported,
 
     mga_is_interlaced,
     mga_wait_for_sync,

@@ -200,6 +200,9 @@ static output_api_t mgaoutput =
     xcommon_is_fullscreen,
     xcommon_is_alwaysontop,
 
+    xcommon_is_fullscreen_supported,
+    xcommon_is_alwaysontop_supported,
+
     mga_is_interlaced,
     mga_wait_for_sync,
     mga_show_frame,

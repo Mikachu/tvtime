@@ -63,6 +63,8 @@ void xcommon_set_colourkey( int colourkey );
 void xcommon_frame_drawn( void );
 void xcommon_set_fullscreen_position( int pos );
 void xcommon_set_matte( int ystart, int height );
+int xcommon_is_fullscreen_supported( void );
+int xcommon_is_alwaysontop_supported( void );
 
 #ifdef __cplusplus
 };

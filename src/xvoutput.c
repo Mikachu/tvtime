@@ -362,6 +362,9 @@ static output_api_t xvoutput =
     xcommon_is_fullscreen,
     xcommon_is_alwaysontop,
 
+    xcommon_is_fullscreen_supported,
+    xcommon_is_alwaysontop_supported,
+
     xv_is_interlaced,
     xv_wait_for_sync,
     xv_show_frame,

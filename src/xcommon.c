@@ -1513,6 +1513,16 @@ int xcommon_is_alwaysontop( void )
     return alwaysontop;
 }
 
+int xcommon_is_fullscreen_supported( void )
+{
+    return 1;
+}
+
+int xcommon_is_alwaysontop_supported( void )
+{
+    return has_ewmh_state_above;
+}
+
 area_t xcommon_get_video_area( void )
 {
     return video_area;
