@@ -169,6 +169,11 @@ unsigned int speedy_get_usecs( void );
  */
 void speedy_reset_timer( void );
 
+/**
+ * Returns a measurement of the CPU speed.
+ */
+double speedy_measure_cpu_mhz( void );
+
 #ifdef __cplusplus
 };
 #endif

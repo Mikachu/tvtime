@@ -24,6 +24,8 @@
 #include "speedtools.h"
 #include "speedy.h"
 
+#define rdtscll(val) __asm__ __volatile__("rdtsc" : "=A" (val))
+
 /* Function pointer definitions. */
 void (*interpolate_packed422_scanline)( unsigned char *output,
                                         unsigned char *top,
@@ -1069,5 +1071,22 @@ unsigned int speedy_get_usecs( void )
 void speedy_reset_timer( void )
 {
     speedy_time = 0;
+}
+
+double speedy_measure_cpu_mhz( void )
+{
+    uint64_t tsc_start, tsc_end;
+    struct timeval tv_start, tv_end;
+    int usec_delay;
+
+    rdtscll( tsc_start );
+    gettimeofday( &tv_start, 0 );
+    usleep( 100000 );
+    rdtscll( tsc_end );
+    gettimeofday( &tv_end, 0 );
+
+    usec_delay = 1000000 * (tv_end.tv_sec - tv_start.tv_sec) + (tv_end.tv_usec - tv_start.tv_usec);
+
+    return (((double) (tsc_end - tsc_start)) / ((double) usec_delay));
 }
 
