@@ -302,16 +302,15 @@
     currently supports five output drivers: the standard XVIDEO
     output, a DirectFB output layer, an experimental DirectFB output
     driver specific to the Matrox G400/G450/G550 TV output on the
-    second head, the mga and xmga options interface with mplayer's
-    mga_vid driver for the G400/G200-series cards, and finally the
-    SDL output driver is included to help with porting to other
-    driver layers.  Valid options here are:
+    second head, the mga option interfaces with mplayer's mga_vid
+    driver for the G400/G200-series cards, and finally the SDL
+    output driver is included to help with porting to other driver
+    layers.  Valid options here are:
 
       Xv
       DirectFB
       matroxtv
       mga
-      xmga
       SDL
   -->
   <option name="OutputDriver" value="Xv"/>
