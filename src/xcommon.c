@@ -65,6 +65,8 @@ static int output_width, output_height;
 static int output_aspect = 0;
 static int output_on_root = 0;
 static int has_ewmh_state_fullscreen = 0;
+static int has_ewmh_state_above = 0;
+static int has_ewmh_state_below = 0;
 static Cursor nocursor;
 static int output_fullscreen = 0;
 static int xcommon_verbose = 0;
@@ -177,6 +179,11 @@ static int xprop_errorhandler( Display *dpy, XErrorEvent *ev )
     }
 }
 
+/**
+ * Returns the window name for an Extended Window Manager Hints (EWMH)
+ * compliant window manager.  Sets the name to "unknown" if no name is
+ * set (non-compliant by the spec, but worth handling).
+ */
 static void get_window_manager_name( Display *dpy, Window wm_window, char **wm_name_return )
 {
     Atom atom;
@@ -352,12 +359,10 @@ static int check_for_EWMH_wm( Display *dpy, char **wm_name_return )
     return 0;
 }
 
-
 /**
- * returns 1 if a window manager compliant to the
- * Extended Window Manager Hints (EWMH) spec.
- * supports the _NET_WM_STATE_FULLSCREEN window state
- * Oterhwise returns 0.
+ * Returns 1 if a window manager compliant to the Extended Window
+ * Manager Hints (EWMH) specification supports the
+ * _NET_WM_STATE_FULLSCREEN window state.  Otherwise, returns 0.
  */
 static int check_for_state_fullscreen( Display *dpy )
 {
@@ -393,21 +398,21 @@ static int check_for_state_fullscreen( Display *dpy )
                                 &type_return, &format_return, &nitems_return,
                                 &bytes_after_return, &prop_return) != Success ) {
             if( xcommon_verbose ) {
-                fprintf( stderr, "xcommon: XGetWindowProperty failed in check_for_state_fullscreen\n" );
+                fprintf( stderr, "xcommon: Can't check the fullscreen property (WM not compliant).\n" );
             }
             return 0;
         }
     
         if( type_return == None ) {
             if( xcommon_verbose ) {
-                fprintf( stderr, "xcommon: check_for_state_fullscreen: property does not exist\n" );
+                fprintf( stderr, "xcommon: No property for fullscreen support (WM not compliant).\n" );
             }
             return 0;
         }
 
         if( type_return != XA_ATOM ) {
             if( xcommon_verbose ) {
-                fprintf( stderr, "xcommon: check_for_state_fullscreen: XA_ATOM property has wrong type\n");
+                fprintf( stderr, "xcommon: Broken property for fullscreen support (WM not compliant).\n");
             }
             if( prop_return ) XFree( prop_return );
             return 0;
@@ -416,9 +421,9 @@ static int check_for_state_fullscreen( Display *dpy )
                 int n;
 
                 for( n = 0; n < nitems_return; n++ ) {
-                    if( ((long *) prop_return)[n] == net_wm_state ) {
+                    if( ((long *) prop_return)[ n ] == net_wm_state ) {
                         supports_net_wm_state = 1;
-                    } else if( ((long *) prop_return)[n] == net_wm_state_fullscreen ) {
+                    } else if( ((long *) prop_return)[ n ] == net_wm_state_fullscreen ) {
                         supports_net_wm_state_fullscreen = 1;
                     }
 
@@ -440,6 +445,181 @@ static int check_for_state_fullscreen( Display *dpy )
 
     return 0;
 }
+
+/**
+ * Returns 1 if a window manager compliant to the Extended Window
+ * Manager Hints (EWMH) specification supports the _NET_WM_STATE_ABOVE
+ * window state.  Otherwise, returns 0.
+ */
+static int check_for_state_above( Display *dpy )
+{
+    Atom net_supported, net_wm_state, net_wm_state_above;
+    Atom type_return;
+    int format_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    unsigned char *prop_return = 0;
+    int nr_items = 40;
+    int item_offset = 0;
+    int supports_net_wm_state = 0;
+    int supports_net_wm_state_above = 0;
+
+    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
+    if( net_supported == None ) {
+        return 0;
+    }
+
+    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
+    if( net_wm_state == None ) {
+        return 0;
+    }
+
+    net_wm_state_above = XInternAtom( dpy, "_NET_WM_STATE_ABOVE", False );
+    if( net_wm_state_above == None ) {
+        return 0;
+    }
+
+    do {
+        if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
+                                item_offset, nr_items, False, XA_ATOM,
+                                &type_return, &format_return, &nitems_return,
+                                &bytes_after_return, &prop_return) != Success ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: Can't check the above property (WM not compliant).\n" );
+            }
+            return 0;
+        }
+    
+        if( type_return == None ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: No property for above support (WM not compliant).\n" );
+            }
+            return 0;
+        }
+
+        if( type_return != XA_ATOM ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: Broken property for above support (WM not compliant).\n");
+            }
+            if( prop_return ) XFree( prop_return );
+            return 0;
+        } else {
+            if( format_return == 32 ) {
+                int n;
+
+                for( n = 0; n < nitems_return; n++ ) {
+                    if( ((long *) prop_return)[ n ] == net_wm_state ) {
+                        supports_net_wm_state = 1;
+                    } else if( ((long *) prop_return)[ n ] == net_wm_state_above ) {
+                        supports_net_wm_state_above = 1;
+                    }
+
+                    if( supports_net_wm_state && supports_net_wm_state_above ) {
+                        XFree( prop_return );
+                        return 1;
+                    }
+                }
+
+                XFree( prop_return );
+            } else {
+                XFree( prop_return );
+                return 0;
+            }
+        }
+
+        item_offset += nr_items;
+    } while( bytes_after_return > 0 );
+
+    return 0;
+}
+
+/**
+ * Returns 1 if a window manager compliant to the Extended Window
+ * Manager Hints (EWMH) specification supports the _NET_WM_STATE_BELOW
+ * window state.  Otherwise, returns 0.
+ */
+static int check_for_state_below( Display *dpy )
+{
+    Atom net_supported, net_wm_state, net_wm_state_below;
+    Atom type_return;
+    int format_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    unsigned char *prop_return = 0;
+    int nr_items = 40;
+    int item_offset = 0;
+    int supports_net_wm_state = 0;
+    int supports_net_wm_state_below = 0;
+
+    net_supported = XInternAtom( dpy, "_NET_SUPPORTED", False );
+    if( net_supported == None ) {
+        return 0;
+    }
+
+    net_wm_state = XInternAtom( dpy, "_NET_WM_STATE", False );
+    if( net_wm_state == None ) {
+        return 0;
+    }
+
+    net_wm_state_below = XInternAtom( dpy, "_NET_WM_STATE_BELOW", False );
+    if( net_wm_state_below == None ) {
+        return 0;
+    }
+
+    do {
+        if( XGetWindowProperty( dpy, DefaultRootWindow( dpy ), net_supported,
+                                item_offset, nr_items, False, XA_ATOM,
+                                &type_return, &format_return, &nitems_return,
+                                &bytes_after_return, &prop_return) != Success ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: Can't check the below property (WM not compliant).\n" );
+            }
+            return 0;
+        }
+    
+        if( type_return == None ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: No property for below support (WM not compliant).\n" );
+            }
+            return 0;
+        }
+
+        if( type_return != XA_ATOM ) {
+            if( xcommon_verbose ) {
+                fprintf( stderr, "xcommon: Broken property for below support (WM not compliant).\n");
+            }
+            if( prop_return ) XFree( prop_return );
+            return 0;
+        } else {
+            if( format_return == 32 ) {
+                int n;
+
+                for( n = 0; n < nitems_return; n++ ) {
+                    if( ((long *) prop_return)[ n ] == net_wm_state ) {
+                        supports_net_wm_state = 1;
+                    } else if( ((long *) prop_return)[ n ] == net_wm_state_below ) {
+                        supports_net_wm_state_below = 1;
+                    }
+
+                    if( supports_net_wm_state && supports_net_wm_state_below ) {
+                        XFree( prop_return );
+                        return 1;
+                    }
+                }
+
+                XFree( prop_return );
+            } else {
+                XFree( prop_return );
+                return 0;
+            }
+        }
+
+        item_offset += nr_items;
+    } while( bytes_after_return > 0 );
+
+    return 0;
+}
+
 
 /**
  * Some math:
@@ -639,7 +819,7 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
 
     if( check_for_EWMH_wm( display, &wmname ) ) {
         if( xcommon_verbose ) {
-            fprintf( stderr, "xcommon: Window manager is %s.\n", wmname );
+            fprintf( stderr, "xcommon: Window manager is %s and is EWMH compliant.\n", wmname );
         }
 
         if( !strcasecmp( wmname, "metacity" ) ) {
@@ -650,10 +830,26 @@ int xcommon_open_display( int aspect, int init_height, int verbose )
             wm_is_metacity = 1;
         }
         free( wmname );
-    }
-    has_ewmh_state_fullscreen = check_for_state_fullscreen( display );
-    if( has_ewmh_state_fullscreen && xcommon_verbose ) {
-        fprintf( stderr, "xcommon: Using EWMH state fullscreen property.\n" );
+
+
+        /**
+         * If we have an EWMH compliant window manager, check for
+         * fullscreen, above and below states.
+         */
+        has_ewmh_state_fullscreen = check_for_state_fullscreen( display );
+        if( has_ewmh_state_fullscreen && xcommon_verbose ) {
+            fprintf( stderr, "xcommon: Using EWMH state fullscreen property.\n" );
+        }
+        has_ewmh_state_above = check_for_state_above( display );
+        if( has_ewmh_state_above && xcommon_verbose ) {
+            fprintf( stderr, "xcommon: Using EWMH state above property.\n" );
+        }
+        has_ewmh_state_below = check_for_state_below( display );
+        if( has_ewmh_state_below && xcommon_verbose ) {
+            fprintf( stderr, "xcommon: Using EWMH state below property.\n" );
+        }
+    } else if( xcommon_verbose ) {
+        fprintf( stderr, "xcommon: Window manager is not EWMH compliant.\n" );
     }
 
     gc = DefaultGC( display, screen );
