@@ -1254,7 +1254,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     if( !output || !output->init( config_get_outputheight( ct ),
                                   sixteennine, verbose ) ) {
-        fputs( _("tvtime: Output driver failed to initialize:"
+        fputs( _("tvtime: Output driver failed to initialize: "
                  "no video output available.\n"), stderr );
         /* FIXME: Delete everything here! */
         return 1;
@@ -1355,7 +1355,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             width = rvrreader_get_width( rvrreader );
             height = rvrreader_get_height( rvrreader );
             if( verbose ) {
-                fprintf( stderr, _("tvtime: RVR frame sampling"
+                fprintf( stderr, _("tvtime: RVR frame sampling "
                                    "%d pixels per scanline.\n"), width );
             }
         }
@@ -1417,18 +1417,18 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
         fieldsavailable = 4;
     } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
                                "V4L.  Not enough to continue.  Exiting.\n"),
                      videoinput_get_numframes( vidin ) );
             return 1;
         } else if( videoinput_get_numframes( vidin ) == 2 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
                                "V4L.  Limiting deinterlace plugins\n"
                                "tvtime: to those which only need 1 field.\n"),
                      videoinput_get_numframes( vidin ) );
             fieldsavailable = 1;
         } else if( videoinput_get_numframes( vidin ) == 3 ) {
-            fprintf( stderr, _("tvtime: Can only get %d frame buffers from"
+            fprintf( stderr, _("tvtime: Can only get %d frame buffers from "
                                "V4L.  Limiting deinterlace plugins\n"
                                "tvtime: to those which only need 2 fields.\n"),
                      videoinput_get_numframes( vidin ) );
@@ -1437,12 +1437,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
             fieldsavailable = 4;
         }
         if( fieldsavailable < 4 && videoinput_is_bttv( vidin ) ) {
-            fputs( _("\n*** You are using the bttv driver, but without enough"
-                     "gbuffers available.\n"
-                     "*** See the support page at " PACKAGE_BUGREPORT
-                     " for information\n"
-                     "*** on how to increase your gbuffers setting.\n\n",
-                     stderr );
+            fprintf( stderr,
+                     _("\n*** You are using the bttv driver, but without "
+                       "enough gbuffers available.\n"
+                       "*** See the support page at %s "
+                       "for information\n"
+                       "*** on how to increase your gbuffers setting.\n\n",
+                       PACKAGE_BUGREPORT ) );
         }
     } else {
         fieldsavailable = 4;
@@ -1646,7 +1647,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
     if( vidin && height == 480 ) {
         vs = vbiscreen_new( width, height, pixel_aspect, verbose );
         if( !vs ) {
-            fputs( _("tvtime: Could not create vbiscreen,"
+            fputs( _("tvtime: Could not create vbiscreen, "
                      "closed captions unavailable.\n"), stderr );
         }
 
@@ -2718,7 +2719,7 @@ int main( int argc, char **argv )
     /* Steal system resources in the name of performance. */
     setpriority( PRIO_PROCESS, 0, -19 );
     if( !set_realtime_priority( 0 ) ) {
-        fputs( _("tvtime: Can't get realtime priority for better performance,"
+        fputs( _("tvtime: Can't get realtime priority for better performance, "
                  "need root access.\n"), stderr );
     }
 
