@@ -388,7 +388,7 @@ int aspect_adjust_packed4444_scanline( unsigned char *output,
                                        double aspectratio )
 {
     double i;
-    int w=0, prev_i=0, j;
+    int w=0, prev_i=0, j, pos;
     double avg_a=0.0, avg_y=0.0, avg_cb=0.0, avg_cr=0.0, c=0.0;
     unsigned char *curin;
 
@@ -405,20 +405,16 @@ int aspect_adjust_packed4444_scanline( unsigned char *output,
             avg_y = 0.0;
             avg_cb = 0.0;
             avg_cr = 0.0;
-            for( c=0,j=prev_i; j <= (int)i; j++,c++ ) {
-                avg_a += input[ j*4 ];
-                avg_y += input[ j*4 + 1 ];
-                avg_cb += input[ j*4 + 2 ];
-                avg_cr += input[ j*4 + 3 ];
+            for( c=0,j=prev_i,pos=prev_i; j <= (int)i; j++,c++ ) {
+                avg_a += input[ pos ];
+                avg_y += input[ ++pos ];
+                avg_cb += input[ ++pos ];
+                avg_cr += input[ ++pos ];
             }
-            avg_a /= c;
-            avg_y /= c;
-            avg_cb /= c;
-            avg_cr /= c;
-            output[ 0 ] = avg_a;
-            output[ 1 ] = avg_y;
-            output[ 2 ] = avg_cb;
-            output[ 3 ] = avg_cr;
+            output[ 0 ] = avg_a / c;
+            output[ 1 ] = avg_y / c;
+            output[ 2 ] = avg_cb / c;
+            output[ 3 ] = avg_cr / c;
         }
         output += 4;
         prev_i = (int)i;
