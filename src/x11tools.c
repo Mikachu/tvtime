@@ -53,7 +53,6 @@ static pid_t ping_xscreensaver_child = 0;
 static int ping_xscreensaver_sleep = 60;
 /* Exit values */
 #define NO_XSCREENSAVER  2
-#define BAD_XSCREENSAVER 3
 
 static int kdescreensaver_was_running=0;
 
@@ -67,13 +66,14 @@ static int kdescreensaver_was_running=0;
  */
 void sigchld_handler( int signum )
 {
+    int result;
     if( signum == SIGCHLD ) {
+	wait( &result );  /* Discard the result, we assume failure. */
         ping_xscreensaver_child = 0;
         stop_xscreensaver = 0;
         signal( signum, SIG_DFL );
     }
 }
-
 
 void saver_on(Display *mDisplay) {
 
@@ -114,8 +114,10 @@ void saver_on(Display *mDisplay) {
     /* Re-enable xscreensaver.  This isn't performed if the
      * ping_xscreensaver loop has been killed before. */
     if( ping_xscreensaver_child && stop_xscreensaver ) {
+        int result;
         signal( SIGCHLD, SIG_DFL );
         kill( ping_xscreensaver_child, SIGHUP );
+        wait( &result );  /* Discard the result, we don't care. */
         ping_xscreensaver_child = 0;
     }
 
@@ -206,7 +208,6 @@ void saver_off(Display *mDisplay) {
                  * xscreensaver-command */
                 errno = 0;
                 result = fork();
-
                 if ( !result ) {
                     /* Child process: exec xscreensaver-command */
                     /* xscreensaver-command must be written _twice_ as 
