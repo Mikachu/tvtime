@@ -139,6 +139,7 @@ struct config_s
     int start_channel;
     int prev_channel;
     int framerate;
+    int slave_mode;
 
     double hoverscan;
     double voverscan;
@@ -477,12 +478,13 @@ static int conf_xml_parse( config_t *ct, char *configFile )
  
 static void print_usage( char **argv )
 {
-    fprintf( stderr, "usage: %s [-ahmsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
+    fprintf( stderr, "usage: %s [-ahkmsSv] [-F <config file>] [-r <rvrfile>] [-H <height>]\n"
                      "\t\t[-I <sampling>] [-d <device>] [-b <device>] [-i <input>]\n"
                      "\t\t[-n <norm>] [-f <frequencies>]\n", argv[ 0 ] );
 
     fprintf( stderr, "\t-a\t16:9 mode.\n" );
     fprintf( stderr, "\t-h\tShow this help message.\n" );
+    fprintf( stderr, "\t-k\tDisables keyboard input handling in tvtime (slave mode).\n" );
     fprintf( stderr, "\t-m\tStart tvtime in fullscreen mode.\n" );
     fprintf( stderr, "\t-s\tPrint stats on frame drops (for debugging).\n" );
 
@@ -706,9 +708,10 @@ config_t *config_new( int argc, char **argv )
         conf_xml_parse(ct, configFile);
     }
 
-    while( (c = getopt( argc, argv, "ahmsSvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
+    while( (c = getopt( argc, argv, "ahkmsSvF:r:H:I:d:b:i:n:f:" )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
+        case 'k': ct->slave_mode = 1; break;
         case 'm': ct->fullscreen = 1; break;
         case 's': ct->debug = 1; break;
         case 'S': saveoptions = 1; break;
@@ -993,6 +996,11 @@ const char *config_get_rvr_filename( config_t *ct )
 int config_get_framerate_mode( config_t *ct )
 {
     return ct->framerate;
+}
+
+int config_get_slave_mode( config_t *ct )
+{
+    return ct->slave_mode;
 }
 
 configsave_t *config_get_configsave( config_t *ct )

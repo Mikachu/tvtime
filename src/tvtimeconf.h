@@ -71,6 +71,7 @@ int config_get_right_scanline_bias( config_t *ct );
 const char *config_get_screenshot_dir( config_t *ct );
 const char *config_get_rvr_filename( config_t *ct );
 int config_get_framerate_mode( config_t *ct );
+int config_get_slave_mode( config_t *ct );
 
 const char *config_get_config_filename( config_t *ct );
 
