@@ -384,8 +384,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_PROGRAM4_BAR ].ypos = osd->strings[ OSD_PROGRAM3_BAR ].ypos
                                           + osd_string_get_height( osd->strings[ OSD_PROGRAM3_BAR ].string );
 
-//dmr
-
 
     /* Bottom. */
     osd_string_set_colour_rgb( osd->strings[ OSD_MESSAGE2_BAR ].string, other_r, other_g, other_b );

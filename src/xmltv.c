@@ -234,7 +234,7 @@ int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
 {
     return (xmltv->refresh || (date_compare( year, month, day, hour, min,
                                              xmltv->end_year, xmltv->end_month, xmltv->end_day,
-                                             xmltv->end_hour, xmltv->end_min ) < 0));
+                                             xmltv->end_hour, xmltv->end_min ) >= 0));
 }
 
 const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )
