@@ -1748,8 +1748,8 @@ static void display_current_menu( commands_t *cmd )
     }
 
     tvtime_osd_list_set_hilight( cmd->osd, cmd->curmenupos + 1 );
-    tvtime_osd_list_hold( cmd->osd, 1 );
     tvtime_osd_show_list( cmd->osd, 1, 0 );
+    tvtime_osd_list_hold( cmd->osd, 1 );
 }
 
 menu_t *commands_get_menu( commands_t *cmd, const char *menuname )
