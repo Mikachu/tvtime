@@ -10,7 +10,9 @@ if test x"$host_alias" = x""; then host_alias="$host"; fi
 
 # Checks for programs.
 AC_PROG_CC
+type "$CC" || exit 1
 AC_PROG_CXX
+type "$CXX" || exit 1
 AC_PROG_LIBTOOL
 
 # Checks for header files.
