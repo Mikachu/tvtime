@@ -27,6 +27,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
+#include <errno.h>
 #include "pngoutput.h"
 #include "pnginput.h"
 #include "videoinput.h"
@@ -44,6 +45,13 @@
 #include "performance.h"
 #include "taglines.h"
 #include "xvoutput.h"
+
+/**
+ * This is ridiculous, but apparently I need to give my own
+ * prototype for this function because of a glibc bug. -Billy
+ */
+int setresuid( uid_t ruid, uid_t euid, uid_t suid );
+
 
 /* Number of frames to pause after channel change. */
 #define CHANNEL_ACTIVE_DELAY 2
@@ -608,7 +616,11 @@ int main( int argc, char **argv )
     }
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
-    setuid( getuid() );
+    if( setresuid( getuid(), getuid(), getuid() ) == -1 ) {
+        fprintf( stderr, "tvtime: Unknown problems dropping root access: %s\n", strerror( errno ) );
+        return 1;
+    }
+
 
     /* Setup the output. */
     output = get_xv_output();

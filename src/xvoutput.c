@@ -41,7 +41,6 @@ static int completion_type;
 static XWindowAttributes attribs;
 
 static int output_width, output_height;
-static int output_x, output_y;
 static int input_width, input_height;
 static int output_aspect = 0;
 static Cursor nocursor;
@@ -399,13 +398,13 @@ void xv_show_frame( void )
 
 void xv_poll_events( input_t *in )
 {
-    Window junk;
     XEvent event;
     KeySym mykey;
     int arg = 0;
     char mykey_string;
     int reconfigure = 0;
-    int reconfwidth, reconfheight;
+    int reconfwidth = 0;
+    int reconfheight = 0;
 
     while (XPending(display)) {
         XNextEvent(display, &event);
