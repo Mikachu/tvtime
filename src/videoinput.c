@@ -372,7 +372,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curframe = 0;
     vidin->verbose = verbose;
     vidin->norm = norm;
-    vidin->height = ( vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP ) ? 480 : 576;
+    vidin->height = ( vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M ) ? 480 : 576;
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
     vidin->signal_recover_wait = 0;
     vidin->signal_aquire_wait = 0;
