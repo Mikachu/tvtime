@@ -98,8 +98,29 @@ static const char *taglines[] = {
 "tvtime: I don't think it's quite fair to condemn a whole program because of a single slip-up",
 "tvtime: it's better than bad, it's good",
 "tvtime: the more you use it, the more you love it",
-"tvtime: om katten själv får välja"
-
+"tvtime: om katten själv får välja",
+"tvtime: it's finger-licking good",
+"tvtime: have you had your break today?",
+"tvtime: but it's not television!",
+"tvtime: how do you like your tvtime?",
+"tvtime: mmmmm, I love tvtime",
+"tvtime; give like Santa, save like Scrooge",
+"tvtime: where do you want to go today?",
+"tvtime: excel-lerate your television",
+"tvtime: why 1984 won't be like \"1984\"",
+"tvtime: dude, you're getting tvtime!",
+"got tvtime?",
+"tvtime: can't beat the real thing",
+"tvtime: gimme a break, gimme a break",
+"tvtime: sunny day, sweeping the clouds away",
+"tvtime: we take care",
+"tvtime: for he goes whirling down and down the white water",
+"tvtime: quality is job one",
+"tvtime: like a rock",
+"tvtime: i know something you don't know",
+"tvtime; Mikey likes it!",
+"tvtime: more than meets the eye",
+"tvtime: can you see the difference?"
 };
 
 static int numtaglines = ( sizeof( taglines ) / sizeof( char * ) );
