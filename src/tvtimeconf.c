@@ -858,25 +858,3 @@ const char *config_get_screenshot_dir( config_t *ct )
     return ct->ssdir;
 }
 
-void config_set_horizontal_overscan( config_t *ct, double hoverscan )
-{
-    if( hoverscan > 0.4 ) {
-        ct->hoverscan = 0.4;
-    } else if( hoverscan < 0.0 ) {
-        ct->hoverscan = 0.0;
-    } else {
-        ct->hoverscan = hoverscan;
-    }
-}
-
-void config_set_vertical_overscan( config_t *ct, double voverscan )
-{
-    if( voverscan > 0.4 ) {
-        ct->voverscan = 0.4;
-    } else if( voverscan < 0.0 ) {
-        ct->voverscan = 0.0;
-    } else {
-        ct->voverscan = voverscan;
-    }
-}
-

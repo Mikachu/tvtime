@@ -1200,10 +1200,10 @@ int main( int argc, char **argv )
         int paused = 0;
         int output_x, output_y, output_w, output_h;
 
-        output_x = (int) ((((double) width) * config_get_horizontal_overscan( ct )) + 0.5);
-        output_w = (int) ((((double) width) - (((double) width) * config_get_horizontal_overscan( ct ) * 2.0)) + 0.5);
-        output_y = (int) ((((double) height) * config_get_vertical_overscan( ct )) + 0.5);
-        output_h = (int) ((((double) height) - (((double) height) * config_get_vertical_overscan( ct ) * 2.0)) + 0.5);
+        output_x = (int) ((((double) width) * commands_get_horizontal_overscan( commands )) + 0.5);
+        output_w = (int) ((((double) width) - (((double) width) * commands_get_horizontal_overscan( commands ) * 2.0)) + 0.5);
+        output_y = (int) ((((double) height) * commands_get_vertical_overscan( commands )) + 0.5);
+        output_h = (int) ((((double) height) - (((double) height) * commands_get_vertical_overscan( commands ) * 2.0)) + 0.5);
 
         if( fifo ) {
             int cmd;

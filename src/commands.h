@@ -135,6 +135,8 @@ int commands_toggle_pulldown_detection( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );
 int commands_update_luma_power( commands_t *in );
 double commands_get_luma_power( commands_t *in );
+double commands_get_horizontal_overscan( commands_t *in );
+double commands_get_vertical_overscan( commands_t *in );
 int commands_half_framerate( commands_t *in );
 int commands_scan_channels( commands_t *in );
 void commands_set_console( commands_t *in, console_t *con );
