@@ -203,68 +203,64 @@ static void update_xmltv_channel( commands_t *cmd )
 
 static void update_xmltv_listings( commands_t *cmd )
 {
-    if( cmd->xmltv && cmd->osd ) {
-        time_t tm = time( 0 );
+    if( cmd->xmltv && cmd->osd && xmltv_needs_refresh( cmd->xmltv ) ) {
+        const int maxlinelen = 64;
+        const char *desc;
+        char title[ 128 ];
+        char next_title_data[ 128 ];
+        char subtitle[ 1024 ];
+        char descdata[ 128 ];
+        char *line1 = 0;
+        char *line2 = 0;
+        char next_title[64];
 
-        if( xmltv_needs_refresh( cmd->xmltv, tm ) ) {
-            const int maxlinelen = 64;
-            const char *desc;
-            char title[ 128 ];
-            char next_title_data[ 128 ];
-            char subtitle[ 1024 ];
-            char descdata[ 128 ];
-            char *line1 = 0;
-            char *line2 = 0;
-            char next_title[64];
+        xmltv_refresh( cmd->xmltv );
 
-            xmltv_refresh( cmd->xmltv, tm );
-
-            desc = xmltv_get_description( cmd->xmltv );
-            if( desc ) {
-                line1 = descdata;
-                line2 = 0;
-                if( truncate_string( descdata, desc, "...",
-                                     sizeof( descdata ) ) > maxlinelen ) {
-                    /* truncate_string returns strlen(descdata) */
-                    line2 = break_line( descdata, maxlinelen );
-                    if( line2 == NULL ) {
-                        /*
-                         * FIXME
-                         * line breaking failed because no white space
-                         * was found. what should we do here?
-                         */
-                    }
+        desc = xmltv_get_description( cmd->xmltv );
+        if( desc ) {
+            line1 = descdata;
+            line2 = 0;
+            if( truncate_string( descdata, desc, "...",
+                                 sizeof( descdata ) ) > maxlinelen ) {
+                /* truncate_string returns strlen(descdata) */
+                line2 = break_line( descdata, maxlinelen );
+                if( line2 == NULL ) {
+                    /*
+                     * FIXME
+                     * line breaking failed because no white space
+                     * was found. what should we do here?
+                     */
                 }
             }
-
-            if( xmltv_get_sub_title( cmd->xmltv ) ) {
-               snprintf( subtitle, sizeof( subtitle ), "%s - %s",
-                         xmltv_get_times( cmd->xmltv ),
-                         xmltv_get_sub_title( cmd->xmltv ) );
-            } else {
-               snprintf( subtitle, sizeof( subtitle ), "%s",
-                         xmltv_get_times( cmd->xmltv ) );
-            }
-
-            if( xmltv_get_title( cmd->xmltv ) ) {
-                truncate_string( title, xmltv_get_title( cmd->xmltv ), "...",
-                                 sizeof( title ) );
-            } else {
-                *title = '\0';
-            }
-
-            if( xmltv_get_next_title( cmd->xmltv ) ) {
-                snprintf( next_title_data, sizeof( next_title_data ),
-                          _("Next: %s"), xmltv_get_next_title( cmd->xmltv ) );
-                truncate_string ( next_title, next_title_data,
-                                  "...", sizeof( next_title ) );
-            } else {
-                *next_title = '\0';
-            }
-
-            tvtime_osd_show_program_info( cmd->osd, title, subtitle,
-                                          line1, line2, next_title );
         }
+
+        if( xmltv_get_sub_title( cmd->xmltv ) ) {
+           snprintf( subtitle, sizeof( subtitle ), "%s - %s",
+                     xmltv_get_times( cmd->xmltv ),
+                     xmltv_get_sub_title( cmd->xmltv ) );
+        } else {
+           snprintf( subtitle, sizeof( subtitle ), "%s",
+                     xmltv_get_times( cmd->xmltv ) );
+        }
+
+        if( xmltv_get_title( cmd->xmltv ) ) {
+            truncate_string( title, xmltv_get_title( cmd->xmltv ), "...",
+                             sizeof( title ) );
+        } else {
+            *title = '\0';
+        }
+
+        if( xmltv_get_next_title( cmd->xmltv ) ) {
+            snprintf( next_title_data, sizeof( next_title_data ),
+                      _("Next: %s"), xmltv_get_next_title( cmd->xmltv ) );
+            truncate_string ( next_title, next_title_data,
+                              "...", sizeof( next_title ) );
+        } else {
+            *next_title = '\0';
+        }
+
+        tvtime_osd_show_program_info( cmd->osd, title, subtitle,
+                                      line1, line2, next_title );
     }
 }
 

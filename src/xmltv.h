@@ -45,7 +45,7 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel );
 /**
  * Refreshes the information given a new time.
  */
-void xmltv_refresh( xmltv_t *xmltv, time_t now );
+void xmltv_refresh( xmltv_t *xmltv );
 
 /**
  * Returns the current show title if one is set, 0 otherwise.
@@ -81,7 +81,7 @@ const char *xmltv_get_channel( xmltv_t *xmltv );
  * Returns true if the show information must be updated (the current
  * program has ended.
  */
-int xmltv_needs_refresh( xmltv_t *xmltv, time_t now );
+int xmltv_needs_refresh( xmltv_t *xmltv );
 
 /**
  * Looks up the xmltv id of a channel given a corresponding xmltv display name.
