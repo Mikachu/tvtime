@@ -1,5 +1,8 @@
 
-0.9.8.2 -
+0.9.8.3 -
+
+0.9.8.2 - Sat May  3 18:01:30 ADT 2003
+  * Paco-Paco: Fixed the build.
 
 0.9.8.1 - Sat May  3 10:07:26 ADT 2003
   * vektor: Removed some of the fonts we don't use from the dist

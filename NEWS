@@ -3,7 +3,15 @@ For news and updates on tvtime, please visit our website at:
 
   http://tvtime.sourceforge.net/
 
+News for 0.9.8.3
+
+  *  Slightly less partial experimental UTF-8 support. Now
+     works with any simple left-to-right scripts which are
+     in FreeSansBold.ttf
+
 News for 0.9.8.2
+
+  *  Fixed to compile on older gcc versions (blame pv2b).
 
 News for 0.9.8.1
 
