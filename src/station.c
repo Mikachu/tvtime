@@ -39,6 +39,7 @@ struct station_info_s
     char network_name[ 33 ];
     char network_call_letters[ 7 ];
     char norm[ 10 ];
+    char audio[ 10 ];
     char xmltvid[ 128 ];
     const band_t *band;
     const band_entry_t *channel;
@@ -65,6 +66,7 @@ struct station_mgr_s
     char band_and_frequency[ 1024 ];
     char stationrc[ 255 ];
     char *norm;
+    char audio[ 10 ];
     char *table;
 };
 
@@ -115,6 +117,7 @@ static station_info_t *station_info_new( int pos, const char *name,
         memset( i->network_name, 0, sizeof( i->network_name ) );
         memset( i->network_call_letters, 0, sizeof( i->network_call_letters ) );
         memset( i->norm, 0, sizeof( i->norm ) );
+        memset( i->audio, 0, sizeof( i->audio ) );
         memset( i->xmltvid, 0, sizeof( i->xmltvid ) );
         i->brightness = -1;
         i->contrast = -1;
@@ -222,6 +225,7 @@ int station_readconfig( station_mgr_t *mgr )
     xmlDocPtr doc;
     xmlNodePtr station;
     xmlNodePtr list;
+    xmlChar *list_audio;
 
     if( !file_is_openable_for_read( mgr->stationrc ) ) {
         /* There is no file to try to read, so forget it. */
@@ -258,6 +262,11 @@ int station_readconfig( station_mgr_t *mgr )
         xmlFreeDoc( doc );
         return 0;
     }
+    list_audio = xmlGetProp( list, BAD_CAST "audio" );
+    if( list_audio ) {
+        snprintf( mgr->audio, sizeof( mgr->audio ), "%s", list_audio );
+        xmlFree( list_audio );
+    }
 
     station = list->xmlChildrenNode;
     while( station ) {
@@ -270,6 +279,7 @@ int station_readconfig( station_mgr_t *mgr )
             xmlChar *network = xmlGetProp( station, BAD_CAST "network" );
             xmlChar *call = xmlGetProp( station, BAD_CAST "call" );
             xmlChar *norm = xmlGetProp( station, BAD_CAST "norm" );
+            xmlChar *audio = xmlGetProp( station, BAD_CAST "audio" );
             xmlChar *brightness = xmlGetProp( station, BAD_CAST "brightness" );
             xmlChar *contrast = xmlGetProp( station, BAD_CAST "contrast" );
             xmlChar *colour = xmlGetProp( station, BAD_CAST "colour" );
@@ -299,6 +309,17 @@ int station_readconfig( station_mgr_t *mgr )
                 } else {
                     station_set_current_norm( mgr, mgr->norm );
                 }
+                if( audio ) {
+                    if( !strcasecmp( (char *) audio, "auto" ) ) {
+                        station_set_current_audio_norm( mgr, -1 );
+                    } else if( !strcasecmp( (char *) audio, "dk" ) ) {
+                        station_set_current_audio_norm( mgr, 1 );
+                    } else {
+                        station_set_current_audio_norm( mgr, 0 );
+                    }
+                } else {
+                    station_set_current_audio_norm( mgr, -1 );
+                }
                 if( brightness ) station_set_current_brightness( mgr, atoi( (char *) brightness ) );
                 if( contrast ) station_set_current_contrast( mgr, atoi( (char *) contrast ) );
                 if( colour ) station_set_current_colour( mgr, atoi( (char *) colour ) );
@@ -314,6 +335,7 @@ int station_readconfig( station_mgr_t *mgr )
             if( colour ) xmlFree( colour );
             if( hue ) xmlFree( hue );
             if( norm ) xmlFree( norm );
+            if( audio ) xmlFree( audio );
             if( network ) xmlFree( network );
             if( call ) xmlFree( call );
             if( name ) xmlFree( name );
@@ -351,6 +373,7 @@ station_mgr_t *station_new( const char *norm, const char *table,
         free( mgr );
         return 0;
     }
+    sprintf( mgr->audio, "bg" );
 
     mgr->table = strdup( table );
     if( !mgr->table ) {
@@ -570,6 +593,20 @@ void station_toggle_us_cable_mode( station_mgr_t *mgr )
     mgr->us_cable_mode = (mgr->us_cable_mode + 1) % 3;
 }
 
+void station_set_default_audio_norm( station_mgr_t *mgr, int dk )
+{
+    if( dk ) {
+        sprintf( mgr->audio, "dk" );
+    } else {
+        sprintf( mgr->audio, "bg" );
+    }
+}
+
+int station_get_default_audio_norm( station_mgr_t *mgr )
+{
+    return !strcasecmp( mgr->audio, "dk" );
+}
+
 int station_get_current_frequency( station_mgr_t *mgr )
 {
     if( !mgr->current ) {
@@ -723,6 +760,36 @@ void station_set_current_norm( station_mgr_t *mgr, const char *norm )
 {
     if( mgr->current ) {
         snprintf( mgr->current->norm, sizeof( mgr->current->norm ), "%s", norm );
+    }
+}
+
+int station_get_current_audio_norm( station_mgr_t *mgr )
+{
+    const char *str;
+
+    if( mgr->current ) {
+        if( !strcasecmp( mgr->current->audio, "auto" ) ) {
+            str = mgr->audio;
+        } else {
+            str = mgr->current->audio;
+        }
+    } else {
+        str = mgr->audio;
+    }
+
+    return !strcasecmp( str, "dk" );
+}
+
+void station_set_current_audio_norm( station_mgr_t *mgr, int dk )
+{
+    if( mgr->current ) {
+        if( dk < 0 ) {
+            sprintf( mgr->current->audio, "auto" );
+        } else if( dk ) {
+            sprintf( mgr->current->audio, "dk" );
+        } else {
+            sprintf( mgr->current->audio, "bg" );
+        }
     }
 }
 
@@ -982,6 +1049,7 @@ int station_writeconfig( station_mgr_t *mgr )
         xmlNewProp( list, BAD_CAST "norm", BAD_CAST mgr->norm );
         xmlNewProp( list, BAD_CAST "frequencies", BAD_CAST mgr->table );
     }
+    xmlSetProp( list, BAD_CAST "audio", BAD_CAST mgr->audio );
 
     do {
         xmlNodePtr node = find_station( list->xmlChildrenNode, rp->name );
@@ -1010,6 +1078,9 @@ int station_writeconfig( station_mgr_t *mgr )
         }
         if( *(rp->norm) ) {
             xmlSetProp( node, BAD_CAST "norm", BAD_CAST rp->norm );
+        }
+        if( *(rp->audio) ) {
+            xmlSetProp( node, BAD_CAST "audio", BAD_CAST rp->audio );
         }
         if( rp->brightness >= 0 ) {
             snprintf( buf, sizeof( buf ), "%d", rp->brightness );

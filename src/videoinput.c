@@ -376,8 +376,11 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
  
         cur_buf.type = vidin->capbuffers[ 0 ].vidbuf.type;
         if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't read frame. Error was: %s (%d).\n",
-                     strerror( errno ), vidin->frames_since_start );
+            /* some drivers return EIO when there is no signal */
+            if( errno != EIO ) {
+                fprintf( stderr, "videoinput: Can't read frame. Error was: %s (%d).\n",
+                         strerror( errno ), vidin->frames_since_start );
+            }
             /* We must now restart capture. */
             videoinput_stop_capture_v4l2( vidin );
             videoinput_free_all_frames( vidin );
@@ -1619,9 +1622,10 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
 
 void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode )
 {
-    if( !vidin ) return; 
-    vidin->dkmode = dkmode;
-    videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
+    if( dkmode != vidin->dkmode && vidin->norm == VIDEOINPUT_PAL ) {
+        vidin->dkmode = dkmode;
+        videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
+    }
 }
 
 int videoinput_get_pal_audio_mode( videoinput_t *vidin )

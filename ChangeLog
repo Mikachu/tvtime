@@ -1,5 +1,9 @@
 
 0.9.13 -
+  * vektor: Support toggling PAL-DK/PAL-BG audio mode as a global
+      setting, and added per-channel support for overriding this
+      setting.  This should solve problems for cx88 users where the
+      driver cannot identify the audio signal.
   * vektor: Added an option for making screenshots "quiet", where they
       will not announce themselves on the OSD.
   * vektor: Added a compatibility layer for xawtv-remote and the
@@ -29,9 +33,6 @@
   * vektor: Always keep the mixer device open to work around a weird
       problem with the ALSA emulation where it only maintains volume state
       during an open and not across sessions.
-  * bitstream: Add PalDKMode setting for forcing the use of PAL_DK norm when
-      a) in PAL mode and b) using v4l2. This resolves an issue for some cx88
-      users.
   * vektor: Added a setting called 'audio boost' to control the volume
       we set on the capture card itself.
   * vektor: Return the magic number 3 when tvtime exits from a SLEEP

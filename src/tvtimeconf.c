@@ -87,7 +87,6 @@ struct config_s
     int inputnum;
     char *v4ldev;
     char *norm;
-    int dkmode;
     char *freq;
     char *ssdir;
     char *timeformat;
@@ -371,11 +370,6 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             if( ct->mixerdev ) free( ct->mixerdev );
             ct->mixerdev = strdup( curval );
         }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "PalDKMode" ) ) {
-            ct->dkmode = atoi( curval );
-        }
-
     }
 
     if( name ) xmlFree( name );
@@ -715,7 +709,6 @@ config_t *config_new( void )
     ct->inputnum = 0;
     ct->v4ldev = strdup( "/dev/video0" );
     ct->norm = strdup( "ntsc" );
-    ct->dkmode = 0;
     ct->freq = strdup( "us-cable" );
     temp_dirname = getenv( "HOME" );
     if( temp_dirname ) {
@@ -1566,11 +1559,6 @@ int config_get_cc( config_t *ct )
 int config_get_mirror( config_t *ct )
 {
     return ct->mirror;
-}
-
-int config_get_pal_audio_mode( config_t *ct )
-{
-    return ct->dkmode;
 }
 
 int config_get_audio_boost( config_t *ct )

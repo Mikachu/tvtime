@@ -188,7 +188,6 @@ int config_get_invert( config_t *ct );
 int config_get_cc( config_t *ct );
 int config_get_mirror( config_t *ct );
 int config_get_audio_boost( config_t *ct );
-int config_get_pal_audio_mode( config_t *ct );
 int config_get_quiet_screenshots( config_t *ct );
 
 #ifdef __cplusplus

@@ -1320,7 +1320,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         vidin = 0;
      } else {
         const char *audiomode = config_get_audio_mode( ct );
-        int dkmode = config_get_pal_audio_mode( ct );
         videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
 
         if( audiomode ) {
@@ -1334,10 +1333,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             } else {
                 videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
             }
-        }
-
-        if( dkmode ) {
-            videoinput_set_pal_audio_mode( vidin, dkmode );
         }
 
         width = videoinput_get_width( vidin );

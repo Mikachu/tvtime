@@ -97,6 +97,16 @@ void station_toggle_us_cable_mode( station_mgr_t *mgr );
 int station_get_us_cable_mode( station_mgr_t *mgr );
 
 /**
+ * Set the default audio norm.
+ */
+void station_set_default_audio_norm( station_mgr_t *mgr, int dk );
+
+/**
+ * Returns true if the default audio norm is PAL-DK.
+ */
+int station_get_default_audio_norm( station_mgr_t *mgr );
+
+/**
  * Returns the id of this channel.
  */
 int station_get_current_id( station_mgr_t *mgr );
@@ -148,6 +158,11 @@ const char *station_get_current_xmltv_id( station_mgr_t *mgr );
  * Returns the norm set for this channel.
  */
 const char *station_get_current_norm( station_mgr_t *mgr );
+
+/**
+ * Returns true if the audio norm for this channel is PAL-DK.
+ */
+int station_get_current_audio_norm( station_mgr_t *mgr );
 
 /**
  * Returns picture settings for this channel.
@@ -221,6 +236,11 @@ void station_set_current_xmltv_id( station_mgr_t *mgr, const char *xmltvid );
  * Sets the norm for this channel.
  */
 void station_set_current_norm( station_mgr_t *mgr, const char *norm );
+
+/**
+ * Sets what audio norm to use for this channel.
+ */
+void station_set_current_audio_norm( station_mgr_t *mgr, int dk );
 
 /**
  * Sets picture settings for this channel.

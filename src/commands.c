@@ -291,7 +291,8 @@ static void update_xmltv_listings( commands_t *cmd )
 
 static void reset_stations_menu( menu_t *menu, int ntsc, int pal, int secam,
                                  int ntsccable, int active, int signaldetect,
-                                 int scanning )
+                                 int scanning, int v4l2, int default_paldk,
+                                 int paldk )
 {
     char string[ 128 ];
     int cur;
@@ -362,6 +363,23 @@ static void reset_stations_menu( menu_t *menu, int ntsc, int pal, int secam,
         cur++;
     }
 
+    if( pal && v4l2 ) {
+        if( default_paldk ) {
+            snprintf( string, sizeof( string ), !paldk ?
+                      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+                      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+                      _("Use PAL-BG audio decoding") );
+        } else {
+            snprintf( string, sizeof( string ), paldk ?
+                      TVTIME_ICON_GENERALTOGGLEON "  %s" :
+                      TVTIME_ICON_GENERALTOGGLEOFF "  %s",
+                      _("Use PAL-DK audio decoding") );
+        }
+        menu_set_text( menu, cur, string );
+        menu_set_enter_command( menu, cur, TVTIME_TOGGLE_CHANNEL_PAL_DK, "" );
+        cur++;
+    }
+
     snprintf( string, sizeof( string ), TVTIME_ICON_FREQUENCYTABLESEL "  %s",
               _("Change frequency table") );
     menu_set_text( menu, cur, string );
@@ -409,6 +427,8 @@ static void reinit_tuner( commands_t *cmd )
         if( norm >= 0 ) {
             videoinput_switch_pal_secam( cmd->vidin, norm );
         }
+        videoinput_set_pal_audio_mode( cmd->vidin, 
+                                       station_get_current_audio_norm( cmd->stationmgr ) );
 
         if( config_get_save_restore_picture( cmd->cfg ) ) {
             int brightness = station_get_current_brightness( cmd->stationmgr );
@@ -474,7 +494,8 @@ static void reinit_tuner( commands_t *cmd )
                                  (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                                   !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                                  station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                                 cmd->scan_channels );
+                                 cmd->scan_channels,
+                                 videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
             commands_refresh_menu( cmd );
         }
         cmd->frame_counter = 0;
@@ -526,7 +547,7 @@ static void reinit_tuner( commands_t *cmd )
     }
 }
 
-static void reset_pal_input_menu( menu_t *menu, videoinput_t *vidin )
+static void reset_pal_input_menu( menu_t *menu, videoinput_t *vidin, station_mgr_t *stationmgr )
 {
     char string[ 128 ];
     int cur = 2;
@@ -538,10 +559,11 @@ static void reset_pal_input_menu( menu_t *menu, videoinput_t *vidin )
     cur++;
 
     if( videoinput_is_v4l2( vidin ) ) {
-        snprintf( string, sizeof( string ), videoinput_get_pal_audio_mode( vidin ) ?
+        int dk_default = station_get_default_audio_norm( stationmgr );
+        snprintf( string, sizeof( string ), dk_default ?
                   TVTIME_ICON_GENERALTOGGLEON "  %s" :
                   TVTIME_ICON_GENERALTOGGLEOFF "  %s",
-                  _("Use PAL-DK audio decoding") );
+                  _("Default to PAL-DK audio decoding") );
         menu_set_text( menu, cur, string );
         menu_set_enter_command( menu, cur, TVTIME_TOGGLE_PAL_DK_AUDIO, "" );
         cur++;
@@ -1165,7 +1187,8 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                              (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                               !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                              station_get_current_active( cmd->stationmgr ),
-                             cmd->checkfreq, cmd->scan_channels );
+                             cmd->checkfreq, cmd->scan_channels,
+                             videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
     }
 
     menu = menu_new( "frequencies" );
@@ -1273,7 +1296,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
-    reset_pal_input_menu( menu, vidin );
+    reset_pal_input_menu( menu, vidin, cmd->stationmgr );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "hres" );
@@ -2089,21 +2112,55 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         cmd->screenshot = 1;
         break;
 
-    case TVTIME_TOGGLE_PAL_DK_AUDIO:
+    case TVTIME_TOGGLE_CHANNEL_PAL_DK:
         if( cmd->vidin ) {
-            char message[ 128 ];
-            videoinput_set_pal_audio_mode( cmd->vidin,
-                !videoinput_get_pal_audio_mode( cmd->vidin ) );
+            int is_dk = station_get_current_audio_norm( cmd->stationmgr );
+            station_set_current_audio_norm( cmd->stationmgr, !is_dk );
+            videoinput_set_pal_audio_mode( cmd->vidin, 
+                                           station_get_current_audio_norm( cmd->stationmgr ) );
             if( cmd->osd ) {
-                if( videoinput_get_pal_audio_mode( cmd->vidin ) ) {
+                char message[ 128 ];
+                if( is_dk ) {
                     snprintf( message, sizeof( message ),
-                              _("Using PAL-DK audio decoding.") );
+                              _("Using PAL-BG audio decoding for this channel.") );
                 } else {
                     snprintf( message, sizeof( message ),
-                              _("Using PAL-BG audio decoding.") );
+                              _("Using PAL-DK audio decoding for this channel.") );
+                }
+                reset_stations_menu( commands_get_menu( cmd, "stations" ),
+                                     (videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC ||
+                                      videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC_JP),
+                                     videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_PAL,
+                                     videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_SECAM,
+                                     (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
+                                      !strcasecmp( cmd->newfreqtable, "us-cable100" )),
+                                     station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
+                                     cmd->scan_channels,
+                                     videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
+                commands_refresh_menu( cmd );
+                tvtime_osd_show_message( cmd->osd, message );
+            }
+        }
+        break;
+
+    case TVTIME_TOGGLE_PAL_DK_AUDIO:
+        if( cmd->vidin ) {
+            int dk_default = station_get_default_audio_norm( cmd->stationmgr );
+            char message[ 128 ];
+            dk_default = !dk_default;
+            station_set_default_audio_norm( cmd->stationmgr, dk_default );
+            videoinput_set_pal_audio_mode( cmd->vidin, 
+                                           station_get_current_audio_norm( cmd->stationmgr ) );
+            if( cmd->osd ) {
+                if( dk_default ) {
+                    snprintf( message, sizeof( message ),
+                              _("Defaulting to PAL-DK audio decoding.") );
+                } else {
+                    snprintf( message, sizeof( message ),
+                              _("Defaulting to PAL-BG audio decoding.") );
                 }
                 reset_pal_input_menu( commands_get_menu( cmd, "input-pal" ),
-                                      cmd->vidin );
+                                      cmd->vidin, cmd->stationmgr );
                 commands_refresh_menu( cmd );
                 tvtime_osd_show_message( cmd->osd, message );
             }
@@ -2142,7 +2199,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                  (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                                   !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                                  station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                                 cmd->scan_channels );
+                                 cmd->scan_channels,
+                                 videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
             commands_refresh_menu( cmd );
             station_writeconfig( cmd->stationmgr );
         }
@@ -2349,7 +2407,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                          (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                                           !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                                          station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                                         cmd->scan_channels );
+                                         cmd->scan_channels,
+                                         videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
                     commands_refresh_menu( cmd );
 
                     if( cmd->scan_channels ) {
@@ -2418,7 +2477,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                  (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                                   !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                                  station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                                 cmd->scan_channels );
+                                 cmd->scan_channels,
+                                 videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
             commands_refresh_menu( cmd );
         }
 
@@ -2522,7 +2582,8 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                  (!strcasecmp( cmd->newfreqtable, "us-cable" ) ||
                                   !strcasecmp( cmd->newfreqtable, "us-cable100" )),
                                  station_get_current_active( cmd->stationmgr ), cmd->checkfreq,
-                                 cmd->scan_channels );
+                                 cmd->scan_channels,
+                                 videoinput_is_v4l2( cmd->vidin ), station_get_default_audio_norm( cmd->stationmgr ), station_get_current_audio_norm( cmd->stationmgr ) );
             if( cmd->checkfreq ) {
                 tvtime_osd_show_message( cmd->osd,
                     _("Signal detection enabled.") );
