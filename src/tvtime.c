@@ -885,6 +885,43 @@ static void build_framerate_menu( menu_t *menu, double maxrate, int mode )
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
 }
 
+static void build_output_menu( menu_t *menu, int widescreen, int fullscreen, int alwaysontop )
+{
+    char string[ 128 ];
+
+    if( widescreen ) {
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa5 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  16:9 output", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_right_command( menu, 1, TVTIME_TOGGLE_ASPECT, "" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+
+    if( fullscreen ) {
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa5 );
+    } else {
+        snprintf( string, sizeof( string ), "%c%c%c  Fullscreen", 0xee, 0x80, 0xa4 );
+    }
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_FULLSCREEN, "" );
+    menu_set_right_command( menu, 2, TVTIME_TOGGLE_FULLSCREEN, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+
+    snprintf( string, sizeof( string ), "%c%c%c  Always On Top", 0xee, 0x80, 0x80 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_TOGGLE_ALWAYSONTOP, "" );
+    menu_set_right_command( menu, 3, TVTIME_TOGGLE_ALWAYSONTOP, "" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+}
+
 static void osd_list_framerates( tvtime_osd_t *osd, double maxrate, int mode )
 {
     char text[ 200 ];
@@ -1064,9 +1101,9 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "\n*** /dev/rtc support is needed for smooth video.  Support is available,\n"
-                         "*** but tvtime cannot get 1024hz resolution!  Please run tvtime as root,\n"
-                         "*** or, with linux kernel version 2.4.19 or later, run:\n"
+                fprintf( stderr, "\n*** Failed to get 1024hz resolution from /dev/rtc.  This will\n"
+                         "*** cause video to be unsmooth.  Please run tvtime as root, or, with\n"
+                         "*** linux kernel version 2.4.19 or later, please run:\n"
                          "***       sysctl -w dev.rtc.max-user-freq=1024\n"
                          "*** See our support page at " PACKAGE_BUGREPORT " for more information\n\n" );
             }
@@ -1529,9 +1566,9 @@ int main( int argc, char **argv )
         commands_handle( commands, TVTIME_TOGGLE_FRAMERATE, 0 );
     }
 
-    /* If we are a new install, start scanning channels. */
+    /* If we are a new install, show the menu. */
     if( station_is_new_install( stationmgr ) ) {
-        commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
+        commands_handle( commands, TVTIME_SHOW_MENU, 0 );
     }
 
     /* Set the mier device. */
@@ -1546,6 +1583,8 @@ int main( int argc, char **argv )
             lastframe = videoinput_next_frame( vidin, &lastframeid );
         }
     }
+
+    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
 
     /* Initialize our timestamps. */
     for(;;) {
@@ -1653,6 +1692,7 @@ int main( int argc, char **argv )
 
                 if( config_get_fullscreen( cur ) && !output->is_fullscreen() ) {
                     output->toggle_fullscreen( 0, 0 );
+                    build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
                 } else {
                     if( config_get_outputheight( cur ) < 0 ) {
                         output->resize_window_fullscreen();
@@ -1691,6 +1731,8 @@ int main( int argc, char **argv )
                 config_save( ct, "FullScreen", "0" );
                 if( osd ) tvtime_osd_show_message( osd, "Windowed mode active." );
             }
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            commands_refresh_menu( commands );
         }
         if( commands_toggle_alwaysontop( commands ) ) {
             if( output->toggle_alwaysontop() ) {
@@ -1698,6 +1740,8 @@ int main( int argc, char **argv )
             } else {
                 if( osd ) tvtime_osd_show_message( osd, "Window not set always-on-top." );
             }
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            commands_refresh_menu( commands );
         }
         if( commands_toggle_aspect( commands ) ) {
             matte_mode = 0;
@@ -1717,6 +1761,8 @@ int main( int argc, char **argv )
                 tvtime_osd_show_list( osd, 0 );
                 tvtime_osd_set_pixel_aspect( osd, pixel_aspect );
             }
+            build_output_menu( commands_get_menu( commands, "output" ), sixteennine, output->is_fullscreen(), 0 );
+            commands_refresh_menu( commands );
         }
         if( commands_toggle_matte( commands ) ) {
             double matte = 4.0 / 3.0;
@@ -2259,6 +2305,7 @@ int main( int argc, char **argv )
     input_delete( in );
     commands_delete( commands );
     performance_delete( perf );
+    station_writeconfig( stationmgr );
     station_delete( stationmgr );
     if( fifo ) {
         fifo_delete( fifo );

@@ -452,7 +452,7 @@ static void reset_norm_menu( menu_t *menu, const char *norm )
     menu_set_left_command( menu, 8, TVTIME_SHOW_MENU, "input" );
 }
 
-static void osd_build_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
+static void reset_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
 {
     char string[ 128 ];
 
@@ -517,7 +517,6 @@ static void osd_build_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
         menu_set_left_command( menu, 5, TVTIME_SHOW_MENU, "input" );
     }
 }
-
 
 static void menu_set_value( menu_t *menu, int newval )
 {
@@ -633,11 +632,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 5, TVTIME_SHOW_MENU, "output" );
     menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_MENU_EXIT, 0 );
+    menu_set_right_command( menu, 6, TVTIME_MENU_EXIT, 0 );
+    menu_set_left_command( menu, 6, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "root-notuner" );
@@ -657,11 +661,16 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_left_command( menu, 3, TVTIME_MENU_EXIT, 0 );
-    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    sprintf( string, "%c%c%c  Output configuration", 0xee, 0x80, 0x80 );
     menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    menu_set_right_command( menu, 4, TVTIME_MENU_EXIT, 0 );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "output" );
+    menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "output" );
     menu_set_left_command( menu, 4, TVTIME_MENU_EXIT, 0 );
+    sprintf( string, "%c%c%c  Exit", 0xee, 0x80, 0xa0 );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_right_command( menu, 5, TVTIME_MENU_EXIT, 0 );
+    menu_set_left_command( menu, 5, TVTIME_MENU_EXIT, 0 );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations" );
@@ -749,11 +758,11 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, "Setup - Input configuration - Preferred audio mode" );
     commands_add_menu( cmd, menu );
     if( cmd->vidin ) {
-        osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                                   videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                   videoinput_get_audio_mode( cmd->vidin ) );
+        reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                               videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                               videoinput_get_audio_mode( cmd->vidin ) );
     } else {
-        osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ), 0, 0 );
+        reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ), 0, 0 );
     }
 
     menu = menu_new( "norm" );
@@ -782,6 +791,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         cmd->newnorm = "NTSC";
     }
     reset_norm_menu( menu, cmd->newnorm );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "output" );
+    menu_set_text( menu, 0, "Setup - Output configuration" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
@@ -1585,9 +1598,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 }
                 tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
                 tvtime_osd_show_info( cmd->osd );
-                osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                                           videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                           videoinput_get_audio_mode( cmd->vidin ) );
+                reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                                       videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                       videoinput_get_audio_mode( cmd->vidin ) );
                 commands_refresh_menu( cmd );
             }
         }
@@ -1601,9 +1614,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                                       videoinput_get_audio_mode( cmd->vidin ) );
                 tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
                 tvtime_osd_show_info( cmd->osd );
-                osd_build_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                                           videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                           videoinput_get_audio_mode( cmd->vidin ) );
+                reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
+                                       videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                       videoinput_get_audio_mode( cmd->vidin ) );
                 commands_refresh_menu( cmd );
             }
         }
