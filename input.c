@@ -575,6 +575,10 @@ void input_menu_callback( input_t *in, InputEvent command, int arg )
                 in->quit = 1;
                 break;
 
+            case TVTIME_SCREENSHOT:
+                in->screenshot = 1;
+                break;
+
             case TVTIME_MENUMODE:
                 in->togglemenumode = 0;
                 in->menu_screen = MENU_MAIN;

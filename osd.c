@@ -313,7 +313,8 @@ struct osd_graphic_s
     unsigned char *image4444;
     int image_width;
     int image_height;
-    int image_aspect;
+    double image_aspect;
+    int image_adjusted_width;
     int alpha;
 };
 
@@ -340,7 +341,7 @@ osd_graphic_t *osd_graphic_new( const char *filename, int video_width,
     }
     osdg->image_width = video_width;
     osdg->image_height = video_height;
-    osdg->image_aspect = video_aspect;
+    osdg->image_aspect = video_aspect / (double)(((double)osdg->image_width)/((double)osdg->image_height));
     osdg->alpha = 255;
 
     return osdg;
@@ -357,7 +358,7 @@ void osd_graphic_delete( osd_graphic_t *osdg )
 
 void composite_packed444_to_packed4444_alpha_scanline( unsigned char *output, 
                                                        unsigned char *input,
-                                                       int width, int alpha)
+                                                       int width, int alpha )
 {
     int i;
 
@@ -375,6 +376,52 @@ void composite_packed444_to_packed4444_alpha_scanline( unsigned char *output,
 
 }
 
+int aspect_adjust_packed4444_scanline( unsigned char *output,
+                                       unsigned char *input, 
+                                       int width,
+                                       double aspectratio )
+{
+    double i;
+    int w=0, prev_i=0, j;
+    double avg_a=0.0, avg_y=0.0, avg_cb=0.0, avg_cr=0.0, c=0.0;
+    unsigned char *curin;
+
+    for( i=0; i < width; i += aspectratio ) {
+        curin = input + ((int)i)*4;
+
+        if( !prev_i ) {
+            output[ 0 ] = curin[ 0 ];
+            output[ 1 ] = curin[ 1 ];
+            output[ 2 ] = curin[ 2 ];
+            output[ 3 ] = curin[ 3 ];
+        } else {
+            avg_a = 0.0;
+            avg_y = 0.0;
+            avg_cb = 0.0;
+            avg_cr = 0.0;
+            for( c=0,j=prev_i; j <= (int)i; j++,c++ ) {
+                avg_a += input[ j*4 ];
+                avg_y += input[ j*4 + 1 ];
+                avg_cb += input[ j*4 + 2 ];
+                avg_cr += input[ j*4 + 3 ];
+            }
+            avg_a /= c;
+            avg_y /= c;
+            avg_cb /= c;
+            avg_cr /= c;
+            output[ 0 ] = avg_a;
+            output[ 1 ] = avg_y;
+            output[ 2 ] = avg_cb;
+            output[ 3 ] = avg_cr;
+        }
+        output += 4;
+        prev_i = (int)i;
+        w++;
+    }
+
+    return w;
+}
+
 void osd_graphic_render_image4444( osd_graphic_t *osdg )
 {
     int i, width, height;
@@ -386,11 +433,14 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
     width = pnginput_get_width( osdg->png );
     height = pnginput_get_width( osdg->png );
 
-    cb444 = (unsigned char *) malloc( width * 3 );
+    cb444 = (unsigned char *) malloc( (width * 3) );
     if( !cb444 ) return;
 
 
-    curout = osdg->image4444;
+    curout = (unsigned char *)malloc( width*4 );
+    if( !curout) return;
+
+
     for( i=0; i < height; i++ ) {
 
         scanline = pnginput_get_scanline( osdg->png, i );
@@ -403,8 +453,15 @@ void osd_graphic_render_image4444( osd_graphic_t *osdg )
                                                               width, 
                                                               255 );
         }
-        curout += osdg->image_width*4;
+        osdg->image_adjusted_width = aspect_adjust_packed4444_scanline( 
+                                           osdg->image4444+(i*osdg->image_width*4),
+                                           curout, 
+                                           width, 
+                                           osdg->image_aspect );
     }
+
+    free( curout );
+    free( cb444 );
 }
 
 void osd_graphic_show_graphic( osd_graphic_t *osdg, int timeout, int alpha )
@@ -437,7 +494,7 @@ void osd_graphic_composite_packed422( osd_graphic_t *osdg,
 
     composite_packed4444_alpha_to_packed422( output, width, height, stride,
                                        osdg->image4444, 
-                                       pnginput_get_width( osdg->png ),
+                                       osdg->image_adjusted_width,
                                        pnginput_get_height( osdg->png ),
                                        osdg->image_width*4,
                                        xpos, ypos, osdg->alpha );
