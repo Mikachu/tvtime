@@ -1,4 +1,12 @@
 
+0.9.13 -
+  * vektor: We now always mute the sound card on channel change to protect
+      against all of the broken drivers.
+  * vektor: Removed MPEG2 support which did not work anyway.
+  * vektor: Removed SDL, MGA, and DirectFB output drivers, since they are
+      unmaintained and all have various problems.  Removed the command
+      line parameters for selecting an output driver as well.
+
 0.9.12 - Fri Nov 21 23:29:32 AST 2003
   * vektor: Updated with the xmltv memset fix, aspect ratio fix, and
       cs and sv translation updates.

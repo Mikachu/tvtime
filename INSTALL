@@ -1,4 +1,4 @@
-Copyright (C) 2003 Billy Biggs.
+Copyright (C) 2003, 2004 Billy Biggs.
 
 This file is free documentation; Billy Biggs gives unlimited permission to
 copy, distribute and modify it.
@@ -37,19 +37,6 @@ configuration files, and /usr/share/... for icons and menu entries.
   ~/tvtime-0.9.12$ su
   <enter password>
   /home/user/tvtime-0.9.12# make install
-
-Compiling without SDL or DirectFB support
-=========================================
-
-tvtime has two optional dependencies for two special output layers,
-namely DirectFB and SDL.  In some circumstances it may be necessary to
-compile tvtime without these dependencies, for example, if you are
-packaging tvtime for a distribution that does not ship with either SDL
-or DirectFB.  To do this, simply use the options --without-sdl and
---without-directfb as follows:
-
-  ~/tvtime-0.9.12$ ./configure --prefix=/usr --sysconfdir=/etc \
-                               --without-sdl --without-directfb
 
 Compiling with optimized CFLAGS
 ===============================
