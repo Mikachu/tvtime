@@ -35,7 +35,7 @@ struct parser_file_s {
 typedef struct parser_file_s parser_file_t;
 
 int parser_new( parser_file_t *pf, const char *filename );
-const char *parser_get( parser_file_t *pf, const char *name );
+const char *parser_get( parser_file_t *pf, const char *name, int k );
 void parser_delete( parser_file_t *pf );
 int parser_dump( parser_file_t *pf );
 

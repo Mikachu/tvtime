@@ -60,7 +60,7 @@ int parser_openfile( parser_file_t *pf, const char *filename )
     return 1;
 }
 
-const char *parser_get( parser_file_t *pf, const char *name )
+const char *parser_get( parser_file_t *pf, const char *name, int k )
 {
     int i;
 
@@ -71,7 +71,8 @@ const char *parser_get( parser_file_t *pf, const char *name )
 
     for( i=0; i < pf->num_pairs && pf->nv_pairs[i].name; i++ ) {
         if( !strcasecmp( name, pf->nv_pairs[i].name ) ) {
-            return pf->nv_pairs[i].value;
+            if ( --k <= 0 )
+                return pf->nv_pairs[i].value;
         }
     }
 

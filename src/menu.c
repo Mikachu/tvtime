@@ -108,6 +108,8 @@ menu_t *menu_new( input_t *in, config_t *cfg, int width,
 /* Menus */
 void menu_init( menu_t *m )
 {
+
+    if( !m ) return;
     m->menu_screen = MENU_MAIN;
     m->menu_state = 0;
     m->menu_previous_screen = MENU_MAIN;
@@ -119,6 +121,8 @@ void menu_init( menu_t *m )
 
 void menu_main( menu_t *m, int key )
 {
+    if( !m ) return;
+
     switch( key ) {
     case I_UP:
     case I_DOWN:
@@ -186,6 +190,8 @@ void menu_preview( menu_t *m, int key )
 int menu_callback( menu_t *m, InputEvent command, int arg )
 {
     int tvtime_cmd, verbose, fixed_arg = 0;
+
+    if( !m ) return;
 
     verbose = config_get_verbose( m->cfg );
 

@@ -185,7 +185,8 @@ void input_callback( input_t *in, InputEvent command, int arg )
              break;
 
          case TVTIME_CHANNEL_CHAR:
-             /* decode the input char from commands and capitalize */
+             /* decode the input char from commands  */
+             if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
              in->next_chan_buffer[ in->digit_counter ] = arg & 0xFF;
              in->digit_counter++;
              in->digit_counter %= 4;
