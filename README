@@ -28,17 +28,60 @@ computer monitor or projector.
   o   2-3 Pulldown detection for optimal quality viewing of film content
       from NTSC sources.
 
-
-  See docs/default.tvtime.xml for a default configuration file and the
-default runtime keybindings.
-
-  Run 'tvtime -h' to get a list of command line arguments.
-
-  More detailed help, documentation, and known hardware issues can be
-found on the tvtime website.
+  Contents
+  --------
+  1. Where to find help with tvtime
+  2. How to configure your tvtime
+  3. An introduction to using tvtime
+  4. Setting up your channel list in tvtime
 
 
-  Setting up your channel list in tvtime
+1 Where to find help with tvtime
+  ------------------------------
+
+  Detailed help, documentation, known bugs, and known hardware issues can be
+  found on the tvtime website:
+
+     http://tvtime.sourceforge.net/
+
+
+2 How to configure your tvtime
+  ----------------------------
+
+  Run 'tvtime -h' to get a list of command line arguments.  You can also
+save command line arguments to your config file using the -S option.
+
+  tvtime -S -n pal -f europe
+
+  Will save to your config file the norm PAL and frequency table Europe
+as your defaults.  See docs/default.tvtime.xml for a default
+configuration file and the default runtime keybindings.
+
+3 An introduction to using tvtime
+  -------------------------------
+
+  General keys
+    Quit                                 Escape and q
+    Channel up/down and fine tuning      Arrow keys, vi movement keys
+                                         Mouse wheel
+    Mixer mute                           m
+    Volume Control (Line input)          +/-
+    Channel access                       Numbers + enter
+    Fullscreen toggle                    f
+    Take a screenshot                    s
+    Switch deinterlacer                  t
+    Switch framerate                     =
+    Change overscan level                < and >
+    Load next preset settings mode       *
+
+  Video input keys
+    Switch input (Tuner, S-Video, ...)   i
+    Enable closed captions               w
+    Brightness/Contrast/Colour/Hue       F1-F8
+    Show colourbars                      b
+
+
+4 Setting up your channel list in tvtime
   --------------------------------------
 
   Command reference:
@@ -57,7 +100,7 @@ found on the tvtime website.
       the channel list before running the scanner if you believe some
       channels are missing, or if new channels have become available.
 
-  CHANNEL_SKIP (r)
+  CHANNEL_SKIP (F12)
     - Toggles the current channel as being active or disabled in the
       station list.  You can use this to manually scan your channels and
       enable those with signal or disable duplicate stations.
@@ -67,8 +110,8 @@ found on the tvtime website.
       with the number you type in.  Use this to configure your station
       list to suit preference or locality.
 
-  stationlist.xml
-  ---------------
+4.1 stationlist.xml
+    ---------------
 
   The station listing is read in from the ~/.tvtime/stationlist.xml.
 Channel settings are saved specific to norm and frequency table.
@@ -104,8 +147,8 @@ Entries in a list are in the following form:
        <station name="2" active="1" position="0"
                 band="Custom" channel="55.69MHz"/>
 
-  Future enhancements
-  -------------------
+4.2 Future enhancements
+    -------------------
 
   tvtime still needs a method of editing channel names at runtime
 (should not be hard), a full frequency band scanner, native support for
