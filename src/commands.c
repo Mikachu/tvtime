@@ -377,7 +377,7 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             }
         }
         station_writeconfig( in->stationmgr );
-	break;
+    break;
             
     case TVTIME_TOGGLE_ASPECT:
         in->toggleaspect = 1;
@@ -397,14 +397,17 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_TOGGLE_CC:
-	/* Doug: I dont want this to be enabled yet so ...*/
-	break;
-	
+    /* Doug: I dont want this to be enabled yet so ...*/
+        break;
+    
         vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
-        if( in->capturemode )
+        if( in->capturemode ) {
+            tvtime_osd_show_message( in->osd, "Closed Captioning Disabled." );
             in->capturemode = CAPTURE_OFF;
-        else
+        } else {
+            tvtime_osd_show_message( in->osd, "Closed Captioning Enabled." );
             in->capturemode = CAPTURE_CC1;
+        }
         break;
 
     case TVTIME_DISPLAY_INFO:
@@ -505,8 +508,8 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
         if( videoinput_has_tuner( in->vidin ) ) {
-	    station_toggle_us_cable_mode( in->stationmgr );
-	    commands_station_change( in );
+            station_toggle_us_cable_mode( in->stationmgr );
+            commands_station_change( in );
         }
         break;
 
