@@ -525,7 +525,7 @@ static void print_usage( char **argv )
 
     fprintf( stderr, "\t-n\tThe mode to set the tuner to: PAL, NTSC, SECAM, PAL-NC,\n"
                      "\t  \tPAL-M, PAL-N or NTSC-JP (defaults to NTSC).\n" );
-    fprintf( stderr, "\t-D\tThe output driver to use: Xv, DirectFB, mga_vid (defaults to Xv).\n");
+    fprintf( stderr, "\t-D\tThe output driver to use: Xv, DirectFB, mga, xmga (defaults to Xv).\n");
 
     fprintf( stderr, "\t-f\tThe channels you are receiving with the tuner\n"
                      "\t  \t(defaults to us-cable).\n"

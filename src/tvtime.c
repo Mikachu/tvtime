@@ -57,6 +57,7 @@
 #include "station.h"
 #include "dfboutput.h"
 #include "mgaoutput.h"
+#include "xmgaoutput.h"
 #include "rvrreader.h"
 #include "pulldown.h"
 
@@ -101,9 +102,10 @@ static unsigned int pulldown_alg = 0;
  * Which output driver we're using.
  */
 enum {
-    OUTPUT_XV = 0,
-    OUTPUT_DIRECTFB = 1,
-    OUTPUT_MGA = 2,
+    OUTPUT_XV,
+    OUTPUT_DIRECTFB,
+    OUTPUT_MGA,
+    OUTPUT_XMGA
 };
 static unsigned int output_driver = 0;
 
@@ -937,8 +939,10 @@ int main( int argc, char **argv )
         if( !strcasecmp( config_get_output_driver( ct ), "directfb" ) ) {
             fprintf( stderr, "tvtime: Using DirectFB output driver.\n" );
             output_driver = OUTPUT_DIRECTFB;
-        } else if( !strcasecmp( config_get_output_driver( ct ), "mga_vid" ) ) {
+        } else if( !strcasecmp( config_get_output_driver( ct ), "mga" ) ) {
             output_driver = OUTPUT_MGA;
+        } else if( !strcasecmp( config_get_output_driver( ct ), "xmga" ) ) {
+            output_driver = OUTPUT_XMGA;
         } else {
             output_driver = OUTPUT_XV;
         }
@@ -1008,6 +1012,8 @@ int main( int argc, char **argv )
         output = get_dfb_output();
     } else if( output_driver == OUTPUT_MGA ) {
         output = get_mga_output();
+    } else if( output_driver == OUTPUT_XMGA ) {
+        output = get_xmga_output();
     } else {
         output = get_xv_output();
     }
@@ -1148,7 +1154,11 @@ int main( int argc, char **argv )
     }
 
     /* Set input size. */
-    output->set_input_size( width, height );
+    if( !output->set_input_size( width, height ) ) {
+        fprintf( stderr, "tvtime: Can't display input size %dx%d.\n", width, height );
+        /* FIXME: Clean up. */
+        return 1;
+    }
 
     if( profile_startup ) {
         struct timeval profiletime;
