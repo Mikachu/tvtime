@@ -28,7 +28,6 @@ typedef struct commands_s commands_t;
 #include "tvtimeosd.h"
 #include "videoinput.h"
 #include "tvtimeconf.h"
-#include "menu.h"
 #include "console.h"
 #include "vbidata.h"
 #include "station.h"
@@ -143,7 +142,6 @@ int commands_show_bars( commands_t *in );
 int commands_toggle_fullscreen( commands_t *in );
 int commands_toggle_aspect( commands_t *in );
 int commands_toggle_deinterlacing_mode( commands_t *in );
-int commands_toggle_menu( commands_t *in );
 int commands_toggle_pulldown_detection( commands_t *in );
 int commands_toggle_mode( commands_t *in );
 int commands_apply_luma_correction( commands_t *in );
@@ -158,9 +156,6 @@ void commands_set_console( commands_t *in, console_t *con );
 void commands_set_vbidata( commands_t *in, vbidata_t *con );
 
 int commands_console_on( commands_t *in );
-int commands_menu_on( commands_t *in );
-
-void commands_set_menu( commands_t *in, menu_t *m );
 
 void commands_next_frame( commands_t *in );
 int commands_pause( commands_t *in );

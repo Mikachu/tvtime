@@ -61,7 +61,7 @@ typedef struct videoinput_s videoinput_t;
 /**
  * Returns a text version of the norm.
  */
-const char *videoinput_norm_name( int norm );
+const char *videoinput_get_norm_name( int norm );
 
 /**
  * Returns a text version of the audio mode.

@@ -1055,7 +1055,7 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    stationmgr = station_new( videoinput_norm_name( norm ), config_get_v4l_freq( ct ),
+    stationmgr = station_new( videoinput_get_norm_name( norm ), config_get_v4l_freq( ct ),
                               config_get_ntsc_cable_mode( ct ), verbose );
     if( !stationmgr ) {
         fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
@@ -1215,7 +1215,7 @@ int main( int argc, char **argv )
             tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
         } else if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
-            tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
+            tvtime_osd_set_norm( osd, videoinput_get_norm_name( videoinput_get_norm( vidin ) ) );
         } else {
             tvtime_osd_set_input( osd, "No video source" );
             tvtime_osd_set_norm( osd, "" );
@@ -1269,16 +1269,6 @@ int main( int argc, char **argv )
         fflush( stderr );
     }
 
-    /**
-     * Menu disabled until we have time to work on it again.
-    menu = menu_new( commands, ct, vidin, osd, width, height, 
-                     config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
-    if( !menu ) {
-        fprintf( stderr, "tvtime: Can't create menu.\n" );
-    }
-    commands_set_menu( commands, menu );
-    */
-
     /* Ensure the FIFO directory exists */
     fifodir = opendir( FIFODIR );
     if( !fifodir ) {
@@ -1329,7 +1319,7 @@ int main( int argc, char **argv )
         commands_set_console( commands, con );
     }
 
-    in = input_new( ct, commands, con, 0, verbose );
+    in = input_new( ct, commands, con, verbose );
     if( !in ) {
         fprintf( stderr, "tvtime: Can't create input handler.\n" );
         return 1;

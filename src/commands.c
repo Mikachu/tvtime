@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include "station.h"
 #include "mixer.h"
+#include "input.h"
 #include "commands.h"
 #include "console.h"
 
@@ -203,9 +204,6 @@ struct commands_s {
 
     int audio_counter;
     
-    int menu_on;
-    menu_t *menu;
-
     int console_on;
     int scrollconsole;
     console_t *console;
@@ -283,7 +281,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->stationmgr = mgr;
     in->frame_counter = 0;
     in->digit_counter = 0;
-    in->menu = 0;
 
     in->quit = 0;
     in->showbars = 0;
@@ -295,7 +292,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     in->togglepulldowndetection = 0;
     in->togglemode = 0;
     in->framerate = FRAMERATE_FULL;
-    in->menu_on = 0;
     in->console_on = 0;
     in->scrollconsole = 0;
     in->scan_channels = 0;
@@ -349,12 +345,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
     switch( tvtime_cmd ) {
     case TVTIME_QUIT:
         in->quit = 1;
-        break;
-
-    case TVTIME_MENUMODE:
-        in->menu_on = in->menu_on ^ 1;
-        if( in->menu_on )
-            menu_init( in->menu );
         break;
 
     case TVTIME_SHOW_STATS:
@@ -1017,20 +1007,9 @@ int commands_toggle_mode( commands_t *in )
     return in->togglemode;
 }
 
-int commands_toggle_menu( commands_t *in )
-{
-    in->menu_on = !in->menu_on;
-    return in->menu_on;
-}
-
 void commands_set_console( commands_t *in, console_t *con )
 {
     in->console = con;
-}
-
-void commands_set_menu( commands_t *in, menu_t *m )
-{
-    in->menu = m;
 }
 
 void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
@@ -1041,11 +1020,6 @@ void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
 int commands_console_on( commands_t *in )
 {
     return in->console_on;
-}
-
-int commands_menu_on( commands_t *in )
-{
-    return in->menu_on;
 }
 
 int commands_scan_channels( commands_t *in )

@@ -66,7 +66,6 @@ struct config_s
     char *freq;
     char *ssdir;
     char *timeformat;
-    unsigned int menu_bg_rgb;
     unsigned int channel_text_rgb;
     unsigned int other_text_rgb;
 
@@ -244,10 +243,6 @@ static void parse_option( config_t *ct, xmlNodePtr node )
         if( !xmlStrcasecmp( name, BAD_CAST "ScreenShotDir" ) ) {
             if( ct->ssdir ) free( ct->ssdir );
             ct->ssdir = expand_user_path( curval );
-        }
-
-        if( !xmlStrcasecmp( name, BAD_CAST "MenuBG" ) ) {
-            ct->menu_bg_rgb = parse_colour( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "ChannelTextFG" ) ) {
@@ -483,7 +478,6 @@ config_t *config_new( void )
     ct->nummodes = 0;
     ct->modelist = 0;
     ct->fullscreen = 0;
-    ct->menu_bg_rgb = 4278190080U;     /* opaque black (billy: says who?) */
     ct->channel_text_rgb = 0xffffff00; /* opaque yellow */
     ct->other_text_rgb = 0xfff5deb3;   /* opaque wheat */
     ct->deinterlace_method = strdup( "GreedyH" );
@@ -883,11 +877,6 @@ const char *config_get_v4l_freq( config_t *ct )
 const char *config_get_timeformat( config_t *ct )
 {
     return ct->timeformat;
-}
-
-unsigned int config_get_menu_bg_rgb( config_t *ct )
-{
-    return ct->menu_bg_rgb;
 }
 
 unsigned int config_get_channel_text_rgb( config_t *ct )

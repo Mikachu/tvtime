@@ -34,7 +34,6 @@
 #include "tvtimeconf.h"
 #include "input.h"
 #include "commands.h"
-#include "menu.h"
 #include "console.h"
 
 /* Number of frames to wait for next channel digit. */
@@ -119,9 +118,6 @@ struct input_s {
     config_t *cfg;
     commands_t *com;
     
-    int menu_on;
-    menu_t *menu;
-
     int console_on;
     console_t *console;
 
@@ -136,8 +132,7 @@ struct input_s {
 #endif
 };
 
-input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
-                    menu_t *menu, int verbose )
+input_t *input_new( config_t *cfg, commands_t *com, console_t *con, int verbose )
 {
     input_t *in = (input_t *) malloc( sizeof( input_t ) );
 
@@ -147,11 +142,8 @@ input_t *input_new( config_t *cfg, commands_t *com, console_t *con,
     }
 
     in->cfg = cfg;
-    in->menu = menu;
     in->com = com;
-    in->menu_on = 0;
     in->console_on = 0;
-    in->menu = menu;
     in->console = con;
     in->quit = 0;
     in->slave_mode = config_get_slave_mode( cfg );
@@ -193,12 +185,6 @@ void input_callback( input_t *in, InputEvent command, int arg )
     if( in->quit ) return;
 
     verbose = config_get_verbose( in->cfg );
-
-    if( commands_menu_on( in->com ) && in->menu ) {
-        if( menu_callback( in->menu, command, arg ) ) {
-            return;
-        }
-    }
 
     switch( command ) {
     case I_QUIT:

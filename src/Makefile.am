@@ -49,9 +49,9 @@ AM_LDFLAGS = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
-	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c menu.c \
+	pngoutput.c tvtimeosd.c input.c cpu_accel.c speedy.c pnginput.c \
 	deinterlace.c videocorrection.c videotools.c attributes.h deinterlace.h \
-	leetft.h input.h menu.h mixer.h mm_accel.h mmx.h osdtools.h pnginput.h \
+	leetft.h input.h mixer.h mm_accel.h mmx.h osdtools.h pnginput.h \
 	pngoutput.h rtctimer.h speedy.h taglines.h tvtimeconf.h tvtimeosd.h \
 	videocorrection.h videoinput.h videotools.h performance.h performance.c \
 	vbidata.h vbidata.c credits.c credits.h console.h console.c speedtools.h \

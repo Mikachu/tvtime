@@ -45,7 +45,6 @@ const char *config_get_v4l_norm( config_t *ct );
 const char *config_get_v4l_freq( config_t *ct );
 int config_get_ntsc_cable_mode( config_t *ct );
 const char *config_get_timeformat( config_t *ct );
-unsigned int config_get_menu_bg_rgb( config_t *ct );
 unsigned int config_get_channel_text_rgb( config_t *ct );
 unsigned int config_get_other_text_rgb( config_t *ct );
 int config_get_fullscreen( config_t *ct );

@@ -217,7 +217,7 @@ int videoinput_get_num_inputs( videoinput_t *vidin )
     return vidin->numinputs;
 }
 
-const char *videoinput_norm_name( int norm )
+const char *videoinput_get_norm_name( int norm )
 {
     if( norm == VIDEOINPUT_NTSC ) {
         return "NTSC";
@@ -236,6 +236,31 @@ const char *videoinput_norm_name( int norm )
     } else {
         return "ERROR";
     }
+}
+
+static int videoinput_get_norm_height( int norm )
+{
+    if( norm == VIDEOINPUT_NTSC || norm == VIDEOINPUT_NTSC_JP || norm == VIDEOINPUT_PAL_M ) {
+        return 480;
+    } else {
+        return 576;
+    }
+}
+
+static int videoinput_next_compatible_norm( int norm, int isbttv )
+{
+    int height = videoinput_get_norm_height( norm );
+
+    do {
+        norm = norm + 1;
+        if( isbttv ) {
+            norm %= VIDEOINPUT_NTSC_JP;
+        } else {
+            norm %= VIDEOINPUT_PAL_NC;
+        }
+    } while( videoinput_get_norm_height( norm ) != height );
+
+    return norm;
 }
 
 const char *videoinput_audio_mode_name( int mode )
@@ -280,7 +305,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->curframe = 0;
     vidin->verbose = verbose;
     vidin->norm = norm;
-    vidin->height = ( vidin->norm == VIDEOINPUT_NTSC || vidin->norm == VIDEOINPUT_NTSC_JP || vidin->norm == VIDEOINPUT_PAL_M ) ? 480 : 576;
+    vidin->height = videoinput_get_norm_height( norm );
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
     vidin->signal_recover_wait = 0;
     vidin->signal_acquire_wait = 0;
@@ -333,7 +358,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     } else if( norm > VIDEOINPUT_SECAM ) {
         fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
                  "videoinput: The norm you requested, %s, is only supported for bttv-based cards.\n",
-                 v4l_device, videoinput_norm_name( norm ) );
+                 v4l_device, videoinput_get_norm_name( norm ) );
         close( vidin->grab_fd );
         free( vidin );
         return 0;
