@@ -1,0 +1,72 @@
+
+From: Serguei Miridonov <mirsev@cicese.mx>
+
+>   A user of your driver and I were trying to figure out why
+> tvtime wasn't working.  tvtime operates by grabbing interlaced
+> frames at full rate (29.97/25fps), 4:2:2 Y'CbCr sampling, and
+> deinterlacing them to give an output at field rate (but increased
+> to frame size) of 59.94fps/50fps progressive.  The zoran driver,
+> when capturing at 640x480 4:2:2, was providing nasty green
+> frames/colourbars instead of providing any reasonable video
+> content.
+>
+>   The user determined that this is because of some memory
+> limitations of the card, it can't handle this data rate,
+
+It depends on the Zoran PCI controller (new versions work better than
+the old one), and on the motherboard. Intel is much better than VIA,
+for example...
+
+> and so only lower resolutions like 320x240 or something can be
+> provided when asking for raw 4:2:2 images, and that some sort of
+> bigphysmem thing is required to get it to work, if at all.
+>
+>   This restriction seems pretty reasonable given the hardware
+> involved, so that is not my concern.  My concern is simply that
+> the driver did not fail or anything, but fooled tvtime into
+> thinking everything was 'ok'.  I would very much appreciate it if
+> the driver could return some error when it is set in a mode that
+> will not work.  Is this at all possible?
+
+It's not so simple. I can only guess which hardware combination will
+work and which will not (see above). And the hardware provides no
+means to detect any buffer overflow for uncompressed video capture.
+Perhaps, this is because the card was primarily designed for MJPEG
+capture (low bandwidth) and to provide video monitoring on the
+computer display (no RAM access,  just the PCI-PCI transfer from Zoran
+to any graphics adapter. It can capture uncompressed video into memory
+even at full frame rate but not on every system. My old system with
+Pentium MMX 266MHz with Intel 430TX works better than newer Athlon XP
+1800+ at VIA KT266A and DDR memory. Pentium MMX system can capture
+uncompressed video to memory but can do nothing with it due to CPU and
+disk I/O limitations. Athlon system can do anything (even encode into
+MPEG-4 in real time) but some uncompressed frames are dropped due to
+PCI limitations on VIA chipset...
+
+Marcel Birthelmer wrote:
+
+> Sorry for the misunderstanding, i wasn't complaining about a bug.
+> I looked through zoran.c and i realized that the reason for
+> grabdisplay not working was the 128 limit,
+
+This is a limit from Linux kernel: it will not give you contiguous
+memory  longer than 128Kbytes without some special tricks: bigphysmem
+patch or reserving memory at system boot using mem=XXX line in LILO or
+GRUB configs.
+
+> so i tested it, and grabdisplay does work with very small picture
+> sizes. So my question is, what are my options for increasing this
+> memory amount?
+
+Bigphysmem patch or reserving memory at boot time.  I suggest you to
+read  README file: it has notes about this.
+
+> just changing 128 to 1024 doesn't seem to work, but also i don't
+> really want to patch my kernel unless i have to.  Any
+> suggestions?
+
+If you need help, please, describe your system: motherboard chipset,
+processor, memory size and type, etc. Also please note that older
+ZR36057 chip may not work properly on some motherboards.  Newer
+ZR36067 is better but it also may have problems with VIA chipsets.
+
