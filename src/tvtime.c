@@ -2103,10 +2103,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                            (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
                     rtctimer_next_tick( rtctimer );
                 }
-            } else if( performance_get_usecs_since_frame_acquired( perf ) <
-                       fieldtime ) {
-                usleep( fieldtime -
-                        performance_get_usecs_since_frame_acquired( perf ) );
+            } else {
+                int timeleft = performance_get_usecs_since_frame_acquired( perf );
+                if( timeleft < fieldtime ) {
+                    usleep( fieldtime - timeleft );
+                }
             }
         }
 
@@ -2347,10 +2348,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                    < ( fieldtime - (rtctimer_get_usecs( rtctimer ) / 2) ) ) {
                 rtctimer_next_tick( rtctimer );
             }
-        } else if( performance_get_usecs_since_frame_acquired( perf ) <
-                   fieldtime ) {
-            usleep( fieldtime -
-                    performance_get_usecs_since_frame_acquired( perf ) );
+        } else {
+            int timeleft = performance_get_usecs_since_frame_acquired( perf );
+
+            if( timeleft < fieldtime ) {
+                usleep( fieldtime - timeleft );
+            }
         }
         performance_checkpoint_wait_for_bot_field( perf );
 
