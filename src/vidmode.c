@@ -7,7 +7,7 @@
 #include "config.h"
 #include "vidmode.h"
 
-#ifdef HAVE_VIDMODE
+#ifdef HAVE_XF86VIDMODE
 
 #include <X11/Xlib.h>
 #include <X11/extensions/xf86vmode.h>

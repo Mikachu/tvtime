@@ -25,6 +25,9 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
+#include "display.h"
+#include "wm_state.h"
+
 #define FOURCC_YUY2 0x32595559
 
 static XvImage *image;
@@ -43,9 +46,7 @@ static int input_width, input_height;
 static int output_aspect = 0;
 static Cursor nocursor;
 static int output_fullscreen = 0;
-
-static int window_width, window_height;
-static int window_x, window_y;
+static int screen;
 
 int HandleXError( Display *display, XErrorEvent *xevent )
 {
@@ -125,7 +126,6 @@ static int open_display( void )
     int major;
     int minor;
     Bool pixmaps;
-    int screen;
     unsigned int fg, bg;
     char *hello = "tvtime";
     XSizeHints hint;
@@ -135,25 +135,22 @@ static int open_display( void )
 
     display = XOpenDisplay( 0 );
     if( !display ) {
-	fprintf( stderr, "Can not open display\n" );
-	return 0;
+        fprintf( stderr, "Can not open display\n" );
+        return 0;
     }
 
     if( ( XShmQueryVersion( display, &major, &minor, &pixmaps) == 0 ) ||
-	 (major < 1) || ((major == 1) && (minor < 1))) {
-	fprintf (stderr, "No xshm extension\n");
-	return 0;
+         (major < 1) || ((major == 1) && (minor < 1))) {
+        fprintf (stderr, "No xshm extension\n");
+        return 0;
     }
 
     completion_type = XShmGetEventBase( display ) + ShmCompletion;
 
-    screen = DefaultScreen(display);
+    screen = DefaultScreen( display );
     bg = BlackPixel( display, screen );
     fg = BlackPixel( display, screen );
     XGetWindowAttributes( display, DefaultRootWindow( display ), &attribs );
-
-    fprintf( stderr, "going to create window.\n" );
-    // window = XCreateSimpleWindow( display, DefaultRootWindow( display ), 0, 0, 720, 480, 4, fg, bg );
 
     xswa.override_redirect = False;
     xswa.backing_store = NotUseful;
@@ -165,8 +162,6 @@ static int open_display( void )
     window = XCreateWindow( display, RootWindow( display, screen ), 0, 0,
                             output_width, output_height, 0,
                             CopyFromParent, InputOutput, CopyFromParent, mask, &xswa);
-
-
     gc = DefaultGC(display, screen);
 
     hint.x = 0;
@@ -177,7 +172,8 @@ static int open_display( void )
 
     XSetStandardProperties( display, window, hello, hello, None, 0, 0, &hint );
 
-    XSelectInput( display, window, ButtonPressMask | StructureNotifyMask | KeyPressMask );
+    XSelectInput( display, window, ButtonPressMask | StructureNotifyMask |
+                                   KeyPressMask | ExposureMask | PropertyChangeMask );
 
     XMapWindow( display, window );
 
@@ -193,6 +189,14 @@ static int open_display( void )
     curs_col.flags = 0;
     curs_col.pad = 0;
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
+
+    DpyInfoInit( display, screen );
+    fprintf( stderr, "setupdate: %d\n", DpyInfoSetUpdateResolution( display, screen, DpyInfoOriginXF86VidMode ) );
+    DpyInfoSetUpdateGeometry( display, screen, DpyInfoOriginX11 );
+
+    DpyInfoUpdateResolution( display, screen, 0, 0 );
+    DpyInfoUpdateGeometry( display, screen );
+
     return 1;
 }
 
@@ -242,7 +246,6 @@ static void xv_alloc_frame( void )
     size = input_width * input_height * 2;
     alloc = (unsigned char *) create_shm( size);
     if( alloc ) {
-        fprintf( stderr, "creating image.\n" );
         image = XvShmCreateImage( display, xv_port, FOURCC_YUY2, (char *) alloc,
                                   input_width, input_height, &shminfo );
         image_data = alloc;
@@ -280,41 +283,29 @@ void sizehint( int x, int y, int width, int height, int max )
 
 int xv_toggle_fullscreen( int fullscreen_width, int fullscreen_height )
 {
-/*
+    int root_x, root_y;
+    Window dummy_win;
+  
+    XTranslateCoordinates( display, window, DefaultRootWindow( display ), 
+                           0, 0, &root_x, &root_y, &dummy_win );
     output_fullscreen = !output_fullscreen;
+    DpyInfoUpdateResolution( display, screen, root_x, root_y );
+
     if( output_fullscreen ) {
-        window_width = output_width;
-        window_height = output_height;
-        window_x = output_x;
-        window_y = output_y;
-
-        output_width = fullscreen_width;
-        output_height = fullscreen_height;
-
-        sizehint( 0, 0, output_width, output_height, 0 );
-
-        XMoveResizeWindow( display, window, 0, 0, output_width, output_height );
+        ChangeWindowState( display, window, WINDOW_STATE_FULLSCREEN );
         XGrabPointer( display, window, True, 0, GrabModeAsync, GrabModeAsync,
                       window, None, CurrentTime );
         XGrabKeyboard( display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime );
         XDefineCursor( display, window, nocursor );
-        XRaiseWindow( display, window );
-        XSync( display, True );
     } else {
-        output_width = window_width;
-        output_height = window_height;
-        output_x = window_x;
-        output_y = window_y;
-
-        sizehint( output_x, output_y, output_width, output_height, 0 );
-
+        ChangeWindowState( display, window, WINDOW_STATE_NORMAL );
         XUngrabPointer( display, CurrentTime );
         XUngrabKeyboard( display, CurrentTime );
         XUndefineCursor( display, window );
-        XMoveResizeWindow( display, window, window_x, window_y, output_width, output_height );
     }
-*/
 
+    XFlush( display );
+    XSync( display, False );
     return output_fullscreen;
 }
 
@@ -359,9 +350,12 @@ void xv_poll_events( input_t *in )
     while (XPending(display)) {
         XNextEvent(display, &event);
         switch( event.type ) {
+        case Expose:
+            XClearWindow( display, window );
+            break;
         case ConfigureNotify:
-	    XTranslateCoordinates( display, window, DefaultRootWindow( display ), 0, 0,
-			           &output_x, &output_y, &junk );
+            XTranslateCoordinates( display, window, DefaultRootWindow( display ), 0, 0,
+                                   &output_x, &output_y, &junk );
 
             if( event.xconfigure.width != output_width || event.xconfigure.height != output_height ) {
                 output_width = event.xconfigure.width;
@@ -370,7 +364,7 @@ void xv_poll_events( input_t *in )
             }
             break;
         case KeyPress:
-	    mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
+            mykey = XKeycodeToKeysym( display, event.xkey.keycode, 0 );
             if( event.xkey.state & ShiftMask ) arg |= I_SHIFT;
             if( event.xkey.state & ControlMask ) arg |= I_CTRL;
             if( event.xkey.state & Mod1Mask ) arg |= I_META;
