@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <libxml/parser.h>
 #include "configsave.h"
+#include "utils.h"
 
 struct configsave_s
 {
@@ -60,22 +61,6 @@ static xmlNodePtr find_option( xmlNodePtr node, const char *optname )
 
     return 0;
 }
-
-/**
- * This should be moved elsewhere.
- */
-static int file_is_openable_for_read( const char *filename )
-{
-    int fd;
-    fd = open( filename, O_RDONLY );
-    if( fd < 0 ) {
-        return 0;
-    } else {
-        close( fd );
-        return 1;
-    }
-}
-
 
 /* Attempt to parse the file for key elements and create them if they don't exist */
 configsave_t *configsave_open( const char *filename )

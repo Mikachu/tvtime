@@ -25,6 +25,7 @@
 #include <libxml/tree.h>
 #include "station.h"
 #include "bands.h"
+#include "utils.h"
 
 static band_t custom_band = { "Custom", 0, 0 };
 
@@ -646,21 +647,6 @@ static xmlNodePtr find_station( xmlNodePtr node, const char *stationname )
     }
 
     return 0;
-}
-
-/**
- * This should be moved elsewhere.
- */
-static int file_is_openable_for_read( const char *filename )
-{
-    int fd;
-    fd = open( filename, O_RDONLY );
-    if( fd < 0 ) {
-        return 0;
-    } else {
-        close( fd );
-        return 1;
-    }
 }
 
 int station_writeconfig( station_mgr_t *mgr )

@@ -34,6 +34,7 @@
 #include "input.h"
 #include "station.h"
 #include "commands.h"
+#include "utils.h"
 
 #define MAX_KEYSYMS 350
 #define MAX_BUTTONS 10
@@ -510,21 +511,6 @@ static void print_usage( char **argv )
                      "\t  \t\trussia\n" );
     fprintf( stderr, "\t-D\tThe deinterlace method tvtime will use on startup\n"
                      "\t  \t(defaults to 0)\n");
-}
-
-/**
- * This should be moved elsewhere.
- */
-static int file_is_openable_for_read( const char *filename )
-{
-    int fd;
-    fd = open( filename, O_RDONLY );
-    if( fd < 0 ) {
-        return 0;
-    } else {
-        close( fd );
-        return 1;
-    }
 }
 
 config_t *config_new( int argc, char **argv )
