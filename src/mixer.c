@@ -36,6 +36,7 @@ static int saved_volume = (50 & 0xFF00) | (50 & 0x00FF);
 static int mixer_channel = SOUND_MIXER_LINE;
 static int mixer_dev_mask = 1 << SOUND_MIXER_LINE;
 static int muted = 0;
+static int mutecount = 0;
 
 int mixer_get_volume( void )
 {
@@ -95,9 +96,17 @@ void mixer_mute( int mute )
 {
     int fd, v, cmd, devs;
 
+    /**
+     * Make sure that if multiple users mute the card,
+     * we only honour the last one.
+     */
+    if( !mute ) mutecount--;
+    if( mutecount ) return;
+
     fd = open( mixer_device, O_RDONLY );
 
     if( mute ) {
+        mutecount++;
         if( fd != -1 ) {
 
             /* Save volume */

@@ -1202,6 +1202,7 @@ void videoinput_set_tuner_freq( videoinput_t *vidin, int freqKHz )
         }
 
         vidin->change_muted = 1;
+        mixer_mute( 1 );
         videoinput_do_mute( vidin, vidin->user_muted || vidin->change_muted );
         vidin->cur_tuner_state = TUNER_STATE_SIGNAL_DETECTED;
         vidin->signal_acquire_wait = SIGNAL_ACQUIRE_DELAY;
@@ -1542,6 +1543,7 @@ int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
             if( vidin->change_muted ) {
                 vidin->change_muted = 0;
                 videoinput_do_mute( vidin, vidin->user_muted || vidin->change_muted );
+                mixer_mute( 0 );
             }
             break;
         }
@@ -1552,6 +1554,7 @@ int videoinput_check_for_signal( videoinput_t *vidin, int check_freq_present )
             vidin->cur_tuner_state = TUNER_STATE_SIGNAL_LOST;
             vidin->signal_recover_wait = SIGNAL_RECOVER_DELAY;
             vidin->change_muted = 1;
+            mixer_mute( 1 );
             videoinput_do_mute( vidin, vidin->user_muted || vidin->change_muted );
         case TUNER_STATE_SIGNAL_LOST:
             if( vidin->signal_recover_wait ) {
