@@ -1,7 +1,8 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2002, 2003 Doug Bell <drbell@users.sourceforge.net>
  *
- * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
+ * Some mixer routines from mplayer, http://mplayer.sourceforge.net.
+ * Copyright (C) 2000-2002. by A'rpi/ESP-team & others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +26,31 @@
 extern "C" {
 #endif
 
-int mixer_get_volume( void );
-int mixer_set_volume( int percentdiff );
-void mixer_mute( int mute );
-int mixer_conditional_mute( void );
-void mixer_toggle_mute( void );
-int mixer_ismute( void );
+/**
+ * Sets the mixer device and channel.  The device name is of the form
+ * devicename:channelname.  The default is /dev/mixer:line.
+ */
 void mixer_set_device( const char *devname );
+
+/**
+ * Returns the current volume setting.
+ */
+int mixer_get_volume( void );
+
+/**
+ * Tunes the relative volume.
+ */
+int mixer_set_volume( int percentdiff );
+
+/**
+ * Sets the mute state.
+ */
+void mixer_mute( int mute );
+
+/**
+ * Returns true if the mixer is muted.
+ */
+int mixer_ismute( void );
 
 #ifdef __cplusplus
 };

@@ -1,7 +1,8 @@
 /**
- * Copyright (C) 2002 Doug Bell <drbell@users.sourceforge.net>
+ * Copyright (C) 2002, 2003 Doug Bell <drbell@users.sourceforge.net>
  *
- * Mixer routines stolen from mplayer, http://mplayer.sourceforge.net.
+ * Some mixer routines from mplayer, http://mplayer.sourceforge.net.
+ * Copyright (C) 2000-2002. by A'rpi/ESP-team & others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,20 +144,6 @@ void mixer_mute( int mute )
             return;
         }
     }
-}
-
-int mixer_conditional_mute( void )
-{
-    if( !muted ) {
-        mixer_mute( 1 );
-        return 1;
-    }
-    return 0;
-}
-
-void mixer_toggle_mute( void )
-{
-    mixer_mute( !muted );
 }
 
 int mixer_ismute( void )
