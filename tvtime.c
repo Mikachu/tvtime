@@ -516,12 +516,12 @@ int main( int argc, char **argv )
         } else {
             if( config_get_apply_luma_correction( ct ) ) {
                 if( copymode ) {
-                    video_correction_packed422_field_to_frame_bot_twoframe( vc, sdl_get_output(),
+                    video_correction_packed422_field_to_frame_bot_twoframe_copy( vc, sdl_get_output(),
                                                            width*2, curframe,
                                                            lastframe, width,
                                                            height, width*2 );
                 } else {
-                    video_correction_packed422_field_to_frame_bot_twoframe_copy( vc, sdl_get_output(),
+                    video_correction_packed422_field_to_frame_bot_twoframe( vc, sdl_get_output(),
                                                            width*2, curframe,
                                                            lastframe, width,
                                                            height, width*2 );
@@ -536,12 +536,12 @@ int main( int argc, char **argv )
 */
             } else {
                 if( copymode ) {
-                    packed422_field_to_frame_bot_twoframe( sdl_get_output(),
+                    packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
                                                            width*2, curframe,
                                                            lastframe, width,
                                                            height, width*2 );
                 } else {
-                    packed422_field_to_frame_bot_twoframe_copy( sdl_get_output(),
+                    packed422_field_to_frame_bot_twoframe( sdl_get_output(),
                                                            width*2, curframe,
                                                            lastframe, width,
                                                            height, width*2 );
