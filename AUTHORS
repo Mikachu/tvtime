@@ -87,8 +87,8 @@ Code we stole (well, used under the GPL)
     tests yet.
 
   Mixer routines stolen from mplayer
-    http://mplayer.sourceforge.net/
     I took these a while back while doing movietime.
+    http://www.mplayerhq.hu/
 
   Contains fonts which are hosted under the freefont project:
     http://www.nongnu.org/freefont/
@@ -116,10 +116,14 @@ Code we stole (well, used under the GPL)
   Code and ideas on 2-3 pulldown detection by
     D Richard Felker III <dalias@aerifal.cx>, from his work on
     deinterlacer filters for mplayer
+    http://www.mplayerhq.hu/
 
   MMX code for the MPEG2-style vertical [-1 4 2 4 -1]/8 deinterlacer
   filter from ffmpeg by Fabrice Bellard:
     http://ffmpeg.org/
+
+  Screen saver disabling routines from mplayer, 
+    http://www.mplayerhq.hu/
 
   Taglines courtesy of
     James Dewar, Adam Letts, Andrew Lewycky, Håkan Hjort, Billy Biggs,
