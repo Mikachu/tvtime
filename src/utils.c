@@ -680,7 +680,7 @@ void setup_i18n( void )
           fprintf( stderr,
                    "Call to bind_textdomain_codeset() failed to set UTF-8 mode.\n"
                    "This may cause GUI messages to be displayed incorrectly!\n"
-                   "Please report this as a bug at %s.\n"
+                   "Please report this as a bug at %s.\n",
                    PACKAGE_BUGREPORT );
         }
     }
