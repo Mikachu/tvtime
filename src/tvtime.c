@@ -2745,15 +2745,15 @@ int main( int argc, char **argv )
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
                 fprintf( stderr,
-                         _("\n*** Failed to get 1024hz resolution "
-                           "from /dev/rtc.  This will\n"
-                           "*** cause video to be unsmooth.  Please run "
-                           "tvtime as root, or, with\n"
-                           "*** linux kernel version 2.4.19 or later, "
-                           "please run:\n"
-                           "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-                           "*** See our support page at %s "
-                           "for more information\n\n"), PACKAGE_BUGREPORT );
+                         _( "\n*** Failed to get 1024hz resolution from "
+                            "/dev/rtc.  This will cause\n"
+                            "*** video to not be smooth.  Please run tvtime "
+                            "as root, or change\n"
+                            "*** the maximum resolution by running this "
+                            "command as root:\n"
+                            "***       sysctl -w dev.rtc.max-user-freq=1024\n"
+                            "*** See our support page at %s for more "
+                            "information\n\n"), PACKAGE_BUGREPORT );
             }
         }
     }
