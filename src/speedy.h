@@ -292,22 +292,6 @@ extern void (*rgba32_to_packed4444_rec601_scanline)( uint8_t *output,
                                                      int width );
 
 /**
- * Chroma upsampler for a chroma plane (8 bit per pixel) from
- * 4:2:2 to 4:4:4.  I believe that implements the filter described
- * in the MPEG2 spec, but I have not confirmed.
- */
-extern void (*chroma_422_to_444_mpeg2_plane)( uint8_t *dst, uint8_t *src,
-                                              int width, int height );
-
-/**
- * Chroma upsampler for a chroma plane (8 bit per pixel) from
- * 4:2:0 to 4:2:2.  I believe that implements the filter described
- * in the MPEG2 spec, but I have not confirmed.
- */
-extern void (*chroma_420_to_422_mpeg2_plane)( uint8_t *dst, uint8_t *src,
-                                              int width, int height, int progressive );
-
-/**
  * Convert from 4:2:2 with UYVY ordering to 4:2:2 with YUYV ordering.
  */
 extern void (*convert_uyvy_to_yuyv_scanline)( uint8_t *uyvy_buf,
