@@ -74,6 +74,12 @@ void blit_packed422_scanline_i386_linux( unsigned char *dest,
 void blit_packed422_scanline_c( unsigned char *dest, const unsigned char *src,
                                 int width );
 
+/* Alpha provided is from 0-256 not 0-255. */
+void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
+                                                         unsigned char *input,
+                                                         unsigned char *foreground,
+                                                         int width, int alpha );
+
 /**
  * Here are the function pointers which will be initialized to point at the
  * fastest available version of the above after a call to setup_speedy_calls().
@@ -87,6 +93,14 @@ extern void (*blit_colour_packed4444_scanline)( unsigned char *output,
                                                 int width, int alpha, int luma,
                                                 int cb, int cr );
 extern void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
+extern void (*composite_packed4444_to_packed422_scanline)( unsigned char *output,
+                                                           unsigned char *input,
+                                                           unsigned char *foreground,
+                                                           int width );
+extern void (*composite_packed4444_alpha_to_packed422_scanline)( unsigned char *output,
+                                                                 unsigned char *input,
+                                                                 unsigned char *foreground,
+                                                                 int width, int alpha );
 
 /**
  * Sets up the function pointers to point at the fastest function available.

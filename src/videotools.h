@@ -70,10 +70,6 @@ void composite_alphamask_alpha_to_packed4444_scanline( unsigned char *output,
                                                        unsigned char *foreground, int width,
                                                        int textluma, int textcb,
                                                        int textcr, int alpha );
-void composite_packed4444_to_packed422_scanline( unsigned char *output,
-                                                 unsigned char *background,
-                                                 unsigned char *foreground,
-                                                 int width );
 
 void premultiply_packed4444_scanline( unsigned char *output, unsigned char *input, int width );
 
@@ -86,11 +82,7 @@ void composite_bars_packed4444_scanline( unsigned char *output,
                                          int percentage );
 
 
-/* Alpha provided is from 0-256 not 0-255. */
-void composite_packed4444_alpha_to_packed422_scanline( unsigned char *output,
-                                                       unsigned char *background,
-                                                       unsigned char *foreground,
-                                                       int width, int alpha );
+/* Alpha/pos provided is from 0-256 not 0-255. */
 void crossfade_packed422_scanline( unsigned char *output, unsigned char *src1,
                                    unsigned char *src2, int width, int pos );
 void cheap_packed444_to_packed422_scanline( unsigned char *output,

@@ -18,6 +18,20 @@ void (*blit_colour_packed4444_scanline)( unsigned char *output,
                                          int width, int alpha, int luma,
                                          int cb, int cr );
 void (*blit_packed422_scanline)( unsigned char *dest, const unsigned char *src, int width );
+void (*composite_packed4444_to_packed422_scanline)( unsigned char *output, unsigned char *input,
+                                                    unsigned char *foreground, int width );
+void (*composite_packed4444_alpha_to_packed422_scanline)( unsigned char *output,
+                                                          unsigned char *input,
+                                                          unsigned char *foreground,
+                                                          int width, int alpha );
+
+
+static inline __attribute__ ((always_inline,const)) int multiply_alpha( int a, int r )
+{
+    int temp;
+    temp = (r * a) + 0x80;
+    return ((temp + (temp >> 8)) >> 8);
+}
 
 
 void comb_factor_packed422_scanline( unsigned char *top, unsigned char *mid,
@@ -352,22 +366,50 @@ void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
     int i;
 
     for( i = 0; i < width; i++ ) {
-        if( foreground[ 0 ] ) {
-            int a = ((foreground[ 0 ]*alpha)+0x80)>>8;
-            int tmp1, tmp2;
+        int af = foreground[ 0 ];
 
-            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *output = tmp2 & 0xff;
+        if( af ) {
+            int a = ((af * alpha) + 0x80) >> 8;
 
-            if( ( i & 1 ) == 0 ) {
-                tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
-                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 1 ] = tmp2 & 0xff;
 
-                tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
-                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 3 ] = tmp2 & 0xff;
+            if( a == 0xff ) {
+                output[ 0 ] = foreground[ 1 ];
+
+                if( ( i & 1 ) == 0 ) {
+                    output[ 1 ] = foreground[ 2 ];
+                    output[ 3 ] = foreground[ 3 ];
+                }
+            } else if( a ) {
+                /**
+                 * (1 - alpha)*B + alpha*F
+                 * (1 - af*a)*B + af*a*F
+                 *  B - af*a*B + af*a*F
+                 *  B + a*(af*F - af*B)
+                 */
+
+                output[ 0 ] = input[ 0 ]
+                            + ((alpha*( foreground[ 1 ]
+                                        - multiply_alpha( foreground[ 0 ], input[ 0 ] ) ) + 0x80) >> 8);
+
+                if( ( i & 1 ) == 0 ) {
+
+                    /**
+                     * At first I thought I was doing this incorrectly, but
+                     * the following math has convinced me otherwise.
+                     *
+                     * C_r = (1 - alpha)*B + alpha*F
+                     * C_r = B - af*a*B + af*a*F
+                     *
+                     * C_r = 128 + ((1 - af*a)*(B - 128) + a*af*(F - 128))
+                     * C_r = 128 + (B - af*a*B - 128 + af*a*128 + a*af*F - a*af*128)
+                     * C_r = B - af*a*B + a*af*F
+                     */
+
+                    output[ 1 ] = input[ 1 ] + ((alpha*( foreground[ 2 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 1 ] ) ) + 0x80) >> 8);
+                    output[ 3 ] = input[ 3 ] + ((alpha*( foreground[ 3 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 3 ] ) ) + 0x80) >> 8);
+                }
             }
         }
         foreground += 4;
@@ -378,44 +420,56 @@ void composite_packed4444_alpha_to_packed422_scanline_c( unsigned char *output,
 
 void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *output,
                                                               unsigned char *input,
-                                                              unsigned char *foreground, int width, int alpha )
+                                                              unsigned char *foreground,
+                                                              int width, int alpha )
 {
     int i;
 
-    // [ cr ][ cb ][ y1 ][ a1 ][ cr ][ cb ][ y2 ][ a2 ]
-    // ->
-    // [                ][ a1 ][                ][ a2 ]
-    // [ a1 ][ a1 ][ a2 ][ a2 ]
-    // [ cr ][ y1 ][ cb ][ y2 ]
-
-    // [ cr ][ cb ][ y3 ][ a3 ][ cr ][ cb ][ y4 ][ a4 ]
-    // ->
-    // [                ][ a3 ][                ][ a4 ]
-    // [ a3 ][ a3 ][ a4 ][ a4 ]
-    // [ cr ][ y3 ][ cb ][ y4 ]
-
-    // [ cr ][ y1 ][ cb ][ y2 ][ cr ][ y3 ][ cb ][ y4 ]
-    // [ a1 ][ a1 ][ a1 ][ a2 ][
-
-    // [ CR ][ Y1 ][ CB ][ Y2 ][ CR ][ Y3 ][ CB ][ Y4 ]
-
     for( i = 0; i < width; i++ ) {
-        if( foreground[ 0 ] ) {
-            int a = ((foreground[ 0 ]*alpha)+0x80)>>8;
-            int tmp1, tmp2;
+        int af = foreground[ 0 ];
 
-            tmp1 = (foreground[ 1 ] - input[ 0 ]) * a;
-            tmp2 = input[ 0 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *output = tmp2 & 0xff;
+        if( af ) {
+            int a = ((af * alpha) + 0x80) >> 8;
 
-            if( ( i & 1 ) == 0 ) {
-                tmp1 = (foreground[ 2 ] - input[ 1 ]) * a;
-                tmp2 = input[ 1 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 1 ] = tmp2 & 0xff;
 
-                tmp1 = (foreground[ 3 ] - input[ 3 ]) * a;
-                tmp2 = input[ 3 ] + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                output[ 3 ] = tmp2 & 0xff;
+            if( a == 0xff ) {
+                output[ 0 ] = foreground[ 1 ];
+
+                if( ( i & 1 ) == 0 ) {
+                    output[ 1 ] = foreground[ 2 ];
+                    output[ 3 ] = foreground[ 3 ];
+                }
+            } else if( a ) {
+                /**
+                 * (1 - alpha)*B + alpha*F
+                 * (1 - af*a)*B + af*a*F
+                 *  B - af*a*B + af*a*F
+                 *  B + a*(af*F - af*B)
+                 */
+
+                output[ 0 ] = input[ 0 ]
+                            + ((alpha*( foreground[ 1 ]
+                                        - multiply_alpha( foreground[ 0 ], input[ 0 ] ) ) + 0x80) >> 8);
+
+                if( ( i & 1 ) == 0 ) {
+
+                    /**
+                     * At first I thought I was doing this incorrectly, but
+                     * the following math has convinced me otherwise.
+                     *
+                     * C_r = (1 - alpha)*B + alpha*F
+                     * C_r = B - af*a*B + af*a*F
+                     *
+                     * C_r = 128 + ((1 - af*a)*(B - 128) + a*af*(F - 128))
+                     * C_r = 128 + (B - af*a*B - 128 + af*a*128 + a*af*F - a*af*128)
+                     * C_r = B - af*a*B + a*af*F
+                     */
+
+                    output[ 1 ] = input[ 1 ] + ((alpha*( foreground[ 2 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 1 ] ) ) + 0x80) >> 8);
+                    output[ 3 ] = input[ 3 ] + ((alpha*( foreground[ 3 ]
+                                            - multiply_alpha( foreground[ 0 ], input[ 3 ] ) ) + 0x80) >> 8);
+                }
             }
         }
         foreground += 4;
@@ -423,6 +477,130 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( unsigned char *out
         input += 2;
     }
 }
+
+void composite_packed4444_to_packed422_scanline_c( unsigned char *output,
+                                                   unsigned char *input,
+                                                   unsigned char *foreground, int width )
+{
+    int i;
+
+    for( i = 0; i < width; i++ ) {
+        int a = foreground[ 0 ];
+
+        if( a == 0xff ) {
+            output[ 0 ] = foreground[ 1 ];
+
+            if( ( i & 1 ) == 0 ) {
+                output[ 1 ] = foreground[ 2 ];
+                output[ 3 ] = foreground[ 3 ];
+            }
+        } else if( a ) {
+            /**
+             * (1 - alpha)*B + alpha*F
+             *  B + af*F - af*B
+             */
+
+            output[ 0 ] = input[ 0 ] + foreground[ 1 ] - multiply_alpha( foreground[ 0 ], input[ 0 ] );
+
+            if( ( i & 1 ) == 0 ) {
+
+                /**
+                 * C_r = (1 - af)*B + af*F
+                 * C_r = B - af*B + af*F
+                 */
+
+                output[ 1 ] = input[ 1 ] + foreground[ 2 ] - multiply_alpha( foreground[ 0 ], input[ 1 ] );
+                output[ 3 ] = input[ 3 ] + foreground[ 3 ] - multiply_alpha( foreground[ 0 ], input[ 3 ] );
+            }
+        }
+        foreground += 4;
+        output += 2;
+        input += 2;
+    }
+}
+
+
+/*
+void test( void )
+{
+    const int64_t alpha2 = 0x0000FFFF00000000;
+    const int64_t alpha1 = 0xFFFF0000FFFFFFFF;
+    const int64_t round  = 0x0080008000800080;
+          int64_t alpha  = 0x00ff00ff00ff00ff;
+
+    {
+        // mm0 = [ cr ][ cb ][ y2 ][ a1 ][  - ][  - ][ y2 ][ a2 ]
+        movq_m2r( *foreground, mm0 );
+
+        // mm1 = [       cr ][        y ][       cb ][        y ]
+        punpckhbw_m2r( *background, mm1 );
+
+        // mm3 = [       cr ][       cb ][        y ][       a1 ]
+        punpckhbw_r2r( mm0, mm3 );
+
+        // mm4 = [        - ][        - ][       y2 ][       a2 ]
+        punpcklbw_r2r( mm0, mm4 );
+
+        // mm5 = [       a1 ][       a1 ][       a1 ][       a1 ]
+        pshufw_r2r( mm3, mm5, 0 );
+
+        // mm6 = [       a2 ][       a2 ][       a2 ][       a2 ]
+        pshufw_r2r( mm4, mm6, 0 );
+
+        // mm6 = [        0 ][       a2 ][        0 ][        0 ]
+        por_m2r( alpha2, mm6 );
+
+        // mm5 = [       a1 ][        0 ][       a1 ][       a1 ]
+        por_m2r( alpha1, mm5 );
+
+        // mm5 = [       a1 ][       a2 ][       a1 ][       a1 ]
+        por_r2r( mm6, mm5 );
+
+        // mm3 = [       cr ][       cb ][        y ][       a1 ]
+        // mm3 = [       cr ][       cb ][       cb ][        y ]
+        pshufw_r2r( mm3, mm3, 0 );
+
+        // mm3 = [       cr ][        0 ][       cb ][        y ]
+        por_m2r( alpha1, mm3 );
+
+        // mm4 = [        - ][        - ][       y2 ][       a2 ]
+        // mm4 = [        - ][       y2 ][        - ][        - ]
+        pshufw_r2r( mm4, mm4, 0 );
+
+        // mm4 = [        0 ][       y2 ][        0 ][        0 ]
+        por_m2r( alpha2, mm4 );
+
+
+        // mm3 = [       cr ][       y2 ][       cb ][       y1 ]
+        por_r2r( mm4, mm3 );
+
+        // result = B + a*(af*F - af*B)
+        //                  mm3      ^- mm1
+        // mm5 = [       a1 ][       a2 ][       a1 ][       a1 ]
+        // mm3 = [       cr ][       y2 ][       cb ][       y1 ]
+
+        // mm7 = [       cr ][        y ][       cb ][        y ]
+        movq_r2r( mm1, mm7 );
+
+        // mm7 = [    a1*cr ][     a2*y ][    a1*cb ][     a1*y ]
+        pmullw_r2r( mm5, mm7 );
+
+        // mm7 = mm7 + round
+        paddw_m2r( round, mm7 );
+
+        // mm7 = [ cr-a1*cr ][  y2-a2*y ][ cb-a1*cb ][  y1-a1*y ]
+        psubw_r2r( mm5, mm7 );
+
+
+// read in pixels
+
+// B + a*( af*B + af*F )
+// must multiply 
+        
+    }
+}
+*/
+
 
 static uint32_t speedy_accel;
 
@@ -434,6 +612,8 @@ void setup_speedy_calls( void )
     blit_colour_packed422_scanline = blit_colour_packed422_scanline_c;
     blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_c;
     blit_packed422_scanline = blit_packed422_scanline_c;
+    composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_c;
+    composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         fprintf( stderr, "speedycode: Using MMXEXT optimized functions.\n" );
