@@ -25,24 +25,40 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#else
+# define _(string) string
+#endif
 #include "utils.h"
 #include "tvtimeconf.h"
 
 int main( int argc, char **argv )
 {
     int nc = tvtime_num_commands();
-    config_t *cfg = config_new();
+    config_t *cfg;
     FILE *fifo;
     char *fifofile;
     int i;
 
+    /*
+     * Setup i18n. This has to be done as early as possible in order
+     * to show startup messages in the users preferred language.
+     */
+    setup_i18n();
+
+    cfg = config_new();
     if( !cfg ) {
-        fprintf( stderr, "%s: Cannot allocate memory.\n", argv[ 0 ] );
+        fprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
     if( argc < 2 ) {
-        fprintf( stdout, "\nAvailable commands:\n" );
+        fprintf( stdout, _("\nAvailable commands:\n") );
         for( i = 0; i < (nc + 1)/2; i++ ) {
             fprintf( stdout, "    %-25s  %-25s\n", tvtime_get_command( i ),
                ((nc + 1)/2+i < nc ? tvtime_get_command((nc + 1)/2 + i) : "") );
@@ -52,7 +68,7 @@ int main( int argc, char **argv )
 
     fifofile = get_tvtime_fifo_filename( config_get_uid( cfg ) );
     if( !fifofile ) {
-        fprintf( stderr, "%s: Cannot allocate memory.\n", argv[ 0 ] );
+        fprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         config_delete( cfg );
         return 1;
     }
@@ -61,9 +77,9 @@ int main( int argc, char **argv )
     i = open( fifofile, O_WRONLY | O_NONBLOCK );
     if( i < 0 ) {
         if( errno == ENXIO || errno == ENODEV ) {
-            fprintf( stderr, "tvtime not running.\n" );
+            fprintf( stderr, _("tvtime not running.\n") );
         } else {
-            fprintf( stderr, "%s: Cannot open %s: %s\n",
+            fprintf( stderr, _("%s: Cannot open %s: %s\n"),
                      argv[ 0 ], fifofile, strerror( errno ) );
         }
         config_delete( cfg );
@@ -73,7 +89,7 @@ int main( int argc, char **argv )
 
     fifo = fdopen( i, "w" );
     if( !fifo ) {
-        fprintf( stderr, "%s: Cannot open %s: %s\n",
+        fprintf( stderr, _("%s: Cannot open %s: %s\n"),
                  argv[ 0 ], fifofile, strerror( errno ) );
         close( i );
         config_delete( cfg );
@@ -84,17 +100,17 @@ int main( int argc, char **argv )
     for( i = 1; i < argc; i++ ) {
         int cmd = tvtime_string_to_command( argv[ i ] );
         if( cmd == TVTIME_NOCOMMAND ) {
-            fprintf( stderr, "%s: Invalid command '%s'\n",
+            fprintf( stderr, _("%s: Invalid command '%s'\n"),
                      argv[ 0 ], argv[ i ] );
         } else if( tvtime_command_takes_arguments( cmd ) && (i + 1) < argc ) {
             const char *name = tvtime_command_to_string( cmd );
             const char *arg = argv[ ++i ];
-            fprintf( stdout, "%s: Sending command %s with argument %s.\n",
+            fprintf( stdout, _("%s: Sending command %s with argument %s.\n"),
                      argv[ 0 ], name, arg );
             fprintf( fifo, "%s %s\n", name, arg );
         } else {
             const char *name = tvtime_command_to_string( cmd );
-            fprintf( stdout, "%s: Sending command %s.\n", argv[ 0 ], name );
+            fprintf( stdout, _("%s: Sending command %s.\n"), argv[ 0 ], name );
             fprintf( fifo, "%s\n", name );
         }
     }

@@ -20,13 +20,21 @@
  * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#else
+# define _(string) string
+#endif
 #include "videoinput.h"
 #include "tvtimeconf.h"
 #include "station.h"
@@ -34,7 +42,7 @@
 
 int main( int argc, char **argv )
 {
-    config_t *cfg = config_new();
+    config_t *cfg;
     station_mgr_t *stationmgr = 0;
     videoinput_t *vidin;
     int fi, on, tuned;
@@ -42,8 +50,15 @@ int main( int argc, char **argv )
     int verbose, norm;
     int curstation = 1;
 
+    /*
+     * Setup i18n. This has to be done as early as possible in order
+     * to show startup messages in the users preferred language.
+     */
+    setup_i18n();
+
+    cfg = config_new();
     if( !cfg ) {
-        fprintf( stderr, "tvtime-scanner: Can't initialize tvtime configuration, exiting.\n" );
+        fprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
@@ -73,12 +88,13 @@ int main( int argc, char **argv )
         norm = VIDEOINPUT_NTSC;
     }
 
-    fprintf( stderr, "tvtime-scanner: Scanning using TV standard '%s'\n",
+    fprintf( stderr, _("Scanning using TV standard %s.\n"),
              videoinput_get_norm_name( norm ) );
 
-    stationmgr = station_new( videoinput_get_norm_name( norm ), "Custom", 0, verbose );
+    stationmgr = station_new( videoinput_get_norm_name( norm ),
+                              "Custom", 0, verbose );
     if( !stationmgr ) {
-        fprintf( stderr, "tvtime-scanner: Can't create station manager (no memory?), exiting.\n" );
+        lfprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         config_delete( cfg );
         return 1;
     }
@@ -87,8 +103,8 @@ int main( int argc, char **argv )
                             config_get_inputwidth( cfg ), 
                             norm, verbose );
     if( !vidin ) {
-        fprintf( stderr, "tvtime-scanner: Can't open video4linux device '%s'.\n",
-                config_get_v4l_device( cfg ) );
+        fprintf( stderr, _("Can't open capture device '%s'.\n"),
+                 config_get_v4l_device( cfg ) );
         station_delete( stationmgr );
         config_delete( cfg );
         return 1;
@@ -97,8 +113,9 @@ int main( int argc, char **argv )
     }
 
     if( !videoinput_has_tuner( vidin ) ) {
-        fprintf( stderr, "tvtime-scanner: No tuner found on input %d.\n"
-                 "tvtime-scanner: If you have a tuner, select a different input using --input=<num>.\n",
+        fprintf( stderr, _("\n"
+              "    No tuner found on input %d.  If you have a tuner, please\n"
+              "    select a different input using --input=<num>.\n\n"),
                  config_get_inputnum( cfg ) );
         videoinput_delete( vidin );
         station_delete( stationmgr );
@@ -107,7 +124,7 @@ int main( int argc, char **argv )
     }
 
     /* Scan freqnencies */
-    fprintf( stderr, "tvtime-scanner: Scanning from %6.2fMHz to %6.2fMHz.\n",
+    fprintf( stderr, _("Scanning from %6.2f MHz to %6.2f MHz.\n"),
              44.0, 958.0 );
     on = 0;
     fc = 0;
@@ -119,24 +136,24 @@ int main( int argc, char **argv )
         char stationmhz[ 128 ];
 
         videoinput_set_tuner_freq( vidin, (f * 1000) / 16 );
-        fprintf( stderr, "tvtime-scanner: Checking %6.2fMHz:", ((double) f) / 16.0 );
+        fprintf( stderr, _("Checking %6.2fMHz:"), ((double) f) / 16.0 );
         usleep( 200000 ); /* 0.2 sec */
         tuned = videoinput_freq_present( vidin );
 
         /* state machine */
         if( 0 == on && 0 == tuned ) {
-            fprintf( stderr, "  - No signal      \r" );
+            fprintf( stderr, "  - %-30s\r", _("No signal") );
             continue;
         }
         if( 0 == on && 0 != tuned ) {
-            fprintf( stderr, "  + Signal detected\r" );
+            fprintf( stderr, "  + %-30s\r", _("Signal detected") );
             f1 = f;
             /* if( i != chancount ) { fi = i; fc = f; } */
             on = 1;
             continue;
         }
         if( 0 != on && 0 != tuned ) {
-            fprintf( stderr, "  * Signal detected\r" );
+            fprintf( stderr, "  * %-30s\r", _("Signal detected") );
             /* if( i != chancount ) { fi = i; fc = f; } */
             continue;
         }
@@ -148,8 +165,10 @@ int main( int argc, char **argv )
             fc = ((fc + 2)/4)*4;
         }
 
-        fprintf( stderr, "\rtvtime-scanner: Found a channel at %6.2fMHz (%.2f-%.2fMHz), adding to stationlist.\n",
-                 ((double) fc) / 16.0, ((double) f1) / 16.0, ((double) f2) / 16.0 );
+        fprintf( stderr, _("\rFound a channel at %6.2f MHz (%.2f - %.2f MHz), "
+                           "adding to stationlist.\n"),
+                 ((double) fc) / 16.0, ((double) f1) / 16.0,
+                 ((double) f2) / 16.0 );
 
         sprintf( stationmhz, "%.2fMHz", ((double) fc) / 16.0 );
         station_add( stationmgr, curstation, "Custom", stationmhz, stationmhz );

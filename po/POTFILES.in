@@ -4,4 +4,8 @@
 src/tvtime.c
 src/commands.c
 src/tvtimeconf.c
+src/tvtimeosd.c
 src/utils.c
+src/tvtime-command.c
+src/tvtime-configure.c
+src/tvtime-scanner.c

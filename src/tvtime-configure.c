@@ -21,18 +21,35 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#else
+# define _(string) string
+#endif
+#include "utils.h"
 #include "tvtimeconf.h"
 
 int main( int argc, char **argv )
 {
-    config_t *cfg = config_new();
+    config_t *cfg;
+
+    /*
+     * Setup i18n. This has to be done as early as possible in order
+     * to show startup messages in the users preferred language.
+     */
+    setup_i18n();
+
+    cfg = config_new();
     if( !cfg ) {
-        fprintf( stderr, "tvtime-configure: Can't initialize tvtime configuration, exiting.\n" );
+        fprintf( stderr, _("%s: Cannot allocate memory.\n"), argv[ 0 ] );
         return 1;
     }
 
     config_parse_tvtime_config_command_line( cfg, argc, argv );
-
     config_delete( cfg );
     return 0;
 }

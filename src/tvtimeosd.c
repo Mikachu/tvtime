@@ -21,6 +21,15 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef ENABLE_NLS
+# define _(string) gettext (string)
+# include "gettext.h"
+#else
+# define _(string) string
+#endif
 #include "osdtools.h"
 #include "tvtimeosd.h"
 #include "pulldown.h"
@@ -306,7 +315,6 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         !osd->strings[ OSD_PROGRAM5_BAR ].string || !osd->strings[ OSD_DATA_VALUE ].string ||
         !osd->strings[ OSD_MUTED ].string || !osd->strings[ OSD_SHOW_INFO ].string ) {
 
-        fprintf( stderr, "tvtimeosd: Can't create all OSD objects.\n" );
         tvtime_osd_delete( osd );
         return 0;
     }
@@ -344,7 +352,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     osd_string_set_colour_rgb( osd->strings[ OSD_SIGNAL_INFO ].string, other_r, other_g, other_b );
     osd_string_show_border( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_SIGNAL_INFO ].string, "No signal", 0 );
+    osd_string_show_text( osd->strings[ OSD_SIGNAL_INFO ].string, _("No signal"), 0 );
     osd_string_set_hold( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
     osd->strings[ OSD_SIGNAL_INFO ].align = OSD_CENTRE;
     osd->strings[ OSD_SIGNAL_INFO ].xpos = width / 2;
@@ -455,7 +463,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
 
     osd_string_set_colour_rgb( osd->strings[ OSD_MUTED ].string, other_r, other_g, other_b );
     osd_string_show_border( osd->strings[ OSD_MUTED ].string, 1 );
-    osd_string_show_text( osd->strings[ OSD_MUTED ].string, "Mute", 0 );
+    osd_string_show_text( osd->strings[ OSD_MUTED ].string, _("Mute"), 0 );
     osd->strings[ OSD_MUTED ].align = OSD_LEFT;
     osd->strings[ OSD_MUTED ].xpos = osd->margin_left;
     osd->strings[ OSD_MUTED ].ypos = osd->strings[ OSD_MESSAGE1_BAR ].ypos
