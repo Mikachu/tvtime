@@ -173,6 +173,10 @@ station_mgr_t *station_init( config_t *ct )
         station_add_band( mgr, "japan cable" );
     } else if( !strcasecmp( frequencies, "japan-broadcast" ) ) {
         station_add_band( mgr, "japan broadcast" );
+    } else if( !strcasecmp( frequencies, "russia" ) ) {
+        station_add_band( mgr, "vhf russia" );
+        station_add_band( mgr, "uhf" );
+        station_add_band( mgr, "vhf s1-s41" );
     } else if( !strcasecmp( frequencies, "europe" ) ) {
         station_add_band( mgr, "vhf e2-e12" );
         station_add_band( mgr, "vhf s1-s41" );
