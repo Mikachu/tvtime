@@ -168,7 +168,6 @@ static void deinterlace_scanline_linear_blend2( uint8_t *output,
 
 static deinterlace_method_t linearblendmethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Blur: Temporal",
     "BlurTemporal",
     2,

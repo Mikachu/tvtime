@@ -47,7 +47,6 @@ static void copy_scanline( uint8_t *output,
 
 static deinterlace_method_t weavemethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Progressive: Bottom Field First",
     "ProgressiveBFF",
     3,

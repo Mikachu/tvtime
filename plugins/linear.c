@@ -42,7 +42,6 @@ static void copy_scanline( uint8_t *output,
 
 static deinterlace_method_t linearmethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Television: Full resolution",
     "TelevisionFull",
     1,

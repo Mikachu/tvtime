@@ -100,7 +100,6 @@ static void deinterlace_frame_di_tomsmocomp( uint8_t *output, int outstride,
 
 static deinterlace_method_t tomsmocompmethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Motion Adaptive: Motion Search",
     "AdaptiveSearch",
     4,

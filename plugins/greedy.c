@@ -175,7 +175,6 @@ static deinterlace_setting_t settings[] =
 
 static deinterlace_method_t greedymethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Motion Adaptive: Simple Detection",
     "AdaptiveSimple",
     3,

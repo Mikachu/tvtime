@@ -143,7 +143,6 @@ static void copy_scanline( uint8_t *output,
 
 static deinterlace_method_t vfirmethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Blur: Vertical",
     "BlurVertical",
     1,

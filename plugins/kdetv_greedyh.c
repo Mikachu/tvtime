@@ -101,7 +101,6 @@ static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
 
 static deinterlace_method_t greedymethod =
 {
-    DEINTERLACE_PLUGIN_API_VERSION,
     "Motion Adaptive: Advanced Detection",
     "AdaptiveAdvanced",
     4,

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2005 Billy Biggs <vektor@dumbterm.net>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define DEINTERLACE_PLUGIN_API_VERSION 0x00000005
 
 /**
  * Our deinterlacer plugin API is modeled after DScaler's.  This module
@@ -157,7 +155,6 @@ struct deinterlace_setting_s
  */
 struct deinterlace_method_s
 {
-    int version;
     const char *name;
     const char *short_name;
     int fields_required;
