@@ -203,13 +203,14 @@ void xfullscreen_delete( xfullscreen_t *xf )
 
 void xfullscreen_print_summary( xfullscreen_t *xf )
 {
+    int n;
+    int d;
     if( xf->squarepixel ) {
         fprintf( stderr, "xfullscreen: Pixels are square.\n" );
     } else {
+        xfullscreen_get_pixel_aspect( xf, &n, &d );
         fprintf( stderr, "xfullscreen: Pixel aspect ratio on the primary "
-                         "head is: %.2f.\n",
-                 ((double) (xf->heightmm * xf->hdisplay)) /
-                 ((double) (xf->widthmm * xf->vdisplay)) );
+                 "head is: %d/%d == %.2f.\n", n, d, ( (double) n / d ) );
     }
 
     if( xf->usevidmode ) {
@@ -282,21 +283,86 @@ static int calculate_gcd( int x, int y )
     return x;
 }
 
+static void simplify_fraction( int *n, int *d )
+{
+    int gcd = calculate_gcd( *n, *d );
+    *n /= gcd;
+    *d /= gcd;
+}
+
 void xfullscreen_get_pixel_aspect( xfullscreen_t *xf, int *aspect_n,
                                    int *aspect_d )
 {
     if( xf->squarepixel ) {
         *aspect_n = *aspect_d = 1;
     } else {
-        int gcd;
+        int cd;
+        int error_n;
+        int error_d;
 
+        /* Calculate the aspect ratio. */
         *aspect_n = xf->heightmm * xf->hdisplay;
         *aspect_d = xf->widthmm * xf->vdisplay;
+        simplify_fraction( aspect_n, aspect_d );
 
-        gcd = calculate_gcd( *aspect_n, *aspect_d );
-        if( gcd ) {
-            *aspect_n /= gcd;
-            *aspect_d /= gcd;
+        /*
+         * Calculate the maximum error, assuming that the
+         * maximum error in the sources is half a millimeter.
+         */
+        error_n = 1 * xf->hdisplay;
+        error_d = 2 * (xf->widthmm - 1) * xf->vdisplay;
+        simplify_fraction( &error_n, &error_d );
+
+        /* Put the two on a common denominator. */
+        cd = *aspect_d * error_d;
+        error_n *= *aspect_d;
+        *aspect_n *= error_d;
+        *aspect_d = error_d = cd;
+
+        /*
+         * We want to see if the error means that we could end up either
+         * above or below a set aspect ratio. (Capital letters represent
+         * pseudo-variables.)
+         *
+         * <==> This equivalent to saying:
+         * 
+         * (ASPECT + ERROR > RATIO && ASPECT - ERROR < RATIO) ||
+         * (ASPECT + ERROR < RATIO && ASPECT - ERROR > RATIO)
+         *
+         * <==> Changing to compare all to zero.
+         *
+         * (ASPECT + ERROR - RATIO > 0 && ASPECT - ERROR - RATIO < 0) ||
+         * (ASPECT + ERROR - RATIO < 0 && ASPECT - ERROR - RATIO > 0)
+         *
+         * <==> By inspection we can see:
+         *
+         * SIGN(ASPECT + ERROR - RATIO) != SIGN(ASPECT - ERROR - RATIO)
+         *
+         * <==> And since multiplying two integers with different signs
+         *      returns a negative number:
+         *
+         * (ASPECT + ERROR - RATIO) * (ASPECT - ERROR - RATIO) < 0
+         *
+         * <==> Now, we multiply the test by the common denominator, cd:
+         *
+         * (aspect_n+error_n - RATIO_N) * (aspect_n-error_n - RATIO_N) < 0 * cd
+         *
+         * <==> In our case, we're just checking for RATIO == 1, but this can
+         *      be extended in the future to encompass other common aspect
+         *      ratios if neccecary. In our case, also, RATIO_N == cd, because
+         *      (RATIO * cd = RATIO_N) and (RATIO = 1). Also 0 * cd == 0.
+         *      So we get the final test:
+         */
+
+        if( ( *aspect_n + error_n - cd ) * ( *aspect_n - error_n - cd ) < 0 ) {
+            /*
+             * We can assume square pixels, since taking in account the error,
+             * the pixels could either be narrow or wide.
+             */
+            *aspect_n = *aspect_d = 1;
+        } else {
+            /* Simplify and return the aspect ratio. */
+            simplify_fraction( aspect_n, aspect_d );
         }
     }
 }
