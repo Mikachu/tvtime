@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.11\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2003-11-04 14:34-0400\n"
-"PO-Revision-Date: 2003-11-03 19:59+0100\n"
+"PO-Revision-Date: 2003-11-20 00:24+0100\n"
 "Last-Translator: Per von Zweigbergk <pvz@e.kth.se>\n"
 "Language-Team: Per von Zweigbergk <pvz@e.kth.se>\n"
 "MIME-Version: 1.0\n"
@@ -372,7 +372,7 @@ msgstr "Flytta kanal"
 
 #: src/commands.c:314 src/commands.c:317
 msgid "Current channel active in list"
-msgstr "Visar kanal vid bläddring"
+msgstr "Visa kanal vid bläddring"
 
 #: src/commands.c:327
 msgid "Stop channel scan"
