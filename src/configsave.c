@@ -125,6 +125,11 @@ int configsave( configsave_t *cs, const char *INIT_name, const char *INIT_val, c
     xmlAttrPtr attr;
 
     top = xmlDocGetRootElement( cs->Doc );
+    if( !top ) {
+        fprintf( stderr, "configsave: Error, can't get document root.\n" );
+        return 0;
+    }
+
     node = find_option( top->xmlChildrenNode, INIT_name );
     if( !node ) {
         node = xmlNewTextChild( top, 0, BAD_CAST "option", 0 );
