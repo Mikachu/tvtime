@@ -610,7 +610,8 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_SHOW_MENU || command == TVTIME_SET_FRAMERATE ||
             command == TVTIME_SET_AUDIO_MODE || command == TVTIME_SET_INPUT_WIDTH ||
             command == TVTIME_SET_MATTE || command == TVTIME_SET_FREQUENCY_TABLE ||
-            command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION);
+            command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION ||
+	    command == TVTIME_MIXER_UP || command == TVTIME_MIXER_DOWN);
 }
 
 #ifdef ENABLE_NLS

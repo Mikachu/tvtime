@@ -92,6 +92,9 @@ Authors and contributors
   Kevin Ko <kevko@users.sourceforge.net>
     - Improved CC decoding by adding better VBI clock-signal locking
 
+  Corey Quilliam <tourettes@users.sourceforge.net>
+    - Fixed the mixer commands to allow changing by percentages.
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>

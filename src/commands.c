@@ -2752,8 +2752,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->vidin && videoinput_get_muted( cmd->vidin ) ) {
             commands_handle( cmd, TVTIME_TOGGLE_MUTE, 0 );
         }
-        volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
-
+	/* Check to see if an argument was passed, if so, use it. */
+	if (atoi(arg) > 0) {
+	    int perc = atoi(arg);
+	    volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? perc : -perc ) );
+	} else {
+            volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
+	}
+	
         if( cmd->osd ) {
             tvtime_osd_show_data_bar( cmd->osd, _("Volume"), volume & 0xff );
         }
