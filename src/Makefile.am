@@ -76,13 +76,13 @@ tvtime_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 tvtime_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-tvtime_command_SOURCES = utils.c tvtimeconf.c tvtime-command.c
+tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c tvtime-command.c
 tvtime_command_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_command_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-tvtime_configure_SOURCES = utils.c tvtimeconf.c tvtime-configure.c
+tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c tvtime-configure.c
 tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
-tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.c station.c tvtime-scanner.c
+tvtime_scanner_SOURCES = utils.c videoinput.c tvtimeconf.h tvtimeconf.c station.c tvtime-scanner.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
 tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
 
@@ -95,8 +95,10 @@ timingtest_LDFLAGS  = $(SDL_LIBS) $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(PLUGINS_LIBS) $(DIRECTFB_LIBS) $(X11_LIBS) $(XML2_LIBS) $(DYNAMIC_LD_LIBS) -lm
 timingtest_LDADD = $(top_builddir)/plugins/libtvtimeplugins.la wine/libwine.la -lpthread
 
-rvr_SOURCES = $(COMMON_SRCS) reepktq.h reepktq.c rvrmain.c
-rvr_LDADD = -lpthread
+rvr_SOURCES = reepktq.h reepktq.c rtctimer.h rtctimer.c utils.h utils.c \
+	videoinput.h videoinput.c tvtimeconf.h tvtimeconf.c rvrmain.c diffcomp.h diffcomp.c
+rvr_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
+rvr_LDADD = $(ZLIB_LIBS) $(XML2_LIBS) -lpthread
 
 CLEANFILES = expandpng timingtest rvr
 
