@@ -609,27 +609,21 @@ int videoinput_has_tuner( videoinput_t *vidin )
     return (vidin->tuner_number > -1);
 }
 
+int videoinput_is_muted( videoinput_t *vidin )
+{
+    return ( ( vidin->audio.flags & VIDEO_AUDIO_MUTE ) == VIDEO_AUDIO_MUTE );
+}
+
 void videoinput_do_mute( videoinput_t *vidin, int mute )
 {
-    if( !vidin->has_audio ) return;
+    if( vidin->has_audio && mute != videoinput_is_muted( vidin ) ) {
 
-    if( ioctl( vidin->grab_fd, VIDIOCGAUDIO, &(vidin->audio) ) < 0 ) {
-        fprintf( stderr, "videoinput: Can't get audio settings, no audio on this card?\n" );
-        fprintf( stderr, "videoinput: Please post a bug report on "
-                 "http://www.sourceforge.net/projects/tvtime/ and indicate which card/driver you have.\n" );
-        fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
-    }
-
-    if( mute ) {
-        vidin->audio.flags |= VIDEO_AUDIO_MUTE;
-        if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
-            fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
-                     "might cause this.  Post a bug report with your driver info to "
-                     "http://www.sourceforge.net/projects/tvtime/\n" );
-            fprintf( stderr, "videoinput: Include this error: '%s'\n", strerror( errno ) );
+        if( mute ) {
+            vidin->audio.flags |= VIDEO_AUDIO_MUTE;
+        } else {
+            vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
         }
-    } else {
-        vidin->audio.flags &= ~VIDEO_AUDIO_MUTE;
+
         if( ioctl( vidin->grab_fd, VIDIOCSAUDIO, &(vidin->audio) ) < 0 ) {
             fprintf( stderr, "videoinput: Can't set audio settings.  I have no idea what "
                      "might cause this.  Post a bug report with your driver info to "
