@@ -122,7 +122,7 @@ static void build_colourbars( uint8_t *output, int width, int height )
     for( i = 0; i < height; i++ ) {
         uint8_t *curout = output + (i * width * 2);
         uint8_t *curin = cb444 + (i * width * 3);
-        cheap_packed444_to_packed422_scanline( curout, curin, width );
+        packed444_to_packed422_scanline_c( curout, curin, width );
     }
 
     free( cb444 );

@@ -83,7 +83,7 @@ unsigned int (*comb_factor_packed422_scanline)( uint8_t *top, uint8_t *mid,
 void (*kill_chroma_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*mirror_packed422_inplace_scanline)( uint8_t *data, int width );
 void (*halfmirror_packed422_inplace_scanline)( uint8_t *data, int width );
-void (*speedy_memcpy)( void *output, void *input, size_t size );
+void (*speedy_memcpy)( void *output, const void *input, size_t size );
 void (*diff_packed422_block8x8)( pulldown_metrics_t *m, uint8_t *old,
                                  uint8_t *new, int os, int ns );
 void (*a8_subpix_blit_scanline)( uint8_t *output, uint8_t *input,
@@ -478,9 +478,7 @@ void diff_packed422_block8x8_c( pulldown_metrics_t *m, uint8_t *old,
     SPEEDY_END();
 }
 
-
-
-void cheap_packed444_to_packed422_scanline( uint8_t *output, uint8_t *input, int width )
+void packed444_to_packed422_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     SPEEDY_START();
     width /= 2;
@@ -495,7 +493,7 @@ void cheap_packed444_to_packed422_scanline( uint8_t *output, uint8_t *input, int
     SPEEDY_END();
 }
 
-void cheap_packed422_to_packed444_scanline( uint8_t *output, uint8_t *input, int width )
+void packed422_to_packed444_scanline_c( uint8_t *output, uint8_t *input, int width )
 {
     SPEEDY_START();
     width /= 2;
@@ -697,6 +695,77 @@ void interpolate_packed422_scanline_c( uint8_t *output, uint8_t *top,
     SPEEDY_END();
 }
 
+void interpolate_packed422_scanline_mmx( uint8_t *output, uint8_t *top,
+                                         uint8_t *bot, int width )
+{
+    const mmx_t shiftmask = { 0xfefffefffefffeffULL };  /* To avoid shifting chroma to luma. */
+    int i;
+
+    SPEEDY_START();
+
+    for( i = width/16; i; --i ) {
+        movq_m2r( *bot, mm0 );
+        movq_m2r( *top, mm1 );
+        movq_m2r( *(bot + 8), mm2 );
+        movq_m2r( *(top + 8), mm3 );
+        movq_m2r( *(bot + 16), mm4 );
+        movq_m2r( *(top + 16), mm5 );
+        movq_m2r( *(bot + 24), mm6 );
+        movq_m2r( *(top + 24), mm7 );
+        pand_m2r( shiftmask, mm0 );
+        pand_m2r( shiftmask, mm1 );
+        pand_m2r( shiftmask, mm2 );
+        pand_m2r( shiftmask, mm3 );
+        pand_m2r( shiftmask, mm4 );
+        pand_m2r( shiftmask, mm5 );
+        pand_m2r( shiftmask, mm6 );
+        pand_m2r( shiftmask, mm7 );
+        psrlw_i2r( 1, mm0 );
+        psrlw_i2r( 1, mm1 );
+        psrlw_i2r( 1, mm2 );
+        psrlw_i2r( 1, mm3 );
+        psrlw_i2r( 1, mm4 );
+        psrlw_i2r( 1, mm5 );
+        psrlw_i2r( 1, mm6 );
+        psrlw_i2r( 1, mm7 );
+        paddb_r2r( mm1, mm0 );
+        paddb_r2r( mm3, mm2 );
+        paddb_r2r( mm5, mm4 );
+        paddb_r2r( mm7, mm6 );
+        movq_r2m( mm0, *output );
+        movq_r2m( mm2, *(output + 8) );
+        movq_r2m( mm4, *(output + 16) );
+        movq_r2m( mm6, *(output + 24) );
+        output += 32;
+        top += 32;
+        bot += 32;
+    }
+    width = (width & 0xf);
+
+    for( i = width/4; i; --i ) {
+        movq_m2r( *bot, mm0 );
+        movq_m2r( *top, mm1 );
+        pand_m2r( shiftmask, mm0 );
+        pand_m2r( shiftmask, mm1 );
+        psrlw_i2r( 1, mm0 );
+        psrlw_i2r( 1, mm1 );
+        paddb_r2r( mm1, mm0 );
+        movq_r2m( mm0, *output );
+        output += 8;
+        top += 8;
+        bot += 8;
+    }
+    width = width & 0x7;
+
+    /* Handle last few pixels. */
+    for( i = width * 2; i; --i ) {
+        *output++ = ((*top++) + (*bot++)) >> 1;
+    }
+
+    emms();
+
+    SPEEDY_END();
+}
 
 void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
                                             uint8_t *bot, int width )
@@ -744,6 +813,7 @@ void interpolate_packed422_scanline_mmxext( uint8_t *output, uint8_t *top,
         *output++ = ((*top++) + (*bot++)) >> 1;
     }
 
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -759,6 +829,48 @@ void blit_colour_packed422_scanline_c( uint8_t *output, int width, int y, int cb
     for( width /= 2; width; --width ) {
         *o++ = colour;
     }
+
+    SPEEDY_END();
+}
+
+void blit_colour_packed422_scanline_mmx( uint8_t *output, int width, int y, int cb, int cr )
+{
+    unsigned int colour = cr << 24 | y << 16 | cb << 8 | y;
+    int i;
+
+    SPEEDY_START();
+
+    movd_m2r( colour, mm1 );
+    movd_m2r( colour, mm2 );
+    psllq_i2r( 32, mm1 );
+    por_r2r( mm1, mm2 );
+
+    for( i = width / 16; i; --i ) {
+        movq_r2m( mm2, *output );
+        movq_r2m( mm2, *(output + 8) );
+        movq_r2m( mm2, *(output + 16) );
+        movq_r2m( mm2, *(output + 24) );
+        output += 32;
+    }
+    width = (width & 0xf);
+
+    for( i = width / 4; i; --i ) {
+        movq_r2m( mm2, *output );
+        output += 8;
+    }
+    width = (width & 0x7);
+
+    for( i = width / 2; i; --i ) {
+        *((unsigned int *) output) = colour;
+        output += 4;
+    }
+
+    if( width & 1 ) {
+        *output = y;
+        *(output + 1) = cb;
+    }
+
+    emms();
 
     SPEEDY_END();
 }
@@ -800,6 +912,7 @@ void blit_colour_packed422_scanline_mmxext( uint8_t *output, int width, int y, i
         *(output + 1) = cb;
     }
 
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -818,6 +931,45 @@ void blit_colour_packed4444_scanline_c( uint8_t *output, int width,
         *output++ = cb;
         *output++ = cr;
     }
+
+    SPEEDY_END();
+}
+
+void blit_colour_packed4444_scanline_mmx( uint8_t *output, int width,
+                                          int alpha, int luma,
+                                          int cb, int cr )
+{
+    unsigned int colour = (cr << 24) | (cb << 16) | (luma << 8) | alpha;
+    int i;
+
+    SPEEDY_START();
+
+    movd_m2r( colour, mm1 );
+    movd_m2r( colour, mm2 );
+    psllq_i2r( 32, mm1 );
+    por_r2r( mm1, mm2 );
+
+    for( i = width / 8; i; --i ) {
+        movq_r2m( mm2, *output );
+        movq_r2m( mm2, *(output + 8) );
+        movq_r2m( mm2, *(output + 16) );
+        movq_r2m( mm2, *(output + 24) );
+        output += 32;
+    }
+    width = (width & 0x7);
+
+    for( i = width / 2; i; --i ) {
+        movq_r2m( mm2, *output );
+        output += 8;
+    }
+    width = (width & 0x1);
+
+    if( width ) {
+        *((unsigned int *) output) = colour;
+        output += 4;
+    }
+
+    emms();
 
     SPEEDY_END();
 }
@@ -856,6 +1008,7 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
         output += 4;
     }
 
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -868,28 +1021,10 @@ void blit_colour_packed4444_scanline_mmxext( uint8_t *output, int width,
  */
 
 /* linux kernel __memcpy (from: /include/asm/string.h) */
-static inline void * __memcpy(void * to, const void * from, size_t n)
+static inline __attribute__ ((always_inline,const)) void small_memcpy( void *to, const void *from, size_t n )
 {
-int d0, d1, d2;
-__asm__ __volatile__(
-        "rep ; movsl\n\t"
-        "testb $2,%b4\n\t"
-        "je 1f\n\t"
-        "movsw\n"
-        "1:\ttestb $1,%b4\n\t"
-        "je 2f\n\t"
-        "movsb\n"
-        "2:"
-        : "=&c" (d0), "=&D" (d1), "=&S" (d2)
-        :"0" (n/4), "q" (n),"1" ((long) to),"2" ((long) from)
-        : "memory");
-return (to);
-}
-
-static void temp_memcpy( void *to, void *from, size_t n )
-{
-int d0, d1, d2;
-__asm__ __volatile__(
+    int d0, d1, d2;
+    __asm__ __volatile__(
         "rep ; movsl\n\t"
         "testb $2,%b4\n\t"
         "je 1f\n\t"
@@ -903,19 +1038,72 @@ __asm__ __volatile__(
         : "memory");
 }
 
-/**
- * Scanlines are assumed to be approximately 2048 bytes.
- */
-void blit_packed422_scanline_mmxext_billy( uint8_t *dest, const uint8_t *src, int width )
+void speedy_memcpy_c( void *dest, const void *src, size_t n )
 {
     SPEEDY_START();
 
     if( dest != src ) {
-        int i;
+        memcpy( dest, src, n );
+    }
 
-        READ_PREFETCH_2048( src );
+    SPEEDY_END();
+}
 
-        for( i = width/32; i; i-- ) {
+void speedy_memcpy_mmx( void *d, const void *s, size_t n )
+{
+    const uint8_t *src = s;
+    uint8_t *dest = d;
+
+    SPEEDY_START();
+
+    if( dest != src ) {
+        while( n > 64 ) {
+            movq_m2r( src[ 0 ], mm0 );
+            movq_m2r( src[ 8 ], mm1 );
+            movq_m2r( src[ 16 ], mm2 );
+            movq_m2r( src[ 24 ], mm3 );
+            movq_m2r( src[ 32 ], mm4 );
+            movq_m2r( src[ 40 ], mm5 );
+            movq_m2r( src[ 48 ], mm6 );
+            movq_m2r( src[ 56 ], mm7 );
+            movq_r2m( mm0, dest[ 0 ] );
+            movq_r2m( mm1, dest[ 8 ] );
+            movq_r2m( mm2, dest[ 16 ] );
+            movq_r2m( mm3, dest[ 24 ] );
+            movq_r2m( mm4, dest[ 32 ] );
+            movq_r2m( mm5, dest[ 40 ] );
+            movq_r2m( mm6, dest[ 48 ] );
+            movq_r2m( mm7, dest[ 56 ] );
+            dest += 64;
+            src += 64;
+            n -= 64;
+        }
+
+        while( n > 8 ) {
+            movq_m2r( src[ 0 ], mm0 );
+            movq_r2m( mm0, dest[ 0 ] );
+            dest += 8;
+            src += 8;
+            n -= 8;
+        }
+
+        if( n ) small_memcpy( dest, src, n );
+
+        emms();
+    }
+
+    SPEEDY_END();
+}
+
+void speedy_memcpy_mmxext( void *d, const void *s, size_t n )
+{
+    const uint8_t *src = s;
+    uint8_t *dest = d;
+
+    SPEEDY_START();
+
+    if( dest != src ) {
+        while( n > 64 ) {
             movq_m2r( src[ 0 ], mm0 );
             movq_m2r( src[ 8 ], mm1 );
             movq_m2r( src[ 16 ], mm2 );
@@ -934,9 +1122,19 @@ void blit_packed422_scanline_mmxext_billy( uint8_t *dest, const uint8_t *src, in
             movntq_r2m( mm7, dest[ 56 ] );
             dest += 64;
             src += 64;
+            n -= 64;
         }
-        i = (width * 2) & 63;
-        if( i ) __memcpy( dest, src, i );
+
+        while( n > 8 ) {
+            movq_m2r( src[ 0 ], mm0 );
+            movntq_r2m( mm0, dest[ 0 ] );
+            dest += 8;
+            src += 8;
+            n -= 8;
+        }
+
+        if( n ) small_memcpy( dest, src, n );
+
         sfence();
         emms();
     }
@@ -944,19 +1142,19 @@ void blit_packed422_scanline_mmxext_billy( uint8_t *dest, const uint8_t *src, in
     SPEEDY_END();
 }
 
-
-void blit_packed422_scanline_i386_linux( uint8_t *dest, const uint8_t *src, int width )
-{
-    SPEEDY_START();
-    if( dest != src ) __memcpy( dest, src, width*2 );
-    SPEEDY_END();
-}
-
 void blit_packed422_scanline_c( uint8_t *dest, const uint8_t *src, int width )
 {
-    SPEEDY_START();
-    if( dest != src ) memcpy( dest, src, width*2 );
-    SPEEDY_END();
+    speedy_memcpy_c( dest, src, width*2 );
+}
+
+void blit_packed422_scanline_mmx( uint8_t *dest, const uint8_t *src, int width )
+{
+    speedy_memcpy_mmx( dest, src, width*2 );
+}
+
+void blit_packed422_scanline_mmxext( uint8_t *dest, const uint8_t *src, int width )
+{
+    speedy_memcpy_mmxext( dest, src, width*2 );
 }
 
 void composite_packed4444_alpha_to_packed422_scanline_c( uint8_t *output, uint8_t *input,
@@ -1116,6 +1314,7 @@ void composite_packed4444_alpha_to_packed422_scanline_mmxext( uint8_t *output,
         output += 4;
         input += 4;
     }
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -1253,6 +1452,7 @@ void composite_packed4444_to_packed422_scanline_mmxext( uint8_t *output, uint8_t
         output += 4;
         input += 4;
     }
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -1395,6 +1595,7 @@ void composite_alphamask_to_packed4444_scanline_mmxext( uint8_t *output,
         output += 4;
         input += 4;
     }
+    sfence();
     emms();
     SPEEDY_END();
 }
@@ -1491,6 +1692,7 @@ void premultiply_packed4444_scanline_mmxext( uint8_t *output, uint8_t *input, in
         output += 4;
         input += 4;
     }
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -1553,6 +1755,7 @@ void blend_packed422_scanline_mmxext( uint8_t *output, uint8_t *src1,
             src1 += 4;
             src2 += 4;
         }
+        sfence();
         emms();
 
         SPEEDY_END();
@@ -1611,6 +1814,7 @@ void quarter_blit_vertical_packed422_scanline_mmxext( uint8_t *output, uint8_t *
         three++;
     }
 
+    sfence();
     emms();
 
     SPEEDY_END();
@@ -1693,7 +1897,7 @@ void setup_speedy_calls( int verbose )
     kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_c;
     mirror_packed422_inplace_scanline = mirror_packed422_inplace_scanline_c;
     halfmirror_packed422_inplace_scanline = halfmirror_packed422_inplace_scanline_c;
-    speedy_memcpy = temp_memcpy;
+    speedy_memcpy = speedy_memcpy_c;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
     quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
@@ -1706,7 +1910,7 @@ void setup_speedy_calls( int verbose )
         interpolate_packed422_scanline = interpolate_packed422_scanline_mmxext;
         blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmxext;
         blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmxext;
-        blit_packed422_scanline = blit_packed422_scanline_mmxext_billy;
+        blit_packed422_scanline = blit_packed422_scanline_mmxext;
         composite_packed4444_to_packed422_scanline = composite_packed4444_to_packed422_scanline_mmxext;
         composite_packed4444_alpha_to_packed422_scanline = composite_packed4444_alpha_to_packed422_scanline_mmxext;
         composite_alphamask_to_packed4444_scanline = composite_alphamask_to_packed4444_scanline_mmxext;
@@ -1717,14 +1921,20 @@ void setup_speedy_calls( int verbose )
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
         quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_mmxext;
+        speedy_memcpy = speedy_memcpy_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );
         }
+        interpolate_packed422_scanline = interpolate_packed422_scanline_mmx;
+        blit_colour_packed422_scanline = blit_colour_packed422_scanline_mmx;
+        blit_colour_packed4444_scanline = blit_colour_packed4444_scanline_mmx;
+        blit_packed422_scanline = blit_packed422_scanline_mmx;
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         kill_chroma_packed422_inplace_scanline = kill_chroma_packed422_inplace_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
+        speedy_memcpy = speedy_memcpy_mmx;
     } else {
         if( verbose ) {
             fprintf( stderr, "speedycode: No MMX or MMXEXT support detected, using C fallbacks.\n" );
