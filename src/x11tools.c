@@ -162,17 +162,21 @@ void saver_off(Display *mDisplay) {
       sigaction( SIGCHLD, &sigchld_act, NULL );
 
       errno = 0;
+      printf( "Creating child...\n" );
       ping_xscreensaver_child = fork();
       if( !ping_xscreensaver_child ) {
         int result;
+        printf( "Child executing.\n" );
         /* We are the child, and we will ping xscreensaver every minute,
          * to keep it from activating on us. */
 
         /* We don't trap for any close() errors because we don't care
          * about data lossage. */
         close( STDIN_FILENO );
-        close( STDOUT_FILENO );
-        close( STDERR_FILENO );
+
+        /* Don't close stdin/out as it's nice to see any errors */
+/*        close( STDOUT_FILENO );
+        close( STDERR_FILENO );*/
 
         /* We need to drop privileges to the normal user, in case we are
          * still setuid. */
@@ -199,17 +203,46 @@ void saver_off(Display *mDisplay) {
         /* Ping xscreensaver once every ping_xscreensaver_sleep 
          * seconds. */
         for( ;; ) {
-          errno = 0;
-          result = execlp( "xscreensaver-command", "-deactivate", NULL );
-          if( errno ) {
-            exit( NO_XSCREENSAVER );
-          }
 
-          if( result ) {
-            exit( BAD_XSCREENSAVER );
+          errno = 0;
+
+          /* create a new process that will be _replaced_ by xscreensaver */
+          result = fork();
+
+          if ( result == 0 ) {
+
+            /* Child process - exec xscreensaver */
+            /* xscreensaver-command must be written _twice_ as execlp starts
+            its parameters with arg[0], not arg[1] */
+            result = execlp( "xscreensaver-command", "xscreensaver-command",
+              "-deactivate", NULL );
+            if( errno ) {
+              exit( NO_XSCREENSAVER );
+            }
+
+          } else if ( result > 0 ) {
+
+            /* Parent process - wait for child */
+            wait( &result );
+            if ( result > 0 ) {
+
+              /* xscreensaver-command exited nonzero status, or the child
+              couldn't exec xscreensaver-command */
+              printf( "Parent: Child exited with nonzero status.\n" );
+              exit( result );
+
+            }
+
+          } else {
+
+              /* Could not create child to run xscreensaver-command */
+              printf( "Could not create xscreensaver child.\n" );
+              exit( NO_XSCREENSAVER );
+
           }
 
           sleep( ping_xscreensaver_sleep );
+
         }
       } else if( ping_xscreensaver_child < 0 ) {
         fprintf( stderr, "x11tools: can't fork a child.\n" );
