@@ -230,11 +230,6 @@ static void reinit_tuner( commands_t *in )
             vbidata_capture_mode( in->vbi, in->capturemode );
         }
 
-        if( config_get_verbose( in->cfg ) ) {
-            fprintf( stderr, "tvtime: Changing to channel %s.\n",
-                     station_get_current_channel_name( in->stationmgr ) );
-        }
-
         videoinput_set_audio_mode( in->vidin, VIDEOINPUT_MONO );
         in->audio_counter = CHANNEL_STEREO_DELAY;
 
@@ -350,9 +345,7 @@ void commands_delete( commands_t *in )
 
 void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 {
-    int verbose, volume;
-
-    verbose = config_get_verbose( in->cfg );
+    int volume;
 
     switch( tvtime_cmd ) {
     case TVTIME_QUIT:
@@ -610,10 +603,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
             if( in->luma_power > 10.0 ) in->luma_power = 10.0;
             if( in->luma_power <  0.0 ) in->luma_power = 0.0;
 
-            if( verbose ) {
-                fprintf( stderr, "tvtime: Luma correction value: %.1f\n", in->luma_power );
-            }
-
             snprintf( message, sizeof( message ), "%.1f", in->luma_power );
             config_save( in->cfg, "LumaCorrection", message );
             if( in->osd ) {
@@ -646,25 +635,20 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
 
     case TVTIME_FINETUNE_DOWN:
     case TVTIME_FINETUNE_UP:
-        if( in->vidin ) {
-            if( !videoinput_has_tuner( in->vidin ) && verbose ) {
-                fprintf( stderr, "tvtime: Can't fine tune channel, "
-                         "no tuner available on this input!\n" );
-            } else if( videoinput_has_tuner( in->vidin ) ) {
-                videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
-                                           ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
+        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+            videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
+                                       ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
-                if( in->vbi ) {
-                    vbidata_reset( in->vbi );
-                    vbidata_capture_mode( in->vbi, in->capturemode );
-                }
+            if( in->vbi ) {
+                vbidata_reset( in->vbi );
+                vbidata_capture_mode( in->vbi, in->capturemode );
+            }
 
-                if( in->osd ) {
-                    char message[ 200 ];
-                    snprintf( message, sizeof( message ), "Tuning: %4.2fMhz.",
-                              ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-                    tvtime_osd_show_message( in->osd, message );
-                }
+            if( in->osd ) {
+                char message[ 200 ];
+                snprintf( message, sizeof( message ), "Tuning: %4.2fMhz.",
+                          ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
+                tvtime_osd_show_message( in->osd, message );
             }
         }
         break;
@@ -727,9 +711,6 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         }
         volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
 
-        if( verbose ) {
-            fprintf( stderr, "input: volume %d\n", (volume & 0xFF) );
-        }
         if( in->osd ) {
             tvtime_osd_show_volume_bar( in->osd, volume & 0xff );
         }
