@@ -908,12 +908,15 @@ int commands_toggle_menu( commands_t *in )
 void commands_next_frame( commands_t *in )
 {
     /* Decrement the frame counter if user is typing digits */
-    if( in->frame_counter > 0 ) in->frame_counter--;
+    if( in->frame_counter > 0 ) {
+        in->frame_counter--;
+        if( in->frame_counter == 0 ) {
+            /* Switch to the next channel if the countdown expires. */
+            commands_handle( in, TVTIME_ENTER, 0 );
+        }
+    }
 
     if( in->frame_counter == 0 ) {
-        /* Switch to the next channel if the countdown expires. */
-        commands_handle( in, TVTIME_ENTER, 0 );
-
         memset( in->next_chan_buffer, 0, 5 );
         in->digit_counter = 0;
         if( in->renumbering ) {
