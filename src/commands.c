@@ -906,9 +906,11 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_SHOW_MENU:
-        commands_clear_menu_positions( cmd );
-        if( set_menu( cmd, arg ) || set_menu( cmd, "root" ) ) {
-            display_current_menu( cmd );
+        if( cmd->osd ) {
+            commands_clear_menu_positions( cmd );
+            if( set_menu( cmd, arg ) || set_menu( cmd, "root" ) ) {
+                display_current_menu( cmd );
+            }
         }
         break;
 
