@@ -1,7 +1,9 @@
-#include <stdio.h>
+#include "config.h"
 
 #ifdef HAVE_LIBXML2
 
+#include <stdio.h>
+#include <string.h>
 #include <libxml/parser.h>
 #include <libxml/xmlmemory.h>
 
@@ -9,12 +11,6 @@
 #include "videotools.h"
 #include "parser.h"
 #include "input.h"
-
-typedef struct
-{
-    char *name;
-    char *val;
-} ConfigDef;
 
 /*
  type can be:
@@ -27,13 +23,20 @@ typedef struct
     s - *char
 */
 
-typedef struct
+typedef struct config_s
 {
     char *name;
     void *val;
     char type;
-    Conf *next;
+    struct config_s *next;
 } Conf;
+
+typedef struct
+{
+    char *name;
+    char *val;
+} ConfigDef;
+
 
 
 typedef struct
@@ -135,8 +138,8 @@ static const KeyBindDef key_def[] =
     {'r',	TVTIME_SKIP_CHANNEL},
     {' ',	TVTIME_AUTO_ADJUST_PICT},
     {'=',	TVTIME_TOGGLE_HALF_FRAMERATE},
-    {"b",	TVTIME_DETECT_SCANLINE_BIAS},
-    {0, 0}
+    {'b',	TVTIME_DETECT_SCANLINE_BIAS},
+    {'\0', 0}
 };
 
 static const MouseBindDef mouse_def[] = 
@@ -210,7 +213,7 @@ static const Cmd_Names cmd_table[] = {
     { "CHANNEL_8", TVTIME_CHANNEL_8 },
     { "CHANNEL_9", TVTIME_CHANNEL_9 },
     { "CHANNEL_0", TVTIME_CHANNEL_0 }, 
-    { NULL, NULL }
+    { NULL, 0 }
 };
 
 
@@ -226,9 +229,10 @@ int xml_string_to_command( const char *str )
     return TVTIME_NOCOMMAND;
 }
 
-Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const char *type)
+Conf *xml_config_set(Conf *C_root, const xmlChar *name, const xmlChar *value, const xmlChar *type)
 {
     Conf *C_cur, *C_prev=NULL;
+    int i;
 
     if( !name || !*name ||
 	!value || !*value ||
@@ -238,19 +242,21 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
     for(C_cur=C_root; C_cur != NULL; C_cur=C_cur->next)
     {
 	C_prev=C_cur;
-	if(!strcasecmp(name, C_cur->name) && *type == C_cur->type)
+	if(!xmlStrcmp(name, (const xmlChar *)C_cur->name) && *type == C_cur->type)
 	{
 	    switch (*type)
 	    {
 		case 'i':
 		case 'u':
-		    memcpy(C_cur->val, atoi(value), sizeof(int));
+		    i = atoi((const char *)value);
+		    memcpy(C_cur->val, &i, sizeof(int));
 		    break;
 		case 'f':
 		    memcpy(C_cur->val, value, sizeof(double));
 		    break;
 		case 'c':
-		    memcpy(C_cur->val, string_to_command(value), sizeof(int));
+		    i = string_to_command((const char *)value);
+		    memcpy(C_cur->val, &i, sizeof(int));
 		    break;
 		case 'b':
 		    switch (*value)
@@ -260,7 +266,8 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 			case '1': /* 1    */
 			case 'Y': /* Yes  */
 			case 'y': /* yes  */
-			    memcpy(C_cur->val, (const int)1, sizeof(int));
+			    i=1;
+			    memcpy(C_cur->val, &i, sizeof(int));
 			    break;
 			case 'F': /* False */
 			case 'f': /* false */
@@ -268,7 +275,8 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 			case 'N': /* No    */
 			case 'n': /* no    */
 			default:
-			    memcpy(C_cur->val, (const int)0, sizeof(int));
+			    i=0;
+			    memcpy(C_cur->val, &i, sizeof(int));
 			    break;
 		    }
 		    break;
@@ -279,7 +287,7 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 		default:
 		    if(C_cur->val != NULL)
 		    {
-			if(!strcasecmp(value, (char *)C_cur->val)) break;
+			if(!xmlStrcmp(value, C_cur->val)) break;
 			free(C_cur->val);
 		    }
 		    if((C_cur->val = (void *)strdup(value)) == NULL)
@@ -292,32 +300,33 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 
 /* Item not found. Add new item */
 
-    if(C_cur = (Conf *) malloc(sizeof(Conf)) == NULL ) return NULL;
+    if((C_cur = (Conf *) malloc(sizeof(Conf))) == NULL ) return C_root;
     
     switch (*type)
     {
 	case 'i':
 	case 'u':
-    	    if((C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
+    	    if( (C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
+		(C_cur->name = strdup(name)) == NULL ) return C_root;
 	    memcpy(C_cur->val, value, sizeof(int));
 	    break;
 
 	case 'f':
-	    if((C_cur->val = (void *)malloc(sizeof(double))) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
+	    if( (C_cur->val = (void *)malloc(sizeof(double))) == NULL ||
+		(C_cur->name = strdup(name)) == NULL ) return C_root;
 	    memcpy(C_cur->val, value, sizeof(double));
 	    break;
 		
 	case 'c':
-	    if((C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
-	    memcpy(C_cur->val, string_to_command(value), sizeof(int));
+	    if( (C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
+		(C_cur->name = strdup(name)) == NULL ) return C_root;
+	    i = string_to_command((const char *)value);
+	    memcpy(C_cur->val, &i, sizeof(int));
 	    break;
 
 	case 'b':
-	    if((C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
+	    if( (C_cur->val = (void *)malloc(sizeof(int))) == NULL ||
+		(C_cur->name = strdup(name)) == NULL) return C_root;
 	    switch (*value)
 	    {
 		case 'T': /* True */
@@ -325,7 +334,8 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 		case '1': /* 1    */
 		case 'Y': /* Yes  */
 		case 'y': /* yes  */
-		    memcpy(C_cur->val, (const int)1, sizeof(int));
+		    i = 1;
+		    memcpy(C_cur->val, &i, sizeof(int));
 		    break;
 		case 'F': /* False */
 		case 'f': /* false */
@@ -333,20 +343,21 @@ Conf *xml_config_set(Conf *C_root, const char *name, const char *value, const ch
 		case 'N': /* No    */
 		case 'n': /* no    */
 		default:
-		    memcpy(C_cur->val, (const int)0, sizeof(int));
+		    i = 0;
+		    memcpy(C_cur->val, &i, sizeof(int));
 		    break;
 	    }
 	    break;
 	case 'l':
-	    if((C_cur->val = (void *)malloc(sizeof(long long))) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
+	    if( (C_cur->val = (void *)malloc(sizeof(long long))) == NULL ||
+		(C_cur->name = strdup(name)) == NULL ) return C_root;
 	    memcpy(C_cur->val, value, sizeof(long long));
 	    break;
 
 	case 's':
 	default:
-	    if((C_cur->val = (void *)strdup(value)) == NULL ||
-		C_cur->name = strdup(name)) { free(C_cur); return NULL; }
+	    if( (C_cur->val = (void *)strdup(value)) == NULL ||
+		(C_cur->name = strdup(name)) == NULL ) return C_root;
 	    break;
     }
     
@@ -360,8 +371,7 @@ Conf *xml_config_init(char *docname)
 {
     xmlDocPtr doc;
     xmlNodePtr cur;
-    Conf *C_root, *C_cur, *C_prev;
-    char *type, *value;
+    Conf *C_root;
     
     if((doc = xmlParseFile(docname)) == NULL)
     {
@@ -378,7 +388,7 @@ Conf *xml_config_init(char *docname)
     
     if (xmlStrcmp(cur->name, (const xmlChar *) "Conf"))
     {
-	fprintf(stderr,"Incorrect root node in configuration file %s (must be 'Conf')");
+	fprintf(stderr,"Incorrect root node in configuration file %s (must be 'Conf')", cur->name);
 	xmlFreeDoc(doc);
 	return NULL;
     }
@@ -396,18 +406,21 @@ Conf *xml_config_init(char *docname)
     
     for (C_root=NULL; cur != NULL; cur=cur->next)
 	if ((!xmlStrcmp(cur->name, (const xmlChar *)"entry")))
-	    xml_config_set(C_root, xmlGetProp(cur, "name"), xmlGetProp(cur, "value"), mlGetProp(cur, "type")))
-
+	    C_root=xml_config_set(C_root, xmlGetProp(cur, (const xmlChar *)"name"), 
+				    xmlGetProp(cur, (const xmlChar *)"value"), 
+				    xmlGetProp(cur, (const xmlChar *)"type"));
 
     xmlFreeDoc(doc);
     return C_root;
 }
 
+/*
 Conf *xml_config_new(int argc, char **argv)
 {
     Conf *C;
     xmlDocPtr doc;
     
 }
+*/
 
 #endif /* #ifdef HAVE_LIBXML2 */
