@@ -16,7 +16,7 @@
 #include "registry.h"
 
 //#undef TRACE
-#define TRACE printf
+//#define TRACE printf
 
 extern char *get_path ( char * );
 
@@ -302,6 +302,10 @@ static void init_registry(void)
 	regpathname = get_path("registry");
 	localregpathname = regpathname;
 #else
+#ifdef XINE_MAJOR
+	localregpathname = (char *)malloc(strlen(xine_get_homedir()) + 21);
+	sprintf(localregpathname, "%s/.xine/win32registry", xine_get_homedir());
+#else
 	// regpathname is an external pointer
         //
 	// registry.c is holding it's own internal pointer
@@ -322,6 +326,7 @@ static void init_registry(void)
 	    strcpy(localregpathname, pthn);
 	    strcat(localregpathname, "/.registry");
 	}
+#endif
 #endif
 
 	open_registry();
@@ -406,65 +411,65 @@ long RegCloseKey(long key)
 
 long RegQueryValueExA(long key, const char* value, int* reserved, int* type, int* data, int* count)
 {
-	struct reg_value* t;
-	char* c;
-	TRACE("Querying value %s\n", value);
-	if(!regs)
-	    init_registry();
+    struct reg_value* t;
+    char* c;
+    TRACE("Querying value %s\n", value);
+    if(!regs)
+	init_registry();
 
-	c=build_keyname(key, value);
-	if(c==NULL)
-	    	return 1;
-        t=find_value_by_name(c);
-	free(c);
-	if(t==0)
-		return 2;
-	if(type)
-		*type=t->type;
-	if(data)
-	{
-		memcpy(data, t->value, (t->len<*count)?t->len:*count);
-		TRACE("returning %d bytes: %d\n", t->len, *(int*)data);
-	}
-		if(*count<t->len)
-		{
-			*count=t->len;
-			return ERROR_MORE_DATA;
+    c=build_keyname(key, value);
+    if (!c)
+	return 1;
+    t=find_value_by_name(c);
+    free(c);
+    if (t==0)
+	return 2;
+    if (type)
+	*type=t->type;
+    if (data)
+    {
+	memcpy(data, t->value, (t->len<*count)?t->len:*count);
+	TRACE("returning %d bytes: %d\n", t->len, *(int*)data);
+    }
+    if(*count<t->len)
+    {
+	*count=t->len;
+	return ERROR_MORE_DATA;
     }
     else
     {
-        *count=t->len;
-	}
+	*count=t->len;
+    }
     return 0;
 }
 long RegCreateKeyExA(long key, const char* name, long reserved,
 		     void* classs, long options, long security,
 		     void* sec_attr, int* newkey, int* status)
 {
-	reg_handle_t* t;
-	char* fullname;
-	struct reg_value* v;
-//        TRACE("Creating/Opening key %s\n", name);
-        TRACE("Creating/Opening key %s\n", name);
-	if(!regs)
-	    init_registry();
+    reg_handle_t* t;
+    char* fullname;
+    struct reg_value* v;
+    //        TRACE("Creating/Opening key %s\n", name);
+    if(!regs)
+	init_registry();
 
-	fullname=build_keyname(key, name);
-	if(fullname==NULL)
-		return 1;
-	v=find_value_by_name(fullname);
-	if(v==0)
-	{
-		int qw=45708;
-		v=insert_reg_value(key, name, DIR, &qw, 4);
-		if (status) *status=REG_CREATED_NEW_KEY;
-//		return 0;
-	}
+    fullname=build_keyname(key, name);
+    if (!fullname)
+	return 1;
+    TRACE("Creating/Opening key %s\n", fullname);
+    v=find_value_by_name(fullname);
+    if(v==0)
+    {
+	int qw=45708;
+	v=insert_reg_value(key, name, DIR, &qw, 4);
+	if (status) *status=REG_CREATED_NEW_KEY;
+	//		return 0;
+    }
 
-	t=insert_handle(generate_handle(), fullname);
-	*newkey=t->handle;
-	free(fullname);
-	return 0;
+    t=insert_handle(generate_handle(), fullname);
+    *newkey=t->handle;
+    free(fullname);
+    return 0;
 }
 
 /*

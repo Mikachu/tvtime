@@ -1,20 +1,19 @@
-EXTRA_DIST = stubs.s
+EXTRA_DIST = stubs.s wrapper.S
 
 noinst_LTLIBRARIES = $(wine_lib)
 
-##
-##
-AM_CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer \
+# WARNING: DO NOT USE AM_CFLAGS HERE UNLESS YOU UNDERSTAND THE PROBLEM WITH
+# DEFAULT XINE FLAGS AND KNOW HOW TO FIX IT.
+CFLAGS = $(X_CFLAGS) -fno-omit-frame-pointer \
 	-Wmissing-prototypes -Wimplicit-function-declaration \
 	-DWIN32_PATH=\"@w32_path@\" -I$(srcdir)/.. -D__WINE__ \
-	-Ddbg_printf=__vprintf -DTRACE=__vprintf -fno-omit-frame-pointer
+	-Ddbg_printf=__vprintf -DTRACE=__vprintf
 
-#DEBUG_CFLAGS = @DEBUG_CFLAGS@ $(X_CFLAGS) -fno-omit-frame-pointer \
-#	-Wmissing-prototypes -Wimplicit-function-declaration \
-#	-DWIN32_PATH=\\\"@w32_path@\\\" -I$(srcdir)/.. -D__WINE__ \
-#	-Ddbg_printf=__vprintf -DTRACE=__vprintf -fno-omit-frame-pointer
-
-
+DEBUG_CFLAGS = @DEBUG_CFLAGS@ $(X_CFLAGS) -fno-omit-frame-pointer \
+	-Wmissing-prototypes -Wimplicit-function-declaration \
+	-DWIN32_PATH=\\\"@w32_path@\\\" -I$(srcdir)/.. -D__WINE__ \
+	-Ddbg_printf=__vprintf -DTRACE=__vprintf
+	
 if HAVE_W32DLL
 wine_lib = libwine.la
 endif
@@ -33,7 +32,7 @@ libwine_la_SOURCES = \
 	vfl.c \
 	win32.c 
 
-libwine_la_LIBADD = stubs.lo
+libwine_la_LIBADD = stubs.lo wrapper.lo
 
 noinst_HEADERS = \
 	avifmt.h \
@@ -70,10 +69,14 @@ noinst_HEADERS = \
 	winestring.h \
 	winnt.h \
 	winreg.h \
-	winuser.h
+	winuser.h \
+	wrapper.h
 
 stubs.lo: stubs.s
 	$(CC) -c $(srcdir)/stubs.s -o stubs.lo
+
+wrapper.lo: wrapper.S
+	$(CC) -c $(srcdir)/wrapper.S -o wrapper.lo
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

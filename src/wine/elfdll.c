@@ -3,7 +3,7 @@
  *
  * Copyright 1999 Bertho A. Stultiens
  */
-#include "config.h"
+#include <config.h>
 
 #ifdef HAVE_LIBDL
 
@@ -21,16 +21,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <dlfcn.h>
-
-struct modref_list_t;
-
-typedef struct modref_list_t
-{
-    WINE_MODREF* wm;
-    struct modref_list_t *next;
-    struct modref_list_t *prev;    
-}
-modref_list;
 
 
 //WINE_MODREF *local_wm=NULL;

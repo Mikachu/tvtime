@@ -9,7 +9,7 @@
  * Copyright 1995 Alexandre Julliard
  * Copyright 1997 Marcus Meissner
  */
-#include "config.h"
+#include <config.h>
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -22,7 +22,7 @@
 //#include "process.h"
 //#include "stackframe.h"
 #include "debugtools.h"
-#include "ext.h"
+#include <ext.h>
 
 /**********************************************************************
  *  HMODULE32toPE_MODREF 

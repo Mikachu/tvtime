@@ -8,12 +8,11 @@
 #include "config.h"
 #include "windef.h"
 
-#include "compat.h"
+// #include "compat.h"
 
 struct _GUID;
 
-//#define TRACE __vprintf
-#define TRACE printf
+#define TRACE __vprintf
 #define dbg_printf __vprintf
 
 /* Internal definitions (do not use these directly) */

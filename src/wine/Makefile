@@ -1,5 +1,5 @@
 CC= gcc
-INCLUDES= -Idriver
+INCLUDES= -Idriver -I.
 
 # 
 CFLAGS= -DSPEED -Wall -O3 -g -mcpu=i686 -march=i686 -falign-functions=4
@@ -20,7 +20,8 @@ WINOBJ = module.o \
 	 vfl.o \
 	 afl.o \
 	 stubs.o \
-	 driver.o
+	 driver.o \
+	wrapper.o
 
 
 all: $(WINOBJ)

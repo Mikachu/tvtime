@@ -4,7 +4,7 @@
  * Copyright 1993 Robert J. Amstadt
  * Copyright 1995 Alexandre Julliard
  */
-#include "config.h"
+#include <config.h>
 
 #include <assert.h>
 #include <stdio.h>
