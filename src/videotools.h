@@ -39,6 +39,8 @@ void composite_bars_packed4444_scanline( unsigned char *output,
                                          int percentage );
 
 
+void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
+                                                   unsigned char *input, int width );
 void packed444_to_rgb24_rec601_scanline( unsigned char *output,
                                          unsigned char *input, int width );
 void rgb24_to_packed444_rec601_scanline( unsigned char *output,

@@ -515,12 +515,9 @@ void packed444_to_rgb24_rec601_reference_scanline( unsigned char *output,
                                                    unsigned char *input, int width )
 {
     while( width-- ) {
-        int luma255 = input[ 0 ];
-        int cb255 = input[ 1 ];
-        int cr255 = input[ 2 ];
-        double yp = ((double) luma255) / 255.0;
-        double cb = ((double) cb255) / 255.0;
-        double cr = ((double) cr255) / 255.0;
+        double yp = (((double) input[ 0 ]) - 16.0) / 255.0;
+        double cb = (((double) input[ 1 ]) - 128.0) / 255.0;
+        double cr = (((double) input[ 2 ]) - 128.0) / 255.0;
         double r, g, b;
 
         r = yp - (0.0009*cb) + (1.4017*cr);
