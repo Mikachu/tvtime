@@ -43,6 +43,7 @@ enum input_event
 input_t *input_new( config_t *cfg, commands_t *com, int verbose );
 void input_delete( input_t *in );
 void input_callback( input_t *in, int command, int arg );
+void input_xawtv_command( input_t *in, int argc, char **argv );
 
 #ifdef __cplusplus
 };

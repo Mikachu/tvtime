@@ -136,3 +136,20 @@ void input_callback( input_t *in, int command, int arg )
     commands_handle( in->com, tvtime_cmd, curarg );
 }
 
+void input_xawtv_command( input_t *in, int argc, char **argv )
+{
+    if( argc == 0 ) return;
+
+    if( !strcasecmp( argv[ 0 ], "fullscreen" ) ) {
+        commands_handle( in->com, TVTIME_TOGGLE_FULLSCREEN, "" );
+    } else if( !strcasecmp( argv[ 0 ], "exit" ) ||
+               !strcasecmp( argv[ 0 ], "bye" ) ||
+               !strcasecmp( argv[ 0 ], "quit" ) ) {
+        commands_handle( in->com, TVTIME_QUIT, "" );
+    } else if( !strcasecmp( argv[ 0 ], "showtime" ) ) {
+        commands_handle( in->com, TVTIME_DISPLAY_INFO, "" );
+    } else if( !strcasecmp( argv[ 0 ], "message" ) ) {
+        commands_handle( in->com, TVTIME_DISPLAY_MESSAGE, argv[ 1 ] );
+    }
+}
+

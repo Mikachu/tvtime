@@ -994,7 +994,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
 
     /* The class hint is useful for window managers like WindowMaker. */
-    classhint.res_class = "tvtime";
+    classhint.res_class = "xawtv";
     classhint.res_name = "TVWindow";
     XSetClassHint( display, wm_window, &classhint );
     classhint.res_name = "TVFullscreen";
@@ -1420,6 +1420,33 @@ void xcommon_poll_events( input_t *in )
             reconfheight = event.xconfigure.height;
             if( reconfwidth != output_width || reconfheight != output_height ) {
                 reconfigure = 1;
+            }
+            break;
+        case PropertyNotify:
+            if( event.xproperty.atom == xawtv_remote ) {
+                Atom type_return;
+                int format_return;
+                unsigned long bytes_after_return;
+                unsigned long nitems_return;
+                unsigned char *prop_return = 0;
+                char *argv[ 32 ];
+                if( XGetWindowProperty( display, event.xproperty.window,
+                                        event.xproperty.atom, 0, 65536,
+                                        True, XA_STRING, &type_return,
+                                        &format_return, &nitems_return,
+                                        &bytes_after_return,
+                                        &prop_return ) == Success ) {
+                    if( nitems_return > 0 ) {
+                        int arg = 0;
+                        int i;
+                        for( i = 0; i < nitems_return && *(prop_return + i); i += strlen( ((char *) prop_return) + i ) + 1 ) {
+                            argv[ arg++ ] = ((char *) prop_return) + i;
+                        }
+                        argv[ arg ] = 0;
+                        input_xawtv_command( in, arg, argv );
+                        XFree( prop_return );
+                    }
+                }
             }
             break;
         case KeyPress:
