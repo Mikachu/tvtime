@@ -69,14 +69,14 @@ osd_string_t *osd_string_new( const char *fontfile, int fontsize,
 
     osds->font = efont_new( fontfile, fontsize, video_width, video_height, video_aspect );
     if( !osds->font ) {
-        fprintf( stderr, "osd: Can't open font '%s'\n", fontfile );
+        fprintf( stderr, "osd_string: Can't open font '%s'\n", fontfile );
         free( osds );
         return 0;
     }
 
     osds->efs = efs_new( osds->font );
     if( !osds->efs ) {
-        fprintf( stderr, "osd: Can't create string.\n" );
+        fprintf( stderr, "osd_string: Can't create string.\n" );
         efont_delete( osds->font );
         free( osds );
         return 0;

@@ -46,7 +46,7 @@ int parser_openfile( parser_file_t *pf, const char *filename )
     if( !filename ) return 0;
 
     if( pf->fh ) {
-        fclose(pf->fh);
+        fclose( pf->fh );
         pf->fh = NULL;
     }
 
