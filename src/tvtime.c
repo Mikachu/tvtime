@@ -1657,10 +1657,12 @@ int main( int argc, char **argv )
                 commands_handle( commands, TVTIME_CHANNEL_INC, 0 );
                 after_pos = station_get_current_pos( stationmgr );
 
-                numscanned += (after_pos + station_get_num_stations( stationmgr ) - before_pos) % station_get_num_stations( stationmgr );
+                if( station_get_num_stations( stationmgr ) ) {
+                    numscanned += (after_pos + station_get_num_stations( stationmgr ) - before_pos) % station_get_num_stations( stationmgr );
+                }
 
                 /* Stop when we loop around. */
-                if( numscanned > station_get_num_stations( stationmgr ) ) {
+                if( numscanned > station_get_num_stations( stationmgr ) || !station_get_num_stations( stationmgr ) ) {
                     commands_handle( commands, TVTIME_CHANNEL_SCAN, 0 );
                 }
             }
