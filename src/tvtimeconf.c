@@ -71,6 +71,7 @@ struct config_s
     char *vbidev;
 
     int start_channel;
+    int prev_channel;
     int halfrate;
 
     double hoverscan;
@@ -377,6 +378,10 @@ static void config_init( config_t *ct, parser_file_t *pf )
         ct->other_text_rgb = parse_colour( tmp );
     }
 
+    if( (tmp = parser_get( pf, "PrevChannel", 1 )) ) {
+        ct->prev_channel = atoi( tmp );
+    }
+
     if( (tmp = parser_get( pf, "StartChannel", 1 )) ) {
         ct->start_channel = atoi( tmp );
     }
@@ -507,6 +512,7 @@ config_t *config_new( int argc, char **argv )
     ct->check_freq_present = 1;
     ct->use_vbi = 0;
     ct->start_channel = 1;
+    ct->prev_channel = 1;
     ct->hoverscan = 0.0;
     ct->voverscan = 0.0;
     ct->rvr_filename = 0;
@@ -750,6 +756,11 @@ int config_get_aspect( config_t *ct )
 int config_get_start_channel( config_t *ct )
 {
     return ct->start_channel;
+}
+
+int config_get_prev_channel( config_t *ct )
+{
+    return ct->prev_channel;
 }
 
 int config_get_inputnum( config_t *ct )

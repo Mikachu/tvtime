@@ -806,6 +806,7 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
         return 1;
     }
+    station_set( stationmgr, config_get_prev_channel( ct ) );
     station_set( stationmgr, config_get_start_channel( ct ) );
 
     if( !strcasecmp( config_get_v4l_norm( ct ), "pal" ) ) {
@@ -1492,10 +1493,15 @@ int main( int argc, char **argv )
         filtered_cur = 1;
     }
 
+    snprintf( number, 3, "%d", station_get_prev_id( stationmgr ) );
+    configsave( "PrevChannel", number, 1 );
+
     snprintf( number, 3, "%d", station_get_current_id( stationmgr ) );
     configsave( "StartChannel", number, 1 );
+
     snprintf( number, 3, "%d", half_framerate );
     configsave( "HalfFramerate", number, 1 );
+
     if( vidin ) {
         snprintf( number, 3, "%d", videoinput_get_input_num( vidin ) );
         configsave( "CaptureSource", number, 1 );

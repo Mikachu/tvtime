@@ -355,6 +355,15 @@ int station_get_current_id( station_mgr_t *mgr )
     }
 }
 
+int station_get_prev_id( station_mgr_t *mgr )
+{
+    if( !mgr->current ) {
+        return 0;
+    } else {
+        return mgr->last_channel;
+    }
+}
+
 const char *station_get_current_channel_name( station_mgr_t *mgr )
 {
     if( !mgr->current ) {
