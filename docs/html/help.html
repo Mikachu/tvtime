@@ -16,31 +16,39 @@
     <col width="579px">
 </colgroup>
 
-<tr><td align="center" colspan="3"><img src="tvtime-logo-banner.png" alt="tvtime"/></td></tr>
+<tr><td align="center" colspan="3"><a href="http://tvtime.sourceforge.net/"><img src="tvtime-logo-banner.png" alt="tvtime"/></a></td></tr>
 
 <tr><td class="hangspace"></td>
     <td class="navbar">
 
-    <table cellpadding="4" width="100%">
-    <tr><td class="box">
-        <a href="why.html">why tvtime?</a></td></tr>
-    <tr><td class="box">
+    <table class="doclist" width="95%">
+    <tr><td class="docentry">
+        <a href="http://tvtime.sourceforge.net/why.html">why tvtime?</a></td></tr>
+    <tr><td class="docentry">
         <a href="http://tvtime.sourceforge.net/downloads.php">download tvtime!</a></td></tr>
-    <tr><td class="box">
-        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
-    <tr><td class="box">
-        <a href="help.html">help and faq</a></td></tr>
-    <tr><td class="box">
-        <a href="usage.html">using tvtime</a></td></tr>
-    <tr><td class="box">
-        <a href="hardware.html">hardware and driver support</a></td></tr>
-    <tr><td class="box">
+    <tr><td class="docentry">
         <a href="http://tvtime.sourceforge.net/screenshots.html">screenshots!</a></td></tr>
-    <tr><td class="box">
+    <tr><td class="docentry">
         <a href="http://tvtime.sourceforge.net/links.html">related sites</a></td></tr>
-    <tr><td class="box">
+    <tr><td class="docentry">
         <a href="http://tvtime.sourceforge.net/">home</a></td></tr>
     </table>
+
+    <p></p>
+
+    <table class="doclist" width="95%">
+    <tr><th class="docbox">support</td></tr>
+    <tr><td class="docentry">
+        <a href="help.html">help and faq</a></td></tr>
+    <tr><td class="docentry">
+        <a href="usage.html">using tvtime</a></td></tr>
+    <tr><td class="docentry">
+        <a href="problems.html">common problems</a></td></tr>
+    <tr><td class="docentry">
+        <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">report bugs</a></td></tr>
+    </table>
+
+    <p></p>
 
     <table cellpadding="4" width="100%">
     <tr><td class="center">
@@ -68,403 +76,237 @@
     <table width="90%" class="centered">
     <tr><td>
 
-        <h2 class="center">Help and FAQ</h2>
+        <h2 class="center">Where to get help</h2>
+        <ol>
+        <li>IRC with us at <tt>#livid</tt> on <a href="http://www.freenode.net">irc.freenode.net</a>.
+        <li>Post bugs on <a href="http://www.sourceforge.net/tracker/?group_id=64301&amp;atid=506987">our
+        Sourceforge bug tracker</a>.
+        <li>Subscribe to the
+        <a href="http://sourceforge.net/mail/?group_id=64301">tvtime development mailing list</a>.
+        </ol>
 
-        <table class="centered">
-        <tr><td>
-            <ol>
-            <li><a href="#resources">Support resources</a>
-            <li><a href="#summary">Summary of new features by release</a>
-            <li><a href="#bugs">Summary of known bugs by release</a>
-            <li><a href="#performance">Performance: run as root, use
-                 the real-time clock</a>
-            <li><a href="#fullscreen">Window manager issues with fullscreen
-                mode</a>
-            <li><a href="#nodeint">FAQ: How do I disable deinterlacing?</a>
-            <li><a href="#recording">FAQ: Does tvtime support recording?</a>
-            <li><a href="#screenshots">FAQ: Why is the tvtime window appear
-                blue or black in screenshots?</a>
-            <li><a href="#macrovision">FAQ: Purple lines in video?  How do
-                I avoid macrovision?</a>
-            <li><a href="#noise">FAQ: Interference problems with soundcards</a>
-            <li><a href="#tvout">FAQ: Optimal settings for tvtime on TV
-                output</a>
-            <li><a href="#bsd">FAQ: Does tvtime support FreeBSD or NetBSD?</a>
-            <li><a href="#ssname">FAQ: How do I force the screenshots to be a specific filename?</a>
-            </ol>
-        </td></tr></table>
+        <h2 class="center">Frequently asked questions</h2>
+        <ol>
+        <li><a href="#nodeint">How do I disable deinterlacing?</a>
+        <li><a href="#recording">Does tvtime support recording?</a>
+        <li><a href="#screenshots">Why is the tvtime window appear
+            pink in screenshots?</a>
+        <li><a href="#macrovision">I see purple lines in the video from my
+        DVD player.  How do I avoid Macrovision copy-protection?</a>
+        <li><a href="#noise">Interference problems with soundcards</a>
+        <li><a href="#tvout">Optimal settings for tvtime on TV
+            output</a>
+        <li><a href="#bsd">Does tvtime support FreeBSD or NetBSD?</a>
+        <li><a href="#ssname">How do I force the screenshots to be a specific filename?</a>
+        <li><a href="#architectures">Does tvtime support any architectures besides x86?</a>
+        <li><a href="#canadacable">Where is the "canada-cable" frequency table?</a>
+        <li><a href="#audioconnect">How can I map audio to my digital
+            output?</a>
+        <li><a href="#noaudio">My capture card does not have an audio
+            output jack, what do I do?</a>
+        </ol>
 
-        <hr>
-        <h3><a name="resources">1. Support resources</a></h3>
+        <h3><a name="nodeint">1. How do I disable deinterlacing?</a></h3>
 
-        <p>Interested in <b>tvtime</b>?  Having trouble?  Have
-        suggestions?  Why not hang out with us on <b>IRC</b> at
-        <a href="http://www.freenode.net">irc.freenode.net</a>, channel
-        <b>#livid</b>.  Hope to see you there!</p>
+        <p>Many users seem confused about what the deinterlacing plugins do
+        and what it means to disable them.  The signal output from almost any
+        video source, be it a Gamecube or cable TV, is an interlaced video
+        signal.  Implicitly when you display this on a computer screen, you are
+        deinterlacing: you're taking interlaced content and displaying it on a
+        non-interlaced display.</p>
 
-        <p>There is also a
-        <a href="http://sourceforge.net/mail/?group_id=64301">tvtime
-        mailing list</a> which you can subscribe to, or read on the web.</p>
+        <p>The simplest way to do this, and the default in some TV applications,
+        is to buffer every two consecutive fields together and show them
+        as a single frame.  You can do this in tvtime by setting it to one of
+        our Progressive modes.  That's about as close to "not deinterlacing"
+        as you can get, but it's still deinterlacing.</p>
 
-        <hr>
-        <h3><a name="summary">2. Summary of new features by release</a></h3>
+        <p>Ideally, tvtime would be able to detect progressive content sent
+        over an interlaced channel, such as the output from some video games
+        or DV cameras in progressive mode.  This feature is something we
+        would like to have in a future release.</p>
 
-        <table border="0" width="100%">
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.9</b></th></tr>
-        <tr><td>
-            <ol>
-            <li>Added a full menu system for configuring tvtime.
-            <li>Simplified deinterlacer names and provide online help for them.
-            <li>Unified OSD appearance across all television standards.
-            <li>Support for saving picture settings both globally and per-channel.
-            <li>Finetune settings saved per-channel.
-            <li>Support for the V4L2 DVB driver and bttv9 for PAL-60 support.
-            <li>Added a channel scanner application 'tvtime-scanner' that outputs
-                to the 'Custom' frequency table.
-            <li>Native support for UYVY input from the rivatv driver.
-            <li>Removed lirc support in favour of using tvtime-command.
-            <li>Fixed remaining screensaver, Xinerama and fullscreen issues.
-            <li>Many other new features and bugfixes.
-            </ol></td></tr>
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.5</b></th></tr>
-        <tr><td>
-            <ol>
-                <li>Some root safety improvements.
-                <li>Added support for long-format command line arguments.
-                <li>Added config file options to set startup window position.
-                <li>Compile fixes for non-C99 compilers and older DirectFB
-                    versions.
-            </ol></td></tr>
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.4</b></th></tr>
-        <tr><td>
-            <ol>
-                <li>Support for norm switching between "compatible"
-                    norms for areas which receive both SECAM and
-                    PAL format stations.
-                <li>Added support for the mga_vid driver for the
-                    Matrox G200/G400 series cards from mplayer.
-                <li>Semi-experimental of the X code for better
-                    fullscreen support under many window managers.
-                    Testing appreciated.
-                <li>Support for changing the mixer device and channel
-                    (see 'man tvtime' and the config file documentation).
-                <li>Slightly less partial experimental UTF-8 support.
-                    Now works with any simple left-to-right scripts
-                    which are in FreeSansBold.ttf .
-           </ol></td></tr>
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.2</b></td></tr>
-        <tr><td>
-            <ol>
-                <li>Fixed all of the known crashes and many minor
-                    bugs from the 0.9.8 release.
-                <li>Updated the look-and-feel of the user interface.
-                <li>Partial EXPERIMENTAL UTF-8 support. Only works with
-                    UTF-8 characters that are also in ISO-8859-1 (Latin-1).
-            </ol></td></tr>
-        <tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8</b></td></tr>
-        <tr><td>
-            <ol>
-                <li>New XML config file format for both the tvtime
-                    configuration, and the station list.
-                <li>tvtime now has two distinct half-framerate modes:
-                    top-field-first frames, and bottom-field-first
-                    frames.  This helps with manually deinterlacing
-                    2-2 pulldown or progressive content.
-                <li>Added support for preset 'modes', which can set the
-                    deinterlacer, window size, fullscreen setting and
-                    framerate mode.
-                <li>Added support for custom frequencies in the
-                    stationlist.xml file, and a runtime command to add
-                    a new station from the current fine-tuning settings.
-                <li>Added some DScaler DLLs and a wine layer to load
-                    these deinterlacer plugins directly without porting
-                    to Linux.  This gives us the following new
-                    deinterlacers:
-                    <ol>
-                        <li>DScaler: Greedy - High Motion
-                        <li>DScaler: Greedy - 2-frame
-                        <li>DScaler: TwoFrame
-                        <li>DScaler: TomsMoComp
-                        <li>DScaler: Video Bob
-                        <li>DScaler: Video Weave
-                    </ol>
-                    We had our own ports of videobob, twoframe, and
-                    greedy2frame, but they were found to be buggy.  Our
-                    ports are currently disabled.
-                <li>Added the ffmpeg vertical deinterlacer filter.
-                <li>Support for multiple audio channels (stereo, mono,
-                    lang1, lang2).
-                <li>Included a bunch of fixes for PAL-M support.
-                <li>Added a slave mode for freevo integration.
-                <li>Various speedups, quality improvements, and bugfixes.
-            </ol></td></tr>
-        </table>
+        <h3><a name="recording">2. Does tvtime support recording?</a></h3>
 
-<hr>
-<h3><a name="bugs">3. Summary of known bugs by release</a></h3>
+        <p>tvtime does not support recording or playback of recorded
+        streams, and it is unclear to us if this is in the scope of what
+        tvtime should try to accomplish.  Many users ask for this feature,
+        but they have very different goals.  Some users want a quick way to
+        record small, low-quality clips from television.  Some want a high
+        quality recorder for recording shows.  Others want to have a full PVR
+        system integrated into tvtime.</p>
 
-<p>The following is a list of known bugs in the tvtime code itself.  For
-detailed information on known capture driver, X driver, and hardware
-bugs, please see
-<a href="http://tvtime.sourceforge.net/hardware.html">the tvtime
-hardware and driver support page</a>.</p>
+        <p>Currently, we would rather focus on making tvtime the best high
+        quality live TV viewer for Linux, with a clean and consistent user
+        experience.  We recommend using <tt>mencoder</tt> for recording
+        from television, and systems like <b>MythTV</b> or <b>freevo</b> for
+        a PVR system.  If you are interested in coding some sort of
+        support for recording in tvtime, please contact us so we can discuss
+        how it might best be integrated into tvtime.</p>
 
-<table border="0" width="100%">
-<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.5</b>
-<tr><td>
-<ol>
-<li>tvtime does not modify V4L input volume, so if it is set
-incorrectly before running tvtime you may not get sound
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729964&amp;group_id=64301&amp;atid=506987">bug 729964</a>).
-<li>tvtime does not support the standard -geometry command line option
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727947&amp;group_id=64301&amp;atid=506987">bug 727947</a>).
-<li>tvtime does not support the standard -display command line option
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727946&amp;group_id=64301&amp;atid=506987">bug 727946</a>).
-<li>tvtime does not support the linux-dvb driver
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=694544&amp;group_id=64301&amp;atid=506987">bug 694544</a>).
-<li>dalias' pulldown detection algorithm is currently disabled
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=751093&amp;group_id=64301&amp;atid=506987">bug 751093</a>).
-<li>No support for PAL-60
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729660&amp;group_id=64301&amp;atid=506987">bug 729660</a>).
-<li>No runtime norm switching for non-compatible norms (PAL/NTSC
-switching)
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=743918&amp;group_id=64301&amp;atid=506987">bug 743918</a>).
-</ol>
-<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.2</b>
-<tr><td>
-<ol>
-<li>Toggling fullscreen nukes AlwaysOnTop setting in kwin
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720300&amp;group_id=64301&amp;atid=506987">bug 720300</a>).
-<li>Luma correction broken if using Dalias' pulldown detection
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726822&amp;group_id=64301&amp;atid=506987">bug 726822</a>).
-<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
-    change channels
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
-<li>font aspect ratio is not updated if you toggle the aspect ratio at
-    runtime
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
-<li>We have not written MMX versions of many functions that we do have
-    MMXEXT versions of, as such, performance is much worse than it
-    should be on older CPUs
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
-<li>tvtime does not notify the user when frames are being dropped
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
-</ol>
-<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8.1</b>
-<tr><td>
-<ol>
-<li>Compile is broken for pre-gcc3
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=731932&amp;group_id=64301&amp;atid=506987">bug 731932</a>).
-</ol>
-<tr><th class="version"><b>&nbsp; &nbsp; tvtime 0.9.8</b>
-<tr><td>
-<ol>
-<li>README incorrectly lists 'b' as channel_renumber key when it is really 'r'
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729675&amp;group_id=64301&amp;atid=506987">bug 729675</a>).
-<li>xscreensaver shutdown code does not work
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729718&amp;group_id=64301&amp;atid=506987">bug 729718</a>).
-<li>kscreensaver code is disabled as it is too slow
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=727990&amp;group_id=64301&amp;atid=506987">bug 727990</a>).
-<li>Fullscreen the wrong size if using Xinerama
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726820&amp;group_id=64301&amp;atid=506987">bug 726820</a>).
-<li>Toggling fullscreen nukes AlwaysOnTop setting in kwin
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=720300&amp;group_id=64301&amp;atid=506987">bug 720300</a>).
-<li>Luma correction broken if using Dalias' pulldown detection
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=726822&amp;group_id=64301&amp;atid=506987">bug 726822</a>).
-<li>Network name and call letters from XDS not displayed
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=729588&amp;group_id=64301&amp;atid=506987">bug 729588</a>).
-<li>if using less than 4 gbuffers, tvtime shows a blue frame as you
-    change channels
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=690473&amp;group_id=64301&amp;atid=506987">bug 690473</a>).
-<li>font aspect ratio is not updated if you toggle the aspect ratio at
-    runtime
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=628943&amp;group_id=64301&amp;atid=506987">bug 628943</a>).
-<li>We have not written MMX versions of many functions that we do have
-    MMXEXT versions of, as such, performance is much worse than it
-    should be on older CPUs
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=630236&amp;group_id=64301&amp;atid=506987">bug 630236</a>).
-<li>tvtime does not notify the user when frames are being dropped
-(<a href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=633235&amp;group_id=64301&amp;atid=506987">bug 633235</a>).
-</ol>
-</table>
+        <h3><a name="screenshots">3. Why does tvtime appear pink in
+        screenshots?</a></h3>
 
-<hr>
-<h3><a name="performance">4. Performance: run as root, use the real-time clock</a></h3>
+        <p>tvtime outputs video into a <b>video overlay surface</b>, an area
+        of video memory outside of the framebuffer, using the <b>XVIDEO</b>
+        X extension.  Applications which take screenshots such as
+        <tt>ksnapshot</tt>, <tt>gimp</tt> or <tt>xwd</tt> only see the
+        colourkeyed window, and not output of tvtime.</p>
 
-<p>For optimal performance, tvtime should run as root, either by logging in
-or using <b>su</b> to become root, or setting the executable setuid
-root.  As root, tvtime can:</p>
+        <p>We believe it is a design flaw or driver limitation on the X or
+        video card hardware that neither can provide the image to screenshot
+        applications.  For this reason, the only known method of taking
+        screenshots of tvtime along with the desktop is to use the
+        <b>screenshot</b> feature inside tvtime, and cut-and-paste the
+        output into a full desktop screen capture.</p>
 
-<ol>
-<li>Reset the process priority to one which gives highest priority to the
-    tvtime process, the specific value can be set in the <b>tvtime.xml</b> file.
-    Many high priorities are only available to processes with root access.
-<li>Aquire <b>realtime</b> priority by entering into the
-    <b>SCHED_FIFO</b> scheduling queue, where tvtime will be allowed to
-    processes video uninterrupted by other processes.  This is
-    most important when using deinterlacers that eat up alot of
-    CPU to make sure that tvtime does not drop frames.
-<li>Running as root automatically gives you access to 1024hz resolution
-    from the real-time clock device.
-</ol><p>
+        <h3><a name="macrovision">4. I see purple lines in the video from my
+        DVD player.  How do I avoid Macrovision copy-protection?</a></h3>
 
-Note that if tvtime is setuid root, we will <b>drop root priviledges
-after aquiring all of the performance enhancements we need</b>, making
-it slightly more polite.<p>
+        <p>If you are seeing purple lines or having problems with video signal
+        quality from an external DVD player, VCR, or Laserdisc player, try
+        disabling Macrovision in your bttv driver (if you have a bttv card).
+        See <a href="http://www.colby.edu/personal/k/kjseptor/bttv.html">http://www.colby.edu/personal/k/kjseptor/bttv.html</a>
+        for information on how to do that.</p>
 
-Support for the <b>real-time clock</b> device is needed for smooth
-video.  We STRONGLY recommend that you load the <b>rtc</b> kernel module
-before starting tvtime.  The following command will tell you if rtc
-support is available:<p>
+        <h3><a name="noise">5. Interference problems with soundcards</a></h3>
+
+        <p>If you are experiencing a generally fuzzy picture, try moving your
+        tv card one or two slots away from your soundcard (inside your pc).
+        Interference from the soundcard can mess up some channels.</p>
+
+        <h3><a name="tvout">6. Optimal settings for tvtime on TV output</a></h3>
+
+        <p>Some people are interested in using tvtime even when their output
+        itself a television.  Usually this is in the context of setting up a
+        home theatre PC system.  Ideally for television output, no
+        deinterlacing is required;  the interlaced signal is sent to the output
+        such that every top field in the input is mapped to a top field in the
+        output.</p>
+
+        <p>Unfortunately, there is no standard TV output API under Linux.  The
+        VESA framebuffer setup for TV output cannot tell us which field is
+        currently being displayed.  Similarily, some TV output setups under
+        Linux have it as a second head in X, but again, with no field
+        information. We cannot know how to supply it with interlaced content
+        to ensure that fields are shown in the right order.</p>
+
+        <p>There are two possible solutions.  I have been told that with the
+        NVIDIA TV output drivers, when using XVIDEO, if you supply them with
+        <b>top-field-first</b> frames, they will display the fields correctly.
+        To experiment, try tvtime using the <b>Progressive: Top Field First</b>
+        deinterlacer.  This may give good results.  The second option would be
+        using a card with a TV output driver that gives field information.
+        An example is the Matrox G400/G450/G550 driver in <b>DirectFB</b>.
+        We have an output mode in tvtime specifically for this driver, but
+        it is experimental and currently not being further developed.</p>
+
+        <h3><a name="bsd">7. Does tvtime support FreeBSD or NetBSD?</a></h3>
+
+        <p>Currently, tvtime will not work on BSD-based systems, but the
+        code to get it to work should not be too difficult.</p>
+
+        <p>There is a driver for bt848 and bt878-based cards under BSD called
+        <b>bsdbt848</b>.  The API for this driver is different from Linux's
+        video4linux that tvtime was written for, so the first job would be to
+        do the input code in tvtime to handle this driver.  See
+        <a href="http://mplayerhq.hu">mplayer</a> for one example of some code
+        that uses this driver.</p>
+
+        <p>The only other Linux-specific features that we use would be the
+        /dev/rtc code to do high performance timing (I assume there is a BSD
+        equivalent of this), and potentially the wine loader for the DScaler
+        DLLs may need updating.</p>
+
+        <p>If you make any progress on any of these, please let us know.
+        Thanks.</p>
+
+        <h3><a name="ssname">8. How do I force the screenshots to be a
+        specific filename?</a></h3>
+
+        <p>tvtime's screenshots can be given a filename when requested
+        using <b>tvtime-command</b>.  Simply do:</p>
 
 <pre>
-    cat /proc/driver/rtc
-</pre><p>
-
-If this file exists, then the real time clock driver is loaded.
-Otherwise, please load it by typing:<p>
-
-<pre>
-    modprobe rtc
-</pre><p>
-
-Or add it to your /etc/modules file to have it loaded on every reboot.
-For smooth video, make sure you run as root, but if you are
-uncomfortable with this, you can let tvtime access high resolutions from
-the rtc device by executing the following command:<p>
-
-<pre>
-    sysctl -w dev.rtc.max-user-freq=1024
-</pre><p>
-
-Note that this setting is lost on reboot, so this should be added into
-your system startup scripts.  Consult your Linux distribution
-documentation for how to do this correctly on your system.<p>
-
-<hr>
-<h3><a name="nodeint">6. FAQ: How do I disable deinterlacing?</a></h3>
-
-<p>I think there is a misconception about what the deinterlacing plugins do
-and what it means to disable them.  The signal output from almost any
-video source, be it a Gamecube or cable TV, is an interlaced video
-signal.  Implicitly when you display this on a computer screen, you are
-deinterlacing: you're taking interlaced content and sending it out to a
-non-interlaced display.</p>
-                                                                                                                
-<p>The simplest way to do this, and the default if you use xawtv in overlay
-mode, is to buffer every two consecutive fields together and show them
-as a single frame.  You can do this in tvtime by using the Weave plugin,
-and hitting the 'half framerate' button.  That's about as close to "not
-deinterlacing" as you can get, but it's still deinterlacing.</p>
-                                                                                                                
-<p>However it's worthy to mention that detecting progressive content sent
-over an interlaced channel, as will happen with some video games, or DV
-cameras in progressive modes, is still deinterlacing and is something we
-don't really do right now, except by manually using Weave and half
-framerate mode (which won't work for pulldown sources).  This feature is
-being improved.</p>
-
-<hr>
-<h3><a name="recording">7. FAQ: Does tvtime support recording?</a></h3>
-
-<p>tvtime does not yet support recording or playback of recorded streams.
-If you are interested in helping with coding this feature, please
-contact the authors.</p>
-
-<hr>
-<h3><a name="screenshots">8. FAQ: Why does tvtime appear blue in screenshots?</a></h3>
-
-<p>tvtime outputs video into a <b>video overlay surface</b>, an area of memory
-outside of the framebuffer, using the <b>XVIDEO</b> X extension.  As such,
-applications which take screenshots such as <b>ksnapshot</b>, <b>gimp</b> or
-<b>xwd</b> only see the colourkeyed window, and not output of tvtime.</p>
-
-<p>We believe it is a design flaw or driver limitation on the X or video card
-hardware that one or the other cannot provide the image to screenshot
-applications.  For this reason, the only known workaround for taking
-screenshots of tvtime along with the desktop is to use the <b>screenshot</b>
-feature inside tvtime, and cut-and-paste the output into a full desktop screen
-capture.</p>
-
-<hr>
-<h3><a name="macrovision">9. FAQ: Purple lines in video?  How do I avoid macrovision?</a></h3>
-
-<p>If you are seeing purple lines or having problems with video signal
-quality from an external DVD player, VCR, or Laserdisc player, try
-disabling Macrovision in your bttv driver (if you have a bttv card). See
-<a href="http://www.colby.edu/personal/k/kjseptor/bttv.html">
-http://www.colby.edu/personal/k/kjseptor/bttv.html</a> for information
-on how to do that.</p>
-
-<hr>
-<h3><a name="noise">10. FAQ: Interference problems with soundcards</a></h3>
-
-<p>If you are experiencing a generally fuzzy picture, try moving your tv
-card one or two slots away from your soundcard (inside your pc).
-Interference from the soundcard can mess up some channels.</p>
-
-<hr>
-<h3><a name="tvout">11. FAQ: Optimal settings for tvtime on TV output</a></h3>
-
-<p>Some people are interested in using tvtime even when their output
-itself a television.  Usually this is in the context of setting up a
-home theatre PC system as in a PVR.  Ideally for television output, no
-deinterlacing is required;  the interlaced signal is sent to the output
-such that every top field in the input is mapped to a top field in the
-output.</p>
-
-<p>Unfortunately, there is no standard TV output API under linux.  The
-vesa framebuffer setup for TV output cannot tell us which field is
-currently being output.  Similarily, some TV output setups under linux
-have it as a second head in X, but again, with no field information we
-cannot know how to supply it with interlaced content to ensure that
-fields are shown in the right order.</p>
-
-<p>There are two possible solutions.  I have been told that with the
-NVIDIA TV output drivers, when using XVIDEO, if you supply them with
-<b>top-field-first</b> frames, they will display the fields correctly.
-To experiment, try tvtime using the <b>Progressive: Top Field First</b>
-deinterlacer.  This may give good results.  The second option would be
-using a card with a TV output driver that gives field information.
-An example is the Matrox G400/G450/G550 driver in <b>DirectFB</b>.
-We are working on native support for TV output in this setting.</p>
-
-<hr>
-<h3><a name="bsd">12. FAQ: Does tvtime support FreeBSD or NetBSD?</a></h3>
-
-<p>Every now and then someone asks about BSD'ish systems and tvtime.
-Currently, tvtime will not work on BSD-based systems, but the code to
-get it to work should not be too difficult.</p>
-
-<p>There is a driver for bt848 and bt878-based cards under BSD called
-<b>bsdbt848</b>.  The API for this driver is different from Linux's
-video4linux that tvtime was written for, so the first job would be to do
-the input code in tvtime to handle this driver.  See
-<a href="http://mplayerhq.hu">mplayer</a> for one example of some code
-that uses this driver.</p>
-
-<p>The only other Linux-specific features that we use would be the
-/dev/rtc code to do high performance timing (I assume there is a BSD
-equivalent of this), and potentially the wine loader for the DScaler
-DLLs may need updating.</p>
-
-<p>If you make any progress on any of these, please let me know.
-Thanks.</p>
-
-<hr>
-<h3><a name="ssname">FAQ: How do I force the screenshots to be a specific filename?</a></h3>
-
-<p>tvtime's screenshots can be given a filename when requested
-using <b>tvtime-command</b>.  Simply do:</p>
-
-<pre>
-  tvtime-command SCREENSHOT "current.png"
+    tvtime-command SCREENSHOT "current.png"
 </pre>
 
-<p>And the screenshot will output as <b>current.png</b>.  This is
-useful for scripts which upload the latest image from the TV to a webpage,
-for example.</p>
+        <p>And the screenshot will output as <b>current.png</b>.  This is
+        useful for scripts which upload the latest image from the TV to a
+        webpage, for example.</p>
 
+        <h3><a name="architectures">9. Does tvtime support any architectures
+        besides x86??</a></h3>
+
+        <p>Some work was done by Helge Kreutzmann to try tvtime on
+        alpha Linux.  We determined that disabling the wine loader was
+        enough to get tvtime to compile and run.  tvtime 0.9.11 should
+        compile at least on this architecture.</p>
+
+        <p>Besides that, most other architectures are simply untested.
+        If anyone is seriously interested in another architecture, has
+        some coding ability, and has sufficient hardware resources to try
+        tvtime on another architecture, please email me at
+        <a href="mailto:vektor@dumbterm.net">vektor@dumbterm.net</a>.</p>
+
+        <p>As a miminum, your system should have a video card that can
+        handle high bandwidth uploads (in our default configuration we
+        upload 40 megabytes per second) and supports hardware video
+        overlays, preferably using the XVIDEO extension.  As well, we require
+        a video4linux or video4linux2-compatible driver and about the CPU
+        power of a reasonable P3.</p>
+
+        <h3><a name="canadacable">10. Where is the "canada-cable" frequency
+        table?</a></h3>
+
+        <p>If you needed to use the "<tt>canada-cable</tt>" frequency table in
+        another TV application, then your capture card's tuner has been
+        misdetected as a PAL tuner when it is actually an NTSC tuner.  Please
+        see <a href="problems.html#tvwonder">this support question on our
+        hardware support page</a> for information on how to fix this
+        problem.</p>
+
+        <h3><a name="audioconnect">11. How can I map audio to my digital
+            output?</a></h3>
+
+        <p>Many bt878-based cards also support digital capture of the
+        audio.  This can be accessed using the <tt>btaudio</tt> kernel
+        module, which registers an OSS sound device that supports 32 KHz
+        audio capture.  On a capable card, loading the module gives
+        something like this in your system logs:</p>
+
+<pre>
+    btaudio: driver version 0.7 loaded [digital+analog]
+    btaudio: Bt878 (rev 2) at 01:0b.1, irq: 6,
+             latency: 64, mmio: 0xf16ff000
+    btaudio: using card config "default"
+    btaudio: registered device dsp2 [digital]
+    btaudio: registered device dsp3 [analog]
+    btaudio: registered device mixer1
+</pre>
+
+        <p>On my system <tt>/dev/dsp2</tt> can now be used to read
+        digital audio from the card at 32 KHz.  This can be then sent
+        out to an arbitrary soundcard using a program such
+        as <tt>sox</tt>.</p>
+
+<pre>
+    sox -r 32000 -w -t ossdsp /dev/dsp2 -t ossdsp /dev/dsp
+</pre>
+
+        <p>This command reads the input at 32 KHz from
+        <tt>/dev/dsp2</tt> and writes it out to my soundcard
+        at <tt>/dev/dsp</tt>.  Having this run while using tvtime
+        will enable you to perform arbitrary maps of the audio, such
+        as playing it out the digital output of your soundcard.</p>
+
+        <h3><a name="noaudio">12. My capture card does not have an audio
+            output jack, what do I do?</a></h3>
+
+        <p>If your capture card does not has a pass-through audio
+        jack, you can use the <a href="#audioconnect">technique
+        described above</a> to map the audio from the internal
+        digital capture out to your soundcard.</p>
 
         </td></tr>
     </table>
