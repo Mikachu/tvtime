@@ -38,8 +38,7 @@ struct xmltv_s
 };
 
 /**
- * This exists so that we can store program info during search without
- * modifying xmltv.
+ * Struct to store program info.
  */
 struct program_s {
     xmlChar *title;
@@ -176,72 +175,42 @@ static time_t parse_xmltv_date( const char *date )
     return mktime( &tm_obj );
 }
 
-/**
- * Necessary in order to avoid the assumption that the next node represents
- * the next show.
- */
-static xmlNodePtr get_next_program( xmlNodePtr cur, const char *channelid,
-                                    time_t time )
+static void reinit_program( program_t *pro, xmlNodePtr cur )
 {
-    time_t min_diff = 0;
-    xmlNodePtr min_node = 0;
-
-    cur = cur->xmlChildrenNode;
-    while( cur ) {
-        if( !xmlStrcasecmp( cur->name, BAD_CAST "programme" ) ) {
-            xmlChar *channel = xmlGetProp( cur, BAD_CAST "channel" );
-            if( channel && !xmlStrcasecmp( channel, BAD_CAST channelid ) ) {
-                xmlChar *start = xmlGetProp( cur, BAD_CAST "start" );
-                if( start ) {
-                    time_t start_time;
-                    time_t diff = 0;
-
-                    start_time = parse_xmltv_date( (char *) start );
-                    diff = start_time - time;
-                    if ( diff > 0 ) { /* if diff == 0, it's the same show */
-                        if ( min_diff == 0 || diff < min_diff ) {
-                            min_diff = diff;
-                            min_node = cur;
-                        }
-                    }
-                    xmlFree( start );
-                }
-            }
-            if( channel ) xmlFree( channel );
-        }
-        cur = cur->next;
-    }
-
-    return min_node;
-}
-
-static void reinit_program( program_t *pro, xmlNodePtr cur, time_t end_time )
-{
-    if( !pro ) {
-        return;
-    }
-
     if( cur ) {
         xmlChar *start = xmlGetProp( cur, BAD_CAST "start" );
+        xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
+        time_t start_time = 0;
+        time_t end_time = 0;
+        struct tm start_tm;
+        struct tm end_tm;
+
         if( start ) {
-            time_t start_time;
-            struct tm start_tm;
-            struct tm end_tm;
             start_time = parse_xmltv_date( (char *) start );
-            localtime_r( &start_time, &start_tm );
-            localtime_r( &end_time, &end_tm );
-            /* FIXME: This needs i18n-approval. In French, for example, times
-               are written as 18h30, and in Swedish, we write 18.30. Not to
-               mention different leading-zero rules. */
-            /* Printing the string here was a hack to begin with.  There
-               should be functions to return the start/end time from the
-               xmltv object so that formatting can be handled by the
-               application.  -Billy */
-            sprintf( pro->times, "%2d:%02d - %2d:%02d",
-                     start_tm.tm_hour, start_tm.tm_min,
-                     end_tm.tm_hour, end_tm.tm_min );
             xmlFree( start );
         }
+        if( stop ) {
+            end_time = parse_xmltv_date( (char *) stop );
+            xmlFree( stop );
+        } else {
+            end_time = start_time + 1800;
+        }
+        pro->end_time = end_time;
+
+        localtime_r( &start_time, &start_tm );
+        localtime_r( &end_time, &end_tm );
+
+        /* FIXME: This needs i18n-approval. In French, for example, times
+           are written as 18h30, and in Swedish, we write 18.30. Not to
+           mention different leading-zero rules. */
+        /* Printing the string here was a hack to begin with.  There
+           should be functions to return the start/end time from the
+           xmltv object so that formatting can be handled by the
+           application.  -Billy */
+        sprintf( pro->times, "%2d:%02d - %2d:%02d",
+                 start_tm.tm_hour, start_tm.tm_min,
+                 end_tm.tm_hour, end_tm.tm_min );
+
         cur = cur->xmlChildrenNode;
         while( cur ) {
             if( !xmlStrcasecmp( cur->name, BAD_CAST "title" ) ) {
@@ -255,20 +224,20 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, time_t end_time )
         }
     } else {
          pro->title = pro->subtitle = pro->description = 0;
+         pro->end_time = 0;
          *pro->times = 0;
     }
-    pro->end_time = end_time;
 }
 
-program_t *program_new()
+static program_t *program_new( void )
 {
     program_t *pro = malloc( sizeof( program_t ) );
-    reinit_program( pro, 0, 0 );
+    reinit_program( pro, 0 );
     return pro;
 }
 
-static xmlNodePtr get_program( xmlNodePtr root, program_t *pro,
-                               const char *channelid, time_t time )
+static xmlNodePtr get_program( xmlNodePtr root, const char *channelid,
+                               time_t time )
 {
     xmlNodePtr cur = root->xmlChildrenNode;
     while( cur ) {
@@ -287,25 +256,10 @@ static xmlNodePtr get_program( xmlNodePtr root, program_t *pro,
                             end_time = parse_xmltv_date( (char *) stop );
                             xmlFree( stop );
                         } else {
-                            xmlNodePtr next_program = get_next_program( root,
-                                                        channelid, start_time );
-                            xmlChar *next_start = 0;
-                            if ( next_program ) {
-                                next_start = xmlGetProp( next_program,
-                                                         BAD_CAST "start" );
-                                if ( next_start ) {
-                                    end_time = parse_xmltv_date( (char *) next_start );
-                                }
-                            }
-                            if ( !next_program || !next_start ) {
-                                /* Set to 23:59 the same day. */
-                                end_time =
-                                    start_time - (start_time % 86400) + 86340;
-                            }
-                            if ( next_start ) xmlFree( next_start );
+                            /* Set to half an hour later. */
+                            end_time = start_time + 1800;
                         }
                         if( end_time > time ) {
-                            reinit_program( pro, cur, end_time );
                             xmlFree( start );
                             xmlFree( channel );
                             return cur;
@@ -386,12 +340,13 @@ xmltv_t *xmltv_new( const char *filename )
     return xmltv;
 }
 
-void program_delete( program_t *pro ) {
+static void program_delete( program_t *pro )
+{
     if( pro->title ) xmlFree( pro->title );
     if( pro->subtitle ) xmlFree( pro->subtitle );
     if( pro->description ) xmlFree( pro->description );
-    reinit_program( pro, 0, 0 );
-    free ( pro );
+    reinit_program( pro, 0 );
+    free( pro );
 }
 
 void xmltv_delete( xmltv_t *xmltv )
@@ -417,28 +372,31 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
 
 void xmltv_refresh( xmltv_t *xmltv )
 {
-    xmlNodePtr program_node = 0;
     time_t curtime = time( 0 );
 
     if( xmltv->pro->title ) xmlFree( xmltv->pro->title );
     if( xmltv->pro->subtitle ) xmlFree( xmltv->pro->subtitle );
     if( xmltv->pro->description ) xmlFree( xmltv->pro->description );
-    reinit_program( xmltv->pro, 0, 0 );
+    reinit_program( xmltv->pro, 0 );
 
     if( xmltv->next_pro->title ) xmlFree( xmltv->next_pro->title );
     if( xmltv->next_pro->subtitle ) xmlFree( xmltv->next_pro->subtitle );
     if( xmltv->next_pro->description ) xmlFree( xmltv->next_pro->description );
-    reinit_program( xmltv->next_pro, 0, 0 );
+    reinit_program( xmltv->next_pro, 0 );
 
     if( *xmltv->curchannel ) {
-        program_node = get_program( xmltv->root, xmltv->pro, xmltv->curchannel,
-                                    curtime );
+        xmlNodePtr program_node = 0;
+        program_node = get_program( xmltv->root, xmltv->curchannel, curtime );
+        reinit_program( xmltv->pro, program_node );
 
         if( program_node ) {
-            get_program( xmltv->root, xmltv->next_pro, xmltv->curchannel,
-                         xmltv->pro->end_time );
+            /* If we found a program, lookup what's on next. */
+            program_node = get_program( xmltv->root, xmltv->curchannel,
+                                        xmltv->pro->end_time );
+            reinit_program( xmltv->next_pro, program_node );
         } else {
-            xmltv->pro->end_time = curtime + 3600;
+            /* We found no program, schedule a check in a half hour. */
+            xmltv->pro->end_time = curtime + 1800;
         }
     }
     xmltv->refresh = 0;
