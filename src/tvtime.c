@@ -677,9 +677,9 @@ int main( int argc, char **argv )
 
         if( tuner_state == TUNER_STATE_HAS_SIGNAL ) {
             has_signal = 1;
-            tvtime_osd_signal_present( osd, 1 );
+            if( osd ) tvtime_osd_signal_present( osd, 1 );
         } else if( tuner_state == TUNER_STATE_NO_SIGNAL ) {
-            tvtime_osd_signal_present( osd, 0 );
+            if( osd ) tvtime_osd_signal_present( osd, 0 );
             if( fadepos < 256 ) {
                 crossfade_frame( fadeframe, saveframe, blueframe, width,
                                  height, width*2, width*2, width*2, fadepos );
