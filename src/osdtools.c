@@ -912,7 +912,7 @@ void osd_list_rerender( osd_list_t *osdl )
 {
     int i;
 
-    for( i = 0; i < osdl->numlines; i++ ) {
+    for( i = 0; i < OSD_LIST_MAX_LINES; i++ ) {
         osd_string_rerender( osdl->lines[ i ] );
     }
 }
