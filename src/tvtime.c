@@ -54,6 +54,7 @@
 #include "configsave.h"
 #include "config.h"
 #include "vgasync.h"
+#include "rvrreader.h"
 
 /**
  * Set this to 1 to enable the experimental pulldown detection code.
@@ -825,6 +826,7 @@ int main( int argc, char **argv )
     videoinput_t *vidin = 0;
     rtctimer_t *rtctimer = 0;
     station_mgr_t *stationmgr = 0;
+    rvrreader_t *rvrreader = 0;
     int width, height;
     int norm = 0;
     int fieldtime;
@@ -949,8 +951,14 @@ int main( int argc, char **argv )
         fprintf( stderr, "tvtime: Can't open video input, "
                          "maybe try a different device?\n" );
     }
-
-    if( vidin ) {
+    // rvrreader = rvrreader_new( "testfile.rvr" );
+    if( rvrreader ) {
+        width = rvrreader_get_width( rvrreader );
+        height = rvrreader_get_height( rvrreader );
+        if( verbose ) {
+            fprintf( stderr, "tvtime: RVR frame sampling %d pixels per scanline.\n", width );
+        }
+    } else if( vidin ) {
         videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
         width = videoinput_get_width( vidin );
         height = videoinput_get_height( vidin );
@@ -974,7 +982,9 @@ int main( int argc, char **argv )
      * 4 buffers: 5 fields available.  [t][b][t][b][t][b][-][-]
      *                                 ^^^^^^^^^^^^^^^
      */
-    if( vidin ) {
+    if( rvrreader ) {
+        fieldsavailable = 5;
+    } else if( vidin ) {
         if( videoinput_get_numframes( vidin ) < 2 ) {
             fprintf( stderr, "tvtime: Can only get %d frame buffers from V4L.  "
                      "Not enough to continue.  Exiting.\n",
@@ -1038,7 +1048,10 @@ int main( int argc, char **argv )
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         tvtime_osd_set_deinterlace_method( osd, curmethod->name );
-        if( vidin ) {
+        if( rvrreader ) {
+            tvtime_osd_set_input( osd, "No input" );
+            tvtime_osd_set_norm( osd, height == 480 ? "NTSC" : "PAL" );
+        } else if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
             tvtime_osd_set_norm( osd, videoinput_norm_name( videoinput_get_norm( vidin ) ) );
         } else {
@@ -1184,6 +1197,7 @@ int main( int argc, char **argv )
                        config_get_aspect( ct ), verbose ) ) {
         fprintf( stderr, "tvtime: XVideo output failed to initialize: "
                          "no video output available.\n" );
+        /* FIXME: Delete everything here! */
         if( vidin ) videoinput_delete( vidin );
         return 1;
     }
@@ -1290,7 +1304,9 @@ int main( int argc, char **argv )
         videofilter_set_bt8x8_correction( filter, commands_apply_luma_correction( commands ) );
 
         /* Aquire the next frame. */
-        if( vidin ) {
+        if( rvrreader ) {
+            tuner_state = TUNER_STATE_HAS_SIGNAL;
+        } else if( vidin ) {
             tuner_state = videoinput_check_for_signal( vidin, config_get_check_freq_present( ct ) );
         } else {
             tuner_state = TUNER_STATE_NO_SIGNAL;
@@ -1315,7 +1331,14 @@ int main( int argc, char **argv )
         }
 
         if( !paused && (tuner_state == TUNER_STATE_HAS_SIGNAL || tuner_state == TUNER_STATE_SIGNAL_DETECTED) ) {
-            curframe = videoinput_next_frame( vidin, &curframeid );
+            if( rvrreader ) {
+                if( !rvrreader_next_frame( rvrreader ) ) break;
+                curframe = rvrreader_get_curframe( rvrreader );
+                lastframe = rvrreader_get_lastframe( rvrreader );
+                secondlastframe = rvrreader_get_secondlastframe( rvrreader );
+            } else if( vidin ) {
+                curframe = videoinput_next_frame( vidin, &curframeid );
+            }
             aquired = 1;
             filtered_cur = 0;
         }
@@ -1418,7 +1441,7 @@ int main( int argc, char **argv )
                         basename = outfile = fifo_args;
                     } else {
                         strftime( timestamp, sizeof( timestamp ),
-                              config_get_timeformat( ct ), localtime( &tm ) );
+                                  config_get_timeformat( ct ), localtime( &tm ) );
                         sprintf( filename, "tvtime-output-%s.png", timestamp );
                         sprintf( pathfilename, "%s/%s", config_get_screenshot_dir( ct ), filename );
                         outfile = pathfilename;
@@ -1565,6 +1588,9 @@ int main( int argc, char **argv )
 
     if( verbose ) {
         fprintf( stderr, "tvtime: Cleaning up.\n" );
+    }
+    if( rvrreader ) {
+        rvrreader_delete( rvrreader );
     }
     if( vidin ) {
         videoinput_delete( vidin );
