@@ -108,14 +108,14 @@ struct osd_string_s
 osd_string_t *osd_string_new( osd_font_t *font, int video_width )
 {
     osd_string_t *osds = (osd_string_t *) malloc( sizeof( osd_string_t ) );
-    int fontsize = ft_font_get_size( osd_font_get_font( font ) );
+    int max_height = ft_font_get_height( osd_font_get_font( font ) ) + 4;
 
     if( !osds ) {
         return 0;
     }
 
     osds->font = font;
-    osds->image4444 = (unsigned char *) malloc( video_width * (fontsize*2) * 4 );
+    osds->image4444 = (unsigned char *) malloc( video_width * max_height * 4 );
     if( !osds->image4444 ) {
         free( osds );
         return 0;
@@ -141,7 +141,7 @@ osd_string_t *osd_string_new( osd_font_t *font, int video_width )
     osds->border_cr = 128;
 
     osds->image_width = video_width;
-    osds->image_height = fontsize*2;
+    osds->image_height = max_height;
     osds->image_textwidth = 0;
     osds->image_textheight = 0;
 
@@ -194,8 +194,19 @@ void osd_string_set_border_colour( osd_string_t *osds, int luma, int cb, int cr 
 
 void osd_string_render_image4444( osd_string_t *osds )
 {
-    osds->image_textwidth = ft_string_get_width( osds->fts ) + 4;
-    osds->image_textheight = ft_string_get_height( osds->fts ) + 6;
+    int stringwidth = ft_string_get_width( osds->fts );
+    int stringheight = ft_string_get_height( osds->fts );
+    int bordersize = 4;
+
+    if( stringheight > ( osds->image_height - bordersize) ) {
+        stringheight = ( osds->image_height - bordersize);
+    }
+    if( stringwidth > ( osds->image_width - bordersize ) ) {
+        stringwidth = ( osds->image_width - bordersize );
+    }
+
+    osds->image_textheight = ft_string_get_height( osds->fts ) + bordersize;
+    osds->image_textwidth = ft_string_get_width( osds->fts ) + bordersize;
 
     /* TODO: Only blit size of data if < full text size. */
     blit_colour_packed4444( osds->image4444, osds->image_textwidth,
@@ -206,8 +217,7 @@ void osd_string_render_image4444( osd_string_t *osds )
         composite_alphamask_alpha_to_packed4444( osds->image4444, osds->image_width,
                                                  osds->image_height, osds->image_width * 4,
                                                  ft_string_get_buffer( osds->fts ),
-                                                 ft_string_get_width( osds->fts ),
-                                                 ft_string_get_height( osds->fts ),
+                                                 stringwidth, stringheight,
                                                  ft_string_get_stride( osds->fts ),
                                                  osds->border_luma, osds->border_cb,
                                                  osds->border_cr, 128, 3, 2 );
@@ -215,8 +225,9 @@ void osd_string_render_image4444( osd_string_t *osds )
 
     composite_alphamask_to_packed4444( osds->image4444, osds->image_width,
                                        osds->image_height, osds->image_width * 4,
-                                       ft_string_get_buffer( osds->fts ), ft_string_get_width( osds->fts ),
-                                       ft_string_get_height( osds->fts ), ft_string_get_stride( osds->fts ),
+                                       ft_string_get_buffer( osds->fts ),
+                                       stringwidth, stringheight,
+                                       ft_string_get_stride( osds->fts ),
                                        osds->text_luma, osds->text_cb, osds->text_cr, 0, 0 );
 }
 
