@@ -162,6 +162,7 @@ typedef struct menu_names_s {
 
 static menu_names_t menu_table[] = {
     { "root", MENU_REDIRECT, "root-tuner" },
+    { "input", MENU_REDIRECT, "input-ntsc" },
     { "favorites", MENU_FAVORITES, 0 },
     { "color", MENU_REDIRECT, "colour" }
 };
@@ -501,6 +502,11 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
         fprintf( stderr, "commands: Input isn't from a bt8x8, disabling luma correction.\n" );
     }
 
+    if( vidin && videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC &&
+                 videoinput_get_norm( vidin ) != VIDEOINPUT_NTSC_JP ) {
+        set_redirect( "input", "input-pal" );
+    }
+
     if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
         fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
         cmd->luma_power = 1.0;
@@ -601,17 +607,17 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
-    menu = menu_new( "input" );
+    menu = menu_new( "input-ntsc" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
     sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
     menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
-    sprintf( string, "%c%c%c  Data services", 0xee, 0x80, 0x9a );
+    sprintf( string, "%c%c%c  Toggle closed captions", 0xee, 0x80, 0x9a );
     menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
-    menu_set_right_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
+    menu_set_enter_command( menu, 2, TVTIME_TOGGLE_CC, "" );
+    menu_set_right_command( menu, 2, TVTIME_TOGGLE_CC, "" );
     menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
     sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
     menu_set_text( menu, 3, string );
@@ -624,6 +630,26 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_right_command( menu, 4, TVTIME_SHOW_MENU, "root" );
     menu_set_left_command( menu, 4, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+
+    menu = menu_new( "input-pal" );
+    menu_set_text( menu, 0, "Setup - Input configuration" );
+    sprintf( string, "%c%c%c  Television standard", 0xee, 0x80, 0xad );
+    menu_set_text( menu, 1, string );
+    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
+    menu_set_right_command( menu, 1, TVTIME_SHOW_MENU, "norm" );
+    menu_set_left_command( menu, 1, TVTIME_SHOW_MENU, "root" );
+    sprintf( string, "%c%c%c  Restart with new settings", 0xee, 0x80, 0x9c );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_RESTART, "" );
+    menu_set_right_command( menu, 2, TVTIME_RESTART, "" );
+    menu_set_left_command( menu, 2, TVTIME_SHOW_MENU, "root" );
+    commands_add_menu( cmd, menu );
+    sprintf( string, "%c%c%c  Back", 0xe2, 0x86, 0x90 );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_right_command( menu, 3, TVTIME_SHOW_MENU, "root" );
+    menu_set_left_command( menu, 3, TVTIME_SHOW_MENU, "root" );
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "norm" );
