@@ -87,6 +87,13 @@ int main( int argc, char **argv )
 {
     struct timeval lastfieldtime;
     struct timeval lastframetime;
+    struct timeval checkpoint1;
+    struct timeval checkpoint2;
+    struct timeval checkpoint3;
+    struct timeval checkpoint4;
+    struct timeval checkpoint5;
+    struct timeval checkpoint6;
+    struct timeval checkpoint7;
     double luma_correction = 1.0;
     video_correction_t *vc;
     videoinput_t *vidin;
@@ -248,6 +255,14 @@ int main( int argc, char **argv )
     /* Setup the mixer */
     mixer_set_volume( mixer_get_volume() );
 
+    gettimeofday( &checkpoint1, 0 );
+    gettimeofday( &checkpoint2, 0 );
+    gettimeofday( &checkpoint3, 0 );
+    gettimeofday( &checkpoint4, 0 );
+    gettimeofday( &checkpoint5, 0 );
+    gettimeofday( &checkpoint6, 0 );
+    gettimeofday( &checkpoint7, 0 );
+
     gettimeofday( &lastframetime, 0 );
     gettimeofday( &lastfieldtime, 0 );
     for(;;) {
@@ -357,16 +372,34 @@ int main( int argc, char **argv )
             printdebug = 1;
         }
 
+/* CHECKPOINT1 : Blit the second field */
+        gettimeofday( &checkpoint1, 0 );
 
         /* Aquire the next frame. */
         curluma  = videoinput_next_image( vidin );
         curcb422 = curluma  + ( width   * height );
         curcr422 = curcb422 + ( width/2 * height );
 
+/* CHECKPOINT2 : Got the frame */
+        gettimeofday( &checkpoint2, 0 );
+
         gettimeofday( &curframetime, 0 );
-        if( printdebug || (debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2))) ) {
-            fprintf( stderr, "tvtime: Skip [%8d]: diff %dus, last blittime %dus, frametime %dus\n",
-                     skipped++, timediff( &curframetime, &lastframetime ), blittime, (fieldtime*2) );
+        if( printdebug ) {
+            fprintf( stderr, "tvtime: aquire %d, build top %d "
+                             "blit top %d built bot %d free input %d "
+                             "wait bot %d blit bot %d\n",
+                     timediff( &checkpoint2, &checkpoint1 ),
+                     timediff( &checkpoint3, &lastframetime ),
+                     timediff( &checkpoint4, &checkpoint3 ),
+                     timediff( &checkpoint5, &checkpoint4 ),
+                     timediff( &checkpoint6, &checkpoint5 ),
+                     timediff( &checkpoint7, &checkpoint6 ),
+                     timediff( &checkpoint1, &checkpoint7 ) );
+        }
+        if( debug && ((timediff( &curframetime, &lastframetime ) - tolerance) > (fieldtime*2)) ) {
+            fprintf( stderr, "tvtime: Skip %3d: diff %dus, frametime %dus\n",
+                     skipped++,
+                     timediff( &curframetime, &lastframetime ), (fieldtime*2) );
         }
         lastframetime = curframetime;
 
@@ -387,6 +420,9 @@ int main( int argc, char **argv )
                                                                  0, width * 2, width, width, height );
         }
 
+/* CHECKPOINT3 : Constructed the first field */
+        gettimeofday( &checkpoint3, 0 );
+
         /* Wait for the next field time and display. */
         gettimeofday( &curfieldtime, 0 );
         /* I'm commenting this out for now, tvtime takes too much CPU here -Billy
@@ -405,6 +441,9 @@ int main( int argc, char **argv )
         lastfieldtime = blitend;
         blittime = timediff( &blitend, &blitstart );
 
+/* CHECKPOINT4 : Blit the first field */
+        gettimeofday( &checkpoint4, 0 );
+
         /* Build our frame, pivot on the top field. */
         if( output420 ) {
             luma_plane_field_to_frame( sdl_get_output(), curluma + width,
@@ -422,8 +461,14 @@ int main( int argc, char **argv )
                                                                  1, width * 2, width, width, height );
         }
 
+/* CHECKPOINT5 : Built the second field */
+        gettimeofday( &checkpoint5, 0 );
+
         /* We're done with the input now. */
         videoinput_free_last_frame( vidin );
+
+/* CHECKPOINT6 : Free'd the input */
+        gettimeofday( &checkpoint6, 0 );
 
         /* Wait for the next field time and display. */
         gettimeofday( &curfieldtime, 0 );
@@ -435,6 +480,9 @@ int main( int argc, char **argv )
             }
             gettimeofday( &curfieldtime, 0 );
         }
+/* CHECKPOINT7 : Wait to blit bot */
+        gettimeofday( &checkpoint7, 0 );
+
         gettimeofday( &blitstart, 0 );
         sdl_show_frame();
         gettimeofday( &blitend, 0 );
