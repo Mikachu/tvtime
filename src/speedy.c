@@ -86,6 +86,10 @@ void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *old,
                                  unsigned char *new, int os, int ns );
 void (*a8_subpix_blit_scanline)( unsigned char *output, unsigned char *input,
                                  int lasta, int startpos, int width );
+void (*quarter_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *one,
+                                                  unsigned char *three, int width );
+void (*subpix_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *top,
+                                                 unsigned char *bot, int subpixpos, int width );
 
 
 static uint64_t speedy_time = 0;
@@ -1550,6 +1554,99 @@ void blend_packed422_scanline_mmxext( unsigned char *output, unsigned char *src1
     }
 }
 
+void quarter_blit_vertical_packed422_scanline_mmxext( unsigned char *output, unsigned char *one,
+                                                      unsigned char *three, int width )
+{
+    int i;
+
+    SPEEDY_START();
+    for( i = width/16; i; --i ) {
+        movq_m2r( *one, mm0 );
+        movq_m2r( *three, mm1 );
+        movq_m2r( *(one + 8), mm2 );
+        movq_m2r( *(three + 8), mm3 );
+        movq_m2r( *(one + 16), mm4 );
+        movq_m2r( *(three + 16), mm5 );
+        movq_m2r( *(one + 24), mm6 );
+        movq_m2r( *(three + 24), mm7 );
+        pavgb_r2r( mm1, mm0 );
+        pavgb_r2r( mm1, mm0 );
+        pavgb_r2r( mm3, mm2 );
+        pavgb_r2r( mm3, mm2 );
+        pavgb_r2r( mm5, mm4 );
+        pavgb_r2r( mm5, mm4 );
+        pavgb_r2r( mm7, mm6 );
+        pavgb_r2r( mm7, mm6 );
+        movntq_r2m( mm0, *output );
+        movntq_r2m( mm2, *(output + 8) );
+        movntq_r2m( mm4, *(output + 16) );
+        movntq_r2m( mm6, *(output + 24) );
+        output += 32;
+        one += 32;
+        three += 32;
+    }
+    width = (width & 0xf);
+
+    for( i = width/4; i; --i ) {
+        movq_m2r( *one, mm0 );
+        movq_m2r( *three, mm1 );
+        pavgb_r2r( mm1, mm0 );
+        pavgb_r2r( mm1, mm0 );
+        movntq_r2m( mm0, *output );
+        output += 8;
+        one += 8;
+        three += 8;
+    }
+    width = width & 0x7;
+
+    /* Handle last few pixels. */
+    for( i = width * 2; i; --i ) {
+        *output++ = (*one + *three + *three + *three + 2) / 4;
+        one++;
+        three++;
+    }
+
+    emms();
+
+    SPEEDY_END();
+}
+
+
+void quarter_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *one,
+                                                 unsigned char *three, int width )
+{
+    SPEEDY_START();
+    width *= 2;
+    while( width-- ) {
+        *output++ = (*one + *three + *three + *three + 2) / 4;
+        one++;
+        three++;
+    }
+    SPEEDY_END();
+}
+
+void subpix_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *top,
+                                                unsigned char *bot, int subpixpos, int width )
+{
+    if( subpixpos == 32768 ) {
+        interpolate_packed422_scanline( output, top, bot, width );
+    } else if( subpixpos == 16384 ) {
+        quarter_blit_vertical_packed422_scanline( output, top, bot, width );
+    } else if( subpixpos == 49152 ) {
+        quarter_blit_vertical_packed422_scanline( output, bot, top, width );
+    } else {
+        int x;
+
+        SPEEDY_START();
+
+        width *= 2;
+        for( x = 0; x < width; x++ ) {
+            output[ x ] = ( ( top[ x ] * subpixpos ) + ( bot[ x ] * ( 0xffff - subpixpos ) ) ) >> 16;
+        }
+        SPEEDY_END();
+    }
+}
+
 void a8_subpix_blit_scanline_c( unsigned char *output, unsigned char *input,
                                 int lasta, int startpos, int width )
 {
@@ -1594,6 +1691,8 @@ void setup_speedy_calls( int verbose )
     speedy_memcpy = temp_memcpy;
     diff_packed422_block8x8 = diff_packed422_block8x8_c;
     a8_subpix_blit_scanline = a8_subpix_blit_scanline_c;
+    quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_c;
+    subpix_blit_vertical_packed422_scanline = subpix_blit_vertical_packed422_scanline_c;
 
     if( speedy_accel & MM_ACCEL_X86_MMXEXT ) {
         if( verbose ) {
@@ -1612,6 +1711,7 @@ void setup_speedy_calls( int verbose )
         diff_factor_packed422_scanline = diff_factor_packed422_scanline_mmx;
         comb_factor_packed422_scanline = comb_factor_packed422_scanline_mmx;
         diff_packed422_block8x8 = diff_packed422_block8x8_mmx;
+        quarter_blit_vertical_packed422_scanline = quarter_blit_vertical_packed422_scanline_mmxext;
     } else if( speedy_accel & MM_ACCEL_X86_MMX ) {
         if( verbose ) {
             fprintf( stderr, "speedycode: Using MMX optimized functions.\n" );

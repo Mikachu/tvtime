@@ -131,6 +131,12 @@ void cheap_packed444_to_packed422_scanline( unsigned char *output,
                                             unsigned char *input, int width );
 void cheap_packed422_to_packed444_scanline( unsigned char *output,
                                             unsigned char *input, int width );
+void subpix_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *top,
+                                                unsigned char *bot, int subpixpos, int width );
+void quarter_blit_vertical_packed422_scanline_c( unsigned char *output, unsigned char *one,
+                                                 unsigned char *three, int width );
+void quarter_blit_vertical_packed422_scanline_mmxext( unsigned char *output, unsigned char *one,
+                                                      unsigned char *three, int width );
 
 /**
  * This filter actually does not meet the spec so calling it rec601
@@ -199,6 +205,10 @@ extern void (*diff_packed422_block8x8)( pulldown_metrics_t *m, unsigned char *ol
                                         unsigned char *new, int os, int ns );
 extern void (*a8_subpix_blit_scanline)( unsigned char *output, unsigned char *input,
                                         int lasta, int startpos, int width );
+extern void (*quarter_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *one,
+                                                         unsigned char *three, int width );
+extern void (*subpix_blit_vertical_packed422_scanline)( unsigned char *output, unsigned char *top,
+                                                        unsigned char *bot, int subpixpos, int width );
 
 /**
  * Sets up the function pointers to point at the fastest function available.
