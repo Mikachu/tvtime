@@ -38,6 +38,37 @@ struct rvrreader_s
     uint8_t *decoded[ 3 ];
 };
 
+off_t read_full( int fd, void *buf, size_t numbytes )
+{
+	size_t got = 0, total = 0, remain = 0;
+	if ( numbytes == 0 ) { return 0; }
+	if ( numbytes <  0 ) { return -1; }
+	while( total < numbytes ) {
+		remain = numbytes - total;
+		got = read(fd, buf+total, remain);
+		if ( got == 0 ) { break; }
+		if ( got <  0 ) { return got; }
+		total += got;
+	}
+	return total > 0 ? total : -1;
+}
+
+off_t skip_bytes( int fd, off_t numbytes, int unused )
+{
+	static char buf[4096];
+	off_t got = 0, total = 0, remain = 0;
+	if ( numbytes == 0 ) { return 0; }
+	if ( numbytes <  0 ) { return -1; }
+	while( total < numbytes ) {
+		remain = numbytes - total;
+		got = read(fd, buf, remain > 4096 ? 4096 : remain);
+		if ( got == 0 ) { break; }
+		if ( got <  0 ) { return got; }
+		total += got;
+	}
+	return total;
+}
+
 rvrreader_t *rvrreader_new( const char *filename )
 {
     rvrreader_t *reader = malloc( sizeof( rvrreader_t ) );
@@ -70,8 +101,8 @@ rvrreader_t *rvrreader_new( const char *filename )
     }
 
     /* Read in the file header. */
-    read( reader->fd, reader->fhdr, sizeof( ree_file_header_t ) );
-    lseek( reader->fd, reader->fhdr->headersize - sizeof( ree_file_header_t ), SEEK_CUR );
+    read_full( reader->fd, reader->fhdr, sizeof( ree_file_header_t ) );
+    skip_bytes( reader->fd, reader->fhdr->headersize - sizeof( ree_file_header_t ), SEEK_CUR );
 
     reader->curframe = 0;
 
@@ -93,7 +124,7 @@ rvrreader_t *rvrreader_new( const char *filename )
 
     /* Read first packet. */
     reader->dataread = 0;
-    read( reader->fd, reader->pkt, sizeof( ree_packet_header_t ) );
+    read_full( reader->fd, reader->pkt, sizeof( ree_packet_header_t ) );
     return reader;
 }
 
@@ -123,11 +154,11 @@ static int rvrreader_next_packet( rvrreader_t *reader )
 {
     int ret;
     if( !reader->dataread ) {
-        lseek64( reader->fd, reader->pkt->hdr.payloadsize, SEEK_CUR );
+        skip_bytes( reader->fd, reader->pkt->hdr.payloadsize, SEEK_CUR );
     }
     reader->dataread = 0;
 
-    ret = ( read( reader->fd, reader->pkt, sizeof( ree_packet_header_t ) ) == sizeof( ree_packet_header_t ) );
+    ret = ( read_full( reader->fd, reader->pkt, sizeof( ree_packet_header_t ) ) == sizeof( ree_packet_header_t ) );
     if( ree_is_video_packet( reader->pkt ) ) {
         reader->curframe++;
     }
@@ -137,7 +168,7 @@ static int rvrreader_next_packet( rvrreader_t *reader )
 static ree_packet_t *rvrreader_cur_packet( rvrreader_t *reader )
 {
     if( !reader->dataread ) {
-        read( reader->fd, reader->pkt->data, reader->pkt->hdr.payloadsize );
+        read_full( reader->fd, reader->pkt->data, reader->pkt->hdr.payloadsize );
         reader->dataread = 1;
     }
     return reader->pkt;
