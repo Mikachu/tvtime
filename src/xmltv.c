@@ -27,18 +27,23 @@ struct xmltv_s
     xmlDocPtr doc;
     xmlNodePtr root;
     char curchannel[ 256 ];
+    int refresh;
+    xmlChar *curchan;
+    program_t *pro;
+    program_t *next_pro;
+};
+
+/* This exists so that we can store program info during search without modifying xmltv */
+struct program_s {
     xmlChar *title;
     xmlChar *subtitle;
     xmlChar *description;
-    xmlChar *next_title;
     char times[ 256 ];
-    int refresh;
     int end_year;
     int end_month;
     int end_day;
     int end_hour;
     int end_min;
-    xmlChar *curchan;
 };
 
 /**
@@ -109,9 +114,13 @@ static int date_compare( int year1, int month1, int day1, int hour1, int min1,
     return first - second;
 }
 
-static xmlNodePtr get_program( xmlDocPtr doc, xmlNodePtr cur, const char *channelid,
-                               int year, int month, int day, int hour, int min )
+/* Necessary in order to avoid the assumption that the next node represents the next show */
+static xmlNodePtr get_next_program( xmlNodePtr cur, const char *channelid,
+                                    int year, int month, int day, int hour, int min )
 {
+    int min_diff = 0;
+    xmlNodePtr min_node = 0;
+
     cur = cur->xmlChildrenNode;
     while( cur ) {
         if( !xmlStrcasecmp( cur->name, BAD_CAST "programme" ) ) {
@@ -124,42 +133,16 @@ static xmlNodePtr get_program( xmlDocPtr doc, xmlNodePtr cur, const char *channe
                     int start_day;
                     int start_hour;
                     int start_min;
+                    int diff = 0;
+
                     parse_xmltv_date( &start_year, &start_month, &start_day,
                                       &start_hour, &start_min, (char *) start );
-                    if( date_compare( start_year, start_month, start_day, start_hour, start_min,
-                                      year, month, day, hour, min ) <= 0 ) {
-                        int end_year;
-                        int end_month;
-                        int end_day;
-                        int end_hour;
-                        int end_min;
-
-                        xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
-                        if( stop ) {
-                            parse_xmltv_date( &end_year, &end_month, &end_day, &end_hour,
-                                              &end_min, (char *) stop );
-                            if( date_compare( end_year, end_month, end_day,
-                                              end_hour, end_min, year, month,
-                                              day, hour, min ) > 0 ) {
-                                xmlFree( start );
-                                xmlFree( channel );
-                                xmlFree( stop );
-                                return cur;
-                            }
-                            xmlFree( stop );
-                        } else {
-                            end_year = start_year;
-                            end_month = start_month;
-                            end_day = start_day;
-                            end_hour = 23;
-                            end_min = 59;
-                            if( date_compare( end_year, end_month, end_day,
-                                              end_hour, end_min, year, month,
-                                              day, hour, min ) > 0 ) {
-                                xmlFree( start );
-                                xmlFree( channel );
-                                return cur;
-                            }
+                    diff = date_compare( start_year, start_month, start_day, start_hour, start_min,
+                                         year, month, day, hour, min );
+                    if ( diff > 0 ) { // if diff == 0, it's the same show
+                        if ( min_diff == 0 || diff < min_diff ) {
+                            min_diff = diff;
+                            min_node = cur;
                         }
                     }
                     xmlFree( start );
@@ -170,68 +153,133 @@ static xmlNodePtr get_program( xmlDocPtr doc, xmlNodePtr cur, const char *channe
         cur = cur->next;
     }
 
-    return 0;
+    return min_node;
 }
 
-static void get_program_info( xmltv_t *xmltv, xmlNodePtr program )
+static void reinit_program( program_t *pro, xmlNodePtr cur, int end_year, int end_month,
+                            int end_day, int end_hour, int end_min )
 {
-    xmlChar *start = xmlGetProp( program, BAD_CAST "start" );
-    if( start ) {
-        int start_year;
-        int start_month;
-        int start_day;
-        int start_hour;
-        int start_min;
-        xmlChar *stop = xmlGetProp( program, BAD_CAST "stop" );
-
-        parse_xmltv_date( &start_year, &start_month, &start_day,
-                          &start_hour, &start_min, (char *) start );
-        if( stop ) {
-            parse_xmltv_date( &xmltv->end_year, &xmltv->end_month, &xmltv->end_day, &xmltv->end_hour,
-                              &xmltv->end_min, (char *) stop );
-            xmlFree( stop );
-        }
-        else {
-            xmltv->end_year = start_year;
-            xmltv->end_month = start_month;
-            xmltv->end_day = start_day;
-            xmltv->end_hour = 23;
-            xmltv->end_min = 59;
-        }
-        sprintf( xmltv->times, "%2d:%02d - %2d:%02d",
-                 start_hour, start_min, xmltv->end_hour, xmltv->end_min  );
-        xmlFree( start );
+    if ( !pro ) {
+        return;
     }
 
-    program = program->xmlChildrenNode;
-    while( program ) {
-        if( !xmlStrcasecmp( program->name, BAD_CAST "title" ) ) {
-            xmltv->title = xmlNodeGetContent( program );
-        } else if( !xmlStrcasecmp( program->name, BAD_CAST "sub-title" ) ) {
-            xmltv->subtitle = xmlNodeGetContent( program );
-        } else if( !xmlStrcasecmp( program->name, BAD_CAST "desc" ) ) {
-            xmltv->description = xmlNodeGetContent( program );
+    if ( cur ) {
+        xmlChar *start = xmlGetProp( cur, BAD_CAST "start" );
+        if( start ) {
+            int start_year;
+            int start_month;
+            int start_day;
+            int start_hour;
+            int start_min;
+            parse_xmltv_date( &start_year, &start_month, &start_day,
+                              &start_hour, &start_min, (char *) start );
+            sprintf( pro->times, "%2d:%02d - %2d:%02d",
+                     start_hour, start_min, end_hour, end_min  );
+            xmlFree( start );
         }
-        program = program->next;
-    }
-}
-
-static void get_next_title( xmltv_t *xmltv, xmlNodePtr program )
-{
-    if ( program ) {
-        program = program->xmlChildrenNode;
-        while( program ) {
-            if( !xmlStrcasecmp( program->name, BAD_CAST "title" ) ) {
-                xmltv->next_title = xmlNodeGetContent( program );
+        cur = cur->xmlChildrenNode;
+        while( cur ) {
+            if( !xmlStrcasecmp( cur->name, BAD_CAST "title" ) ) {
+                pro->title = xmlNodeGetContent( cur );
+            } else if( !xmlStrcasecmp( cur->name, BAD_CAST "sub-title" ) ) {
+                pro->subtitle = xmlNodeGetContent( cur );
+            } else if( !xmlStrcasecmp( cur->name, BAD_CAST "desc" ) ) {
+                pro->description = xmlNodeGetContent( cur );
             }
-            program = program->next;
+            cur = cur->next;
         }
+    } else {
+         pro->title = pro->subtitle = pro->description = 0;
+         *pro->times = 0;
     }
+    pro->end_year = end_year;
+    pro->end_month = end_month;
+    pro->end_day = end_day;
+    pro->end_hour = end_hour;
+    pro->end_min = end_min;
+}
+
+program_t *program_new()
+{
+    program_t *pro = malloc( sizeof( program_t ) );
+    reinit_program( pro, 0, 0, 0, 0, 0, 0 );
+    return pro;
+}
+
+static xmlNodePtr get_program( xmlNodePtr root, program_t *pro, const char *channelid,
+                               int year, int month, int day, int hour, int min )
+{
+    xmlNodePtr cur = root->xmlChildrenNode;
+    while( cur ) {
+        if( !xmlStrcasecmp( cur->name, BAD_CAST "programme" ) ) {
+            xmlChar *channel = xmlGetProp( cur, BAD_CAST "channel" );
+            if( channel && !xmlStrcasecmp( channel, BAD_CAST channelid ) ) {
+                xmlChar *start = xmlGetProp( cur, BAD_CAST "start" );
+                if( start ) {
+                    int start_year;
+                    int start_month;
+                    int start_day;
+                    int start_hour;
+                    int start_min;
+                    int end_year;
+                    int end_month;
+                    int end_day;
+                    int end_hour;
+                    int end_min;
+                    parse_xmltv_date( &start_year, &start_month, &start_day,
+                                      &start_hour, &start_min, (char *) start );
+                    if( date_compare( start_year, start_month, start_day, start_hour, start_min,
+                                      year, month, day, hour, min ) <= 0 ) {
+                        xmlChar *stop = xmlGetProp( cur, BAD_CAST "stop" );
+                        if( stop ) {
+                            parse_xmltv_date( &end_year, &end_month, &end_day, &end_hour,
+                                              &end_min, (char *) stop );
+                            xmlFree( stop );
+                        } else {
+                            xmlNodePtr next_program = get_next_program(root, channelid,
+                                                                       start_year, start_month, start_day,
+                                                                       start_hour, start_min);
+                            xmlChar *next_start = 0;
+                            if ( next_program ) {
+                                next_start = xmlGetProp( next_program, BAD_CAST "start" );
+                                if ( next_start ) {
+                                    parse_xmltv_date( &end_year, &end_month, &end_day,
+                                                      &end_hour, &end_min, (char *) next_start );
+                                }
+                            }
+                            if ( !next_program || !next_start ) {
+                                end_year = start_year;
+                                end_month = start_month;
+                                end_day = start_day;
+                                end_hour = 23;
+                                end_min = 59;
+                            }
+                            if ( next_start ) xmlFree( next_start );
+                        }
+
+                        if( date_compare( end_year, end_month, end_day,
+                                          end_hour, end_min, year, month,
+                                          day, hour, min ) > 0 ) {
+                            reinit_program( pro, cur, end_year, end_month, end_day, end_hour, end_min );
+                            xmlFree( start );
+                            xmlFree( channel );
+                            return cur;
+                        }
+                    }
+                    xmlFree( start );
+                }
+            }
+            if( channel ) xmlFree( channel );
+        }
+        cur = cur->next;
+    }
+    return 0;
 }
 
 xmltv_t *xmltv_new( const char *filename )
 {
     xmltv_t *xmltv = malloc( sizeof( xmltv_t ) );
+
     if( !xmltv ) {
         return 0;
     }
@@ -260,20 +308,27 @@ xmltv_t *xmltv_new( const char *filename )
         return 0;
     }
 
-    xmltv->title = xmltv->subtitle = xmltv->description = xmltv->curchan = xmltv->next_title = 0;
-    *xmltv->times = 0;
+    xmltv->pro = program_new();
+    xmltv->next_pro = program_new();
+    xmltv->curchan = 0;
     xmltv->refresh = 1;
 
     return xmltv;
 }
 
+void program_delete( program_t *pro ) {
+    if( pro->title ) xmlFree( pro->title );
+    if( pro->subtitle ) xmlFree( pro->subtitle );
+    if( pro->description ) xmlFree( pro->description );
+    reinit_program( pro, 0, 0, 0, 0, 0, 0 );
+    free ( pro );
+}
+
 void xmltv_delete( xmltv_t *xmltv )
 {
-    if( xmltv->title ) xmlFree( xmltv->title );
-    if( xmltv->subtitle ) xmlFree( xmltv->subtitle );
-    if( xmltv->description ) xmlFree( xmltv->description );
+    program_delete( xmltv->pro );
+    program_delete( xmltv->next_pro );
     if( xmltv->curchan ) xmlFree( xmltv->curchan );
-    if( xmltv->next_title ) xmlFree ( xmltv->next_title );
     xmlFreeDoc( xmltv->doc );
     free( xmltv );
 }
@@ -291,34 +346,32 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
 void xmltv_refresh( xmltv_t *xmltv, int year, int month, int day,
                     int hour, int min )
 {
-    xmlNodePtr program, next_program;
+    xmlNodePtr program_node = 0;
 
-    if( xmltv->title ) xmlFree( xmltv->title );
-    if( xmltv->subtitle ) xmlFree( xmltv->subtitle );
-    if( xmltv->description ) xmlFree( xmltv->description );
-    if( xmltv->next_title ) xmlFree ( xmltv->next_title );
-    xmltv->title = xmltv->subtitle = xmltv->description = xmltv->next_title = 0;
-    *xmltv->times = 0;
+    if( xmltv->pro->title ) xmlFree( xmltv->pro->title );
+    if( xmltv->pro->subtitle ) xmlFree( xmltv->pro->subtitle );
+    if( xmltv->pro->description ) xmlFree( xmltv->pro->description );
+    reinit_program( xmltv->pro, 0, 0, 0, 0, 0, 0 );
+
+    if( xmltv->next_pro->title ) xmlFree( xmltv->next_pro->title );
+    if( xmltv->next_pro->subtitle ) xmlFree( xmltv->next_pro->subtitle );
+    if( xmltv->next_pro->description ) xmlFree( xmltv->next_pro->description );
+    reinit_program( xmltv->next_pro, 0, 0, 0, 0, 0, 0 );
 
     if( *xmltv->curchannel ) {
-        program = get_program( xmltv->doc, xmltv->root, xmltv->curchannel,
-                               year, month, day, hour, min );
+        program_node = get_program( xmltv->root, xmltv->pro, xmltv->curchannel,
+                                    year, month, day, hour, min );
 
-        if( program ) {
-            get_program_info( xmltv, program );
-
-            next_program = get_program( xmltv->doc, xmltv->root, xmltv->curchannel,
-                                        xmltv->end_year, xmltv->end_month, xmltv->end_day,
-                                        xmltv->end_hour, xmltv->end_min );
-            if( next_program ) {
-                get_next_title( xmltv, next_program );
-            }
+        if( program_node ) {
+            get_program( xmltv->root, xmltv->next_pro, xmltv->curchannel,
+                         xmltv->pro->end_year, xmltv->pro->end_month, xmltv->pro->end_day,
+                         xmltv->pro->end_hour, xmltv->pro->end_min );
         } else {
-            xmltv->end_year = year;
-            xmltv->end_month = month;
-            xmltv->end_day = day;
-            xmltv->end_hour = hour + 1;
-            xmltv->end_min = min;
+            xmltv->pro->end_year = year;
+            xmltv->pro->end_month = month;
+            xmltv->pro->end_day = day;
+            xmltv->pro->end_hour = hour + 1;
+            xmltv->pro->end_min = min;
         }
     }
     xmltv->refresh = 0;
@@ -326,35 +379,35 @@ void xmltv_refresh( xmltv_t *xmltv, int year, int month, int day,
 
 const char *xmltv_get_title( xmltv_t *xmltv )
 {
-    return (char *) xmltv->title;
+    return (char *) xmltv->pro->title;
 }
 
 const char *xmltv_get_sub_title( xmltv_t *xmltv )
 {
-    return (char *) xmltv->subtitle;
+    return (char *) xmltv->pro->subtitle;
 }
 
 const char *xmltv_get_description( xmltv_t *xmltv )
 {
-    return (char *) xmltv->description;
+    return (char *) xmltv->pro->description;
 }
 
 const char *xmltv_get_times( xmltv_t *xmltv )
 {
-    return xmltv->times;
+    return xmltv->pro->times;
 }
 
 const char *xmltv_get_next_title( xmltv_t *xmltv )
 {
-    return (char *) xmltv->next_title;
+    return (char *) xmltv->next_pro->title;
 }
 
 int xmltv_needs_refresh( xmltv_t *xmltv, int year, int month, int day,
                          int hour, int min )
 {
     return (xmltv->refresh || (date_compare( year, month, day, hour, min,
-                                             xmltv->end_year, xmltv->end_month, xmltv->end_day,
-                                             xmltv->end_hour, xmltv->end_min ) >= 0));
+                                             xmltv->pro->end_year, xmltv->pro->end_month, xmltv->pro->end_day,
+                                             xmltv->pro->end_hour, xmltv->pro->end_min ) >= 0));
 }
 
 const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )

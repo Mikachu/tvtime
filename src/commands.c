@@ -207,18 +207,22 @@ static void update_xmltv_listings( commands_t *cmd )
         int year = 1900 + curtime->tm_year;
         int month = 1 + curtime->tm_mon;
         int day = curtime->tm_mday;
+
         int hour = curtime->tm_hour;
         int min = curtime->tm_min;
-
+        /*
+        int hour = 23;
+        int min = 33;
+        */
         if( xmltv_needs_refresh( cmd->xmltv, year, month, day, hour, min ) ) {
             const char *desc;
             char title[ 128 ];
-            char next_title[ 128 ];
+            char next_title_data[ 128 ];
             char subtitle[ 1024 ];
             char descdata[ 1024 ];
             char *line1 = 0;
             char *line2 = 0;
-            char *line3 = 0;
+            char *next_title = 0;
 
             xmltv_refresh( cmd->xmltv, year, month, day, hour, min );
 
@@ -265,21 +269,16 @@ static void update_xmltv_listings( commands_t *cmd )
             }
 
             if( xmltv_get_next_title( cmd->xmltv ) ) {
-                sprintf( next_title, "Next: " );
-                snprintf( next_title + 6, sizeof( next_title ) - 6, "%s", xmltv_get_next_title( cmd->xmltv ) );
-                if( strlen( next_title ) > 40 ) {
-                    sprintf( next_title + 40, "..." );
+                sprintf( next_title_data, "Next: " );
+                snprintf( next_title_data + 6, sizeof( next_title_data ) - 6, "%s",
+                          xmltv_get_next_title( cmd->xmltv ) );
+                if( strlen( next_title_data ) > 40 ) {
+                    sprintf( next_title_data + 40, "..." );
                 }
-                if( !line1 ) {
-                    line1 = next_title;
-                } else if( !line2 ) {
-                    line2 = next_title;
-                } else {
-                    line3 = next_title;
-                }
+                next_title = next_title_data;
             }
 
-            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2, line3 );
+            tvtime_osd_show_program_info( cmd->osd, title, subtitle, line1, line2, next_title );
         }
     }
 }
@@ -1002,7 +1001,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "input" );
 
-    snprintf( string, sizeof( string ), 
+    snprintf( string, sizeof( string ),
              TVTIME_ICON_PICTURESETTINGS "  %s", _("Picture settings") );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
@@ -1038,7 +1037,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 2, string );
     menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "picture" );
 
-    snprintf( string, sizeof( string ), 
+    snprintf( string, sizeof( string ),
               TVTIME_ICON_VIDEOPROCESSING "  %s", _("Video processing") );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
@@ -1151,12 +1150,12 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
               _("Toggle XDS decoding") );
     menu_set_text( menu, 6, string );
     menu_set_enter_command( menu, 6, TVTIME_TOGGLE_XDS, "" );
- 
+
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
     menu_set_text( menu, 7, string );
     menu_set_enter_command( menu, 7, TVTIME_SHOW_MENU, "root" );
- 
+
     commands_add_menu( cmd, menu );
 
     menu = menu_new( "input-pal" );
@@ -1172,7 +1171,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     }
     menu_set_text( menu, 1, string );
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
- 
+
     snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
               _("Preferred audio mode") );
     menu_set_text( menu, 2, string );
@@ -1593,6 +1592,7 @@ void commands_delete( commands_t *cmd )
             menu_delete( cmd->menus[ i ] );
         }
     }
+
     if( cmd->xmltv ) xmltv_delete( cmd->xmltv );
     free( cmd );
 }
@@ -1978,7 +1978,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         if( cmd->console_on )
             console_scroll_n( cmd->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
         break;
-            
+
     case TVTIME_TOGGLE_FRAMERATE:
         cmd->framerate = (cmd->framerate + 1) % FRAMERATE_MAX;
         break;
@@ -2105,7 +2105,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
             tvtime_osd_show_message( cmd->osd, message );
         }
         break;
-            
+
     case TVTIME_TOGGLE_ASPECT:
         cmd->toggleaspect = 1;
         break;
@@ -2600,7 +2600,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
-    case TVTIME_CHANNEL_INC: 
+    case TVTIME_CHANNEL_INC:
         if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
             /**
@@ -2722,7 +2722,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
-    case TVTIME_BRIGHTNESS_UP: 
+    case TVTIME_BRIGHTNESS_UP:
     case TVTIME_BRIGHTNESS_DOWN:
         if( cmd->vidin ) {
             videoinput_set_brightness_relative( cmd->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );

@@ -116,6 +116,13 @@ struct tvtime_osd_s
 
     int delay;
     int menudelay;
+
+    unsigned int channel_r;
+    unsigned int channel_g;
+    unsigned int channel_b;
+    unsigned int other_r;
+    unsigned int other_g;
+    unsigned int other_b;
 };
 
 const int top_size = 7;
@@ -248,6 +255,13 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         free( osd );
         return 0;
     }
+
+    osd->channel_r = channel_r;
+    osd->channel_g = channel_g;
+    osd->channel_b = channel_b;
+    osd->other_r = other_r;
+    osd->other_g = other_g;
+    osd->other_b = other_b;
 
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( osd->bigfont );
     osd->strings[ OSD_CHANNEL_NAME ].string = osd_string_new( osd->medfont );
@@ -390,7 +404,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->strings[ OSD_PROGRAM4_BAR ].ypos = osd->strings[ OSD_PROGRAM3_BAR ].ypos
                                           + osd_string_get_height( osd->strings[ OSD_PROGRAM3_BAR ].string );
 
-    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM5_BAR ].string, other_r, other_g, other_b );
+    osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM5_BAR ].string, other_r, other_g, channel_b );
     osd_string_show_border( osd->strings[ OSD_PROGRAM5_BAR ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_PROGRAM5_BAR ].string, "8", 0 );
     osd->strings[ OSD_PROGRAM5_BAR ].align = OSD_LEFT;
@@ -947,8 +961,32 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
 
 void tvtime_osd_show_program_info( tvtime_osd_t *osd, const char *message1,
                                    const char *message2, const char *message3,
-                                   const char *message4, const char *message5 )
+                                   const char *message4, const char *next_title )
 {
+    const char *message5 = 0;
+
+    if ( next_title ) {
+        if ( !message3 ) {
+            message3 = next_title;
+            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                                       osd->other_r, osd->other_g, osd->channel_b );
+        }
+        else if ( !message4 ) {
+            message4 = next_title;
+            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                                       osd->other_r, osd->other_g, osd->other_b );
+            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
+                                       osd->other_r, osd->other_g, osd->channel_b );
+        }
+        else {
+            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM3_BAR ].string,
+                                       osd->other_r, osd->other_g, osd->other_b );
+            osd_string_set_colour_rgb( osd->strings[ OSD_PROGRAM4_BAR ].string,
+                                       osd->other_r, osd->other_g, osd->other_b );
+            message5 = next_title;
+        }
+    }
+
     if( message1 ) {
         osd_string_show_text( osd->strings[ OSD_PROGRAM1_BAR ].string, message1, osd->delay );
     } else {
