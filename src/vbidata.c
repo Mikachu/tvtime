@@ -503,13 +503,28 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                 vbi->current_colour = 0xFFFFFFFFU; /* white */
                 vbi->current_indent = 4*( (b2 & 14) >> 1 );
             }
-            vbi->current_row = rows[ ((b1 & 8) << 1) | ((b2 & 32) >> 5) ];
+            vbi->current_row = rows[ ((b1 & 7) << 1) | ((b2 & 32) >> 5) ];
             vbi->current_ul = b2 & 1;
 
             fprintf( stderr, "field: %d chan %d, ital %d, ul %d, colour 0x%x, "
                      "indent %d, row %d\n", bottom, vbi->current_chan,
                      vbi->current_ital, vbi->current_ul, vbi->current_colour,
                      vbi->current_indent, vbi->current_row );
+
+            if( !bottom == vbi->wanttop && 
+                vbi->current_chan == vbi->chan && 
+                vbi->current_istext == vbi->wanttext ) {
+
+                vbi->indent = vbi->current_indent;
+                vbi->ital = vbi->current_ital;
+                vbi->colour = vbi->current_colour;
+                vbi->row = vbi->current_row;
+                vbi->current_istext = 0;
+
+                vbiscreen_new_caption( vbi->vs, vbi->indent, vbi->ital,
+                                       vbi->colour, vbi->row );
+
+            }
 
             vbi->lastcode = ( b1 << 8) | b2;
             vbi->lastcount = 0;
@@ -573,8 +588,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 0;
-                    vbiscreen_set_mode( vbi->vs, 1, POP_UP, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 1, POP_UP );
                 }
                 break;
             case 5: /* ROLL UP 2 */ 
@@ -587,8 +601,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 0;
-                    vbiscreen_set_mode( vbi->vs, 1, ROLL_2, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 1, ROLL_2 );
                 }
                 break;
             case 6: /* ROLL UP 3 */ 
@@ -601,8 +614,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 0;
-                    vbiscreen_set_mode( vbi->vs, 1, ROLL_3, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 1, ROLL_3 );
                 }
                 break;
             case 7: /* ROLL UP 4 */ 
@@ -615,8 +627,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 0;
-                    vbiscreen_set_mode( vbi->vs, 1, ROLL_4, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 1, ROLL_4 );
                 }
                 break;
             case 9: /* PAINT-ON */
@@ -629,8 +640,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 0;
-                    vbiscreen_set_mode( vbi->vs, 1, PAINT_ON, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 1, PAINT_ON );
                 }
                 break;
             case 10:/* TEXT */
@@ -643,8 +653,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 1;
-                    vbiscreen_set_mode( vbi->vs, 0, 0, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 0, 0 );
                 }
                 break;
             case 11:/* TEXT */
@@ -657,8 +666,7 @@ int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
                     vbi->colour = vbi->current_colour;
                     vbi->row = vbi->current_row;
                     vbi->current_istext = 1;
-                    vbiscreen_set_mode( vbi->vs, 0, 0, vbi->indent,
-                                        vbi->ital, vbi->colour, vbi->row );
+                    vbiscreen_set_mode( vbi->vs, 0, 0 );
                 }
                 break;
             default: /* impossible */
@@ -962,28 +970,7 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
         return;
     }
 
-    if( !ProcessLine( vbi, &vbi->buf[ DO_LINE*2048 ], 0 ) ) {
-/*
-        if( !ProcessLine( vbi, &vbi->buf[ (DO_LINE+1)*2048 ], 0 ) ) {
-            if( !ProcessLine( vbi, &vbi->buf[ (DO_LINE+2)*2048 ], 0 ) ) {
-            }
-        }
-*/
-    }
-    if( !ProcessLine( vbi, &vbi->buf[ (16+DO_LINE)*2048 ], 1 ) ) {
-/*
-        if( !ProcessLine( vbi, &vbi->buf[ (16+DO_LINE+1)*2048 ], 1 ) ) {
-            if( !ProcessLine( vbi, &vbi->buf[ (16+DO_LINE+2)*2048 ], 1 ) ) {
-            }
-
-        }
-*/
-
-    }
-
-    if( vbi->vs )
-        vbiscreen_dump_screen_text( vbi->vs );
-
-
+    ProcessLine( vbi, &vbi->buf[ DO_LINE*2048 ], 0 );
+    ProcessLine( vbi, &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
 }
 

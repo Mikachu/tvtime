@@ -851,7 +851,6 @@ int main( int argc, char **argv )
             performance_checkpoint_blit_top_field_end( perf );
         }
 
-
         if( output->is_interlaced() ) {
             /* Wait until we can draw the odd field. */
             output->wait_for_sync( 1 );
@@ -894,7 +893,9 @@ int main( int argc, char **argv )
             } else {
                 videoinput_free_frame( vidin, curframeid );
             }
+
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
+
         }
 
 

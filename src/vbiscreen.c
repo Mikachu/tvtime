@@ -22,10 +22,11 @@
 
 struct vbiscreen_s {
 
-    osd_string_t *line[ ROWS ];
+    osd_string_t *line[ ROWS+1 ];
 
-    char buffers[ 2 * COLS ];
+    char buffers[ COLS ];
     char text[ 2 * ROWS * COLS ];
+    char *disp_buf;
 
     unsigned int fgcolour;
     unsigned int bgcolour;
@@ -45,6 +46,7 @@ struct vbiscreen_s {
     int first_line; /* where to start drawing */
     int curbuffer;
     int top_of_screen; /* a pointer into line[] */
+    int indent;
 
     char *fontfile;
     int fontsize;
@@ -83,6 +85,8 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->style = 0;
     vs->curbuffer = 0;
     vs->top_of_screen = 0;
+    vs->indent = 0;
+    vs->disp_buf = 0;
     memset( vs->buffers, 0, 2 * COLS );
 
     vs->line[0] = osd_string_new( vs->fontfile, fontsize, video_width, 
@@ -110,9 +114,9 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
     vs->charwidth = osd_string_get_width( vs->line[ 0 ] );
     osd_string_delete( vs->line[ 0 ] );
 
-    for( i = 0; i < ROWS; i++ ) {
+    for( i = 0; i < ROWS+1; i++ ) {
         vs->line[ i ] = osd_string_new( vs->fontfile, fontsize,
-                                        vs->frame_width, vs->frame_height,
+                                        vs->charwidth*COLS, vs->rowheight,
                                         video_aspect );
         if( !vs->line[ i ] ) {
             fprintf( stderr, "vbiscreen: Could not allocate a line.\n" );
@@ -132,19 +136,26 @@ vbiscreen_t *vbiscreen_new( int video_width, int video_height,
 
 void vbiscreen_dump_screen_text( vbiscreen_t *vs )
 {
-    int i, base;
+    int i, offset;
     
     if( !vs ) return;
+    offset = vs->top_of_screen * COLS;
 
-    fprintf( stderr, "\n--------------------------------" );
-    for( i = vs->top_of_screen * COLS; 
-         i < vs->top_of_screen * COLS + ROWS * COLS;
-         i++ ) {
+    fprintf( stderr, "\n   0123456789abcdefghij012345678901" );
+    for( i = 0; i < ROWS * COLS; i++ ) {
         if( !(i % COLS) )
-            fprintf( stderr, "\n" );
-        fprintf( stderr, "%c", vs->text[ i ] ? vs->text[ i ] : ' ' );
+            fprintf( stderr, "\n%.2d ", i / COLS );
+        fprintf( stderr, "%c", vs->text[ offset ] ? vs->text[ offset ] : ' ' );
+        offset++;
+        offset %= 2 * ROWS * COLS;
     }
-    fprintf( stderr, "\n--------------------------------\n" );
+    fprintf( stderr, "\n   0123456789abcdefghij012345678901\n   " );
+    for( i = 0; i < COLS; i++ ) {
+        fprintf( stderr, "%c", vs->text[ offset ] ? vs->text[ offset ] : ' ' );
+        offset++;
+        offset %= 2 * ROWS * COLS;
+    }
+    fprintf( stderr, "\n   0123456789abcdefghij012345678901\n" );
 }
 
 int update_row_x( vbiscreen_t *vs, int row )
@@ -152,10 +163,10 @@ int update_row_x( vbiscreen_t *vs, int row )
     char text[ COLS + 1 ];
     int i, j, haschars = 0, base;
 
-    if( !vs || row > ROWS-1 ) return 0;
+    if( !vs ) return 0;
 
     text[ COLS ] = 0;
-    base = ( vs->top_of_screen + row ) * COLS ;
+    base = ( ( vs->top_of_screen + row ) % ( 2 * ROWS ) ) * COLS;
     for( j = 0, i = base; i < base + COLS; i++, j++ ) {
         if( vs->text[ i ] ) {
             text[ j ] = vs->text[ i ];
@@ -182,19 +193,21 @@ void update_row( vbiscreen_t *vs )
     if( !vs ) return;
 
     update_row_x( vs, vs->cury );
+    vbiscreen_dump_screen_text( vs );
 }
 
 void update_all_rows( vbiscreen_t *vs )
 {
-    int row = 0, base = 0, haschars;
+    int row = 0, base = 0;
 
     if( !vs ) return;
-    if( vs->captions && vs->style <= ROLL_4 )
-        base = vs->first_line - 1;
+    if( vs->captions && vs->style && vs->style <= ROLL_4 )
+        base = vs->first_line;
 
     for( row = base; row < ROWS; row++ ) {
-        haschars = update_row_x( vs, row );
+        update_row_x( vs, row );
     }
+    vbiscreen_dump_screen_text( vs );
 }
 
 void vbiscreen_delete( vbiscreen_t *vs )
@@ -202,20 +215,49 @@ void vbiscreen_delete( vbiscreen_t *vs )
     free( vs );
 }
 
-void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style,
-                         int indent, int ital, unsigned int colour, int row )
+void scroll_screen( vbiscreen_t *vs )
+{
+    int start_row;
+
+    if( !vs || !vs->captions || !vs->style || vs->style > ROLL_4 )
+        return;
+
+    start_row = ( vs->first_line + vs->top_of_screen ) % ( 2 * ROWS );
+
+    /* zero out top row */
+    memset( (char *)( vs->text + start_row * COLS ), 0, COLS );
+
+    vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
+    vs->curx = 0;
+    update_all_rows( vs );
+
+}
+
+void vbiscreen_new_caption( vbiscreen_t *vs, int indent, int ital, 
+                            unsigned int colour, int row )
 {
     if( !vs ) return;
 
     vs->fgcolour = colour;
+    vs->indent = indent;
+    vs->cury = row ? row - 1 : vs->cury;
+
+    if( vs->captions && vs->style && vs->style <= ROLL_4 ) {
+        /* scroll */
+        scroll_screen( vs );
+    }
+
+}
+
+void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style )
+{
+    int base, i;
+    if( !vs ) return;
+    fprintf( stderr, "in set mode\n");
 
     vs->captions = caption;
     vs->style = style;
-    vs->curx = indent ? indent - 1 : 0;
-    vs->top_of_screen = 0;
 
-    memset( (char *)( vs->text + vs->top_of_screen * COLS ), 
-            0, ROWS * COLS );
 
     fprintf( stderr, "Caption: %d ", caption );
     switch( style ) {
@@ -248,13 +290,23 @@ void vbiscreen_set_mode( vbiscreen_t *vs, int caption, int style,
         case ROLL_2:
         case ROLL_3:
         case ROLL_4:
-            vs->first_line = 15 - (style-4-1) - 1;
-            vs->cury = 14;
+            /*
+            base = vs->top_of_screen * COLS;
+            for( i = 0; i < ROWS * COLS; i++ ) {
+                vs->text[ base ] = 0;
+                base++;
+                base %= 2 * ROWS * COLS;
+            }
+            */
+            vs->first_line = ROWS - style - 4;
+            vs->cury = ROWS; /* this is offscreen */
             break;
         case POP_UP:
+            memset( vs->buffers, 0, COLS );
+            break;
         case PAINT_ON:
-            vs->first_line = row-1;
-            vs->cury = row-1;
+            vs->disp_buf = vs->text + 
+                ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
             break;
         }
     }
@@ -275,21 +327,28 @@ void vbiscreen_set_colour( vbiscreen_t *vs, unsigned int col )
 
 void vbiscreen_clear_current_cell( vbiscreen_t *vs )
 {
-    vs->text[ ( vs->top_of_screen + vs->cury ) * COLS + vs->curx ] = 0;
+    vs->text[ ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS 
+              + vs->curx + vs->indent ] = 0;
 }
 
 void vbiscreen_set_current_cell( vbiscreen_t *vs, char text )
 {
+    int base;
     if( !vs ) return;
+    base = ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
     if( isprint( text ) ) 
-        vs->text[ ( vs->top_of_screen + vs->cury ) * COLS + vs->curx ] = text;
+        vs->text[ base + vs->curx + vs->indent ] = text;
     else
-        vs->text[ ( vs->top_of_screen + vs->cury ) * COLS + vs->curx ] = ' ';
+        vs->text[ base + vs->curx + vs->indent ] = ' ';
+//    fprintf( stderr, "setting %d,%d = %c\n", vs->curx + vs->indent, 
+    //            vs->cury, vs->text[ base + vs->curx + vs->indent ] );
+
 }
 
 void vbiscreen_delete_to_end( vbiscreen_t *vs )
 {
     int i;
+    fprintf( stderr, "in del to end\n");
     if( !vs ) return;
     for( i = vs->curx; i < COLS; i++ ) {
         vbiscreen_clear_current_cell( vs );
@@ -301,6 +360,7 @@ void vbiscreen_delete_to_end( vbiscreen_t *vs )
 
 void vbiscreen_backspace( vbiscreen_t *vs )
 {
+    fprintf( stderr, "in backspace\n");
     if( !vs ) return;
     if( !vs->curx ) return;
     vs->curx--;
@@ -311,6 +371,7 @@ void vbiscreen_backspace( vbiscreen_t *vs )
 void blank_screen( vbiscreen_t *vs )
 {
     int i;
+    fprintf( stderr, "in blank\n");
     for( i = 0; i < ROWS; i++ ) {
         osd_string_show_text( vs->line[ i ], "", 0 );
     }
@@ -318,114 +379,105 @@ void blank_screen( vbiscreen_t *vs )
 
 void vbiscreen_erase_displayed( vbiscreen_t *vs )
 {
+    int base , i;
+    fprintf( stderr, "in erase disp\n");
     if( !vs ) return;
 
-    memset( (char *)( vs->text + vs->top_of_screen * COLS ), 0, ROWS * COLS );
-    memset( (char *)( vs->buffers + vs->curbuffer * COLS ) , 0, COLS );
+    if( vs->disp_buf && vs->style == POP_UP )
+        memset( vs->disp_buf, 0, COLS );
+    else if( vs->style && vs->style <= ROLL_4 ) {
+        base = vs->top_of_screen * COLS;
+        for( i = 0; i < ROWS * COLS; i++ ) {
+            vs->text[ base ] = 0;
+            base++;
+            base %= 2 * ROWS * COLS;
+        }
+        
+    }
+
     update_all_rows( vs );
-    blank_screen( vs );
 }
 
 void vbiscreen_erase_non_displayed( vbiscreen_t *vs )
 {
+    fprintf( stderr, "in erase non disp\n");
     if( !vs ) return;
-    if( !vs->captions || vs->style != POP_UP ) return;
-    memset( (char *)( vs->buffers + !vs->curbuffer * COLS ) , 0, COLS );
+    if( !vs->captions || vs->style < POP_UP ) return;
+    memset( vs->buffers, 0, COLS );
 }
 
 void vbiscreen_carriage_return( vbiscreen_t *vs )
 {
-    int i;
     if( !vs ) return;
-    if( vs->cury == ROWS-1 ) {
+    fprintf( stderr, "in CR\n");
+    if( vs->cury == ROWS ) {
         /* not sure if this is right for text mode */
         /* in text mode, perhaps a CR on last row clears screen and goes
          * to (0,0) */
-        int start_row = vs->first_line + vs->top_of_screen;
-        if( vs->captions && vs->style > ROLL_4 ) 
-            start_row = vs->top_of_screen;
-        for( i = start_row * COLS;
-             i < start_row * COLS + COLS;
-             i++ ) {
-            vs->text[ i ] = 0;
-        }
-
-        vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
-        update_all_rows( vs );
+        scroll_screen( vs );
     }
 
     /* keep cursor on bottom for rollup */
-    if( vs->captions && vs->style <= ROLL_4 )
-        vs->cury = ROWS-2;
+    if( vs->captions && vs->style && vs->style <= ROLL_4 )
+        vs->cury--;
 
-    vs->cury = (vs->cury + 1) % ROWS;
+    vs->cury++;
     vs->curx = 0;
 }
 
 void vbiscreen_end_of_caption( vbiscreen_t *vs )
 {
-    int i, j;
+    int i, j, base;
 
     if( !vs ) return;
-
-    memset( (char *)( vs->buffers + vs->curbuffer * COLS ) , 0, COLS );
-    vs->curbuffer = !vs->curbuffer;
+    fprintf( stderr, "in end of caption\n");
     /* draw it now */
-    for( j = 0, i = ( vs->top_of_screen + vs->cury ) * COLS + vs->curx;
-         i < ( vs->top_of_screen + vs->cury ) * COLS + COLS;
+    base = ( ( vs->top_of_screen + vs->cury ) % ( 2 * ROWS ) ) * COLS;
+    for( j = 0, i = base + vs->curx + vs->indent;
+         i < base + COLS;
          j++, i++ ) {
-        vs->text[ i ] = vs->buffers[ vs->curbuffer * COLS + j ];
+        vs->text[ i ] = vs->buffers[ j ];
+        fprintf( stderr, "%c", vs->buffers[ j ] );
     }
+    fprintf( stderr, "\n" );
+    vs->disp_buf = vs->text + base;
+
     update_row( vs );
+    memset( vs->buffers, 0, COLS );
+    vs->style = 0;
+    vs->indent = 0;
 }
 
 void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
 {
     int i;
-    
     if( !vs ) return;
+    fprintf( stderr, "in print\n");
     if( vs->captions && vs->style == POP_UP ) {
         /* this all gets displayed at another time */
         for( i = 0; i < COLS; i++ ) {
-            if( !vs->buffers[ i + !vs->curbuffer * COLS ] ) {
-                if( vs->curx + i == COLS-1 ) {
-                    vs->buffers[ i + !vs->curbuffer * COLS ] = c2;
+            if( !vs->buffers[ i ] ) {
+                if( i == COLS-1 ) {
+                    vs->buffers[ i ] = c2;
                 } else {
-                    vs->buffers[ i + !vs->curbuffer * COLS ] = c1;
-                    vs->buffers[ i+1 + !vs->curbuffer * COLS ] = c2;
+                    vs->buffers[ i ] = c1;
+                    vs->buffers[ i+1 ] = c2;
                 }
                 return;
             }
+            /* buffer is full so c2 will be at the end */
+            vs->buffers[ COLS-1 ] = c2;
+            return;
         }
-        /* buffer is full so c2 will be at the end */
-        vs->buffers[ COLS + !vs->curbuffer * COLS ] = c2;
     }
 
-    if( !vs->captions || vs->style == PAINT_ON ) {
-        vbiscreen_set_current_cell( vs, c1 );
-        vs->curx++;
-        if( vs->curx == COLS )
-            vs->curx--;
-
-        vbiscreen_set_current_cell( vs, c2 );
-        vs->curx++;
-        if( vs->curx == COLS )
-            vs->curx--;
-
-        update_row( vs );
-
-    } else if( vs->captions && vs->style <= ROLL_4 ) {
-        /* ROLL-UP */
+    if( vs->captions && vs->style && vs->style != POP_UP ) {
+        /* ROLL-UP or PAINT ON */
         if( vs->curx != COLS-1 ) {
             vbiscreen_set_current_cell( vs, c1 );
             vs->curx++;
-        } else {
-            for( i = ( vs->first_line + vs->top_of_screen ) * COLS;
-                 i < ( vs->first_line + vs->top_of_screen ) * COLS + COLS;
-                 i++ ) {
-                vs->text[ i ] = 0;
-            }
-            vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
+        } else if( vs->style != PAINT_ON ){
+//            scroll_screen( vs );
             vs->curx = 0;
             vbiscreen_set_current_cell( vs, c1 );
             vs->curx = 1;            
@@ -434,18 +486,22 @@ void vbiscreen_print( vbiscreen_t *vs, char c1, char c2 )
         if( vs->curx != COLS-1 && c2 ) {
             vbiscreen_set_current_cell( vs, c2 );
             vs->curx++;
-        } else if( c2 ) {
-            for( i = ( vs->first_line + vs->top_of_screen ) * COLS;
-                 i < ( vs->first_line + vs->top_of_screen ) * COLS + COLS;
-                 i++ ) {
-                vs->text[ i ] = 0;
+            if( vs->curx == COLS-1 && vs->style != PAINT_ON ) {
+//                scroll_screen( vs );
+                vs->curx = 0;
             }
-            vs->top_of_screen = ( vs->top_of_screen + 1 ) % ( 2 * ROWS );
+        } else if( c2 && vs->style != PAINT_ON ) {
+//            scroll_screen( vs );
             vs->curx = 0;
             vbiscreen_set_current_cell( vs, c2 );
             vs->curx = 1;
+        } else if( c2 && vs->style == PAINT_ON ) {
+            vbiscreen_set_current_cell( vs, c2 );
         }
-        update_all_rows( vs );
+        
+        if( vs->style == PAINT_ON ) {
+            update_row( vs );
+        }
     }
 }
 
