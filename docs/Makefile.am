@@ -19,13 +19,12 @@ pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 
 man_MANS = tvtime.1 tvtime-command.1 tvtime.xml.5 stationlist.xml.5 \
 	tvtime-configure.1 tvtime-scanner.1
-docs_html = html/cctext.png html/hardware.html html/help.html \
-	html/index.html html/little-screenshot.jpg html/nyse.png \
-	html/screenshot-small.jpg html/setws.png html/sun-greedy.png \
-	html/sun-linear.png html/toshiba-16x9-screenshot.jpg \
-	html/tvtime-logo-banner.png html/tvtime.css \
-	html/usage.html html/why.html html/wsshot-small.jpg \
-	html/default.tvtime.xml
+docs_html = html/default.tvtime.xml html/help.html html/index.html \
+	html/lirc.html html/little-screenshot.jpg html/problems.html \
+	html/screenshot-small.jpg html/toshiba-16x9-screenshot.jpg \
+	html/tvtime-logo-banner.png html/tvtime.css html/usage.html \
+	html/wsshot-small.jpg html/xmltv.html html/xmltvshot.jpg
+
 EXTRA_DIST = $(man_MANS) $(docs_html) tvtime.16x16.png \
 	tvtime.32x32.png tvtime.48x48.png tvtime.32x32.xpm
 
