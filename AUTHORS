@@ -1,85 +1,88 @@
 Authors and contributors
 
   Billy Biggs <vektor@dumbterm.net>
-    - Deinterlacing cowboy and video nerd
-    - Original tvtime author
+    - Deinterlacing cowboy and video nerd.
+    - Original tvtime author.
 
   Doug Bell <drbell@users.sourceforge.net>
-    - Tuner, audio mixer, OSD and menu haxor
-    - Configuration and input management
-    - Closed Captioning support
+    - Tuner, audio mixer, OSD and menu haxor.
+    - Configuration and input management.
+    - Closed Captioning support.
 
   Achim Schneider <batchall@mordor.ch>
-    - Station list management code
-    - Frequency table conversion script from xawtv's file format
+    - Station list management code.
+    - Frequency table conversion script from xawtv's file format.
 
   David I. Lehn <dlehn@users.sourceforge.net>
-    - autoconf setup, taken from his autoconf'ing of movietime
+    - autoconf setup, taken from his autoconf'ing of movietime.
 
   Paul Jara <rascasse@users.sourceforge.net>
-    - man pages and the RPM spec file
+    - man pages and the RPM spec file.
 
   Robert Högberg <cogline@linux.se>
-    - Added lirc support
+    - Added lirc support.
 
   Craig Dooley <cd5697@albany.edu>
-    - Added a previous channel command
+    - Added a previous channel command.
 
   Alexander S. Belov <asbel@sice.ru>
     - Config file work and XMLification, check for signal present
-      config parameter
+      config parameter.
 
   Bart Dorsey <echo@thebucket.org>
   Nicolas Boos <nicolaxx@free.fr>
   Simon Law <sfllaw@debian.org>
-    - Work on the debian packages
+    - Work on the debian packages.
 
   Mark Trolley <mtrolley@scs.carleton.ca>
-    - Added the numeric channel commands for better lirc support
+    - Added the numeric channel commands for better lirc support.
 
   Joachim Koenig <Joachim.Koenig@tecnomen.fi>
-    - Wrote the dscaler plugin loader using the wine code
+    - Wrote the dscaler plugin loader using the wine code.
 
   Stewart Allen <stewart@neuron.com>
-    - Cleanup of the command names, various bugfixes
+    - Cleanup of the command names, various bugfixes.
 
   Justin A <justin@bouncybouncy.net>
-    - Previous channel saved to config file
+    - Previous channel saved to config file.
 
   Brian Goines <bgoines78@comcast.net>
-    - Work on XML config files
+    - Work on XML config files.
 
   Krister Lagerstrom <krister@kmlager.com>
-    - Support for reading commands on stdin
+    - Support for reading commands on stdin.
 
   Scott Van Wart <silvaran@users.sourceforge.net>
-    - Awesome menu icon font work, bugfixes
+    - Awesome menu icon font work, bugfixes.
 
   Adrian Minta <gygy@rdslink.ro>
   Jindrich Makovicka <makovick@users.sourceforge.net>
-    - Bugfixes
+    - Bugfixes.
 
   Per von Zweigbergk <pvz@e.kth.se>
-    - Work on making tvtime fully UTF-8 aware
+    - Work on making tvtime fully UTF-8 aware.
 
   Richard Jones <richard@earthmen.com>
     - Work on the DirectFB output driver for the Matrox G400-style
-      TV output drivers
+      TV output drivers.
 
   Ville Syrjala <syrjala@sci.fi>
     - Wrote our DirectFB output layer.
 
   David Atkinson <psykax@psykax.com>
-    - Updates for Australian frequencies
+    - Updates for Australian frequencies.
 
   Mike Bourgeous <nitrogen@slimetech.com>
-    - Compile fixes and some autoconf work for DirectFB
+    - Compile fixes and some autoconf work for DirectFB.
 
   Merlin Ma <softlib@turbolinux.com.cn>
-    - Updates for China broadcast frequencies 
+    - Updates for China broadcast frequencies.
 
   Robbie Viera
     - Donated the tvtime.net domain name!  Thanks a ton Robbie!
+
+  Martin Fiedler <ho-ecker@users.sourceforge.net>
+    - Added the sleep feature.
 
 Code we stole (well, used under the GPL)
 
