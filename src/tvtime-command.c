@@ -23,7 +23,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "commands.h"
-#include "tvtimeconf.h"
+#include "utils.h"
 
 int main( int argc, char **argv )
 {
@@ -46,17 +46,23 @@ int main( int argc, char **argv )
     }
 
     /* check if fifo can be written (tvtime running) */
-    i = open( config_get_command_pipe( cfg ), O_WRONLY | O_NONBLOCK);
+    if( !get_tvtime_fifo( cfg ) ) {
+        fprintf( stderr, "tvtime-command: fifo cannot be found. tvtime not running?\n" );
+	return 1;
+    }
+
+    i = open( get_tvtime_fifo( cfg ), O_WRONLY | O_NONBLOCK);
     if (i < 0)
     {
-        fprintf( stderr, "tvtime-command: fifo %s unwritable. tvtime not running?\n", config_get_command_pipe( cfg ) );
+        fprintf( stderr, "tvtime-command: fifo %s unwritable. tvtime not running?\n", get_tvtime_fifo( cfg ) );
         config_delete( cfg );
         return 1;
     }
 
     fifo = fdopen( i, "w" );
     if( !fifo ) {
-        fprintf( stderr, "tvtime-command: Can't open fifo file %s.\n", config_get_command_pipe( cfg ) );
+        fprintf( stderr, "tvtime-command: Can't open fifo file %s.\n",
+                get_tvtime_fifo( cfg ) );
         config_delete( cfg );
         return 1;
     }

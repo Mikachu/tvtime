@@ -56,8 +56,6 @@ unsigned int config_get_other_text_rgb( config_t *ct );
 int config_get_fullscreen( config_t *ct );
 int config_get_priority( config_t *ct );
 uid_t config_get_uid( config_t *ct );
-const char *config_get_command_pipe_dir( config_t *ct );
-const char *config_get_command_pipe( config_t *ct );
 const char *config_get_deinterlace_method( config_t *ct );
 int config_get_start_channel( config_t *ct );
 int config_get_prev_channel( config_t *ct );

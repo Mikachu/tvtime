@@ -53,6 +53,10 @@ ings in this Software without prior written authorization from him.
 #include <sys/stat.h>
 #include <unistd.h>
 #include <wordexp.h>
+#include <errno.h>
+#include <dirent.h>
+#include <pwd.h>
+#include "tvtimeconf.h"
 #include "utils.h"
 
 int file_is_openable_for_read( const char *filename )
@@ -89,6 +93,154 @@ const char *get_tvtime_paths( void )
 #else
     return DATADIR ":../data:./data";
 #endif
+}
+
+const char *get_tvtime_fifodir( config_t *ct )
+{
+    static char *fifodir = NULL;
+
+    if( !fifodir ) {
+        /* We have nothing in our cache. */
+        struct passwd *pwuid = NULL;
+        char *user = NULL;
+        DIR *dirhandle = NULL;
+
+        /* Check for the user's existance. */
+        pwuid = getpwuid( config_get_uid( ct ) );
+        if( pwuid ) {
+            if( asprintf( &user,
+                          "%s",
+                          pwuid->pw_name) < 0 ) {
+                fprintf( stderr, "utils: Out of memory.\n" );
+                return NULL;
+            }
+        } else {
+            if( asprintf( &user,
+                          "%u",
+                          config_get_uid( ct ) ) < 0 ) {
+                fprintf( stderr, "utils: Out of memory.\n" );
+                return NULL;
+            }
+        }
+
+        /* First try the FIFODIR. */
+        if( asprintf( &fifodir, 
+                      "%s/TV-%s",
+                      FIFODIR,
+                      user ) < 0 ) {
+            free( user );
+            fprintf( stderr, "utils: Out of memory.\n" );
+            return NULL;
+        }
+        free( user );
+
+        /* We will try to ensure that the FIFO directory exists,
+         * and create the user's subdirectory while we're at it. */
+        errno = 0;
+        if( mkdir( fifodir, S_IRWXU ) < 0 ) {
+            if( errno == EEXIST ) {
+                dirhandle = opendir( fifodir );
+                if( dirhandle ) {
+                    struct stat dirstat;
+		    closedir( dirhandle );
+                    if( !stat( fifodir, &dirstat ) ) {
+                        if( dirstat.st_uid == config_get_uid( ct ) ) {
+                            return fifodir;
+                        }
+                    }
+                }
+            }
+        }
+
+        /* We will now resort to using the home directory. */
+        free( fifodir );
+        user = getenv( "HOME" );
+        if( !user ) {
+            fprintf( stderr, "utils: You're HOMEless, go away!\n" );
+            return NULL;
+        }
+        if( asprintf( &fifodir,
+                      "%s/.tvtime",
+                      user ) < 0 ) {
+            fprintf( stderr, "utils: Out of memory.\n" );
+            return NULL;
+        }
+        free( user );
+
+        /* We will try to ensure that the FIFO directory exists. */
+        errno = 0;
+        if( mkdir( fifodir, S_IRWXU ) < 0 ) {
+            if( errno == EEXIST ) {
+                dirhandle = opendir( fifodir );
+                if( dirhandle ) {
+                    struct stat dirstat;
+		    closedir( dirhandle );
+                    if( !stat( fifodir, &dirstat ) ) {
+                        if( dirstat.st_uid == config_get_uid( ct ) ) {
+                            return fifodir;
+                        }
+                    }
+                }
+            }
+        }
+
+        /* It appears we failed.  Bail out. */
+        free( fifodir );
+        return NULL;
+    }
+
+    /* Return the value in the cache. */
+    return fifodir;
+}
+
+const char *get_tvtime_fifo( config_t *ct )
+{
+    static char *fifo = NULL;
+
+    if( !fifo ) {
+        /* We have nothing in our cache. */
+        const char *fifodir = NULL;
+        char *hostname = NULL;
+
+        /* Get the FIFO directory. */
+        fifodir = get_tvtime_fifo( ct );
+        if( !fifodir ) {
+            fprintf( stderr, "utils: No FIFO directory found.!\n" );
+            return NULL;
+        }
+
+        /* Try to get a hostname. */
+        hostname = getenv( "HOSTNAME" );
+        if( hostname ) {
+            if( asprintf( &hostname, "-%s", hostname ) < 0 ) {
+                fprintf( stderr, "utils: Out of memory.\n" );
+                /* Try to get away with no hostname. */
+                if( asprintf( &hostname, "%s", "" ) < 0 ) {
+                    fprintf( stderr, "utils: Really out of memory.\n" );
+                    return NULL;
+                }
+            }
+        } else {
+            if( asprintf( &hostname, "%s", "" ) < 0 ) {
+                fprintf( stderr, "utils: Really out of memory.\n" );
+                return NULL;
+            }
+        }
+
+        if( asprintf( &fifo,
+                      "%s/tvtimefifo%s",
+                      fifodir,
+                      hostname ) < 0 ) {
+            fprintf( stderr, "utils: Out of memory.\n" );
+            if( asprintf( &fifo, "%s", "" ) < 0 ) {
+                fprintf( stderr, "utils: Really out of memory.\n" );
+                return NULL;
+            }
+        }
+    }
+
+    /* Return the value in the cache. */
+    return fifo;
 }
 
 char *get_tvtime_file( const char *filename )

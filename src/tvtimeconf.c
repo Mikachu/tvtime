@@ -72,8 +72,6 @@ struct config_s
     unsigned int other_text_rgb;
 
     uid_t uid;
-    char *command_pipe_dir;
-    char *command_pipe;
 
     char *rvr_filename;
 
@@ -114,8 +112,6 @@ static void copy_config( config_t *dest, config_t *src )
     /* Some of these I am keeping invalid for now. */
     dest->v4ldev = 0;
     dest->vbidev = 0;
-    dest->command_pipe_dir = 0;
-    dest->command_pipe = 0;
     dest->rvr_filename = 0;
     dest->mixerdev = 0;
     dest->config_filename = 0;
@@ -561,7 +557,6 @@ config_t *config_new( void )
 {
     char temp_dirname[ 1024 ];
     char base[ 256 ];
-    struct passwd *pwuid = 0;
 
     config_t *ct = malloc( sizeof( config_t ) );
     if( !ct ) {
@@ -606,23 +601,8 @@ config_t *config_new( void )
     ct->doc = 0;
 
     ct->uid = getuid();
-    pwuid = getpwuid( ct->uid );
-    if( !pwuid ) {
+    if( !getpwuid( ct->uid ) ) {
         fprintf( stderr, "config: You don't exist, go away!\n" );
-        config_delete( ct );
-        return 0;
-    }
-    if( asprintf( &(ct->command_pipe_dir), 
-                  "%s/TV-%s", FIFODIR, pwuid->pw_name ) < 0 ) {
-        fprintf( stderr, "config: Out of memory.\n" );
-        ct->command_pipe_dir = 0;
-        config_delete( ct );
-        return 0;
-    }
-    if( asprintf( &(ct->command_pipe), 
-                  "%s/TV-%s/tvtimefifo", FIFODIR, pwuid->pw_name ) < 0 ) {
-        fprintf( stderr, "config: Out of memory.\n" );
-        ct->command_pipe = 0;
         config_delete( ct );
         return 0;
     }
@@ -838,8 +818,6 @@ void config_free_data( config_t *ct )
     if( ct->ssdir ) free( ct->ssdir );
     if( ct->timeformat ) free( ct->timeformat );
     if( ct->output_driver ) free( ct->output_driver );
-    if( ct->command_pipe_dir ) free( ct->command_pipe_dir );
-    if( ct->command_pipe ) free( ct->command_pipe );
     if( ct->rvr_filename ) free( ct->rvr_filename );
     if( ct->mixerdev ) free( ct->mixerdev );
     if( ct->vbidev ) free( ct->vbidev );
@@ -1049,16 +1027,6 @@ unsigned int config_get_other_text_rgb( config_t *ct )
 uid_t config_get_uid( config_t *ct )
 {
     return ct->uid;
-}
-
-const char *config_get_command_pipe_dir( config_t *ct )
-{
-    return ct->command_pipe_dir;
-}
-
-const char *config_get_command_pipe( config_t *ct )
-{
-    return ct->command_pipe;
 }
 
 int config_get_usevbi( config_t *ct )

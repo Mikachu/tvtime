@@ -19,6 +19,7 @@
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
+#include "tvtimeconf.h"
 #include <stdint.h>
 
 /**
@@ -42,6 +43,16 @@ char *get_tvtime_file( const char *filename );
  * Returns the standard path list for tvtime.
  */
 const char *get_tvtime_paths( void );
+
+/**
+ * Returns a FIFO directory name.
+ */
+const char *get_tvtime_fifodir( config_t *ct );
+
+/**
+ * Returns a FIFO file name.
+ */
+const char *get_tvtime_fifo( config_t *ct );
 
 /**
  * Expands a pathname using wordexp.  This expands ~/foo

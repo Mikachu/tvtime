@@ -60,6 +60,7 @@
 #include "xmgaoutput.h"
 #include "rvrreader.h"
 #include "pulldown.h"
+#include "utils.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -1319,43 +1320,39 @@ int main( int argc, char **argv )
         fflush( stderr );
     }
 
-    /* Ensure the FIFO directory exists */
-    fifodir = opendir( FIFODIR );
-    if( !fifodir ) {
-        fprintf( stderr, "tvtime: Directory %s does not exist.  "
-                         "FIFO disabled.\n", FIFODIR );
+    /* Create the user's FIFO directory */
+    if( !get_tvtime_fifodir( ct ) ) {
+        fprintf( stderr, "tvtime: Cannot find FIFO directory.  "
+                         "FIFO disabled.\n" );
     } else {
         int success = 0;
-
-        closedir( fifodir );
-        /* Create the user's FIFO directory */
-        if( mkdir( config_get_command_pipe_dir( ct ), S_IRWXU ) < 0 ) {
+        if( mkdir( get_tvtime_fifodir( ct ), S_IRWXU ) < 0 ) {
             if( errno != EEXIST ) {
                 fprintf( stderr, "tvtime: Cannot create directory %s.  "
                                  "FIFO disabled.\n", 
-                        config_get_command_pipe_dir( ct ) );
+                         get_tvtime_fifodir( ct ) );
             } else {
-                fifodir = opendir( config_get_command_pipe_dir( ct ) );
+                fifodir = opendir( get_tvtime_fifodir( ct ) );
                 if( !fifodir ) {
                     fprintf( stderr, "tvtime: %s is not a directory.  "
                                      "FIFO disabled.\n", 
-                            config_get_command_pipe_dir( ct ) );
+                             get_tvtime_fifodir( ct ) );
                 } else {
                     struct stat dirstat;
                     closedir( fifodir );
                     /* Ensure the FIFO directory is owned by the user. */
-                    if( !stat( config_get_command_pipe_dir( ct ), &dirstat ) ) {
+                    if( !stat( get_tvtime_fifodir( ct ), &dirstat ) ) {
                         if( dirstat.st_uid == config_get_uid( ct ) ) {
                             success = 1;
                         } else {
                             fprintf( stderr, "tvtime: You do not own %s.  "
                                              "FIFO disabled.\n",
-                                     config_get_command_pipe_dir( ct ) );
+                                     get_tvtime_fifodir( ct ) );
                         }
                     } else {
                         fprintf( stderr, "tvtime: Cannot stat %s.  "
                                          "FIFO disabled.\n",
-                                 config_get_command_pipe_dir( ct ) );
+                                 get_tvtime_fifodir( ct ) );
                     }
                 }
             }
@@ -1365,10 +1362,15 @@ int main( int argc, char **argv )
 
         if( success ) {
             /* Setup the FIFO */
-            fifo = fifo_new( config_get_command_pipe( ct ) );
-            if( !fifo && verbose ) {
-                fprintf( stderr, "tvtime: Not reading input from FIFO.  "
-                                 "Failed to create FIFO object.\n" );
+            if( !get_tvtime_fifo( ct ) ) {
+                fprintf( stderr, "tvtime: Cannot find FIFO file.  "
+                                 "Failed to create FIFO object.\n"  );
+            } else {
+                fifo = fifo_new( get_tvtime_fifo( ct ) );
+                if( !fifo && verbose ) {
+                    fprintf( stderr, "tvtime: Not reading input from FIFO."
+                                     "  Failed to create FIFO object.\n" );
+                }
             }
         }
     }
