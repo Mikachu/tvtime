@@ -243,6 +243,10 @@ int tvtime_command_takes_arguments( int command );
 
 void setup_i18n( void );
 
+int lfputs( const char *s, FILE *stream );
+int lprintf( const char *format, ... );
+int lfprintf( FILE *stream, const char *format, ... );
+
 #ifdef __cplusplus
 };
 #endif

@@ -64,6 +64,7 @@ ings in this Software without prior written authorization from him.
 # define _(string) gettext (string)
 # include "gettext.h"
 # include <langinfo.h>
+# include <iconv.h>
 #endif
 #include "tvtimeconf.h"
 #include "utils.h"
@@ -687,4 +688,136 @@ void setup_i18n( void )
 #endif
 }
 
+int lfputs( const char *s, FILE *stream )
+{
+#ifdef ENABLE_NLS
+    char *mycodeset = nl_langinfo( CODESET );
+    /* iconv wants a char ** even though the argument is not modified. */
+    char *inbuf = (char *)s;
+    size_t inbytesleft = strlen( s );
+    char *outbufstart = alloca( BUFSIZ );
+    char *outbuf = outbufstart;
+    size_t outbytesleft = BUFSIZ;
+    iconv_t cd;
+    int ret;
+    int nonreversible = 0;
+    
+    /* conversion not neccecary. save our time. */
+    if( !strcmp( mycodeset, "UTF-8" ) )
+        return fputs( s, stream );
+    
+    cd = iconv_open( mycodeset, "UTF-8" );
+    if( cd == (iconv_t)(-1) ) {
+        fprintf( stream,
+                 "*** Failed to convert following string "
+                 "from UTF-8 to %s: iconv_open failed (%s)\n",
+                 mycodeset, strerror( errno ) );
+        fputs( s, stream );
+        return EOF;
+    }
+    
+    while( inbytesleft > 0 ) {
+        ret = iconv( cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft );
+        if( ret > 0 )
+            nonreversible += ret;
+        else if( ret < 0 ) {
+            switch( errno ) {
+            case E2BIG: /* Insufficient room at *outbuf */
+                /* Recoverable, and indeed expected! We just
+                   flush the buffers and keep on going. */
+                /* Flush the output buffer */
+                fwrite( outbufstart, sizeof( *outbuf ),
+                        BUFSIZ - outbytesleft, stream );
+                /* ... and rewind it */
+                outbuf = outbufstart;
+                outbytesleft = BUFSIZ;
+                
+                break;
+            case EILSEQ: /* Invalid multibyte sequence */
+            case EINVAL: /* Incomplete multibyte sequence */
+                /* Flush the output buffer */
+                fwrite( outbufstart, sizeof( *outbuf ),
+                        BUFSIZ - outbytesleft, stream );
+                /* ... and rewind it */
+                outbuf = outbufstart;
+                outbytesleft = BUFSIZ;
+                
+                /* To my knowledge, we cannot recover here,
+                   we must truncate the string. */
+                fputs( "[Truncated: Illegal sequence]\n", stream );
+                iconv_close( cd );
+                return EOF;
+            }
+        }
+    }
+    /* inbytesleft == 0 */
+    /* Flush the output buffer */
+    fwrite( outbufstart, sizeof( *outbuf ), BUFSIZ - outbytesleft, stream );
+    /* ... and rewind it */
+    outbuf = outbufstart;
+    outbytesleft = BUFSIZ;
+    
+    iconv_close( cd );
+    return nonreversible;
+#else /* no ENABLE_NLS */
+    return fputs( s, string );
+#endif
+}
 
+static int lvprintf( const char *format, va_list ap )
+{
+    return lvfprintf( stdout, format, ap );
+}
+
+static int lvfprintf( FILE *stream, const char *format, va_list ap )
+{
+#ifdef ENABLE_NLS
+    char *str;
+    char *mycodeset = nl_langinfo( CODESET );
+    int ret = -1;
+    
+    /* conversion not neccecary. save our time. */
+    if ( !strcmp( mycodeset, "UTF-8" ) )
+        return vfprintf( stream, format, ap );
+    
+    ret = vasprintf( &str, format, ap );
+    if( ret == -1 ) {
+        /* I am not convinced this is the best way to deal
+           with this situation. Suggestions? */
+        fprintf( stream,
+                 "*** Failed to convert following string "
+                 "from UTF-8 to %s: (Low memory?)\n",
+                 mycodeset );
+        vfprintf( stream, format, ap );
+        return -1;
+    }
+    
+    if( lfputs( str, stream ) == EOF)
+        ret = -1;
+    /* else, ret remains as the return value from vasprintf () */
+    free( str );
+    return ret;
+#else /* no ENABLE_NLS */
+    return vfprintf( stream, format, ap );
+#endif
+}
+
+int lprintf( const char *format, ... )
+{
+    int ret;
+    va_list ap;
+    va_start( ap, format );
+    ret = lvprintf( format, ap );
+    va_end( ap );
+    return ret;
+}
+
+int lfprintf( FILE *stream, const char *format, ... )
+{
+	int ret;
+	va_list ap;
+	va_start( ap, format );
+	ret = lvfprintf( stream, format, ap );
+	va_end( ap );
+	return ret;
+}
