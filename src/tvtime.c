@@ -443,6 +443,16 @@ static void tvtime_build_deinterlaced_frame( unsigned char *output,
         return;
     }
 
+    /*
+    if( !bottom_field ) {
+        pulldown_metrics_t peak, rel, mean;
+        diff_factor_packed422_frame( &peak, &rel, &mean, lastframe, curframe,
+                                     width, frame_height, width*2, width*2 );
+        fprintf( stderr, "stats: pd=%d re=%d ro=%d rt=%d rs=%d rp=%d rd=%d, took %d\n",
+                peak.d, rel.e, rel.o, rel.t, rel.s, rel.p, rel.d, timediff( &after, &before ) );
+    }
+    */
+
 
     if( !curmethod->scanlinemode ) {
         deinterlace_frame_data_t data;
@@ -1303,7 +1313,7 @@ int main( int argc, char **argv )
         /* Print statistics and check for missed frames. */
         if( printdebug ) {
             performance_print_last_frame_stats( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
-            fprintf( stderr, "Speedy time last frame: %dus\n", speedy_get_usecs() );
+            fprintf( stderr, "tvtime: Speedy time last frame: %d cycles.\n", speedy_get_cycles() );
         }
         if( config_get_debug( ct ) ) {
             performance_print_frame_drops( perf, curmethod->doscalerbob ? (width * height) : (width * height * 2) );
