@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include "pulldown.h"
 #include "rvrreader.h"
 
@@ -45,7 +46,7 @@ off_t read_full( int fd, void *buf, size_t numbytes )
 	if ( numbytes <  0 ) { return -1; }
 	while( total < numbytes ) {
 		remain = numbytes - total;
-		got = read(fd, buf+total, remain);
+		got = read(fd, ((uint8_t *) buf) + total, remain);
 		if ( got == 0 ) { break; }
 		if ( got <  0 ) { return got; }
 		total += got;
