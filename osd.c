@@ -156,7 +156,7 @@ void osd_string_composite_packed422( osd_string_t *osds, unsigned char *output,
                                                    output + ((dest_x) * 2),
                                                    efs_get_scanline( osds->efs, src_y + i ),
                                                    blit_w, osds->text_luma, osds->text_cb,
-                                                   osds->text_cr, (double) osds->frames_left / 50.0 );
+                                                   osds->text_cr, ((double) osds->frames_left) / 50.0 );
             output += stride;
         }
     }
