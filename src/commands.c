@@ -358,11 +358,11 @@ void commands_handle( commands_t *in, int tvtime_cmd, int arg )
         break;
 
     case TVTIME_CHANNEL_UP: 
-	station_prev();
+	station_next();
 	commands_station_change(in);
 	break;
     case TVTIME_CHANNEL_DOWN:
-	station_next();
+	station_prev();
 	commands_station_change(in);
         break;
 
