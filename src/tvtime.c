@@ -83,6 +83,12 @@ const int scan_delay = 10;
 static int left_scanline_bias = 0;
 static int right_scanline_bias = 0;
 
+/**
+ * These are for the ogle code.
+ */
+char *program_name = "tvtime";
+int dlevel = 3;
+
 static void build_colourbars( unsigned char *output, int width, int height )
 {
     unsigned char *cb444 = (unsigned char *) malloc( width * height * 3 );
@@ -571,6 +577,9 @@ int main( int argc, char **argv )
         return 1;
     }
     verbose = config_get_verbose( ct );
+    if( verbose ) {
+        dlevel = 5;
+    }
 
     if( config_get_parsed_file( ct )->filename && !configsave_open( config_get_parsed_file( ct )->filename ) ) {
         fprintf( stderr, "tvtime: Can't open config file for runtime option saving.\n" );

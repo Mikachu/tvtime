@@ -34,8 +34,6 @@
 #include "display.h"
 #include "wm_state.h"
 
-char *program_name = "tvtime";
-int dlevel = 5;
 
 static WindowState_t current_state = WINDOW_STATE_NORMAL;
 static int kwin_bug = 0;
@@ -266,7 +264,7 @@ static void switch_to_fullscreen_state(Display *dpy, Window win)
     XSetWMNormalHints(dpy, win, sizehints);
     XFree(sizehints);
     if(wm_name != NULL && (strcmp(wm_name, "KWin") == 0) && kwin_bug) {
-      fprintf(stderr, "sleeping before map\n");
+      fprintf(stderr, "wm_state: Sleeping before map to avoid a kwin bug.\n");
       sleep(1);
     }
     XMapWindow(dpy, win);
@@ -466,7 +464,7 @@ static void switch_to_normal_state(Display *dpy, Window win)
     XFree(sizehints);
 
     if(wm_name != NULL && (strcmp(wm_name, "KWin") == 0) && kwin_bug) {
-      fprintf(stderr, "sleeping before map\n");
+      fprintf(stderr, "wm_state: Sleeping before map to avoid a kwin bug.\n");
       sleep(1);
     }
     
@@ -1059,7 +1057,8 @@ int ChangeWindowState(Display *dpy, Window win, WindowState_t state)
     if(getenv("OGLE_KWIN_BUG")) {
       kwin_bug = 1;
     } else {
-      kwin_bug = 0;
+      /* billy: enable kwin bug all the time for now. */
+      kwin_bug = 1;
     }
 
     EWMH_wm = check_for_EWMH_wm(dpy, &wm_name);
