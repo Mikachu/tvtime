@@ -9,17 +9,29 @@
 #include <unistd.h>
 #include <errno.h>
 #include "vbidata.h"
+#include "console.h"
 
 #define DO_LINE 11
 static char outbuf[2048];
 static int pll = 0;
 
+struct vbidata_s
+{
+    int fd;
+    unsigned char buf[ 65536 ];
+    console_t *con;
+};
+
+
 /* this is NOT exactly right */
-static char *ccode = " !\"#$%&'()\0341+,-./0123456789:;<=>?@"
+//static char *ccode = " !\"#$%&'()\0341+,-./0123456789:;<=>?@"
+static char *ccode = " !\"#$%&'()a+,-./0123456789:;<=>?@"
                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 //                     "abcdefghijklmnopqrstuvwxyz"
-                     "[\0351]\0355\0363\0372abcdefghijklmnopqr"
-                     "stuvwxyz\0347\0367\0245\0244\0240";
+//                     "[\0351]\0355\0363\0372abcdefghijklmnopqr"
+                     "[e]iouabcdefghijklmnopqr"
+//                     "stuvwxyz\0347\0367\0245\0244\0240";
+                     "stuvwxyzcoNn ";
 static char *wccode = "\0256\0260\0275\0277T\0242\0243#\0340 "
                       "\0350\0354\0362\0371";
 
@@ -106,6 +118,17 @@ int ccdecode(unsigned char *vbiline)
 
 static char xds_packet[ 2048 ];
 static int xds_cursor = 0;
+
+const char *movies[] = { "N/A", "G", "PG", "PG-13", "R", 
+                         "NC-17", "X", "Not Rated" };
+const char *usa_tv[] = { "Not Rated", "TV-Y", "TV-Y7", "TV-G", 
+                         "TV-PG", "TV-14", "TV-MA", "Not Rated" };
+const char *cane_tv[] = { "Exempt", "C", "C8+", "G", "PG", 
+                          "14+", "18+", "Reserved" };
+const char *canf_tv[] = { "Exempt", "G", "8 ans +", "13 ans +", 
+                          "16 ans +", "18 ans +", "Reserved", 
+                          "Reserved" };
+
 
 const char *months[] = { 0, "Jan", "Feb", "Mar", "Apr", "May",
     "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -235,21 +258,11 @@ static void parse_xds_packet( const char *packet, int length )
     } else if( packet[ 0 ] == 0x05 && packet[ 1 ] == 0x01 ) {
         fprintf( stderr, "Network name: '%s'\n", packet + 2 );
     } else if( packet[ 0 ] == 0x01 && packet[ 1 ] == 0x05 ) {
-        static char *movies[] = { "N/A", "G", "PG", "PG-13", "R", 
-                                  "NC-17", "X", "Not Rated" };
-        static char *usa_tv[] = { "Not Rated", "TV-Y", "TV-Y7", "TV-G", 
-                                  "TV-PG", "TV-14", "TV-MA", "Not Rated" };
-        static char *cane_tv[] = { "Exempt", "C", "C8+", "G", "PG", 
-                                   "14+", "18+", "Reserved" };
-        static char *canf_tv[] = { "Exempt", "G", "8 ans +", "13 ans +", 
-                                   "16 ans +", "18 ans +", "Reserved", 
-                                   "Reserved" };
-
         int movie_rating = packet[ 2 ] & 7;
         int scheme = (packet[ 2 ] & 56) >> 3;
         int tv_rating = packet[ 3 ] & 7;
         int VSL = packet[ 3 ] & 56;
-        char * str;
+        const char * str;
 
         switch( VSL | scheme ) {
         case 3: /* Canadian English TV */
@@ -379,12 +392,14 @@ static int xds_decode( int b1, int b2 )
     return 1;
 }
 
-int ProcessLine( unsigned char *s, int bottom )
+int ProcessLine( vbidata_t *vbi, unsigned char *s, int bottom )
 {
     int w1, b1, b2;
-    static int lastchar = 0, mode = 0;
-    static int nocc = 0;
+    static int lastchar = 0, mode = 0, incc=0;
+    static int nocc = 0, lastcc=0;
     int m=0, n=0;
+
+    if( !vbi ) return 0;
 
     m = strlen(outbuf);
     w1 = ccdecode(s);
@@ -397,7 +412,143 @@ int ProcessLine( unsigned char *s, int bottom )
     if( !b1 && !b2 ) return 0;
 
     if( b1 >= 0x10 && b1 <= 0x1F && b2 >= 0x20 && b2 <= 0x7F ) {
-        fprintf( stderr, "control code: 0x%02x 0x%02x\n", b1, b2 );
+//        fprintf( stderr, "control code: 0x%02x 0x%02x\n", b1, b2 );
+        fprintf( stderr, "Channel: %d ", (b1 & 8) >> 4 );
+        if( b1 & 2 ) {
+            fprintf( stderr, "Tab Offset: %d ", b2 & 2 );
+            return 0;
+        }
+        fprintf( stderr, "Field: %d Cmd: ", b1 & 1 );
+        switch( b2 & 7 ) {
+        case 0:
+            fprintf( stderr, "Resume Caption Loading\n");
+            lastcc = incc;
+            incc=1;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        case 1:
+            lastchar = 1;
+            fprintf( stderr, "Backspace\n");
+            if( *outbuf ) {
+                outbuf[ strlen(outbuf) - 1 ] = 0;
+            }
+            break;
+        case 2:
+        case 3:
+            fprintf( stderr, "Reserved\n");
+            break;
+        case 4:
+            fprintf( stderr, "Delete to End of Row\n");
+            lastcc = incc;
+            incc=0;
+            *outbuf = 0;
+            mode = 0;
+            break;
+        case 5:
+            fprintf( stderr, "Roll Up Captions, 2 rows\n");
+            lastcc = incc;
+            incc=1;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        case 6:
+            fprintf( stderr, "Roll Up Captions, 3 rows\n");
+            lastcc = incc;
+            incc=1;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        case 7:
+            fprintf( stderr, "Roll Up Captions, 4 rows\n");
+            lastcc = incc;
+            incc=1;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        case 8:
+            fprintf( stderr, "Flash On\n");
+            break;
+        case 9:
+            fprintf( stderr, "Resume Direct Captioning\n");
+            break;
+        case 10:
+            fprintf( stderr, "Text Restart\n");
+            break;
+        case 11:
+            fprintf( stderr, "Resume Text Display\n");
+            break;
+        case 12:
+            fprintf( stderr, "Erase Displayed Memory\n");
+            break;
+        case 13:
+            fprintf( stderr, "Carriage Return\n");
+            lastcc = incc;
+            incc=0;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        case 14:
+            fprintf( stderr, "Erase Non-Displayed Memory\n");
+            break;
+        case 15:
+            fprintf( stderr, "End Of Caption\n");
+            lastcc = incc;
+            incc=0;
+            if ( *outbuf ) {
+                fprintf(stderr, "%s\n", outbuf);
+                if( vbi->con ) {
+                    console_printf( vbi->con, "%s\n", outbuf );
+                }
+
+                *outbuf = 0;
+                mode = 0;
+            }
+
+            break;
+        default:
+            break;
+        }
+
         return 0;
     }
 
@@ -423,7 +574,6 @@ int ProcessLine( unsigned char *s, int bottom )
             b2 >> 1 & 1,
             b2 >> 0 & 1, b1, b2);
 */
-    if( (b1 & 96) )
     fprintf( stderr, "b1 = 0x%02x  b2 = 0x%02x\n", b1, b2 );
     if( b1 == 0x11 || b1 == 0x19 || 
         b1 == 0x12 || b1 == 0x13 || 
@@ -432,22 +582,56 @@ int ProcessLine( unsigned char *s, int bottom )
         case 0x1A:
         case 0x12:
             /* use extcode1 */
+            if( b1 > 31 && b2 > 31 && b1 <= 0x3F && b2 <= 0x3F )
+                fprintf( stderr, "char %d (%c),  char %d (%c)\n", b1, extcode1[b1-32] , b2, extcode1[b2-32] );
+
             break;
         case 0x13:
         case 0x1B:
             /* use extcode2 */
+            if( b1 > 31 && b2 > 31 && b1 <= 0x3F && b2 <= 0x3F )
+                fprintf( stderr, "char %d (%c),  char %d (%c)\n", b1, extcode2[b1-32] , b2, extcode2[b2-32] );
+
             break;
         case 0x11:
         case 0x19:
             /* use wcode */
+            if( b1 > 31 && b2 > 31 && b1 <= 0x3F && b2 <= 0x3F )
+                fprintf( stderr, "char %d (%c),  char %d (%c)\n", b1, wccode[b1-32] , b2, wccode[b2-32] );
+
             break;
         default:
+            
             break;
         }
-    } else if( (b1 & 96) ) {
+    } else if( b1  ) {
         /* use ccode */
-        
+        if( lastchar == 1 ) {
+            /* backspace */
+        }
+        if( b1 > 31 && incc ) {
+            char blah = b1;
+            //fprintf( stderr, "char %d [%c] (%c)\n",  b1, b1, ccode[b1-32] );
+            strncat(outbuf, &ccode[blah-32], 1 );
+        }
+        if( b2 > 31 && incc ) {
+            char blah = b2;
+//            fprintf( stderr, "char %d [%c] (%c)\n",  b2, b2, ccode[b2-32] );
+            strncat(outbuf, &ccode[blah-32], 1 );
+        }
+
+        if ( 0 && *outbuf && incc )
+            if (outbuf[strlen(outbuf) - 1] != ' ')
+                strncat(outbuf, ccode, 1);
+        n = strlen(outbuf);
+
+        if( !incc )
+            fprintf( stderr, "Not in CC\n");
+
+//        fprintf(stderr, "CC: %s\n", outbuf);
     }
+
+
 
 #if 0
     if ((b1 & 96)) {
@@ -476,26 +660,15 @@ int ProcessLine( unsigned char *s, int bottom )
         if (outbuf[strlen(outbuf) - 1] != ' ')
             strncat(outbuf, ccode, 1);
     n = strlen(outbuf);
-    if (!(b1 & 96) && b1 && *outbuf) {
-        if (++mode > 4) {
-            fprintf(stderr, "%s\n", outbuf);
-            *outbuf = 0;
-            mode = 0;
-        }
-    }
+
 #endif
 
     return n - m;
 }				/* ProcessLine */
 
 
-struct vbidata_s
-{
-    int fd;
-    unsigned char buf[ 65536 ];
-};
 
-vbidata_t *vbidata_new( const char *filename )
+vbidata_t *vbidata_new( const char *filename, console_t *con  )
 {
     vbidata_t *vbi = (vbidata_t *) malloc( sizeof( vbidata_t ) );
     if( !vbi ) {
@@ -509,6 +682,8 @@ vbidata_t *vbidata_new( const char *filename )
         free( vbi );
         return 0;
     }
+
+    vbi->con = con;
 
     return vbi;
 }
@@ -527,8 +702,9 @@ void vbidata_process_frame( vbidata_t *vbi, int printdebug )
         return;
     }
 
-    ProcessLine( &vbi->buf[ DO_LINE*2048 ], 0 );
-    ProcessLine( &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
+    ProcessLine( vbi, &vbi->buf[ DO_LINE*2048 ], 0 );
+    ProcessLine( vbi, &vbi->buf[ (16+DO_LINE)*2048 ], 1 );
+
 
 /*
     if( printdebug ) {

@@ -391,16 +391,18 @@ void console_printf( console_t *con, char *format, ... )
     size = strlen(format)*3;
 
     va_start( ap, format );
-    for(;;) {
+    str = (char *)malloc( size );
+    if( !str ) return;
+    n = vsnprintf( str, size-1, format, ap );
+    if( n > size ) {
+        free( str );
+        size = n+1;
         str = (char *)malloc( size );
         if( !str ) return;
-        n = vsnprintf( str, size-1, format, ap );
-        if( n == -1 ) {
+        n = vsnprintf( str, size, format, ap );
+        if ( n > size ) {
             free( str );
-            str = NULL;
-            size *= 2;
-        } else {
-            break;
+            return;
         }
     }
     va_end( ap );
@@ -467,15 +469,6 @@ void console_printf( console_t *con, char *format, ... )
 
     con->text[ con->curx + con->cury * con->cols ] = '\0';
 #endif
-
-    if( str ) {
-        char *hmm;
-        hmm = realloc( (void *)str, strlen(str)+1 );
-        if( hmm ) {
-            size = strlen(str)+1;
-            str = hmm;
-        }
-    }
 
     if( con->text ) {
         char *hmm;

@@ -655,7 +655,7 @@ int main( int argc, char **argv )
     }
 
     /* Open the VBI device. */
-    vbidata = vbidata_new( "/dev/vbi0" );
+    vbidata = vbidata_new( "/dev/vbi0", con );
 
     /* Setup the output. */
     output = get_xv_output();
