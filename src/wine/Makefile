@@ -2,7 +2,7 @@ CC= gcc
 INCLUDES= -Idriver
 
 # 
-CFLAGS= -DSPEED -Wall -O3 -g -mcpu=i686  -march=i686 -malign-functions=4 
+CFLAGS= -DSPEED -Wall -O3 -g -mcpu=i686 -march=i686 -falign-functions=4
 #CFLAGS= -DSPEED -Wall -O3 -mcpu=pentiumpro  -fomit-frame-pointer -finline-functions -fcaller-saves -ffast-math -fno-strength-reduce -fthread-jumps -funroll-loops
 
 # 

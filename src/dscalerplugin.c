@@ -99,9 +99,8 @@ DEINTERLACE_METHOD *LoadDeintPlugin( char *filename )
         return 0;
     }
 
-    pMethod = pfnGetDeinterlacePluginInfo(CpuFeatureFlags);
-    if(pMethod != NULL)
-    {
+    pMethod = pfnGetDeinterlacePluginInfo( CpuFeatureFlags );
+    if( pMethod ) {
         if(pMethod->SizeOfStructure == sizeof(DEINTERLACE_METHOD) &&
             pMethod->DeinterlaceStructureVersion >= DEINTERLACE_VERSION_3) {
 
