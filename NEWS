@@ -3,6 +3,20 @@ For news and updates on tvtime, please visit our website at:
 
   http://tvtime.sourceforge.net/
 
+News for 0.9.7
+
+  *  Moved config files into a new config file directory ~/.tvtime
+  *  Reworked the frequency tables, merging europe-cable, europe-west,
+     europe-east all into 'europe'.  Added the 'russia' frequency table.
+  *  Added a channel scanner.  F10 walks through the channel list and
+     disables active channels.
+  *  Added the 'XVideo Bob' deinterlacer filter.
+  *  Added lirc support.
+  *  Added the overscan feature.
+  *  Added hardware support webpage.
+  *  Added a half-framerate mode ('=' to activate it).
+  *  Fixed alot of bug reports.
+
 News for 0.9.6
 
   *  We updated the tuner frequencies, please make sure you're up to
