@@ -624,9 +624,8 @@ int main( int argc, char **argv )
     curmethodid = config_get_preferred_deinterlace_method( ct );
     if( curmethodid >= get_num_deinterlace_methods() ||
         curmethodid < 0) {
-        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, "
-                         "exiting.\n" );
-        return 1;
+        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, using method 0.\n" );
+        curmethodid = 0;
     }
     curmethod = get_deinterlace_method( curmethodid );
 
