@@ -1371,12 +1371,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int argc, char **argv )
 
     /* Set input size. */
     if( !output->set_input_size( width, height ) ) {
-        lfprintf( stderr, _("tvtime: Can't display input size %dx%d.\n"),
-                  width, height );
         /* FIXME: Clean up. */
         return 1;
     }
-
 
     /**
      * 1 buffer : 0 fields available.  [t][b]

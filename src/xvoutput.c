@@ -172,7 +172,10 @@ static void *create_shm( int size )
 
     maxid = shmctl( 0, SHM_INFO, &shm_info );
     if( maxid < 0 ) {
-        fprintf( stderr, "xvoutput: kernel not configured for shared memory\n" );
+        fprintf( stderr, "\n"
+          "    Your kernel has been compiled without support for shared\n"
+          "    memory.  Please fix this in your kernel before running\n"
+          "    tvtime.\n\n" );
         return 0;
     }
 
@@ -223,7 +226,9 @@ static int xv_alloc_frame( void )
     size = input_width * input_height * 2;
     alloc = create_shm( size );
     if( alloc ) {
-        blit_colour_packed422_scanline( alloc, input_width * input_height, 0, 128, 128 );
+        /* Initialize the input image to black. */
+        blit_colour_packed422_scanline( alloc, input_width * input_height,
+                                        16, 128, 128 );
         image = XvShmCreateImage( display, xv_port, FOURCC_YUY2, (char *) alloc,
                                   input_width, input_height, &shminfo );
         image_data = alloc;
