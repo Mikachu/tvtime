@@ -234,5 +234,6 @@ AC_CONFIG_FILES([
 	docs/man/Makefile
 	docs/man/de/Makefile
 	docs/man/en/Makefile
+	docs/man/es/Makefile
 ])
 AC_OUTPUT
