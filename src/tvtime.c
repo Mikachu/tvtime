@@ -522,8 +522,8 @@ int main( int argc, char **argv )
 
     ct = config_new( argc, argv );
     if( !ct ) {
-        fprintf( stderr, "tvtime: Can't set configuration options.\n" );
-        return 0;
+        fprintf( stderr, "tvtime: Can't set configuration options, exiting.\n" );
+        return 1;
     }
     verbose = config_get_verbose( ct );
 
@@ -533,8 +533,8 @@ int main( int argc, char **argv )
 
     stationmgr = station_init( ct );
     if( !stationmgr ) {
-        fprintf( stderr, "tvtime: Can't create station manager.\n" );
-        return 0;
+        fprintf( stderr, "tvtime: Can't create station manager (no memory?), exiting.\n" );
+        return 1;
     }
     station_set( stationmgr, config_get_start_channel( ct ) );
 
@@ -564,7 +564,7 @@ int main( int argc, char **argv )
     safetytime = fieldtime - ((fieldtime*3)/4);
     perf = performance_new( fieldtime );
     if( !perf ) {
-        fprintf( stderr, "tvtime: Can't initialize performance monitor.\n" );
+        fprintf( stderr, "tvtime: Can't initialize performance monitor, exiting.\n" );
         return 1;
     }
     vidin = videoinput_new( config_get_v4l_device( ct ), 
@@ -580,8 +580,7 @@ int main( int argc, char **argv )
     width = videoinput_get_width( vidin );
     height = videoinput_get_height( vidin );
     if( verbose ) {
-        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", 
-                 width );
+        fprintf( stderr, "tvtime: V4L sampling %d pixels per scanline.\n", width );
     }
 
     /**
@@ -624,7 +623,7 @@ int main( int argc, char **argv )
     curmethodid = config_get_preferred_deinterlace_method( ct );
     if( curmethodid >= get_num_deinterlace_methods() ||
         curmethodid < 0) {
-        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, using method 0.\n" );
+        fprintf( stderr, "tvtime: Invalid preferred deinterlace method, using first method found.\n" );
         curmethodid = 0;
     }
     curmethod = get_deinterlace_method( curmethodid );
@@ -646,7 +645,7 @@ int main( int argc, char **argv )
     /* Setup OSD stuff. */
     osd = tvtime_osd_new( ct, width, height, config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0) );
     if( !osd ) {
-        fprintf( stderr, "Can't initialize OSD object.\n" );
+        fprintf( stderr, "Can't initialize OSD object, OSD disabled.\n" );
     } else {
         tvtime_osd_set_timeformat( osd, config_get_timeformat( ct ) );
         tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
@@ -711,9 +710,8 @@ int main( int argc, char **argv )
     }
     rtctimer = rtctimer_new( verbose );
     if( !rtctimer ) {
-        if( verbose ) {
-            fprintf( stderr, "tvtime: Can't open /dev/rtc (needed for accurate blit scheduling).\n" );
-        }
+        fprintf( stderr, "tvtime: /dev/rtc support is needed for smooth video.  We STRONGLY recommend\n"
+                         "tvtime: that you load the 'rtc' kernel module before starting tvtime.\n" );
     } else {
         if( !rtctimer_set_interval( rtctimer, 1024 ) && !rtctimer_set_interval( rtctimer, 64 ) ) {
             rtctimer_delete( rtctimer );
@@ -722,7 +720,9 @@ int main( int argc, char **argv )
             rtctimer_start_clock( rtctimer );
 
             if( rtctimer_get_resolution( rtctimer ) < 1024 ) {
-                fprintf( stderr, "tvtime: Can't get 1024hz resolution from /dev/rtc.\n" );
+                fprintf( stderr, "tvtime: /dev/rtc loaded fine, but we can't get 1024hz resolution!\n" );
+                fprintf( stderr, "tvtime: Please run tvtime as root, or, as root and with kernel >= 2.4.19, run:\n"
+                                 "        sysctl -w dev.rtc.max-user-freq=1024\n" );
             }
         }
     }

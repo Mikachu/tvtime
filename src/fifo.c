@@ -42,10 +42,10 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
     fifo_t *fifo = (fifo_t *)malloc( sizeof(struct fifo_s) );
 
     if( !fifo ) {
-        return NULL;
+        return 0;
     }
 
-    fifo->filename = NULL;
+    fifo->filename = 0;
 
     if( givenname ) filename = givenname;
 
@@ -57,12 +57,12 @@ fifo_t *fifo_new( config_t *ct, char *givenname )
             fprintf( stderr, "fifo: Couldn't create %s as a fifo: %s\n",
                      filename, strerror( errno ) );
             free( fifo );
-            return NULL;
+            return 0;
         }
         fifo->fd = open( filename , O_RDONLY | O_NONBLOCK );
         if( fifo->fd == -1 ) {
             free( fifo );
-            return NULL;
+            return 0;
         }
     }
 
@@ -78,7 +78,7 @@ char *fifo_next_line( fifo_t *fifo )
 {
     char c;
 
-    if( !fifo ) return NULL;
+    if( !fifo ) return 0;
 
     while( read( fifo->fd, &c, 1 ) > 0 ) {
         if( c == '\n' ) return fifo->buf;
@@ -90,13 +90,13 @@ char *fifo_next_line( fifo_t *fifo )
         if( fifo->bufpos < sizeof( fifo->buf ) - 1 ) 
             fifo->buf[ fifo->bufpos++ ] = c;
     }
-    return NULL;
+    return 0;
 }
 
 int fifo_next_command( fifo_t *fifo )
 {
     int cmd;
-    char *str = NULL;
+    char *str = 0;
 
     if( !fifo ) return TVTIME_NOCOMMAND;
     str = fifo_next_line( fifo );
@@ -119,6 +119,7 @@ void fifo_delete( fifo_t *fifo )
 
 char *fifo_get_filename( fifo_t *fifo )
 {
-    if( !fifo ) return NULL;
+    if( !fifo ) return 0;
     return fifo->filename;
 }
+

@@ -45,13 +45,23 @@ rtctimer_t *rtctimer_new( int verbose )
     if( !rtctimer ) return 0;
 
     rtctimer->verbose = verbose;
-    if( ( rtctimer->rtc_fd = open( "/dev/rtc", O_RDONLY ) ) < 0 ) {
+    if( (( rtctimer->rtc_fd = open( "/dev/rtc", O_RDONLY ) ) < 0) ) {
         if( rtctimer->verbose ) {
             fprintf( stderr, "rtctimer: Cannot open /dev/rtc: %s\n",
                      strerror( errno ) );
+            fprintf( stderr, "rtctimer: Trying /dev/misc/rtc just in case...\n" );
         }
-        free( rtctimer );
-        return 0;
+        if( ( rtctimer->rtc_fd = open( "/dev/misc/rtc", O_RDONLY ) ) < 0 ) {
+            if( rtctimer->verbose ) {
+                fprintf( stderr, "rtctimer: Cannot open /dev/misc/rtc: %s\n",
+                         strerror( errno ) );
+            }
+            free( rtctimer );
+            return 0;
+        }
+        if( rtctimer->verbose ) {
+            fprintf( stderr, "rtctimer: Using /dev/misc/rtc instead.\n" );
+        }
     }
 
     if( fcntl( rtctimer->rtc_fd, F_SETOWN, getpid() ) < 0 ) {
