@@ -1369,13 +1369,17 @@ int main( int argc, char **argv )
 
     /* Open the VBI device. */
     if( usevbi ) {
-        vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
-        if( !vbidata ) {
-            fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+        if( height == 480 ) {
+            vbidata = vbidata_new( config_get_vbidev( ct ), vs, verbose );
+            if( !vbidata ) {
+                fprintf( stderr, "tvtime: Could not create vbidata.\n" );
+            } else {
+                vbidata_capture_mode( vbidata, CAPTURE_OFF );
+            }
+            commands_set_vbidata( commands, vbidata );
         } else {
-            vbidata_capture_mode( vbidata, CAPTURE_OFF );
+            fprintf( stderr, "tvtime: VBI decoding not available for your TV norm.\n" );
         }
-        commands_set_vbidata( commands, vbidata );
     }
 
     /* Randomly assign a tagline as the window caption. */
@@ -1624,7 +1628,7 @@ int main( int argc, char **argv )
             if( osd ) osd_list_matte( osd, matte_mode, sixteennine );
         }
         if( commands_toggle_pulldown_detection( commands ) ) {
-            if( videoinput_get_height( vidin ) == 480 ) {
+            if( height == 480 ) {
                 tvtime->pulldown_alg = (tvtime->pulldown_alg + 1) % PULLDOWN_MAX;
                 if( osd ) {
                     if( tvtime->pulldown_alg == PULLDOWN_NONE ) {
