@@ -1860,7 +1860,7 @@ int main( int argc, char **argv )
             if( vbidata ) vbidata_process_frame( vbidata, printdebug );
         }
 
-        if( (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF)  && !output->is_interlaced() ) {
+        if( output->is_exposed() && (framerate_mode == FRAMERATE_FULL || framerate_mode == FRAMERATE_HALF_TFF) && !output->is_interlaced() ) {
             /* Wait for the next field time. */
             if( rtctimer && !we_were_late ) {
 

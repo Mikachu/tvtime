@@ -176,7 +176,13 @@ if test x"$no_x" != x"yes"; then
 	    X11_LIBS="$X11_LIBS -lXinerama"],,
 	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
 
-	dnl check for Xvmode
+	dnl check for XTest
+        AC_CHECK_LIB([Xtst],[XTestFakeKeyEvent],
+            [AC_DEFINE([HAVE_XTESTEXTENSION],,[XTest support])
+            X11_LIBS="$X11_LIBS -lXtst"],,
+	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
+
+	dnl check for Xvidmode
 	AC_CHECK_LIB([Xxf86vm],[XF86VidModeGetModeLine],
 	    [AC_DEFINE([HAVE_XF86VIDMODE],,[XF86VidModeExtension support])
 	    X11_LIBS="$X11_LIBS -lXxf86vm"],,

@@ -87,7 +87,7 @@ Code we stole (well, used under the GPL)
     I also got some help with my Xv code from walken's xv module in
     libmpeg2.
 
-  Some Xv output code help, and fastmemcpy stolen from xine
+  Some Xv output code help, XTest code, and fastmemcpy stolen from xine
     http://xine.sourceforge.net/
     They apparently got the fastmemcpy from mplayer.  I took their version
     because I happened to have it around.  I have not done my own performance
@@ -128,9 +128,6 @@ Code we stole (well, used under the GPL)
   MMX code for the MPEG2-style vertical [-1 4 2 4 -1]/8 deinterlacer
   filter from ffmpeg by Fabrice Bellard:
     http://ffmpeg.org/
-
-  Screen saver disabling routines from mplayer, 
-    http://www.mplayerhq.hu/
 
   wine direcory for win32 DLL loading support from libw32 in xine.
     http://xine.sf.net/

@@ -57,8 +57,8 @@ COMMON_SRCS = mixer.c videoinput.c rtctimer.c leetft.c osdtools.c tvtimeconf.c \
 	vbidata.h vbidata.c credits.c credits.h console.h console.c speedtools.h \
 	vbiscreen.h vbiscreen.c fifo.h fifo.c commands.h commands.c videofilter.h \
 	videofilter.c station.h station.c bands.h configsave.h configsave.c \
-	x11tools.c x11tools.h debug_print.h vgasync.h vgasync.c dscalerplugin.h \
-	dscalerplugin.c DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h utils.h utils.c \
+	debug_print.h vgasync.h vgasync.c dscalerplugin.h dscalerplugin.c \
+	DS_ApiCommon.h DS_Deinterlace.h DS_Filter.h utils.h utils.c \
 	diffcomp.h diffcomp.c rvrreader.h rvrreader.c ree.h ree.c pulldown.h \
 	pulldown.c hashtable.h hashtable.c
 

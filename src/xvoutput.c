@@ -1,5 +1,8 @@
 /**
- * Copyright (C) 2002 Billy Biggs <vektor@dumbterm.net>.
+ * Copyright (C) 2002, 2003 Billy Biggs <vektor@dumbterm.net>.
+ *
+ * Helped by XTest code from xine, a free video player,
+ * Copyright (C) 2000-2003 the xine project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,13 +46,17 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
+#ifdef HAVE_XTESTEXTENSION
+#include <X11/extensions/XTest.h>
+#endif
 
 #include "display.h"
 #include "wm_state.h"
 
-#include "x11tools.h"
-
 #define FOURCC_YUY2 0x32595559
+
+/* Every 30 seconds, ping the screensaver. */
+#define SCREENSAVER_PING_TIME (30 * 1000 * 1000)
 
 static XvImage *image;
 static uint8_t *image_data;
@@ -60,6 +67,10 @@ static GC gc;
 static XvPortID xv_port;
 static int completion_type;
 static XWindowAttributes attribs;
+#ifdef HAVE_XTESTEXTENSION
+static KeyCode kc_shift_l; /* Fake key to send. */
+#endif
+static int have_xtest = 0;
 
 static int output_width, output_height;
 static int input_width, input_height;
@@ -103,6 +114,49 @@ static void x11_InstallXErrorHandler( void )
 {
     XSetErrorHandler( HandleXError );
     XFlush( display );
+}
+
+static int have_xtestextention( void )
+{  
+#ifdef HAVE_XTESTEXTENSION
+    int dummy1, dummy2, dummy3, dummy4;
+  
+    return (XTestQueryExtension( display, &dummy1, &dummy2, &dummy3, &dummy4 ) == True);
+#endif
+    return 0;
+}
+
+static int timediff( struct timeval *large, struct timeval *small )
+{
+    return (   ( ( large->tv_sec * 1000 * 1000 ) + large->tv_usec )
+             - ( ( small->tv_sec * 1000 * 1000 ) + small->tv_usec ) );
+}
+
+static struct timeval last_ping_time;
+static int time_initialized = 0;
+
+static void ping_screensaver( void )
+{
+    struct timeval curtime;
+
+    if( !time_initialized ) {
+        gettimeofday( &last_ping_time, 0 );
+        time_initialized = 1;
+    }
+
+    gettimeofday( &curtime, 0 );
+    if( timediff( &curtime, &last_ping_time ) > SCREENSAVER_PING_TIME ) { 
+        last_ping_time = curtime;
+#ifdef HAVE_XTESTEXTENSION
+        if( have_xtest ) {
+            XTestFakeKeyEvent( display, kc_shift_l, True, CurrentTime );
+            XTestFakeKeyEvent( display, kc_shift_l, False, CurrentTime );
+        } else 
+#endif
+        {
+            XResetScreenSaver( display );
+        }
+    }
 }
 
 static int xv_port_has_yuy2( XvPortID port )
@@ -285,6 +339,14 @@ static int open_display( void )
         fprintf( stderr, "xvoutput: Geometry %dx%d, display aspect ratio %.2f\n",
                  displaywidthratio, displayheightratio,
                  (double) displaywidthratio / (double) displayheightratio );
+    }
+
+#ifdef HAVE_XTESTEXTENSION
+    kc_shift_l = XKeysymToKeycode( display, XK_Shift_L );
+#endif
+    have_xtest = have_xtestextention();
+    if( have_xtest && xvoutput_verbose ) {
+        fprintf( stderr, "xvoutput: Have XTest, will use it to ping the screensaver.\n" );
     }
 
     /* Initially, get the best width for our height. */
@@ -501,7 +563,6 @@ int xv_init( int outputheight, int aspect, int verbose )
     if( !xv_check_extension() ) return 0;
 
     calculate_video_area();
-    saver_off( display );
     return 1;
 }
 
@@ -567,6 +628,7 @@ int xv_toggle_aspect( void )
 int xv_show_frame( int x, int y, int width, int height )
 {
     XLockDisplay( display );
+    ping_screensaver();
     XvShmPutImage( display, xv_port, window, gc, image,
                    x, y, width, height,
                    video_area.x, video_area.y,
@@ -752,7 +814,6 @@ void xv_poll_events( input_t *in )
 
 void xv_quit( void )
 {
-    saver_on( display );
     XShmDetach( display, &shminfo );
     shmdt( shminfo.shmaddr );
     XDestroyWindow( display, window );
