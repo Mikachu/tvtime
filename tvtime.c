@@ -308,36 +308,17 @@ int main( int argc, char **argv )
         }
         if( commands & TVTIME_DIGIT ) {
             int digit = 0;
-            if( commands & TVTIME_KP0 ) {
-                digit = 0;
-            }
-            if( commands & TVTIME_KP1 ) {
-                digit = 1;
-            }
-            if( commands & TVTIME_KP2 ) {
-                digit = 2;
-            }
-            if( commands & TVTIME_KP3 ) {
-                digit = 3;
-            }
-            if( commands & TVTIME_KP4 ) {
-                digit = 4;
-            }
-            if( commands & TVTIME_KP5 ) {
-                digit = 5;
-            }
-            if( commands & TVTIME_KP6 ) {
-                digit = 6;
-            }
-            if( commands & TVTIME_KP7 ) {
-                digit = 7;
-            }
-            if( commands & TVTIME_KP8 ) {
-                digit = 8;
-            }
-            if( commands & TVTIME_KP9 ) {
-                digit = 9;
-            }
+
+            if( commands & TVTIME_KP0 ) { digit = 0; }
+            if( commands & TVTIME_KP1 ) { digit = 1; }
+            if( commands & TVTIME_KP2 ) { digit = 2; }
+            if( commands & TVTIME_KP3 ) { digit = 3; }
+            if( commands & TVTIME_KP4 ) { digit = 4; }
+            if( commands & TVTIME_KP5 ) { digit = 5; }
+            if( commands & TVTIME_KP6 ) { digit = 6; }
+            if( commands & TVTIME_KP7 ) { digit = 7; }
+            if( commands & TVTIME_KP8 ) { digit = 8; }
+            if( commands & TVTIME_KP9 ) { digit = 9; }
 
             if( (long)time(NULL) - last_chan_time > 500 ) {
                 if( digit == 0 ) {
@@ -347,7 +328,7 @@ int main( int argc, char **argv )
                     last_chan_time = time(NULL);
                     chanindex = digit - 1;
 
-                    videoinput_set_tuner_freq( chanlist[ chanindex ].freq);
+                    videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
 
                     fprintf( stderr, "tvtime: Changing to channel %s\n",
                              chanlist[ chanindex ].name );
@@ -361,7 +342,7 @@ int main( int argc, char **argv )
                     chanindex = (chanindex+1)*10 + digit - 1;
                 }
 
-                videoinput_set_tuner_freq( chanlist[ chanindex ].freq);
+                videoinput_set_tuner_freq( chanlist[ chanindex ].freq );
 
                 fprintf( stderr, "tvtime: Changing to channel %s\n", 
                          chanlist[ chanindex ].name );                    
