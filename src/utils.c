@@ -615,7 +615,8 @@ int tvtime_command_takes_arguments( int command )
             command == TVTIME_RUN_COMMAND || command == TVTIME_SET_FULLSCREEN_POSITION ||
             command == TVTIME_MIXER_UP || command == TVTIME_MIXER_DOWN ||
             command == TVTIME_SET_AUDIO_BOOST || command == TVTIME_SET_STATION ||
-            command == TVTIME_SET_XMLTV_LANGUAGE || command == TVTIME_SET_INPUT);
+            command == TVTIME_SET_XMLTV_LANGUAGE || command == TVTIME_SET_INPUT ||
+            command == TVTIME_SET_NORM);
 }
 
 #ifdef ENABLE_NLS
