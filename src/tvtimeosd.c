@@ -55,6 +55,7 @@ struct tvtime_osd_s
     char channel_number_text[ 20 ];
     char tv_norm_text[ 20 ];
     char input_text[ 128 ];
+    char freqtable_text[ 128 ];
     char deinterlace_text[ 128 ];
     char timeformat[ 128 ];
 
@@ -80,6 +81,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect )
 
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
+    memset( osd->freqtable_text, 0, sizeof( osd->freqtable_text ) );
     memset( osd->input_text, 0, sizeof( osd->input_text ) );
     memset( osd->deinterlace_text, 0, sizeof( osd->deinterlace_text ) );
     memset( osd->timeformat, 0, sizeof( osd->timeformat ) );
@@ -161,6 +163,11 @@ void tvtime_osd_set_input( tvtime_osd_t *osd, const char *norm )
     snprintf( osd->input_text, sizeof( osd->input_text ) - 1, norm );
 }
 
+void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
+{
+    snprintf( osd->freqtable_text, sizeof( osd->freqtable_text ) - 1, freqtable );
+}
+
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *norm )
 {
     snprintf( osd->channel_number_text, sizeof( osd->channel_number_text ) - 1, norm );
@@ -185,7 +192,8 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     strftime( timestamp, 50, osd->timeformat, localtime( &tm ) );
     osd_string_show_text( osd->channel_number, osd->channel_number_text, 80 );
     osd_string_show_text( osd->channel_info, timestamp, 80 );
-    sprintf( text, "[%s] %s - %s", osd->tv_norm_text, osd->input_text, osd->deinterlace_text );
+    sprintf( text, "[%s, %s] %s - %s", osd->tv_norm_text, osd->freqtable_text,
+             osd->input_text, osd->deinterlace_text );
     osd_string_show_text( osd->data_bar, text, 80 );
     osd_graphic_show_graphic( osd->channel_logo, 80 );
     osd_string_set_timeout( osd->volume_bar, 0 );

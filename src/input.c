@@ -53,8 +53,36 @@ struct input_s {
     menu_t *menu;
 };
 
+/**
+ * Tuner settings.
+ */
+#define NTSC_CABLE_MODE_NOMINAL 0
+#define NTSC_CABLE_MODE_IRC     1
+#define NTSC_CABLE_MODE_HRC     2
 static int cur_channel = 0;
 static int cur_freq_table = 1;
+static int ntsc_cable_mode = NTSC_CABLE_MODE_NOMINAL;
+static int finetune_amount = 0;
+static void toggle_ntsc_cable_mode( void ) { ntsc_cable_mode = ( ntsc_cable_mode + 1 ) % 3; }
+
+static int get_current_frequency( void )
+{
+    int base = tvtuner[ cur_channel ].freq[ cur_freq_table ];
+
+    if( !base ) {
+        return 0;
+    }
+
+    if( cur_freq_table == NTSC_CABLE ) {
+        if( ntsc_cable_mode == NTSC_CABLE_MODE_IRC ) {
+            base = NTSC_CABLE_IRC( base );
+        } else if( ntsc_cable_mode == NTSC_CABLE_MODE_HRC ) {
+            base = NTSC_CABLE_HRC( base );
+        }
+    }
+
+    return base + finetune_amount;
+}
 
 static int frequencies_find_current_index( videoinput_t *vidin )
 {
@@ -129,8 +157,7 @@ static void reinit_tuner( input_t *in )
         if( !frequencies_find_current_index( in->vidin ) ) {
             /* set to a known frequency */
             frequencies_choose_first_frequency();
-            videoinput_set_tuner_freq( in->vidin, tvtuner[ cur_channel ].freq[ cur_freq_table ] +
-                                       config_get_finetune( in->cfg ) );
+            videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
         }
 
         if( config_get_verbose( in->cfg ) ) {
@@ -182,7 +209,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
      */
     chanlist_name = config_get_v4l_freq( in->cfg );
     if( !strcasecmp( "us-bcast", chanlist_name ) ) {
-        cur_freq_table = NTSC_BROADCAST;
+        cur_freq_table = NTSC_BCAST;
     } else if( !strcasecmp( "japan-bcast", chanlist_name ) ) {
         cur_freq_table = NTSC_JP_BCAST;
     } else if( !strcasecmp( "japan-cable", chanlist_name ) ) {
@@ -192,7 +219,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     } else if( !strcasecmp( "italy", chanlist_name ) ) {
         cur_freq_table = PAL_ITALY;
     } else if( !strcasecmp( "newzealand", chanlist_name ) ) {
-        cur_freq_table = PAL_NEWZEALAND;
+        cur_freq_table = PAL_NZ_CABLE;
     } else if( !strcasecmp( "australia", chanlist_name ) ) {
         cur_freq_table = PAL_AUSTRALIA;
     } else if( !strcasecmp( "ireland", chanlist_name ) ) {
@@ -204,6 +231,7 @@ input_t *input_new( config_t *cfg, videoinput_t *vidin,
     } else {
         cur_freq_table = NTSC_CABLE;
     }
+    finetune_amount = config_get_finetune( in->cfg );
 
     reinit_tuner( in );
 
@@ -235,8 +263,7 @@ static void input_channel_change_relative( input_t *in, int offset )
             if( tvtuner[ cur_channel ].freq[ cur_freq_table ] ) break;
         }
 
-        videoinput_set_tuner_freq( in->vidin, tvtuner[ cur_channel ].freq[ cur_freq_table ] +
-                                   config_get_finetune( in->cfg ) );
+        videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
 
         if( verbose ) {
             fprintf( stderr, "tvtime: Changing to channel %s\n", 
@@ -373,15 +400,29 @@ void input_callback( input_t *in, InputEvent command, int arg )
             }
             break;
 
+        case TVTIME_FREQLIST_DOWN:
+        case TVTIME_FREQLIST_UP:
+            if( videoinput_has_tuner( in->vidin ) ) {
+                cur_freq_table = ( cur_freq_table + 1 ) % NUM_FREQ_TABLES;
+                reinit_tuner( in );
+                tvtime_osd_set_freq_table( in->osd, freq_table_info[ cur_freq_table ].name );
+            }
+            break;
+
+        case TVTIME_TOGGLE_NTSC_CABLE_MODE:
+            if( videoinput_has_tuner( in->vidin ) ) {
+                toggle_ntsc_cable_mode();
+                reinit_tuner( in );
+            }
+            break;
+
         case TVTIME_FINETUNE_DOWN:
         case TVTIME_FINETUNE_UP:
             if( !videoinput_has_tuner( in->vidin ) && verbose ) {
                 fprintf( stderr, "tvtime: Can't fine tune channel, "
                          "no tuner available on this input!\n" );
             } else if( videoinput_has_tuner( in->vidin ) ) {
-                videoinput_set_tuner_freq( in->vidin, 
-                                           videoinput_get_tuner_freq( in->vidin ) +
-                                           config_get_finetune( in->cfg ) +
+                videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
                                            ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
                 if( in->osd ) {
@@ -483,9 +524,7 @@ void input_callback( input_t *in, InputEvent command, int arg )
                             if( tvtuner[ cur_channel ].freq[ cur_freq_table ] ) break;
                             cur_channel = (cur_channel + 1 + CHAN_ENTRIES) % CHAN_ENTRIES;
                         }
-                        videoinput_set_tuner_freq( in->vidin, 
-                            tvtuner[ cur_channel ].freq[ cur_freq_table ] +
-                            config_get_finetune( in->cfg ) );
+                        videoinput_set_tuner_freq( in->vidin, get_current_frequency() );
 
                         if( verbose ) {
                             fprintf( stderr, "tvtime: Changing to channel %s\n", 

@@ -60,6 +60,9 @@ static Cmd_Names cmd_table[] = {
     { "FINETUNE_DOWN", TVTIME_FINETUNE_DOWN },
     { "FINETUNE_UP", TVTIME_FINETUNE_UP },
 
+    { "FREQLIST_DOWN", TVTIME_FREQLIST_DOWN },
+    { "FREQLIST_UP", TVTIME_FREQLIST_UP },
+
     { "SHOW_BARS", TVTIME_SHOW_BARS },
     { "DEBUG", TVTIME_DEBUG },
 
@@ -70,7 +73,9 @@ static Cmd_Names cmd_table[] = {
 
     { "MENUMODE", TVTIME_MENUMODE },
     { "DISPLAY_INFO", TVTIME_DISPLAY_INFO },
-    { "SHOW_CREDITS", TVTIME_SHOW_CREDITS }
+    { "SHOW_CREDITS", TVTIME_SHOW_CREDITS },
+
+    { "TOGGLE_NTSC_CABLE_MODE", TVTIME_TOGGLE_NTSC_CABLE_MODE }
 };
 
 
@@ -202,7 +207,6 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ '+' ] = TVTIME_MIXER_UP;
     ct->keymap[ '-' ] = TVTIME_MIXER_DOWN;
     ct->keymap[ I_ENTER ] = TVTIME_ENTER;
-    ct->keymap[ I_F9 ] = TVTIME_TV_VIDEO;
     ct->keymap[ I_F1 ] = TVTIME_HUE_DOWN;
     ct->keymap[ I_F2 ] = TVTIME_HUE_UP;
     ct->keymap[ I_F3 ] = TVTIME_BRIGHT_DOWN;
@@ -211,10 +215,12 @@ config_t *config_new( int argc, char **argv )
     ct->keymap[ I_F6 ] = TVTIME_CONT_UP;
     ct->keymap[ I_F7 ] = TVTIME_COLOUR_DOWN;
     ct->keymap[ I_F8 ] = TVTIME_COLOUR_UP;
+    ct->keymap[ I_F9 ] = TVTIME_TV_VIDEO;
+    ct->keymap[ I_F10 ] = TVTIME_TOGGLE_NTSC_CABLE_MODE;
     ct->keymap[ I_F11 ] = TVTIME_SHOW_BARS;
     ct->keymap[ I_F12 ] = TVTIME_SHOW_CREDITS;
     ct->keymap[ 'd' ] = TVTIME_DEBUG;
-    ct->keymap[ 'f' ] = TVTIME_FULLSCREEN;
+    ct->keymap[ 'f' ] = TVTIME_FREQLIST_UP;
     ct->keymap[ 'a' ] = TVTIME_ASPECT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;
     ct->keymap[ 't' ] = TVTIME_DEINTERLACINGMODE;

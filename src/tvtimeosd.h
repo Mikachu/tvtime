@@ -51,18 +51,19 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double frameaspect );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 
 void tvtime_osd_show_info( tvtime_osd_t *osd );
+
 void tvtime_osd_set_norm( tvtime_osd_t *osd, const char *norm );
+void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable );
 void tvtime_osd_set_input( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text );
 void tvtime_osd_set_deinterlace_method( tvtime_osd_t *osd, const char *method );
+void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 
 void tvtime_osd_set_timeformat( tvtime_osd_t *osd, const char *format );
 
 void tvtime_osd_toggle_show_credits( tvtime_osd_t *osd );
 
-
 void tvtime_osd_show_volume_bar( tvtime_osd_t *osd, int percentage );
-void tvtime_osd_volume_muted( tvtime_osd_t *osd, int mutestate );
 
 int tvtime_osd_data_bar_visible( tvtime_osd_t *osd );
 void tvtime_osd_show_data_bar( tvtime_osd_t *osd, const char *barname,
