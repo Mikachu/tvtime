@@ -154,41 +154,41 @@ int tvtime_is_menu_command( int command );
 commands_t *commands_new( config_t *cfg, videoinput_t *vidin, 
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime );
-void commands_delete( commands_t *in );
+void commands_delete( commands_t *cmd );
 
-void commands_handle( commands_t *in, int command, const char *arg );
+void commands_handle( commands_t *cmd, int command, const char *arg );
 
-void commands_add_menu( commands_t *in, menu_t *menu );
+void commands_add_menu( commands_t *cmd, menu_t *menu );
 
-int commands_quit( commands_t *in );
-int commands_take_screenshot( commands_t *in );
-int commands_print_debug( commands_t *in );
-int commands_show_bars( commands_t *in );
-int commands_toggle_fullscreen( commands_t *in );
-int commands_toggle_aspect( commands_t *in );
-int commands_toggle_deinterlacer( commands_t *in );
-int commands_toggle_pulldown_detection( commands_t *in );
-int commands_toggle_mode( commands_t *in );
-int commands_toggle_matte( commands_t *in );
-int commands_toggle_alwaysontop( commands_t *in );
-int commands_apply_luma_correction( commands_t *in );
-int commands_resize_window( commands_t *in );
-int commands_update_luma_power( commands_t *in );
-double commands_get_luma_power( commands_t *in );
-double commands_get_overscan( commands_t *in );
-double commands_get_overscan( commands_t *in );
-int commands_get_framerate( commands_t *in );
-void commands_set_framerate( commands_t *in, int framerate );
-int commands_scan_channels( commands_t *in );
-void commands_set_console( commands_t *in, console_t *con );
-void commands_set_vbidata( commands_t *in, vbidata_t *con );
-int commands_show_deinterlacer_info( commands_t *in );
-int commands_in_menu( commands_t *in );
+int commands_quit( commands_t *cmd );
+int commands_take_screenshot( commands_t *cmd );
+int commands_print_debug( commands_t *cmd );
+int commands_show_bars( commands_t *cmd );
+int commands_toggle_fullscreen( commands_t *cmd );
+int commands_toggle_aspect( commands_t *cmd );
+int commands_toggle_deinterlacer( commands_t *cmd );
+int commands_toggle_pulldown_detection( commands_t *cmd );
+int commands_toggle_mode( commands_t *cmd );
+int commands_toggle_matte( commands_t *cmd );
+int commands_toggle_alwaysontop( commands_t *cmd );
+int commands_apply_luma_correction( commands_t *cmd );
+int commands_resize_window( commands_t *cmd );
+int commands_update_luma_power( commands_t *cmd );
+double commands_get_luma_power( commands_t *cmd );
+double commands_get_overscan( commands_t *cmd );
+double commands_get_overscan( commands_t *cmd );
+int commands_get_framerate( commands_t *cmd );
+void commands_set_framerate( commands_t *cmd, int framerate );
+int commands_scan_channels( commands_t *cmd );
+void commands_set_console( commands_t *cmd, console_t *con );
+void commands_set_vbidata( commands_t *cmd, vbidata_t *con );
+int commands_show_deinterlacer_info( commands_t *cmd );
+int commands_in_menu( commands_t *cmd );
 
-int commands_console_on( commands_t *in );
+int commands_console_on( commands_t *cmd );
 
-void commands_next_frame( commands_t *in );
-int commands_pause( commands_t *in );
+void commands_next_frame( commands_t *cmd );
+int commands_pause( commands_t *cmd );
 
 #ifdef __cplusplus
 };

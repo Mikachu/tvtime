@@ -285,59 +285,59 @@ struct commands_s {
     menu_t *root_notuner;
 };
 
-static void reinit_tuner( commands_t *in )
+static void reinit_tuner( commands_t *cmd )
 {
     /* Setup the tuner if available. */
-    if( in->vbi ) {
-        vbidata_reset( in->vbi );
-        vbidata_capture_mode( in->vbi, in->capturemode );
+    if( cmd->vbi ) {
+        vbidata_reset( cmd->vbi );
+        vbidata_capture_mode( cmd->vbi, cmd->capturemode );
     }
 
     set_redirect( "root", "root-notuner" );
 
-    if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+    if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
         int norm;
 
         set_redirect( "root", "root-tuner" );
 
-        videoinput_set_tuner_freq( in->vidin, station_get_current_frequency( in->stationmgr ) );
+        videoinput_set_tuner_freq( cmd->vidin, station_get_current_frequency( cmd->stationmgr ) );
 
-        norm = videoinput_get_norm_number( station_get_current_norm( in->stationmgr ) );
+        norm = videoinput_get_norm_number( station_get_current_norm( cmd->stationmgr ) );
         if( norm >= 0 ) {
-            videoinput_switch_to_compatible_norm( in->vidin, norm );
+            videoinput_switch_to_compatible_norm( cmd->vidin, norm );
         }
 
-        if( in->osd ) {
+        if( cmd->osd ) {
             char channel_display[ 20 ];
             snprintf( channel_display, sizeof( channel_display ), "%d",
-                      station_get_current_id( in->stationmgr ) );
-            tvtime_osd_set_norm( in->osd, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
-            tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
-            tvtime_osd_set_freq_table( in->osd, station_get_current_band( in->stationmgr ) );
-            tvtime_osd_set_channel_number( in->osd, channel_display );
-            tvtime_osd_set_channel_name( in->osd, station_get_current_channel_name( in->stationmgr ) );
-            tvtime_osd_set_network_call( in->osd, station_get_current_network_call_letters( in->stationmgr ) );
-            tvtime_osd_set_network_name( in->osd, station_get_current_network_name( in->stationmgr ) );
-            tvtime_osd_set_show_name( in->osd, "" );
-            tvtime_osd_set_show_rating( in->osd, "" );
-            tvtime_osd_set_show_start( in->osd, "" );
-            tvtime_osd_set_show_length( in->osd, "" );
-            tvtime_osd_show_info( in->osd );
+                      station_get_current_id( cmd->stationmgr ) );
+            tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
+            tvtime_osd_set_freq_table( cmd->osd, station_get_current_band( cmd->stationmgr ) );
+            tvtime_osd_set_channel_number( cmd->osd, channel_display );
+            tvtime_osd_set_channel_name( cmd->osd, station_get_current_channel_name( cmd->stationmgr ) );
+            tvtime_osd_set_network_call( cmd->osd, station_get_current_network_call_letters( cmd->stationmgr ) );
+            tvtime_osd_set_network_name( cmd->osd, station_get_current_network_name( cmd->stationmgr ) );
+            tvtime_osd_set_show_name( cmd->osd, "" );
+            tvtime_osd_set_show_rating( cmd->osd, "" );
+            tvtime_osd_set_show_start( cmd->osd, "" );
+            tvtime_osd_set_show_length( cmd->osd, "" );
+            tvtime_osd_show_info( cmd->osd );
         }
-        in->frame_counter = 0;
+        cmd->frame_counter = 0;
 
-    } else if( in->osd ) {
-        tvtime_osd_set_audio_mode( in->osd, "" );
-        tvtime_osd_set_freq_table( in->osd, "" );
-        tvtime_osd_set_channel_number( in->osd, "" );
-        tvtime_osd_set_channel_name( in->osd, "" );
-        tvtime_osd_set_network_call( in->osd, "" );
-        tvtime_osd_set_network_name( in->osd, "" );
-        tvtime_osd_set_show_name( in->osd, "" );
-        tvtime_osd_set_show_rating( in->osd, "" );
-        tvtime_osd_set_show_start( in->osd, "" );
-        tvtime_osd_set_show_length( in->osd, "" );
-        tvtime_osd_show_info( in->osd );
+    } else if( cmd->osd ) {
+        tvtime_osd_set_audio_mode( cmd->osd, "" );
+        tvtime_osd_set_freq_table( cmd->osd, "" );
+        tvtime_osd_set_channel_number( cmd->osd, "" );
+        tvtime_osd_set_channel_name( cmd->osd, "" );
+        tvtime_osd_set_network_call( cmd->osd, "" );
+        tvtime_osd_set_network_name( cmd->osd, "" );
+        tvtime_osd_set_show_name( cmd->osd, "" );
+        tvtime_osd_set_show_rating( cmd->osd, "" );
+        tvtime_osd_set_show_start( cmd->osd, "" );
+        tvtime_osd_set_show_length( cmd->osd, "" );
+        tvtime_osd_show_info( cmd->osd );
     }
 }
 
@@ -345,75 +345,75 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
                           station_mgr_t *mgr, tvtime_osd_t *osd,
                           int fieldtime )
 {
-    commands_t *in = malloc( sizeof( struct commands_s ) );
+    commands_t *cmd = malloc( sizeof( struct commands_s ) );
     menu_t *menu;
 
-    if( !in ) {
+    if( !cmd ) {
         return 0;
     }
 
     /* Number of frames to wait for next channel digit. */
-    in->delay = 1000000 / fieldtime;
+    cmd->delay = 1000000 / fieldtime;
 
-    in->cfg = cfg;
-    in->vidin = vidin;
-    in->osd = osd;
-    in->stationmgr = mgr;
-    in->frame_counter = 0;
-    in->digit_counter = 0;
+    cmd->cfg = cfg;
+    cmd->vidin = vidin;
+    cmd->osd = osd;
+    cmd->stationmgr = mgr;
+    cmd->frame_counter = 0;
+    cmd->digit_counter = 0;
 
-    in->displayinfo = 0;
+    cmd->displayinfo = 0;
 
-    in->quit = 0;
-    in->showbars = 0;
-    in->showdeinterlacerinfo = 0;
-    in->printdebug = 0;
-    in->screenshot = 0;
-    in->togglefullscreen = 0;
-    in->toggleaspect = 0;
-    in->togglealwaysontop = 0;
-    in->toggledeinterlacer = 0;
-    in->togglepulldowndetection = 0;
-    in->togglemode = 0;
-    in->togglematte = 0;
-    in->framerate = FRAMERATE_FULL;
-    in->console_on = 0;
-    in->scrollconsole = 0;
-    in->scan_channels = 0;
-    in->pause = 0;
-    in->change_channel = 0;
-    in->renumbering = 0;
-    in->resizewindow = 0;
+    cmd->quit = 0;
+    cmd->showbars = 0;
+    cmd->showdeinterlacerinfo = 0;
+    cmd->printdebug = 0;
+    cmd->screenshot = 0;
+    cmd->togglefullscreen = 0;
+    cmd->toggleaspect = 0;
+    cmd->togglealwaysontop = 0;
+    cmd->toggledeinterlacer = 0;
+    cmd->togglepulldowndetection = 0;
+    cmd->togglemode = 0;
+    cmd->togglematte = 0;
+    cmd->framerate = FRAMERATE_FULL;
+    cmd->console_on = 0;
+    cmd->scrollconsole = 0;
+    cmd->scan_channels = 0;
+    cmd->pause = 0;
+    cmd->change_channel = 0;
+    cmd->renumbering = 0;
+    cmd->resizewindow = 0;
 
-    in->apply_luma = config_get_apply_luma_correction( cfg );
-    in->update_luma = 0;
-    in->luma_power = config_get_luma_correction( cfg );
+    cmd->apply_luma = config_get_apply_luma_correction( cfg );
+    cmd->update_luma = 0;
+    cmd->luma_power = config_get_luma_correction( cfg );
 
-    if( vidin && !videoinput_is_bttv( vidin ) && in->apply_luma ) {
-        in->apply_luma = 0;
+    if( vidin && !videoinput_is_bttv( vidin ) && cmd->apply_luma ) {
+        cmd->apply_luma = 0;
         fprintf( stderr, "commands: Input isn't from a bt8x8, disabling luma correction.\n" );
     }
 
-    if( in->luma_power < 0.0 || in->luma_power > 10.0 ) {
+    if( cmd->luma_power < 0.0 || cmd->luma_power > 10.0 ) {
         fprintf( stderr, "commands: Luma correction value out of range. Using 1.0.\n" );
-        in->luma_power = 1.0;
+        cmd->luma_power = 1.0;
     }
 
-    in->overscan = config_get_overscan( cfg );
-    if( in->overscan > 0.4 ) in->overscan = 0.4; if( in->overscan < 0.0 ) in->overscan = 0.0;
+    cmd->overscan = config_get_overscan( cfg );
+    if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
 
-    in->console = 0;
-    in->vbi = 0;
-    in->capturemode = CAPTURE_OFF;
+    cmd->console = 0;
+    cmd->vbi = 0;
+    cmd->capturemode = CAPTURE_OFF;
 
-    in->numfavorites = 0;
-    in->curfavorite = 0;
+    cmd->numfavorites = 0;
+    cmd->curfavorite = 0;
 
-    in->menuactive = 0;
-    in->curmenu = MENU_FAVORITES;
-    in->curmenupos = 0;
-    in->curusermenu = 0;
-    memset( in->menus, 0, sizeof( in->menus ) );
+    cmd->menuactive = 0;
+    cmd->curmenu = MENU_FAVORITES;
+    cmd->curmenupos = 0;
+    cmd->curusermenu = 0;
+    memset( cmd->menus, 0, sizeof( cmd->menus ) );
 
     menu = menu_new( "root-tuner" );
     menu_set_text( menu, 0, "Setup" );
@@ -427,7 +427,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, 5, "Exit" );
     menu_set_command( menu, 5, TVTIME_MENU_EXIT, 0 );
-    commands_add_menu( in, menu );
+    commands_add_menu( cmd, menu );
 
     menu = menu_new( "root-notuner" );
     menu_set_text( menu, 0, "Setup" );
@@ -439,7 +439,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "processing" );
     menu_set_text( menu, 4, "Exit" );
     menu_set_command( menu, 4, TVTIME_MENU_EXIT, 0 );
-    commands_add_menu( in, menu );
+    commands_add_menu( cmd, menu );
 
     menu = menu_new( "stations" );
     menu_set_text( menu, 0, "Setup - Station management" );
@@ -452,7 +452,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 4, "Scan channels for frequency" );
     menu_set_text( menu, 4, "Back" );
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( in, menu );
+    commands_add_menu( cmd, menu );
 
     menu = menu_new( "input" );
     menu_set_text( menu, 0, "Setup - Input configuration" );
@@ -462,7 +462,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 2, TVTIME_SHOW_MENU, "dataservices" );
     menu_set_text( menu, 3, "Back" );
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( in, menu );
+    commands_add_menu( cmd, menu );
 
     menu = menu_new( "processing" );
     menu_set_text( menu, 0, "Setup - Video processing" );
@@ -474,36 +474,36 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_command( menu, 3, TVTIME_SHOW_MENU, "filters" );
     menu_set_text( menu, 4, "Back" );
     menu_set_command( menu, 4, TVTIME_SHOW_MENU, "root" );
-    commands_add_menu( in, menu );
+    commands_add_menu( cmd, menu );
 
-    reinit_tuner( in );
+    reinit_tuner( cmd );
 
-    return in;
+    return cmd;
 }
 
-void commands_delete( commands_t *in )
+void commands_delete( commands_t *cmd )
 {
     int i;
 
     for( i = 0; i < MAX_USER_MENUS; i++ ) {
-        if( in->menus[ i ] ) {
-            menu_delete( in->menus[ i ] );
+        if( cmd->menus[ i ] ) {
+            menu_delete( cmd->menus[ i ] );
         }
     }
-    free( in );
+    free( cmd );
 }
 
-static void add_to_favorites( commands_t *in, int pos )
+static void add_to_favorites( commands_t *cmd, int pos )
 {
     int i;
 
     for( i = 0; i < NUM_FAVORITES; i++ ) {
-        if( in->favorites[ i ] == pos ) return;
+        if( cmd->favorites[ i ] == pos ) return;
     }
-    in->favorites[ in->curfavorite ] = pos;
-    in->curfavorite = (in->curfavorite + 1) % NUM_FAVORITES;
-    if( in->numfavorites < NUM_FAVORITES ) {
-        in->numfavorites++;
+    cmd->favorites[ cmd->curfavorite ] = pos;
+    cmd->curfavorite = (cmd->curfavorite + 1) % NUM_FAVORITES;
+    if( cmd->numfavorites < NUM_FAVORITES ) {
+        cmd->numfavorites++;
     }
 }
 
@@ -532,65 +532,65 @@ static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
  * Hardcoded menus.
  */
 
-static void menu_off( commands_t *in )
+static void menu_off( commands_t *cmd )
 {
-    tvtime_osd_list_hold( in->osd, 0 );
-    tvtime_osd_show_list( in->osd, 0 );
-    in->menuactive = 0;
+    tvtime_osd_list_hold( cmd->osd, 0 );
+    tvtime_osd_show_list( cmd->osd, 0 );
+    cmd->menuactive = 0;
 }
 
-static void menu_enter( commands_t *in )
+static void menu_enter( commands_t *cmd )
 {
-    if( in->curmenu == MENU_FAVORITES ) {
-        if( in->curmenupos == in->numfavorites ) {
-            add_to_favorites( in, station_get_current_id( in->stationmgr ) );
+    if( cmd->curmenu == MENU_FAVORITES ) {
+        if( cmd->curmenupos == cmd->numfavorites ) {
+            add_to_favorites( cmd, station_get_current_id( cmd->stationmgr ) );
         } else {
-            if( in->curmenupos < in->numfavorites ) {
-                station_set( in->stationmgr, in->favorites[ in->curmenupos ] );
-                in->change_channel = 1;
+            if( cmd->curmenupos < cmd->numfavorites ) {
+                station_set( cmd->stationmgr, cmd->favorites[ cmd->curmenupos ] );
+                cmd->change_channel = 1;
             }
         }
-        menu_off( in );
-    } else if( in->curmenu == MENU_USER ) {
-        int command = menu_get_command( in->curusermenu, in->curmenupos + 1 );
-        const char *argument = menu_get_argument( in->curusermenu, in->curmenupos + 1 );
+        menu_off( cmd );
+    } else if( cmd->curmenu == MENU_USER ) {
+        int command = menu_get_command( cmd->curusermenu, cmd->curmenupos + 1 );
+        const char *argument = menu_get_argument( cmd->curusermenu, cmd->curmenupos + 1 );
 
         /* I check for MENU_ENTER just to avoid a malicious infinite loop. */
         if( command != TVTIME_MENU_ENTER ) {
-            commands_handle( in, command, argument );
+            commands_handle( cmd, command, argument );
         }
     }
 }
 
-static void display_current_menu( commands_t *in )
+static void display_current_menu( commands_t *cmd )
 {
     int i;
 
-    if( in->curmenu == MENU_FAVORITES ) {
-        tvtime_osd_list_set_lines( in->osd, in->numfavorites + 3 );
-        tvtime_osd_list_set_text( in->osd, 0, "Favorites" );
-        for( i = 0; i < in->numfavorites; i++ ) {
+    if( cmd->curmenu == MENU_FAVORITES ) {
+        tvtime_osd_list_set_lines( cmd->osd, cmd->numfavorites + 3 );
+        tvtime_osd_list_set_text( cmd->osd, 0, "Favorites" );
+        for( i = 0; i < cmd->numfavorites; i++ ) {
             char text[ 32 ];
-            sprintf( text, "%d", in->favorites[ i ] );
-            tvtime_osd_list_set_text( in->osd, i + 1, text );
+            sprintf( text, "%d", cmd->favorites[ i ] );
+            tvtime_osd_list_set_text( cmd->osd, i + 1, text );
         }
-        tvtime_osd_list_set_text( in->osd, in->numfavorites + 1, "Add current station" );
-        tvtime_osd_list_set_text( in->osd, in->numfavorites + 2, "Exit" );
-        in->curmenusize = in->numfavorites + 2;
-    } else if( in->curmenu == MENU_USER && in->curusermenu ) {
-        tvtime_osd_list_set_lines( in->osd, menu_get_num_lines( in->curusermenu ) );
-        for( i = 0; i < menu_get_num_lines( in->curusermenu ); i++ ) {
-            tvtime_osd_list_set_text( in->osd, i, menu_get_text( in->curusermenu, i ) );
+        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 1, "Add current station" );
+        tvtime_osd_list_set_text( cmd->osd, cmd->numfavorites + 2, "Exit" );
+        cmd->curmenusize = cmd->numfavorites + 2;
+    } else if( cmd->curmenu == MENU_USER && cmd->curusermenu ) {
+        tvtime_osd_list_set_lines( cmd->osd, menu_get_num_lines( cmd->curusermenu ) );
+        for( i = 0; i < menu_get_num_lines( cmd->curusermenu ); i++ ) {
+            tvtime_osd_list_set_text( cmd->osd, i, menu_get_text( cmd->curusermenu, i ) );
         }
-        in->curmenusize = menu_get_num_lines( in->curusermenu ) - 1;
+        cmd->curmenusize = menu_get_num_lines( cmd->curusermenu ) - 1;
     }
 
-    tvtime_osd_list_set_hilight( in->osd, in->curmenupos + 1 );
-    tvtime_osd_list_hold( in->osd, 1 );
-    tvtime_osd_show_list( in->osd, 1 );
+    tvtime_osd_list_set_hilight( cmd->osd, cmd->curmenupos + 1 );
+    tvtime_osd_list_hold( cmd->osd, 1 );
+    tvtime_osd_show_list( cmd->osd, 1 );
 }
 
-static int set_menu( commands_t *in, const char *menuname )
+static int set_menu( commands_t *cmd, const char *menuname )
 {
     int i;
 
@@ -598,105 +598,105 @@ static int set_menu( commands_t *in, const char *menuname )
         return 0;
     }
 
-    in->menuactive = 1;
-    in->curusermenu = 0;
+    cmd->menuactive = 1;
+    cmd->curusermenu = 0;
 
     for( i = 0; i < tvtime_num_builtin_menus(); i++ ) {
         if( !strcasecmp( menu_table[ i ].name, menuname ) ) {
             if( menu_table[ i ].menutype == MENU_REDIRECT ) {
-                return set_menu( in, menu_table[ i ].dest );
+                return set_menu( cmd, menu_table[ i ].dest );
             } else {
-                in->curmenu = menu_table[ i ].menutype;
-                in->curmenupos = 0;
+                cmd->curmenu = menu_table[ i ].menutype;
+                cmd->curmenupos = 0;
                 return 1;
             }
         }
     }
 
-    in->curmenu = MENU_USER;
-    in->curusermenu = 0;
+    cmd->curmenu = MENU_USER;
+    cmd->curusermenu = 0;
 
     if( menuname && *menuname ) {
         for( i = 0; i < MAX_USER_MENUS; i++ ) {
-            if( !in->menus[ i ] ) {
+            if( !cmd->menus[ i ] ) {
                 break;
             }
 
-            if( !strcasecmp( menuname, menu_get_name( in->menus[ i ] ) ) ) {
-                in->curusermenu = in->menus[ i ];
+            if( !strcasecmp( menuname, menu_get_name( cmd->menus[ i ] ) ) ) {
+                cmd->curusermenu = cmd->menus[ i ];
                 break;
             }
         }
     }
 
-    if( in->curusermenu ) {
-        in->curmenupos = menu_get_cursor( in->curusermenu );
-        in->curmenusize = menu_get_num_lines( in->curusermenu ) - 1;
+    if( cmd->curusermenu ) {
+        cmd->curmenupos = menu_get_cursor( cmd->curusermenu );
+        cmd->curmenusize = menu_get_num_lines( cmd->curusermenu ) - 1;
         return 1;
     }
 
-    in->menuactive = 0;
+    cmd->menuactive = 0;
     return 0;
 }
 
-void commands_add_menu( commands_t *in, menu_t *menu )
+void commands_add_menu( commands_t *cmd, menu_t *menu )
 {
     int i;
 
     for( i = 0; i < MAX_USER_MENUS; i++ ) {
-        if( !in->menus[ i ] ) {
-            in->menus[ i ] = menu;
+        if( !cmd->menus[ i ] ) {
+            cmd->menus[ i ] = menu;
             return;
         }
     }
 }
 
-int commands_in_menu( commands_t *in )
+int commands_in_menu( commands_t *cmd )
 {
-    return in->menuactive;
+    return cmd->menuactive;
 }
 
-void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
+void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 {
     int volume;
 
-    if( in->menuactive && !tvtime_is_menu_command( tvtime_cmd ) ) {
-        menu_off( in );
+    if( cmd->menuactive && !tvtime_is_menu_command( tvtime_cmd ) ) {
+        menu_off( cmd );
     }
 
-    if( in->menuactive ) {
+    if( cmd->menuactive ) {
         int x, y, line;
         switch( tvtime_cmd ) {
         case TVTIME_MENU_EXIT:
-            menu_off( in );
+            menu_off( cmd );
             break;
         case TVTIME_MENU_UP:
-            in->curmenupos = (in->curmenupos + in->curmenusize - 1) % (in->curmenusize);
-            if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
-            display_current_menu( in );
+            cmd->curmenupos = (cmd->curmenupos + cmd->curmenusize - 1) % (cmd->curmenusize);
+            if( cmd->curusermenu ) menu_set_cursor( cmd->curusermenu, cmd->curmenupos );
+            display_current_menu( cmd );
             break;
         case TVTIME_MENU_DOWN:
-            in->curmenupos = (in->curmenupos + 1) % (in->curmenusize);
-            if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
-            display_current_menu( in );
+            cmd->curmenupos = (cmd->curmenupos + 1) % (cmd->curmenusize);
+            if( cmd->curusermenu ) menu_set_cursor( cmd->curusermenu, cmd->curmenupos );
+            display_current_menu( cmd );
             break;
         case TVTIME_MENU_ENTER:
-            menu_enter( in );
+            menu_enter( cmd );
             break;
         case TVTIME_SHOW_MENU:
-            if( set_menu( in, arg ) ) {
-                display_current_menu( in );
+            if( set_menu( cmd, arg ) ) {
+                display_current_menu( cmd );
             } else {
-                menu_off( in );
+                menu_off( cmd );
             }
             break;
         case TVTIME_MOUSE_MOVE:
             sscanf( arg, "%d %d", &x, &y );
-            line = tvtime_osd_list_get_line_pos( in->osd, y );
+            line = tvtime_osd_list_get_line_pos( cmd->osd, y );
             if( line > 0 ) {
-                in->curmenupos = (line - 1);
-                if( in->curusermenu ) menu_set_cursor( in->curusermenu, in->curmenupos );
-                display_current_menu( in );
+                cmd->curmenupos = (line - 1);
+                if( cmd->curusermenu ) menu_set_cursor( cmd->curusermenu, cmd->curmenupos );
+                display_current_menu( cmd );
             }
             break;
         }
@@ -705,134 +705,134 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
 
     switch( tvtime_cmd ) {
     case TVTIME_QUIT:
-        in->quit = 1;
+        cmd->quit = 1;
         break;
 
     case TVTIME_SHOW_MENU:
-        if( set_menu( in, arg ) || set_menu( in, "root" ) ) {
-            display_current_menu( in );
+        if( set_menu( cmd, arg ) || set_menu( cmd, "root" ) ) {
+            display_current_menu( cmd );
         }
         break;
 
     case TVTIME_SHOW_DEINTERLACER_INFO:
-        in->showdeinterlacerinfo = 1;
+        cmd->showdeinterlacerinfo = 1;
         break;
 
     case TVTIME_SHOW_STATS:
-        in->printdebug = 1;
+        cmd->printdebug = 1;
         break;
 
     case TVTIME_SCREENSHOT:
-        in->screenshot = 1;
+        cmd->screenshot = 1;
         break;
 
     case TVTIME_TOGGLE_BARS:
-        in->showbars = !in->showbars;
+        cmd->showbars = !cmd->showbars;
         break;
 
     case TVTIME_TOGGLE_FULLSCREEN:
-        in->togglefullscreen = 1;
+        cmd->togglefullscreen = 1;
         break;
 
     case TVTIME_SCROLL_CONSOLE_UP:
     case TVTIME_SCROLL_CONSOLE_DOWN:
-        if( in->console_on )
-            console_scroll_n( in->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
+        if( cmd->console_on )
+            console_scroll_n( cmd->console, (tvtime_cmd == TVTIME_SCROLL_CONSOLE_UP) ? -1 : 1 );
         break;
             
     case TVTIME_TOGGLE_FRAMERATE:
-        in->framerate = (in->framerate + 1) % FRAMERATE_MAX;
+        cmd->framerate = (cmd->framerate + 1) % FRAMERATE_MAX;
         break;
 
     case TVTIME_TOGGLE_CONSOLE:
-        in->console_on = !in->console_on;
-        console_toggle_console( in->console );
+        cmd->console_on = !cmd->console_on;
+        console_toggle_console( cmd->console );
         break;
 
     case TVTIME_CHANNEL_SKIP:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            station_set_current_active( in->stationmgr, !station_get_current_active( in->stationmgr ) );
-            if( in->osd ) {
-                if( station_get_current_active( in->stationmgr ) ) {
-                    tvtime_osd_show_message( in->osd, "Channel active in list." );
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            station_set_current_active( cmd->stationmgr, !station_get_current_active( cmd->stationmgr ) );
+            if( cmd->osd ) {
+                if( station_get_current_active( cmd->stationmgr ) ) {
+                    tvtime_osd_show_message( cmd->osd, "Channel active in list." );
                 } else {
-                    tvtime_osd_show_message( in->osd, "Channel disabled from list." );
+                    tvtime_osd_show_message( cmd->osd, "Channel disabled from list." );
                 }
             }
-            station_writeconfig( in->stationmgr );
+            station_writeconfig( cmd->stationmgr );
         }
     break;
             
     case TVTIME_TOGGLE_ASPECT:
-        in->toggleaspect = 1;
+        cmd->toggleaspect = 1;
         break;
 
     case TVTIME_TOGGLE_ALWAYSONTOP:
-        in->togglealwaysontop = 1;
+        cmd->togglealwaysontop = 1;
         break;
 
     case TVTIME_CHANNEL_SAVE_TUNING:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
             char freq[ 32 ];
             int pos;
 
-            snprintf( freq, sizeof( freq ), "%f", ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-            pos = station_add( in->stationmgr, 0, "Custom", freq, 0 );
-            station_writeconfig( in->stationmgr );
-            station_set( in->stationmgr, pos );
-            in->change_channel = 1;
+            snprintf( freq, sizeof( freq ), "%f", ((double) videoinput_get_tuner_freq( cmd->vidin )) / 1000.0 );
+            pos = station_add( cmd->stationmgr, 0, "Custom", freq, 0 );
+            station_writeconfig( cmd->stationmgr );
+            station_set( cmd->stationmgr, pos );
+            cmd->change_channel = 1;
         }
         break;
 
     case TVTIME_CHANNEL_ACTIVATE_ALL:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            if( in->osd ) tvtime_osd_show_message( in->osd, "All channels re-activated." );
-            station_activate_all_channels( in->stationmgr );
-            station_writeconfig( in->stationmgr );
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            if( cmd->osd ) tvtime_osd_show_message( cmd->osd, "All channels re-activated." );
+            station_activate_all_channels( cmd->stationmgr );
+            station_writeconfig( cmd->stationmgr );
         }
         break;
 
     case TVTIME_CHANNEL_RENUMBER:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
             /* If we're scanning and suddenly want to renumber, stop scanning. */
-            if( in->scan_channels ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
             /* Accept input of the destination channel. */
-            if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-            in->frame_counter = in->delay;
-            in->renumbering = 1;
-            if( in->osd ) {
+            if( cmd->digit_counter == 0 ) memset( cmd->next_chan_buffer, 0, 5 );
+            cmd->frame_counter = cmd->delay;
+            cmd->renumbering = 1;
+            if( cmd->osd ) {
                 char message[ 256 ];
                 snprintf( message, sizeof( message ),
                           "Remapping %d.  Enter new channel number.",
-                          station_get_current_id( in->stationmgr ) );
-                tvtime_osd_set_hold_message( in->osd, message );
+                          station_get_current_id( cmd->stationmgr ) );
+                tvtime_osd_set_hold_message( cmd->osd, message );
             }
         }
         break;
 
     case TVTIME_CHANNEL_SCAN:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            if( !config_get_check_freq_present( in->cfg ) ) {
-                if( in->osd ) {
-                    tvtime_osd_show_message( in->osd, "Scanner unavailable: Signal checking disabled." );
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            if( !config_get_check_freq_present( cmd->cfg ) ) {
+                if( cmd->osd ) {
+                    tvtime_osd_show_message( cmd->osd, "Scanner unavailable: Signal checking disabled." );
                 }
             } else {
-                in->scan_channels = !in->scan_channels;
+                cmd->scan_channels = !cmd->scan_channels;
 
-                if( in->scan_channels && in->renumbering ) {
-                    memset( in->next_chan_buffer, 0, 5 );
-                    in->digit_counter = 0;
-                    in->frame_counter = 0;
-                    if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
-                    in->renumbering = 0;
+                if( cmd->scan_channels && cmd->renumbering ) {
+                    memset( cmd->next_chan_buffer, 0, 5 );
+                    cmd->digit_counter = 0;
+                    cmd->frame_counter = 0;
+                    if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+                    cmd->renumbering = 0;
                 }
 
-                if( in->osd ) {
-                    if( in->scan_channels ) {
-                        int keycode = config_command_to_key( in->cfg, TVTIME_CHANNEL_SCAN );
+                if( cmd->osd ) {
+                    if( cmd->scan_channels ) {
+                        int keycode = config_command_to_key( cmd->cfg, TVTIME_CHANNEL_SCAN );
                         if( keycode ) {
                             const char *special = input_special_key_to_string( keycode );
                             char message[ 256 ];
@@ -842,12 +842,12 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
                             } else {
                                 snprintf( message, sizeof( message ), "Scanning (hit %c to stop).", keycode );
                             }
-                            tvtime_osd_set_hold_message( in->osd, message );
-                            tvtime_osd_show_info( in->osd );
+                            tvtime_osd_set_hold_message( cmd->osd, message );
+                            tvtime_osd_show_info( cmd->osd );
                         }
                     } else {
-                        tvtime_osd_set_hold_message( in->osd, "" );
-                        tvtime_osd_show_info( in->osd );
+                        tvtime_osd_set_hold_message( cmd->osd, "" );
+                        tvtime_osd_show_info( cmd->osd );
                     }
                 }
             }
@@ -855,45 +855,45 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_TOGGLE_CC:
-        if( in->vbi ) {
-            vbidata_capture_mode( in->vbi, in->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
-            if( in->capturemode ) {
-                if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Disabled." );
-                in->capturemode = CAPTURE_OFF;
+        if( cmd->vbi ) {
+            vbidata_capture_mode( cmd->vbi, cmd->capturemode ? CAPTURE_OFF : CAPTURE_CC1 );
+            if( cmd->capturemode ) {
+                if( cmd->osd ) tvtime_osd_show_message( cmd->osd, "Closed Captioning Disabled." );
+                cmd->capturemode = CAPTURE_OFF;
             } else {
-                if( in->osd ) tvtime_osd_show_message( in->osd, "Closed Captioning Enabled." );
-                in->capturemode = CAPTURE_CC1;
+                if( cmd->osd ) tvtime_osd_show_message( cmd->osd, "Closed Captioning Enabled." );
+                cmd->capturemode = CAPTURE_CC1;
             }
         } else {
-            if( in->osd ) tvtime_osd_show_message( in->osd, "No VBI device configured for CC decoding." );
+            if( cmd->osd ) tvtime_osd_show_message( cmd->osd, "No VBI device configured for CC decoding." );
         }
         break;
 
     case TVTIME_TOGGLE_COMPATIBLE_NORM:
-        videoinput_switch_to_next_compatible_norm( in->vidin );
-        if( videoinput_has_tuner( in->vidin ) ) {
-            station_set_current_norm( in->stationmgr, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
-            station_writeconfig( in->stationmgr );
+        videoinput_switch_to_next_compatible_norm( cmd->vidin );
+        if( videoinput_has_tuner( cmd->vidin ) ) {
+            station_set_current_norm( cmd->stationmgr, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            station_writeconfig( cmd->stationmgr );
         }
-        if( in->osd ) {
-            tvtime_osd_set_norm( in->osd, videoinput_get_norm_name( videoinput_get_norm( in->vidin ) ) );
-            tvtime_osd_show_info( in->osd );
+        if( cmd->osd ) {
+            tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
+            tvtime_osd_show_info( cmd->osd );
         }
         break;
 
     case TVTIME_DISPLAY_MESSAGE:
-        if( in->osd && arg ) tvtime_osd_show_message( in->osd, arg );
+        if( cmd->osd && arg ) tvtime_osd_show_message( cmd->osd, arg );
         break;
 
     case TVTIME_DISPLAY_INFO:
-        in->displayinfo = !in->displayinfo;
-        if( in->osd ) {
-            if( in->displayinfo ) {
-                tvtime_osd_hold( in->osd, 1 );
-                tvtime_osd_show_info( in->osd );
+        cmd->displayinfo = !cmd->displayinfo;
+        if( cmd->osd ) {
+            if( cmd->displayinfo ) {
+                tvtime_osd_hold( cmd->osd, 1 );
+                tvtime_osd_show_info( cmd->osd );
             } else {
-                tvtime_osd_hold( in->osd, 0 );
-                tvtime_osd_clear( in->osd );
+                tvtime_osd_hold( cmd->osd, 0 );
+                tvtime_osd_clear( cmd->osd );
             }
         }
         break;
@@ -902,197 +902,197 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_TOGGLE_AUDIO_MODE:
-        if( in->vidin ) {
-            videoinput_set_audio_mode( in->vidin, videoinput_get_audio_mode( in->vidin ) << 1 );
-            if( in->osd ) {
-                osd_list_audio_modes( in->osd, videoinput_get_norm( in->vidin ) == VIDEOINPUT_NTSC,
-                                      videoinput_get_audio_mode( in->vidin ) );
-                tvtime_osd_set_audio_mode( in->osd, videoinput_get_audio_mode_name( in->vidin, videoinput_get_audio_mode( in->vidin ) ) );
-                tvtime_osd_show_info( in->osd );
+        if( cmd->vidin ) {
+            videoinput_set_audio_mode( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) << 1 );
+            if( cmd->osd ) {
+                osd_list_audio_modes( cmd->osd, videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
+                                      videoinput_get_audio_mode( cmd->vidin ) );
+                tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
+                tvtime_osd_show_info( cmd->osd );
             }
         }
         break;
 
     case TVTIME_TOGGLE_DEINTERLACER:
-        in->toggledeinterlacer = 1;
+        cmd->toggledeinterlacer = 1;
         break;
 
     case TVTIME_TOGGLE_PULLDOWN_DETECTION:
-        in->togglepulldowndetection = 1;
+        cmd->togglepulldowndetection = 1;
         break;
 
     case TVTIME_CHANNEL_CHAR:
-        if( arg && isdigit( arg[ 0 ] ) && in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( arg && isdigit( arg[ 0 ] ) && cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
-            if( in->scan_channels ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
             /* Decode the input char from commands.  */
-            if( in->digit_counter == 0 ) memset( in->next_chan_buffer, 0, 5 );
-            in->next_chan_buffer[ in->digit_counter ] = arg[ 0 ];
-            in->digit_counter++;
-            in->frame_counter = in->delay;
+            if( cmd->digit_counter == 0 ) memset( cmd->next_chan_buffer, 0, 5 );
+            cmd->next_chan_buffer[ cmd->digit_counter ] = arg[ 0 ];
+            cmd->digit_counter++;
+            cmd->frame_counter = cmd->delay;
 
             /**
              * Send an enter command if we type more
              * digits than there are channels.
              */
-            if( in->digit_counter > 0 && (station_get_max_position( in->stationmgr ) < 10) ) {
-                commands_handle( in, TVTIME_ENTER, 0 );
-            } else if( in->digit_counter > 1 && (station_get_max_position( in->stationmgr ) < 100) ) {
-                commands_handle( in, TVTIME_ENTER, 0 );
-            } else if( in->digit_counter > 2 ) {
-                commands_handle( in, TVTIME_ENTER, 0 );
+            if( cmd->digit_counter > 0 && (station_get_max_position( cmd->stationmgr ) < 10) ) {
+                commands_handle( cmd, TVTIME_ENTER, 0 );
+            } else if( cmd->digit_counter > 1 && (station_get_max_position( cmd->stationmgr ) < 100) ) {
+                commands_handle( cmd, TVTIME_ENTER, 0 );
+            } else if( cmd->digit_counter > 2 ) {
+                commands_handle( cmd, TVTIME_ENTER, 0 );
             }
         }
         break;
 
     case TVTIME_TOGGLE_LUMA_CORRECTION:
-        in->apply_luma = !in->apply_luma;
-        if( in->osd ) {
-            if( in->apply_luma ) {
-                tvtime_osd_show_message( in->osd, "Luma correction enabled." );
-                config_save( in->cfg, "ApplyLumaCorrection", "1" );
+        cmd->apply_luma = !cmd->apply_luma;
+        if( cmd->osd ) {
+            if( cmd->apply_luma ) {
+                tvtime_osd_show_message( cmd->osd, "Luma correction enabled." );
+                config_save( cmd->cfg, "ApplyLumaCorrection", "1" );
             } else {
-                tvtime_osd_show_message( in->osd, "Luma correction disabled." );
-                config_save( in->cfg, "ApplyLumaCorrection", "0" );
+                tvtime_osd_show_message( cmd->osd, "Luma correction disabled." );
+                config_save( cmd->cfg, "ApplyLumaCorrection", "0" );
             }
         }
         break;
 
     case TVTIME_OVERSCAN_UP:
     case TVTIME_OVERSCAN_DOWN:
-        in->overscan = in->overscan + ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 );
-        if( in->overscan > 0.4 ) in->overscan = 0.4; if( in->overscan < 0.0 ) in->overscan = 0.0;
+        cmd->overscan = cmd->overscan + ( (tvtime_cmd == TVTIME_OVERSCAN_UP) ? 0.0025 : -0.0025 );
+        if( cmd->overscan > 0.4 ) cmd->overscan = 0.4; if( cmd->overscan < 0.0 ) cmd->overscan = 0.0;
 
-        if( in->osd ) {
+        if( cmd->osd ) {
             char message[ 200 ];
             snprintf( message, sizeof( message ), "Overscan: %.1f%%",
-                      in->overscan * 2.0 * 100.0 );
-            tvtime_osd_show_message( in->osd, message );
+                      cmd->overscan * 2.0 * 100.0 );
+            tvtime_osd_show_message( cmd->osd, message );
         }
         break;
 
     case TVTIME_LUMA_UP:
     case TVTIME_LUMA_DOWN:
-        if( !in->apply_luma ) {
+        if( !cmd->apply_luma ) {
             fprintf( stderr, "tvtime: Luma correction disabled.  "
                      "Run with -c to use it.\n" );
         } else {
             char message[ 200 ];
-            in->luma_power = in->luma_power + ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 );
+            cmd->luma_power = cmd->luma_power + ( (tvtime_cmd == TVTIME_LUMA_UP) ? 0.1 : -0.1 );
 
-            in->update_luma = 1;
+            cmd->update_luma = 1;
 
-            if( in->luma_power > 10.0 ) in->luma_power = 10.0;
-            if( in->luma_power <  0.0 ) in->luma_power = 0.0;
+            if( cmd->luma_power > 10.0 ) cmd->luma_power = 10.0;
+            if( cmd->luma_power <  0.0 ) cmd->luma_power = 0.0;
 
-            snprintf( message, sizeof( message ), "%.1f", in->luma_power );
-            config_save( in->cfg, "LumaCorrection", message );
-            if( in->osd ) {
+            snprintf( message, sizeof( message ), "%.1f", cmd->luma_power );
+            config_save( cmd->cfg, "LumaCorrection", message );
+            if( cmd->osd ) {
                 snprintf( message, sizeof( message ), "Luma correction value: %.1f",
-                          in->luma_power );
-                tvtime_osd_show_message( in->osd, message );
+                          cmd->luma_power );
+                tvtime_osd_show_message( cmd->osd, message );
             }
         }
         break;
 
     case TVTIME_AUTO_ADJUST_PICT:
-        if( in->vidin ) {
-            videoinput_reset_default_settings( in->vidin );
-            if( in->osd ) {
-                tvtime_osd_show_message( in->osd, "Picture settings reset to defaults." );
+        if( cmd->vidin ) {
+            videoinput_reset_default_settings( cmd->vidin );
+            if( cmd->osd ) {
+                tvtime_osd_show_message( cmd->osd, "Picture settings reset to defaults." );
             }
         }
         break;
 
     case TVTIME_AUTO_ADJUST_WINDOW:
-        in->resizewindow = 1;
+        cmd->resizewindow = 1;
         break;
 
     case TVTIME_TOGGLE_NTSC_CABLE_MODE:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            station_toggle_us_cable_mode( in->stationmgr );
-            in->change_channel = 1;
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            station_toggle_us_cable_mode( cmd->stationmgr );
+            cmd->change_channel = 1;
         }
         break;
 
     case TVTIME_FINETUNE_DOWN:
     case TVTIME_FINETUNE_UP:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
-            videoinput_set_tuner_freq( in->vidin, videoinput_get_tuner_freq( in->vidin ) +
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
+            videoinput_set_tuner_freq( cmd->vidin, videoinput_get_tuner_freq( cmd->vidin ) +
                                        ( tvtime_cmd == TVTIME_FINETUNE_UP ? ((1000/16)+1) : -(1000/16) ) );
 
-            if( in->vbi ) {
-                vbidata_reset( in->vbi );
-                vbidata_capture_mode( in->vbi, in->capturemode );
+            if( cmd->vbi ) {
+                vbidata_reset( cmd->vbi );
+                vbidata_capture_mode( cmd->vbi, cmd->capturemode );
             }
 
-            if( in->osd ) {
+            if( cmd->osd ) {
                 char message[ 200 ];
                 snprintf( message, sizeof( message ), "Tuning: %4.2fMhz.",
-                          ((double) videoinput_get_tuner_freq( in->vidin )) / 1000.0 );
-                tvtime_osd_show_message( in->osd, message );
+                          ((double) videoinput_get_tuner_freq( cmd->vidin )) / 1000.0 );
+                tvtime_osd_show_message( cmd->osd, message );
             }
-        } else if( in->osd ) {
-            tvtime_osd_show_info( in->osd );
+        } else if( cmd->osd ) {
+            tvtime_osd_show_info( cmd->osd );
         }
         break;
 
     case TVTIME_CHANNEL_INC: 
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
             /**
              * If we're scanning and the user hits a key, stop scanning.
              * arg will be 0 if the scanner has called us.
              */
-            if( in->scan_channels && arg ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels && arg ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_inc( in->stationmgr );
-            in->change_channel = 1;
-        } else if( in->osd ) {
-            tvtime_osd_show_info( in->osd );
+            station_inc( cmd->stationmgr );
+            cmd->change_channel = 1;
+        } else if( cmd->osd ) {
+            tvtime_osd_show_info( cmd->osd );
         }
         break;
     case TVTIME_CHANNEL_DEC:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
-            if( in->scan_channels ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_dec( in->stationmgr );
-            in->change_channel = 1;
-        } else if( in->osd ) {
-            tvtime_osd_show_info( in->osd );
+            station_dec( cmd->stationmgr );
+            cmd->change_channel = 1;
+        } else if( cmd->osd ) {
+            tvtime_osd_show_info( cmd->osd );
         }
         break;
 
     case TVTIME_CHANNEL_PREV:
-        if( in->vidin && videoinput_has_tuner( in->vidin ) ) {
+        if( cmd->vidin && videoinput_has_tuner( cmd->vidin ) ) {
 
             /* If we're scanning and the user hits a key, stop scanning. */
-            if( in->scan_channels ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            station_prev( in->stationmgr );
-            in->change_channel = 1;
-        } else if( in->osd ) {
-            tvtime_osd_show_info( in->osd );
+            station_prev( cmd->stationmgr );
+            cmd->change_channel = 1;
+        } else if( cmd->osd ) {
+            tvtime_osd_show_info( cmd->osd );
         }
         break;
 
     case TVTIME_MIXER_TOGGLE_MUTE:
         mixer_mute( !mixer_ismute() );
 
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Volume", (mixer_get_volume()) & 0xff );
+        if( cmd->osd ) {
+            tvtime_osd_show_data_bar( cmd->osd, "Volume", (mixer_get_volume()) & 0xff );
         }
         break;
 
@@ -1100,384 +1100,384 @@ void commands_handle( commands_t *in, int tvtime_cmd, const char *arg )
     case TVTIME_MIXER_DOWN:
 
         /* If the user hits the volume control, drop us out of mute mode. */
-        if( in->vidin && videoinput_get_muted( in->vidin ) ) {
-            commands_handle( in, TVTIME_TOGGLE_MUTE, 0 );
+        if( cmd->vidin && videoinput_get_muted( cmd->vidin ) ) {
+            commands_handle( cmd, TVTIME_TOGGLE_MUTE, 0 );
         }
         volume = mixer_set_volume( ( (tvtime_cmd == TVTIME_MIXER_UP) ? 1 : -1 ) );
 
-        if( in->osd ) {
-            tvtime_osd_show_data_bar( in->osd, "Volume", volume & 0xff );
+        if( cmd->osd ) {
+            tvtime_osd_show_data_bar( cmd->osd, "Volume", volume & 0xff );
         }
         break;
 
     case TVTIME_TOGGLE_MUTE:
-        if( in->vidin ) {
-            videoinput_mute( in->vidin, !videoinput_get_muted( in->vidin ) );
-            if( in->osd ) {
-                tvtime_osd_volume_muted( in->osd, videoinput_get_muted( in->vidin ) );
+        if( cmd->vidin ) {
+            videoinput_mute( cmd->vidin, !videoinput_get_muted( cmd->vidin ) );
+            if( cmd->osd ) {
+                tvtime_osd_volume_muted( cmd->osd, videoinput_get_muted( cmd->vidin ) );
             }
         }
         break;
 
     case TVTIME_TOGGLE_INPUT:
-        if( in->vidin ) {
-            in->frame_counter = 0;
+        if( cmd->vidin ) {
+            cmd->frame_counter = 0;
 
-            if( in->renumbering ) {
-                memset( in->next_chan_buffer, 0, sizeof( in->next_chan_buffer ) );
-                commands_handle( in, TVTIME_ENTER, 0 );
+            if( cmd->renumbering ) {
+                memset( cmd->next_chan_buffer, 0, sizeof( cmd->next_chan_buffer ) );
+                commands_handle( cmd, TVTIME_ENTER, 0 );
             }
 
-            if( in->scan_channels ) {
-                commands_handle( in, TVTIME_CHANNEL_SCAN, 0 );
+            if( cmd->scan_channels ) {
+                commands_handle( cmd, TVTIME_CHANNEL_SCAN, 0 );
             }
 
-            videoinput_set_input_num( in->vidin, ( videoinput_get_input_num( in->vidin ) + 1 ) % videoinput_get_num_inputs( in->vidin ) );
-            reinit_tuner( in );
+            videoinput_set_input_num( cmd->vidin, ( videoinput_get_input_num( cmd->vidin ) + 1 ) % videoinput_get_num_inputs( cmd->vidin ) );
+            reinit_tuner( cmd );
 
-            if( in->osd ) {
-                tvtime_osd_set_input( in->osd, videoinput_get_input_name( in->vidin ) );
-                tvtime_osd_show_info( in->osd );
+            if( cmd->osd ) {
+                tvtime_osd_set_input( cmd->osd, videoinput_get_input_name( cmd->vidin ) );
+                tvtime_osd_show_info( cmd->osd );
             }
         }
         break;
 
     case TVTIME_HUE_UP:
     case TVTIME_HUE_DOWN:
-        if( in->vidin ) {
-            videoinput_set_hue_relative( in->vidin, (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
-            if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Hue", videoinput_get_hue( in->vidin ) );
+        if( cmd->vidin ) {
+            videoinput_set_hue_relative( cmd->vidin, (tvtime_cmd == TVTIME_HUE_UP) ? 1 : -1 );
+            if( cmd->osd ) {
+                tvtime_osd_show_data_bar( cmd->osd, "Hue", videoinput_get_hue( cmd->vidin ) );
             }
         }
         break;
 
     case TVTIME_BRIGHTNESS_UP: 
     case TVTIME_BRIGHTNESS_DOWN:
-        if( in->vidin ) {
-            videoinput_set_brightness_relative( in->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );
-            if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Brightness", videoinput_get_brightness( in->vidin ) );
+        if( cmd->vidin ) {
+            videoinput_set_brightness_relative( cmd->vidin, (tvtime_cmd == TVTIME_BRIGHTNESS_UP) ? 1 : -1 );
+            if( cmd->osd ) {
+                tvtime_osd_show_data_bar( cmd->osd, "Brightness", videoinput_get_brightness( cmd->vidin ) );
             }
         }
         break;
 
     case TVTIME_CONTRAST_UP:
     case TVTIME_CONTRAST_DOWN:
-        if( in->vidin ) {
-            videoinput_set_contrast_relative( in->vidin, (tvtime_cmd == TVTIME_CONTRAST_UP) ? 1 : -1 );
-            if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Contrast", videoinput_get_contrast( in->vidin ) );
+        if( cmd->vidin ) {
+            videoinput_set_contrast_relative( cmd->vidin, (tvtime_cmd == TVTIME_CONTRAST_UP) ? 1 : -1 );
+            if( cmd->osd ) {
+                tvtime_osd_show_data_bar( cmd->osd, "Contrast", videoinput_get_contrast( cmd->vidin ) );
             }
         }
         break;
 
     case TVTIME_COLOUR_UP:
     case TVTIME_COLOUR_DOWN:
-        if( in->vidin ) {
-            videoinput_set_colour_relative( in->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
-            if( in->osd ) {
-                tvtime_osd_show_data_bar( in->osd, "Colour", videoinput_get_colour( in->vidin ) );
+        if( cmd->vidin ) {
+            videoinput_set_colour_relative( cmd->vidin, (tvtime_cmd == TVTIME_COLOUR_UP) ? 1 : -1 );
+            if( cmd->osd ) {
+                tvtime_osd_show_data_bar( cmd->osd, "Colour", videoinput_get_colour( cmd->vidin ) );
             }
         }
         break;
 
     case TVTIME_ENTER:
-        if( in->next_chan_buffer[ 0 ] ) {
-            if( in->renumbering ) {
-                station_remap( in->stationmgr, atoi( in->next_chan_buffer ) );
-                station_writeconfig( in->stationmgr );
-                in->renumbering = 0;
-                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+        if( cmd->next_chan_buffer[ 0 ] ) {
+            if( cmd->renumbering ) {
+                station_remap( cmd->stationmgr, atoi( cmd->next_chan_buffer ) );
+                station_writeconfig( cmd->stationmgr );
+                cmd->renumbering = 0;
+                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
             }
-            if( station_set( in->stationmgr, atoi( in->next_chan_buffer ) ) ) {
-                in->change_channel = 1;
+            if( station_set( cmd->stationmgr, atoi( cmd->next_chan_buffer ) ) ) {
+                cmd->change_channel = 1;
             } else {
-                snprintf( in->next_chan_buffer, sizeof( in->next_chan_buffer ),
-                          "%d", station_get_current_id( in->stationmgr ) );
-                if( in->osd ) {
-                    tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
-                    tvtime_osd_show_info( in->osd );
+                snprintf( cmd->next_chan_buffer, sizeof( cmd->next_chan_buffer ),
+                          "%d", station_get_current_id( cmd->stationmgr ) );
+                if( cmd->osd ) {
+                    tvtime_osd_set_channel_number( cmd->osd, cmd->next_chan_buffer );
+                    tvtime_osd_show_info( cmd->osd );
                 }
             }
         } else {
-            if( in->renumbering ) {
-                in->renumbering = 0;
-                if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
+            if( cmd->renumbering ) {
+                cmd->renumbering = 0;
+                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
             }
-            snprintf( in->next_chan_buffer, sizeof( in->next_chan_buffer ),
-                      "%d", station_get_current_id( in->stationmgr ) );
-            if( in->osd ) {
-                tvtime_osd_set_channel_number( in->osd, in->next_chan_buffer );
-                tvtime_osd_show_info( in->osd );
+            snprintf( cmd->next_chan_buffer, sizeof( cmd->next_chan_buffer ),
+                      "%d", station_get_current_id( cmd->stationmgr ) );
+            if( cmd->osd ) {
+                tvtime_osd_set_channel_number( cmd->osd, cmd->next_chan_buffer );
+                tvtime_osd_show_info( cmd->osd );
             }
         }
-        in->frame_counter = 0;
+        cmd->frame_counter = 0;
         break;
 
     case TVTIME_CHANNEL_1:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "1" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "1" );
         break;
 
     case TVTIME_CHANNEL_2:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "2" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "2" );
         break;
 
     case TVTIME_CHANNEL_3:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "3" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "3" );
         break;
 
     case TVTIME_CHANNEL_4:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "4" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "4" );
         break;
 
     case TVTIME_CHANNEL_5:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "5" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "5" );
         break;
 
     case TVTIME_CHANNEL_6:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "6" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "6" );
         break;
 
     case TVTIME_CHANNEL_7:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "7" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "7" );
         break;
 
     case TVTIME_CHANNEL_8:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "8" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "8" );
         break;
 
     case TVTIME_CHANNEL_9:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "9" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "9" );
         break;
 
     case TVTIME_CHANNEL_0:
-        commands_handle( in, TVTIME_CHANNEL_CHAR, "0" );
+        commands_handle( cmd, TVTIME_CHANNEL_CHAR, "0" );
         break;
 
     case TVTIME_TOGGLE_PAUSE:
-        in->pause = !(in->pause);
-        if( in->osd ) tvtime_osd_show_message( in->osd, in->pause ? "Paused" : "Resumed" );
+        cmd->pause = !(cmd->pause);
+        if( cmd->osd ) tvtime_osd_show_message( cmd->osd, cmd->pause ? "Paused" : "Resumed" );
         break;
 
     case TVTIME_TOGGLE_MATTE:
-        in->togglematte = 1;
+        cmd->togglematte = 1;
         break;
 
     case TVTIME_TOGGLE_MODE:
-        in->togglemode = 1;
+        cmd->togglemode = 1;
         break;
     }
 }
 
-void commands_next_frame( commands_t *in )
+void commands_next_frame( commands_t *cmd )
 {
     /* Decrement the frame counter if user is typing digits */
-    if( in->frame_counter > 0 ) {
-        in->frame_counter--;
-        if( in->frame_counter == 0 ) {
+    if( cmd->frame_counter > 0 ) {
+        cmd->frame_counter--;
+        if( cmd->frame_counter == 0 ) {
             /* Switch to the next channel if the countdown expires. */
-            commands_handle( in, TVTIME_ENTER, 0 );
+            commands_handle( cmd, TVTIME_ENTER, 0 );
         }
     }
 
-    if( in->frame_counter == 0 ) {
-        memset( in->next_chan_buffer, 0, 5 );
-        in->digit_counter = 0;
-        if( in->renumbering ) {
-            if( in->osd ) tvtime_osd_set_hold_message( in->osd, "" );
-            in->renumbering = 0;
+    if( cmd->frame_counter == 0 ) {
+        memset( cmd->next_chan_buffer, 0, 5 );
+        cmd->digit_counter = 0;
+        if( cmd->renumbering ) {
+            if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+            cmd->renumbering = 0;
         }
     }
 
-    if( in->frame_counter > 0 && !(in->frame_counter % 5)) {
+    if( cmd->frame_counter > 0 && !(cmd->frame_counter % 5)) {
         char input_text[6];
 
-        strcpy( input_text, in->next_chan_buffer );
-        if( !(in->frame_counter % 10) ) {
+        strcpy( input_text, cmd->next_chan_buffer );
+        if( !(cmd->frame_counter % 10) ) {
             strcat( input_text, "_" );
         } else {
             strcat( input_text, " " );
         }
-        if( in->osd ) {
-            tvtime_osd_set_channel_number( in->osd, input_text );
-            tvtime_osd_show_info( in->osd );
+        if( cmd->osd ) {
+            tvtime_osd_set_channel_number( cmd->osd, input_text );
+            tvtime_osd_show_info( cmd->osd );
         }
     }
 
-    if( in->change_channel ) {
-        reinit_tuner( in );
-        in->change_channel = 0;
+    if( cmd->change_channel ) {
+        reinit_tuner( cmd );
+        cmd->change_channel = 0;
     }
 
-    if( in->vbi ) {
-        if( *(vbidata_get_network_name( in->vbi )) ) {
+    if( cmd->vbi ) {
+        if( *(vbidata_get_network_name( cmd->vbi )) ) {
             /* If the network name has changed, save it to the config file. */
-            if( strcmp( station_get_current_network_name( in->stationmgr ),
-                        vbidata_get_network_name( in->vbi ) ) ) {
-                station_set_current_network_name( in->stationmgr,
-                                                  vbidata_get_network_name( in->vbi ) );
-                station_writeconfig( in->stationmgr );
+            if( strcmp( station_get_current_network_name( cmd->stationmgr ),
+                        vbidata_get_network_name( cmd->vbi ) ) ) {
+                station_set_current_network_name( cmd->stationmgr,
+                                                  vbidata_get_network_name( cmd->vbi ) );
+                station_writeconfig( cmd->stationmgr );
             }
 
-            if( in->osd ) {
-                tvtime_osd_set_network_name( in->osd, station_get_current_network_name( in->stationmgr ) );
+            if( cmd->osd ) {
+                tvtime_osd_set_network_name( cmd->osd, station_get_current_network_name( cmd->stationmgr ) );
             }
         }
 
-        if( *(vbidata_get_network_call_letters( in->vbi )) ) {
+        if( *(vbidata_get_network_call_letters( cmd->vbi )) ) {
             /* If the call letters have changed, save them to the config file. */
-            if( strcmp( station_get_current_network_call_letters( in->stationmgr ),
-                        vbidata_get_network_call_letters( in->vbi ) ) ) {
-                station_set_current_network_call_letters( in->stationmgr,
-                                                          vbidata_get_network_call_letters( in->vbi ) );
-                station_writeconfig( in->stationmgr );
+            if( strcmp( station_get_current_network_call_letters( cmd->stationmgr ),
+                        vbidata_get_network_call_letters( cmd->vbi ) ) ) {
+                station_set_current_network_call_letters( cmd->stationmgr,
+                                                          vbidata_get_network_call_letters( cmd->vbi ) );
+                station_writeconfig( cmd->stationmgr );
             }
 
-            if( in->osd ) {
-                tvtime_osd_set_network_call( in->osd, station_get_current_network_call_letters( in->stationmgr ) );
+            if( cmd->osd ) {
+                tvtime_osd_set_network_call( cmd->osd, station_get_current_network_call_letters( cmd->stationmgr ) );
             }
         }
 
-        if( in->osd ) {
-            tvtime_osd_set_show_name( in->osd, vbidata_get_program_name( in->vbi ) );
-            tvtime_osd_set_show_rating( in->osd, vbidata_get_program_rating( in->vbi ) );
-            tvtime_osd_set_show_start( in->osd, vbidata_get_program_start_time( in->vbi ) );
-            tvtime_osd_set_show_length( in->osd, vbidata_get_program_length( in->vbi ) );
+        if( cmd->osd ) {
+            tvtime_osd_set_show_name( cmd->osd, vbidata_get_program_name( cmd->vbi ) );
+            tvtime_osd_set_show_rating( cmd->osd, vbidata_get_program_rating( cmd->vbi ) );
+            tvtime_osd_set_show_start( cmd->osd, vbidata_get_program_start_time( cmd->vbi ) );
+            tvtime_osd_set_show_length( cmd->osd, vbidata_get_program_length( cmd->vbi ) );
         }
     }
 
-    in->printdebug = 0;
-    in->showdeinterlacerinfo = 0;
-    in->screenshot = 0;
-    in->togglefullscreen = 0;
-    in->toggleaspect = 0;
-    in->togglealwaysontop = 0;
-    in->toggledeinterlacer = 0;
-    in->togglepulldowndetection = 0;
-    in->togglemode = 0;
-    in->togglematte = 0;
-    in->update_luma = 0;
-    in->resizewindow = 0;
+    cmd->printdebug = 0;
+    cmd->showdeinterlacerinfo = 0;
+    cmd->screenshot = 0;
+    cmd->togglefullscreen = 0;
+    cmd->toggleaspect = 0;
+    cmd->togglealwaysontop = 0;
+    cmd->toggledeinterlacer = 0;
+    cmd->togglepulldowndetection = 0;
+    cmd->togglemode = 0;
+    cmd->togglematte = 0;
+    cmd->update_luma = 0;
+    cmd->resizewindow = 0;
 }
 
-int commands_quit( commands_t *in )
+int commands_quit( commands_t *cmd )
 {
-    return in->quit;
+    return cmd->quit;
 }
 
-int commands_print_debug( commands_t *in )
+int commands_print_debug( commands_t *cmd )
 {
-    return in->printdebug;
+    return cmd->printdebug;
 }
 
-int commands_show_bars( commands_t *in )
+int commands_show_bars( commands_t *cmd )
 {
-    return in->showbars;
+    return cmd->showbars;
 }
 
-int commands_take_screenshot( commands_t *in )
+int commands_take_screenshot( commands_t *cmd )
 {
-    return in->screenshot;
+    return cmd->screenshot;
 }
 
-int commands_toggle_fullscreen( commands_t *in )
+int commands_toggle_fullscreen( commands_t *cmd )
 {
-    return in->togglefullscreen;
+    return cmd->togglefullscreen;
 }
 
-int commands_get_framerate( commands_t *in )
+int commands_get_framerate( commands_t *cmd )
 {
-    return in->framerate;
+    return cmd->framerate;
 }
 
-int commands_toggle_aspect( commands_t *in )
+int commands_toggle_aspect( commands_t *cmd )
 {
-    return in->toggleaspect;
+    return cmd->toggleaspect;
 }
 
-int commands_toggle_alwaysontop( commands_t *in )
+int commands_toggle_alwaysontop( commands_t *cmd )
 {
-    return in->togglealwaysontop;
+    return cmd->togglealwaysontop;
 }
 
-int commands_toggle_deinterlacer( commands_t *in )
+int commands_toggle_deinterlacer( commands_t *cmd )
 {
-    return in->toggledeinterlacer;
+    return cmd->toggledeinterlacer;
 }
 
-int commands_toggle_pulldown_detection( commands_t *in )
+int commands_toggle_pulldown_detection( commands_t *cmd )
 {
-    return in->togglepulldowndetection;
+    return cmd->togglepulldowndetection;
 }
 
-int commands_toggle_mode( commands_t *in )
+int commands_toggle_mode( commands_t *cmd )
 {
-    return in->togglemode;
+    return cmd->togglemode;
 }
 
-int commands_toggle_matte( commands_t *in )
+int commands_toggle_matte( commands_t *cmd )
 {
-    return in->togglematte;
+    return cmd->togglematte;
 }
 
-void commands_set_console( commands_t *in, console_t *con )
+void commands_set_console( commands_t *cmd, console_t *con )
 {
-    in->console = con;
+    cmd->console = con;
 }
 
-void commands_set_vbidata( commands_t *in, vbidata_t *vbi )
+void commands_set_vbidata( commands_t *cmd, vbidata_t *vbi )
 {
-    in->vbi = vbi;
+    cmd->vbi = vbi;
 }
 
-int commands_console_on( commands_t *in )
+int commands_console_on( commands_t *cmd )
 {
-    return in->console_on;
+    return cmd->console_on;
 }
 
-int commands_scan_channels( commands_t *in )
+int commands_scan_channels( commands_t *cmd )
 {
-    return in->scan_channels;
+    return cmd->scan_channels;
 }
 
-int commands_pause( commands_t *in )
+int commands_pause( commands_t *cmd )
 {
-    return in->pause;
+    return cmd->pause;
 }
 
-int commands_apply_luma_correction( commands_t *in )
+int commands_apply_luma_correction( commands_t *cmd )
 {
-    return in->apply_luma;
+    return cmd->apply_luma;
 }
 
-int commands_update_luma_power( commands_t *in )
+int commands_update_luma_power( commands_t *cmd )
 {
-    return in->update_luma;
+    return cmd->update_luma;
 }
 
-double commands_get_luma_power( commands_t *in )
+double commands_get_luma_power( commands_t *cmd )
 {
-    return in->luma_power;
+    return cmd->luma_power;
 }
 
-double commands_get_overscan( commands_t *in )
+double commands_get_overscan( commands_t *cmd )
 {
-    return in->overscan;
+    return cmd->overscan;
 }
 
-int commands_resize_window( commands_t *in )
+int commands_resize_window( commands_t *cmd )
 {
-    return in->resizewindow;
+    return cmd->resizewindow;
 }
 
-void commands_set_framerate( commands_t *in, int framerate )
+void commands_set_framerate( commands_t *cmd, int framerate )
 {
-    in->framerate = framerate % FRAMERATE_MAX;
+    cmd->framerate = framerate % FRAMERATE_MAX;
 }
 
-int commands_show_deinterlacer_info( commands_t *in )
+int commands_show_deinterlacer_info( commands_t *cmd )
 {
-    return in->showdeinterlacerinfo;
+    return cmd->showdeinterlacerinfo;
 }
 
