@@ -1202,7 +1202,7 @@ int main( int argc, char **argv )
                             config_get_aspect( ct ) ? (16.0 / 9.0) : (4.0 / 3.0), 
                             verbose );
         if( !vs ) {
-            fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable..\n" );
+            fprintf( stderr, "tvtime: Could not create vbiscreen, closed captions unavailable.\n" );
         }
     }
 
