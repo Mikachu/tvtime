@@ -1,0 +1,27 @@
+Source: tvtime
+Section: x11
+Priority: optional
+Maintainer: Bart Dorsey <echo@thebucket.org>
+Build-Depends: debhelper (>> 3.0.0)
+Standards-Version: 3.5.2
+
+Package: tvtime
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: high quality television application
+ tvtime is a high quality television application for use with 
+ video capture cards. tvtime processes the input from a 
+ capture card and displays it on a computer monitor or 
+ projector.
+ tvtime supports:
+  * Deinterlaced output at full interlaced rate of 59.94 
+    frames per second for NTSC source, or 50 frames per 
+    second for PAL sources. This gives smoothness of motion 
+    and high visual quality.
+  * Multiple deinterlacing algorithms for finding the optimal 
+    mode for the video content and available processor speed.
+  * 16:9 aspect ratio mode for the highest available resolution 
+    when processing input from an external DVD player or digital 
+    satellite receiver.
+  * A super-slick on-screen-display for the complete television experience. 
+
