@@ -188,11 +188,6 @@ int get_num_deinterlace_methods( void );
 deinterlace_method_t *get_deinterlace_method( int i );
 
 /**
- * Loads a deinterlace plugin from the given file.
- */
-void register_deinterlace_plugin( const char *filename );
-
-/**
  * Builds the usable method list.
  */
 void filter_deinterlace_methods( int accel, int fieldsavailable );

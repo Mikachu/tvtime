@@ -36,16 +36,6 @@ AC_CHECK_FUNCS([asprintf atexit fork execlp getopt_long getpriority gettimeofday
 AM_GNU_GETTEXT
 
 dnl ---------------------------------------------
-dnl dynamic linker
-dnl ---------------------------------------------
-AC_CHECK_LIB(c, dlopen,
-	     DYNAMIC_LD_LIBS="",
-	     AC_CHECK_LIB(dl, dlopen,
-             	          DYNAMIC_LD_LIBS="-ldl",
-	                  AC_MSG_ERROR(dynamic linker needed)))
-AC_SUBST(DYNAMIC_LD_LIBS)
-
-dnl ---------------------------------------------
 dnl zlib
 dnl ---------------------------------------------
 dnl Test for libz
