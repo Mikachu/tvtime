@@ -173,7 +173,7 @@ static void crossfade_frame( unsigned char *output,
 static void pngscreenshot( const char *filename, unsigned char *frame422,
                            int width, int height, int stride )
 {
-    pngoutput_t *pngout = pngoutput_new( filename, width, height, 0, 0.45 );
+    pngoutput_t *pngout = pngoutput_new( filename, width, height, 0, 0.45, 0 );
     unsigned char *tempscanline = (unsigned char *) malloc( width * 3 );
     int i;
 
