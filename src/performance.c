@@ -184,7 +184,7 @@ void performance_print_last_frame_stats( performance_t *perf, int framesize )
     double wait_bot = ((double) timediff( &perf->delay_blit_bot, &perf->constructed_bot )) / 1000.0;
     double blit_bot = ((double) timediff( &perf->blit_bot_end, &perf->blit_bot_start )) / 1000.0;
 
-    fprintf( stderr, "tvtime: acquire % 2.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
+    fprintf( stderr, "tvtime: acquire %5.2fms, build top % 2.2fms, wait top % 2.2fms, blit top % 2.2fms\n"
                      "tvtime:                  build bot % 2.2fms, wait bot % 2.2fms, blit bot % 2.2fms\n",
              acquire, build_top, wait_top, blit_top, build_bot, wait_bot, blit_bot );
     fprintf( stderr, "tvtime: system->video memory speed approximately %.2fMB/sec\n",
