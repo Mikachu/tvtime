@@ -585,6 +585,7 @@ static void print_usage( char **argv )
 {
     lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
     lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
+    lfputs( _("  -A, --nowidescreen         4:3 mode.\n"), stderr );
     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
@@ -635,6 +636,7 @@ static void print_config_usage( char **argv )
 {
     lfprintf( stderr, _("usage: %s [OPTION]...\n\n"), argv[ 0 ] );
     lfputs( _("  -a, --widescreen           16:9 mode.\n"), stderr );
+    lfputs( _("  -A, --nowidescreen         4:3 mode.\n"), stderr );
     lfputs( _("  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"), stderr );
     lfputs( _("  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"), stderr );
     lfputs( _("  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"), stderr );
@@ -883,6 +885,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "window", 0, 0, 'M' },
         { "slave", 0, 0, 'k' },
         { "widescreen", 0, 0, 'a' },
+        { "nowidescreen", 0, 0, 'A' },
         { "xmltv", 1, 0, 't' },
         { "xmltvlanguage", 1, 0, 'l' },
         { "display", 1, 0, 'X' },
@@ -895,10 +898,11 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "ahkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
+        while( (c = getopt_long( argc, argv, "aAhkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
+            case 'A': ct->aspect = 0; break;
             case 'k': ct->slave_mode = 1; break;
             case 'm': ct->fullscreen = 1; break;
             case 'M': ct->fullscreen = 0; break;
@@ -1021,6 +1025,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "fullscreen", 0, 0, 'm' },
         { "window", 0, 0, 'M' },
         { "widescreen", 0, 0, 'a' },
+        { "nowidescreen", 0, 0, 'A' },
         { "xmltv", 2, 0, 't' },
         { "xmltvlanguage", 2, 0, 'l' },
         { "priority", 2, 0, 'R' },
@@ -1035,10 +1040,11 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         return 0;
     }
 
-    while( (c = getopt_long( argc, argv, "ahmMF:g:I:d:b:i:c:n:D:f:x:t:l:R:",
+    while( (c = getopt_long( argc, argv, "aAhmMF:g:I:d:b:i:c:n:D:f:x:t:l:R:",
             long_options, &option_index )) != -1 ) {
         switch( c ) {
         case 'a': ct->aspect = 1; break;
+        case 'A': ct->aspect = 0; break;
         case 'm': ct->fullscreen = 1; break;
         case 'M': ct->fullscreen = 0; break;
         case 'F': if( ct->config_filename ) free( ct->config_filename );
