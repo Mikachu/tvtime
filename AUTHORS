@@ -110,6 +110,12 @@ Authors and contributors
   Andrei Badea <andrei.badea@movzx.net>
     - Added support for _NET_WM_ICON.
 
+  Martijn Lina <martijn@users.sourceforge.net>
+    - Bugfix for capture cards that don't support a volume control.
+
+  Tobias Gruetzmacher <tobig@users.sourceforge.net>
+    - Bugfix for the SET_NORM command.
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>
