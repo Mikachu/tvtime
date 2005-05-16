@@ -54,6 +54,7 @@ static deinterlace_method_t weavemethod =
     deinterlace_scanline_weave,
     copy_scanline,
     0,
+    0,
     { "Only updates the most recent field",
       "",
       "",

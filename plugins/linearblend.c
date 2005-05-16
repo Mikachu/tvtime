@@ -179,6 +179,7 @@ static deinterlace_method_t linearblendmethod =
     deinterlace_scanline_linear_blend,
     deinterlace_scanline_linear_blend2,
     0,
+    0,
     { "Avoids flicker by blurring consecutive frames",
       "of input.  Use this if you want to run your",
       "monitor at an arbitrary refresh rate and not",

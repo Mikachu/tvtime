@@ -142,6 +142,7 @@ static deinterlace_method_t vfirmethod =
     deinterlace_scanline_vfir,
     copy_scanline,
     0,
+    0,
     { "Avoids flicker by blurring consecutive frames",
       "of input.  Use this if you want to run your",
       "monitor at an arbitrary refresh rate and not",

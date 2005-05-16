@@ -182,6 +182,7 @@ static deinterlace_method_t greedymethod =
     copy_scanline,
     deinterlace_greedy_packed422_scanline_mmxext,
     0,
+    1,
     { "Uses heuristics to detect motion in the input",
       "frames and reconstruct image detail where",
       "possible.  Use this for high quality output",

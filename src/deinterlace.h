@@ -106,9 +106,13 @@ struct deinterlace_frame_data_s
     uint8_t *f3;
 };
 
+/**
+ * Note: second_field is used in xine. For tvtime it should be the same as bottom_field.
+ */
 typedef void (*deinterlace_frame_t)( uint8_t *output, int outstride,
                                      deinterlace_frame_data_t *data,
-                                     int bottom_field, int width, int height );
+                                     int bottom_field, int second_field,
+                                     int width, int height );
 
 
 /**
@@ -125,6 +129,7 @@ struct deinterlace_method_s
     deinterlace_interp_scanline_t interpolate_scanline;
     deinterlace_copy_scanline_t copy_scanline;
     deinterlace_frame_t deinterlace_frame;
+    int delaysfield; /* xine: this method delays output by one field relative to input */
     const char *description[ 10 ];
 };
 

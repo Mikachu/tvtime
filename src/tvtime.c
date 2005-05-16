@@ -387,7 +387,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                                              uint8_t *curframe,
                                              uint8_t *lastframe,
                                              uint8_t *secondlastframe,
-                                             int bottom_field,
+                                             int bottom_field, int second_field,
                                              int width,
                                              int frame_height,
                                              int instride,
@@ -485,7 +485,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
         data.f1 = lastframe;
         data.f2 = secondlastframe;
 
-        tvtime->curmethod->deinterlace_frame( output, outstride, &data, bottom_field, width, frame_height );
+        tvtime->curmethod->deinterlace_frame( output, outstride, &data, bottom_field, bottom_field, width, frame_height );
 
         if( tvtime->outputfilter ) {
             for( i = 0; i < frame_height; i++ ) {
@@ -526,6 +526,9 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
         scanline++;
 
         /* Something is wrong here. -Billy */
+        /* xine's suggestion:
+        loop_size = ((frame_height - 2) / 2);
+        */
         loop_size = ((frame_height - 2) / 2) - bottom_field;
         for( i = loop_size; i; --i ) {
             deinterlace_scanline_data_t data;
@@ -540,7 +543,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
                 videofilter_packed422_scanline( tvtime->inputfilter, curframe + (instride*2), width, 0, scanline + 1 );
             }
 
-            if( bottom_field ) {
+            if( second_field ) {
                 data.tt1 = (i < loop_size) ? (curframe - instride) : (curframe + instride);
                 data.m1  = curframe + instride;
                 data.bb1 = (i > 1) ? (curframe + (instride*3)) : (curframe + instride);
@@ -553,7 +556,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             data.t2 = lastframe;
             data.b2 = lastframe + (instride*2);
 
-            if( bottom_field ) {
+            if( second_field ) {
                 data.tt3 = (i < loop_size) ? (lastframe - instride) : (lastframe + instride);
                 data.m3  = lastframe + instride;
                 data.bb3 = (i > 1) ? (lastframe + (instride*3)) : (lastframe + instride);
@@ -575,7 +578,7 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             data.m0  = curframe + (instride*2);
             data.bb0 = (i > 1) ? (curframe + (instride*4)) : (curframe + (instride*2));
 
-            if( bottom_field ) {
+            if( second_field ) {
                 data.t1 = curframe + instride;
                 data.b1 = (i > 1) ? (curframe + (instride*3)) : (curframe + instride);
             } else {
@@ -587,11 +590,17 @@ static void tvtime_build_deinterlaced_frame( tvtime_t *tvtime,
             data.m2  = lastframe + (instride*2);
             data.bb2 = (i > 1) ? (lastframe + (instride*4)) : (lastframe + (instride*2));
 
-            if( bottom_field ) {
+            if( second_field ) {
                 data.t2 = lastframe + instride;
+                /* xine's suggestion:
+                data.b2 = (i > 1) ? (lastframe + (instride*3)) : (lastframe + instride);
+                */
                 data.b2 = lastframe + (instride*3);
             } else {
                 data.t2 = secondlastframe + instride;
+                /* xine's suggestion:
+                data.b2 = (i > 1) ? (secondlastframe + (instride*3)) : (secondlastframe + instride);
+                */
                 data.b2 = secondlastframe + (instride*3);
             }
 
@@ -2253,7 +2262,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                         tvtime_build_deinterlaced_frame( tvtime,
                               output->get_output_buffer(),
                               curframe, lastframe, secondlastframe,
-                              0, width, height, width * 2,
+                              0, 0, width, height, width * 2,
                               output->get_output_stride() );
                     }
                 }
@@ -2399,7 +2408,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     } else {
                         tvtime_build_deinterlaced_frame( tvtime,
                               output->get_output_buffer(),
-                              curframe, lastframe, secondlastframe, 1,
+                              curframe, lastframe, secondlastframe, 1, 1,
                               width, height, width * 2,
                               output->get_output_stride() );
                     }

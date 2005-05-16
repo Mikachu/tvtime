@@ -52,6 +52,7 @@ static deinterlace_method_t linearmethod =
     deinterlace_scanline_linear,
     copy_scanline,
     0,
+    0,
     { "Expands each field independently without",
       "blurring or copying in time.  Use this if you",
       "want TV-quality with low CPU, and you have",

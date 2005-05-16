@@ -34,6 +34,7 @@ static deinterlace_method_t scalerbobmethod =
     0,
     0,
     0,
+    0,
     { "Expands each field independently without",
       "blurring or copying in time.  Use this if you",
       "want TV-quality with low CPU, and you have",

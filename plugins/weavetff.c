@@ -57,6 +57,7 @@ static deinterlace_method_t weavemethod =
     deinterlace_scanline_weave,
     copy_scanline,
     0,
+    0,
     { "Constructs frames from pairs of fields.  Use",
       "this if you are watching a film broadcast or",
       "DVD in a PAL area, or if you are using a",

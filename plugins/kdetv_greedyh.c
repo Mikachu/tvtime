@@ -36,7 +36,8 @@
 
 static void deinterlace_frame_di_greedyh( uint8_t *output, int outstride,
                                           deinterlace_frame_data_t *data,
-                                          int bottom_field, int width, int height )
+                                          int bottom_field, int second_field,
+                                          int width, int height )
 {
     TDeinterlaceInfo Info;
     TPicture Picture[ 8 ];
@@ -111,6 +112,7 @@ static deinterlace_method_t greedymethod =
     0,
     0,
     deinterlace_frame_di_greedyh,
+    0,
     { "Uses heuristics to detect motion in the input",
       "frames and reconstruct image detail where",
       "possible.  Use this for high quality output",
