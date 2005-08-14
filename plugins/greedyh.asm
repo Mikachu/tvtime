@@ -265,7 +265,9 @@ void DScalerFilterGreedyH::FUNCT_NAME(TDeinterlaceInfo* pInfo)
 #ifdef ARCH_386
                "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",
 #endif
+#ifdef __MMX__
                "mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7",
+#endif
                "memory", "cc"
             );
 

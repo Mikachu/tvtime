@@ -102,6 +102,7 @@ Authors and contributors
 
   Than Ngo <than@redhat.com>
     - Fixed for compiling with gcc-3.4 and -fPIC.
+    - Fixed for compiling with gcc-4.0
 
   Ingo van Lil <inguin@gmx.de>
     - Added support for reading the localized program descriptions
