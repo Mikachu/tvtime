@@ -1,4 +1,5 @@
 1.0 -
+  * vektor: Add a South Africa station list submitted by Jan Gutter.
   * vektor: Add mattes for 16:10 monitors.
   * vektor: Compile fixes for gcc4 from Than Ngo.
 

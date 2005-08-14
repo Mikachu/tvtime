@@ -749,18 +749,25 @@ static void reset_frequency_menu( menu_t *menu, int norm, const char *tablename 
                   _("China Broadcast") );
         menu_set_text( menu, 7, string );
         menu_set_enter_command( menu, 7, TVTIME_SET_FREQUENCY_TABLE, "china-broadcast" );
+        
+        snprintf( string, sizeof( string ),
+                  !strcasecmp( tablename, "southafrica" ) ?
+                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+                  _("South Africa") );
+        menu_set_text( menu, 8, string );
+        menu_set_enter_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "southafrica" );
 
         snprintf( string, sizeof( string ),
                   !strcasecmp( tablename, "custom" ) ?
                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
                   _("Custom (first run tvtime-scanner)") );
-        menu_set_text( menu, 8, string );
-        menu_set_enter_command( menu, 8, TVTIME_SET_FREQUENCY_TABLE, "custom" );
+        menu_set_text( menu, 9, string );
+        menu_set_enter_command( menu, 9, TVTIME_SET_FREQUENCY_TABLE, "custom" );
 
         snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
                   _("Back") );
-        menu_set_text( menu, 9, string );
-        menu_set_enter_command( menu, 9, TVTIME_SHOW_MENU, "stations" );
+        menu_set_text( menu, 10, string );
+        menu_set_enter_command( menu, 10, TVTIME_SHOW_MENU, "stations" );
     }
 }
 

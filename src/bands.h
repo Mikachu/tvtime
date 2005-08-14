@@ -297,6 +297,17 @@ const band_entry_t band_data_cn_bcast[] = {
     { "C3",  583250 }, { "C4",  591250 }, { "C5",  599250 } 
 };
 
+/**
+ * South African bands.
+ */
+const band_entry_t band_data_vhf_za[] = {
+    { "1",   175250 }, { "2",   183250 }, { "3",   191250 },
+    { "4",   199250 }, { "5",   207250 }, { "6",   215250 },
+    { "7",   223250 }, { "8",   231250 }, { "9",   239250 },
+    { "10",  247250 }, { "11",  255250 }, { "12",  263250 },
+    { "13",  271250 }    
+};
+
 const band_entry_t band_data_japan_bcast[] = {
     { "1",   91250 }, { "2",   97250 }, { "3",  103250 },
     { "4",  171250 }, { "5",  177250 }, { "6",  183250 },
@@ -369,6 +380,7 @@ const band_t bands[] = {
     { "US Two-Way", band_data_us_twoway, sizeof( band_data_us_twoway ) / sizeof( band_entry_t ) },
     { "US Broadcast", band_data_us_bcast, sizeof( band_data_us_bcast ) / sizeof( band_entry_t ) },
     { "China Broadcast", band_data_cn_bcast, sizeof( band_data_cn_bcast ) / sizeof( band_entry_t ) },
+    { "VHF South Africa", band_data_vhf_za, sizeof( band_data_vhf_za ) / sizeof( band_entry_t ) },
     { "Japan Broadcast", band_data_japan_bcast, sizeof( band_data_japan_bcast ) / sizeof( band_entry_t ) },
     { "Japan Cable", band_data_japan_catv, sizeof( band_data_japan_catv ) / sizeof( band_entry_t ) },
     { "VHF E2-E12", band_data_vhf_e1_e12, sizeof( band_data_vhf_e1_e12 ) / sizeof( band_entry_t ) },
@@ -387,16 +399,17 @@ const int numbands = ( sizeof( bands ) / sizeof( band_t ) );
 const band_t *us_cable_band = &(bands[ 0 ]);
 
 /*
- UK         VHF Ireland, VHF Misc, UHF
- Europe     VHF Italy, VHF E1-E12, VHF S1-S41, VHF Russia, UHF
- France     VHF France, UHF
- East       VHF Russia, UHF
- Australia  VHF Australia, UHF-AU
- NZ         VHF E1-E12, UHF
- US Cable   US CATV
- US Air     US Bcast
- JP Cable   JP Cable
- JP Air     JP Bcast
+ UK           VHF Ireland, VHF Misc, UHF
+ Europe       VHF Italy, VHF E1-E12, VHF S1-S41, VHF Russia, UHF
+ France       VHF France, UHF
+ East         VHF Russia, UHF
+ Australia    VHF Australia, UHF-AU
+ NZ           VHF E1-E12, UHF
+ US Cable     US CATV
+ US Air       US Bcast
+ JP Cable     JP Cable
+ JP Air       JP Bcast
+ South Africa VHF South Africa, UHF
 */
 
 #define NTSC_CABLE_HRC(x) ((x == 77250) ? 78000 : ((x == 83250) ? 84000 : (x - 1250)))
