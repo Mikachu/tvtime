@@ -1,4 +1,5 @@
 1.0 -
+  * vektor: Add mattes for 16:10 monitors.
   * vektor: Compile fixes for gcc4 from Than Ngo.
 
 0.99 - Tue Apr 19 21:49:19 EDT 2005

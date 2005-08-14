@@ -1083,13 +1083,17 @@ static void build_matte_menu( menu_t *menu, int mode, int sixteennine )
                   _("4:3 centre") );
         menu_set_text( menu, 4, string );
         menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "4:3" );
+        snprintf( string, sizeof( string ), (mode == 4) ?
+                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+                  _("16:10") );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SET_MATTE, "16:10" );
     } else {
         snprintf( string, sizeof( string ), (mode == 0) ?
                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
                   _("4:3 + Overscan") );
         menu_set_text( menu, 1, string );
         menu_set_enter_command( menu, 1, TVTIME_SET_MATTE, "4:3" );
-        menu_set_back_command( menu, TVTIME_SHOW_MENU, "output" );
         snprintf( string, sizeof( string ), (mode == 1) ?
                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
                   _("16:9") );
@@ -1097,37 +1101,44 @@ static void build_matte_menu( menu_t *menu, int mode, int sixteennine )
         menu_set_enter_command( menu, 2, TVTIME_SET_MATTE, "16:9" );
         snprintf( string, sizeof( string ), (mode == 2) ?
                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-                  _("1.85:1") );
+                  _("16:10") );
         menu_set_text( menu, 3, string );
-        menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "1.85:1" );
+        menu_set_enter_command( menu, 3, TVTIME_SET_MATTE, "16:10" );
         snprintf( string, sizeof( string ), (mode == 3) ?
                   TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-                  _("2.35:1") );
+                  _("1.85:1") );
         menu_set_text( menu, 4, string );
-        menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "2.35:1" );
+        menu_set_enter_command( menu, 4, TVTIME_SET_MATTE, "1.85:1" );
+        snprintf( string, sizeof( string ), (mode == 4) ?
+                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
+                  _("2.35:1") );
+        menu_set_text( menu, 5, string );
+        menu_set_enter_command( menu, 5, TVTIME_SET_MATTE, "2.35:1" );
     }
 
     snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
               _("Back") );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "output" );
 }
 
 static void osd_list_matte( tvtime_osd_t *osd, int mode, int sixteennine )
 {
-    tvtime_osd_list_set_lines( osd, 5 );
+    tvtime_osd_list_set_lines( osd, 6 );
     if( sixteennine ) {
         tvtime_osd_list_set_text( osd, 0, _("Matte setting (Anamorphic input)") );
         tvtime_osd_list_set_text( osd, 1, _("16:9 + Overscan") );
         tvtime_osd_list_set_text( osd, 2, "1.85:1" );
         tvtime_osd_list_set_text( osd, 3, "2.35:1" );
         tvtime_osd_list_set_text( osd, 4, _("4:3 centre") );
+        tvtime_osd_list_set_text( osd, 5, "16:10" );
     } else {
         tvtime_osd_list_set_text( osd, 0, _("Matte setting (4:3 input)") );
         tvtime_osd_list_set_text( osd, 1, _("4:3 + Overscan") );
         tvtime_osd_list_set_text( osd, 2, "16:9" );
-        tvtime_osd_list_set_text( osd, 3, "1.85:1" );
-        tvtime_osd_list_set_text( osd, 4, "2.35:1" );
+        tvtime_osd_list_set_text( osd, 3, "16:10" );
+        tvtime_osd_list_set_text( osd, 4, "1.85:1" );
+        tvtime_osd_list_set_text( osd, 5, "2.35:1" );
     }
     tvtime_osd_list_set_hilight( osd, mode + 1 );
     tvtime_osd_show_list( osd, 1, 0 );
@@ -1837,16 +1848,19 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
             matte_x = 0;
             matte_w = width;
             if( commands_toggle_matte( commands ) ) {
-                matte_mode = (matte_mode + 1) % 4;
+                matte_mode = (matte_mode + 1) % 5;
             } else {
                 if( !strcmp( commands_get_matte_mode( commands ), "16:9" ) ) {
                     matte_mode = sixteennine ? 0 : 1;
                 } else if( !strcmp( commands_get_matte_mode( commands ),
+                                    "16:10" ) ) {
+                    matte_mode = sixteennine ? 4 : 2;
+                } else if( !strcmp( commands_get_matte_mode( commands ),
                                     "1.85:1" ) ) {
-                    matte_mode = sixteennine ? 1 : 2;
+                    matte_mode = sixteennine ? 1 : 3;
                 } else if( !strcmp( commands_get_matte_mode( commands ),
                                     "2.35:1" ) ) {
-                    matte_mode = sixteennine ? 2 : 3;
+                    matte_mode = sixteennine ? 2 : 4;
                 } else {
                     matte_mode = sixteennine ? 3 : 0;
                 }
@@ -1863,16 +1877,29 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     matte = 4.0 / 3.0;
                     matte_w = (int) (((double) sqheight * matte) + 0.5);
                     matte_x = (width - matte_w) / 2;
-                    matte_h = height;
-                    matte_y = 0;
+                    /* We're cropping the sides off so we add overscan to avoid mess
+                     * at the top of the screen. */
+                    matte_y = commands_get_overscan( commands ) * height / 2;
+                    matte_h = height - matte_y;
                     output->set_matte( (matte_h * 4) / 3, matte_h );
+                } else if( matte_mode == 4 ) {
+                    matte = 1.6;
+                    matte_w = (int) (((double) sqheight * matte) + 0.5);
+                    matte_x = (width - matte_w) / 2;
+                    /* We're cropping the sides off so we add overscan to avoid mess
+                     * at the top of the screen. */
+                    matte_y = commands_get_overscan( commands ) * height / 2;
+                    matte_h = height - matte_y;
+                    output->set_matte( (matte_h * 16) / 10, matte_h );
                 }
             } else {
                 if( matte_mode == 1 ) {
                     matte = 16.0 / 9.0;
                 } else if( matte_mode == 2 ) {
-                    matte = 1.85;
+                    matte = 1.6;
                 } else if( matte_mode == 3 ) {
+                    matte = 1.85;
+                } else if( matte_mode == 4 ) {
                     matte = 2.35;
                 }
             }

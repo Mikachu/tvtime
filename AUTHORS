@@ -117,6 +117,9 @@ Authors and contributors
   Tobias Gruetzmacher <tobig@users.sourceforge.net>
     - Bugfix for the SET_NORM command.
 
+  Robert Jessop <rj200@users.sourceforge.net>
+    - Patch for mattes for 16:10 monitors.
+
 Translators
 
   Per von Zweigbergk <pvz@e.kth.se>
