@@ -56,6 +56,7 @@ struct config_s
     char *geometry;
     int verbose;
     int aspect;
+    int squarepixels;
     int debug;
     int fullscreen;
     int alwaysontop;
@@ -279,6 +280,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
             } else {
                 ct->fspos = 0;
             }
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "SquarePixels" ) ) {
+            ct->squarepixels = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "Widescreen" ) ) {
@@ -707,6 +712,7 @@ config_t *config_new( void )
     ct->geometry = strdup( "0x576" );
     ct->verbose = 0;
     ct->aspect = 0;
+    ct->squarepixels = 1;
     ct->debug = 0;
     ct->fullscreen = 0;
     ct->alwaysontop = 0;
@@ -1647,5 +1653,10 @@ int config_get_mute_on_exit( config_t *ct )
 int config_get_show_taglines( config_t *ct )
 {
     return ct->show_taglines;
+}
+
+int config_get_square_pixels( config_t *ct )
+{
+    return ct->squarepixels;
 }
 

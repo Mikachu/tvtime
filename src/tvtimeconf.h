@@ -191,6 +191,7 @@ int config_get_unmute_volume( config_t *ct );
 int config_get_muted( config_t *ct );
 int config_get_mute_on_exit( config_t *ct );
 int config_get_show_taglines( config_t *ct );
+int config_get_square_pixels( config_t *ct );
 
 #ifdef __cplusplus
 };

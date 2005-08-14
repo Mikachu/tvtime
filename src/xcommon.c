@@ -86,6 +86,7 @@ static int matte_height;
 static int alwaysontop;
 static int has_focus;
 static int wm_is_metacity;
+static int use_square_pixels;
 static xfullscreen_t *xf;
 
 static Atom net_supporting_wm_check;
@@ -309,7 +310,11 @@ static void xv_get_output_aspect( int *px_widthratio, int *px_heightratio )
         metric_widthratio = matte_width;
     }
 
-    xfullscreen_get_pixel_aspect( xf, &sar_frac_w, &sar_frac_h );
+    if( use_square_pixels ) {
+        sar_frac_w = sar_frac_h = 1;
+    } else {
+        xfullscreen_get_pixel_aspect( xf, &sar_frac_w, &sar_frac_h );
+    }
 
     if( xcommon_verbose ) {
         fprintf( stderr, "xcommon: Pixel aspect ratio %d:%d.\n",
@@ -830,7 +835,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XSetWindowAttributes xswa;
     const char *hello = "tvtime";
     unsigned long mask;
-    char *wmname;
+    char *wmname = 0;
     int wx, wy;
     unsigned int ww, wh;
     int gflags;
@@ -1830,5 +1835,10 @@ void xcommon_update_xawtv_station( int frequency, int channel_id,
     XChangeProperty( display, wm_window, xawtv_station,
                      XA_STRING, 8, PropModeReplace,
                      (unsigned char *) data, length );
+}
+
+void xcommon_set_square_pixel_mode( int squarepixel )
+{
+    use_square_pixels = squarepixel;
 }
 

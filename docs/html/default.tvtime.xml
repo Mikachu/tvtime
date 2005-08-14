@@ -130,6 +130,14 @@
   <option name="Widescreen" value="0"/>
 
   <!--
+    Disabling this option tells tvtime to use the X server DPI to determine
+    pixel shape.  By default, tvtime assumes pixels are square.  Set this
+    to 0 if you have a 4:3 monitor but run it at 1280x1024 and want tvtime
+    to do the right thing.
+  -->
+  <option name="SquarePixels" value="1"/>
+
+  <!--
     Sets the geometry of the window.  A width value of 0 signifies
     that the appropriate width for the given height will be used.
     For 4:3 content on a square pixel display, this defaults to a

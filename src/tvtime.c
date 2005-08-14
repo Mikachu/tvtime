@@ -1242,7 +1242,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     sixteennine = config_get_aspect( ct );
 
     if( !output || !output->init( config_get_geometry( ct ),
-                                  sixteennine, verbose ) ) {
+                                  sixteennine, config_get_square_pixels( ct ),
+                                  verbose ) ) {
         /* Error messages are driver specific. */
         return 1;
     }

@@ -245,6 +245,13 @@ name:channel name.  Valid channels are:
 .hy
 
 .TP
+<option name="SquarePixels" value="1"/>
+Disabling this option tells tvtime to use the X server DPI to determine
+pixel shape.  By default, tvtime assumes pixels are square.  Set this
+to 0 if you have a 4:3 monitor but run it at 1280x1024 and want tvtime
+to do the right thing.
+
+.TP
 <option name="Widescreen" value="0"/>
 This option enables 16:9 aspect ratio mode by default on startup.
 

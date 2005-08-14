@@ -293,7 +293,7 @@ static int get_colourkey( void )
     return 0;
 }
 
-static int xv_init( const char *user_geometry, int aspect, int verbose )
+static int xv_init( const char *user_geometry, int aspect, int squarepixel, int verbose )
 {
     xvoutput_verbose = verbose;
 
@@ -302,6 +302,7 @@ static int xv_init( const char *user_geometry, int aspect, int verbose )
         fprintf( stderr, "xvoutput: Not using shared memory XVIDEO.\n" );
     }
 
+    xcommon_set_square_pixel_mode( squarepixel );
     if( !xcommon_open_display( user_geometry, aspect, verbose ) ) {
         return 0;
     }

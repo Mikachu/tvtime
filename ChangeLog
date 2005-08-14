@@ -1,4 +1,8 @@
 1.0 -
+  * vektor: Add a new config option, SquarePixels.  By default, tvtime
+      will now assume that the output device is square pixel, since
+      X servers are so often misconfigured anyway and all LCD panels
+      have square pixels.
   * vektor: Add a South Africa station list submitted by Jan Gutter.
   * vektor: Add mattes for 16:10 monitors.
   * vektor: Compile fixes for gcc4 from Than Ngo.

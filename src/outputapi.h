@@ -28,7 +28,7 @@
 
 typedef struct output_api_s
 {
-    int (* init)( const char *user_geometry, int aspect, int verbose );
+    int (* init)( const char *user_geometry, int aspect, int squarepixel, int verbose );
 
     int (* set_input_size)( int inputwidth, int inputheight );
 
