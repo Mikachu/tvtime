@@ -149,9 +149,8 @@ msgid "4:3 centre"
 msgstr "4:3 centrování"
 
 #: src/tvtime.c:1088 src/tvtime.c:1104
-#, fuzzy
 msgid "16:10"
-msgstr "16:9"
+msgstr "16:10"
 
 #: src/tvtime.c:1094 src/tvtime.c:1137
 msgid "4:3 + Overscan"
@@ -463,7 +462,7 @@ msgstr "Čínské vysílání"
 
 #: src/commands.c:756
 msgid "South Africa"
-msgstr ""
+msgstr "Jížní Afrika"
 
 #: src/commands.c:763
 msgid "Custom (first run tvtime-scanner)"
@@ -992,7 +991,6 @@ msgstr ""
 "  -d, --device=ZAŘÍZENÍ      zařízení video4linux (standardně /dev/video0).\n"
 
 #: src/tvtimeconf.c:597 src/tvtimeconf.c:649
-#, fuzzy
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1022,6 +1020,7 @@ msgstr ""
 "                                 us-cable100\n"
 "                                 us-broadcast\n"
 "                                 china-broadcast\n"
+"                                 southafrica\n"
 "                                 japan-cable\n"
 "                                 japan-broadcast\n"
 "                                 europe\n"

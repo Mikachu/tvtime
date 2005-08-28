@@ -4,10 +4,10 @@
 # GERE Károly <kgere@message.hu>, 2005
 msgid ""
 msgstr ""
-"Project-Id-Version: tvtime 0.9.14\n"
+"Project-Id-Version: tvtime 0.99\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2005-08-14 14:41-0400\n"
-"PO-Revision-Date: 2005-07-18 15:22+0100\n"
+"PO-Revision-Date: 2005-08-15 15:45+0100\n"
 "Last-Translator: GERE Károly <kgere@message.hu>\n"
 "Language-Team: GERE Károly <kgere@message.hu>\n"
 "MIME-Version: 1.0\n"
@@ -33,17 +33,17 @@ msgstr "Vissza"
 #: src/tvtime.c:854 src/tvtime.c:997
 #, c-format
 msgid "Full rate: %.2f fps"
-msgstr "Teljes képkockasebesség: %.2f Hz"
+msgstr "Teljes képkockasebesség: %.2f fps"
 
 #: src/tvtime.c:862 src/tvtime.c:1001
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
-msgstr "Fél képkockasebesség, felső mezők: %.2f Hz"
+msgstr "Fél képkockasebesség, felső mezők: %.2f fps"
 
 #: src/tvtime.c:869 src/tvtime.c:1005
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
-msgstr "Fél képkockasebesség, alsó mezők: %.2f Hz"
+msgstr "Fél képkockasebesség, alsó mezők: %.2f fps"
 
 #: src/tvtime.c:894
 msgid "Overscan setting"
@@ -71,7 +71,7 @@ msgstr "Teljes képernyő pozíciója"
 
 #: src/tvtime.c:942
 msgid "Always-on-top"
-msgstr "Mindig látható"
+msgstr "A tvtime mindig látható"
 
 #: src/tvtime.c:951
 msgid "Quiet screenshots"
@@ -119,7 +119,7 @@ msgstr "Átlagos blit-idő: %.2f ms (%.0f MB/s)"
 #: src/tvtime.c:1039
 #, c-format
 msgid "Average render time: %5.2f ms"
-msgstr "Átlagos képszerkesztési idő: %5.2f ms"
+msgstr "Átlagos renderelési idő: %5.2f ms"
 
 #: src/tvtime.c:1043
 #, c-format
@@ -148,9 +148,8 @@ msgid "4:3 centre"
 msgstr "4:3 középen"
 
 #: src/tvtime.c:1088 src/tvtime.c:1104
-#, fuzzy
 msgid "16:10"
-msgstr "16:9"
+msgstr "16:10"
 
 #: src/tvtime.c:1094 src/tvtime.c:1137
 msgid "4:3 + Overscan"
@@ -216,7 +215,6 @@ msgstr ""
 "    esetében ez az alapbeállítás. Kérlek, hogy a bttv modul betöltésekor\n"
 "    add meg a \"gbuffers=4\" paramétert. További információkért keresd\n"
 "    fel a következő címet: %s\n"
-"    %s\n"
 "\n"
 
 #: src/tvtime.c:1398
@@ -234,9 +232,8 @@ msgstr ""
 "    A rögzítőkártya meghajtója (%s) nem szolgáltat elég pufferterületet\n"
 "    a videófeldolgozáshoz. Kérlek, ellenőrizd a meghajtóprogram\n"
 "    dokumentációjában, hogy lehetséges-e az alkalmazások számára nyújtott\n"
-"    pufferek számának növelése, és küldj erről jelentést a tvtime "
-"hibakövető\n"
-"    rendszerébe a következő címre: %s.\n"
+"    pufferek számának növelése, és küldj erről jelentést a tvtime     "
+"hibakövető rendszerébe a következő címre: %s.\n"
 "\n"
 
 #: src/tvtime.c:1452
@@ -249,7 +246,7 @@ msgstr "Nincs videóforrás"
 
 #: src/tvtime.c:1508
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
-msgstr "FIFO éltrehozása sikertlene, a távirányító letiltva.\n"
+msgstr "FIFO létrehozása sikertelen, a távirányító letiltva.\n"
 
 #: src/tvtime.c:1526
 msgid "Closed caption display failed to initialize, disabled.\n"
@@ -333,7 +330,7 @@ msgstr "Jelenlegi"
 #. TRANSLATORS: This refers to a TV program, not a computer program.
 #: src/commands.c:214 src/commands.c:221
 msgid "No program information available"
-msgstr "Nincs elérhető műsorinform"
+msgstr "Nincs elérhető műsorinformáció"
 
 #: src/commands.c:277
 #, c-format
@@ -342,11 +339,11 @@ msgstr "Következő: %s"
 
 #: src/commands.c:320
 msgid "Renumber current channel"
-msgstr "Aktuális csatorna újraszámozása"
+msgstr "Csatorna újraszámozása"
 
 #: src/commands.c:328 src/commands.c:331
 msgid "Current channel active in list"
-msgstr "Az aktuális csatorna aktív a listán"
+msgstr "A csatorna aktív a listán"
 
 #: src/commands.c:341
 msgid "Stop channel scan"
@@ -362,7 +359,7 @@ msgstr "Az összes csatorna aktívra állítása"
 
 #: src/commands.c:359
 msgid "Finetune current channel"
-msgstr "Aktuális csatorna finomhangolása"
+msgstr "Csatorna finomhangolása"
 
 #: src/commands.c:366
 msgid "Change NTSC cable mode"
@@ -370,19 +367,19 @@ msgstr "NTSC kábel mód váltása"
 
 #: src/commands.c:372
 msgid "Set current channel as SECAM"
-msgstr "Aktuális csatorna SECAM-ra állítása"
+msgstr "Csatorna SECAM-ra állítása"
 
 #: src/commands.c:373
 msgid "Set current channel as PAL"
-msgstr "Aktuális csatorna PAL-ra állítása"
+msgstr "Csatorna PAL-ra állítása"
 
 #: src/commands.c:384
 msgid "Use PAL-BG audio decoding"
-msgstr "PAL B/G audiódekódolás használata"
+msgstr "PAL-BG audiódekódolás használata"
 
 #: src/commands.c:389
 msgid "Use PAL-DK audio decoding"
-msgstr "PAL D/K audiódekódolás használata"
+msgstr "PAL-DK audiódekódolás használata"
 
 #: src/commands.c:397
 msgid "Change frequency table"
@@ -411,7 +408,7 @@ msgstr "Audió mód"
 
 #: src/commands.c:620
 msgid "Default to PAL-DK audio decoding"
-msgstr "Alapértelmezett PAL-DK audió dekódolás"
+msgstr "PAL-DK audió dekódolás"
 
 #: src/commands.c:627 src/commands.c:1308 src/commands.c:1383
 msgid "Audio volume boost"
@@ -467,7 +464,7 @@ msgstr "Kína (antennás)"
 
 #: src/commands.c:756
 msgid "South Africa"
-msgstr ""
+msgstr "Dél-Afrika"
 
 #: src/commands.c:763
 msgid "Custom (first run tvtime-scanner)"
@@ -719,22 +716,22 @@ msgstr "Leállítás kikapcsolva."
 #: src/commands.c:2238
 #, c-format
 msgid "Using PAL-BG audio decoding for this channel."
-msgstr "PAL B/G audió dekódolás használata ehhez a csatornához."
+msgstr "PAL-BG audió dekódolás használata ehhez a csatornához."
 
 #: src/commands.c:2241
 #, c-format
 msgid "Using PAL-DK audio decoding for this channel."
-msgstr "PAL D/K audió dekódolás használata ehhez a csatornához."
+msgstr "PAL-DK audió dekódolás használata ehhez a csatornához."
 
 #: src/commands.c:2270
 #, c-format
 msgid "Defaulting to PAL-DK audio decoding."
-msgstr "PAL D/K audió dekódolás aktiválva."
+msgstr "PAL-DK audió dekódolás aktiválva."
 
 #: src/commands.c:2273
 #, c-format
 msgid "Defaulting to PAL-BG audio decoding."
-msgstr "PAL B/G audió dekódolás aktiválva."
+msgstr "PAL-BG audió dekódolás aktiválva."
 
 #: src/commands.c:2301
 msgid "Channel marked as active in the browse list."
@@ -897,12 +894,12 @@ msgstr "Hangerő"
 
 #: src/commands.c:3236
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Aktuális képbeállítások mentése globális alapértelmezettként.\n"
+msgstr "Képbeállítások mentése globális alapértelmezettként.\n"
 
 #: src/commands.c:3249
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
-msgstr "A képbeállítások mentése a %d. csatornához.\n"
+msgstr "Képbeállítások elmentve a %d. csatornához.\n"
 
 #: src/commands.c:3336
 msgid "Paused."
@@ -997,7 +994,6 @@ msgstr ""
 "  -d, --device=ESZKÖZ        video4linux eszköz (alapért.: /dev/video0)\n"
 
 #: src/tvtimeconf.c:597 src/tvtimeconf.c:649
-#, fuzzy
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1027,6 +1023,7 @@ msgstr ""
 "                                 us-cable100\n"
 "                                 us-broadcast\n"
 "                                 china-broadcast\n"
+"                                 southafrica\n"
 "                                 japan-cable\n"
 "                                 japan-broadcast\n"
 "                                 europe\n"
@@ -1297,12 +1294,15 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "    Enhanced Real Time Clock -tuki kernelissä on välttämätön sulavaa\n"
-#~ "    toistoa varten. Suosittelemme \"rtc\"-moduulin lataamista kerneliin\n"
-#~ "    ennen tvtimen käynnistämistä, sekä tarkistamaan, että käyttäjälläsi "
-#~ "on\n"
-#~ "    oikeudet laitetiedostoon (/dev/rtc tai /dev/misc/rtc). Lisätietoja\n"
-#~ "    saa tukisivultamme osoitteessa: %s.\n"
+#~ "    A folyamatos videómegjelenítéshez szükseég van az \"Enhanced Real "
+#~ "Time\n"
+#~ "    Clock\" támogatásra a kernelben. Erősen javasolt az \"rtc\" modul "
+#~ "betöltése\n"
+#~ "    a tvtime elindítása előtt, és a felhasználónak megfelelő jogokkal "
+#~ "kell\n"
+#~ "    rendelkeznie az eszköz (/dev/rtc vagy /dev/misc/rtc) fölött. További\n"
+#~ "    információkért látogasd meg a következő címet:\n"
+#~ "    %s\n"
 #~ "\n"
 
 #~ msgid ""
@@ -1317,12 +1317,12 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "    RTC-laitteen asettaminen 1024 Hz resoluutiolle epäonnistui. Tarkan\n"
-#~ "    ajoituksen saaminen on välttämätöntä sulavaa toistoa varten. Aja\n"
-#~ "    tvtimea pääkäyttäjänä, aseta tvtime SUID root -ohjelmaksi tai muuta\n"
-#~ "    RTC-laitteen korkein käyttäjäprosesseille sallittu "
-#~ "aikaerottelutarkkuus\n"
-#~ "    ajamalla pääkäyttäjänä komento:\n"
+#~ "    Az RTC eszköztől nem sikerült 1024 Hz-es frekvenciűt kérni.\n"
+#~ "    A folyamatos videóegjelenítéshez magas frekvenciára van szükség.\n"
+#~ "    Kérlek, futtasd a tvtime-ot root-ként, állítsd be SUID root-ra,\n"
+#~ "    vagy a következő parancs root-ként történő futtatásával állítsd\n"
+#~ "    át a maximális RTC frekvenciát:\n"
 #~ "        sysctl -w dev.rtc.max-user-freq=1024\n"
-#~ "    Lisätiedoja saa tukisivultamme osoitteessa: %s.\n"
+#~ "    További információkért látogasd meg a következő címet:\n"
+#~ "    %s\n"
 #~ "\n"
