@@ -3409,8 +3409,12 @@ void commands_next_frame( commands_t *cmd )
     }
 
     if( cmd->change_channel ) {
+        char number[ 6 ];
         reinit_tuner( cmd );
         cmd->change_channel = 0;
+        snprintf( number, 4, "%d",
+                  station_get_current_id( cmd->stationmgr ) );
+        config_save( cmd->cfg, "Channel", number );
     }
 
     cmd->xmltvupdated = 0;

@@ -1,4 +1,7 @@
 1.0 -
+  * vektor: Update the Channel config file parameter as the channel
+      changes, rather than once on shutdown.  Feature requested by
+      Andrew Oikle.
   * vektor: Add a new config option, SquarePixels.  By default, tvtime
       will now assume that the output device is square pixel, since
       X servers are so often misconfigured anyway and all LCD panels
