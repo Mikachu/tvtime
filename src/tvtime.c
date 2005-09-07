@@ -2646,6 +2646,20 @@ int main( int argc, char **argv )
     int read_stdin = 1;
     int result = 0;
     int realtime = 0;
+    uid_t priv_uid = geteuid();
+    uid_t user_uid = getuid();
+
+    /*
+     * Temporarily drop down to user-level access, so that files aren't
+     * created setuid root.
+     */
+    if( seteuid( user_uid ) == -1 ) {
+        lfprintf( stderr, _("\n"
+    "    Failed to drop root privileges: %s.\n"
+    "    tvtime will now exit to avoid security problems.\n\n"),
+            strerror( errno ) );
+        return 1;
+    }
 
     /*
      * Setup i18n. This has to be done as early as possible in order
@@ -2671,6 +2685,7 @@ int main( int argc, char **argv )
     /* Steal system resources in the name of performance. */
     /* Get maximum priority before dropping root privileges. We'll drop back */
     /* to the value specified in the config file (or the default) later. */
+    seteuid( priv_uid );
     setpriority( PRIO_PROCESS, 0, -19 );
     if( set_realtime_priority( 0 ) ) {
         realtime = 1;
@@ -2693,7 +2708,7 @@ int main( int argc, char **argv )
 
 
     /* We've now stolen all our root-requiring resources, drop to a user. */
-    if( setuid( getuid() ) == -1 ) {
+    if( setuid( user_uid ) == -1 ) {
         /*
          * This used to say "Unknown problems", but we're printing an
          * error string, so that didn't really make sense, did it?
