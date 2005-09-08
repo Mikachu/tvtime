@@ -114,6 +114,7 @@ struct tvtime_osd_s
     char show_info[ 128 ];
 
     char hold_message[ 255 ];
+    char hold_message2[ 255 ];
 
     int film_mode;
     int info_available;
@@ -168,6 +169,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     }
 
     strcpy( osd->hold_message, "" );
+    strcpy( osd->hold_message2, "" );
     osd->film_mode = -1;
     osd->pulldown_mode = 0;
     osd->mutestate = 0;
@@ -525,8 +527,10 @@ void tvtime_osd_clear( tvtime_osd_t *osd )
 {
     int i;
 
-    for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
-        osd_string_set_timeout( osd->strings[ i ].string, 0 );
+    if (!osd->hold) {
+        for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
+            osd_string_set_timeout( osd->strings[ i ].string, 0 );
+        }
     }
     if( osd->film_logo ) osd_animation_set_timeout( osd->film_logo, 0 );
     if( osd->info_icon ) osd_animation_set_timeout( osd->info_icon, 0 );
@@ -613,9 +617,14 @@ void tvtime_osd_signal_present( tvtime_osd_t *osd, int signal )
     osd_string_set_timeout( osd->strings[ OSD_SIGNAL_INFO ].string, signal ? 0 : 100 );
 }
 
-void tvtime_osd_set_hold_message( tvtime_osd_t* osd, const char *str )
+void tvtime_osd_set_hold_message( tvtime_osd_t *osd, const char *text, const char *text2 )
 {
-    snprintf( osd->hold_message, sizeof( osd->hold_message ), "%s", str );
+    snprintf( osd->hold_message, sizeof( osd->hold_message ), "%s", text );
+    if( text2 ) {
+        snprintf( osd->hold_message2, sizeof( osd->hold_message2 ), "%s", text2 );
+    } else {
+        *osd->hold_message2 = 0;
+    }
 }
 
 void tvtime_osd_set_network_name( tvtime_osd_t* osd, const char *str )
@@ -691,7 +700,12 @@ void tvtime_osd_show_info( tvtime_osd_t *osd )
     if( *(osd->hold_message) ) {
         snprintf( text, sizeof( text ), "%s", osd->hold_message );
         osd_string_show_text( osd->strings[ OSD_MESSAGE1_BAR ].string, text, osd->delay );
-        osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
+        if( *(osd->hold_message2) ) {
+            snprintf( text, sizeof( text ), "%s", osd->hold_message2 );
+            osd_string_show_text( osd->strings[ OSD_MESSAGE2_BAR ].string, text, osd->delay );
+        } else {
+            osd_string_set_timeout( osd->strings[ OSD_MESSAGE2_BAR ].string, 0 );
+        }
         osd_string_set_timeout( osd->strings[ OSD_DATA_VALUE ].string, 0 );
         osd_rect_set_timeout( osd->databar, 0 );
         osd_rect_set_timeout( osd->databarbg, 0 );
@@ -871,8 +885,10 @@ void tvtime_osd_advance_frame( tvtime_osd_t *osd )
         gettimeofday( &tv, 0 );
     }
 
-    for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
-        osd_string_advance_frame( osd->strings[ i ].string );
+    if (!osd->hold) {
+        for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
+            osd_string_advance_frame( osd->strings[ i ].string );
+        }
     }
 
     if( osd->film_logo ) osd_animation_advance_frame( osd->film_logo );
@@ -891,7 +907,7 @@ void tvtime_osd_composite_packed422_scanline( tvtime_osd_t *osd,
     int i;
 
     for( i = 0; i < OSD_MAX_STRING_OBJECTS; i++ ) {
-        if( osd_string_visible( osd->strings[ i ].string ) ) {
+        if( osd->hold || osd_string_visible( osd->strings[ i ].string ) ) {
             int start = osd->strings[ i ].ypos;
             int end = start + osd_string_get_height( osd->strings[ i ].string );
 

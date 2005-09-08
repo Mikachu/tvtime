@@ -2539,7 +2539,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 snprintf( message, sizeof( message ),
                           _("Remapping %d.  Enter new channel number."),
                           station_get_current_id( cmd->stationmgr ) );
-                tvtime_osd_set_hold_message( cmd->osd, message );
+                tvtime_osd_set_hold_message( cmd->osd, message, 0 );
             }
         }
         break;
@@ -2558,7 +2558,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                     memset( cmd->next_chan_buffer, 0, 5 );
                     cmd->digit_counter = 0;
                     cmd->frame_counter = 0;
-                    if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+                    if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "", 0 );
                     cmd->renumbering = 0;
                 }
 
@@ -2577,10 +2577,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
 
                     if( cmd->scan_channels ) {
                         tvtime_osd_set_hold_message( cmd->osd,
-                            _("Scanning for channels being broadcast.") );
+                            _("Scanning for channels being broadcast."), 0 );
                     } else {
                         /* Nuke the hold message, and make sure we show nothing (hack). */
-                        tvtime_osd_set_hold_message( cmd->osd, "" );
+                        tvtime_osd_set_hold_message( cmd->osd, "", 0 );
                         tvtime_osd_show_message( cmd->osd, " " );
                     }
                     tvtime_osd_show_info( cmd->osd );
@@ -3259,7 +3259,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
                 station_remap( cmd->stationmgr, atoi( cmd->next_chan_buffer ) );
                 station_writeconfig( cmd->stationmgr );
                 cmd->renumbering = 0;
-                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "", 0 );
             }
             if( station_set( cmd->stationmgr, atoi( cmd->next_chan_buffer ) ) ) {
                 cmd->change_channel = 1;
@@ -3274,7 +3274,7 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         } else {
             if( cmd->renumbering ) {
                 cmd->renumbering = 0;
-                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+                if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "", 0 );
             }
             snprintf( cmd->next_chan_buffer, sizeof( cmd->next_chan_buffer ),
                       "%d", station_get_current_id( cmd->stationmgr ) );
@@ -3388,7 +3388,7 @@ void commands_next_frame( commands_t *cmd )
         memset( cmd->next_chan_buffer, 0, 5 );
         cmd->digit_counter = 0;
         if( cmd->renumbering ) {
-            if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "" );
+            if( cmd->osd ) tvtime_osd_set_hold_message( cmd->osd, "", 0 );
             cmd->renumbering = 0;
         }
     }

@@ -1193,6 +1193,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int kbd_pos = 0;
     int kbd_available;
     char *error_string = 0;
+    char *error_string2 = 0;
     double pixel_aspect;
     char number[ 6 ];
     tvtime_t *tvtime;
@@ -1327,6 +1328,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                       config_get_v4l_device( ct ) ) < 0 ) {
             error_string = 0;
         }
+        if( asprintf( &error_string2, "%s", strerror( errno ) ) < 0 ) {
+            error_string2 = 0;
+        }
     } else if( videoinput_get_numframes( vidin ) < 2 ) {
         lfprintf( stderr, _("\n"
     "    Your capture card driver, %s, does not seem\n"
@@ -1458,8 +1462,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
         if( vidin ) {
             tvtime_osd_set_input( osd, videoinput_get_input_name( vidin ) );
-            tvtime_osd_set_norm
-                ( osd,
+            tvtime_osd_set_norm( osd,
                   videoinput_get_norm_name( videoinput_get_norm( vidin ) ) );
         } else {
             tvtime_osd_set_input( osd, _("No video source") );
@@ -1467,8 +1470,9 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
 
         if( error_string ) {
-            tvtime_osd_set_hold_message( osd, error_string );
+            tvtime_osd_set_hold_message( osd, error_string2, error_string );
             tvtime_osd_hold( osd, 1 );
+            tvtime_osd_show_info( osd );
             free( error_string );
             error_string = 0;
         }
