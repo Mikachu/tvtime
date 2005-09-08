@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.52)
-AC_INIT(tvtime, 0.99, http://tvtime.net/)
+AC_INIT(tvtime, 1.0, http://tvtime.net/)
 AC_CONFIG_SRCDIR([src/tvtime.c])
-AM_INIT_AUTOMAKE(tvtime,0.99)
+AM_INIT_AUTOMAKE(tvtime,1.0)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
@@ -163,16 +163,9 @@ if test x"$GCC" = x"yes"; then
     i?86-* | k?-*)
 	    AC_DEFINE([ARCH_X86],,[x86 architecture])
 	    AC_DEFINE([ARCH_386],,[386 architecture])
-        ARCH_X86=yes
-        ARCH_386=yes
-	    
-        case "$host_alias" in
-	        i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
-	        i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
-	        i586-*) OPT_CFLAGS="$CFLAGS -mcpu=pentium";;
-	        i686-*) OPT_CFLAGS="$CFLAGS -mcpu=pentiumpro";;
-	        k6-*)   OPT_CFLAGS="$CFLAGS -mcpu=k6";;
-	    esac
+	    ARCH_X86=yes
+	    ARCH_386=yes
+	    OPT_CFLAGS="$CFLAGS"
 	    AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
     x86_64-*)
             AC_DEFINE([ARCH_X86],,[x86 architecture])
