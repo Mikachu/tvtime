@@ -181,6 +181,7 @@ struct videoinput_s
     int verbose;
     int grab_fd;
     char drivername[ 64 ];
+    char shortdriver[ 64 ];
 
     int numinputs;
     int curinput;
@@ -424,7 +425,7 @@ int videoinput_buffer_invalid( videoinput_t *vidin, int frameid )
 }
 
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
-                              int volume, int norm, int verbose )
+                              int volume, int norm, int verbose, char *error_string )
 {
     videoinput_t *vidin = malloc( sizeof( videoinput_t ) );
     struct video_capability caps_v4l1;
@@ -443,6 +444,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     if( !vidin ) {
         fprintf( stderr, "videoinput: Cannot allocate memory.\n" );
+        sprintf( error_string, "%s", strerror( ENOMEM ) );
         return 0;
     }
 
@@ -478,12 +480,14 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
     memset( vidin->inputname, 0, sizeof( vidin->inputname ) );
     memset( vidin->drivername, 0, sizeof( vidin->drivername ) );
+    memset( vidin->shortdriver, 0, sizeof( vidin->shortdriver ) );
 
     /* First, open the device. */
     vidin->grab_fd = open( v4l_device, O_RDWR );
     if( vidin->grab_fd < 0 ) {
         fprintf( stderr, "videoinput: Cannot open capture device %s: %s\n",
                  v4l_device, strerror( errno ) );
+        sprintf( error_string, "%s", strerror( errno ) );
         free( vidin );
         return 0;
     }
@@ -497,6 +501,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( ioctl( vidin->grab_fd, VIDIOCGCAP, &caps_v4l1 ) < 0 ) {
             fprintf( stderr, "videoinput: %s is not a video4linux device.\n",
                      v4l_device );
+            sprintf( error_string, "Not a video4linux device" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -507,6 +512,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         }
         snprintf( vidin->drivername, sizeof( vidin->drivername ),
                   "%s", caps_v4l1.name );
+        snprintf( vidin->shortdriver, sizeof( vidin->shortdriver ),
+                  "%s", caps_v4l1.name );
     } else {
         if( vidin->verbose ) {
             fprintf( stderr, "videoinput: Using video4linux2 driver '%s', card '%s' (bus %s).\n"
@@ -516,9 +523,11 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         }
         vidin->isv4l2 = 1;
         snprintf( vidin->drivername, sizeof( vidin->drivername ),
-                  "%s (card %s, bus %s) - %u",
+                  "%s [%s/%s/%u]",
                   caps_v4l2.driver, caps_v4l2.card,
                   caps_v4l2.bus_info, caps_v4l2.version );
+        snprintf( vidin->shortdriver, sizeof( vidin->shortdriver ),
+                  "%s", caps_v4l2.driver );
     }
 
     if( vidin->isv4l2 ) {
@@ -539,6 +548,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( !vidin->numinputs ) {
             fprintf( stderr, "videoinput: No inputs available on "
                      "video4linux2 device '%s'.\n", v4l_device );
+            sprintf( error_string, "No inputs available" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -549,6 +559,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( vidin->numinputs == 0 ) {
             fprintf( stderr, "videoinput: No inputs available on "
                      "video4linux device '%s'.\n", v4l_device );
+            sprintf( error_string, "No inputs available" );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -569,6 +580,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             fprintf( stderr, "videoinput: Capture card '%s' does not seem to use the bttv driver.\n"
                              "videoinput: The norm %s is only supported in V4L1 for bttv-supported cards.\n",
                      v4l_device, videoinput_get_norm_name( norm ) );
+            sprintf( error_string, "%s unsupported by %s", videoinput_get_norm_name( norm ), vidin->shortdriver );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -577,6 +589,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( norm > VIDEOINPUT_NTSC_JP ) {
             fprintf( stderr, "videoinput: Detected only a V4L1 driver.  The PAL-60 norm\n"
                              "videoinput: is only available if driver supports V4L2.\n" );
+            sprintf( error_string, "%s unsupported by %s", videoinput_get_norm_name( norm ), vidin->shortdriver );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -644,6 +657,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
      "    Message from the card was: %s\n\n",
                     vidin->drivername, strerror( errno ) );
 
+                sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -658,6 +672,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     "    This is true for many low-quality webcams.  Please select a\n"
     "    different video device for tvtime to use with the command line\n"
     "    option --device.\n\n", vidin->drivername );
+            sprintf( error_string, "Frames too short from %s", vidin->shortdriver );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -692,6 +707,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             fprintf( stderr, "videoinput: video4linux device '%s' refuses "
                      "to provide set capability information, giving up.\n",
                      v4l_device );
+            sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -726,6 +742,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                      "process the output: %s.\n", strerror( errno ) );
             fprintf( stderr, "videoinput: Please post a bug report to " PACKAGE_BUGREPORT
                      " indicating your capture card, driver, and the error message above.\n" );
+            sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -746,6 +763,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
      "\n"
      "    Message from the card was: %s\n\n",
                     vidin->drivername, strerror( errno ) );
+                sprintf( error_string, "Format unsupported by %s", vidin->shortdriver );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -766,6 +784,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( ioctl( vidin->grab_fd, VIDIOCSWIN, &grab_win ) < 0 ) {
             fprintf( stderr, "videoinput: Failed to set the V4L window size (capture width and height): %s\n",
                      strerror( errno ) );
+            sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -785,6 +804,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
         if( ioctl( vidin->grab_fd, VIDIOC_REQBUFS, &req ) < 0 ) {
             fprintf( stderr, "videoinput: Card failed to allocate capture buffers: %s\n",
                      strerror( errno ) );
+            sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -793,6 +813,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
 
         if( vidin->numframes < 1 ) {
             fprintf( stderr, "videoinput: No capture buffers available from card.\n" );
+            sprintf( error_string, "%s: No capture buffers", vidin->shortdriver );
             close( vidin->grab_fd );
             free( vidin );
             return 0;
@@ -817,6 +838,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             if( ioctl( vidin->grab_fd, VIDIOC_QUERYBUF, vidbuf ) < 0 ) {
                 fprintf( stderr, "videoinput: Can't get information about buffer %d: %s.\n",
                          i, strerror( errno ) );
+                sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -829,6 +851,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
             if( vidin->capbuffers[ i ].data == MAP_FAILED ) {
                 fprintf( stderr, "videoinput: Can't map buffer %d: %s.\n",
                          i, strerror( errno ) );
+                sprintf( error_string, "%s: %s", vidin->shortdriver, strerror( errno ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;
@@ -866,6 +889,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                                       vidin->numframes );
             if( !vidin->grab_buf ) {
                 fprintf( stderr, "videoinput: Can't allocate memory.\n" );
+                sprintf( error_string, "%s", strerror( ENOMEM ) );
                 close( vidin->grab_fd );
                 free( vidin );
                 return 0;

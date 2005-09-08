@@ -49,6 +49,7 @@ int main( int argc, char **argv )
     int f, f1, f2, fc;
     int verbose, norm;
     int curstation = 1;
+    char error_string[ 4096 ];
 
     /*
      * Setup i18n. This has to be done as early as possible in order
@@ -102,7 +103,7 @@ int main( int argc, char **argv )
     vidin = videoinput_new( config_get_v4l_device( cfg ), 
                             config_get_inputwidth( cfg ), 
                             config_get_audio_boost( cfg ), 
-                            norm, verbose );
+                            norm, verbose, error_string );
     if( !vidin ) {
         station_delete( stationmgr );
         config_delete( cfg );

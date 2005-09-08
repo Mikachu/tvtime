@@ -1193,7 +1193,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     int kbd_pos = 0;
     int kbd_available;
     char *error_string = 0;
-    char *error_string2 = 0;
+    char error_string2[4096];
     double pixel_aspect;
     char number[ 6 ];
     tvtime_t *tvtime;
@@ -1321,15 +1321,12 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     vidin = videoinput_new( config_get_v4l_device( ct ), 
                             config_get_inputwidth( ct ), 
                             config_get_audio_boost( ct ), 
-                            norm, verbose );
+                            norm, verbose, error_string2 );
     if( !vidin ) {
         if( asprintf( &error_string,
                       _("Cannot open capture device %s."),
                       config_get_v4l_device( ct ) ) < 0 ) {
             error_string = 0;
-        }
-        if( asprintf( &error_string2, "%s", strerror( errno ) ) < 0 ) {
-            error_string2 = 0;
         }
     } else if( videoinput_get_numframes( vidin ) < 2 ) {
         lfprintf( stderr, _("\n"

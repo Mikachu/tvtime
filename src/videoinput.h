@@ -109,7 +109,8 @@ const char *videoinput_get_audio_mode_name( videoinput_t *vidin, int mode );
  * bad, and maybe for some helpful information messages.
  */
 videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
-                              int volume, int norm, int verbose );
+                              int volume, int norm, int verbose,
+                              char *error_string );
 
 /**
  * Shut down the capture device.
