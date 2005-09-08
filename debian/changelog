@@ -1,10 +1,10 @@
-tvtime (1.0-1.1) experimental; urgency=low
+tvtime (1.0.1-1.1) experimental; urgency=low
 
   * Unofficial build from CVS.
 
  -- J. Random Hacker <jrhacker@example.com>  Wed, 07 Sep 2005 22:36:29 -0400
 
-tvtime (1.0-1) unstable; urgency=low
+tvtime (1.0.1-1) unstable; urgency=low
 
   * New upstream relase.  (Closes: Bug#313645)
     - Root no longer created $HOME/.tvtime.  (Closes: Bug#301733)
