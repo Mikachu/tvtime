@@ -1,3 +1,8 @@
+1.0.1 - Thu Sep  8 00:19:31 EDT 2005
+  * vektor: Bring back the 'a' key binding.
+  * vektor: Change MuteOnExit to default to 0.
+      http://qa.mandriva.com/show_bug.cgi?id=14810
+
 1.0 - Wed Sep  7 23:27:36 EDT 2005
   * vektor: Add a PAL-I setting to the BG/DK/I mess.  This is required
       to work around limitations of the cx88 driver.

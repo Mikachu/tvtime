@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2005-09-07 23:23-0400\n"
+"POT-Creation-Date: 2005-09-08 00:09-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,7 +171,7 @@ msgstr ""
 
 #: src/tvtime.c:1216 src/tvtime.c:1258 src/tvtime.c:1303 src/tvtime.c:1311
 #: src/tvtime.c:1434 src/tvtime.c:1484 src/tvtime.c:1505 src/tvtime.c:1519
-#: src/tvtime.c:1533 src/tvtimeconf.c:961 src/tvtimeconf.c:1147
+#: src/tvtime.c:1533 src/tvtimeconf.c:962 src/tvtimeconf.c:1148
 #: src/tvtime-command.c:56 src/tvtime-command.c:71 src/tvtime-configure.c:48
 #: src/tvtime-scanner.c:62 src/tvtime-scanner.c:98
 #, c-format
@@ -1080,21 +1080,21 @@ msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:857 src/tvtimeconf.c:866 src/tvtimeconf.c:930
-#: src/tvtimeconf.c:1063 src/tvtimeconf.c:1228
+#: src/tvtimeconf.c:858 src/tvtimeconf.c:867 src/tvtimeconf.c:931
+#: src/tvtimeconf.c:1064 src/tvtimeconf.c:1229
 #, c-format
 msgid "Reading configuration from %s\n"
 msgstr ""
 
-#: src/tvtimeconf.c:968
+#: src/tvtimeconf.c:969
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:979
+#: src/tvtimeconf.c:980
 msgid "Saving command line options.\n"
 msgstr ""
 
-#: src/tvtimeconf.c:1154
+#: src/tvtimeconf.c:1155
 msgid "Cannot update configuration while tvtime running.\n"
 msgstr ""
 

@@ -732,7 +732,7 @@ config_t *config_new( void )
     ct->quiet_screenshots = 0;
     ct->unmute_volume = -1;
     ct->muted = 0;
-    ct->mute_on_exit = 1;
+    ct->mute_on_exit = 0;
     ct->show_taglines = 1;
 
     memset( ct->keymap, 0, sizeof( ct->keymap ) );
@@ -804,6 +804,7 @@ config_t *config_new( void )
     ct->keymap[ I_F6 ] = TVTIME_PICTURE_DOWN;
     ct->keymap[ I_F7 ] = TVTIME_PICTURE_UP;
     ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
+    ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
     ct->keymap[ 's' ] = TVTIME_SCREENSHOT;

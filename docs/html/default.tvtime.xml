@@ -302,11 +302,9 @@
 
   <!--
     This setting controls whether tvtime should mute its mixer device on
-    exit.  By default, tvtime mutes the mixer device to work around noisy
-    capture cards.  Turn this off if this option has adverse affects on
-    other applications.
+    exit.  This can be used to work around noisy capture cards.
   -->
-  <option name="MuteOnExit" value="1"/>
+  <option name="MuteOnExit" value="0"/>
 
   <!--
     This setting controls whether tvtime should show the silly taglines
@@ -471,6 +469,10 @@
 
   <bind command="show_stats">
     <keyboard key="d"/>
+  </bind>
+
+  <bind command="toggle_aspect">
+    <keyboard key="a"/>
   </bind>
 
   <bind command="toggle_fullscreen">

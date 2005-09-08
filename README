@@ -85,6 +85,7 @@ Here are the core set of key bindings you want to learn for using tvtime:
   Here are some advanced keys.  These features are all configurable via
 the menu, but some of these may be useful if you use the features often:
 
+    a               Toggle the output aspect ratio
     e               Toggle audio mode (stereo/mono/SAP)
     v               Toggle always-on-top with supporting window managers
     F5/F6/F7        Picture settings
