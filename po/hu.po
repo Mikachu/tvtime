@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.99\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2005-09-07 22:36-0400\n"
+"POT-Creation-Date: 2005-09-07 23:23-0400\n"
 "PO-Revision-Date: 2005-08-15 15:45+0100\n"
 "Last-Translator: GERE Károly <kgere@message.hu>\n"
 "Language-Team: GERE Károly <kgere@message.hu>\n"
@@ -168,10 +168,10 @@ msgid "Matte setting (4:3 input)"
 msgstr "Képmaszkbeállítás (4:3 input)"
 
 #: src/tvtime.c:1216 src/tvtime.c:1258 src/tvtime.c:1303 src/tvtime.c:1311
-#: src/tvtime.c:1437 src/tvtime.c:1487 src/tvtime.c:1508 src/tvtime.c:1522
-#: src/tvtime.c:1536 src/tvtimeconf.c:961 src/tvtimeconf.c:1147
+#: src/tvtime.c:1434 src/tvtime.c:1484 src/tvtime.c:1505 src/tvtime.c:1519
+#: src/tvtime.c:1533 src/tvtimeconf.c:961 src/tvtimeconf.c:1147
 #: src/tvtime-command.c:56 src/tvtime-command.c:71 src/tvtime-configure.c:48
-#: src/tvtime-scanner.c:61 src/tvtime-scanner.c:97
+#: src/tvtime-scanner.c:62 src/tvtime-scanner.c:98
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
 msgstr "%s: Sikertelen memóriafoglalás.\n"
@@ -181,7 +181,7 @@ msgstr "%s: Sikertelen memóriafoglalás.\n"
 msgid "Cannot open capture device %s."
 msgstr "A rögzítőeszköz (%s) megnyitása sikertelen."
 
-#: src/tvtime.c:1335
+#: src/tvtime.c:1332
 #, c-format
 msgid ""
 "\n"
@@ -198,7 +198,7 @@ msgstr ""
 "    rögzítőeszközt (%s) választottad-e.\n"
 "\n"
 
-#: src/tvtime.c:1395
+#: src/tvtime.c:1392
 #, c-format
 msgid ""
 "\n"
@@ -217,7 +217,7 @@ msgstr ""
 "    fel a következő címet: %s\n"
 "\n"
 
-#: src/tvtime.c:1402
+#: src/tvtime.c:1399
 #, c-format
 msgid ""
 "\n"
@@ -236,73 +236,73 @@ msgstr ""
 "hibakövető rendszerébe a következő címre: %s.\n"
 "\n"
 
-#: src/tvtime.c:1456
+#: src/tvtime.c:1453
 msgid "On screen display failed to initialize, disabled.\n"
 msgstr "Az OSD inicializálása nem sikerült, letiltva.\n"
 
-#: src/tvtime.c:1468
+#: src/tvtime.c:1465
 msgid "No video source"
 msgstr "Nincs videóforrás"
 
-#: src/tvtime.c:1512
+#: src/tvtime.c:1509
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
 msgstr "FIFO létrehozása sikertelen, a távirányító letiltva.\n"
 
-#: src/tvtime.c:1530
+#: src/tvtime.c:1527
 msgid "Closed caption display failed to initialize, disabled.\n"
 msgstr ""
 "Closed Caption (CC, képfeliratok) inicializásása sikertelen, letiltva.\n"
 
-#: src/tvtime.c:1754
+#: src/tvtime.c:1751
 msgid "Always-on-top enabled."
 msgstr "Mindig látható mód engedélyezve."
 
-#: src/tvtime.c:1759
+#: src/tvtime.c:1756
 msgid "Always-on-top disabled."
 msgstr "Mindig látható mód letiltva."
 
-#: src/tvtime.c:1779
+#: src/tvtime.c:1776
 msgid "16:9 display mode active."
 msgstr "16:9 mód aktív."
 
-#: src/tvtime.c:1788
+#: src/tvtime.c:1785
 msgid "4:3 display mode active."
 msgstr "4:3 mód aktív."
 
-#: src/tvtime.c:1838
+#: src/tvtime.c:1835
 msgid "Screenshot messages disabled."
 msgstr "Képmentési üzenetek letiltva."
 
-#: src/tvtime.c:1840
+#: src/tvtime.c:1837
 msgid "Screenshot messages enabled."
 msgstr "Képmentési üzenetek engedélyezve."
 
-#: src/tvtime.c:1931
+#: src/tvtime.c:1928
 msgid "2-3 pulldown inversion disabled."
 msgstr "2-3 pulldown inversion letiltva."
 
-#: src/tvtime.c:1934
+#: src/tvtime.c:1931
 msgid "2-3 pulldown inversion enabled."
 msgstr "2-3 pulldown inversion engedélyezve."
 
-#: src/tvtime.c:1940
+#: src/tvtime.c:1937
 msgid "2-3 pulldown inversion is not valid with your TV norm."
 msgstr "A 2-3 pulldown inversion nem alkalmazható ennél a TV normánál."
 
-#: src/tvtime.c:2339 src/tvtime.c:2484
+#: src/tvtime.c:2336 src/tvtime.c:2481
 #, c-format
 msgid "Screenshot: %s"
 msgstr "Kép mentése: %s"
 
-#: src/tvtime.c:2639
+#: src/tvtime.c:2636
 msgid "Restarting tvtime.\n"
 msgstr "A tvtime újraindul.\n"
 
-#: src/tvtime.c:2643
+#: src/tvtime.c:2640
 msgid "Thank you for using tvtime.\n"
 msgstr "Köszönöm, hogy a tvtime-ot használod.\n"
 
-#: src/tvtime.c:2661 src/tvtime.c:2720
+#: src/tvtime.c:2658 src/tvtime.c:2717
 #, c-format
 msgid ""
 "\n"
@@ -316,7 +316,7 @@ msgstr ""
 "    érdekében most leáll.\n"
 "\n"
 
-#: src/tvtime.c:2679
+#: src/tvtime.c:2676
 #, c-format
 msgid "Running %s.\n"
 msgstr "Futtatás: %s.\n"
@@ -1176,7 +1176,7 @@ msgstr "Parancssori opciók mentése.\n"
 msgid "Cannot update configuration while tvtime running.\n"
 msgstr "A konfiguráció nem módosítható, míg a tvtime fut.\n"
 
-#: src/tvtimeosd.c:344 src/tvtime-scanner.c:144
+#: src/tvtimeosd.c:344 src/tvtime-scanner.c:145
 msgid "No signal"
 msgstr "Nincs jel"
 
@@ -1251,12 +1251,12 @@ msgstr "%s: A(z) %s parancs küldése %s paraméterrel.\n"
 msgid "%s: Sending command %s.\n"
 msgstr "%s: Parancs küldése: %s.\n"
 
-#: src/tvtime-scanner.c:91
+#: src/tvtime-scanner.c:92
 #, c-format
 msgid "Scanning using TV standard %s.\n"
 msgstr "Keresés a(z) %s norma használatával.\n"
 
-#: src/tvtime-scanner.c:115
+#: src/tvtime-scanner.c:116
 #, c-format
 msgid ""
 "\n"
@@ -1269,21 +1269,21 @@ msgstr ""
 "    egy másikat a --input=<szám> paraméterrel.\n"
 "\n"
 
-#: src/tvtime-scanner.c:126
+#: src/tvtime-scanner.c:127
 #, c-format
 msgid "Scanning from %6.2f MHz to %6.2f MHz.\n"
 msgstr "Keresés a(z) %6.2f - %6.2f MHz tartományban.\n"
 
-#: src/tvtime-scanner.c:137
+#: src/tvtime-scanner.c:138
 #, c-format
 msgid "Checking %6.2f MHz:"
 msgstr "Vizsgálat: %6.2f MHz:"
 
-#: src/tvtime-scanner.c:148 src/tvtime-scanner.c:155
+#: src/tvtime-scanner.c:149 src/tvtime-scanner.c:156
 msgid "Signal detected"
 msgstr "Jel érzékelhető"
 
-#: src/tvtime-scanner.c:167
+#: src/tvtime-scanner.c:168
 #, c-format
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
