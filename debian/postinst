@@ -25,7 +25,7 @@ set -e
 
 setuid () {
     db_get tvtime/setuid
-    if [ -x /usr/bin/tvtime -a "$RET" = "false" ] ; then
+    if [ -x /usr/bin/tvtime ] && [ "$RET" = "false" ] ; then
 	if [ ! -x /usr/sbin/dpkg-statoverride ] ||\
 	    ! /usr/sbin/dpkg-statoverride --list /usr/bin/tvtime >/dev/null; then
 	    chmod u=rwx,go=rx /usr/bin/tvtime
