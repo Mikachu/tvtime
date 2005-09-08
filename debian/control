@@ -2,8 +2,8 @@ Source: tvtime
 Section: x11
 Priority: optional
 Maintainer: Simon Law <sfllaw@debian.org>
-Build-Depends: debhelper (>= 4.1.16), zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev
-Standards-Version: 3.6.1
+Build-Depends: debhelper (>= 4.1.16), zlib1g-dev, libpng-dev, libfreetype6-dev, xlibs-dev, libxml2-dev, fontforge
+Standards-Version: 3.6.2
 
 Package: tvtime
 Architecture: any

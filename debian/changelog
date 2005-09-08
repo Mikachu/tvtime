@@ -1,8 +1,30 @@
-tvtime (0.9.15-1.1) experimental; urgency=low
+tvtime (1.0-1.1) experimental; urgency=low
 
   * Unofficial build from CVS.
 
- -- J. Random Hacker <jrhacker@example.com>  Wed, 17 Nov 2004 16:45:35 -0500
+ -- J. Random Hacker <jrhacker@example.com>  Wed, 07 Sep 2005 22:36:29 -0400
+
+tvtime (1.0-1) unstable; urgency=low
+
+  * New upstream relase.  (Closes: Bug#313645)
+    - Root no longer created $HOME/.tvtime.  (Closes: Bug#301733)
+    - Corrected Australia's channel frequencies.  (Closes: Bug#308407)
+    - --nowidescreen switch.  (Closes: Bug#312656)
+    - Manpage fixes.  (Closes: Bug#323541, #323542)
+    - Builds with GCC 4.0.  (Closes: Bug#325345)
+  * Updated copyright information.  (Closes: Bug#295914)
+  * We no longer need a .desktop entry in /usr/share/applnk/Multimedia.
+    (Closes: Bug#285384)
+  * Fixed encoding problem with German translation.  (Closes: Bug#313891)
+    Thanks to Jens Seidel <jensseidel@users.sf.net>
+  * Added a Czech translation of the Debconf templates.  (Closes: Bug#321739)
+    Thanks to Jan Outrata <outrataj@upcase.inf.upol.cz>
+  * Added a Vietnamese Debconf translation.  (Closes: Bug#322392)
+    Thanks to Clytie Siddall <clytie@riverland.net.au>
+  * Don't suggest libdscaler, since it's no longer required.
+  * Build-Depend on fontforge.
+
+ -- Simon Law <sfllaw@debian.org>  Wed, 07 Sep 2005 19:38:49 -0400
 
 tvtime (0.9.15-1) unstable; urgency=low
 
