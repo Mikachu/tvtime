@@ -623,7 +623,9 @@ void station_toggle_us_cable_mode( station_mgr_t *mgr )
 
 void station_set_default_audio_norm( station_mgr_t *mgr, int dk )
 {
-    if( dk ) {
+    if( dk == 2 ) {
+        sprintf( mgr->audio, "i" );
+    } else if( dk ) {
         sprintf( mgr->audio, "dk" );
     } else {
         sprintf( mgr->audio, "bg" );
@@ -632,6 +634,7 @@ void station_set_default_audio_norm( station_mgr_t *mgr, int dk )
 
 int station_get_default_audio_norm( station_mgr_t *mgr )
 {
+    if ( !strcasecmp( mgr->audio, "i" ) ) return 2;
     return !strcasecmp( mgr->audio, "dk" );
 }
 
@@ -805,6 +808,7 @@ int station_get_current_audio_norm( station_mgr_t *mgr )
         str = mgr->audio;
     }
 
+    if( !strcasecmp( str, "i" ) ) return 2;
     return !strcasecmp( str, "dk" );
 }
 
@@ -813,7 +817,9 @@ void station_set_current_audio_norm( station_mgr_t *mgr, int dk )
     if( mgr->current ) {
         if( dk < 0 ) {
             sprintf( mgr->current->audio, "auto" );
-        } else if( dk ) {
+        } else if( dk == 2 ) {
+            sprintf( mgr->current->audio, "i" );
+        } else if( dk == 1 ) {
             sprintf( mgr->current->audio, "dk" );
         } else {
             sprintf( mgr->current->audio, "bg" );

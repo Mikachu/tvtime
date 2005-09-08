@@ -1,4 +1,6 @@
 1.0 -
+  * vektor: Add a PAL-I setting to the BG/DK/I mess.  This is required
+      to work around limitations of the cx88 driver.
   * vektor: Update the Channel config file parameter as the channel
       changes, rather than once on shutdown.  Feature requested by
       Andrew Oikle.

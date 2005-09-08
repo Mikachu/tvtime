@@ -6,6 +6,10 @@ For news and updates on tvtime, please visit our website at:
 
 News for 1.0
 
+  *  The cx88 driver cannot detect the PAL audio mode (BG/DK/I),
+     and attempts to reverse engineer the Windows driver have failed.
+     tvtime now allows users to select between BG/DK/I mode in the
+     UI to help work around this driver limitation.
   *  By default, tvtime now assumes that pixels are square.  This
      avoids problems with many misconfigured X servers.
 

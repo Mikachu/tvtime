@@ -191,7 +191,7 @@ struct videoinput_s
     int maxwidth;
     int norm;
     int volume;
-    int dkmode;
+    int amode;
 
     int isbttv;
     int isv4l2;
@@ -452,7 +452,7 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
     vidin->verbose = verbose;
     vidin->norm = norm;
     vidin->volume = volume;
-    vidin->dkmode = 0;
+    vidin->amode = 0;
     vidin->height = videoinput_get_norm_height( norm );
     vidin->cur_tuner_state = TUNER_STATE_NO_SIGNAL;
 
@@ -883,9 +883,8 @@ videoinput_t *videoinput_new( const char *v4l_device, int capwidth,
                 vidin->grab_buf[ i ].height = vidin->height;
             }
 
-            vidin->map = (uint8_t *) mmap( 0, vidin->gb_buffers.size,
-                                           PROT_READ|PROT_WRITE,
-                                           MAP_SHARED, vidin->grab_fd, 0 );
+            vidin->map = mmap( 0, vidin->gb_buffers.size, PROT_READ|PROT_WRITE,
+                               MAP_SHARED, vidin->grab_fd, 0 );
             if( vidin->map != MAP_FAILED ) {
                 vidin->have_mmap = 1;
                 videoinput_free_all_frames( vidin );
@@ -1520,8 +1519,12 @@ void videoinput_set_input_num( videoinput_t *vidin, int inputnum )
                      strerror( errno ) );
         } else {
             std = videoinput_get_v4l2_norm( vidin->norm );
-            if( std == V4L2_STD_PAL && vidin->dkmode ) {
-                std = V4L2_STD_PAL_DK;
+            if( std == V4L2_STD_PAL ) {
+                if( vidin->amode == VIDEOINPUT_PAL_DK_AUDIO ) {
+                    std = V4L2_STD_PAL_DK;
+                } else if( vidin->amode == VIDEOINPUT_PAL_I_AUDIO ) {
+                    std = V4L2_STD_PAL_I;
+                }
             } 
             if( ioctl( vidin->grab_fd, VIDIOC_S_STD, &std ) < 0 ) {
                 fprintf( stderr, "videoinput: Driver refuses to set norm: %s\n",
@@ -1658,10 +1661,10 @@ int videoinput_get_audio_mode( videoinput_t *vidin )
     }
 }
 
-void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode )
+void videoinput_set_pal_audio_mode( videoinput_t *vidin, int amode )
 {
-    if( dkmode != vidin->dkmode && vidin->norm == VIDEOINPUT_PAL ) {
-        vidin->dkmode = dkmode;
+    if( amode != vidin->amode && vidin->norm == VIDEOINPUT_PAL ) {
+        vidin->amode = amode;
         videoinput_set_input_num( vidin, videoinput_get_input_num( vidin ) );
     }
 }
@@ -1669,7 +1672,7 @@ void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode )
 int videoinput_get_pal_audio_mode( videoinput_t *vidin )
 {
     if( !vidin ) return 0;
-    return vidin->dkmode;
+    return vidin->amode;
 }
 
 int videoinput_has_tuner( videoinput_t *vidin )

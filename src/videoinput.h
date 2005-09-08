@@ -72,6 +72,13 @@ typedef struct videoinput_s videoinput_t;
 #define VIDEOINPUT_LANG2   8
 
 /**
+ * Possible PAL audio modes, for the cx88 driver that cannot autodetect.
+ */
+#define VIDEOINPUT_PAL_BG_AUDIO  0
+#define VIDEOINPUT_PAL_DK_AUDIO  1
+#define VIDEOINPUT_PAL_I_AUDIO   2
+
+/**
  * Returns a text version of the norm.
  */
 const char *videoinput_get_norm_name( int norm );
@@ -255,12 +262,12 @@ void videoinput_toggle_pal_secam( videoinput_t *vidin );
 void videoinput_switch_pal_secam( videoinput_t *vidin, int norm );
 
 /**
- * Whether or not to use PAL_DK mode. Only applies to V4L2.
+ * Selects the PAL audio mode.  Only applies to the cx88 driver.
  */
-void videoinput_set_pal_audio_mode( videoinput_t *vidin, int dkmode );
+void videoinput_set_pal_audio_mode( videoinput_t *vidin, int amode );
 
 /**
- * Get pal_dk mode current value.
+ * Gets the current PAL audio mode.
  */
 int videoinput_get_pal_audio_mode( videoinput_t *vidin );
 
