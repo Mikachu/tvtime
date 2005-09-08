@@ -77,20 +77,20 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
     }
     error = FT_Load_Glyph( font->face, glyph_index, FT_LOAD_NO_HINTING );
     if( error ) {
-        fprintf( stderr, "leetft: Can't load glyph %ld\n", wchar );
+        fprintf( stderr, "leetft: Can't load glyph %ld\n", (long int) wchar );
         return 0;
     }
     
     error = FT_Get_Glyph( font->face->glyph, &cur->glyph );
     if( error ) {
         fprintf( stderr, "leetft: FT_Get_Glyph failure for glyph %ld\n",
-                 wchar );
+                 (long int) wchar );
         return 0;
     }
         
     error = FT_Glyph_Copy( cur->glyph, &cur->bitmap );
     if( error ) {
-        fprintf( stderr, "leetft: Can't copy glyph %ld\n", wchar );
+        fprintf( stderr, "leetft: Can't copy glyph %ld\n", (long int) wchar );
         FT_Done_Glyph( cur->glyph );
         hashtable_delete( font->glyphdata, wchar );
         return 0;
@@ -98,7 +98,7 @@ static int ft_cache_glyph( ft_font_t *font, wchar_t wchar,
         
     error = FT_Glyph_To_Bitmap( &cur->bitmap, ft_render_mode_normal, 0, 1 );
     if( error ) {
-        fprintf( stderr, "leetft: Can't render glyph %ld\n", wchar );
+        fprintf( stderr, "leetft: Can't render glyph %ld\n", (long int) wchar );
         FT_Done_Glyph( cur->glyph );
         FT_Done_Glyph( cur->bitmap );
         hashtable_delete( font->glyphdata, wchar );
