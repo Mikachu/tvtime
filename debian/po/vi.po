@@ -1,0 +1,138 @@
+# Vietnamese translation for tvtime.
+# Copyright © 2005 Free Software Foundation, Inc.
+# Clytie Siddall <clytie@riverland.net.au>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tvtime 0.9.15-1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-11-15 23:21-0500\n"
+"PO-Revision-Date: 2005-08-10 22:03+0930\n"
+"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"X-Generator: LocFactoryEditor 1.2.2\n"
+
+#. Type: select
+#. Choices
+#: ../templates:3
+msgid "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+msgstr "NTSC, PAL, SECAM, PAL-Nc, PAL-M, PAL-N, NTSC-JP, PAL-60"
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid "Select the default television standard for your location"
+msgstr "Hãy chọn tiêu chuẩn TV tại chỗ bạn."
+
+#. Type: select
+#. Description
+#: ../templates:4
+msgid ""
+"North American users should select NTSC.  Most areas in the world use PAL."
+msgstr "Phần lớn thế giới dùng PAL. Người tại Mỹ cần chọn NTSC."
+
+#. Type: select
+#. Choices
+#: ../templates:9
+msgid "Cable, Broadcast, Cable including channels 100+"
+msgstr "Cáp, Quảng bá, Cáp gồm kênh 100+"
+
+#. Type: select
+#. Choices
+#: ../templates:17
+msgid "Cable, Broadcast"
+msgstr "Cáp, Quảng bá"
+
+#. Type: select
+#. Description
+#: ../templates:18
+msgid ""
+"The frequency table specifies which frequencies correspond to the familiar "
+"channel numbers.  Select broadcast if you use an antenna for over-the-air "
+"signals."
+msgstr "Bảng tần số xác định tần số nào tương ứng với số kênh bạn biết. Hãy chọn « Quảng bá » nếu bạn dùng ăngten để nhận tín hiệu từ xa."
+
+#. Type: select
+#. Choices
+#: ../templates:25
+msgid ""
+"Europe, France, Russia, Australia, New Zealand, China Broadcast, Australia "
+"Optus, Custom (must run tvtime-scanner first)"
+msgstr "Châu Âu, Pháp, Nga, Úc, Niu Di-lan, Quảng bá Trung quốc, Optus Úc, Tự chọn (cần phải chạy tvtime-scanner trước hết)"
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid "Select the default frequency table"
+msgstr "Hãy chọn bảng tần số mặc định."
+
+#. Type: select
+#. Description
+#: ../templates:26
+msgid ""
+"Users of the Optus cable company in Australia should select Australia "
+"Optus.  If you are a user of a cable company that does not use standard "
+"frequencies, such as Casema, UPC or Mixtics, please select Custom and run "
+"the tvtime-scanner application before using tvtime."
+msgstr "Người dùng công ty cáp optus tại Úc nên chọn « Optus Úc ». Nếu bạn là người dùng một công ty cáp không dùng tần số chuẩn, như Casema, UPC hay Mixtics, hãy chọn « Tự chọn », rồi chạy ứng dụng « tvtime-scanner » trước khi dùng trình tvtime."
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid "Specify your default television capture device"
+msgstr "Hãy xác định thiết bị bắt TV mặc định."
+
+#. Type: string
+#. Description
+#: ../templates:35
+msgid ""
+"This should be the video4linux device which corresponds to your capture card."
+msgstr "Giá trị này nên là thiết bị video4linux tương ứng với thẻ bắt."
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid "Specify a device to use for VBI decoding"
+msgstr "Hãy xác định thiết bị cần dùng để mã hóa VBI."
+
+#. Type: string
+#. Description
+#: ../templates:42
+msgid ""
+"This will only be used in NTSC areas for decoding closed captions and XDS "
+"channel information."
+msgstr "Sẽ dùng thiết bị này chỉ trong vùng NTSC để giải mã phụ đề bị đóng và thông tin kênh XDS."
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid "Do you wish to make `/usr/bin/tvtime' setuid root?"
+msgstr "Bạn có muốn đặt « /usr/bin/tvtime » setuid root không?"
+
+#. Type: boolean
+#. Description
+#: ../templates:49
+msgid ""
+"This allows tvtime to run at a high priority to ensure smooth video and "
+"should be used for high quality video output even during high CPU load."
+msgstr "Tùy chọn này cho phép trình tvtime chạy với ưu tiên cao hơn trong hệ thống, để đảm bảo hiển thị ảnh động mịn, và nên được dùng để xuất ảnh động chất lượng cao, kể cả trong khi thời gian có trọng tải đơn vị xử lý trung tâm (CPU) nặng."
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid "Specify the process priority for the tvtime binary"
+msgstr "Hãy xác định ưu tiên tiến trình cho tập tin nhị phân tvtime."
+
+#. Type: string
+#. Description
+#: ../templates:56
+msgid ""
+"This setting controls the priority of the tvtime process relative to other "
+"processes on the system.  The allowed range is from -19 to 19. Lower values "
+"indicate higher priority, and a value of 0 would give tvtime the same "
+"priority as a normal process."
+msgstr "Thiết lập này điều khiển ưu tiên của tiến trình tvtime, tương đối so với các tiến trình khác trong hệ thống (cũng được biết là giá trị « nice »). Cho phép phạm vị từ -19 đến +19. Giá trị thấp hơn ngụ ý ưu tiên cao hơn, và giá trị 0 cho tvtime cùng một ưu tiên với tiến trình thường."
