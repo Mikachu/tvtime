@@ -1,8 +1,16 @@
-tvtime (1.0.1-1.1) experimental; urgency=low
+tvtime (1.0.1-2.1) experimental; urgency=low
 
   * Unofficial build from CVS.
 
- -- J. Random Hacker <jrhacker@example.com>  Wed, 07 Sep 2005 22:36:29 -0400
+ -- J. Random Hacker <jrhacker@example.com>  Wed, 21 Sep 2005 10:07:23 -0400
+
+tvtime (1.0.1-2) unstable; urgency=low
+
+  * Switch architecture to any, since tvtime no longer depends on i386
+    assembly.
+  * Add debian/watch file.
+
+ -- Simon Law <sfllaw@debian.org>  Wed, 21 Sep 2005 10:06:30 -0400
 
 tvtime (1.0.1-1) unstable; urgency=low
 
