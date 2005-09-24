@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.9.14\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2005-09-08 00:09-0400\n"
-"PO-Revision-Date: 2005-08-15 22:22+0200\n"
+"PO-Revision-Date: 2005-09-24 23:50+0200\n"
 "Last-Translator: Ingo van Lil <inguin@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -374,9 +374,8 @@ msgid "Set current channel as PAL"
 msgstr "Auf PAL umstellen"
 
 #: src/commands.c:388
-#, fuzzy
 msgid "Switch audio standard"
-msgstr "Fernsehnorm"
+msgstr "Audiostandard wechseln"
 
 #: src/commands.c:395
 msgid "Change frequency table"
@@ -405,7 +404,7 @@ msgstr "Bevorzugter Audiomodus"
 
 #: src/commands.c:625
 msgid "Change default audio standard"
-msgstr ""
+msgstr "Voreingestellter Audiostandard"
 
 #: src/commands.c:632 src/commands.c:1315 src/commands.c:1390
 msgid "Audio volume boost"
@@ -711,9 +710,9 @@ msgid "Sleep off."
 msgstr "Schlafmodus deaktiviert."
 
 #: src/commands.c:2245
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-I audio decoding for this channel."
-msgstr "PAL-BG Audiodekodierung für diesen Kanal gewählt."
+msgstr "PAL-I Audiodekodierung für diesen Kanal gewählt."
 
 #: src/commands.c:2248
 #, c-format
@@ -726,9 +725,9 @@ msgid "Using PAL-BG audio decoding for this channel."
 msgstr "PAL-BG Audiodekodierung für diesen Kanal gewählt."
 
 #: src/commands.c:2282
-#, fuzzy, c-format
+#, c-format
 msgid "Defaulting to PAL-I audio decoding."
-msgstr "PAL-BG Audiodekodierung als Standard gewählt."
+msgstr "PAL-I Audiodekodierung als Standard gewählt."
 
 #: src/commands.c:2285
 #, c-format
@@ -1295,12 +1294,3 @@ msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
 "Kanal auf %6.2f MHz (%.2f - %.2f MHz) gefunden, zur Kanalliste hinzugefügt.\n"
-
-#~ msgid "Use PAL-BG audio decoding"
-#~ msgstr "PAL-BG Audiodekodierung"
-
-#~ msgid "Use PAL-DK audio decoding"
-#~ msgstr "PAL-DK Audiodekodierung"
-
-#~ msgid "Default to PAL-DK audio decoding"
-#~ msgstr "PAL-DK Audiodekodierung als Standard verwenden"
