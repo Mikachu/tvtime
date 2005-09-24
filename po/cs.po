@@ -372,9 +372,8 @@ msgid "Set current channel as PAL"
 msgstr "Nastavení kanálu na PAL"
 
 #: src/commands.c:388
-#, fuzzy
 msgid "Switch audio standard"
-msgstr "Televizní standard"
+msgstr "Změnit standard audia"
 
 #: src/commands.c:395
 msgid "Change frequency table"
@@ -403,7 +402,7 @@ msgstr "Preferovaný mód audia"
 
 #: src/commands.c:625
 msgid "Change default audio standard"
-msgstr ""
+msgstr "Změnit přednastavený standard audia"
 
 #: src/commands.c:632 src/commands.c:1315 src/commands.c:1390
 msgid "Audio volume boost"
@@ -709,9 +708,9 @@ msgid "Sleep off."
 msgstr "Usínání vypnuto."
 
 #: src/commands.c:2245
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-I audio decoding for this channel."
-msgstr "Pro dekódování audia tohoto kanálu se používá PAL-BG."
+msgstr "Pro dekódování audia tohoto kanálu se používá PAL-I."
 
 #: src/commands.c:2248
 #, c-format
@@ -724,9 +723,9 @@ msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Pro dekódování audia tohoto kanálu se používá PAL-BG."
 
 #: src/commands.c:2282
-#, fuzzy, c-format
+#, c-format
 msgid "Defaulting to PAL-I audio decoding."
-msgstr "Předvolené dekódování audia bude PAL-BG"
+msgstr "Předvolené dekódování audia bude PAL-I"
 
 #: src/commands.c:2285
 #, c-format
