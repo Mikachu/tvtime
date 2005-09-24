@@ -1,3 +1,6 @@
+1.0.2 -
+  * vektor: Add back missing translations.
+
 1.0.1 - Thu Sep  8 00:19:31 EDT 2005
   * vektor: Bring back the 'a' key binding.
   * vektor: Change MuteOnExit to default to 0.
