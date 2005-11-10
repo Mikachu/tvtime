@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.14\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2005-09-08 00:09-0400\n"
+"POT-Creation-Date: 2005-11-09 21:48-0500\n"
 "PO-Revision-Date: 2005-04-14 00:18+0200\n"
 "Last-Translator: Iván Eixarch <ivan@bonacamp.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -607,12 +607,12 @@ msgstr "Salir del menú"
 msgid "Frequency table"
 msgstr "Tabla de frecuencias"
 
-#: src/commands.c:1269 src/commands.c:3000
+#: src/commands.c:1269 src/commands.c:3003
 msgid "Finetune"
 msgstr "Ajuste fino"
 
 #: src/commands.c:1301 src/commands.c:1304 src/commands.c:1353
-#: src/commands.c:1356 src/commands.c:3112 src/commands.c:3142
+#: src/commands.c:1356 src/commands.c:3115 src/commands.c:3145
 msgid "Change video source"
 msgstr "Cambiar origen de vídeo"
 
@@ -650,22 +650,22 @@ msgid "Picture"
 msgstr "Imágen"
 
 #: src/commands.c:1522 src/commands.c:1584 src/commands.c:1652
-#: src/commands.c:3172 src/commands.c:3213
+#: src/commands.c:3175 src/commands.c:3216
 msgid "Brightness"
 msgstr "Brillo"
 
 #: src/commands.c:1527 src/commands.c:1589 src/commands.c:1685
-#: src/commands.c:3186 src/commands.c:3216
+#: src/commands.c:3189 src/commands.c:3219
 msgid "Contrast"
 msgstr "Contraste"
 
 #: src/commands.c:1531 src/commands.c:1593 src/commands.c:1718
-#: src/commands.c:3200 src/commands.c:3219
+#: src/commands.c:3203 src/commands.c:3222
 msgid "Saturation"
 msgstr "Saturación"
 
 #: src/commands.c:1539 src/commands.c:1600 src/commands.c:1751
-#: src/commands.c:3158 src/commands.c:3222
+#: src/commands.c:3161 src/commands.c:3225
 msgid "Hue"
 msgstr "Enfoque"
 
@@ -702,220 +702,220 @@ msgstr "Añadir canal actual"
 msgid "Exit"
 msgstr "Salir"
 
-#: src/commands.c:2203
+#: src/commands.c:2206
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Me voy a dormir en %d minutos."
 
-#: src/commands.c:2206
+#: src/commands.c:2209
 #, c-format
 msgid "Sleep off."
 msgstr "¡Ya no tengo sueño!"
 
-#: src/commands.c:2245
+#: src/commands.c:2248
 #, fuzzy, c-format
 msgid "Using PAL-I audio decoding for this channel."
 msgstr "Usando decodificación de audio PAL-GB para este canal."
 
-#: src/commands.c:2248
+#: src/commands.c:2251
 #, c-format
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Usando decodificación de audio PAL-DK para este canal."
 
-#: src/commands.c:2251
+#: src/commands.c:2254
 #, c-format
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Usando decodificación de audio PAL-GB para este canal."
 
-#: src/commands.c:2282
+#: src/commands.c:2285
 #, fuzzy, c-format
 msgid "Defaulting to PAL-I audio decoding."
 msgstr "Usando decodificación de audio PAL-GB por defecto."
 
-#: src/commands.c:2285
+#: src/commands.c:2288
 #, c-format
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "Usando decodificación de audio PAL-DK por defecto."
 
-#: src/commands.c:2288
+#: src/commands.c:2291
 #, c-format
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "Usando decodificación de audio PAL-GB por defecto."
 
-#: src/commands.c:2316
+#: src/commands.c:2319
 msgid "Channel marked as active in the browse list."
 msgstr "Canal marcado como activo en la lista de navegación."
 
-#: src/commands.c:2319
+#: src/commands.c:2322
 msgid "Channel disabled from the browse list."
 msgstr "Canal desactivado en la lista de navegación."
 
-#: src/commands.c:2351
+#: src/commands.c:2354
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr "El volumen de la capturadora no será controlado por tvtime."
 
-#: src/commands.c:2354
+#: src/commands.c:2357
 #, c-format
 msgid "Setting capture card volume to %d%%."
 msgstr "Estableciendo el volumen de la capturadora a %d%%."
 
-#: src/commands.c:2387
+#: src/commands.c:2390
 msgid "Processing every input field."
 msgstr "Procesando cada campo de entrada."
 
-#: src/commands.c:2390
+#: src/commands.c:2393
 msgid "Processing every top field."
 msgstr "Procesando cada campo superior."
 
-#: src/commands.c:2393
+#: src/commands.c:2396
 msgid "Processing every bottom field."
 msgstr "Procesando cada campo inferior."
 
-#: src/commands.c:2409
+#: src/commands.c:2412
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "La resolución horizontal será de %d pixels cuando reinicies."
 
-#: src/commands.c:2466
+#: src/commands.c:2469
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "La norma de televisión será %s cuando reinicies."
 
-#: src/commands.c:2494
+#: src/commands.c:2497
 #, c-format
 msgid "Using default language for XMLTV data."
 msgstr "Usando lenguaje por defecto para XMLTV."
 
-#: src/commands.c:2497
+#: src/commands.c:2500
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
 msgstr "Usando lenguaje desconocido (%s) para XMLTV."
 
-#: src/commands.c:2501
+#: src/commands.c:2504
 #, c-format
 msgid "XMLTV language set to %s (%s)."
 msgstr "Lenguaje de XMLTV es %s (%s)."
 
-#: src/commands.c:2536
+#: src/commands.c:2539
 msgid "All channels re-activated."
 msgstr "Todos los canales reactivados."
 
-#: src/commands.c:2557
+#: src/commands.c:2560
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Renumerando %d. Introduzca un núevo número de canal."
 
-#: src/commands.c:2569
+#: src/commands.c:2572
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Escáner no disponible con la detección de señal desactivada."
 
-#: src/commands.c:2599
+#: src/commands.c:2602
 msgid "Scanning for channels being broadcast."
 msgstr "Escaneando en busca de canales."
 
-#: src/commands.c:2617
+#: src/commands.c:2620
 msgid "Closed captions disabled."
 msgstr "Subtítulos para sordos desactivados."
 
-#: src/commands.c:2623
+#: src/commands.c:2626
 msgid "Closed captions enabled."
 msgstr "Subtítulos para sordos activados."
 
-#: src/commands.c:2635
+#: src/commands.c:2638
 msgid "No VBI device configured for CC decoding."
 msgstr "Ningún dispositivo VBI configurado para decodificación CC."
 
-#: src/commands.c:2651
+#: src/commands.c:2654
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Decodificación de color para este canal establecida a %s."
 
-#: src/commands.c:2699
+#: src/commands.c:2702
 #, c-format
 msgid "Running: %s"
 msgstr "Ejecutando: %s"
 
-#: src/commands.c:2779
+#: src/commands.c:2782
 msgid "Signal detection enabled."
 msgstr "Detección de señal activada."
 
-#: src/commands.c:2782
+#: src/commands.c:2785
 msgid "Signal detection disabled."
 msgstr "Detección de señal desactivada."
 
-#: src/commands.c:2795
+#: src/commands.c:2798
 msgid "XDS decoding enabled."
 msgstr "Decodificación XDS activada."
 
-#: src/commands.c:2798
+#: src/commands.c:2801
 msgid "XDS decoding disabled."
 msgstr "Decodificación XDS desactivada."
 
-#: src/commands.c:2843
+#: src/commands.c:2846
 msgid "Colour invert enabled."
 msgstr "Inversión de colores activada."
 
-#: src/commands.c:2845
+#: src/commands.c:2848
 msgid "Colour invert disabled."
 msgstr "Inversión de colores desactivada."
 
-#: src/commands.c:2866
+#: src/commands.c:2869
 msgid "Mirror enabled."
 msgstr "Espejo activado."
 
-#: src/commands.c:2868
+#: src/commands.c:2871
 msgid "Mirror disabled."
 msgstr "Espejo desactivado."
 
-#: src/commands.c:2889
+#: src/commands.c:2892
 msgid "Chroma kill enabled."
 msgstr "Blanco y negro activado."
 
-#: src/commands.c:2891
+#: src/commands.c:2894
 msgid "Chroma kill disabled."
 msgstr "Blanco y negro desactivado."
 
-#: src/commands.c:2903
+#: src/commands.c:2906
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Overscan: %.1f%%"
 
-#: src/commands.c:2935
+#: src/commands.c:2938
 msgid "Picture settings reset to defaults."
 msgstr "Los ajustes de imágen por defecto han sido recuperados."
 
-#: src/commands.c:2963
+#: src/commands.c:2966
 msgid "Using nominal NTSC cable frequencies."
 msgstr "Usando frecuencias de cable NTSC."
 
-#: src/commands.c:2969
+#: src/commands.c:2972
 msgid "Using IRC cable frequencies."
 msgstr "Usando frecuencias de cable IRC."
 
-#: src/commands.c:2975
+#: src/commands.c:2978
 msgid "Using HRC cable frequencies."
 msgstr "Usando frecuencias de cable HRC."
 
-#: src/commands.c:3059 src/commands.c:3079
+#: src/commands.c:3062 src/commands.c:3082
 msgid "Volume"
 msgstr "Volumen"
 
-#: src/commands.c:3259
+#: src/commands.c:3262
 msgid "Saved current picture settings as global defaults.\n"
 msgstr ""
 "Los ajustes de imágen actuales han sido guardados para todos los canales.\n"
 
-#: src/commands.c:3272
+#: src/commands.c:3275
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Los ajustes de imágen actuales han sido guardados para el canal %d.\n"
 
-#: src/commands.c:3359
+#: src/commands.c:3362
 msgid "Paused."
 msgstr "Pausa."
 
-#: src/commands.c:3359
+#: src/commands.c:3362
 msgid "Resumed."
 msgstr "Recuperado."
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tvtime 0.9.14\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
-"POT-Creation-Date: 2005-09-08 00:09-0400\n"
+"POT-Creation-Date: 2005-11-09 21:48-0500\n"
 "PO-Revision-Date: 2005-04-14 00:16+0200\n"
 "Last-Translator: Tapio Leipälä <lucid@sci.fi>\n"
 "Language-Team: Tapio Leipälä <lucid@sci.fi>\n"
@@ -605,12 +605,12 @@ msgstr "Sulje valikko"
 msgid "Frequency table"
 msgstr "Kanavataulukko"
 
-#: src/commands.c:1269 src/commands.c:3000
+#: src/commands.c:1269 src/commands.c:3003
 msgid "Finetune"
 msgstr "Hienoviritys"
 
 #: src/commands.c:1301 src/commands.c:1304 src/commands.c:1353
-#: src/commands.c:1356 src/commands.c:3112 src/commands.c:3142
+#: src/commands.c:1356 src/commands.c:3115 src/commands.c:3145
 msgid "Change video source"
 msgstr "Vaihda videolähde"
 
@@ -648,22 +648,22 @@ msgid "Picture"
 msgstr "Värisäädöt"
 
 #: src/commands.c:1522 src/commands.c:1584 src/commands.c:1652
-#: src/commands.c:3172 src/commands.c:3213
+#: src/commands.c:3175 src/commands.c:3216
 msgid "Brightness"
 msgstr "Kirkkaus"
 
 #: src/commands.c:1527 src/commands.c:1589 src/commands.c:1685
-#: src/commands.c:3186 src/commands.c:3216
+#: src/commands.c:3189 src/commands.c:3219
 msgid "Contrast"
 msgstr "Kontrasti"
 
 #: src/commands.c:1531 src/commands.c:1593 src/commands.c:1718
-#: src/commands.c:3200 src/commands.c:3219
+#: src/commands.c:3203 src/commands.c:3222
 msgid "Saturation"
 msgstr "Värikylläisyys"
 
 #: src/commands.c:1539 src/commands.c:1600 src/commands.c:1751
-#: src/commands.c:3158 src/commands.c:3222
+#: src/commands.c:3161 src/commands.c:3225
 msgid "Hue"
 msgstr "Värisävy"
 
@@ -700,219 +700,219 @@ msgstr "Lisää valittu kanava"
 msgid "Exit"
 msgstr "Lopeta"
 
-#: src/commands.c:2203
+#: src/commands.c:2206
 #, c-format
 msgid "Sleep in %d minutes."
 msgstr "Uniajastin: %d minuuttia."
 
-#: src/commands.c:2206
+#: src/commands.c:2209
 #, c-format
 msgid "Sleep off."
 msgstr "Uniajastin sammutettu."
 
-#: src/commands.c:2245
+#: src/commands.c:2248
 #, fuzzy, c-format
 msgid "Using PAL-I audio decoding for this channel."
 msgstr "Käytetään PAL B/G -äänikanavapurkua tällä kanavalla."
 
-#: src/commands.c:2248
+#: src/commands.c:2251
 #, c-format
 msgid "Using PAL-DK audio decoding for this channel."
 msgstr "Käytetään PAL D/K -äänikanavapurkua tällä kanavalla."
 
-#: src/commands.c:2251
+#: src/commands.c:2254
 #, c-format
 msgid "Using PAL-BG audio decoding for this channel."
 msgstr "Käytetään PAL B/G -äänikanavapurkua tällä kanavalla."
 
-#: src/commands.c:2282
+#: src/commands.c:2285
 #, fuzzy, c-format
 msgid "Defaulting to PAL-I audio decoding."
 msgstr "PAL B/G -äänikanavapurku valittu oletukseksi."
 
-#: src/commands.c:2285
+#: src/commands.c:2288
 #, c-format
 msgid "Defaulting to PAL-DK audio decoding."
 msgstr "PAL D/K -äänikanavapurku valittu oletukseksi."
 
-#: src/commands.c:2288
+#: src/commands.c:2291
 #, c-format
 msgid "Defaulting to PAL-BG audio decoding."
 msgstr "PAL B/G -äänikanavapurku valittu oletukseksi."
 
-#: src/commands.c:2316
+#: src/commands.c:2319
 msgid "Channel marked as active in the browse list."
 msgstr "Kanava merkitty aktiiviseksi."
 
-#: src/commands.c:2319
+#: src/commands.c:2322
 msgid "Channel disabled from the browse list."
 msgstr "Kanava merkitty pois käytöstä."
 
-#: src/commands.c:2351
+#: src/commands.c:2354
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
 msgstr "Kaappauskortin äänilähdön tasoa ei muuteta."
 
-#: src/commands.c:2354
+#: src/commands.c:2357
 #, c-format
 msgid "Setting capture card volume to %d%%."
 msgstr "Kaappauskortin äänilähtö asetettu tasolle %d%%."
 
-#: src/commands.c:2387
+#: src/commands.c:2390
 msgid "Processing every input field."
 msgstr "Käsitellään kaikki kuvakentät."
 
-#: src/commands.c:2390
+#: src/commands.c:2393
 msgid "Processing every top field."
 msgstr "Käsitellään ylemmät kuvakentät."
 
-#: src/commands.c:2393
+#: src/commands.c:2396
 msgid "Processing every bottom field."
 msgstr "Käsitellään alemmat kuvakentät."
 
-#: src/commands.c:2409
+#: src/commands.c:2412
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
 msgstr "Vaakaresoluutio on %d uudelleenkäynnistyksen jälkeen."
 
-#: src/commands.c:2466
+#: src/commands.c:2469
 #, c-format
 msgid "Television standard will be %s on restart."
 msgstr "TV-standardi on %s uudelleenkäynnistyksen jälkeen."
 
-#: src/commands.c:2494
+#: src/commands.c:2497
 #, c-format
 msgid "Using default language for XMLTV data."
 msgstr "Käytetään oletuskieltä XMLTV-tiedoille."
 
-#: src/commands.c:2497
+#: src/commands.c:2500
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
 msgstr "Käytetään tuntematonta kieltä (%s) XMLTV-tiedoille."
 
-#: src/commands.c:2501
+#: src/commands.c:2504
 #, c-format
 msgid "XMLTV language set to %s (%s)."
 msgstr "XMLTV-tietojen kieleksi valittu %s (%s)."
 
-#: src/commands.c:2536
+#: src/commands.c:2539
 msgid "All channels re-activated."
 msgstr "Kaikki kanavat merkitty aktiivisiksi."
 
-#: src/commands.c:2557
+#: src/commands.c:2560
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
 msgstr "Syötä kanavan %d uusi numero."
 
-#: src/commands.c:2569
+#: src/commands.c:2572
 msgid "Scanner unavailable with signal checking disabled."
 msgstr "Kanavahaku vaatii signaalintunnistuksen toimiakseen."
 
-#: src/commands.c:2599
+#: src/commands.c:2602
 msgid "Scanning for channels being broadcast."
 msgstr "Kanavien haku käynnissä."
 
-#: src/commands.c:2617
+#: src/commands.c:2620
 msgid "Closed captions disabled."
 msgstr "Closed captions poistettu käytöstä."
 
-#: src/commands.c:2623
+#: src/commands.c:2626
 msgid "Closed captions enabled."
 msgstr "Closed captions käytössä."
 
-#: src/commands.c:2635
+#: src/commands.c:2638
 msgid "No VBI device configured for CC decoding."
 msgstr "Ei VBI-laitetta määriteltynä CC-purkua varten."
 
-#: src/commands.c:2651
+#: src/commands.c:2654
 #, c-format
 msgid "Colour decoding for this channel set to %s."
 msgstr "Kanavan värijärjestelmäksi valittu %s."
 
-#: src/commands.c:2699
+#: src/commands.c:2702
 #, c-format
 msgid "Running: %s"
 msgstr "Käynnissä: %s"
 
-#: src/commands.c:2779
+#: src/commands.c:2782
 msgid "Signal detection enabled."
 msgstr "Signaalintunnistus käytössä."
 
-#: src/commands.c:2782
+#: src/commands.c:2785
 msgid "Signal detection disabled."
 msgstr "Signaalintunnistus poistettu käytöstä."
 
-#: src/commands.c:2795
+#: src/commands.c:2798
 msgid "XDS decoding enabled."
 msgstr "XDS-tietojen purku käytössä."
 
-#: src/commands.c:2798
+#: src/commands.c:2801
 msgid "XDS decoding disabled."
 msgstr "XDS-tietojen purku poistettu käytöstä."
 
-#: src/commands.c:2843
+#: src/commands.c:2846
 msgid "Colour invert enabled."
 msgstr "Käänteiset värit käytössä."
 
-#: src/commands.c:2845
+#: src/commands.c:2848
 msgid "Colour invert disabled."
 msgstr "Käänteiset värit poistettu käytöstä."
 
-#: src/commands.c:2866
+#: src/commands.c:2869
 msgid "Mirror enabled."
 msgstr "Peilaus käytössä."
 
-#: src/commands.c:2868
+#: src/commands.c:2871
 msgid "Mirror disabled."
 msgstr "Peilaus poistettu käytöstä."
 
-#: src/commands.c:2889
+#: src/commands.c:2892
 msgid "Chroma kill enabled."
 msgstr "Värienpoisto käytössä."
 
-#: src/commands.c:2891
+#: src/commands.c:2894
 msgid "Chroma kill disabled."
 msgstr "Värienpoisto poistettu käytöstä."
 
-#: src/commands.c:2903
+#: src/commands.c:2906
 #, c-format
 msgid "Overscan: %.1f%%"
 msgstr "Ylipyyhkäisy: %.1f%%"
 
-#: src/commands.c:2935
+#: src/commands.c:2938
 msgid "Picture settings reset to defaults."
 msgstr "Värisäätöjen oletusarvot palautettu."
 
-#: src/commands.c:2963
+#: src/commands.c:2966
 msgid "Using nominal NTSC cable frequencies."
 msgstr "Käytetään virallisia NTSC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:2969
+#: src/commands.c:2972
 msgid "Using IRC cable frequencies."
 msgstr "Käytetään IRC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:2975
+#: src/commands.c:2978
 msgid "Using HRC cable frequencies."
 msgstr "Käytetään HRC-kaapeli-TV:n taajuuksia."
 
-#: src/commands.c:3059 src/commands.c:3079
+#: src/commands.c:3062 src/commands.c:3082
 msgid "Volume"
 msgstr "Äänenvoimakkuus"
 
-#: src/commands.c:3259
+#: src/commands.c:3262
 msgid "Saved current picture settings as global defaults.\n"
 msgstr "Värisäädöt tallennettu oletusarvoiksi.\n"
 
-#: src/commands.c:3272
+#: src/commands.c:3275
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
 msgstr "Värisäädöt tallennettu kanavalle %d.\n"
 
-#: src/commands.c:3359
+#: src/commands.c:3362
 msgid "Paused."
 msgstr "Pysäytetty."
 
-#: src/commands.c:3359
+#: src/commands.c:3362
 msgid "Resumed."
 msgstr "Jatketaan."
 
