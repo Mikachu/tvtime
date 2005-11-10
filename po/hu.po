@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: tvtime 0.99\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2005-09-08 00:09-0400\n"
-"PO-Revision-Date: 2005-08-15 15:45+0100\n"
+"PO-Revision-Date: 2005-11-02 23:07+0100\n"
 "Last-Translator: GERE Károly <kgere@message.hu>\n"
 "Language-Team: GERE Károly <kgere@message.hu>\n"
 "MIME-Version: 1.0\n"
@@ -374,9 +374,8 @@ msgid "Set current channel as PAL"
 msgstr "Csatorna PAL-ra állítása"
 
 #: src/commands.c:388
-#, fuzzy
 msgid "Switch audio standard"
-msgstr "TV szabvány"
+msgstr "Audió norma váltása"
 
 #: src/commands.c:395
 msgid "Change frequency table"
@@ -405,7 +404,7 @@ msgstr "Audió mód"
 
 #: src/commands.c:625
 msgid "Change default audio standard"
-msgstr ""
+msgstr "Alapértelmezett audió norma váltása"
 
 #: src/commands.c:632 src/commands.c:1315 src/commands.c:1390
 msgid "Audio volume boost"
@@ -711,9 +710,9 @@ msgid "Sleep off."
 msgstr "Leállítás kikapcsolva."
 
 #: src/commands.c:2245
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-I audio decoding for this channel."
-msgstr "PAL-BG audió dekódolás használata ehhez a csatornához."
+msgstr "PAL-I audió dekódolás használata ehhez a csatornához."
 
 #: src/commands.c:2248
 #, c-format
@@ -726,9 +725,9 @@ msgid "Using PAL-BG audio decoding for this channel."
 msgstr "PAL-BG audió dekódolás használata ehhez a csatornához."
 
 #: src/commands.c:2282
-#, fuzzy, c-format
+#, c-format
 msgid "Defaulting to PAL-I audio decoding."
-msgstr "PAL-BG audió dekódolás aktiválva."
+msgstr "PAL-I audió dekódolás aktiválva."
 
 #: src/commands.c:2285
 #, c-format
