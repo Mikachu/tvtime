@@ -2128,6 +2128,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     }
 
     switch( tvtime_cmd ) {
+    case TVTIME_NOOP:
+        break;
+
     case TVTIME_QUIT:
         cmd->quit = 1;
         break;
