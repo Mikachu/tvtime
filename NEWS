@@ -4,6 +4,11 @@ For news and updates on tvtime, please visit our website at:
   http://tvtime.net/
 
 
+News for 1.0.2
+
+  *  Add back the missing translations from the 1.0.1 release.
+  *  Allow key bindings to map to noop to disable keys.
+
 News for 1.0.1
 
   *  Minor updates that were intended for the 1.0 release.

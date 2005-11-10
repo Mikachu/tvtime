@@ -1,4 +1,4 @@
-1.0.2 -
+1.0.2 - Wed Nov  9 21:46:28 EST 2005
   * vektor: Add a proper TVTIME_NOOP command so that you can remove
       keybindings.  Thanks to Andrew Dalton for the fix.
   * vektor: Add back missing translations.
