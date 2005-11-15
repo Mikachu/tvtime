@@ -811,7 +811,7 @@ int ProcessLine( vbidata_t *vbi, uint8_t *s, int bottom )
         case 2:
         case 3:
             if( !vbi->initialised ) return 0;
-            fprintf( stderr, "Reserved\n");
+            if( vbi->verbose ) fprintf( stderr, "Reserved\n");
             break;
         case 4:
             if( !vbi->initialised ) return 0;
