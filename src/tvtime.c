@@ -1242,9 +1242,14 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
 
     sixteennine = config_get_aspect( ct );
 
-    if( !output || !output->init( config_get_geometry( ct ),
-                                  sixteennine, config_get_square_pixels( ct ),
-                                  verbose ) ) {
+    if (!output) {
+        fprintf (stderr, "%s: Broken tvtime install, "
+                 "not compiled with X support?\n", argv[ 0 ]);
+        return 1;
+    }
+
+    if( !output->init( config_get_geometry( ct ), sixteennine,
+                       config_get_square_pixels( ct ), verbose ) ) {
         /* Error messages are driver specific. */
         return 1;
     }
