@@ -18,7 +18,7 @@
 
 #include "x86-64_macros.inc"
 
-void DScalerFilterGreedyH::FUNCT_NAME(TDeinterlaceInfo* pInfo)
+void FUNCT_NAME(TDeinterlaceInfo* pInfo)
 {
     int64_t i;
     bool InfoIsOdd = (pInfo->PictureHistory[0]->Flags & PICTURE_INTERLACED_ODD) ? 1 : 0;

@@ -5,9 +5,9 @@
 #endif
 
 #ifdef USE_STRANGE_BOB
-#define SEARCH_EFFORT_FUNC(n) DScalerFilterTomsMoComp::SEFUNC(n##_SB)
+#define SEARCH_EFFORT_FUNC(n) SEFUNC(n##_SB)
 #else
-#define SEARCH_EFFORT_FUNC(n) DScalerFilterTomsMoComp::SEFUNC(n)
+#define SEARCH_EFFORT_FUNC(n) SEFUNC(n)
 #endif
 
 int SEARCH_EFFORT_FUNC(0)		// we don't try at all ;-)
