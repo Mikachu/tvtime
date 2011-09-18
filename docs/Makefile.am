@@ -33,7 +33,7 @@ EXTRA_DIST = $(docs_html) tvtime.16x16.png \
 # We use $(datadir)/applications from the freedesktop spec
 # http://www.freedesktop.org/standards/desktop-entry-spec/
 desktopdatadir = $(datadir)/applications
-dist_desktopdata_DATA = net-tvtime.desktop
+dist_desktopdata_DATA = tvtime.desktop
 
 # We use $(datadir)/icons/hicolor as our theme from the freedesktop spec
 # http://www.freedesktop.org/standards/menu-spec/
