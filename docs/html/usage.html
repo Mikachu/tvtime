@@ -422,7 +422,6 @@ their default values.
 Automatically resize the window to match the content inside it.  This
 is for when you resize tvtime into, say, a long rectangle, and want it
 to jump back to being a perfect 4:3 box around the content.
-</p><p>The <b>AUTO_ADJUST_WINDOW</b> command was added in tvtime 0.9.8.3.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -455,14 +454,12 @@ missing, or if new channels have become available.
 <tr><th class="docboxleft">CHANNEL_DEC / CHANNEL_DOWN
 <tr><td class="docentry"><p>
 Move one channel down in the channel list.
-</p><p>The <b>CHANNEL_DEC</b> command was added in tvtime 0.9.8.1.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">CHANNEL_INC / CHANNEL_UP
 <tr><td class="docentry"><p>
 Move one channel up in the channel list.
-</p><p>The <b>CHANNEL_INC</b> command was added in tvtime 0.9.8.1.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -470,7 +467,6 @@ Move one channel up in the channel list.
 <tr><td class="docentry"><p>
 Changes to the last channel you were at.  Useful for jumping back and
 forth between two programs on distant channels.
-</p><p>The <b>CHANNEL_JUMP</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -544,7 +540,6 @@ input settings.
 This will display a message along the bottom of the OSD.  Useful for
 cron jobs or other scripts to send notifications to a user running
 tvtime.
-</p><p>The <b>DISPLAY_MESSAGE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -553,7 +548,6 @@ tvtime.
 This command provides the dual functionality of channel down or menu arrow
 down, depending on whether the menu is currently active.  This command is
 to be used together with the <b>LEFT</b>, <b>RIGHT</b> and <b>UP</b> commands.
-</p><p>The <b>DOWN</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -596,7 +590,6 @@ Increases the hue setting of the input.
 Sends a fake keystroke event to tvtime.  This is useful for
 doing complex operations via a remote control, as you can
 indirect events to tvtime's internal key binding system.
-</p><p>The <b>KEY_EVENT</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -606,14 +599,12 @@ This command provides the dual functionality of mixer volume down or
 menu back command, depending on whether the menu is currently active.
 This command is to be used together with the <B>RIGHT</b>, <b>UP</b>
 and <b>DOWN</b> commands.
-</p><p>The <b>LEFT</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">MENU_DOWN
 <tr><td class="docentry"><p>
 In menu mode, this command moves the cursor down one entry in the menu.
-</p><p>The <b>MENU_DOWN</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -621,36 +612,31 @@ In menu mode, this command moves the cursor down one entry in the menu.
 <tr><td class="docentry"><p>
 In menu mode, this command selects the current entry or moves forward
 one level in the menu.
-</p><p>The <b>MENU_ENTER</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">MENU_EXIT
 <tr><td class="docentry"><p>
 In menu mode, this command shuts off the menu.
-</p><p>The <b>MENU_EXIT</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
-<tr><th class="docboxleft">MENU_LEFT
+<tr><th class="docboxleft">MENU_BACK
 <tr><td class="docentry"><p>
 In menu mode, this command moves back one level in the menu.
-</p><p>The <b>MENU_LEFT</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
-<tr><th class="docboxleft">MENU_RIGHT
+<tr><th class="docboxleft">MENU_ENTER
 <tr><td class="docentry"><p>
 In menu mode, this command selects the current entry or moves forward
 one level in the menu.
-</p><p>The <b>MENU_RIGHT</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">MENU_UP
 <tr><td class="docentry"><p>
 In menu mode, this command moves the cursor up one entry in the menu.
-</p><p>The <b>MENU_UP</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -666,7 +652,6 @@ An optional parameter specifies the percentage to decrease by.
 <tr><td class="docentry"><p>
 Toggles the mute status with the mixer, and not with the capture card
 like <b>TOGGLE_MUTE</b> does.
-</p><p>The <b>MIXER_TOGGLE_MUTE</b> command was added in tvtime 0.9.8.3.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -682,7 +667,6 @@ An optional parameter specifies the percentage to increase by.
 <tr><td class="docentry"><p>
 The command to do nothing.  Useful for when you want to blank out one of
 the default key bindings in tvtime.
-</p><p>The <b>NOOP</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -708,21 +692,18 @@ using the
 and
 <b>PICTURE_DOWN</b>
 commands.
-</p><p>The <b>PICTURE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">PICTURE_UP
 <tr><td class="docentry"><p>
 Increases the current picture setting value (brightness/contrast/colour/hue).
-</p><p>The <b>PICTURE_UP</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">PICTURE_DOWN
 <tr><td class="docentry"><p>
 Decreases the current picture setting value (brightness/contrast/colour/hue).
-</p><p>The <b>PICTURE_DOWN</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -730,7 +711,6 @@ Decreases the current picture setting value (brightness/contrast/colour/hue).
 <tr><td class="docentry"><p>
 Asks tvtime to restart itself.  This is used in the menu when we have changed
 a value that we can't yet change at runtime.
-</p><p>The <b>RESTART</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -740,7 +720,6 @@ This command provides the dual functionality of mixer volume up or
 menu enter command, depending on whether the menu is currently active.
 This command is to be used together with the <b>LEFT</b>, <b>UP</b>
 and <b>DOWN</b> commands.
-</p><p>The <b>RIGHT</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -749,14 +728,12 @@ and <b>DOWN</b> commands.
 Instructs tvtime to spawn a command.  This can be used to start a program using
 a key in tvtime or lirc, such as to spawn mythepg or alevt.  Using
 tvtime-command run_command "xterm" will have tvtime call system( "xterm &amp;" ).
-</p><p>The <b>RUN_COMMAND</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">SAVE_PICTURE_GLOBAL
 <tr><td class="docentry"><p>
 Saves the current picture settings as the global defaults.
-</p><p>The <b>SAVE_PICTURE_GLOBAL</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -764,7 +741,6 @@ Saves the current picture settings as the global defaults.
 <tr><td class="docentry"><p>
 Saves the current picture settings as the defaults for the current channel
 on the tuner.
-</p><p>The <b>SAVE_PICTURE_CHANNEL</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -784,7 +760,6 @@ running user's home directory.
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current audio mode.  Valid
 options are "mono", "stereo", "sap", "lang1" or "lang2".
-</p><p>The <b>SET_AUDIO_MODE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -792,7 +767,6 @@ options are "mono", "stereo", "sap", "lang1" or "lang2".
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current deinterlacer.  Valid
 options are the short name of any of the deinterlacers available in tvtime.
-</p><p>The <b>SET_DEINTERLACER</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -800,14 +774,12 @@ options are the short name of any of the deinterlacers available in tvtime.
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current framerate.  Valid
 options are "full", "top" and "bottom".
-</p><p>The <b>SET_FRAMERATE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">SET_FREQUENCY_TABLE
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current frequency table.
-</p><p>The <b>SET_FREQUENCY_TABLE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -815,7 +787,6 @@ This command takes a parameter and sets the current frequency table.
 <tr><td class="docentry"><p>
 This command sets where widescreen output will be aligned when in fullscreen
 mode, either top for the top of the screen, center, or bottom.
-</p><p>The <b>SET_FULLSCREEN_POSITION</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -824,7 +795,6 @@ mode, either top for the top of the screen, center, or bottom.
 This command takes a parameter and sets the the capture card input (0-n).
 Among the Inputs are: the tuner, composite, or S-Video connectors on the
 capture card.
-</p><p>The <b>SET_INPUT</b> command was added in tvtime 0.9.14.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -832,7 +802,6 @@ capture card.
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current input width in pixels.
 It will be used in tvtime after a restart.
-</p><p>The <b>SET_INPUT_WIDTH</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -843,7 +812,6 @@ size of the output window, and is useful for watching a 2.35:1 movie in
 a long, thin window, or for watching it at the top of the screen using
 the fullscreen position option.  Valid options here are 16:9, 1.85:1,
 2.35:1 or 4:3.
-</p><p>The <b>SET_MATTE</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -851,7 +819,6 @@ the fullscreen position option.  Valid options here are 16:9, 1.85:1,
 <tr><td class="docentry"><p>
 This command takes a parameter and sets the current television standard.
 It will be used in tvtime after a restart.
-</p><p>The <b>SET_NORM</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -859,7 +826,6 @@ It will be used in tvtime after a restart.
 <tr><td class="docentry"><p>
 This command takes a station name or number as a parameter and changes
 the channel to the station given.
-</p><p>The <b>SET_STATION</b> command was added in tvtime 0.9.13.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -868,7 +834,6 @@ the channel to the station given.
 Set the preferred language code for XMLTV data. The argument can be
 either the two-letter language code according to ISO 639 or a number
 to select one of the known languages.
-</p><p>The <b>SET_XMLTV_LANGUAGE</b> command was added in tvtime 0.9.13.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -884,14 +849,12 @@ replaced by <b>SET_INPUT_WIDTH</b> in tvtime 0.9.11.
 <tr><th class="docboxleft">SHOW_DEINTERLACER_INFO
 <tr><td class="docentry"><p>
 Shows a help screen on the OSD describing the current deinterlacer setting.
-</p><p>The <b>SHOW_DEINTERLACER_INFO</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
 <tr><th class="docboxleft">SHOW_MENU
 <tr><td class="docentry"><p>
 This command is used to bring up the tvtime setup menu.
-</p><p>The <b>SHOW_MENU</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -907,7 +870,6 @@ This command sets the sleep timer to tell tvtime to shut itself off after
 a certain amount of time.  Sending this command will first activate the feature,
 and sending it again will increase the timer up until a maximum value at which
 point it is shut off.
-</p><p>The <b>SLEEP</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -916,7 +878,6 @@ point it is shut off.
 If supported by your window manager, this command will ask to have the
 window be put into an "always on top" state, where no other window can
 be stacked above it.
-</p><p>The <b>TOGGLE_ALWAYSONTOP</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -964,7 +925,6 @@ configuration file.
 <tr><td class="docentry"><p>
 For PAL users, toggles the audio mode of the current channel between
 the PAL-BG and PAL-DK audio norms.
-</p><p>The <b>TOGGLE_CHANNEL_PAL_DK</b> command was added in tvtime 0.9.13.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -973,7 +933,6 @@ the PAL-BG and PAL-DK audio norms.
 Enables or disables the chroma killer filter, which makes the input
 black and white.  Useful when watching a black-and-white movie to avoid
 chrominance artifacts.
-</p><p>The <b>TOGGLE_CHROMA_KILL</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1021,7 +980,6 @@ tuner, composite, or S-Video connectors on the capture card.
 Switches between the available mattes.  This cuts off the top and
 bottom of the input picture to help fit the window to the image
 content.
-</p><p>The <b>TOGGLE_MATTE</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1031,7 +989,6 @@ Turns on or off the mirror filter, which flips the input.  This is
 useful for using tvtime with mirroring projectors, although I don't
 think it will actually work as intended yet since we don't mirror
 the OSD output.  :)  Comments appreciated.
-</p><p>The <b>TOGGLE_MIRROR</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1056,7 +1013,6 @@ are available.
 <tr><td class="docentry"><p>
 For PAL users, toggles the default audio mode of all channels between
 the PAL-BG and PAL-DK audio norms.
-</p><p>The <b>TOGGLE_PAL_DK_AUDIO</b> command was added in tvtime 0.9.13.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1065,7 +1021,6 @@ the PAL-BG and PAL-DK audio norms.
 Toggles between PAL and SECAM on the current channel.  This feature is
 useful for regions which receive both PAL and SECAM channels, such that
 tvtime can be configured on a per-channel basis for the correct norm.
-</p><p>The <b>TOGGLE_PAL_SECAM</b> command was added in tvtime 0.9.9.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1089,7 +1044,6 @@ Toggles on and off tvtime's signal detection code.  Signal detection enables
 features like channel scanning and increases responsiveness on channels with
 poor reception, but may make it impossible to watch stations where the
 reception is too bad for the card to detect it reliably.
-</p><p>The <b>TOGGLE_SIGNAL_DETECTION</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1099,7 +1053,6 @@ Toggles on and off tvtime's XDS decoding code.  XDS is used to send information
 about the channel including the network name and call letters, and
 sometimes information about the current show.  This information is then shown
 on the OSD and saved to the stationlist.xml file.
-</p><p>The <b>TOGGLE_XDS</b> command was added in tvtime 0.9.10.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1107,7 +1060,6 @@ on the OSD and saved to the stationlist.xml file.
 <tr><td class="docentry"><p>
 Toggles which language to show by default from the XMLTV file from
 the ones available in the file.
-</p><p>The <b>TOGGLE_XMLTV_LANGUAGE</b> command was added in tvtime 0.9.13.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
@@ -1116,7 +1068,6 @@ the ones available in the file.
 This command provides the dual functionality of channel up or menu arrow up,
 depending on whether the menu is currently active.  This command is to be
 used together with the <b>LEFT</b>, <b>RIGHT</b> and <b>DOWN</b> commands.
-</p><p>The <b>UP</b> command was added in tvtime 0.9.11.
 </p></table><p></p>
 
 <table width="90%" class="doclist">
