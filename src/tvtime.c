@@ -1343,21 +1343,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         videoinput_delete( vidin );
         vidin = 0;
      } else {
-        const char *audiomode = config_get_audio_mode( ct );
         videoinput_set_input_num( vidin, config_get_inputnum( ct ) );
-
-        if( audiomode ) {
-            if( !strcasecmp( audiomode, "mono" ) ) {
-                videoinput_set_audio_mode( vidin, VIDEOINPUT_MONO );
-            } else if( !strcasecmp( audiomode, "stereo" ) ) {
-                videoinput_set_audio_mode( vidin, VIDEOINPUT_STEREO );
-            } else if( !strcasecmp( audiomode, "sap" )
-                       || !strcasecmp( audiomode, "lang1" ) ) {
-                videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG1 );
-            } else {
-                videoinput_set_audio_mode( vidin, VIDEOINPUT_LANG2 );
-            }
-        }
 
         width = videoinput_get_width( vidin );
         height = videoinput_get_height( vidin );
@@ -1392,23 +1378,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         }
 
         if( fieldsavailable < 4 ) {
-            if( videoinput_is_bttv( vidin ) ) {
-                lfprintf( stderr,
-                      _("\n"
-        "    You are using the bttv driver, but have not configured enough\n"
-        "    buffers for tvtime to process the video optimally.  This is\n"
-        "    true by default with bttv in kernels before 2.4.21.  Please\n"
-        "    set the option gbuffers=4 when loading bttv.  For more\n"
-        "    information see our support page at %s\n\n"), PACKAGE_BUGREPORT );
-            } else {
-                lfprintf( stderr, _("\n"
+	    lfprintf( stderr, _("\n"
      "    Your capture card driver, %s, is not providing\n"
      "    enough buffers for tvtime to process the video.  Please check with\n"
      "    your driver documentation to see if you can increase the number\n"
      "    of buffers provided to applications, and report this to the tvtime\n"
      "    bug tracker at %s\n\n"), videoinput_get_driver_name( vidin ),
                                    PACKAGE_BUGREPORT );
-            }
         }
     } else {
         fieldsavailable = 4;
@@ -2583,16 +2559,6 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
     if( vidin ) {
         snprintf( number, 4, "%d", videoinput_get_input_num( vidin ) );
         config_save( ct, "V4LInput", number );
-
-        if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_MONO ) {
-            config_save( ct, "AudioMode", "mono" );
-        } else if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_LANG1 ) {
-            config_save( ct, "AudioMode", "lang1" );
-        } else if( videoinput_get_audio_mode( vidin ) == VIDEOINPUT_LANG2 ) {
-            config_save( ct, "AudioMode", "lang2" );
-        } else {
-            config_save( ct, "AudioMode", "stereo" );
-        }
 
         snprintf( number, 4, "%d", videoinput_get_pal_audio_mode( vidin ) );
         config_save( ct, "PalDKMode", number );

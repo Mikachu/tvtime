@@ -527,7 +527,6 @@ static void reinit_tuner( commands_t *cmd )
                 tvtime_osd_set_channel_name( cmd->osd, station_get_current_channel_name( cmd->stationmgr ) );
             }
             tvtime_osd_set_norm( cmd->osd, videoinput_get_norm_name( videoinput_get_norm( cmd->vidin ) ) );
-            tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
             tvtime_osd_set_freq_table( cmd->osd, station_get_current_band( cmd->stationmgr ) );
             tvtime_osd_set_channel_number( cmd->osd, channel_display );
             tvtime_osd_set_network_call( cmd->osd, station_get_current_network_call_letters( cmd->stationmgr ) );
@@ -605,12 +604,6 @@ static void reset_pal_input_menu( menu_t *menu, videoinput_t *vidin, station_mgr
 {
     char string[ 128 ];
     int cur = 2;
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
-              _("Preferred audio mode") );
-    menu_set_text( menu, cur, string );
-    menu_set_enter_command( menu, cur, TVTIME_SHOW_MENU, "audiomode" );
-    cur++;
 
     if( videoinput_is_v4l2( vidin ) ) {
         const char *curnorm = "PAL-BG";
@@ -911,54 +904,6 @@ static void reset_norm_menu( menu_t *menu, const char *norm )
                    TVTIME_ICON_RADIOON "  PAL-60" :
                    TVTIME_ICON_RADIOOFF "  PAL-60");
     menu_set_enter_command( menu, 8, TVTIME_SET_NORM, "pal-60" );
-}
-
-static void reset_audio_mode_menu( menu_t *menu, int ntsc, int curmode )
-{
-    char string[ 128 ];
-
-    snprintf( string, sizeof( string ), curmode == VIDEOINPUT_MONO ?
-              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-              _("Mono") );
-    menu_set_text( menu, 1, string );
-    menu_set_back_command( menu, TVTIME_SHOW_MENU, "input" );
-    menu_set_enter_command( menu, 1, TVTIME_SET_AUDIO_MODE, "mono" );
-
-    snprintf( string, sizeof( string ), curmode == VIDEOINPUT_STEREO ?
-              TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-              _("Stereo") );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SET_AUDIO_MODE, "stereo" );
-
-    if( ntsc ) {
-        snprintf( string, sizeof( string ), (curmode == VIDEOINPUT_LANG1 ||
-                                            curmode == VIDEOINPUT_LANG2) ?
-                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-                  _("SAP") );
-        menu_set_text( menu, 3, string );
-        menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "sap" );
-        snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
-                  _("Back") );
-
-        menu_set_text( menu, 4, string );
-        menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "input" );
-    } else {
-        snprintf( string, sizeof( string ), (curmode == VIDEOINPUT_LANG1) ?
-                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-                  _("Primary Language") );
-        menu_set_text( menu, 3, string );
-        menu_set_enter_command( menu, 3, TVTIME_SET_AUDIO_MODE, "lang1" );
-        snprintf( string, sizeof( string ), (curmode == VIDEOINPUT_LANG2) ?
-                  TVTIME_ICON_RADIOON "  %s" : TVTIME_ICON_RADIOOFF "  %s",
-                  _("Secondary Language") );
-        menu_set_text( menu, 4, string );
-        menu_set_enter_command( menu, 4, TVTIME_SET_AUDIO_MODE, "lang2" );
-
-        snprintf( string, sizeof( string ), TVTIME_ICON_PLAINLEFTARROW "  %s",
-                  _("Back") );
-        menu_set_text( menu, 5, string );
-        menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "input" );
-    }
 }
 
 static void reset_overscan_menu( menu_t *menu, double overscan )
@@ -1307,11 +1252,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_enter_command( menu, 1, TVTIME_TOGGLE_INPUT, "" );
 
     snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
-              _("Preferred audio mode") );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "audiomode" );
-
-    snprintf( string, sizeof( string ), TVTIME_ICON_STATIONMANAGEMENT "  %s",
               _("Audio volume boost") );
     menu_set_text( menu, 3, string );
     menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "audioboost" );
@@ -1377,13 +1317,6 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
               _("Setup"), _("Input configuration"), _("Preferred audio mode") );
     menu_set_text( menu, 0, string );
     commands_add_menu( cmd, menu );
-    if( cmd->vidin ) {
-        reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                               videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                               videoinput_get_audio_mode( cmd->vidin ) );
-    } else {
-        reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ), 0, 0 );
-    }
 
     menu = menu_new( "audioboost" );
     snprintf( string, sizeof( string ), "%s - %s - %s",
@@ -1818,27 +1751,6 @@ static void add_to_favorites( commands_t *cmd, int pos )
     if( cmd->numfavorites < NUM_FAVORITES ) {
         cmd->numfavorites++;
     }
-}
-
-static void osd_list_audio_modes( tvtime_osd_t *osd, int ntsc, int curmode )
-{
-    tvtime_osd_list_set_lines( osd, ntsc ? 4 : 5 );
-    tvtime_osd_list_set_text( osd, 0, _("Preferred audio mode") );
-    tvtime_osd_list_set_text( osd, 1, _("Mono") );
-    tvtime_osd_list_set_text( osd, 2, _("Stereo") );
-    tvtime_osd_list_set_text( osd, 3, ntsc ?
-                              _("SAP") : _("Primary Language") );
-    if( !ntsc ) tvtime_osd_list_set_text( osd, 4, _("Secondary Language") );
-    if( curmode == VIDEOINPUT_MONO ) {
-        tvtime_osd_list_set_hilight( osd, 1 );
-    } else if( curmode == VIDEOINPUT_STEREO ) {
-        tvtime_osd_list_set_hilight( osd, 2 );
-    } else if( curmode == VIDEOINPUT_LANG1 || (ntsc && curmode == VIDEOINPUT_LANG2) ) {
-        tvtime_osd_list_set_hilight( osd, 3 );
-    } else if( curmode == VIDEOINPUT_LANG2 ) {
-        tvtime_osd_list_set_hilight( osd, 4 );
-    }
-    tvtime_osd_show_list( osd, 1, 0 );
 }
 
 /**
@@ -2710,45 +2622,9 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_SET_AUDIO_MODE:
-        if( cmd->vidin ) {
-            if( !strcasecmp( arg, "mono" ) ) {
-                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_MONO );
-            } else if( !strcasecmp( arg, "stereo" ) ) {
-                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_STEREO );
-            } else if( !strcasecmp( arg, "sap" ) || !strcasecmp( arg, "lang1" ) ) {
-                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_LANG1 );
-            } else {
-                videoinput_set_audio_mode( cmd->vidin, VIDEOINPUT_LANG2 );
-            }
-            if( cmd->osd ) {
-                if( !cmd->menuactive ) {
-                    osd_list_audio_modes( cmd->osd, videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                          videoinput_get_audio_mode( cmd->vidin ) );
-                }
-                tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
-                tvtime_osd_show_info( cmd->osd );
-                reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                                       videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                       videoinput_get_audio_mode( cmd->vidin ) );
-                commands_refresh_menu( cmd );
-            }
-        }
         break;
 
     case TVTIME_TOGGLE_AUDIO_MODE:
-        if( cmd->vidin ) {
-            videoinput_set_audio_mode( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) << 1 );
-            if( cmd->osd ) {
-                osd_list_audio_modes( cmd->osd, videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                      videoinput_get_audio_mode( cmd->vidin ) );
-                tvtime_osd_set_audio_mode( cmd->osd, videoinput_get_audio_mode_name( cmd->vidin, videoinput_get_audio_mode( cmd->vidin ) ) );
-                tvtime_osd_show_info( cmd->osd );
-                reset_audio_mode_menu( commands_get_menu( cmd, "audiomode" ),
-                                       videoinput_get_norm( cmd->vidin ) == VIDEOINPUT_NTSC,
-                                       videoinput_get_audio_mode( cmd->vidin ) );
-                commands_refresh_menu( cmd );
-            }
-        }
         break;
 
     case TVTIME_TOGGLE_DEINTERLACER:

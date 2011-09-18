@@ -35,7 +35,6 @@
 #else
 # define _(string) string
 #endif
-#include <videodev.h>
 #include <videodev2.h>
 
 typedef struct v4l_device_s v4l_device_t;
