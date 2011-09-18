@@ -1376,7 +1376,6 @@ void xcommon_poll_events( input_t *in )
     int reconfigure = 0;
     int reconfwidth = 0;
     int reconfheight = 0;
-    int getfocus = 0;
     int motion = 0;
     int motion_x = 0;
     int motion_y = 0;
@@ -1446,9 +1445,6 @@ void xcommon_poll_events( input_t *in )
             }
             XUndefineCursor( display, output_window );
             motion_timeout = 30;
-            break;
-        case EnterNotify:
-            getfocus = 1;
             break;
         case FocusIn:
             has_focus = 1;
@@ -1633,7 +1629,6 @@ void xcommon_poll_events( input_t *in )
                 input_callback( in, I_BUTTONPRESS, event.xbutton.button );
                 lastpresstime = event.xbutton.time;
             }
-            getfocus = 1;
             break;
         case ButtonRelease:
             xcommon_update_server_time( event.xbutton.time );
@@ -1641,7 +1636,6 @@ void xcommon_poll_events( input_t *in )
                 input_callback( in, I_BUTTONRELEASE, event.xbutton.button );
                 lastreleasetime = event.xbutton.time;
             }
-            getfocus = 1;
             break;
         default: break;
         }
@@ -1649,10 +1643,6 @@ void xcommon_poll_events( input_t *in )
 
     if( motion ) {
         input_callback( in, I_MOUSEMOVE, ((motion_x & 0xffff) << 16 | (motion_y & 0xffff)) );
-    }
-
-    if( getfocus ) {
-        XSetInputFocus( display, wm_window, RevertToPointerRoot, CurrentTime );
     }
 
     if( !has_ewmh_state_fullscreen && output_fullscreen ) {
