@@ -66,6 +66,7 @@ static int screen;
 static Window wm_window;
 static Window fs_window;
 static Window output_window;
+static XSizeHints hint;
 static GC gc;
 static int have_xss;
 static int output_width, output_height;
@@ -340,10 +341,9 @@ static int xv_get_height_for_width( int window_width )
 
 static void x11_northwest_gravity( Display *dpy, Window win )
 {
-    XSizeHints hints;
-    hints.flags = PWinGravity;
-    hints.win_gravity = NorthWestGravity;
-    XSetWMNormalHints( dpy, win, &hints );
+    hint.flags |= PWinGravity;
+    hint.win_gravity = NorthWestGravity;
+    XSetWMNormalHints( dpy, win, &hint );
 }
 
 static void x11_grab_fullscreen_input( Display *dpy, Window win )
@@ -824,7 +824,6 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
 {
     Pixmap curs_pix;
     XEvent xev;
-    XSizeHints hint;
     XClassHint classhint;
     XColor curs_col = { 0 };
     XSetWindowAttributes xswa;
