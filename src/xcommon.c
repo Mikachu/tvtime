@@ -85,7 +85,6 @@ static int matte_width;
 static int matte_height;
 static int alwaysontop;
 static int has_focus;
-static int wm_is_metacity;
 static int use_square_pixels;
 static xfullscreen_t *xf;
 
@@ -858,7 +857,6 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     matte_height = 0;
     alwaysontop = 0;
     has_focus = 0;
-    wm_is_metacity = 0;
 
     display = XOpenDisplay( 0 );
     if( !display ) {
@@ -1023,13 +1021,6 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
             fprintf( stderr, "xcommon: Window manager is %s and is EWMH compliant.\n", wmname );
         }
 
-        if( !strcasecmp( wmname, "metacity" ) ) {
-            if( xcommon_verbose ) {
-                fprintf( stderr, "xcommon: You are using metacity.  Disabling aspect ratio hints\n"
-                                 "xcommon: since most deployed versions of metacity are still broken.\n" );
-            }
-            wm_is_metacity = 1;
-        }
         free( wmname );
 
 
