@@ -263,6 +263,10 @@ void xfullscreen_get_position( xfullscreen_t *xf, int window_x, int window_y,
         int max_area = -1;
         int i;
 
+        *x = xf->heads[ 0 ].x;
+        *y = xf->heads[ 0 ].y;
+        *w = xf->heads[ 0 ].w;
+        *h = xf->heads[ 0 ].h;
         for( i = 0; i < xf->nheads; i++ ) {
             int head_x1 = xf->heads[ i ].x;
             int head_x2 = xf->heads[ i ].x + xf->heads[ i ].w - 1;
