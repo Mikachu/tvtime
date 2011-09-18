@@ -2940,12 +2940,14 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_MIXER_UP:
-    case TVTIME_MIXER_DOWN:
 
-        /* If the user hits the volume control, drop us out of mute mode. */
+        /* If the user increases the volume, drop us out of mute mode. */
         if( cmd->vidin && videoinput_get_muted( cmd->vidin ) ) {
             commands_handle( cmd, TVTIME_TOGGLE_MUTE, 0 );
         }
+    /* fallthrough */
+    case TVTIME_MIXER_DOWN:
+
         /* Check to see if an argument was passed, if so, use it. */
         if (atoi(arg) > 0) {
             int perc = atoi(arg);
