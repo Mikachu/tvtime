@@ -840,7 +840,7 @@ config_t *config_new( void )
     ct->keymapmenu[ 'q' ] = TVTIME_MENU_EXIT;
     ct->keymapmenu[ I_ESCAPE ] = TVTIME_MENU_EXIT;
     ct->buttonmapmenu[ 1 ] = TVTIME_MENU_ENTER;
-    ct->buttonmapmenu[ 3 ] = TVTIME_MENU_ENTER;
+    ct->buttonmapmenu[ 3 ] = TVTIME_MENU_EXIT;
     ct->buttonmapmenu[ 4 ] = TVTIME_MENU_UP;
     ct->buttonmapmenu[ 5 ] = TVTIME_MENU_DOWN;
 

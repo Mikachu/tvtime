@@ -511,12 +511,12 @@
     <keyboard key="q"/>
     <keyboard key="F1"/>
     <keyboard key="Tab"/>
+    <mouse button="3"/>
   </bind>
 
   <bind command="menu_enter">
     <keyboard key="enter"/>
     <mouse button="1"/>
-    <mouse button="3"/>
   </bind>
 
   <!--
