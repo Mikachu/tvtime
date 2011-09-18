@@ -19,9 +19,6 @@ pkgsysconfdir = $(sysconfdir)/@PACKAGE@
 tmpdir = /tmp
 localedir = $(datadir)/locale
 
-TTF_CFLAGS = `$(FREETYPE_CONFIG) --cflags`
-TTF_LIBS = `$(FREETYPE_CONFIG) --libs`
-
 # Set the following if you want to specify an additional font directory
 # FONT_CFLAGS = -DFONTDIR='/usr/share/fonts/truetype/freefont/'
 
@@ -76,20 +73,20 @@ tvtime_SOURCES = $(COMMON_SRCS) $(OUTPUT_SRCS) $(PLUGIN_SRCS) tvtime.c
 tvtime_CFLAGS = $(TTF_CFLAGS) $(PNG_CFLAGS) $(OPT_CFLAGS) \
 	$(PLUGIN_CFLAGS) $(X11_CFLAGS) $(XML2_FLAG) \
 	$(FONT_CFLAGS) $(AM_CFLAGS)
-tvtime_LDFLAGS  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
+tvtime_LDADD  = $(TTF_LIBS) $(ZLIB_LIBS) $(PNG_LIBS) \
 	$(X11_LIBS) $(XML2_LIBS) -lm -lsupc++
 
 tvtime_command_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-command.c
 tvtime_command_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
-tvtime_command_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
+tvtime_command_LDADD  = $(ZLIB_LIBS) $(XML2_LIBS)
 tvtime_configure_SOURCES = utils.h utils.c tvtimeconf.h tvtimeconf.c \
 	tvtime-configure.c
 tvtime_configure_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
-tvtime_configure_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
+tvtime_configure_LDADD  = $(ZLIB_LIBS) $(XML2_LIBS)
 tvtime_scanner_SOURCES = utils.h utils.c videoinput.h videoinput.c \
 	tvtimeconf.h tvtimeconf.c station.h station.c tvtime-scanner.c \
 	mixer.h mixer.c
 tvtime_scanner_CFLAGS = $(OPT_CFLAGS) $(XML2_FLAG) $(AM_CFLAGS)
-tvtime_scanner_LDFLAGS  = $(ZLIB_LIBS) $(XML2_LIBS)
+tvtime_scanner_LDADD  = $(ZLIB_LIBS) $(XML2_LIBS)
 

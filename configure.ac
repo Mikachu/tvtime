@@ -10,15 +10,13 @@ if test x"$host_alias" = x""; then host_alias="$host"; fi
 
 # Check for compilers.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_CHECK_PROG(found_cc, "$CC", yes, no)
 test "x$found_cc" = "xyes" || exit 1
 
 AC_PROG_CXX
 AC_CHECK_PROG(found_cxx, "$CXX", yes, no)
 test "x$found_cxx" = "xyes" || exit 1
-
-# Check for libtool.
-AC_PROG_LIBTOOL
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -65,10 +63,7 @@ dnl ---------------------------------------------
 dnl freetype
 dnl ---------------------------------------------
 dnl Test for freetype
-AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
-if test "$FREETYPE_CONFIG" = "no" ; then
-  AC_MSG_ERROR(freetype2 needed and freetype-config not found)
-fi
+PKG_CHECK_MODULES([TTF], [freetype2])
 
 dnl ---------------------------------------------
 dnl libxml2
