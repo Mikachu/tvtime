@@ -831,7 +831,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XEvent xev;
     XSizeHints hint;
     XClassHint classhint;
-    XColor curs_col;
+    XColor curs_col = { 0 };
     XSetWindowAttributes xswa;
     const char *hello = "tvtime";
     unsigned long mask;
@@ -1083,13 +1083,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     XMaskEvent( display, StructureNotifyMask, &xev );
 
     /* Create a 1 pixel cursor to use in full screen mode */
-    curs_pix = XCreatePixmap( display, output_window, 1, 1, 1 );
-    curs_col.pixel = 0;
-    curs_col.red = 0;
-    curs_col.green = 0;
-    curs_col.blue = 0;
-    curs_col.flags = 0;
-    curs_col.pad = 0;
+    curs_pix = XCreateBitmapFromData( display, output_window, (const char []){0}, 1, 1 );
     nocursor = XCreatePixmapCursor( display, curs_pix, curs_pix, &curs_col, &curs_col, 1, 1 );
     XDefineCursor( display, output_window, nocursor );
     XSetIconName( display, wm_window, "tvtime" );
