@@ -22,6 +22,9 @@ test "x$found_cxx" = "xyes" || exit 1
 AC_HEADER_STDC
 AC_CHECK_HEADERS([ctype.h dirent.h errno.h fcntl.h getopt.h langinfo.h math.h netinet/in.h pwd.h signal.h stdint.h stdio.h stdlib.h string.h sys/ioctl.h sys/mman.h sys/resource.h sys/stat.h sys/time.h sys/wait.h sys/types.h unistd.h wordexp.h locale.h])
 
+AC_CHECK_HEADER([linux/videodev.h], [], AC_MSG_ERROR(linux/videodev.h not found))
+AC_CHECK_HEADER([linux/videodev2.h], [], AC_MSG_ERROR(linux/videodev2.h not found))
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 
