@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: tvtime cvs\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2005-11-09 21:48-0500\n"
-"PO-Revision-Date: 2003-10-08 23:00+0600\n"
-"Last-Translator: Alexander Belov <asbel@mail.ru>\n"
+"PO-Revision-Date: 2006-12-03 09:21+0500\n"
+"Last-Translator: Denis V. Sirotkin <fechiny@gmail.com>\n"
 "Language-Team: Alexander Belov <asbel@mail.ru>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/tvtime.c:792 src/commands.c:1463 src/commands.c:1488
 msgid "Deinterlacer configuration"
-msgstr "Настройка сглаживания черезстрочности"
+msgstr "п²п╟я│я┌я─п╬п╧п╨п╟ я│пЁп╩п╟п╤п╦п╡п╟п╫п╦я▐ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦"
 
 #: src/tvtime.c:822 src/tvtime.c:841 src/tvtime.c:876 src/tvtime.c:957
 #: src/tvtime.c:985 src/tvtime.c:1120 src/commands.c:408 src/commands.c:449
@@ -29,113 +29,112 @@ msgstr "Настройка сглаживания черезстрочности"
 #: src/commands.c:1641 src/commands.c:1672 src/commands.c:1705
 #: src/commands.c:1738 src/commands.c:1770
 msgid "Back"
-msgstr "Назад"
+msgstr "п²п╟п╥п╟п╢"
 
 #: src/tvtime.c:854 src/tvtime.c:997
-#, fuzzy, c-format
+#, c-format
 msgid "Full rate: %.2f fps"
-msgstr "Полная: %.2f кадров/сек."
+msgstr "п÷п╬п╩п╫п╟я▐ я│я┌я─п╬я┤п╫п╟я▐ я─п╟п╥п╡я▒я─я┌п╨п╟: %.2f п╨п╟п╢я─п╬п╡/я│п╣п╨."
 
 #: src/tvtime.c:862 src/tvtime.c:1001
-#, fuzzy, c-format
+#, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
-msgstr "Половинная, строчная развертка верхних областей: %.2f кадров/сек."
+msgstr "п÷п╬п╩п╬п╡п╦п╫п╫п╟я▐ я│я┌я─п╬я┤п╫п╟я▐ я─п╟п╥п╡я▒я─я┌п╨п╟ п╡п╣я─я┘п╫п╦я┘ п╬п╠п╩п╟я│я┌п╣п╧: %.2f п╨п╟п╢я─п╬п╡/я│п╣п╨."
 
 #: src/tvtime.c:869 src/tvtime.c:1005
-#, fuzzy, c-format
+#, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
-msgstr "Половинная, строчная развертка нижних областей: %.2f кадров/сек."
+msgstr "п÷п╬п╩п╬п╡п╦п╫п╫п╟я▐ я│я┌я─п╬я┤п╫п╟я▐ я─п╟п╥п╡я▒я─я┌п╨п╟ п╫п╦п╤п╫п╦я┘ п╬п╠п╩п╟я│я┌п╣п╧: %.2f п╨п╟п╢я─п╬п╡/я│п╣п╨."
 
 #: src/tvtime.c:894
 msgid "Overscan setting"
-msgstr "Приближение"
+msgstr "п÷я─п╦п╠п╩п╦п╤п╣п╫п╦п╣"
 
 #: src/tvtime.c:901 src/commands.c:1440
 msgid "Apply matte"
-msgstr "Изменение размера изображения"
+msgstr "п≤п╥п╪п╣п╫п╣п╫п╦п╣ я─п╟п╥п╪п╣я─п╟ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐"
 
 #: src/tvtime.c:909
 msgid "16:9 output"
-msgstr "размер 16:9"
+msgstr "я─п╟п╥п╪п╣я─ 16:9"
 
 #: src/tvtime.c:916
 msgid "Resize window to match contents"
-msgstr ""
+msgstr "п≤п╥п╪п╣п╫п╦я┌я▄ я─п╟п╥п╪п╣я─я▀ п╬п╨п╫п╟ п╢п╬ я─п╟п╥п╪п╣я─п╬п╡ я│п╬п╢п╣я─п╤п╦п╪п╬пЁп╬"
 
 #: src/tvtime.c:925
 msgid "Fullscreen"
-msgstr "Полный экран"
+msgstr "п÷п╬п╩п╫я▀п╧ я█п╨я─п╟п╫"
 
 #: src/tvtime.c:932
 msgid "Set fullscreen position"
-msgstr "Установка полноэкранного положения"
+msgstr "пёя│я┌п╟п╫п╬п╡п╨п╟ п©п╬п╩п╫п╬я█п╨я─п╟п╫п╫п╬пЁп╬ п©п╬п╩п╬п╤п╣п╫п╦я▐"
 
 #: src/tvtime.c:942
 msgid "Always-on-top"
-msgstr "Всегда впереди"
+msgstr "п▓я│п╣пЁп╢п╟ п╡п©п╣я─п╣п╢п╦ п╢я─я┐пЁп╦я┘ п╬п╨п╬п╫"
 
 #: src/tvtime.c:951
-#, fuzzy
 msgid "Quiet screenshots"
-msgstr "Снимок экрана: %s"
+msgstr "п║п╨я─я▀я┌п╫я▀п╣ я│п╫п╦п╪п╨п╦ я█п╨я─п╟п╫п╟"
 
 #: src/tvtime.c:968
 msgid "Centre"
-msgstr "В центре"
+msgstr "п▓ я├п╣п╫я┌я─п╣"
 
 #: src/tvtime.c:975
 msgid "Top"
-msgstr "Вверху"
+msgstr "п▓п╡п╣я─я┘я┐"
 
 #: src/tvtime.c:981
 msgid "Bottom"
-msgstr "Внизу"
+msgstr "п▓п╫п╦п╥я┐"
 
 #: src/tvtime.c:995 src/commands.c:1472 src/commands.c:1502
 msgid "Attempted framerate"
-msgstr "Частота кадров"
+msgstr "п╖п╟я│я┌п╬я┌п╟ п╨п╟п╢я─п╬п╡"
 
 #: src/tvtime.c:1022
 msgid "Performance estimates"
-msgstr "Характеристики"
+msgstr "п╔п╟я─п╟п╨я┌п╣я─п╦я│я┌п╦п╨п╦"
 
 #: src/tvtime.c:1024
 msgid "Deinterlacer"
-msgstr "Алгоритм сглаживания черезстрочности"
+msgstr "п░п╩пЁп╬я─п╦я┌п╪ я│пЁп╩п╟п╤п╦п╡п╟п╫п╦я▐ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦"
 
 #: src/tvtime.c:1027
-#, fuzzy, c-format
+#, c-format
 msgid "Input: %s at %dx%d pixels"
-msgstr "Сигнал: %s - %dx%d"
+msgstr "п║п╦пЁп╫п╟п╩: %s - %dx%d я┌п╬я┤п╣п╨"
 
 #: src/tvtime.c:1031
-#, fuzzy, c-format
+#, c-format
 msgid "Attempted framerate: %.2f fps"
-msgstr "Частота кадров в секунду:  %.2f"
+msgstr "п╖п╟я│я┌п╬я┌п╟ п╨п╟п╢я─п╬п╡ п╡ я│п╣п╨я┐п╫п╢я┐: %.2f"
 
 #: src/tvtime.c:1035
-#, fuzzy, c-format
+#, c-format
 msgid "Average blit time: %.2f ms (%.0f MB/sec)"
-msgstr "Среднее время смены кадров:  %.2fмсек (%.0fМб/сек)"
+msgstr "п║я─п╣п╢п╫п╣п╣ п╡я─п╣п╪я▐ п╨п╬п©п╦я─п╬п╡п╟п╫п╦я▐ п╨п╟п╢я─п╬п╡: %.2f п╪я│п╣п╨ (%.0f п°п╠/я│п╣п╨)"
 
 #: src/tvtime.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Average render time: %5.2f ms"
-msgstr "Средняя скорость перерисовки: %5.2fмсек"
+msgstr "п║я─п╣п╢п╫п╣п╣ п╡я─п╣п╪я▐ п©п╣я─п╣я─п╦я│п╬п╡п╨п╦: %5.2f п╪я│п╣п╨"
 
 #: src/tvtime.c:1043
 #, c-format
 msgid "Dropped frames: %d"
-msgstr "Пропущенные кадры: %d"
+msgstr "п÷я─п╬п©я┐я┴п╣п╫п╫я▀п╣ п╨п╟п╢я─я▀: %d"
 
 #: src/tvtime.c:1049
-#, fuzzy, c-format
+#, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
-msgstr "Частота смены кадров: %4.1f/%4.1fмсек (должно быть %4.1fмсек)"
+msgstr "п°п╣п╤п╨п╟п╢я─п╬п╡п╬п╣ п╡я─п╣п╪я▐: %4.1f/%4.1f п╪я│п╣п╨ (п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ %4.1f п╪я│п╣п╨)"
 
 #: src/tvtime.c:1068 src/tvtime.c:1130
 msgid "16:9 + Overscan"
-msgstr "16:9 + приближение"
+msgstr "16:9 + п©я─п╦п╠п╩п╦п╤п╣п╫п╦п╣"
 
 #: src/tvtime.c:1073 src/tvtime.c:1109
 msgid "1.85:1"
@@ -147,16 +146,15 @@ msgstr "2.35:1"
 
 #: src/tvtime.c:1083 src/tvtime.c:1133
 msgid "4:3 centre"
-msgstr "4:3 центр"
+msgstr "4:3 я├п╣п╫я┌я─"
 
 #: src/tvtime.c:1088 src/tvtime.c:1104
-#, fuzzy
 msgid "16:10"
-msgstr "16:9"
+msgstr "16:10"
 
 #: src/tvtime.c:1094 src/tvtime.c:1137
 msgid "4:3 + Overscan"
-msgstr "4:3 + приближение"
+msgstr "4:3 + п©я─п╦п╠п╩п╦п╤п╣п╫п╦п╣"
 
 #: src/tvtime.c:1099
 msgid "16:9"
@@ -164,25 +162,25 @@ msgstr "16:9"
 
 #: src/tvtime.c:1129
 msgid "Matte setting (Anamorphic input)"
-msgstr "Установки измененного размера изображения (искаженое изображение)"
+msgstr "пёя│я┌п╟п╫п╬п╡п╨п╦ п╦п╥п╪п╣п╫я▒п╫п╫п╬пЁп╬ я─п╟п╥п╪п╣я─п╟ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ (п╦я│п╨п╟п╤п╣п╫п╫п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣)"
 
 #: src/tvtime.c:1136
 msgid "Matte setting (4:3 input)"
-msgstr "Установки измененного размера изображения (4:3)"
+msgstr "пёя│я┌п╟п╫п╬п╡п╨п╦ п╦п╥п╪п╣п╫п╣п╫п╫п╬пЁп╬ я─п╟п╥п╪п╣я─п╟ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ (4:3)"
 
 #: src/tvtime.c:1216 src/tvtime.c:1258 src/tvtime.c:1303 src/tvtime.c:1311
 #: src/tvtime.c:1434 src/tvtime.c:1484 src/tvtime.c:1505 src/tvtime.c:1519
 #: src/tvtime.c:1533 src/tvtimeconf.c:962 src/tvtimeconf.c:1148
 #: src/tvtime-command.c:56 src/tvtime-command.c:71 src/tvtime-configure.c:48
 #: src/tvtime-scanner.c:62 src/tvtime-scanner.c:98
-#, fuzzy, c-format
+#, c-format
 msgid "%s: Cannot allocate memory.\n"
-msgstr "Невозможно выделить дополнительную память для хранения кадров.\n"
+msgstr "%s: п╫п╣ п╪п╬пЁя┐ п╡я▀п╢п╣п╩п╦я┌я▄ п©п╟п╪я▐я┌я▄.\n"
 
 #: src/tvtime.c:1327
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot open capture device %s."
-msgstr "Не могу открыть устройство video4linux '%s'."
+msgstr "п²п╣ п╪п╬пЁя┐ п╬я┌п╨я─я▀я┌я▄ я┐я│я┌я─п╬п╧я│я┌п╡п╬ п╥п╟я┘п╡п╟я┌п╟ '%s'."
 
 #: src/tvtime.c:1332
 #, c-format
@@ -194,6 +192,12 @@ msgid ""
 "    device (%s).\n"
 "\n"
 msgstr ""
+"\n"
+"    п▓п╬п╥п╪п╬п╤п╫п╬ п╡п╟я┬ п╢я─п╟п╧п╡п╣я─ п©п╩п╟я┌я▀ п╥п╟я┘п╡п╟я┌п╟, %s, п╫п╣ п©п╬п╢п╢п╣я─п╤п╦п╡п╟п╣я┌\n"
+"    п╥п╟я┘п╡п╟я┌ c п©п╬п╩п╫п╬п╧ я┤п╟я│я┌п╬я┌п╬п╧ п╨п╟п╢я─п╬п╡. п▓п╬п╥п╪п╬п╤п╫п╬ п╬п╫ п╫п╣п©я─п╟п╡п╦п╩я▄п╫п╬\n"
+"    п╫п╟я│я┌я─п╬п╣п╫ п╦п╩п╦ п╡я▀ п╡я▀п╠я─п╟п╩п╦ п╬я┬п╦п╠п╬я┤п╫п╬п╣ я┐я│я┌я─п╬п╧я│я┌п╡п╬\n"
+"    п╥п╟я┘п╡п╟я┌п╟ (%s).\n"
+"\n"
 
 #: src/tvtime.c:1392
 #, c-format
@@ -206,6 +210,13 @@ msgid ""
 "    information see our support page at %s\n"
 "\n"
 msgstr ""
+"\n"
+"    п▓я▀ п╦я│п©п╬п╩я▄п╥я┐п╣я┌п╣ п╢я─п╟п╧п╡п╣я─ bttv, п╫п╬ п╫п╣ п╫п╟я│я┌я─п╬п╦п╩п╦ п╢п╬я│я┌п╟я┌п╬я┤п╫п╬п╣\n"
+"    п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╠я┐я└п╣я─п╬п╡ п╢п╩я▐ п╬п©я┌п╦п╪п╟п╩я▄п╫п╬п╧ п╬п╠я─п╟п╠п╬я┌п╨п╦ п╡п╦п╢п╣п╬п©п╬я┌п╬п╨п╟\n"
+"    tvtime. п╒п╟п╨п╬п╣ я┤п╟я│я┌п╬ п╠я▀п╡п╟п╣я┌ я│ bttv п╡ я▐п╢я─п╟я┘ п╢п╬ 2.4.21.\n"
+"    пёя│я┌п╟п╫п╬п╡п╦я┌п╣ п╬п©я├п╦я▌ gbuffers=4 п©я─п╦ п╥п╟пЁя─я┐п╥п╨п╣ bttv. п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я┐я▌\n"
+"    п╦п╫я└п╬я─п╪п╟я├п╦я▌ я│п╪п╬я┌я─п╦я┌п╣ п╫п╟ п╫п╟я┬п╣п╧ я│я┌я─п╟п╫п╦я├п╣ п©п╬п╢п╢п╣я─п╤п╨п╦ %s\n"
+"\n"
 
 #: src/tvtime.c:1399
 #, c-format
@@ -218,80 +229,79 @@ msgid ""
 "    bug tracker at %s\n"
 "\n"
 msgstr ""
+"\n"
+"    п■я─п╟п╧п╡п╣я─ п╡п╟я┬п╣п╧ п©п╩п╟я┌я▀ п╥п╟я┘п╡п╟я┌п╟, %s, п╫п╣ п©я─п╣п╢п╬я│я┌п╟п╡п╩я▐п╣я┌\n"
+"    п╢п╩я▐ tvtime п╢п╬я│я┌п╟я┌п╬я┤п╫п╬пЁп╬ п╨п╬п╩п╦я┤п╣я│я┌п╡п╟ п╠я┐я└п╣я─п╬п╡ п╢п╩я▐ п╬п╠я─п╟п╠п╬я┌п╨п╦\n"
+"    п╡п╦п╢п╣п╬п©п╬я┌п╬п╨п╟. пёп╠п╣п╢п╦я┌п╣я│я▄ п╡ п╢п╬п╨я┐п╪п╣п╫я┌п╟я├п╦п╦ п╫п╟ п╢я─п╟п╧п╡п╣я─,\n"
+"    п╪п╬п╤п╣я┌п╣ п╩п╦ п╡я▀ я┐п╡п╣п╩п╦я┤п╦я┌я▄ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╠я┐я└п╣я─п╬п╡, п©я─п╣п╢п╬я│я┌п╟п╡п╩я▐п╣п╪я▀я┘\n"
+"    п©я─п╬пЁя─п╟п╪п╪п╟п╪ п╦ п©я─п╦я┬п╩п╦я┌п╣ я█я┌п╦ п╢п╟п╫п╫я▀п╣ я─п╟п╥я─п╟п╠п╬я┌я┤п╦п╨п╟п╪ tvtime\n"
+"    п╫п╟ %s\n"
+"\n"
 
 #: src/tvtime.c:1453
 msgid "On screen display failed to initialize, disabled.\n"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ я█п╨я─п╟п╫п╟, п╬я┌п╨п╩я▌я┤п╣п╫п╬.\n"
 
 #: src/tvtime.c:1465
 msgid "No video source"
-msgstr "Нет сигнала"
+msgstr "п²п╣я┌ я│п╦пЁп╫п╟п╩п╟"
 
 #: src/tvtime.c:1509
-#, fuzzy
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
-msgstr "Не могу создать каталог %s. FIFO недоступно.\n"
+msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ FIFO, я┐п╢п╟п╩я▒п╫п╫п╬п╣ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ tvtime п╬я┌п╨п╩я▌я┤п╣п╫п╬.\n"
 
 #: src/tvtime.c:1527
-#, fuzzy
 msgid "Closed caption display failed to initialize, disabled.\n"
-msgstr "Скрытые титры выключены"
+msgstr "п·я┬п╦п╠п╨п╟ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ я│п╨я─я▀я┌я▀п╣я┘ я┌п╦я┌я─п╬п╡, п╬я┌п╨п╩я▌я┤п╣п╫п╬.\n"
 
 #: src/tvtime.c:1751
-#, fuzzy
 msgid "Always-on-top enabled."
-msgstr "Всегда впереди"
+msgstr "п═п╣п╤п╦п╪ \"п╡я│п╣пЁп╢п╟ п╡п©п╣я─п╣п╢п╦ п╢я─я┐пЁп╦я┘ п╬п╨п╬п╫\" п╡п╨п╩я▌я┤п╣п╫."
 
 #: src/tvtime.c:1756
-#, fuzzy
 msgid "Always-on-top disabled."
-msgstr "Всегда впереди"
+msgstr "п═п╣п╤п╦п╪ \"п╡я│п╣пЁп╢п╟ п╡п©п╣я─п╣п╢п╦ п╢я─я┐пЁп╦я┘ п╬п╨п╬п╫\" п╡я▀п╨п╩я▌я┤п╣п╫."
 
 #: src/tvtime.c:1776
 msgid "16:9 display mode active."
-msgstr "Включен режим 16:9"
+msgstr "п▓п╨п╩я▌я┤п╣п╫ я─п╣п╤п╦п╪ 16:9."
 
 #: src/tvtime.c:1785
 msgid "4:3 display mode active."
-msgstr "Включен режим 4:3"
+msgstr "п▓п╨п╩я▌я┤п╣п╫ я─п╣п╤п╦п╪ 4:3"
 
 #: src/tvtime.c:1835
 msgid "Screenshot messages disabled."
-msgstr ""
+msgstr "п║п╬п╬п╠я┴п╣п╫п╦я▐ п©я─п╦ я│я┼я▒п╪п╣ я█п╨я─п╟п╫п╟ п╬я┌п╨п╩я▌я┤п╣п╫я▀."
 
 #: src/tvtime.c:1837
 msgid "Screenshot messages enabled."
-msgstr ""
+msgstr "п║п╬п╬п╠я┴п╣п╫п╦я▐ п©я─п╦ я│я┼я▒п╪п╣ я█п╨я─п╟п╫п╟ п╡п╨п╩я▌я┤п╣п╫я▀."
 
 #: src/tvtime.c:1928
-#, fuzzy
 msgid "2-3 pulldown inversion disabled."
-msgstr "2-3 пониженная инверсия"
+msgstr "2-3 п©п╬п╫п╦п╤п╣п╫п╫п╟я▐ п╦п╫п╡п╣я─я│п╦я▐ п╬я┌п╨п╩я▌я┤п╣п╫п╟."
 
 #: src/tvtime.c:1931
-#, fuzzy
 msgid "2-3 pulldown inversion enabled."
-msgstr "2-3 пониженная инверсия"
+msgstr "2-3 п©п╬п╫п╦п╤п╣п╫п╫п╟я▐ п╦п╫п╡п╣я─я│п╦я▐ п╡п╨п╩я▌я┤п╣п╫п╟."
 
 #: src/tvtime.c:1937
-#, fuzzy
 msgid "2-3 pulldown inversion is not valid with your TV norm."
-msgstr "2-3 режим понижения не работает в текущем ТВ стандарте."
+msgstr "2-3 п©п╬п╫п╦п╤п╣п╫п╫п╟я▐ п╦п╫п╡п╣я─я│п╦я▐ п╫п╣ я─п╟п╠п╬я┌п╟п╣я┌ п╡ п╡п╟я┬п╣п╪ я│я┌п╟п╫п╢п╟я─я┌п╣ п╒п▓."
 
 #: src/tvtime.c:2336 src/tvtime.c:2481
 #, c-format
 msgid "Screenshot: %s"
-msgstr "Снимок экрана: %s"
+msgstr "п║п╫п╦п╪п╬п╨ я█п╨я─п╟п╫п╟: %s"
 
 #: src/tvtime.c:2636
-#, fuzzy
 msgid "Restarting tvtime.\n"
-msgstr "Перезапуск.\n"
+msgstr "п÷п╣я─п╣п╥п╟п©я┐я│п╨ tvtime.\n"
 
 #: src/tvtime.c:2640
-#, fuzzy
 msgid "Thank you for using tvtime.\n"
-msgstr "Спасибо за использование tvtime.\n"
+msgstr "п║п©п╟я│п╦п╠п╬ п╥п╟ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣ tvtime.\n"
 
 #: src/tvtime.c:2658 src/tvtime.c:2717
 #, c-format
@@ -301,212 +311,214 @@ msgid ""
 "    tvtime will now exit to avoid security problems.\n"
 "\n"
 msgstr ""
+"\n"
+"    п·я┬п╦п╠п╨п╟ п╬я┌п╨п╩я▌я┤п╣п╫п╦я▐ п©я─п╦п╡п╣п╩п╣пЁп╦п╧ я│я┐п©п╣я─п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩я▐ root: %s.\n"
+"    tvtime п╥п╟п╡п╣я─я┬п╟п╣я┌ я─п╟п╠п╬я┌я┐ п╢п╩я▐ п╦п╥п╠п╣п╤п╟п╫п╦я▐ п©я─п╬п╠п╩п╣п╪ я│ п╠п╣п╥п╬п©п╟я│п╫п╬я│я┌я▄я▌.\n"
+"\n"
 
 #: src/tvtime.c:2676
-#, fuzzy, c-format
+#, c-format
 msgid "Running %s.\n"
-msgstr "Запущен: %s"
+msgstr "п≈п╟п©я┐я│п╨ %s.\n"
 
 #: src/commands.c:182 src/commands.c:969 src/commands.c:1272
 #: src/commands.c:1656 src/commands.c:1689 src/commands.c:1722
 #: src/commands.c:1755
 msgid "Current"
-msgstr "Текущий"
+msgstr "п╒п╣п╨я┐я┴п╦п╧"
 
 #. TRANSLATORS: This refers to a TV program, not a computer program.
 #: src/commands.c:214 src/commands.c:221
 msgid "No program information available"
-msgstr ""
+msgstr "п≤п╫я└п╬я─п╪п╟я├п╦я▐ п╬ я┌п╣п╩п╣п©я─п╬пЁя─п╟п╪п╪п╣ п╬я┌я│я┐я┌я│я┌п╡я┐п╣я┌"
 
 #: src/commands.c:277
 #, c-format
 msgid "Next: %s"
-msgstr ""
+msgstr "п║п╩п╣п╢я┐я▌я┴п╦п╧: %s"
 
 #: src/commands.c:320
 msgid "Renumber current channel"
-msgstr "Перенумеровать текущий канал"
+msgstr "п÷п╣я─п╣п╫я┐п╪п╣я─п╬п╡п╟я┌я▄ я┌п╣п╨я┐я┴п╦п╧ п╨п╟п╫п╟п╩"
 
 #: src/commands.c:328 src/commands.c:331
 msgid "Current channel active in list"
-msgstr "Текущий канал активирован"
+msgstr "п╒п╣п╨я┐я┴п╦п╧ п╨п╟п╫п╟п╩ п╟п╨я┌п╦п╡п╦я─п╬п╡п╟п╫"
 
 #: src/commands.c:341
 msgid "Stop channel scan"
-msgstr "Остановка сканирования каналов"
+msgstr "п·я│я┌п╟п╫п╬п╡п╨п╟ я│п╨п╟п╫п╦я─п╬п╡п╟п╫п╦я▐ п╨п╟п╫п╟п╩п╬п╡"
 
 #: src/commands.c:345
 msgid "Scan channels for signal"
-msgstr "Сканирование каналов"
+msgstr "п║п╨п╟п╫п╦я─п╬п╡п╟п╫п╦п╣ п╨п╟п╫п╟п╩п╬п╡"
 
 #: src/commands.c:353
 msgid "Reset all channels as active"
-msgstr "Активировать все каналы"
+msgstr "п░п╨я┌п╦п╡п╦я─п╬п╡п╟я┌я▄ п╡я│п╣ п╨п╟п╫п╟п╩я▀"
 
 #: src/commands.c:359
 msgid "Finetune current channel"
-msgstr "Подстроить текущий канал"
+msgstr "п÷п╬п╢я│я┌я─п╬п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╧ п╨п╟п╫п╟п╩"
 
 #: src/commands.c:366
 msgid "Change NTSC cable mode"
-msgstr "Изменить режим отображения кабельного NTSC"
+msgstr "п≤п╥п╪п╣п╫п╦я┌я▄ я─п╣п╤п╦п╪ п╬я┌п╬п╠я─п╟п╤п╣п╫п╦я▐ п╨п╟п╠п╣п╩я▄п╫п╬пЁп╬ NTSC"
 
 #: src/commands.c:372
 msgid "Set current channel as SECAM"
-msgstr "Показывать этот канал в режиме SECAM"
+msgstr "п÷п╬п╨п╟п╥я▀п╡п╟я┌я▄ я█я┌п╬я┌ п╨п╟п╫п╟п╩ п╡ я─п╣п╤п╦п╪п╣ SECAM"
 
 #: src/commands.c:373
 msgid "Set current channel as PAL"
-msgstr "Показывать этот канал в режиме PAL"
+msgstr "п÷п╬п╨п╟п╥я▀п╡п╟я┌я▄ я█я┌п╬я┌ п╨п╟п╫п╟п╩ п╡ я─п╣п╤п╦п╪п╣ PAL"
 
 #: src/commands.c:388
-#, fuzzy
 msgid "Switch audio standard"
-msgstr "Телевизионный стандарт"
+msgstr "п║я┌п╟п╫п╢п╟я─я┌ п╥п╡я┐п╨п╟ п╢п╩я▐ я█я┌п╬пЁп╬ п╨п╟п╫п╟п╩п╟"
 
 #: src/commands.c:395
 msgid "Change frequency table"
-msgstr "Изменить таблицу каналов"
+msgstr "п≤п╥п╪п╣п╫п╦я┌я▄ я┌п╟п╠п╩п╦я├я┐ п╨п╟п╫п╟п╩п╬п╡"
 
 #: src/commands.c:401
 msgid "Disable signal detection"
-msgstr "Выключить обнаружение входного сигнала"
+msgstr "п▓я▀п╨п╩я▌я┤п╦я┌я▄ п╬п╠п╫п╟я─я┐п╤п╣п╫п╦п╣ п╡я┘п╬п╢п╫п╬пЁп╬ я│п╦пЁп╫п╟п╩п╟"
 
 #: src/commands.c:402
 msgid "Enable signal detection"
-msgstr "Включить обнаружение входного сигнала"
+msgstr "п▓п╨п╩я▌я┤п╦я┌я▄ п╬п╠п╫п╟я─я┐п╤п╣п╫п╦п╣ п╡я┘п╬п╢п╫п╬пЁп╬ я│п╦пЁп╫п╟п╩п╟"
 
 #: src/commands.c:426 src/commands.c:2069
 msgid "Default language"
-msgstr ""
+msgstr "п·я│п╫п╬п╡п╫п╬п╧ я▐п╥я▀п╨"
 
 #: src/commands.c:442 src/commands.c:2074
 msgid "Unknown language"
-msgstr ""
+msgstr "п╞п╥я▀п╨ п╫п╣п╦п╥п╡п╣я│я┌п╣п╫"
 
 #: src/commands.c:610 src/commands.c:1310 src/commands.c:1377
 #: src/commands.c:1826
 msgid "Preferred audio mode"
-msgstr "Настройка звука"
+msgstr "п²п╟я│я┌я─п╬п╧п╨п╟ п╥п╡я┐п╨п╟"
 
 #: src/commands.c:625
 msgid "Change default audio standard"
-msgstr ""
+msgstr "п≤п╥п╪п╣п╫п╦я┌я▄ я└п╬я─п╪п╟я┌ п╥п╡я┐п╨п╟ п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌"
 
 #: src/commands.c:632 src/commands.c:1315 src/commands.c:1390
 msgid "Audio volume boost"
-msgstr ""
+msgstr "п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫п╬п╣ я┐я│п╦п╩п╣п╫п╦п╣ пЁя─п╬п╪п╨п╬я│я┌п╦ п╥п╡я┐п╨п╟"
 
 #: src/commands.c:638 src/commands.c:1320 src/commands.c:1399
 msgid "Television standard"
-msgstr "Телевизионный стандарт"
+msgstr "п╒п╣п╩п╣п╡п╦п╥п╦п╬п╫п╫я▀п╧ я│я┌п╟п╫п╢п╟я─я┌"
 
 #: src/commands.c:644 src/commands.c:1325 src/commands.c:1367
 msgid "Horizontal resolution"
-msgstr ""
+msgstr "п⌠п╬я─п╦п╥п╬п╫я┌п╟п╩я▄п╫п╬п╣ я─п╟п╥я─п╣я┬п╣п╫п╦п╣"
 
 #: src/commands.c:664 src/commands.c:691
 msgid "Cable"
-msgstr "Кабельное"
+msgstr "п п╟п╠п╣п╩я▄п╫п╬п╣"
 
 #: src/commands.c:672 src/commands.c:699
 msgid "Broadcast"
-msgstr "Широковещательное"
+msgstr "п╗п╦я─п╬п╨п╬п╡п╣я┴п╟я┌п╣п╩я▄п╫п╬п╣"
 
 #: src/commands.c:679
 msgid "Cable with channels 100+"
-msgstr "Кабельное с каналами 100+"
+msgstr "п п╟п╠п╣п╩я▄п╫п╬п╣ я│ п╨п╟п╫п╟п╩п╟п╪п╦ 100+"
 
 #: src/commands.c:711
 msgid "Europe"
-msgstr "Европа"
+msgstr "п∙п╡я─п╬п©п╟"
 
 #: src/commands.c:719
 msgid "Russia"
-msgstr "Россия"
+msgstr "п═п╬я│я│п╦я▐"
 
 #: src/commands.c:726
 msgid "France"
-msgstr "Франция"
+msgstr "п╓я─п╟п╫я├п╦я▐"
 
 #: src/commands.c:733
 msgid "Australia"
-msgstr "Австралия"
+msgstr "п░п╡я│я┌я─п╟п╩п╦я▐"
 
 #: src/commands.c:740
 msgid "Australia (Optus)"
-msgstr "Австралия (Optus)"
+msgstr "п░п╡я│я┌я─п╟п╩п╦я▐ (Optus)"
 
 #: src/commands.c:747
 msgid "New Zealand"
-msgstr "Новая Зеландия"
+msgstr "п²п╬п╡п╟я▐ п≈п╣п╩п╟п╫п╢п╦я▐"
 
 #: src/commands.c:754
 msgid "China Broadcast"
-msgstr "Китай"
+msgstr "п п╦я┌п╟п╧"
 
 #: src/commands.c:761
 msgid "South Africa"
-msgstr ""
+msgstr "п╝п╤п╫п╟я▐ п░я└я─п╦п╨п╟"
 
 #: src/commands.c:768
 msgid "Custom (first run tvtime-scanner)"
-msgstr "Другое (запустите tvtime-scanner)"
+msgstr "п■я─я┐пЁп╬п╣ (п╥п╟п©я┐я│я┌п╦я┌п╣ tvtime-scanner)"
 
 #: src/commands.c:785
-#, fuzzy
 msgid "Disabled"
-msgstr "Кабельное"
+msgstr "п·я┌п╨п╩я▌я┤п╣п╫п╬"
 
 #: src/commands.c:791
 msgid "Quiet"
-msgstr ""
+msgstr "п╒п╦я┘п╦п╧"
 
 #: src/commands.c:797
 msgid "Medium"
-msgstr ""
+msgstr "п║я─п╣п╢п╫п╦п╧"
 
 #: src/commands.c:803
 msgid "Full"
-msgstr ""
+msgstr "п÷п╬п╩п╫я▀п╧"
 
 #: src/commands.c:819
 #, c-format
 msgid "%s  Current: %d pixels"
-msgstr "%s: %d pixels"
+msgstr "%s: %d я┌п╬я┤п╣п╨"
 
 #: src/commands.c:826
 msgid "Low (360 pixels)"
-msgstr "Низкое (360 точек)"
+msgstr "п²п╦п╥п╨п╬п╣ (360 я┌п╬я┤п╣п╨)"
 
 #: src/commands.c:832
 msgid "Moderate (576 pixels)"
-msgstr "Умеренное (576 точек)"
+msgstr "пёп╪п╣я─п╣п╫п╫п╬п╣ (576 я┌п╬я┤п╣п╨)"
 
 #: src/commands.c:838
 msgid "Standard (720 pixels)"
-msgstr "Стандартное (720 точек)"
+msgstr "п║я┌п╟п╫п╢п╟я─я┌п╫п╬п╣ (720 я┌п╬я┤п╣п╨)"
 
 #: src/commands.c:844
 msgid "High (768 pixels)"
-msgstr "Высокое (768 точек)"
+msgstr "п▓я▀я│п╬п╨п╬п╣ (768 я┌п╬я┤п╣п╨)"
 
 #: src/commands.c:850
-#, fuzzy, c-format
+#, c-format
 msgid "%s  Maximum (%d pixels)"
-msgstr "%s: %d pixels"
+msgstr "%s п╡ п╪п╟п╨я│п╦п╪я┐п╪п╣ (%d я┌п╬я┤п╣п╨)"
 
 #: src/commands.c:860 src/commands.c:1403
 msgid "Restart with new settings"
-msgstr "Перезапустить с новыми установками"
+msgstr "п÷п╣я─п╣п╥п╟п©я┐я│я┌п╦я┌я▄ я│ п╫п╬п╡я▀п╪п╦ я┐я│я┌п╟п╫п╬п╡п╨п╟п╪п╦"
 
 #: src/commands.c:922 src/commands.c:1827
 msgid "Mono"
-msgstr "Моно"
+msgstr "п°п╬п╫п╬"
 
 #: src/commands.c:929 src/commands.c:1828
 msgid "Stereo"
-msgstr "Стерео"
+msgstr "п║я┌п╣я─п╣п╬"
 
 #: src/commands.c:937 src/commands.c:1830
 msgid "SAP"
@@ -514,37 +526,37 @@ msgstr "SAP"
 
 #: src/commands.c:948 src/commands.c:1830
 msgid "Primary Language"
-msgstr "Основной язык"
+msgstr "п·я│п╫п╬п╡п╫п╬п╧ я▐п╥я▀п╨"
 
 #: src/commands.c:953 src/commands.c:1831
 msgid "Secondary Language"
-msgstr "Дополнительный язык"
+msgstr "п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╧ я▐п╥я▀п╨"
 
 #: src/commands.c:975 src/commands.c:1278 src/commands.c:1662
 #: src/commands.c:1695 src/commands.c:1728 src/commands.c:1760
 msgid "Increase"
-msgstr "Увеличить"
+msgstr "пёп╡п╣п╩п╦я┤п╦я┌я▄"
 
 #: src/commands.c:980 src/commands.c:1283 src/commands.c:1667
 #: src/commands.c:1700 src/commands.c:1733 src/commands.c:1765
 msgid "Decrease"
-msgstr "Уменьшить"
+msgstr "пёп╪п╣п╫я▄я┬п╦я┌я▄"
 
 #: src/commands.c:1003
 msgid "2-3 pulldown inversion"
-msgstr "2-3 пониженная инверсия"
+msgstr "2-3 п©п╬п╫п╦п╤п╣п╫п╫п╟я▐ п╦п╫п╡п╣я─я│п╦я▐"
 
 #: src/commands.c:1012
 msgid "Colour invert"
-msgstr "Инвертировать цвета"
+msgstr "п≤п╫п╡п╣я─я┌п╦я─п╬п╡п╟я┌я▄ я├п╡п╣я┌п╟"
 
 #: src/commands.c:1020
 msgid "Mirror"
-msgstr "Зеркальное отображение"
+msgstr "п≈п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:1028
 msgid "Chroma killer"
-msgstr "Чернобелое изображение"
+msgstr "п╖п╣я─п╫п╬п╠п╣п╩п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:1169 src/commands.c:1204 src/commands.c:1236
 #: src/commands.c:1256 src/commands.c:1268 src/commands.c:1296
@@ -556,387 +568,386 @@ msgstr "Чернобелое изображение"
 #: src/commands.c:1579 src/commands.c:1652 src/commands.c:1685
 #: src/commands.c:1718 src/commands.c:1751
 msgid "Setup"
-msgstr "Настройки"
+msgstr "п²п╟я│я┌я─п╬п╧п╨п╦"
 
 #: src/commands.c:1172 src/commands.c:1236 src/commands.c:1257
 #: src/commands.c:1269
-#, fuzzy
 msgid "Channel management"
-msgstr "Настройки каналов"
+msgstr "пёп©я─п╟п╡п╩п╣п╫п╦п╣ п╨п╟п╫п╟п╩п╟п╪п╦"
 
 #: src/commands.c:1177 src/commands.c:1208 src/commands.c:1297
 #: src/commands.c:1349 src/commands.c:1367 src/commands.c:1377
 #: src/commands.c:1390 src/commands.c:1399
 msgid "Input configuration"
-msgstr "Основные настройки"
+msgstr "п·я│п╫п╬п╡п╫я▀п╣ п╫п╟я│я┌я─п╬п╧п╨п╦"
 
 #: src/commands.c:1182 src/commands.c:1213
 msgid "Picture settings"
-msgstr "Настройки изображения"
+msgstr "п²п╟я│я┌я─п╬п╧п╨п╦ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐"
 
 #: src/commands.c:1187 src/commands.c:1218 src/commands.c:1459
 #: src/commands.c:1488 src/commands.c:1494 src/commands.c:1502
 #: src/commands.c:1508
 msgid "Video processing"
-msgstr "Обработка видеосигнала"
+msgstr "п·п╠я─п╟п╠п╬я┌п╨п╟ п╡п╦п╢п╣п╬я│п╦пЁп╫п╟п╩п╟"
 
 #: src/commands.c:1192 src/commands.c:1223 src/commands.c:1434
 #: src/commands.c:1440 src/commands.c:1446 src/commands.c:1453
 msgid "Output configuration"
-msgstr "Дополнительные настройки изображения"
+msgstr "п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╣ п╫п╟я│я┌я─п╬п╧п╨п╦ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐"
 
 #: src/commands.c:1197 src/commands.c:1228
 msgid "Exit menu"
-msgstr "Выход из меню"
+msgstr "п▓я▀я┘п╬п╢ п╦п╥ п╪п╣п╫я▌"
 
 #: src/commands.c:1257
 msgid "Frequency table"
-msgstr "Частотная таблица"
+msgstr "п╖п╟я│я┌п╬я┌п╫п╟я▐ я┌п╟п╠п╩п╦я├п╟"
 
 #: src/commands.c:1269 src/commands.c:3003
 msgid "Finetune"
-msgstr "Подстройка"
+msgstr "п÷п╬п╢я│я┌я─п╬п╧п╨п╟"
 
 #: src/commands.c:1301 src/commands.c:1304 src/commands.c:1353
 #: src/commands.c:1356 src/commands.c:3115 src/commands.c:3145
 msgid "Change video source"
-msgstr "Изменить входной канал"
+msgstr "п≤п╥п╪п╣п╫п╦я┌я▄ п╡я┘п╬п╢п╫п╬п╧ п╨п╟п╫п╟п╩"
 
 #: src/commands.c:1330
 msgid "Toggle closed captions"
-msgstr "Переключение скрытых титров"
+msgstr "п÷п╣я─п╣п╨п╩я▌я┤п╣п╫п╦п╣ я│п╨я─я▀я┌я▀я┘ я┌п╦я┌я─п╬п╡"
 
 #: src/commands.c:1335
 msgid "Toggle XDS decoding"
-msgstr "Переключение XDS декодирования"
+msgstr "п÷п╣я─п╣п╨п╩я▌я┤п╣п╫п╦п╣ XDS п╢п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦я▐"
 
 #: src/commands.c:1446
 msgid "Overscan"
-msgstr "Приближение"
+msgstr "п÷я─п╦п╠п╩п╦п╤п╣п╫п╦п╣"
 
 #: src/commands.c:1453
 msgid "Fullscreen position"
-msgstr "Положение изображения при полном экране"
+msgstr "п÷п╬п╩п╬п╤п╣п╫п╦п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ п©я─п╦ п©п╬п╩п╫п╬п╪ я█п╨я─п╟п╫п╣"
 
 #: src/commands.c:1468
 msgid "Current deinterlacer description"
-msgstr "Описание текущего режима обработки черезстрочности"
+msgstr "п·п©п╦я│п╟п╫п╦п╣ я┌п╣п╨я┐я┴п╣пЁп╬ я─п╣п╤п╦п╪п╟ п╬п╠я─п╟п╠п╬я┌п╨п╦ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦"
 
 #: src/commands.c:1476 src/commands.c:1508
 msgid "Input filters"
-msgstr "Фильтры"
+msgstr "п╓п╦п╩я▄я┌я─я▀"
 
 #: src/commands.c:1494
 msgid "Deinterlacer description"
-msgstr "Описание режима обработки черезстрочности"
+msgstr "п·п©п╦я│п╟п╫п╦п╣ я─п╣п╤п╦п╪п╟ п╬п╠я─п╟п╠п╬я┌п╨п╦ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦"
 
 #: src/commands.c:1518 src/commands.c:1579 src/commands.c:1652
 #: src/commands.c:1685 src/commands.c:1718 src/commands.c:1751
 msgid "Picture"
-msgstr "Изображение"
+msgstr "п≤п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:1522 src/commands.c:1584 src/commands.c:1652
 #: src/commands.c:3175 src/commands.c:3216
 msgid "Brightness"
-msgstr "Яркость"
+msgstr "п╞я─п╨п╬я│я┌я▄"
 
 #: src/commands.c:1527 src/commands.c:1589 src/commands.c:1685
 #: src/commands.c:3189 src/commands.c:3219
 msgid "Contrast"
-msgstr "Контрасность"
+msgstr "п п╬п╫я┌я─п╟я│п╫п╬я│я┌я▄"
 
 #: src/commands.c:1531 src/commands.c:1593 src/commands.c:1718
 #: src/commands.c:3203 src/commands.c:3222
 msgid "Saturation"
-msgstr ""
+msgstr "п²п╟я│я▀я┴п╣п╫п╫п╬я│я┌я▄"
 
 #: src/commands.c:1539 src/commands.c:1600 src/commands.c:1751
 #: src/commands.c:3161 src/commands.c:3225
 msgid "Hue"
-msgstr "Оттенки"
+msgstr "п·я┌я┌п╣п╫п╨п╦"
 
 #: src/commands.c:1548
 msgid "Save current settings as defaults"
-msgstr "Сохранить текущие установки"
+msgstr "п║п╬я┘я─п╟п╫п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╣ я┐я│я┌п╟п╫п╬п╡п╨п╦"
 
 #: src/commands.c:1554 src/commands.c:1566 src/commands.c:1622
 #: src/commands.c:1635
 msgid "Reset to global defaults"
-msgstr "Сбросить установки к начальным"
+msgstr "п║п╠я─п╬я│п╦я┌я▄ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╨ п╫п╟я┤п╟п╩я▄п╫я▀п╪"
 
 #: src/commands.c:1609
 msgid "Save current settings as global defaults"
-msgstr "Сохранить текущие установки как начальные"
+msgstr "п║п╬я┘я─п╟п╫п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╣ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╨п╟п╨ п╫п╟я┤п╟п╩я▄п╫я▀п╣"
 
 #: src/commands.c:1616
 msgid "Save current settings as channel defaults"
-msgstr "Сохранить текущие установки для этого канала"
+msgstr "п║п╬я┘я─п╟п╫п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╣ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╢п╩я▐ я█я┌п╬пЁп╬ п╨п╟п╫п╟п╩п╟"
 
 #: src/commands.c:1784 src/commands.c:2068
-#, fuzzy
 msgid "Preferred XMLTV language"
-msgstr "Основной язык"
+msgstr "п÷я─п╣п╢п©п╬я┤п╦я┌п╟п╣п╪я▀п╧ я▐п╥я▀п╨ XMLTV"
 
 #: src/commands.c:1900
 msgid "Favorites"
-msgstr ""
+msgstr "п≤п╥п╠я─п╟п╫п╫п╬п╣"
 
 #: src/commands.c:1907
-#, fuzzy
 msgid "Add current channel"
-msgstr "Подстроить текущий канал"
+msgstr "п■п╬п╠п╟п╡п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╧ п╨п╟п╫п╟п╩"
 
 #: src/commands.c:1909
 msgid "Exit"
-msgstr "Выход"
+msgstr "п▓я▀я┘п╬п╢"
 
 #: src/commands.c:2206
 #, c-format
 msgid "Sleep in %d minutes."
-msgstr "Бездействовать %d минут."
+msgstr "п▒п╣п╥п╢п╣п╧я│я┌п╡п╬п╡п╟я┌я▄ %d п╪п╦п╫я┐я┌."
 
 #: src/commands.c:2209
 #, c-format
 msgid "Sleep off."
-msgstr "Отключить бездействие"
+msgstr "п·я┌п╨п╩я▌я┤п╦я┌я▄ п╠п╣п╥п╢п╣п╧я│я┌п╡п╦п╣"
 
 #: src/commands.c:2248
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-I audio decoding for this channel."
-msgstr "Декодирование цвета для этого канала установлено в %s."
+msgstr "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣ п╢п╣п╨п╬п╢п╣я─п╟ п╥п╡я┐п╨п╟ PAL-I."
 
 #: src/commands.c:2251
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-DK audio decoding for this channel."
-msgstr "Декодирование цвета для этого канала установлено в %s."
+msgstr "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣ п╢п╣п╨п╬п╢п╣я─п╟ п╥п╡я┐п╨п╟ PAL-DK."
 
 #: src/commands.c:2254
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-BG audio decoding for this channel."
-msgstr "Декодирование цвета для этого канала установлено в %s."
+msgstr "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣ п╢п╣п╨п╬п╢п╣я─п╟ п╥п╡я┐п╨п╟ PAL-BG."
 
 #: src/commands.c:2285
 #, c-format
 msgid "Defaulting to PAL-I audio decoding."
-msgstr ""
+msgstr "п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╢п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ п╥п╡я┐п╨п╟ PAL-I."
 
 #: src/commands.c:2288
 #, c-format
 msgid "Defaulting to PAL-DK audio decoding."
-msgstr ""
+msgstr "п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╢п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ п╥п╡я┐п╨п╟ PAL-DK."
 
 #: src/commands.c:2291
 #, c-format
 msgid "Defaulting to PAL-BG audio decoding."
-msgstr ""
+msgstr "п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╢п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ п╥п╡я┐п╨п╟ PAL-BG."
 
 #: src/commands.c:2319
 msgid "Channel marked as active in the browse list."
-msgstr "Канал помечен активным"
+msgstr "п п╟п╫п╟п╩ п©п╬п╪п╣я┤п╣п╫ п╟п╨я┌п╦п╡п╫я▀п╪"
 
 #: src/commands.c:2322
 msgid "Channel disabled from the browse list."
-msgstr "Канал отключен"
+msgstr "п п╟п╫п╟п╩ п╬я┌п╨п╩я▌я┤п╣п╫"
 
 #: src/commands.c:2354
 #, c-format
 msgid "Capture card volume will not be set by tvtime."
-msgstr ""
+msgstr "tvtime п╫п╣ п╠я┐п╢п╣я┌ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟я┌я▄ пЁя─п╬п╪п╨п╬я│я┌я▄ п©п╩п╟я┌я▀ п╥п╟я┘п╡п╟я┌п╟"
 
 #: src/commands.c:2357
 #, c-format
 msgid "Setting capture card volume to %d%%."
-msgstr ""
+msgstr "пёя│я┌п╟п╫п╟п╡п╩п╦п╡п╟я▌ пЁя─п╬п╪п╨п╬я│я┌п╦ п©п╩п╟я┌я▀ п╥п╟я┘п╡п╟я┌п╟ п╡ %d%%."
 
 #: src/commands.c:2390
 msgid "Processing every input field."
-msgstr "Обработка каждой входящей области"
+msgstr "п·п╠я─п╟п╠п╬я┌п╨п╟ п╨п╟п╤п╢п╬п╧ п╡я┘п╬п╢я▐я┴п╣п╧ п╬п╠п╩п╟я│я┌п╦"
 
 #: src/commands.c:2393
 msgid "Processing every top field."
-msgstr "Обаботка каждой верхней области"
+msgstr "п·п╠п╟п╠п╬я┌п╨п╟ п╨п╟п╤п╢п╬п╧ п╡п╣я─я┘п╫п╣п╧ п╬п╠п╩п╟я│я┌п╦"
 
 #: src/commands.c:2396
 msgid "Processing every bottom field."
-msgstr "Обаботка каждой нижней области."
+msgstr "п·п╠п╟п╠п╬я┌п╨п╟ п╨п╟п╤п╢п╬п╧ п╫п╦п╤п╫п╣п╧ п╬п╠п╩п╟я│я┌п╦."
 
 #: src/commands.c:2412
-#, fuzzy, c-format
+#, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
-msgstr "После перезапуска резкость будет %d."
+msgstr "п÷п╬я│п╩п╣ п©п╣я─п╣п╥п╟п©я┐я│п╨п╟ пЁп╬я─п╦п╥п╬п╫я┌п╟п╩я▄п╫п╬п╣ я─п╟п╥я─п╣я┬п╣п╫п╦п╣ п╠я┐п╢п╣я┌ %d я┌п╬я┤п╣п╨."
 
 #: src/commands.c:2469
 #, c-format
 msgid "Television standard will be %s on restart."
-msgstr "После перезапуска телевизионный стандарт будет %s."
+msgstr "п÷п╬я│п╩п╣ п©п╣я─п╣п╥п╟п©я┐я│п╨п╟ я┌п╣п╩п╣п╡п╦п╥п╦п╬п╫п╫я▀п╧ я│я┌п╟п╫п╢п╟я─я┌ п╠я┐п╢п╣я┌ %s."
 
 #: src/commands.c:2497
 #, c-format
 msgid "Using default language for XMLTV data."
-msgstr ""
+msgstr "п≤я│п©п╬п╩я▄п╥я┐я▌ п╬я│п╫п╬п╡п╫п╬п╧ я▐п╥я▀п╨ п╢п╩я▐ п╢п╟п╫п╫я▀я┘ XMLTV"
 
 #: src/commands.c:2500
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
-msgstr ""
+msgstr "п≤я│п©п╬п╩я▄п╥я┐я▌ п╫п╣п╦п╥п╡п╣я│я┌п╫я▀п╧ я▐п╥я▀п╨ (%s) п╢п╩я▐ п╢п╟п╫п╫я▀я┘ XMLTV."
 
 #: src/commands.c:2504
 #, c-format
 msgid "XMLTV language set to %s (%s)."
-msgstr ""
+msgstr "п╞п╥я▀п╨ XMLTV я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╡ %s (%s)."
 
 #: src/commands.c:2539
 msgid "All channels re-activated."
-msgstr "Все каналы активированы"
+msgstr "п▓я│п╣ п╨п╟п╫п╟п╩я▀ п╟п╨я┌п╦п╡п╦я─п╬п╡п╟п╫я▀"
 
 #: src/commands.c:2560
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
-msgstr "Переименовать %d. Введите новый номер канала"
+msgstr "п÷п╣я─п╣п╫я┐п╪п╣я─п╬п╡п╟я┌я▄ п╨п╟п╫п╟п╩ %d. п▓п╡п╣п╢п╦я┌п╣ п╫п╬п╡я▀п╧ п╫п╬п╪п╣я─ п╨п╟п╫п╟п╩п╟"
 
 #: src/commands.c:2572
 msgid "Scanner unavailable with signal checking disabled."
-msgstr "Сканер не работает при отключенном автоопределении входного сигнала"
+msgstr "п║п╨п╟п╫п╣я─ п╫п╣ я─п╟п╠п╬я┌п╟п╣я┌ п©я─п╦ п╬я┌п╨п╩я▌я┤п╣п╫п╫п╬п╪ п╟п╡я┌п╬п╬п©я─п╣п╢п╣п╩п╣п╫п╦п╦ п╡я┘п╬п╢п╫п╬пЁп╬ я│п╦пЁп╫п╟п╩п╟"
 
 #: src/commands.c:2602
 msgid "Scanning for channels being broadcast."
-msgstr "Сканирование каналов."
+msgstr "п║п╨п╟п╫п╦я─п╬п╡п╟п╫п╦п╣ п╨п╟п╫п╟п╩п╬п╡."
 
 #: src/commands.c:2620
 msgid "Closed captions disabled."
-msgstr "Скрытые титры выключены"
+msgstr "п║п╨я─я▀я┌я▀п╣ я┌п╦я┌я─я▀ п╡я▀п╨п╩я▌я┤п╣п╫я▀"
 
 #: src/commands.c:2626
 msgid "Closed captions enabled."
-msgstr "Скрытые титры включены"
+msgstr "п║п╨я─я▀я┌я▀п╣ я┌п╦я┌я─я▀ п╡п╨п╩я▌я┤п╣п╫я▀"
 
 #: src/commands.c:2638
 msgid "No VBI device configured for CC decoding."
-msgstr "Устройчтво VBI не настроено для декодирования CC"
+msgstr "пёя│я┌я─п╬п╧я┤я┌п╡п╬ VBI п╫п╣ п╫п╟я│я┌я─п╬п╣п╫п╬ п╢п╩я▐ п╢п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦я▐ CC"
 
 #: src/commands.c:2654
 #, c-format
 msgid "Colour decoding for this channel set to %s."
-msgstr "Декодирование цвета для этого канала установлено в %s."
+msgstr "п■п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ я├п╡п╣я┌п╟ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬ п╡ %s."
 
 #: src/commands.c:2702
 #, c-format
 msgid "Running: %s"
-msgstr "Запущен: %s"
+msgstr "п≈п╟п©я┐я┴п╣п╫: %s"
 
 #: src/commands.c:2782
 msgid "Signal detection enabled."
-msgstr "Автоопределение сигнала включено"
+msgstr "п░п╡я┌п╬п╬п©я─п╣п╢п╣п╩п╣п╫п╦п╣ я│п╦пЁп╫п╟п╩п╟ п╡п╨п╩я▌я┤п╣п╫п╬"
 
 #: src/commands.c:2785
 msgid "Signal detection disabled."
-msgstr "Автоопределение сигнала выключено"
+msgstr "п░п╡я┌п╬п╬п©я─п╣п╢п╣п╩п╣п╫п╦п╣ я│п╦пЁп╫п╟п╩п╟ п╡я▀п╨п╩я▌я┤п╣п╫п╬"
 
 #: src/commands.c:2798
 msgid "XDS decoding enabled."
-msgstr "Декодирование XDS включено"
+msgstr "п■п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ XDS п╡п╨п╩я▌я┤п╣п╫п╬"
 
 #: src/commands.c:2801
 msgid "XDS decoding disabled."
-msgstr "Декодирование XDS выключено"
+msgstr "п■п╣п╨п╬п╢п╦я─п╬п╡п╟п╫п╦п╣ XDS п╡я▀п╨п╩я▌я┤п╣п╫п╬"
 
 #: src/commands.c:2846
 msgid "Colour invert enabled."
-msgstr "Цвета инвертированы"
+msgstr "п╕п╡п╣я┌п╟ п╦п╫п╡п╣я─я┌п╦я─п╬п╡п╟п╫я▀"
 
 #: src/commands.c:2848
 msgid "Colour invert disabled."
-msgstr "Нормальные цвета"
+msgstr "п²п╬я─п╪п╟п╩я▄п╫я▀п╣ я├п╡п╣я┌п╟"
 
 #: src/commands.c:2869
 msgid "Mirror enabled."
-msgstr "Зеркальное изображение"
+msgstr "п≈п╣я─п╨п╟п╩я▄п╫п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:2871
 msgid "Mirror disabled."
-msgstr "Нормальное изображение"
+msgstr "п²п╬я─п╪п╟п╩я▄п╫п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:2892
 msgid "Chroma kill enabled."
-msgstr "Чернобелое изображение"
+msgstr "п╖п╣я─п╫п╬п╠п╣п╩п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:2894
 msgid "Chroma kill disabled."
-msgstr "Цветное изображение"
+msgstr "п╕п╡п╣я┌п╫п╬п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣"
 
 #: src/commands.c:2906
 #, c-format
 msgid "Overscan: %.1f%%"
-msgstr "Приближение: %.1f%%"
+msgstr "п÷я─п╦п╠п╩п╦п╤п╣п╫п╦п╣: %.1f%%"
 
 #: src/commands.c:2938
 msgid "Picture settings reset to defaults."
-msgstr "Установки для изображения сброшены к начальным"
+msgstr "пёя│я┌п╟п╫п╬п╡п╨п╦ п╢п╩я▐ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ я│п╠я─п╬я┬п╣п╫я▀ п╨ п╫п╟я┤п╟п╩я▄п╫я▀п╪"
 
 #: src/commands.c:2966
 msgid "Using nominal NTSC cable frequencies."
-msgstr ""
+msgstr "п≤я│п©п╬п╩я▄п╥я┐я▌ п╫п╬п╪п╦п╫п╟п╩я▄п╫я▀п╣ п╨п╟п╠п╣п╩я▄п╫я▀п╣ я┤п╟я│я┌п╬я┌я▀ NTSC."
 
 #: src/commands.c:2972
 msgid "Using IRC cable frequencies."
-msgstr ""
+msgstr "п≤я│п©п╬п╩я▄п╥я┐я▌ п╨п╟п╠п╣п╩я▄п╫я▀п╣ я┤п╟я│я┌п╬я┌я▀ IRC."
 
 #: src/commands.c:2978
 msgid "Using HRC cable frequencies."
-msgstr ""
+msgstr "п≤я│п©п╬п╩я▄п╥я┐я▌ п╨п╟п╠п╣п╩я▄п╫я▀п╣ я┤п╟я│я┌п╬я┌я▀ HRC."
 
 #: src/commands.c:3062 src/commands.c:3082
 msgid "Volume"
-msgstr "Громкость"
+msgstr "п⌠я─п╬п╪п╨п╬я│я┌я▄"
 
 #: src/commands.c:3262
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Текущие установки изображения сохранены как начальные.\n"
+msgstr "п╒п╣п╨я┐я┴п╦п╣ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ я│п╬я┘я─п╟п╫п╣п╫я▀ п╨п╟п╨ п╫п╟я┤п╟п╩я▄п╫я▀п╣.\n"
 
 #: src/commands.c:3275
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
-msgstr "Текущие установки изображения сохранены для этого канала %d.\n"
+msgstr "п╒п╣п╨я┐я┴п╦п╣ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ я│п╬я┘я─п╟п╫п╣п╫я▀ п╢п╩я▐ я█я┌п╬пЁп╬ п╨п╟п╫п╟п╩п╟ %d.\n"
 
 #: src/commands.c:3362
 msgid "Paused."
-msgstr "Пауза."
+msgstr "п÷п╟я┐п╥п╟."
 
 #: src/commands.c:3362
 msgid "Resumed."
-msgstr "Продолжение."
+msgstr "п÷я─п╬п╢п╬п╩п╤п╣п╫п╦п╣."
 
 #: src/tvtimeconf.c:472
 #, c-format
 msgid "Error parsing configuration file %s.\n"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ п╡ я└п╟п╧п╩п╣ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦ %s.\n"
 
 #: src/tvtimeconf.c:479
 #, c-format
 msgid "No XML root element found in %s.\n"
-msgstr ""
+msgstr "п▓ %s п╫п╣ п╫п╟п╧п╢п╣п╫ п╨п╬я─п╫п╣п╡п╬п╧ я█п╩п╣п╪п╣п╫я┌ XML.\n"
 
 #: src/tvtimeconf.c:487 src/tvtimeconf.c:561
 #, c-format
 msgid "%s is not a tvtime configuration file.\n"
-msgstr ""
+msgstr "%s п╫п╣ я▐п╡п╩я▐п╣я┌я│я▐ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╬п╫п╫я▀п╪ я└п╟п╧п╩п╬п╪ tvtime.\n"
 
 #: src/tvtimeconf.c:519
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr ""
+"п╓п╟п╧п╩ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦ п╫п╣ п╪п╬п╤п╣я┌ п╠я▀я┌я▄ п╬п╠я─п╟п╠п╬я┌п╟п╫.\n"
+"п²п╟я│я┌я─п╬п╧п╨п╦ я│п╬я┘я─п╟п╫п╣п╫я▀ п╫п╣ п╠я┐п╢я┐я┌.\n"
 
 #: src/tvtimeconf.c:526
 msgid "Could not create new config file.\n"
-msgstr ""
+msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ п╫п╬п╡я▀п╧ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╬п╫п╫я▀п╧ я└п╟п╧п╩.\n"
 
 #: src/tvtimeconf.c:550
 msgid "Error creating configuration file.\n"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╬п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟.\n"
 
 #: src/tvtimeconf.c:571 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
-msgstr ""
+msgstr "п²п╣ п╪п╬пЁя┐ п╦п╥п╪п╣п╫п╦я┌я▄ п╡п╩п╟п╢п╣п╩я▄я├п╟ %s: %s.\n"
 
 #: src/tvtimeconf.c:580
 msgid ""
@@ -948,6 +959,16 @@ msgid ""
 "tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
 "Alexander S. Belov, and Achim Schneider.\n"
 msgstr ""
+"\n"
+"tvtime я▐п╡п╩я▐п╣я┌я│я▐ я│п╡п╬п╠п╬п╢п╫я▀п╪ п©я─п╬пЁя─п╟п╪п╪п╫я▀п╪ п╬п╠п╣я│п©п╣я┤п╣п╫п╦п╣п╪, п╫п╟п©п╦я│п╟п╫п╫я▀п╪\n"
+"п▒п╦п╩п╩п╦ п▒п╦пЁя│п╬п╪ (Billy Biggs), п■п╟я┐пЁп╬п╪ п▒я█п╩п╩п╬п╪ (Doug Bell) п╦ п╪п╫п╬пЁп╦п╪п╦ п╢я─я┐пЁп╦п╪п╦\n"
+".пёя│п╩п╬п╡п╦я▐ п╨п╬п©п╦я─п╬п╡п╟п╫п╦я▐ п╦ п╢я─я┐пЁя┐я▌ п╦п╫я└п╬я─п╪п╟я├п╦я▌ я│п╪п╬я┌я─п╦я┌п╣ п╫п╟ п╫п╟я┬п╣п╪ я│п╟п╧я┌п╣\n"
+"http://tvtime.net/\n"
+"\n"
+"п░п╡я┌п╬я─я│п╨п╦п╣ п©я─п╟п╡п╟ п╫п╟ tvtime (C) 2001, 2002, 2003 п©я─п╦п╫п╟п╢п╩п╣п╤п╟я┌ п▒п╦п╩п╩п╦ п▒п╦пЁя│я┐, "
+"п■п╟я┐пЁя┐ п▒я█п╩п╩я┐,\n"
+"п░п╩п╣п╨я│п╟п╫п╢я─я┐ п║. п▒п╣п╩п╬п╡я┐ (Alexander S. Belov), п╦ п░я┤п╦п╪я┐ п╗п╫п╟п╧п╢п╣я─я┐\n"
+"(Achim Schneider).\n"
 
 #: src/tvtimeconf.c:591 src/tvtimeconf.c:643 src/tvtimeconf.c:691
 #, c-format
@@ -955,28 +976,34 @@ msgid ""
 "usage: %s [OPTION]...\n"
 "\n"
 msgstr ""
+"п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: %s [п·п÷п╕п≤п╞]...\n"
+"\n"
 
 #: src/tvtimeconf.c:592 src/tvtimeconf.c:644
 msgid "  -a, --widescreen           16:9 mode.\n"
-msgstr ""
+msgstr "  -a, --widescreen           п═п╣п╤п╦п╪ 16:9.\n"
 
 #: src/tvtimeconf.c:593 src/tvtimeconf.c:645
 msgid "  -A, --nowidescreen         4:3 mode.\n"
-msgstr ""
+msgstr "  -A, --nowidescreen         п═п╣п╤п╦п╪ 4:3.\n"
 
 #: src/tvtimeconf.c:594 src/tvtimeconf.c:646
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr ""
+"  -b, --vbidevice=DEVICE     пёя│я┌я─п╬п╧я│я┌п╡п╬ VBI (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/vbi0).\n"
 
 #: src/tvtimeconf.c:595 src/tvtimeconf.c:647
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr ""
+"  -c, --channel=CHANNEL      п÷я─п╦ п╥п╟пЁя─я┐п╥п╨п╣ п©п╣я─п╣п╨п╩я▌я┤п╦я┌я▄я│я▐ п╫п╟ я┐п╨п╟п╥п╟п╫п╫я▀п╧ п╨п╟п╫п╟п╩.\n"
 
 #: src/tvtimeconf.c:596 src/tvtimeconf.c:648 src/tvtimeconf.c:692
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
+"  -d, --device=DEVICE        пёя│я┌я─п╬п╧я│я┌п╡п╬ video4linux (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/"
+"video0).\n"
 
 #: src/tvtimeconf.c:597 src/tvtimeconf.c:649
 msgid ""
@@ -1000,44 +1027,70 @@ msgid ""
 "                                 custom (first run tvtime-scanner)\n"
 "\n"
 msgstr ""
+"  -f, --frequencies=NAME     п╒п╟п╠п╩п╦я├п╟ я┤п╟я│я┌п╬я┌.\n"
+"                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ us-cable).\n"
+"\n"
+"                             п■п╬я│я┌я┐п©п╫я▀п╣ п╥п╫п╟я┤п╣п╫п╦я▐:\n"
+"                                 us-cable\n"
+"                                 us-cable100\n"
+"                                 us-broadcast\n"
+"                                 china-broadcast\n"
+"                                 southafrica\n"
+"                                 japan-cable\n"
+"                                 japan-broadcast\n"
+"                                 europe\n"
+"                                 australia\n"
+"                                 australia-optus\n"
+"                                 newzealand\n"
+"                                 france\n"
+"                                 russia\n"
+"                                 custom (я│п╫п╟я┤п╟п╩п╬ п╥п╟п©я┐я│я┌п╦я┌п╣ tvtime-scanner)\n"
+"\n"
 
 #: src/tvtimeconf.c:614 src/tvtimeconf.c:666 src/tvtimeconf.c:693
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
 msgstr ""
+"  -F, --configfile=FILE      п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╧ я└п╟п╧п╩ п╢п╩я▐ п╥п╟пЁя─я┐п╥п╨п╦ п╫п╟я│я┌я─п╬п╣п╨.\n"
 
 #: src/tvtimeconf.c:615 src/tvtimeconf.c:667 src/tvtimeconf.c:694
 msgid "  -h, --help                 Show this help message.\n"
-msgstr ""
+msgstr "  -h, --help                 п÷п╬п╨п╟п╥п╟я┌я▄ я█я┌п╬ я│п╬п╬п╠я┴п╣п╫п╦п╣.\n"
 
 #: src/tvtimeconf.c:616 src/tvtimeconf.c:668
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
-msgstr ""
+msgstr "  -g, --geometry=GEOMETRY    пёя│я┌п╟п╫п╬п╡п╦я┌я▄ я─п╟п╥п╪п╣я─ п╬п╨п╫п╟ п╡я▀п╡п╬п╢п╟.\n"
 
 #: src/tvtimeconf.c:617 src/tvtimeconf.c:669 src/tvtimeconf.c:695
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
+"  -i, --input=INPUTNUM       п²п╬п╪п╣я─ п╡я┘п╬п╢п╟ video4linux (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 0).\n"
 
 #: src/tvtimeconf.c:618 src/tvtimeconf.c:670
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
 msgstr ""
+"  -I, --inputwidth=SAMPLING  п⌠п╬я─п╦п╥п╬п╫я┌п╟п╩я▄п╫п╬п╣ я─п╟п╥я─п╣я┬п╣п╫п╦п╣\n"
+"                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 720 я┌п╬я┤п╣п╨).\n"
 
 #: src/tvtimeconf.c:620
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
 msgstr ""
+"  -k, --slave                п·я┌п╨п╩я▌я┤п╦я┌я▄ п╬п╠я─п╟п╠п╬я┌п╨я┐ п╡я┘п╬п╢п╫п╬пЁп╬ я│п╦пЁп╫п╟п╩п╟ п╡\n"
+"                             tvtime (п╡п╣п╢п╬п╪я▀п╧ я─п╣п╤п╦п╪).\n"
 
 #: src/tvtimeconf.c:621 src/tvtimeconf.c:672
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
 msgstr ""
+"  -m, --fullscreen           п≈п╟п©я┐я│я┌п╦я┌я▄ tvtime п╡ п©п╬п╩п╫п╬я█п╨я─п╟п╫п╫п╬п╪ я─п╣п╤п╦п╪п╣.\n"
 
 #: src/tvtimeconf.c:622 src/tvtimeconf.c:673
 msgid "  -M, --window               Start tvtime in window mode.\n"
-msgstr ""
+msgstr "  -M, --window               п≈п╟п©я┐я│я┌п╦я┌я▄ tvtime п╡ п╬п╨п╬п╫п╫п╬п╪ я─п╣п╤п╦п╪п╣.\n"
 
 #: src/tvtimeconf.c:623 src/tvtimeconf.c:674 src/tvtimeconf.c:696
 msgid ""
@@ -1046,34 +1099,46 @@ msgid ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
+"  -n, --norm=NORM            п╒п╣п╩п╣п╡п╦п╥п╦п╬п╫п╫я▀п╧ я│я┌п╟п╫п╢п╟я─я┌.  tvtime п©п╬п╢п╢п╣я─п╤п╦п╡п╟п╣я┌:\n"
+"                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
+"                             PAL-N п╦п╩п╦ PAL-60 (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ NTSC).\n"
 
 #: src/tvtimeconf.c:626
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
+"  -s, --showdrops            п÷п╣я┤п╟я┌п╟я┌я▄ я│п╬я│я┌п╬я▐п╫п╦п╣ п╬п╠ п╬я┌п╠я─п╬я┬п╣п╫п╫я▀я┘ п╨п╟п╢я─п╟я┘\n"
+"                             (п╢п╩я▐ п╬я┌п╩п╟п╢п╨п╦).\n"
 
 #: src/tvtimeconf.c:627
 msgid ""
 "  -S, --saveoptions          Save command line options to the config file.\n"
 msgstr ""
+"  -S, --saveoptions          п║п╬я┘я─п╟п╫п╦я┌я▄ п╬п©я├п╦п╦ п╨п╬п╪п╟п╫п╢п╫п╬п╧ я│я┌я─п╬п╨п╦ п╡\n"
+"                             п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╬п╫п╫я▀п╧ я└п╟п╧п╩.\n"
 
 #: src/tvtimeconf.c:628 src/tvtimeconf.c:678
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
 msgstr ""
+"  -t, --xmltv=FILE           п≈п╟пЁя─я┐п╥п╦я┌я▄ я│п©п╦я│п╨п╦ XMLTV п╦п╥ я┐п╨п╟п╥п╟п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟.\n"
 
 #: src/tvtimeconf.c:629 src/tvtimeconf.c:679
 msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
 msgstr ""
+"  -l, --xmltvlanguage=LANG   п≤я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╢п╟п╫п╫я▀п╣ XMLTV п╡ я┐п╨п╟п╥п╟п╫п╫п╬п╪\n"
+"                             я▐п╥я▀п╨п╣, п╣я│п╩п╦ п╢п╬я│я┌я┐п©п╫п╬.\n"
 
 #: src/tvtimeconf.c:630
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
-msgstr ""
+msgstr "  -v, --verbose              п÷п╣я┤п╟я┌п╟я┌я▄ п╬я┌п╩п╟п╢п╬я┤п╫я▀п╣ я│п╬п╬п╠я┴п╣п╫п╦я▐ п╡ stderr.\n"
 
 #: src/tvtimeconf.c:631
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
 msgstr ""
+"  -X, --display=DISPLAY      п≤я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╢п╩я▐ п©п╬п╢я│п╬п╣п╢п╦п╫п╣п╫п╦я▐ я┐п╨п╟п╥п╟п╫п╫я▀п╧ я█п╨я─п╟п╫ "
+"X.\n"
 
 #: src/tvtimeconf.c:632 src/tvtimeconf.c:680
 msgid ""
@@ -1089,52 +1154,64 @@ msgid ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 msgstr ""
+"  -x, --mixer=DEVICE[:CH]    п≤я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я┐я│я┌я─п╬п╧я│я┌п╡п╬ п╪п╦п╨я┬п╣я─п╟ п╦ п╨п╟п╫п╟п╩.\n"
+"                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/mixer:line)\n"
+"\n"
+"                             п■п╬я│я┌я┐п©п╫я▀п╣ п╨п╟п╫п╟п╩я▀:\n"
+"                                 vol, bass, treble, synth, pcm, speaker, "
+"line,\n"
+"                                 mic, cd, mix, pcm2, rec, igain, ogain, "
+"line1,\n"
+"                                 line2, line3, dig1, dig2, dig3, phin, "
+"phout,\n"
+"                                 video, radio, monitor\n"
 
 #: src/tvtimeconf.c:677
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
 msgstr ""
+"  -R, --priority=PRI         пёя│я┌п╟п╫п╬п╡п╦я┌я▄ п©я─п╦п╬я─п╦я┌п╣я┌ п©я─п╬я├п╣я│я│п╟ tvtime at.\n"
 
 #: src/tvtimeconf.c:858 src/tvtimeconf.c:867 src/tvtimeconf.c:931
 #: src/tvtimeconf.c:1064 src/tvtimeconf.c:1229
-#, fuzzy, c-format
+#, c-format
 msgid "Reading configuration from %s\n"
-msgstr "Основные настройки"
+msgstr "п╖я┌п╣п╫п╦п╣ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦ п╦п╥ %s\n"
 
 #: src/tvtimeconf.c:969
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
-msgstr ""
+msgstr "п²п╣п╩я▄п╥я▐ п╥п╟п©я┐я│я┌п╦я┌я▄ п╢п╡п╣ п╨п╬п©п╦п╦ tvtime я│ п╬п╢п╦п╫п╟п╨п╬п╡я▀п╪п╦ п╫п╟я│я┌я─п╬п╧п╨п╟п╪п╦.\n"
 
 #: src/tvtimeconf.c:980
 msgid "Saving command line options.\n"
-msgstr ""
+msgstr "п║п╬я┘я─п╟п╫я▐я▌ п╬п©я├п╦п╦ п╨п╬п╪п╟п╫п╢п╫п╬п╧ я│я┌я─п╬п╨п╦.\n"
 
 #: src/tvtimeconf.c:1155
 msgid "Cannot update configuration while tvtime running.\n"
-msgstr ""
+msgstr "п²п╣п╩я▄п╥я▐ п╬п╠п╫п╬п╡п╦я┌я▄ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦я▌, п©п╬п╨п╟ tvtime п╥п╟п©я┐я┴п╣п╫.\n"
 
 #: src/tvtimeosd.c:344 src/tvtime-scanner.c:145
 msgid "No signal"
-msgstr ""
+msgstr "п²п╣я┌ я│п╦пЁп╫п╟п╩п╟"
 
 #: src/tvtimeosd.c:455
 msgid "Mute"
-msgstr ""
+msgstr "п≈п╡я┐п╨ п╬я┌п╨п╩я▌я┤п╣п╫"
 
 #: src/utils.c:118
 #, c-format
 msgid "Cannot create %s: %s\n"
-msgstr ""
+msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ %s: %s\n"
 
 #: src/utils.c:124
 #, c-format
 msgid "Cannot open %s: %s\n"
-msgstr ""
+msgstr "п²п╣ п╪п╬пЁя┐ п╬я┌п╨я─я▀я┌я▄ %s: %s\n"
 
 #: src/utils.c:656
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ п╨п╬п╫п╡п╣я─я┌п╬я─п╟ UTF-8 п╡ %s: п╬я┬п╦п╠п╨п╟ iconv_open (%s).\n"
 
 #: src/utils.c:667
 #, c-format
@@ -1146,6 +1223,12 @@ msgid ""
 "    %s.\n"
 "\n"
 msgstr ""
+"\n"
+"    п·я┬п╦п╠п╨п╟ п╡я┘п╬п╢п╟ п╡ я─п╣п╤п╦п╪ UTF-8 я┤п╣я─п╣п╥ bind_textdomain_codeset()\n"
+"    (п╡п╬п╥п╡я─п╟я┴п╣п╫п╬ %s.)  п╜я┌п╬ п╪п╬п╤п╣я┌ п╡я▀п╥п╡п╟я┌я▄ п╫п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣\n"
+"    п╬я┌п╬п╠я─п╟п╤п╣п╫п╦п╣ я│п╬п╬п╠я┴п╣п╫п╦п╧!  п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п╬я┌п©я─п╟п╡я┌п╣ п╬я┌я┤я▒я┌\n"
+"    п╬п╠ п╬я┬п╦п╠п╨п╣ п╫п╟ %s.\n"
+"\n"
 
 #: src/tvtime-command.c:61
 #, c-format
@@ -1153,36 +1236,38 @@ msgid ""
 "\n"
 "Available commands:\n"
 msgstr ""
+"\n"
+"п■п╬я│я┌я┐п©п╫я▀п╣ п╨п╬п╪п╟п╫п╢я▀:\n"
 
 #: src/tvtime-command.c:80
-#, fuzzy, c-format
+#, c-format
 msgid "tvtime not running.\n"
-msgstr "Запущен: %s.\n"
+msgstr "tvtime п╫п╣ п╥п╟п©я┐я┴п╣п╫.\n"
 
 #: src/tvtime-command.c:82 src/tvtime-command.c:92
 #, c-format
 msgid "%s: Cannot open %s: %s\n"
-msgstr ""
+msgstr "%s: п²п╣ п╪п╬пЁя┐ п╬я┌п╨я─я▀я┌я▄ %s: %s\n"
 
 #: src/tvtime-command.c:103
 #, c-format
 msgid "%s: Invalid command '%s'\n"
-msgstr ""
+msgstr "%s: п²п╣п╡п╣я─п╫п╟я▐ п╨п╬п╪п╟п╫п╢п╟ '%s'\n"
 
 #: src/tvtime-command.c:108
 #, c-format
 msgid "%s: Sending command %s with argument %s.\n"
-msgstr ""
+msgstr "%s: п÷п╬я│я▀п╩п╟я▌ п╨п╬п╪п╟п╫п╢я┐ %s я│ п╟я─пЁя┐п╪п╣п╫я┌п╬п╪ %s.\n"
 
 #: src/tvtime-command.c:113
 #, c-format
 msgid "%s: Sending command %s.\n"
-msgstr ""
+msgstr "%s: п÷п╬я│я▀п╩п╟я▌ п╨п╬п╪п╟п╫п╢я┐ %s.\n"
 
 #: src/tvtime-scanner.c:92
 #, c-format
 msgid "Scanning using TV standard %s.\n"
-msgstr ""
+msgstr "п║п╨п╟п╫п╦я─п╬п╡п╟п╫п╦п╣ я┌п╣п╩п╣п╡п╦п╥п╦п╬п╫п╫п╬пЁп╬ я│я┌п╟п╫п╢п╟я─я┌п╟ %s.\n"
 
 #: src/tvtime-scanner.c:116
 #, c-format
@@ -1192,80 +1277,85 @@ msgid ""
 "    select a different input using --input=<num>.\n"
 "\n"
 msgstr ""
+"\n"
+"    п²п╟ п╡я┘п╬п╢п╣ %d я┌я▌п╫п╣я─ п╫п╣ п╬п╠п╫п╟я─я┐п╤п╣п╫. п∙я│п╩п╦ я┌я▌п╫п╣я─ я│я┐я┴п╣я│я┌п╡я┐п╣я┌,\n"
+"    п╡я▀п╠п╣я─п╣я┌п╣ п╢я─я┐пЁп╬п╧ п╡я┘п╬п╢ я│ п©п╬п╪п╬я┴я▄я▌ --input=<num>.\n"
+"\n"
 
 #: src/tvtime-scanner.c:127
 #, c-format
 msgid "Scanning from %6.2f MHz to %6.2f MHz.\n"
-msgstr ""
+msgstr "п║п╨п╟п╫п╦я─я┐я▌ п╬я┌ %6.2f п╢п╬ %6.2f п°п⌠я├.\n"
 
 #: src/tvtime-scanner.c:138
 #, c-format
 msgid "Checking %6.2f MHz:"
-msgstr ""
+msgstr "п÷я─п╬п╡п╣я─я▐я▌ я┤п╟я│я┌п╬я┌я┐ %6.2f п°п⌠я├:"
 
 #: src/tvtime-scanner.c:149 src/tvtime-scanner.c:156
-#, fuzzy
 msgid "Signal detected"
-msgstr "Автоопределение сигнала включено"
+msgstr "п║п╦пЁп╫п╟п╩ п╬п╠п╫п╟я─я┐п╤п╣п╫"
 
 #: src/tvtime-scanner.c:168
 #, c-format
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
+"п²п╟ я┤п╟я│я┌п╬я┌п╣ %6.2f п°п⌠я├ (%.2f - %.2f п°п⌠я├) п╫п╟п╧п╢п╣п╫ п╨п╟п╫п╟п╩, п╢п╬п╠п╟п╡п╩я▐я▌ п╡ я│п©п╦я│п╬п╨ "
+"п╨п╟п╫п╟п╩п╬п╡.\n"
 
 #~ msgid "Frame drop setting"
-#~ msgstr "Пропуск кадров"
+#~ msgstr "п÷я─п╬п©я┐я│п╨ п╨п╟п╢я─п╬п╡"
 
 #~ msgid ""
 #~ "tvtime: Output driver failed to initialize: no video output available.\n"
 #~ msgstr ""
-#~ "Не могу инициализаровать драйвер вывода видео: нет доступных устройств.\n"
+#~ "п²п╣ п╪п╬пЁя┐ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я─п╬п╡п╟я┌я▄ п╢я─п╟п╧п╡п╣я─ п╡я▀п╡п╬п╢п╟ п╡п╦п╢п╣п╬: п╫п╣я┌ п╢п╬я│я┌я┐п©п╫я▀я┘ я┐я│я┌я─п╬п╧я│я┌п╡.\n"
 
 #~ msgid "tvtime: Can't initialize input filters.\n"
-#~ msgstr "Не могу инициализировать фильтры на входном сигнале.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╦п╫п╦я├п╦п╟п╩п╦п╥п╦я─п╬п╡п╟я┌я▄ я└п╦п╩я▄я┌я─я▀ п╫п╟ п╡я┘п╬п╢п╫п╬п╪ я│п╦пЁп╫п╟п╩п╣.\n"
 
 #~ msgid "tvtime: Can't initialize output filters.\n"
-#~ msgstr "Не могу инициализировать фильтры на выходном сигнале.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╦п╫п╦я├п╦п╟п╩п╦п╥п╦я─п╬п╡п╟я┌я▄ я└п╦п╩я▄я┌я─я▀ п╫п╟ п╡я▀я┘п╬п╢п╫п╬п╪ я│п╦пЁп╫п╟п╩п╣.\n"
 
 #~ msgid "tvtime: Can't initialize performance monitor, exiting.\n"
 #~ msgstr ""
-#~ "Не могу инициализировать монитор слежения за производительностью, "
-#~ "завершение работы\n"
+#~ "п²п╣ п╪п╬пЁя┐ п╦п╫п╦я├п╦п╟п╩п╦п╥п╦я─п╬п╡п╟я┌я▄ п╪п╬п╫п╦я┌п╬я─ я│п╩п╣п╤п╣п╫п╦я▐ п╥п╟ п©я─п╬п╦п╥п╡п╬п╢п╦я┌п╣п╩я▄п╫п╬я│я┌я▄я▌, "
+#~ "п╥п╟п╡п╣я─я┬п╣п╫п╦п╣ я─п╟п╠п╬я┌я▀\n"
 
 #~ msgid "tvtime: Can't create stationmanager (no memory?), exiting.\n"
 #~ msgstr ""
-#~ "Не могу создать управление станциями, возможно не хватает памяти, "
-#~ "завершение работы.\n"
+#~ "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ я│я┌п╟п╫я├п╦я▐п╪п╦, п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п©п╟п╪я▐я┌п╦, "
+#~ "п╥п╟п╡п╣я─я┬п╣п╫п╦п╣ я─п╟п╠п╬я┌я▀.\n"
 
 #, fuzzy
 #~ msgid "Can't open RVR file '%s'."
-#~ msgstr "Не могу открыть rvr файл '%s'."
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╬я┌п╨я─я▀я┌я▄ rvr я└п╟п╧п╩ '%s'."
 
 #~ msgid ""
 #~ "tvtime: Can only get %d frame buffers from V4L.  Not enough to continue.  "
 #~ "Exiting.\n"
 #~ msgstr ""
-#~ "V4l буфер дает зазервировать только %d кадров. Этого недостаточно для "
-#~ "работы.Завершение работы.\n"
+#~ "V4l п╠я┐я└п╣я─ п╢п╟п╣я┌ п╥п╟п╥п╣я─п╡п╦я─п╬п╡п╟я┌я▄ я┌п╬п╩я▄п╨п╬ %d п╨п╟п╢я─п╬п╡. п╜я┌п╬пЁп╬ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╢п╩я▐ "
+#~ "я─п╟п╠п╬я┌я▀.п≈п╟п╡п╣я─я┬п╣п╫п╦п╣ я─п╟п╠п╬я┌я▀.\n"
 
 #~ msgid ""
 #~ "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
 #~ "plugins\n"
 #~ "tvtime: to those which only need 1 field.\n"
 #~ msgstr ""
-#~ "V4l буфер дает зазервировать только %d кадров. Ограничение для модулей "
-#~ "сглаживания черезстрочности\n"
-#~ "используется только 1 область.\n"
+#~ "V4l п╠я┐я└п╣я─ п╢п╟п╣я┌ п╥п╟п╥п╣я─п╡п╦я─п╬п╡п╟я┌я▄ я┌п╬п╩я▄п╨п╬ %d п╨п╟п╢я─п╬п╡. п·пЁя─п╟п╫п╦я┤п╣п╫п╦п╣ п╢п╩я▐ п╪п╬п╢я┐п╩п╣п╧ "
+#~ "я│пЁп╩п╟п╤п╦п╡п╟п╫п╦я▐ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦\n"
+#~ "п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ я┌п╬п╩я▄п╨п╬ 1 п╬п╠п╩п╟я│я┌я▄.\n"
 
 #~ msgid ""
 #~ "tvtime: Can only get %d frame buffers from V4L.  Limiting deinterlace "
 #~ "plugins\n"
 #~ "tvtime: to those which only need 2 fields.\n"
 #~ msgstr ""
-#~ "V4l буфер дает зазервировать только %d кадров. Ограничение для модулей "
-#~ "сглаживания черезстрочности\n"
-#~ "используется только 2 области.\n"
+#~ "V4l п╠я┐я└п╣я─ п╢п╟п╣я┌ п╥п╟п╥п╣я─п╡п╦я─п╬п╡п╟я┌я▄ я┌п╬п╩я▄п╨п╬ %d п╨п╟п╢я─п╬п╡. п·пЁя─п╟п╫п╦я┤п╣п╫п╦п╣ п╢п╩я▐ п╪п╬п╢я┐п╩п╣п╧ "
+#~ "я│пЁп╩п╟п╤п╦п╡п╟п╫п╦я▐ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦\n"
+#~ "п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ я┌п╬п╩я▄п╨п╬ 2 п╬п╠п╩п╟я│я┌п╦.\n"
 
 #~ msgid ""
 #~ "\n"
@@ -1276,77 +1366,77 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "*** Ваш bttv драйвер работает с маленьким размером параметра gbuffers.\n"
-#~ "*** Прочтите на %s информацию о том\n"
-#~ "*** как увеличить установки параметра gbuffers\n"
+#~ "*** п▓п╟я┬ bttv п╢я─п╟п╧п╡п╣я─ я─п╟п╠п╬я┌п╟п╣я┌ я│ п╪п╟п╩п╣п╫я▄п╨п╦п╪ я─п╟п╥п╪п╣я─п╬п╪ п©п╟я─п╟п╪п╣я┌я─п╟ gbuffers.\n"
+#~ "*** п÷я─п╬я┤я┌п╦я┌п╣ п╫п╟ %s п╦п╫я└п╬я─п╪п╟я├п╦я▌ п╬ я┌п╬п╪\n"
+#~ "*** п╨п╟п╨ я┐п╡п╣п╩п╦я┤п╦я┌я▄ я┐я│я┌п╟п╫п╬п╡п╨п╦ п©п╟я─п╟п╪п╣я┌я─п╟ gbuffers\n"
 #~ "\n"
 
 #~ msgid "tvtime: No deinterlacing methods available, exiting.\n"
 #~ msgstr ""
-#~ "Нет доступных способов сглаживания черезстрочности, завершение работы.\n"
+#~ "п²п╣я┌ п╢п╬я│я┌я┐п©п╫я▀я┘ я│п©п╬я│п╬п╠п╬п╡ я│пЁп╩п╟п╤п╦п╡п╟п╫п╦я▐ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬я│я┌п╦, п╥п╟п╡п╣я─я┬п╣п╫п╦п╣ я─п╟п╠п╬я┌я▀.\n"
 
 #~ msgid "tvtime: OSD initialization failed, OSD disabled.\n"
-#~ msgstr "Не могу инициализоровать ОSD, работаем без OSD.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╦п╫п╦я├п╦п╟п╩п╦п╥п╬я─п╬п╡п╟я┌я▄ п·SD, я─п╟п╠п╬я┌п╟п╣п╪ п╠п╣п╥ OSD.\n"
 
 #~ msgid ""
 #~ "tvtime: Card requires conversion from UYVY, but we failed to initialize "
 #~ "our converter!\n"
 #~ msgstr ""
-#~ "Требуется преобразование сигнала UYVY. Инициализация конвертора не "
-#~ "прошла\n"
+#~ "п╒я─п╣п╠я┐п╣я┌я│я▐ п©я─п╣п╬п╠я─п╟п╥п╬п╡п╟п╫п╦п╣ я│п╦пЁп╫п╟п╩п╟ UYVY. п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╬п╫п╡п╣я─я┌п╬я─п╟ п╫п╣ "
+#~ "п©я─п╬я┬п╩п╟\n"
 
 #~ msgid "tvtime: Cannot find FIFO directory.  FIFO disabled.\n"
-#~ msgstr "Не могу найти каталог для FIFO. FIFO недоступно.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╫п╟п╧я┌п╦ п╨п╟я┌п╟п╩п╬пЁ п╢п╩я▐ FIFO. FIFO п╫п╣п╢п╬я│я┌я┐п©п╫п╬.\n"
 
 #~ msgid "tvtime: %s is not a directory.  FIFO disabled.\n"
-#~ msgstr "%s не является каталогом. FIFO недоступно.\n"
+#~ msgstr "%s п╫п╣ я▐п╡п╩я▐п╣я┌я│я▐ п╨п╟я┌п╟п╩п╬пЁп╬п╪. FIFO п╫п╣п╢п╬я│я┌я┐п©п╫п╬.\n"
 
 #~ msgid "tvtime: You do not own %s.  FIFO disabled.\n"
-#~ msgstr "Вы не являетесь владельцем %s. FIFO недоступно.\n"
+#~ msgstr "п▓я▀ п╫п╣ я▐п╡п╩я▐п╣я┌п╣я│я▄ п╡п╩п╟п╢п╣п╩я▄я├п╣п╪ %s. FIFO п╫п╣п╢п╬я│я┌я┐п©п╫п╬.\n"
 
 #, fuzzy
 #~ msgid ""
 #~ "tvtime: Cannot stat %s: %s\n"
 #~ "tvtime: FIFO disabled.\n"
-#~ msgstr "Не могу получить статус %s. FIFO недоступно.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п©п╬п╩я┐я┤п╦я┌я▄ я│я┌п╟я┌я┐я│ %s. FIFO п╫п╣п╢п╬я│я┌я┐п©п╫п╬.\n"
 
 #~ msgid "tvtime: Cannot find FIFO file.  Failed to create FIFO object.\n"
-#~ msgstr "Не могу найти FIFO файл. Ошибка создания объекта FIFO.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╫п╟п╧я┌п╦ FIFO я└п╟п╧п╩. п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╬п╠я┼п╣п╨я┌п╟ FIFO.\n"
 
 #~ msgid ""
 #~ "tvtime: Not reading input from FIFO.  Failed to create FIFO object.\n"
-#~ msgstr "Не могу прочитать из FIFO. Ошибка создания объекта FIFO.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п©я─п╬я┤п╦я┌п╟я┌я▄ п╦п╥ FIFO. п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╬п╠я┼п╣п╨я┌п╟ FIFO.\n"
 
 #~ msgid "tvtime: Could not setup console.\n"
-#~ msgstr "Не могу настроить консоль.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ п╫п╟я│я┌я─п╬п╦я┌я▄ п╨п╬п╫я│п╬п╩я▄.\n"
 
 #~ msgid "tvtime: Can't create input handler.\n"
-#~ msgstr "Не могу создать управление входящим сигналом.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ п╡я┘п╬п╢я▐я┴п╦п╪ я│п╦пЁп╫п╟п╩п╬п╪.\n"
 
 #~ msgid "tvtime: Could not create vbiscreen, closed captions unavailable.\n"
-#~ msgstr "Не могу создать vbiscreen, скрытые титры недоступны.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ vbiscreen, я│п╨я─я▀я┌я▀п╣ я┌п╦я┌я─я▀ п╫п╣п╢п╬я│я┌я┐п©п╫я▀.\n"
 
 #~ msgid "tvtime: Could not create vbidata.\n"
-#~ msgstr "Не могу создать vbidata.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ vbidata.\n"
 
 #~ msgid "Window set as always-on-top."
-#~ msgstr "Режим 'поверх всех окон'"
+#~ msgstr "п═п╣п╤п╦п╪ 'п©п╬п╡п╣я─я┘ п╡я│п╣я┘ п╬п╨п╬п╫'"
 
 #~ msgid "Window set to normal stacking."
-#~ msgstr "Режим нормального положения окна"
+#~ msgstr "п═п╣п╤п╦п╪ п╫п╬я─п╪п╟п╩я▄п╫п╬пЁп╬ п©п╬п╩п╬п╤п╣п╫п╦я▐ п╬п╨п╫п╟"
 
 #~ msgid "2-3 Pulldown detection disabled."
-#~ msgstr "2-3 режим понижения выключен"
+#~ msgstr "2-3 я─п╣п╤п╦п╪ п©п╬п╫п╦п╤п╣п╫п╦я▐ п╡я▀п╨п╩я▌я┤п╣п╫"
 
 #~ msgid "2-3 Pulldown detection enabled."
-#~ msgstr "2-3 режим понижения включен"
+#~ msgstr "2-3 я─п╣п╤п╦п╪ п©п╬п╫п╦п╤п╣п╫п╦я▐ п╡п╨п╩я▌я┤п╣п╫"
 
 #, fuzzy
 #~ msgid "tvtime: Stats using '%s' at %dx%d%s.\n"
-#~ msgstr "Используется '%s' - %dx%d.\n"
+#~ msgstr "п≤я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ '%s' - %dx%d.\n"
 
 #~ msgid "tvtime: Cleaning up.\n"
-#~ msgstr "Очистка.\n"
+#~ msgstr "п·я┤п╦я│я┌п╨п╟.\n"
 
 #, fuzzy
 #~ msgid ""
@@ -1357,9 +1447,9 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "*** Внимание: Вы используете НЕСТАБИЛЬНУЮ версию tvtime.\n"
-#~ "*** Мы даже ошибаемся в процессе разработки. Пожалуйста, посылайте\n"
-#~ "*** сообщения об ошибках только о стабильных версиях!!!\n"
+#~ "*** п▓п╫п╦п╪п╟п╫п╦п╣: п▓я▀ п╦я│п©п╬п╩я▄п╥я┐п╣я┌п╣ п²п∙п║п╒п░п▒п≤п⌡п╛п²пёп╝ п╡п╣я─я│п╦я▌ tvtime.\n"
+#~ "*** п°я▀ п╢п╟п╤п╣ п╬я┬п╦п╠п╟п╣п╪я│я▐ п╡ п©я─п╬я├п╣я│я│п╣ я─п╟п╥я─п╟п╠п╬я┌п╨п╦. п÷п╬п╤п╟п╩я┐п╧я│я┌п╟, п©п╬я│я▀п╩п╟п╧я┌п╣\n"
+#~ "*** я│п╬п╬п╠я┴п╣п╫п╦я▐ п╬п╠ п╬я┬п╦п╠п╨п╟я┘ я┌п╬п╩я▄п╨п╬ п╬ я│я┌п╟п╠п╦п╩я▄п╫я▀я┘ п╡п╣я─я│п╦я▐я┘!!!\n"
 #~ "\n"
 
 #~ msgid ""
@@ -1371,11 +1461,11 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "*** Для сглаженнго изображения необходим /dev/rtc. Мы очень рекомендуем\n"
-#~ "*** загружать модуль ядра 'rtc' перед запуском tvtime, и убедитесь в "
-#~ "том,\n"
-#~ "*** что у Вас есть доступ до /dev/rtc.\n"
-#~ "*** Более полную информацию можно получить на странице %s\n"
+#~ "*** п■п╩я▐ я│пЁп╩п╟п╤п╣п╫п╫пЁп╬ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ п╫п╣п╬п╠я┘п╬п╢п╦п╪ /dev/rtc. п°я▀ п╬я┤п╣п╫я▄ я─п╣п╨п╬п╪п╣п╫п╢я┐п╣п╪\n"
+#~ "*** п╥п╟пЁя─я┐п╤п╟я┌я▄ п╪п╬п╢я┐п╩я▄ я▐п╢я─п╟ 'rtc' п©п╣я─п╣п╢ п╥п╟п©я┐я│п╨п╬п╪ tvtime, п╦ я┐п╠п╣п╢п╦я┌п╣я│я▄ п╡ "
+#~ "я┌п╬п╪,\n"
+#~ "*** я┤я┌п╬ я┐ п▓п╟я│ п╣я│я┌я▄ п╢п╬я│я┌я┐п© п╢п╬ /dev/rtc.\n"
+#~ "*** п▒п╬п╩п╣п╣ п©п╬п╩п╫я┐я▌ п╦п╫я└п╬я─п╪п╟я├п╦я▌ п╪п╬п╤п╫п╬ п©п╬п╩я┐я┤п╦я┌я▄ п╫п╟ я│я┌я─п╟п╫п╦я├п╣ %s\n"
 #~ "\n"
 
 #~ msgid ""
@@ -1388,36 +1478,36 @@ msgstr ""
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
-#~ "*** Не устанавливается частота 1024Гц устройства /dev/rtc. Это может\n"
-#~ "*** повлиять на сглаживание изображения. Запустите tvtime от \n"
-#~ "*** пользователя root или измените этот параметр командой\n"
+#~ "*** п²п╣ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌я│я▐ я┤п╟я│я┌п╬я┌п╟ 1024п⌠я├ я┐я│я┌я─п╬п╧я│я┌п╡п╟ /dev/rtc. п╜я┌п╬ п╪п╬п╤п╣я┌\n"
+#~ "*** п©п╬п╡п╩п╦я▐я┌я▄ п╫п╟ я│пЁп╩п╟п╤п╦п╡п╟п╫п╦п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐. п≈п╟п©я┐я│я┌п╦я┌п╣ tvtime п╬я┌ \n"
+#~ "*** п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩я▐ root п╦п╩п╦ п╦п╥п╪п╣п╫п╦я┌п╣ я█я┌п╬я┌ п©п╟я─п╟п╪п╣я┌я─ п╨п╬п╪п╟п╫п╢п╬п╧\n"
 #~ "***       sysctl -w dev.rtc.max-user-freq=1024\n"
-#~ "*** Для получения подробной информации зайдите на %s\n"
+#~ "*** п■п╩я▐ п©п╬п╩я┐я┤п╣п╫п╦я▐ п©п╬п╢я─п╬п╠п╫п╬п╧ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п╥п╟п╧п╢п╦я┌п╣ п╫п╟ %s\n"
 #~ "\n"
 
 #~ msgid "BT8x8 luma correction"
-#~ msgstr "BT8x8 цветовая коррекция"
+#~ msgstr "BT8x8 я├п╡п╣я┌п╬п╡п╟я▐ п╨п╬я─я─п╣п╨я├п╦я▐"
 
 #~ msgid "Sharpness"
-#~ msgstr "Резкость"
+#~ msgstr "п═п╣п╥п╨п╬я│я┌я▄"
 
 #~ msgid "Colour"
-#~ msgstr "Цвет"
+#~ msgstr "п╕п╡п╣я┌"
 
 #~ msgid "Add current station"
-#~ msgstr "Добавить текущую станцию"
+#~ msgstr "п■п╬п╠п╟п╡п╦я┌я▄ я┌п╣п╨я┐я┴я┐я▌ я│я┌п╟п╫я├п╦я▌"
 
 #~ msgid "Luma correction enabled."
-#~ msgstr "Включена коррекция цвета"
+#~ msgstr "п▓п╨п╩я▌я┤п╣п╫п╟ п╨п╬я─я─п╣п╨я├п╦я▐ я├п╡п╣я┌п╟"
 
 #~ msgid "Luma correction disabled."
-#~ msgstr "Коррекция цвета выключена"
+#~ msgstr "п п╬я─я─п╣п╨я├п╦я▐ я├п╡п╣я┌п╟ п╡я▀п╨п╩я▌я┤п╣п╫п╟"
 
 #~ msgid "Luma correction value: %.1f"
-#~ msgstr "Значение коррекции цвета: %.1f"
+#~ msgstr "п≈п╫п╟я┤п╣п╫п╦п╣ п╨п╬я─я─п╣п╨я├п╦п╦ я├п╡п╣я┌п╟: %.1f"
 
 #~ msgid "Input Configuration"
-#~ msgstr "Настройка входящих параметров"
+#~ msgstr "п²п╟я│я┌я─п╬п╧п╨п╟ п╡я┘п╬п╢я▐я┴п╦я┘ п©п╟я─п╟п╪п╣я┌я─п╬п╡"
 
 #~ msgid ""
 #~ "usage: %s [OPTION]...\n"
@@ -1482,19 +1572,19 @@ msgstr ""
 #~ "phout,\n"
 #~ "                                 video, radio, monitor\n"
 #~ msgstr ""
-#~ "использование: %s [ОПЦИИ]...\n"
+#~ "п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: %s [п·п÷п╕п≤п≤]...\n"
 #~ "\n"
-#~ "  -a, --widescreen           Режим 16:9.\n"
-#~ "  -b, --vbidevice=DEVICE     Устройство VBI (по умолчанию /dev/vbi0).\n"
-#~ "  -c, --channel=CHANNEL      После запуска включить указанный канал.\n"
-#~ "  -d, --device=DEVICE        Устройство video4linux (по умолчанию /dev/"
+#~ "  -a, --widescreen           п═п╣п╤п╦п╪ 16:9.\n"
+#~ "  -b, --vbidevice=DEVICE     пёя│я┌я─п╬п╧я│я┌п╡п╬ VBI (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/vbi0).\n"
+#~ "  -c, --channel=CHANNEL      п÷п╬я│п╩п╣ п╥п╟п©я┐я│п╨п╟ п╡п╨п╩я▌я┤п╦я┌я▄ я┐п╨п╟п╥п╟п╫п╫я▀п╧ п╨п╟п╫п╟п╩.\n"
+#~ "  -d, --device=DEVICE        пёя│я┌я─п╬п╧я│я┌п╡п╬ video4linux (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/"
 #~ "video0).\n"
-#~ "  -D, --driver=NAME          Выводить через: Xv, DirectFB, mga,\n"
-#~ "                             xmga, matroxtv или SDL (по умолчанию Xv).\n"
-#~ "  -f, --frequencies=NAME     Частотная таблица.\n"
-#~ "                             (по умолчанию us-cable).\n"
+#~ "  -D, --driver=NAME          п▓я▀п╡п╬п╢п╦я┌я▄ я┤п╣я─п╣п╥: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv п╦п╩п╦ SDL (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ Xv).\n"
+#~ "  -f, --frequencies=NAME     п╖п╟я│я┌п╬я┌п╫п╟я▐ я┌п╟п╠п╩п╦я├п╟.\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ us-cable).\n"
 #~ "\n"
-#~ "                             Возможные значения:\n"
+#~ "                             п▓п╬п╥п╪п╬п╤п╫я▀п╣ п╥п╫п╟я┤п╣п╫п╦я▐:\n"
 #~ "                                 us-cable\n"
 #~ "                                 us-cable100\n"
 #~ "                                 us-broadcast\n"
@@ -1507,36 +1597,36 @@ msgstr ""
 #~ "                                 newzealand\n"
 #~ "                                 france\n"
 #~ "                                 russia\n"
-#~ "                                 custom (запустите tvtime-scanner)\n"
+#~ "                                 custom (п╥п╟п©я┐я│я┌п╦я┌п╣ tvtime-scanner)\n"
 #~ "\n"
-#~ "  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
-#~ "  -h, --help                 Показать помощь.\n"
-#~ "  -H, --height=HEIGHT        Ширина окна (по умолчанию 576).\n"
-#~ "  -i, --input=INPUTNUM       video4linux входной канал (ТВ по умолчанию "
+#~ "  -F, --configfile=FILE      п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╧ я└п╟п╧п╩ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦.\n"
+#~ "  -h, --help                 п÷п╬п╨п╟п╥п╟я┌я▄ п©п╬п╪п╬я┴я▄.\n"
+#~ "  -H, --height=HEIGHT        п╗п╦я─п╦п╫п╟ п╬п╨п╫п╟ (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 576).\n"
+#~ "  -i, --input=INPUTNUM       video4linux п╡я┘п╬п╢п╫п╬п╧ п╨п╟п╫п╟п╩ (п╒п▓ п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ "
 #~ "0).\n"
-#~ "  -I, --inputwidth=SAMPLING  video4linux количество строк\n"
-#~ "                             (по умолчанию 720).\n"
-#~ "  -k, --slave                Отключить управление tvtime\n"
-#~ "  -m, --fullscreen           Полноэкранный режим.\n"
-#~ "  -M, --window               Оконный режим.\n"
-#~ "  -n, --norm=NORM            Выбрать стандарт. tvtime поддерживает:\n"
+#~ "  -I, --inputwidth=SAMPLING  video4linux п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ я│я┌я─п╬п╨\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 720).\n"
+#~ "  -k, --slave                п·я┌п╨п╩я▌я┤п╦я┌я▄ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ tvtime\n"
+#~ "  -m, --fullscreen           п÷п╬п╩п╫п╬я█п╨я─п╟п╫п╫я▀п╧ я─п╣п╤п╦п╪.\n"
+#~ "  -M, --window               п·п╨п╬п╫п╫я▀п╧ я─п╣п╤п╦п╪.\n"
+#~ "  -n, --norm=NORM            п▓я▀п╠я─п╟я┌я▄ я│я┌п╟п╫п╢п╟я─я┌. tvtime п©п╬п╢п╢п╣я─п╤п╦п╡п╟п╣я┌:\n"
 #~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 #~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
-#~ "  -p, --fspos=POS            Установить позицию при полноэкранном "
-#~ "режиме:\n"
-#~ "                             top, bottom or centre (по умолчанию).\n"
-#~ "  -r, --rvr=FILE             RVR записывает файл для проигрывания (для "
-#~ "отладки).\n"
-#~ "  -s, --showdrops            Печатать статус пропущенных кадров (для "
-#~ "отладки).\n"
-#~ "  -S, --saveoptions          Сохранить опции командной строки в файл "
-#~ "конфигурации.\n"
-#~ "  -t, --xmltv=FILE           Читать список XMLTV из файла.\n"
-#~ "  -v, --verbose              Печатать отладочную информацию на stderr.\n"
-#~ "  -x, --mixer=DEVICE[:CH]    Микшер и канал для управления звуком.\n"
-#~ "                             (по умолчанию /dev/mixer:line)\n"
+#~ "  -p, --fspos=POS            пёя│я┌п╟п╫п╬п╡п╦я┌я▄ п©п╬п╥п╦я├п╦я▌ п©я─п╦ п©п╬п╩п╫п╬я█п╨я─п╟п╫п╫п╬п╪ "
+#~ "я─п╣п╤п╦п╪п╣:\n"
+#~ "                             top, bottom or centre (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌).\n"
+#~ "  -r, --rvr=FILE             RVR п╥п╟п©п╦я│я▀п╡п╟п╣я┌ я└п╟п╧п╩ п╢п╩я▐ п©я─п╬п╦пЁя─я▀п╡п╟п╫п╦я▐ (п╢п╩я▐ "
+#~ "п╬я┌п╩п╟п╢п╨п╦).\n"
+#~ "  -s, --showdrops            п÷п╣я┤п╟я┌п╟я┌я▄ я│я┌п╟я┌я┐я│ п©я─п╬п©я┐я┴п╣п╫п╫я▀я┘ п╨п╟п╢я─п╬п╡ (п╢п╩я▐ "
+#~ "п╬я┌п╩п╟п╢п╨п╦).\n"
+#~ "  -S, --saveoptions          п║п╬я┘я─п╟п╫п╦я┌я▄ п╬п©я├п╦п╦ п╨п╬п╪п╟п╫п╢п╫п╬п╧ я│я┌я─п╬п╨п╦ п╡ я└п╟п╧п╩ "
+#~ "п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦.\n"
+#~ "  -t, --xmltv=FILE           п╖п╦я┌п╟я┌я▄ я│п©п╦я│п╬п╨ XMLTV п╦п╥ я└п╟п╧п╩п╟.\n"
+#~ "  -v, --verbose              п÷п╣я┤п╟я┌п╟я┌я▄ п╬я┌п╩п╟п╢п╬я┤п╫я┐я▌ п╦п╫я└п╬я─п╪п╟я├п╦я▌ п╫п╟ stderr.\n"
+#~ "  -x, --mixer=DEVICE[:CH]    п°п╦п╨я┬п╣я─ п╦ п╨п╟п╫п╟п╩ п╢п╩я▐ я┐п©я─п╟п╡п╩п╣п╫п╦я▐ п╥п╡я┐п╨п╬п╪.\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/mixer:line)\n"
 #~ "\n"
-#~ "                             Возможные каналы:\n"
+#~ "                             п▓п╬п╥п╪п╬п╤п╫я▀п╣ п╨п╟п╫п╟п╩я▀:\n"
 #~ "                                 vol, bass, treble, synth, pcm, speaker, "
 #~ "line,\n"
 #~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
@@ -1602,19 +1692,19 @@ msgstr ""
 #~ "phout,\n"
 #~ "                                 video, radio, monitor\n"
 #~ msgstr ""
-#~ "использование: %s [ОПЦИИ]...\n"
+#~ "п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: %s [п·п÷п╕п≤п≤]...\n"
 #~ "\n"
-#~ "  -a, --widescreen           Режим 16:9.\n"
-#~ "  -b, --vbidevice=DEVICE     Устройство VBI (по умолчанию /dev/vbi0).\n"
-#~ "  -c, --channel=CHANNEL      После запуска включить указанный канал.\n"
-#~ "  -d, --device=DEVICE        Устройство video4linux (по умолчанию /dev/"
+#~ "  -a, --widescreen           п═п╣п╤п╦п╪ 16:9.\n"
+#~ "  -b, --vbidevice=DEVICE     пёя│я┌я─п╬п╧я│я┌п╡п╬ VBI (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/vbi0).\n"
+#~ "  -c, --channel=CHANNEL      п÷п╬я│п╩п╣ п╥п╟п©я┐я│п╨п╟ п╡п╨п╩я▌я┤п╦я┌я▄ я┐п╨п╟п╥п╟п╫п╫я▀п╧ п╨п╟п╫п╟п╩.\n"
+#~ "  -d, --device=DEVICE        пёя│я┌я─п╬п╧я│я┌п╡п╬ video4linux (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/"
 #~ "video0).\n"
-#~ "  -D, --driver=NAME          Выводить через: Xv, DirectFB, mga,\n"
-#~ "                             xmga, matroxtv или SDL (по умолчанию Xv).\n"
-#~ "  -f, --frequencies=NAME     Частотная таблица.\n"
-#~ "                             (по умолчанию us-cable).\n"
+#~ "  -D, --driver=NAME          п▓я▀п╡п╬п╢п╦я┌я▄ я┤п╣я─п╣п╥: Xv, DirectFB, mga,\n"
+#~ "                             xmga, matroxtv п╦п╩п╦ SDL (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ Xv).\n"
+#~ "  -f, --frequencies=NAME     п╖п╟я│я┌п╬я┌п╫п╟я▐ я┌п╟п╠п╩п╦я├п╟.\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ us-cable).\n"
 #~ "\n"
-#~ "                             Возможные значения:\n"
+#~ "                             п▓п╬п╥п╪п╬п╤п╫я▀п╣ п╥п╫п╟я┤п╣п╫п╦я▐:\n"
 #~ "                                 us-cable\n"
 #~ "                                 us-cable100\n"
 #~ "                                 us-broadcast\n"
@@ -1627,36 +1717,36 @@ msgstr ""
 #~ "                                 newzealand\n"
 #~ "                                 france\n"
 #~ "                                 russia\n"
-#~ "                                 custom (запустите tvtime-scanner)\n"
+#~ "                                 custom (п╥п╟п©я┐я│я┌п╦я┌п╣ tvtime-scanner)\n"
 #~ "\n"
-#~ "  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
-#~ "  -h, --help                 Показать помощь.\n"
-#~ "  -H, --height=HEIGHT        Ширина окна (по умолчанию 576).\n"
-#~ "  -i, --input=INPUTNUM       video4linux входной канал (ТВ по умолчанию "
+#~ "  -F, --configfile=FILE      п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╧ я└п╟п╧п╩ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦.\n"
+#~ "  -h, --help                 п÷п╬п╨п╟п╥п╟я┌я▄ п©п╬п╪п╬я┴я▄.\n"
+#~ "  -H, --height=HEIGHT        п╗п╦я─п╦п╫п╟ п╬п╨п╫п╟ (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 576).\n"
+#~ "  -i, --input=INPUTNUM       video4linux п╡я┘п╬п╢п╫п╬п╧ п╨п╟п╫п╟п╩ (п╒п▓ п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ "
 #~ "0).\n"
-#~ "  -I, --inputwidth=SAMPLING  video4linux количество строк\n"
-#~ "                             (по умолчанию 720).\n"
-#~ "  -k, --slave                Отключить управление tvtime\n"
-#~ "  -m, --fullscreen           Полноэкранный режим.\n"
-#~ "  -M, --window               Оконный режим.\n"
-#~ "  -n, --norm=NORM            Выбрать стандарт. tvtime поддерживает:\n"
+#~ "  -I, --inputwidth=SAMPLING  video4linux п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ я│я┌я─п╬п╨\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 720).\n"
+#~ "  -k, --slave                п·я┌п╨п╩я▌я┤п╦я┌я▄ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ tvtime\n"
+#~ "  -m, --fullscreen           п÷п╬п╩п╫п╬я█п╨я─п╟п╫п╫я▀п╧ я─п╣п╤п╦п╪.\n"
+#~ "  -M, --window               п·п╨п╬п╫п╫я▀п╧ я─п╣п╤п╦п╪.\n"
+#~ "  -n, --norm=NORM            п▓я▀п╠я─п╟я┌я▄ я│я┌п╟п╫п╢п╟я─я┌. tvtime п©п╬п╢п╢п╣я─п╤п╦п╡п╟п╣я┌:\n"
 #~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 #~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
-#~ "  -p, --fspos=POS            Установить позицию при полноэкранном "
-#~ "режиме:\n"
-#~ "                             top, bottom or centre (по умолчанию).\n"
-#~ "  -r, --rvr=FILE             RVR записывает файл для проигрывания (для "
-#~ "отладки).\n"
-#~ "  -s, --showdrops            Печатать статус пропущенных кадров (для "
-#~ "отладки).\n"
-#~ "  -S, --saveoptions          Сохранить опции командной строки в файл "
-#~ "конфигурации.\n"
-#~ "  -t, --xmltv=FILE           Читать список XMLTV из файла.\n"
-#~ "  -v, --verbose              Печатать отладочную информацию на stderr.\n"
-#~ "  -x, --mixer=DEVICE[:CH]    Микшер и канал для управления звуком.\n"
-#~ "                             (по умолчанию /dev/mixer:line)\n"
+#~ "  -p, --fspos=POS            пёя│я┌п╟п╫п╬п╡п╦я┌я▄ п©п╬п╥п╦я├п╦я▌ п©я─п╦ п©п╬п╩п╫п╬я█п╨я─п╟п╫п╫п╬п╪ "
+#~ "я─п╣п╤п╦п╪п╣:\n"
+#~ "                             top, bottom or centre (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌).\n"
+#~ "  -r, --rvr=FILE             RVR п╥п╟п©п╦я│я▀п╡п╟п╣я┌ я└п╟п╧п╩ п╢п╩я▐ п©я─п╬п╦пЁя─я▀п╡п╟п╫п╦я▐ (п╢п╩я▐ "
+#~ "п╬я┌п╩п╟п╢п╨п╦).\n"
+#~ "  -s, --showdrops            п÷п╣я┤п╟я┌п╟я┌я▄ я│я┌п╟я┌я┐я│ п©я─п╬п©я┐я┴п╣п╫п╫я▀я┘ п╨п╟п╢я─п╬п╡ (п╢п╩я▐ "
+#~ "п╬я┌п╩п╟п╢п╨п╦).\n"
+#~ "  -S, --saveoptions          п║п╬я┘я─п╟п╫п╦я┌я▄ п╬п©я├п╦п╦ п╨п╬п╪п╟п╫п╢п╫п╬п╧ я│я┌я─п╬п╨п╦ п╡ я└п╟п╧п╩ "
+#~ "п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦.\n"
+#~ "  -t, --xmltv=FILE           п╖п╦я┌п╟я┌я▄ я│п©п╦я│п╬п╨ XMLTV п╦п╥ я└п╟п╧п╩п╟.\n"
+#~ "  -v, --verbose              п÷п╣я┤п╟я┌п╟я┌я▄ п╬я┌п╩п╟п╢п╬я┤п╫я┐я▌ п╦п╫я└п╬я─п╪п╟я├п╦я▌ п╫п╟ stderr.\n"
+#~ "  -x, --mixer=DEVICE[:CH]    п°п╦п╨я┬п╣я─ п╦ п╨п╟п╫п╟п╩ п╢п╩я▐ я┐п©я─п╟п╡п╩п╣п╫п╦я▐ п╥п╡я┐п╨п╬п╪.\n"
+#~ "                             (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/mixer:line)\n"
 #~ "\n"
-#~ "                             Возможные каналы:\n"
+#~ "                             п▓п╬п╥п╪п╬п╤п╫я▀п╣ п╨п╟п╫п╟п╩я▀:\n"
 #~ "                                 vol, bass, treble, synth, pcm, speaker, "
 #~ "line,\n"
 #~ "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
@@ -1679,48 +1769,48 @@ msgstr ""
 #~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 #~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 #~ msgstr ""
-#~ "использование: %s [ОПЦИИ]...\n"
+#~ "п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: %s [п·п÷п╕п≤п≤]...\n"
 #~ "\n"
-#~ "  -d, --device=DEVICE        устройство video4linux (по умолчанию /dev/"
+#~ "  -d, --device=DEVICE        я┐я│я┌я─п╬п╧я│я┌п╡п╬ video4linux (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ /dev/"
 #~ "video0).\n"
-#~ "  -F, --configfile=FILE      Дополнительный файл конфигурации.\n"
-#~ "  -h, --help                 Показать подсказку.\n"
-#~ "  -i, --input=INPUTNUM       video4linux номер канала (ТВ по умолчанию "
+#~ "  -F, --configfile=FILE      п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀п╧ я└п╟п╧п╩ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╦.\n"
+#~ "  -h, --help                 п÷п╬п╨п╟п╥п╟я┌я▄ п©п╬п╢я│п╨п╟п╥п╨я┐.\n"
+#~ "  -i, --input=INPUTNUM       video4linux п╫п╬п╪п╣я─ п╨п╟п╫п╟п╩п╟ (п╒п▓ п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ "
 #~ "0).\n"
-#~ "  -n, --norm=NORM            Выбрать стандарт. tvtime поддерживает:\n"
+#~ "  -n, --norm=NORM            п▓я▀п╠я─п╟я┌я▄ я│я┌п╟п╫п╢п╟я─я┌. tvtime п©п╬п╢п╢п╣я─п╤п╦п╡п╟п╣я┌:\n"
 #~ "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 #~ "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 
 #~ msgid "tvtime: Can't set configuration options, exiting.\n"
-#~ msgstr "Не могу установить конфигурационные параметры, завершение работы.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦п╬п╫п╫я▀п╣ п©п╟я─п╟п╪п╣я┌я─я▀, п╥п╟п╡п╣я─я┬п╣п╫п╦п╣ я─п╟п╠п╬я┌я▀.\n"
 
 #~ msgid "tvtime: Can't renice to %d.\n"
-#~ msgstr "Не могу сменить приоритет выполнения tvtime на %d.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я│п╪п╣п╫п╦я┌я▄ п©я─п╦п╬я─п╦я┌п╣я┌ п╡я▀п©п╬п╩п╫п╣п╫п╦я▐ tvtime п╫п╟ %d.\n"
 
 #~ msgid "tvtime: Sending fields to interlaced output devices.\n"
-#~ msgstr "Отображение изображения на устройстве с черезстрочной разверткой.\n"
+#~ msgstr "п·я┌п╬п╠я─п╟п╤п╣п╫п╦п╣ п╦п╥п╬п╠я─п╟п╤п╣п╫п╦я▐ п╫п╟ я┐я│я┌я─п╬п╧я│я┌п╡п╣ я│ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬п╧ я─п╟п╥п╡п╣я─я┌п╨п╬п╧.\n"
 
 #~ msgid "tvtime: Sending frames to interlaced output devices.\n"
-#~ msgstr "Отображение кадров на устройстве с черезстрочной разверткой.\n"
+#~ msgstr "п·я┌п╬п╠я─п╟п╤п╣п╫п╦п╣ п╨п╟п╢я─п╬п╡ п╫п╟ я┐я│я┌я─п╬п╧я│я┌п╡п╣ я│ я┤п╣я─п╣п╥я│я┌я─п╬я┤п╫п╬п╧ я─п╟п╥п╡п╣я─я┌п╨п╬п╧.\n"
 
 #~ msgid "tvtime: RVR frame sampling %d pixels per scanline.\n"
-#~ msgstr "RVR кадр: %d точек на строку.\n"
+#~ msgstr "RVR п╨п╟п╢я─: %d я┌п╬я┤п╣п╨ п╫п╟ я│я┌я─п╬п╨я┐.\n"
 
 #~ msgid "tvtime: V4L sampling %d pixels per scanline.\n"
-#~ msgstr "V4L изображение %d точек на строку.\n"
+#~ msgstr "V4L п╦п╥п╬п╠я─п╟п╤п╣п╫п╦п╣ %d я┌п╬я┤п╣п╨ п╫п╟ я│я┌я─п╬п╨я┐.\n"
 
 #~ msgid "tvtime: Can't display input size %dx%d.\n"
-#~ msgstr "Невозможно получить входной сигнал с разрешением %dx%d.\n"
+#~ msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п©п╬п╩я┐я┤п╦я┌я▄ п╡я┘п╬п╢п╫п╬п╧ я│п╦пЁп╫п╟п╩ я│ я─п╟п╥я─п╣я┬п╣п╫п╦п╣п╪ %dx%d.\n"
 
 #~ msgid "tvtime: Can't create command handler.\n"
-#~ msgstr "Не могу создать управление командами.\n"
+#~ msgstr "п²п╣ п╪п╬пЁя┐ я│п╬п╥п╢п╟я┌я▄ я┐п©я─п╟п╡п╩п╣п╫п╦п╣ п╨п╬п╪п╟п╫п╢п╟п╪п╦.\n"
 
 #~ msgid ""
 #~ "tvtime: Can't get realtime priority for better performance, need root "
 #~ "access.\n"
 #~ msgstr ""
-#~ "Не могу установить режим реального времени для наилучшего качества работы,"
-#~ "необходим доступ от root.\n"
+#~ "п²п╣ п╪п╬пЁя┐ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ я─п╣п╤п╦п╪ я─п╣п╟п╩я▄п╫п╬пЁп╬ п╡я─п╣п╪п╣п╫п╦ п╢п╩я▐ п╫п╟п╦п╩я┐я┤я┬п╣пЁп╬ п╨п╟я┤п╣я│я┌п╡п╟ я─п╟п╠п╬я┌я▀,"
+#~ "п╫п╣п╬п╠я┘п╬п╢п╦п╪ п╢п╬я│я┌я┐п© п╬я┌ root.\n"
 
 #~ msgid ""
 #~ "\n"

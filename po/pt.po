@@ -1,23 +1,26 @@
-# This is the Portuguese locale for tvtime.
-# Copyright (C) 2005 Billy Biggs, Helder Correia
+# Translation of tvtime messages to Portuguese
+# Copyright (C) 2005 the tvtime copyright holder
 # This file is distributed under the same license as the tvtime package.
-# Helder Correia <helder.correia@netcabo.pt>, 2005.
 #
+# Helder Correia <helder.correia@netcabo.pt>, 2005.
+# Américo Monteiro <a_monteiro@netcabo.pt>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: tvtime 0.9.12\n"
+"Project-Id-Version: tvtime 1.0.2-5\n"
 "Report-Msgid-Bugs-To: http://tvtime.net/\n"
 "POT-Creation-Date: 2005-11-09 21:48-0500\n"
-"PO-Revision-Date: 2005-04-14 00:17+0200\n"
-"Last-Translator: Helder Correia <helder.correia@netcabo.pt>\n"
-"Language-Team: Português <helder.correia@netcabo.org>\n"
+"PO-Revision-Date: 2010-01-28 01:03+0000\n"
+"Last-Translator: Américo Monteiro <a_monteiro@netcabo.pt>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/tvtime.c:792 src/commands.c:1463 src/commands.c:1488
 msgid "Deinterlacer configuration"
-msgstr "Configuração do desinterlaçador"
+msgstr "Configuração do desentrelaçador"
 
 #: src/tvtime.c:822 src/tvtime.c:841 src/tvtime.c:876 src/tvtime.c:957
 #: src/tvtime.c:985 src/tvtime.c:1120 src/commands.c:408 src/commands.c:449
@@ -34,21 +37,21 @@ msgstr "Voltar"
 #: src/tvtime.c:854 src/tvtime.c:997
 #, c-format
 msgid "Full rate: %.2f fps"
-msgstr "Ritmo completo: %.2f imagens/segundo"
+msgstr "Taxa completa: %.2f fps"
 
 #: src/tvtime.c:862 src/tvtime.c:1001
 #, c-format
 msgid "Half rate, deinterlace top fields: %.2f fps"
-msgstr "Meio ritmo, desinterlaçar campos de cima: %.2f imagens/segundo"
+msgstr "Meia taxa, desentrelaça campos do topo: %.2f fps"
 
 #: src/tvtime.c:869 src/tvtime.c:1005
 #, c-format
 msgid "Half rate, deinterlace bottom fields: %.2f fps"
-msgstr "Meio ritmo, desinterlaçar campos de baixo: %.2f imagens/segundo"
+msgstr "Meia taxa, desentrelaça campos do fundo: %.2f fps"
 
 #: src/tvtime.c:894
 msgid "Overscan setting"
-msgstr "Preferência de overscan"
+msgstr "Definições do Overscan"
 
 #: src/tvtime.c:901 src/commands.c:1440
 msgid "Apply matte"
@@ -64,11 +67,11 @@ msgstr "Redimensionar a janela de acordo com o conteúdo"
 
 #: src/tvtime.c:925
 msgid "Fullscreen"
-msgstr "Ecrã completo"
+msgstr "Ecrã total"
 
 #: src/tvtime.c:932
 msgid "Set fullscreen position"
-msgstr "Definir posição de ecrã completo"
+msgstr "Definir posição de ecrã total"
 
 #: src/tvtime.c:942
 msgid "Always-on-top"
@@ -92,30 +95,30 @@ msgstr "Fundo"
 
 #: src/tvtime.c:995 src/commands.c:1472 src/commands.c:1502
 msgid "Attempted framerate"
-msgstr "Ritmo de exibição intentado"
+msgstr "Taxa de imagens tentada"
 
 #: src/tvtime.c:1022
 msgid "Performance estimates"
-msgstr "Estimativa de desempenho"
+msgstr "Estimativas de performance"
 
 #: src/tvtime.c:1024
 msgid "Deinterlacer"
-msgstr "Desinterlaçador"
+msgstr "Desentrelaçador"
 
 #: src/tvtime.c:1027
 #, c-format
 msgid "Input: %s at %dx%d pixels"
-msgstr "Entrada: %s a %dx%d pontos"
+msgstr "Entrada: %s a %dx%d pixeis"
 
 #: src/tvtime.c:1031
 #, c-format
 msgid "Attempted framerate: %.2f fps"
-msgstr "Taxa de apresentação objectivo: %.2f imagens/segundo"
+msgstr "Taxa de imagens tentada: %.2f fps"
 
 #: src/tvtime.c:1035
 #, c-format
 msgid "Average blit time: %.2f ms (%.0f MB/sec)"
-msgstr "Tempo médio de desenho: %.2f ms (%.0f MB/s)"
+msgstr "Tempo de blit médio: %.2f ms (%.0f MB/s)"
 
 #: src/tvtime.c:1039
 #, c-format
@@ -125,12 +128,12 @@ msgstr "Tempo médio de renderização: %5.2f ms"
 #: src/tvtime.c:1043
 #, c-format
 msgid "Dropped frames: %d"
-msgstr "Imagens não mostradas: %d"
+msgstr "Imagens abandonadas: %d"
 
 #: src/tvtime.c:1049
 #, c-format
 msgid "Blit spacing: %4.1f/%4.1f ms (want %4.1f ms)"
-msgstr "Intervalo de desenho: %4.1f/%4.1f ms (pretendido %4.1f ms)"
+msgstr "Espaçamento de blit: %4.1f/%4.1f ms (pretende %4.1f ms)"
 
 #: src/tvtime.c:1068 src/tvtime.c:1130
 msgid "16:9 + Overscan"
@@ -149,9 +152,8 @@ msgid "4:3 centre"
 msgstr "4:3 centrado"
 
 #: src/tvtime.c:1088 src/tvtime.c:1104
-#, fuzzy
 msgid "16:10"
-msgstr "16:9"
+msgstr "16:10"
 
 #: src/tvtime.c:1094 src/tvtime.c:1137
 msgid "4:3 + Overscan"
@@ -163,11 +165,11 @@ msgstr "16:9"
 
 #: src/tvtime.c:1129
 msgid "Matte setting (Anamorphic input)"
-msgstr "Preferência de matte (entrada anamórfica)"
+msgstr "Definição do Matte (entrada Anamórfica)"
 
 #: src/tvtime.c:1136
 msgid "Matte setting (4:3 input)"
-msgstr "Preferência de matte (entrada 4:3)"
+msgstr "Definição do Matte (entrada 4:3)"
 
 #: src/tvtime.c:1216 src/tvtime.c:1258 src/tvtime.c:1303 src/tvtime.c:1311
 #: src/tvtime.c:1434 src/tvtime.c:1484 src/tvtime.c:1505 src/tvtime.c:1519
@@ -176,12 +178,12 @@ msgstr "Preferência de matte (entrada 4:3)"
 #: src/tvtime-scanner.c:62 src/tvtime-scanner.c:98
 #, c-format
 msgid "%s: Cannot allocate memory.\n"
-msgstr "%s: Não é possível alocar memória.\n"
+msgstr "%s: Incapaz de alocar memória.\n"
 
 #: src/tvtime.c:1327
 #, c-format
 msgid "Cannot open capture device %s."
-msgstr "Não é possível abrir o dispositivo de captura %s."
+msgstr "Incapaz de abrir o dispositivo de captura %s."
 
 #: src/tvtime.c:1332
 #, c-format
@@ -194,10 +196,10 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    O driver da placa de captura, %s, parece não suportar\n"
-"    captura de ritmo completo. Por favor, verifique se está mal\n"
-"    configurado ou se seleccionou o dispositivo de captura errado\n"
-"    (%s).\n"
+"    A driver da sua placa de captura, %s, não parece suportar\n"
+"    captura em taxa completa. Por favor, verifique se está mal\n"
+"    configurada, ou se você seleccionou um dispositivo de captura\n"
+"    errado (%s).\n"
 "\n"
 
 #: src/tvtime.c:1392
@@ -212,11 +214,11 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Está a usar o módulo bttv, mas não configurou memória suficiente\n"
-"    para o tvtime processar vídeo de forma óptima. Isto é verdade, por\n"
-"    omissão, com o bttv nos kernels anteriores à versão 2.4.21. Por\n"
-"    favor, defina a opção gbuffers=4 quando carrega o bttv. Para mais\n"
-"    informação, veja a nossa página de suporte em %s\n"
+"    Está a usar a driver bttv, mas não configurou buffers suficientes\n"
+"    para o tvtime processar vídeo de forma óptima. Isto é verdadeiro por\n"
+"    predefinição, com o bttv nos kernels anteriores à versão 2.4.21. Por\n"
+"    favor, defina a opção gbuffers=4 quando carregar o bttv. Para mais\n"
+"    informação veja a nossa página de suporte em %s\n"
 "\n"
 
 #: src/tvtime.c:1399
@@ -231,36 +233,36 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    O driver da sua placa de captura, %s, não está a providenciar\n"
-"    memória suficiente para o tvtime processar o vídeo. Por favor,\n"
-"    verifique na documentação do seu driver se e como é possível\n"
-"    aumentar a memória providenciada a aplicações e relate-o ao tvtime\n"
-"    bug tracker em %s\n"
+"    A driver da sua placa de captura, %s, não está a providenciar\n"
+"    buffers suficientes para o tvtime processar o vídeo. Por favor,\n"
+"    verifique na documentação do seu driver para ver se pode aumentar\n"
+"    o número de buffers disponibilizados para aplicações, e reporte isto\n"
+"    ao bug tracker do tvtime em %s\n"
 "\n"
 
 #: src/tvtime.c:1453
 msgid "On screen display failed to initialize, disabled.\n"
-msgstr "Informação no ecrã falhou a inicialização, desactivada.\n"
+msgstr "O display no ecrã  falhou ao inicializar, desactivado.\n"
 
 #: src/tvtime.c:1465
 msgid "No video source"
-msgstr "Não há fonte de vídeo"
+msgstr "Nenhuma fonte de vídeo"
 
 #: src/tvtime.c:1509
 msgid "Cannot create FIFO, remote control of tvtime disabled.\n"
-msgstr "Não foi possível criar FIFO, controlo do tvtime desactivado.\n"
+msgstr "Incapaz de criar FIFO, controlo remoto do tvtime desactivado.\n"
 
 #: src/tvtime.c:1527
 msgid "Closed caption display failed to initialize, disabled.\n"
-msgstr "A exibição de captura fechada falhoua inicialização, desactivada.\n"
+msgstr "Exibição de legendas codificadas falhou ao inicializar, desactivada.\n"
 
 #: src/tvtime.c:1751
 msgid "Always-on-top enabled."
-msgstr "Sempre no topo activado."
+msgstr "Sempre-no-topo activado."
 
 #: src/tvtime.c:1756
 msgid "Always-on-top disabled."
-msgstr "Sempre no topo desactivado."
+msgstr "Sempre-no-topo desactivado."
 
 #: src/tvtime.c:1776
 msgid "16:9 display mode active."
@@ -280,15 +282,15 @@ msgstr "Mensagens de captura de ecrã activadas."
 
 #: src/tvtime.c:1928
 msgid "2-3 pulldown inversion disabled."
-msgstr "Inversão pulldown 2-3 desactivada."
+msgstr "Inversão 2-3 pulldown desactivada."
 
 #: src/tvtime.c:1931
 msgid "2-3 pulldown inversion enabled."
-msgstr "Inversão pulldown 2-3 activada."
+msgstr "Inversão 2-3 pulldown activada."
 
 #: src/tvtime.c:1937
 msgid "2-3 pulldown inversion is not valid with your TV norm."
-msgstr "A inversion pulldown 2-3 não é válida com a sua norma de TV."
+msgstr "A inversão 2-3 pulldown não é válida com a sua norma de TV."
 
 #: src/tvtime.c:2336 src/tvtime.c:2481
 #, c-format
@@ -312,8 +314,8 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Erro ao largar os privilégios de root: %s.\n"
-"    O tvtime sairá para evitar problemas de segurança.\n"
+"    Falha ao abandonar privilégios de root: %s.\n"
+"    O tvtime irá terminar agora para evitar problemas de segurança.\n"
 "\n"
 
 #: src/tvtime.c:2676
@@ -330,7 +332,7 @@ msgstr "Actual"
 #. TRANSLATORS: This refers to a TV program, not a computer program.
 #: src/commands.c:214 src/commands.c:221
 msgid "No program information available"
-msgstr "Não há informação do programa disponível"
+msgstr "Nenhuma informação do programa disponível"
 
 #: src/commands.c:277
 #, c-format
@@ -339,11 +341,11 @@ msgstr "Próximo: %s"
 
 #: src/commands.c:320
 msgid "Renumber current channel"
-msgstr "Renumerar o canal actual"
+msgstr "Re-numerar o canal actual"
 
 #: src/commands.c:328 src/commands.c:331
 msgid "Current channel active in list"
-msgstr "Canal actual activado"
+msgstr "Canal actual activo na lista"
 
 #: src/commands.c:341
 msgid "Stop channel scan"
@@ -351,15 +353,15 @@ msgstr "Parar a pesquisa de canais"
 
 #: src/commands.c:345
 msgid "Scan channels for signal"
-msgstr "Pesquisar canais"
+msgstr "Pesquisar canais por sinal"
 
 #: src/commands.c:353
 msgid "Reset all channels as active"
-msgstr "Activar todos os canais"
+msgstr "Reiniciar todos os canais como activos"
 
 #: src/commands.c:359
 msgid "Finetune current channel"
-msgstr "Ajustar o canal actual"
+msgstr "Afinar o canal actual"
 
 #: src/commands.c:366
 msgid "Change NTSC cable mode"
@@ -367,16 +369,15 @@ msgstr "Alterar o modo de cabo NTSC"
 
 #: src/commands.c:372
 msgid "Set current channel as SECAM"
-msgstr "Definir o canal actual como SECAM"
+msgstr "Definir canal actual como SECAM"
 
 #: src/commands.c:373
 msgid "Set current channel as PAL"
-msgstr "Definir o canal actual como PAL"
+msgstr "Definir canal actual como PAL"
 
 #: src/commands.c:388
-#, fuzzy
 msgid "Switch audio standard"
-msgstr "Norma de televisão"
+msgstr "Mudar a norma de áudio"
 
 #: src/commands.c:395
 msgid "Change frequency table"
@@ -392,7 +393,7 @@ msgstr "Activar a detecção de sinal"
 
 #: src/commands.c:426 src/commands.c:2069
 msgid "Default language"
-msgstr "Linguagem padrão"
+msgstr "Linguagem predefinida"
 
 #: src/commands.c:442 src/commands.c:2074
 msgid "Unknown language"
@@ -405,11 +406,11 @@ msgstr "Modo de áudio preferido"
 
 #: src/commands.c:625
 msgid "Change default audio standard"
-msgstr ""
+msgstr "Alterar a norma de áudio predefinida"
 
 #: src/commands.c:632 src/commands.c:1315 src/commands.c:1390
 msgid "Audio volume boost"
-msgstr "Controlo do volume"
+msgstr "Amplificar volume de áudio"
 
 #: src/commands.c:638 src/commands.c:1320 src/commands.c:1399
 msgid "Television standard"
@@ -425,11 +426,11 @@ msgstr "Cabo"
 
 #: src/commands.c:672 src/commands.c:699
 msgid "Broadcast"
-msgstr "Transmissão"
+msgstr "Difusão"
 
 #: src/commands.c:679
 msgid "Cable with channels 100+"
-msgstr "Cabo com mais de 100 canais"
+msgstr "Cabo com canais 100+"
 
 #: src/commands.c:711
 msgid "Europe"
@@ -457,11 +458,11 @@ msgstr "Nova Zelândia"
 
 #: src/commands.c:754
 msgid "China Broadcast"
-msgstr "China Broadcast"
+msgstr "China Difusão"
 
 #: src/commands.c:761
 msgid "South Africa"
-msgstr ""
+msgstr "África do Sul"
 
 #: src/commands.c:768
 msgid "Custom (first run tvtime-scanner)"
@@ -486,32 +487,32 @@ msgstr "Total"
 #: src/commands.c:819
 #, c-format
 msgid "%s  Current: %d pixels"
-msgstr "%s  Actual: %d pontos"
+msgstr "%s  Actual: %d pixeis"
 
 #: src/commands.c:826
 msgid "Low (360 pixels)"
-msgstr "Baixo (360 pontos)"
+msgstr "Baixo (360 pixeis)"
 
 #: src/commands.c:832
 msgid "Moderate (576 pixels)"
-msgstr "Moderado (576 pontos)"
+msgstr "Moderado (576 pixeis)"
 
 #: src/commands.c:838
 msgid "Standard (720 pixels)"
-msgstr "Padrão (720 pontos)"
+msgstr "Standard (720 pixeis)"
 
 #: src/commands.c:844
 msgid "High (768 pixels)"
-msgstr "Alto (768 pixels)"
+msgstr "Alto (768 pixeis)"
 
 #: src/commands.c:850
 #, c-format
 msgid "%s  Maximum (%d pixels)"
-msgstr "%s  Máximo (%d pontos)"
+msgstr "%s  Máximo (%d pixeis)"
 
 #: src/commands.c:860 src/commands.c:1403
 msgid "Restart with new settings"
-msgstr "Reiniciar com as novas preferências"
+msgstr "Reiniciar com as novas definições"
 
 #: src/commands.c:922 src/commands.c:1827
 msgid "Mono"
@@ -519,7 +520,7 @@ msgstr "Mono"
 
 #: src/commands.c:929 src/commands.c:1828
 msgid "Stereo"
-msgstr "Estéreo"
+msgstr "Stereo"
 
 #: src/commands.c:937 src/commands.c:1830
 msgid "SAP"
@@ -527,11 +528,11 @@ msgstr "SAP"
 
 #: src/commands.c:948 src/commands.c:1830
 msgid "Primary Language"
-msgstr "Língua primária"
+msgstr "Linguagem Principal"
 
 #: src/commands.c:953 src/commands.c:1831
 msgid "Secondary Language"
-msgstr "Língua secundária"
+msgstr "Linguagem Secundária"
 
 #: src/commands.c:975 src/commands.c:1278 src/commands.c:1662
 #: src/commands.c:1695 src/commands.c:1728 src/commands.c:1760
@@ -545,7 +546,7 @@ msgstr "Diminuir"
 
 #: src/commands.c:1003
 msgid "2-3 pulldown inversion"
-msgstr "Inversão pulldown 2-3"
+msgstr "Inversão 2-3 pulldown"
 
 #: src/commands.c:1012
 msgid "Colour invert"
@@ -557,7 +558,7 @@ msgstr "Espelho"
 
 #: src/commands.c:1028
 msgid "Chroma killer"
-msgstr "Preto e branco"
+msgstr "Retirar cor"
 
 #: src/commands.c:1169 src/commands.c:1204 src/commands.c:1236
 #: src/commands.c:1256 src/commands.c:1268 src/commands.c:1296
@@ -569,7 +570,7 @@ msgstr "Preto e branco"
 #: src/commands.c:1579 src/commands.c:1652 src/commands.c:1685
 #: src/commands.c:1718 src/commands.c:1751
 msgid "Setup"
-msgstr "Menu de controlo"
+msgstr "Configuração"
 
 #: src/commands.c:1172 src/commands.c:1236 src/commands.c:1257
 #: src/commands.c:1269
@@ -584,7 +585,7 @@ msgstr "Configuração da entrada"
 
 #: src/commands.c:1182 src/commands.c:1213
 msgid "Picture settings"
-msgstr "Preferências da imagem"
+msgstr "Definições da imagem"
 
 #: src/commands.c:1187 src/commands.c:1218 src/commands.c:1459
 #: src/commands.c:1488 src/commands.c:1494 src/commands.c:1502
@@ -607,7 +608,7 @@ msgstr "Tabela de frequências"
 
 #: src/commands.c:1269 src/commands.c:3003
 msgid "Finetune"
-msgstr "Ajuste"
+msgstr "Afinação"
 
 #: src/commands.c:1301 src/commands.c:1304 src/commands.c:1353
 #: src/commands.c:1356 src/commands.c:3115 src/commands.c:3145
@@ -616,11 +617,11 @@ msgstr "Alterar a fonte de vídeo"
 
 #: src/commands.c:1330
 msgid "Toggle closed captions"
-msgstr "(Des)activar capturas fechadas"
+msgstr "(Des)Ligar legendas codificadas"
 
 #: src/commands.c:1335
 msgid "Toggle XDS decoding"
-msgstr "(Des)activar descodificação XDS"
+msgstr "(Des)Ligar descodificação XDS"
 
 #: src/commands.c:1446
 msgid "Overscan"
@@ -628,11 +629,11 @@ msgstr "Overscan"
 
 #: src/commands.c:1453
 msgid "Fullscreen position"
-msgstr "Posição de ecrã completo"
+msgstr "Posição do ecrã total"
 
 #: src/commands.c:1468
 msgid "Current deinterlacer description"
-msgstr "Descrição de desinterlação corrente"
+msgstr "Descrição do desentrelaçador actual"
 
 #: src/commands.c:1476 src/commands.c:1508
 msgid "Input filters"
@@ -640,7 +641,7 @@ msgstr "Filtros de entrada"
 
 #: src/commands.c:1494
 msgid "Deinterlacer description"
-msgstr "Descrição de desinterlação"
+msgstr "Descrição do desentrelaçador"
 
 #: src/commands.c:1518 src/commands.c:1579 src/commands.c:1652
 #: src/commands.c:1685 src/commands.c:1718 src/commands.c:1751
@@ -669,20 +670,20 @@ msgstr "Cor"
 
 #: src/commands.c:1548
 msgid "Save current settings as defaults"
-msgstr "Gravar as preferências actuais como padrão"
+msgstr "Gravar as definições actuais como predefinição"
 
 #: src/commands.c:1554 src/commands.c:1566 src/commands.c:1622
 #: src/commands.c:1635
 msgid "Reset to global defaults"
-msgstr "Recarregar valores padrão globais"
+msgstr "Regressar às predefinições globais"
 
 #: src/commands.c:1609
 msgid "Save current settings as global defaults"
-msgstr "Gravar as preferências actuais como padrão global"
+msgstr "Gravar definições actuais como predefinição global"
 
 #: src/commands.c:1616
 msgid "Save current settings as channel defaults"
-msgstr "Gravar as preferências actuais como padrão do canal"
+msgstr "Gravar definições actuais como predefinição de canais"
 
 #: src/commands.c:1784 src/commands.c:2068
 msgid "Preferred XMLTV language"
@@ -703,17 +704,17 @@ msgstr "Sair"
 #: src/commands.c:2206
 #, c-format
 msgid "Sleep in %d minutes."
-msgstr "Repouso em %d minutos."
+msgstr "Adormecer em %d minutos."
 
 #: src/commands.c:2209
 #, c-format
 msgid "Sleep off."
-msgstr "Repouso terminado"
+msgstr "Adormecer desligado."
 
 #: src/commands.c:2248
-#, fuzzy, c-format
+#, c-format
 msgid "Using PAL-I audio decoding for this channel."
-msgstr "A usar a descodificação de som PAL-BG para este canal."
+msgstr "A usar a descodificação de áudio PAL-I para este canal."
 
 #: src/commands.c:2251
 #, c-format
@@ -723,30 +724,30 @@ msgstr "A usar a descodificação de áudio PAL-DK para este canal."
 #: src/commands.c:2254
 #, c-format
 msgid "Using PAL-BG audio decoding for this channel."
-msgstr "A usar a descodificação de som PAL-BG para este canal."
+msgstr "A usar a descodificação de áudio PAL-BG para este canal."
 
 #: src/commands.c:2285
-#, fuzzy, c-format
+#, c-format
 msgid "Defaulting to PAL-I audio decoding."
-msgstr "A padronizar a decoding de áudio PAL-BG."
+msgstr "A regressar a predefinição de codificação de áudio PAL-I."
 
 #: src/commands.c:2288
 #, c-format
 msgid "Defaulting to PAL-DK audio decoding."
-msgstr "A padronizar a descodificação de áudio PAL-DK."
+msgstr "A regressar a predefinição de codificação de áudio PAL-DK."
 
 #: src/commands.c:2291
 #, c-format
 msgid "Defaulting to PAL-BG audio decoding."
-msgstr "A padronizar a decoding de áudio PAL-BG."
+msgstr "A regressar a predefinição de codificação de áudio PAL-BG."
 
 #: src/commands.c:2319
 msgid "Channel marked as active in the browse list."
-msgstr "Canal activado."
+msgstr "Canal marcado como activo na lista de navegação."
 
 #: src/commands.c:2322
 msgid "Channel disabled from the browse list."
-msgstr "Canal desactivado."
+msgstr "Canal desactivado da lista de navegação."
 
 #: src/commands.c:2354
 #, c-format
@@ -760,40 +761,40 @@ msgstr "A definir o volume da placa de captura para %d%%."
 
 #: src/commands.c:2390
 msgid "Processing every input field."
-msgstr "A processar todos os campos de entrada."
+msgstr "A processar cada campo de entrada."
 
 #: src/commands.c:2393
 msgid "Processing every top field."
-msgstr "A processar todos os campos de cima."
+msgstr "A processar cada campo do topo."
 
 #: src/commands.c:2396
 msgid "Processing every bottom field."
-msgstr "A processar todos os campos de baixo."
+msgstr "A processar cada campo do fundo."
 
 #: src/commands.c:2412
 #, c-format
 msgid "Horizontal resolution will be %d pixels on restart."
-msgstr "A resolução horizontal será de %d pontos no reinício."
+msgstr "A resolução horizontal será de %d pixeis após reiniciar."
 
 #: src/commands.c:2469
 #, c-format
 msgid "Television standard will be %s on restart."
-msgstr "O padrão de televisão será %s no reinício."
+msgstr "O norma de televisão será %s após reiniciar."
 
 #: src/commands.c:2497
 #, c-format
 msgid "Using default language for XMLTV data."
-msgstr "A usar a língua padrão para os dados do XMLTV."
+msgstr "A usar linguagem predefinida para dados XMLTV."
 
 #: src/commands.c:2500
 #, c-format
 msgid "Using unknown language (%s) for XMLTV data."
-msgstr "A usar uma língua desconhecida (%s) para os dados do XMLTV."
+msgstr "A usar linguagem desconhecida (%s) para dados XMLTV."
 
 #: src/commands.c:2504
 #, c-format
 msgid "XMLTV language set to %s (%s)."
-msgstr "Língua XMLTV definida como %s (%s)."
+msgstr "Linguagem XMLTV definida para %s (%s)."
 
 #: src/commands.c:2539
 msgid "All channels re-activated."
@@ -802,32 +803,32 @@ msgstr "Todos os canais foram reactivados."
 #: src/commands.c:2560
 #, c-format
 msgid "Remapping %d.  Enter new channel number."
-msgstr "A renumerar o canal %d. Insira o novo número do canal."
+msgstr "A re-mapear o canal %d. Insira o novo número do canal."
 
 #: src/commands.c:2572
 msgid "Scanner unavailable with signal checking disabled."
-msgstr "Pesquisa indisponivel com verificador de sinal desctivado."
+msgstr "Sondagem indisponível com verificação de sinal desactivada."
 
 #: src/commands.c:2602
 msgid "Scanning for channels being broadcast."
-msgstr "A pesquisar por canais em transmissão."
+msgstr "A sondar por canais difundidos."
 
 #: src/commands.c:2620
 msgid "Closed captions disabled."
-msgstr "desactivadas."
+msgstr "Legendas codificadas desactivadas."
 
 #: src/commands.c:2626
 msgid "Closed captions enabled."
-msgstr "desactivadas"
+msgstr "Legendas codificadas activadas."
 
 #: src/commands.c:2638
 msgid "No VBI device configured for CC decoding."
-msgstr "Não há dispositivo VBI configurado para descodificação CC."
+msgstr "Nenhum dispositivo VBI configurado para descodificação de CC."
 
 #: src/commands.c:2654
 #, c-format
 msgid "Colour decoding for this channel set to %s."
-msgstr "Descodificação de cor para este canal definida como %s."
+msgstr "Descodificação de cores para este canal definida para %s."
 
 #: src/commands.c:2702
 #, c-format
@@ -868,11 +869,11 @@ msgstr "Espelho desactivado."
 
 #: src/commands.c:2892
 msgid "Chroma kill enabled."
-msgstr "Preto e branco activado."
+msgstr "Remoção de cores activada."
 
 #: src/commands.c:2894
 msgid "Chroma kill disabled."
-msgstr "Preto e branco desactivado."
+msgstr "Remoção de cores desactivada."
 
 #: src/commands.c:2906
 #, c-format
@@ -881,7 +882,7 @@ msgstr "Overscan: %.1f%%"
 
 #: src/commands.c:2938
 msgid "Picture settings reset to defaults."
-msgstr "As preferências de imagem retornaram aos valores padrão."
+msgstr "Definições de imagem reiniciadas aos valores predefinidos."
 
 #: src/commands.c:2966
 msgid "Using nominal NTSC cable frequencies."
@@ -901,30 +902,30 @@ msgstr "Volume"
 
 #: src/commands.c:3262
 msgid "Saved current picture settings as global defaults.\n"
-msgstr "Preferências de imagem actuais gravadas como padrão global.\n"
+msgstr "Definições de imagem actuais gravadas como predefinição global.\n"
 
 #: src/commands.c:3275
 #, c-format
 msgid "Saved current picture settings on channel %d.\n"
-msgstr "Preferências de imagem actuais gravadas no canal %d.\n"
+msgstr "Definições de imagem actuais gravadas no canal %d.\n"
 
 #: src/commands.c:3362
 msgid "Paused."
-msgstr "Pausado."
+msgstr "Em pausa."
 
 #: src/commands.c:3362
 msgid "Resumed."
-msgstr "Resumido."
+msgstr "Continuado."
 
 #: src/tvtimeconf.c:472
 #, c-format
 msgid "Error parsing configuration file %s.\n"
-msgstr "Ocorreu um erro ao ler o ficheiro de configuração %s.\n"
+msgstr "Erro ao analisar ficheiro de configuração %s.\n"
 
 #: src/tvtimeconf.c:479
 #, c-format
 msgid "No XML root element found in %s.\n"
-msgstr "Não foi encontrado um elemento raiz XML em %s.\n"
+msgstr "Nenhum elemento raiz XML encontrado em %s.\n"
 
 #: src/tvtimeconf.c:487 src/tvtimeconf.c:561
 #, c-format
@@ -934,21 +935,21 @@ msgstr "%s não é um ficheiro de configuração do tvtime.\n"
 #: src/tvtimeconf.c:519
 msgid "Config file cannot be parsed. Settings will not be saved.\n"
 msgstr ""
-"O ficheiro de configuração não pode ser lido. As preferências não serão "
+"O ficheiro de configuração não pode ser analisado. As definições não serão "
 "gravadas.\n"
 
 #: src/tvtimeconf.c:526
 msgid "Could not create new config file.\n"
-msgstr "Não foi possível criar um novo ficheiro de configuração.\n"
+msgstr "Incapaz de criar novo ficheiro de configuração.\n"
 
 #: src/tvtimeconf.c:550
 msgid "Error creating configuration file.\n"
-msgstr "Ocorreu um erro ao criar o ficheiro de configuração.\n"
+msgstr "Erro ao criar ficheiro de configuração.\n"
 
 #: src/tvtimeconf.c:571 src/utils.c:134
 #, c-format
 msgid "Cannot change owner of %s: %s.\n"
-msgstr "Não foi possível alterar o dono de %s: %s.\n"
+msgstr "Incapaz de alterar o dono de %s: %s.\n"
 
 #: src/tvtimeconf.c:580
 msgid ""
@@ -961,12 +962,12 @@ msgid ""
 "Alexander S. Belov, and Achim Schneider.\n"
 msgstr ""
 "\n"
-"O tvtime é um progrma livre, desenvolvido por Billy Biggs, Doug Bell\n"
-"e muitos outros. Para detalhes e condições de cópia, por favor, veja\n"
-"a nossa página em http://tvtime.net/\n"
+"tvtime is free software, written by Billy Biggs, Doug Bell and many\n"
+"others.  For details and copying conditions, please see our website\n"
+"at http://tvtime.net/\n"
 "\n"
-"O tvtime é Copyright (C) 2001, 2002, 2003 por Billy Biggs, Doug Bell,\n"
-"Alexander S. Belov e Achim Schneider.\n"
+"tvtime is Copyright (C) 2001, 2002, 2003 by Billy Biggs, Doug Bell,\n"
+"Alexander S. Belov, and Achim Schneider.\n"
 
 #: src/tvtimeconf.c:591 src/tvtimeconf.c:643 src/tvtimeconf.c:691
 #, c-format
@@ -988,23 +989,22 @@ msgstr "  -A, --nowidescreen         modo 4:3.\n"
 #: src/tvtimeconf.c:594 src/tvtimeconf.c:646
 msgid "  -b, --vbidevice=DEVICE     VBI device (defaults to /dev/vbi0).\n"
 msgstr ""
-"  -b, --vbidevice=DISPOS.    dispositivo VBI (por omissão: /dev/vbi0).\n"
+"  -b, --vbidevice=DISPOSITIVO    dispositivo VBI (predefinição: /dev/vbi0).\n"
 
 #: src/tvtimeconf.c:595 src/tvtimeconf.c:647
 msgid ""
 "  -c, --channel=CHANNEL      Tune to the specified channel on startup.\n"
 msgstr ""
-"  -c, --channel=CANAL        Sintonizar o canal especificado no início.\n"
+"  -c, --channel=CANAL        Sintonizar o canal especificado no arranque.\n"
 
 #: src/tvtimeconf.c:596 src/tvtimeconf.c:648 src/tvtimeconf.c:692
 msgid ""
 "  -d, --device=DEVICE        video4linux device (defaults to /dev/video0).\n"
 msgstr ""
-"  -d, --device=DISPOSITIVO   dispositivo video4linux (por omissão: /dev/"
-"video0).\n"
+"  -d, --device=DISPOSITIVO   dispositivo video4linux (predefinição: "
+"/dev/video0).\n"
 
 #: src/tvtimeconf.c:597 src/tvtimeconf.c:649
-#, fuzzy
 msgid ""
 "  -f, --frequencies=NAME     The frequency table to use for the tuner.\n"
 "                             (defaults to us-cable).\n"
@@ -1026,14 +1026,16 @@ msgid ""
 "                                 custom (first run tvtime-scanner)\n"
 "\n"
 msgstr ""
-"  -f, --frequencies=NOME     A tabela de frequência a usar.\n"
-"                             (por omissão: us-cable).\n"
+"  -f, --frequencies=NOME     A tabela de frequência a usar para o "
+"sintonizador.\n"
+"                             (predefinição: us-cable).\n"
 "\n"
-"                             Valores válidos:\n"
+"                             Os valores válidos são:\n"
 "                                 us-cable\n"
 "                                 us-cable100\n"
 "                                 us-broadcast\n"
 "                                 china-broadcast\n"
+"                                 southafrica\n"
 "                                 japan-cable\n"
 "                                 japan-broadcast\n"
 "                                 europe\n"
@@ -1042,16 +1044,19 @@ msgstr ""
 "                                 newzealand\n"
 "                                 france\n"
 "                                 russia\n"
-"                                 custom (correr tvtime-scanner antes)\n"
+"                                 custom (primeiro executar o "
+"tvtime-scanner)\n"
 
 #: src/tvtimeconf.c:614 src/tvtimeconf.c:666 src/tvtimeconf.c:693
 msgid ""
 "  -F, --configfile=FILE      Additional config file to load settings from.\n"
-msgstr "  -F, --configfile=FICHEIRO  Ficheiro de configuração adicional.\n"
+msgstr ""
+"  -F, --configfile=FICHEIRO  Ficheiro de configuração adicional de onde "
+"carregar definições.\n"
 
 #: src/tvtimeconf.c:615 src/tvtimeconf.c:667 src/tvtimeconf.c:694
 msgid "  -h, --help                 Show this help message.\n"
-msgstr "  -h, --help                 Mostrar esta ajuda.\n"
+msgstr "  -h, --help                 Mostra esta mensagem de ajuda.\n"
 
 #: src/tvtimeconf.c:616 src/tvtimeconf.c:668
 msgid "  -g, --geometry=GEOMETRY    Sets the output window size.\n"
@@ -1061,33 +1066,32 @@ msgstr "  -g, --geometry=GEOMETRIA   Define o tamanho da janela.\n"
 msgid ""
 "  -i, --input=INPUTNUM       video4linux input number (defaults to 0).\n"
 msgstr ""
-"  -i, --input=NUMENTRADA     Número de entrada do video4linux (por omissão: "
-"0).\n"
+"  -i, --input=NUMERO_DE_ENTRADA     Número de entrada do video4linux "
+"(predefinição: 0).\n"
 
 #: src/tvtimeconf.c:618 src/tvtimeconf.c:670
-#, fuzzy
 msgid ""
 "  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
 "                             (defaults to 720 pixels).\n"
 msgstr ""
-"  -I, --inputwidth=AMOSTRAG. Resolução horizontal da entrada\n"
-"                             (por omissão: 720 pontos).\n"
+"  -I, --inputwidth=AMOSTRAGEM   Resolução horizontal da entrada\n"
+"                             (predefinição: 720 pixeis).\n"
 
 #: src/tvtimeconf.c:620
 msgid ""
 "  -k, --slave                Disables input handling in tvtime (slave "
 "mode).\n"
 msgstr ""
-"  -k, --slave                Desactiva o tratamento de entrada (modo "
-"escravo).\n"
+"  -k, --slave                Desactiva o tratamento de entrada no tvtime "
+"(modo escravo).\n"
 
 #: src/tvtimeconf.c:621 src/tvtimeconf.c:672
 msgid "  -m, --fullscreen           Start tvtime in fullscreen mode.\n"
-msgstr "  -m, --fullscreen           Inicia em modo de ecrã completo.\n"
+msgstr "  -m, --fullscreen           Arranca o tvtime em modo de ecrã total.\n"
 
 #: src/tvtimeconf.c:622 src/tvtimeconf.c:673
 msgid "  -M, --window               Start tvtime in window mode.\n"
-msgstr "  -M, --window               Inicia em modo de janela.\n"
+msgstr "  -M, --window               Arranca o tvtime numa janela.\n"
 
 #: src/tvtimeconf.c:623 src/tvtimeconf.c:674 src/tvtimeconf.c:696
 msgid ""
@@ -1096,40 +1100,47 @@ msgid ""
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
 "                             PAL-N or PAL-60 (defaults to NTSC).\n"
 msgstr ""
-"  -n, --norm=NORMA           A norma a usar na entrada. O tvtime suporta:\n"
+"  -n, --norm=NORMA           A norma a usar para entrada. O tvtime suporta:\n"
 "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
-"                             PAL-N ou PAL-60 (por omissão: NTSC).\n"
+"                             PAL-N ou PAL-60 (predefinição: NTSC).\n"
 
 #: src/tvtimeconf.c:626
 msgid ""
 "  -s, --showdrops            Print stats on frame drops (for debugging).\n"
 msgstr ""
-"  -s, --showdrops            Exibe estatísticas de abdicação de imagens.\n"
+"  -s, --showdrops            Escreve estatísticas das imagens abandonadas "
+"(para depuração).\n"
 
 #: src/tvtimeconf.c:627
 msgid ""
 "  -S, --saveoptions          Save command line options to the config file.\n"
-msgstr "  -S, --saveoptions          Gravar as opções da linha de comando.\n"
+msgstr ""
+"  -S, --saveoptions          Grava as opções da linha de comandos no "
+"ficheiro de configuração.\n"
 
 #: src/tvtimeconf.c:628 src/tvtimeconf.c:678
 msgid "  -t, --xmltv=FILE           Read XMLTV listings from the given file.\n"
-msgstr "  -t, --xmltv=FICHEIRO       Ler as programações XMLTV do ficheiro.\n"
+msgstr ""
+"  -t, --xmltv=FICHEIRO       Lê as listagens XMLTV a partir do ficheiro "
+"fornecido.\n"
 
 #: src/tvtimeconf.c:629 src/tvtimeconf.c:679
 msgid ""
 "  -l, --xmltvlanguage=LANG   Use XMLTV data in given language, if "
 "available.\n"
 msgstr ""
-"  -l, --xmltvlanguage=LING   Usar dados XMLTV na linguagem dada, se "
+"  -l, --xmltvlanguage=LINGUAGEM   Usa dados XMLTV na linguagem fornecida, se "
 "disponível.\n"
 
 #: src/tvtimeconf.c:630
 msgid "  -v, --verbose              Print debugging messages to stderr.\n"
-msgstr "  -v, --verbose              Exibe mensagens de erro para o stderr.\n"
+msgstr ""
+"  -v, --verbose              Escreve mensagens de depuração no stderr.\n"
 
 #: src/tvtimeconf.c:631
 msgid "  -X, --display=DISPLAY      Use the given X display to connect to.\n"
-msgstr "  -X, --display=DISPLAY      Usar o display X dado para conectar.\n"
+msgstr ""
+"  -X, --display=DISPLAY     Usa o display X fornecido para onde se ligar.\n"
 
 #: src/tvtimeconf.c:632 src/tvtimeconf.c:680
 msgid ""
@@ -1145,11 +1156,11 @@ msgid ""
 "phout,\n"
 "                                 video, radio, monitor\n"
 msgstr ""
-"  -x, --mixer=DISPOS[:CN]    O dispositivo de mistura e canal para "
+"  -x, --mixer=DISPOSITIVO[:CN]    O dispositivo de mistura e canal para "
 "controlo.\n"
-"                             (por omissão:/dev/mixer:line)\n"
+"                             (predefinição para /dev/mixer:line)\n"
 "\n"
-"                             Canais válidos:\n"
+"                             Os canais válidos são:\n"
 "                                 vol, bass, treble, synth, pcm, speaker, "
 "line,\n"
 "                                 mic, cd, mix, pcm2, rec, igain, ogain, "
@@ -1161,51 +1172,53 @@ msgstr ""
 #: src/tvtimeconf.c:677
 msgid ""
 "  -R, --priority=PRI         Sets the process priority to run tvtime at.\n"
-msgstr "  -R, --priority=PRI         Define a prioridade do processo.\n"
+msgstr ""
+"  -R, --priority=PRIORIDADE        Define a prioridade de processo no qual "
+"correr o tvtime.\n"
 
 #: src/tvtimeconf.c:858 src/tvtimeconf.c:867 src/tvtimeconf.c:931
 #: src/tvtimeconf.c:1064 src/tvtimeconf.c:1229
 #, c-format
 msgid "Reading configuration from %s\n"
-msgstr "A ler a configuração de %s\n"
+msgstr "A ler configuração a partir de %s\n"
 
 #: src/tvtimeconf.c:969
 msgid "Cannot run two instances of tvtime with the same configuration.\n"
 msgstr ""
-"Não é possível executar duas instâncias do tvtime com a mesma configuração.\n"
+"Não pode executar duas instâncias do tvtime com a mesma configuração.\n"
 
 #: src/tvtimeconf.c:980
 msgid "Saving command line options.\n"
-msgstr "A gravar opções da linha de comando.\n"
+msgstr "A gravar opções da linha de comandos.\n"
 
 #: src/tvtimeconf.c:1155
 msgid "Cannot update configuration while tvtime running.\n"
-msgstr "Não é possível alterar a configuração com o tvtime em execução.\n"
+msgstr ""
+"Não pode actualizar a configuração enquanto o tvtime está em execução.\n"
 
 #: src/tvtimeosd.c:344 src/tvtime-scanner.c:145
 msgid "No signal"
-msgstr "Sem sinal"
+msgstr "Nenhum sinal"
 
 #: src/tvtimeosd.c:455
 msgid "Mute"
-msgstr "Sem som"
+msgstr "Mudo"
 
 #: src/utils.c:118
 #, c-format
 msgid "Cannot create %s: %s\n"
-msgstr "Erro ao criar %s: %s\n"
+msgstr "Incapaz de criar %s: %s\n"
 
 #: src/utils.c:124
 #, c-format
 msgid "Cannot open %s: %s\n"
-msgstr "Error ao abrir %s: %s\n"
+msgstr "Incapaz de abrir %s: %s\n"
 
 #: src/utils.c:656
 #, c-format
 msgid "Failed to initialize UTF-8 to %s converter: iconv_open failed (%s).\n"
 msgstr ""
-"Falhou a inicialização do conversor de UTF-8 para %s: iconv_open falhou(%"
-"s).\n"
+"Falha ao inicializar conversor de UTF-8 para %s: iconv_open falhou (%s).\n"
 
 #: src/utils.c:667
 #, c-format
@@ -1218,10 +1231,9 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Erro ao entrar em modo UTF-8 mode usando\n"
-"    bind_textdomain_codeset() (retornou %s). Isto pode causar uma\n"
-"    exibição incorrecta de mensagens\n"
-" Por favor, relate este problema em\n"
+"    Falha ao entrar em modo UTF-8 usando bind_textdomain_codeset()\n"
+"    (retornou %s.) Isto pode causar uma exibição\n"
+"    incorrecta das mensagens! Por favor, reporte este bug em\n"
 "    %s.\n"
 "\n"
 
@@ -1242,7 +1254,7 @@ msgstr "O tvtime não está em execução.\n"
 #: src/tvtime-command.c:82 src/tvtime-command.c:92
 #, c-format
 msgid "%s: Cannot open %s: %s\n"
-msgstr "%s: Error ao abrir %s: %s\n"
+msgstr "%s: Incapaz de abrir %s: %s\n"
 
 #: src/tvtime-command.c:103
 #, c-format
@@ -1262,7 +1274,7 @@ msgstr "%s: A enviar o comando %s.\n"
 #: src/tvtime-scanner.c:92
 #, c-format
 msgid "Scanning using TV standard %s.\n"
-msgstr "A pesquisar usando a norma de TV %s.\n"
+msgstr "A sondar usando a norma de TV %s.\n"
 
 #: src/tvtime-scanner.c:116
 #, c-format
@@ -1273,14 +1285,14 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Nenhum sintonizador encontrado na entrada %d. Se tiver um,\n"
-"    seleccione outra entrada usando --input=<num>.\n"
+"    Nenhum sintonizador encontrado na entrada %d. Se tiver um, por favor\n"
+"    seleccione outra entrada diferente usando --input=<número>.\n"
 "\n"
 
 #: src/tvtime-scanner.c:127
 #, c-format
 msgid "Scanning from %6.2f MHz to %6.2f MHz.\n"
-msgstr "A pesquisar de %6.2f MHz até %6.2f MHz.\n"
+msgstr "A sondar desde %6.2f MHz até %6.2f MHz.\n"
 
 #: src/tvtime-scanner.c:138
 #, c-format
@@ -1296,7 +1308,7 @@ msgstr "Sinal detectado"
 msgid ""
 "Found a channel at %6.2f MHz (%.2f - %.2f MHz), adding to channel list.\n"
 msgstr ""
-"Encontrado um canal em %6.2f MHz (%.2f - %.2f MHz), a adicionar lista de "
+"Encontrado um canal em %6.2f MHz (%.2f - %.2f MHz), a adicionar à lista de "
 "canais.\n"
 
 #~ msgid "Use PAL-BG audio decoding"
