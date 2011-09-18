@@ -119,10 +119,10 @@ if test x"$no_x" != x"yes"; then
 		    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
 	fi
 
-	dnl check for XTest
-        AC_CHECK_LIB([Xtst],[XTestFakeKeyEvent],
-            [AC_DEFINE([HAVE_XTESTEXTENSION],,[XTest support])
-            X11_LIBS="$X11_LIBS -lXtst"],,
+	dnl check for XSs
+        AC_CHECK_LIB([Xss],[XScreenSaverSuspend],
+            [AC_DEFINE([HAVE_XSSEXTENSION],,[XSs support])
+            X11_LIBS="$X11_LIBS -lXss"],,
 	    [$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS -lXext])
 
 	dnl check for Xvidmode

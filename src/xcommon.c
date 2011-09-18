@@ -45,8 +45,8 @@
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/XShm.h>
-#ifdef HAVE_XTESTEXTENSION
-#include <X11/extensions/XTest.h>
+#ifdef HAVE_XSSEXTENSION
+#include <X11/extensions/scrnsaver.h>
 #endif
 
 #include "xfullscreen.h"
@@ -67,7 +67,7 @@ static Window wm_window;
 static Window fs_window;
 static Window output_window;
 static GC gc;
-static int have_xtest;
+static int have_xss;
 static int output_width, output_height;
 static int output_aspect;
 static int output_on_root;
@@ -105,10 +105,6 @@ static Atom wm_protocols;
 static Atom wm_delete_window;
 static Atom xawtv_station;
 static Atom xawtv_remote;
-
-#ifdef HAVE_XTESTEXTENSION
-static KeyCode kc_shift_l; /* Fake key to send. */
-#endif
 
 static area_t video_area;
 static area_t window_area;
@@ -247,12 +243,12 @@ static void x11_wait_mapped( Display *dpy, Window win )
     } while ( (event.type != MapNotify) || (event.xmap.event != win) );
 }
 
-static int have_xtestextention( void )
+static int have_xssextension( void )
 {  
-#ifdef HAVE_XTESTEXTENSION
-    int dummy1, dummy2, dummy3, dummy4;
+#ifdef HAVE_XSSEXTENSION
+    int dummy1, dummy2;
   
-    return (XTestQueryExtension( display, &dummy1, &dummy2, &dummy3, &dummy4 ) == True);
+    return (XScreenSaverQueryExtension( display, &dummy1, &dummy2 ) == True);
 #endif
     return 0;
 }
@@ -842,7 +838,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
     output_aspect = aspect;
     output_height = 576;
 
-    have_xtest = 0;
+    have_xss = 0;
     output_on_root = 0;
     has_ewmh_state_fullscreen = 0;
     has_ewmh_state_above = 0;
@@ -925,13 +921,16 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
         xfullscreen_print_summary( xf );
     }
 
-#ifdef HAVE_XTESTEXTENSION
-    kc_shift_l = XKeysymToKeycode( display, XK_Shift_L );
-#endif
-    have_xtest = have_xtestextention();
-    if( have_xtest && xcommon_verbose ) {
-        fprintf( stderr, "xcommon: Have XTest, will use it to ping the screensaver.\n" );
+    have_xss = have_xssextension();
+    if( have_xss && xcommon_verbose ) {
+        fprintf( stderr, "xcommon: Have XSS, will use it to disable the screensaver.\n" );
     }
+
+#ifdef HAVE_XSSEXTENSION
+    if ( have_xss ) {
+        XScreenSaverSuspend( display, True );
+    }
+#endif
 
     /* Initially, get the best width for our height. */
     output_width = xv_get_width_for_height( output_height );
@@ -1095,17 +1094,9 @@ void xcommon_ping_screensaver( void )
     }
 
     gettimeofday( &curtime, 0 );
-    if( timediff( &curtime, &last_ping_time ) > SCREENSAVER_PING_TIME ) { 
+    if( timediff( &curtime, &last_ping_time ) > SCREENSAVER_PING_TIME ) {
         last_ping_time = curtime;
-#ifdef HAVE_XTESTEXTENSION
-        if( have_xtest ) {
-            XTestFakeKeyEvent( display, kc_shift_l, True, CurrentTime );
-            XTestFakeKeyEvent( display, kc_shift_l, False, CurrentTime );
-        } else 
-#endif
-        {
-            XResetScreenSaver( display );
-        }
+        XResetScreenSaver( display );
     }
 }
 
@@ -1700,6 +1691,11 @@ void xcommon_poll_events( input_t *in )
 
 void xcommon_close_display( void )
 {
+#ifdef HAVE_XSSEXTENSION
+    if ( have_xss ) {
+        XScreenSaverSuspend( display, False );
+    }
+#endif
     XDestroyWindow( display, output_window );
     XDestroyWindow( display, wm_window );
     XDestroyWindow( display, fs_window );
