@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Comment=High quality video deinterlacer
-Icon=tvtime.png
+Icon=tvtime
 Exec=tvtime
 Name=TVtime Television Viewer
 GenericName=Television Viewer
