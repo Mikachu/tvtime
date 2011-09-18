@@ -118,9 +118,9 @@ const int num_timezones = sizeof( date_manip_timezones ) / sizeof( tz_map_t );
 typedef struct {
     const char *code;
     const char *name;
-} locale_t;
+} xmltv_locale;
 
-static locale_t locale_table[] = {
+static xmltv_locale locale_table[] = {
     {"AA", "Afar"},           {"AB", "Abkhazian"},      {"AF", "Afrikaans"},
     {"AM", "Amharic"},        {"AR", "Arabic"},         {"AS", "Assamese"},
     {"AY", "Aymara"},         {"AZ", "Azerbaijani"},    {"BA", "Bashkir"},
@@ -168,7 +168,7 @@ static locale_t locale_table[] = {
     {"XH", "Xhosa"},          {"YO", "Yoruba"},         {"ZH", "Chinese"},
     {"ZU", "Zulu"} };
 
-const int num_locales = sizeof( locale_table ) / sizeof( locale_t );
+const int num_locales = sizeof( locale_table ) / sizeof( xmltv_locale );
 
 /**
  * Timezone parsing code based loosely on the algorithm in
