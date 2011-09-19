@@ -43,7 +43,12 @@ void xmltv_delete( xmltv_t *xmltv );
 void xmltv_set_channel( xmltv_t *xmltv, const char *channel );
 
 /**
- * Refreshes the information given a new time.
+ * Refreshes the information given a new time or when the channel has changed.
+ */
+void xmltv_refresh_withtime( xmltv_t *xmltv, time_t curtime );
+
+/**
+ * Refreshes the information given a new time or when the channel has changed.
  */
 void xmltv_refresh( xmltv_t *xmltv );
 

@@ -2210,6 +2210,7 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 }
             }
         }
+	
         if( config_get_debug( ct ) &&
             commands_check_freq_present( commands ) ) {
             if( curmethod )  {
@@ -2739,4 +2740,3 @@ int main( int argc, char **argv )
 
     return result;
 }
-

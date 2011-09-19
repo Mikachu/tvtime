@@ -1082,4 +1082,3 @@ int tvtime_osd_list_set_multitext( tvtime_osd_t *osd, int cur,
 {
     return osd_list_set_multitext( osd->list, cur, text, numlines, 65 );
 }
-

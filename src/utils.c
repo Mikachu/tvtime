@@ -523,6 +523,7 @@ static command_names_t command_table[] = {
     { "SHOW_DEINTERLACER_INFO", TVTIME_SHOW_DEINTERLACER_INFO },
     { "SHOW_MENU", TVTIME_SHOW_MENU },
     { "SHOW_STATS", TVTIME_SHOW_STATS },
+    { "SHOW_EPG", TVTIME_SHOW_EPG },
 
     { "SLEEP", TVTIME_SLEEP },
 
@@ -604,6 +605,12 @@ int tvtime_is_menu_command( int command )
 {
     return (command >= TVTIME_MENU_UP);
 }
+
+int tvtime_is_epg_command( int command )
+{
+    return (command >= TVTIME_SHOW_EPG);
+}
+
 
 int tvtime_command_takes_arguments( int command )
 {
@@ -797,4 +804,3 @@ int lfprintf( FILE *stream, const char *format, ... )
     va_end( ap );
     return ret;
 }
-

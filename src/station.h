@@ -160,6 +160,22 @@ const char *station_get_current_network_call_letters( station_mgr_t *mgr );
 const char *station_get_current_xmltv_id( station_mgr_t *mgr );
 
 /**
+ * Returns the XMLTV identifier for the channel in pos.
+ */
+const char *station_get_xmltv_id( station_mgr_t *mgr, int pos );
+
+/**
+ * Returns the name of the channel in pos.
+ */
+const char *station_get_name( station_mgr_t *mgr, int pos );
+
+/**
+ * Returns the channel nr of the channel in pos.
+ */
+const char *station_get_channel( station_mgr_t *mgr, int pos );
+
+
+/**
  * Returns the norm set for this channel.
  */
 const char *station_get_current_norm( station_mgr_t *mgr );

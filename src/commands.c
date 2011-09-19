@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <time.h>
+#include <sys/time.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -32,13 +33,13 @@
 #else
 # define _(string) (string)
 #endif
-#include "station.h"
 #include "mixer.h"
 #include "input.h"
 #include "commands.h"
 #include "utils.h"
 #include "xmltv.h"
 #include "tvtimeglyphs.h"
+#include "epg.h"
 
 #define NUM_FAVORITES 9
 #define MAX_USER_MENUS 64
@@ -167,6 +168,10 @@ struct commands_s {
     int numfavorites;
     int favorites[ NUM_FAVORITES ];
 
+    int epg;
+    int epg_nowandnext; // We are showing page [epg_nowandnext] of the epg
+    int epg_channel;
+
     int menuactive;
     int curmenu;
     int curmenupos;
@@ -216,7 +221,7 @@ static void display_xmltv_description( commands_t *cmd, const char *title,
 
     if( subtitle && *subtitle ) {
         cur = tvtime_osd_list_set_multitext( cmd->osd, cur, subtitle, 1 );
-    } else {
+    } else if( title ) {
         tvtime_osd_list_set_text( cmd->osd, cur++,
                                   _("No program information available") );
     }
@@ -1079,6 +1084,10 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     cmd->numfavorites = 0;
     memset( cmd->favorites, 0, sizeof( cmd->favorites ) );
 
+    cmd->epg = 0;
+    cmd->epg_nowandnext = 0;
+    cmd->epg_channel = 0;
+    
     cmd->menuactive = 0;
     cmd->curmenu = MENU_FAVORITES;
     cmd->curmenupos = 0;
@@ -2044,6 +2053,61 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         return;
     }
 
+    if( (cmd->epg) && (tvtime_is_epg_command( tvtime_cmd )) ){
+        if (cmd->epg_nowandnext) {
+            switch( tvtime_cmd ) {
+            case TVTIME_MENU_UP:
+                cmd->epg_nowandnext = epg_show_nowandnext( cmd->osd, cmd->epg_nowandnext-1, cmd->stationmgr, cmd->xmltv );
+                break;
+            case TVTIME_MENU_DOWN:
+                cmd->epg_nowandnext = epg_show_nowandnext( cmd->osd, cmd->epg_nowandnext+1, cmd->stationmgr, cmd->xmltv );
+                break;
+            case TVTIME_SHOW_MENU:
+                cmd->epg = 0;
+                cmd->epg_nowandnext = 0;
+                commands_handle( cmd, TVTIME_SHOW_MENU, "" );
+                return;
+                break;
+            case TVTIME_MENU_BACK: 
+                cmd->epg_nowandnext = 0;
+                cmd->epg = 0;
+                break;
+            case TVTIME_SHOW_EPG:         
+                cmd->epg_nowandnext = 0;
+                cmd->epg_channel = epg_show_perchannel( cmd->osd, 1, cmd->stationmgr, cmd->xmltv , station_get_current_pos(cmd->stationmgr)+1);
+                break;
+            }  
+        } else if (cmd->epg_channel) {
+            switch( tvtime_cmd ) {
+            case TVTIME_MENU_UP:
+                cmd->epg_channel = epg_show_perchannel( cmd->osd, 1, cmd->stationmgr, cmd->xmltv , cmd->epg_channel-1);
+                break;
+            case TVTIME_MENU_DOWN:
+                cmd->epg_channel = epg_show_perchannel( cmd->osd, 1, cmd->stationmgr, cmd->xmltv , cmd->epg_channel+1);
+                break;
+            case TVTIME_SHOW_MENU:
+                cmd->epg = 0;
+                cmd->epg_channel = 0;
+                commands_handle( cmd, TVTIME_SHOW_MENU, "" );
+                return;
+                break;
+            case TVTIME_MENU_BACK: 
+            case TVTIME_SHOW_EPG:         
+                cmd->epg_channel = 0;
+                cmd->epg = 0;
+                break;
+            }
+            
+        }
+        if (!cmd->epg_nowandnext && !cmd->epg_channel) {    
+            // No data to show, so clear the osd screen
+            cmd->epg = 0;
+            tvtime_osd_hold( cmd->osd, 0 );
+            tvtime_osd_clear( cmd->osd );
+        }
+        return;
+    }
+    
     switch( tvtime_cmd ) {
     case TVTIME_NOOP:
         break;
@@ -2061,6 +2125,16 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         }
         break;
 
+    case TVTIME_SHOW_EPG:         
+        if( cmd->osd ) {
+            if(( cmd->epg_nowandnext = epg_show_nowandnext( cmd->osd, 1, cmd->stationmgr, cmd->xmltv ))) {
+                cmd->epg = 1;
+                tvtime_osd_hold( cmd->osd, 1 );
+                tvtime_osd_show_info( cmd->osd );
+            } 
+        }
+        break;
+
     case TVTIME_KEY_EVENT:
         key = input_string_to_special_key( arg );
         if( !key ) key = arg[ 0 ];
@@ -2071,28 +2145,28 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
         break;
 
     case TVTIME_UP:
-        if( cmd->menuactive ) {
+        if( cmd->menuactive || cmd->epg ) {
             commands_handle( cmd, TVTIME_MENU_UP, "" );
         } else {
             commands_handle( cmd, TVTIME_CHANNEL_INC, "" );
         }
         break;
     case TVTIME_DOWN:
-        if( cmd->menuactive ) {
+        if( cmd->menuactive || cmd->epg ) {
             commands_handle( cmd, TVTIME_MENU_DOWN, "" );
         } else {
             commands_handle( cmd, TVTIME_CHANNEL_DEC, "" );
         }
         break;
     case TVTIME_LEFT:
-        if( cmd->menuactive ) {
+        if( cmd->menuactive || cmd->epg ) {
             commands_handle( cmd, TVTIME_MENU_BACK, "" );
         } else {
             commands_handle( cmd, TVTIME_MIXER_DOWN, "" );
         }
         break;
     case TVTIME_RIGHT:
-        if( cmd->menuactive ) {
+        if( cmd->menuactive || cmd->epg ) {
             commands_handle( cmd, TVTIME_MENU_ENTER, "" );
         } else {
             commands_handle( cmd, TVTIME_MIXER_UP, "" );
@@ -2594,11 +2668,12 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_DISPLAY_INFO:
         cmd->displayinfo = !cmd->displayinfo;
         if( cmd->osd ) {
-            if( cmd->xmltv && cmd->vidin &&
-                videoinput_has_tuner( cmd->vidin ) ) {
-                update_xmltv_display( cmd );
-            }
             if( cmd->displayinfo ) {
+                cmd->epg = 0;
+                if( cmd->xmltv && cmd->vidin &&
+                    videoinput_has_tuner( cmd->vidin ) ) {
+                    update_xmltv_display( cmd );
+                }
                 tvtime_osd_hold( cmd->osd, 1 );
                 tvtime_osd_show_info( cmd->osd );
             } else {
@@ -3649,4 +3724,3 @@ void commands_get_menu_bounding_box( commands_t *cmd, int *x, int *y,
         *x = *y = *width = *height = 0;
     }
 }
-

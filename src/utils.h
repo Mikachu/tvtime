@@ -222,6 +222,9 @@ enum tvtime_commands
     TVTIME_LEFT,
     TVTIME_RIGHT,
 
+    /* Everything below here is a epg-mode command. */
+    TVTIME_SHOW_EPG,
+
     /* Everything below here is a menu-mode command. */
     TVTIME_MENU_UP,
     TVTIME_MENU_DOWN,
@@ -248,6 +251,7 @@ int tvtime_num_commands( void );
 const char *tvtime_get_command( int pos );
 int tvtime_get_command_id( int pos );
 int tvtime_is_menu_command( int command );
+int tvtime_is_epg_command( int command );
 int tvtime_command_takes_arguments( int command );
 
 

@@ -201,6 +201,9 @@ static time_t parse_xmltv_timezone( const char *tzstr )
     return 0;
 }
 
+/**
+ * Parse xmltv date string according to timezone
+ */
 static time_t parse_xmltv_date( const char *date )
 {
     char syear[ 6 ];
@@ -281,6 +284,11 @@ static time_t parse_xmltv_date( const char *date )
     return mktime( &tm_obj );
 }
 
+/**
+ * Reinit a program object using data from [cur] xmlNode and applying [locale]
+ * When [cur]==0 the object is cleared, memory freed and the object is put to its
+ * initial empty state
+ */
 static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
 {
     if( cur ) {
@@ -350,6 +358,9 @@ static void reinit_program( program_t *pro, xmlNodePtr cur, xmlChar *locale )
     }
 }
 
+/**
+ * Creates a new empty program object
+ */
 static program_t *program_new( void )
 {
     program_t *pro = malloc( sizeof( program_t ) );
@@ -357,6 +368,10 @@ static program_t *program_new( void )
     return pro;
 }
 
+/**
+ * Returns xmlNodePtr pointing to the program starting on or before [time] on
+ * [channelid] which has not finished at [time]
+ */
 static xmlNodePtr get_program( xmlNodePtr root, const char *channelid,
                                time_t time )
 {
@@ -396,6 +411,9 @@ static xmlNodePtr get_program( xmlNodePtr root, const char *channelid,
     return 0;
 }
 
+/**
+ * IS THIS CORRECT: XMLTV was file created by tv_grab_na?
+ */
 static int xmltv_is_tv_grab_na( xmltv_t *xmltv )
 {
     xmlNodePtr cur = xmltv->root->xmlChildrenNode;
@@ -417,6 +435,9 @@ static int xmltv_is_tv_grab_na( xmltv_t *xmltv )
     return 0;
 }
 
+/**
+ * Adds language to list of language objects
+ */
 static language_t *xmltv_add_language( xmltv_t *xmltv, const xmlChar *lang )
 {
     language_t *last = 0;
@@ -462,6 +483,9 @@ static language_t *xmltv_add_language( xmltv_t *xmltv, const xmlChar *lang )
     return l;
 }
 
+/**
+ * Exctracts al languages from XMLTV tree
+ */
 static int xmltv_find_languages( xmlNodePtr node, xmltv_t *xmltv )
 {
     xmlNodePtr cur = node->xmlChildrenNode;
@@ -474,6 +498,35 @@ static int xmltv_find_languages( xmlNodePtr node, xmltv_t *xmltv )
     return 0;
 }
 
+/**
+ * Cleans up, deletes end frees an XMLTV program obejct
+ */
+static void program_delete( program_t *pro )
+{
+    if( pro->title ) xmlFree( pro->title );
+    if( pro->subtitle ) xmlFree( pro->subtitle );
+    if( pro->description ) xmlFree( pro->description );
+    reinit_program( pro, 0, 0 );
+    free( pro );
+}
+
+/**
+ * Deletes and frees a language from the list of languages
+ */
+static void languages_delete( language_t *languages )
+{
+    language_t *cur, *next;
+    cur = languages;
+    while( cur ) {
+        next = cur->next;
+        free( cur );
+        cur = next;
+    }
+}
+
+/**
+ * Creates a new XMLTV parser object.
+ */
 xmltv_t *xmltv_new( const char *filename, const char *locale )
 {
     xmltv_t *xmltv = malloc( sizeof( xmltv_t ) );
@@ -527,26 +580,9 @@ xmltv_t *xmltv_new( const char *filename, const char *locale )
     return xmltv;
 }
 
-static void program_delete( program_t *pro )
-{
-    if( pro->title ) xmlFree( pro->title );
-    if( pro->subtitle ) xmlFree( pro->subtitle );
-    if( pro->description ) xmlFree( pro->description );
-    reinit_program( pro, 0, 0 );
-    free( pro );
-}
-
-static void languages_delete( language_t *languages )
-{
-    language_t *cur, *next;
-    cur = languages;
-    while( cur ) {
-        next = cur->next;
-        free( cur );
-        cur = next;
-    }
-}
-
+/**
+ * Cleans up and deletes an XMLTV parser object.
+ */
 void xmltv_delete( xmltv_t *xmltv )
 {
     program_delete( xmltv->pro );
@@ -558,6 +594,9 @@ void xmltv_delete( xmltv_t *xmltv )
     free( xmltv );
 }
 
+/**
+ * Sets the current channel to use for xmltv.
+ */
 void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
 {
     if( channel ) {
@@ -569,9 +608,11 @@ void xmltv_set_channel( xmltv_t *xmltv, const char *channel )
     xmltv->refresh = 1;
 }
 
-void xmltv_refresh( xmltv_t *xmltv )
+/**
+ *
+ */
+void xmltv_refresh_withtime ( xmltv_t *xmltv, time_t curtime )
 {
-    time_t curtime = time( 0 );
 
     if( xmltv->pro->title ) xmlFree( xmltv->pro->title );
     if( xmltv->pro->subtitle ) xmlFree( xmltv->pro->subtitle );
@@ -601,6 +642,19 @@ void xmltv_refresh( xmltv_t *xmltv )
     xmltv->refresh = 0;
 }
 
+
+/**
+ * Refreshes the information given a new time or when the channel has changed.
+ */
+void xmltv_refresh( xmltv_t *xmltv )
+{
+    time_t curtime = time( 0 );
+    xmltv_refresh_withtime(xmltv, curtime);
+}
+
+/**
+ * Returns the current show title if one is set, 0 otherwise.
+ */
 const char *xmltv_get_title( xmltv_t *xmltv )
 {
     if ( xmltv->pro->title_local ) {
@@ -609,6 +663,9 @@ const char *xmltv_get_title( xmltv_t *xmltv )
     return (char *) xmltv->pro->title;
 }
 
+/**
+ * Returns the current show sub-title if one is set, 0 otherwise.
+ */
 const char *xmltv_get_sub_title( xmltv_t *xmltv )
 {
     if ( xmltv->pro->subtitle_local ) {
@@ -617,6 +674,9 @@ const char *xmltv_get_sub_title( xmltv_t *xmltv )
     return (char *) xmltv->pro->subtitle;
 }
 
+/**
+ * Returns the current show description if one is set, 0 otherwise.
+ */
 const char *xmltv_get_description( xmltv_t *xmltv )
 {
     if ( xmltv->pro->description_local ) {
@@ -625,16 +685,25 @@ const char *xmltv_get_description( xmltv_t *xmltv )
     return (char *) xmltv->pro->description;
 }
 
+/**
+ * Returns the current show's start time if one is set, 0 otherwise.
+ */
 time_t xmltv_get_start_time( xmltv_t *xmltv )
 {
     return xmltv->pro->start_time;
 }
 
+/**
+ * Returns the current show's end time if one is set, 0 otherwise.
+ */
 time_t xmltv_get_end_time( xmltv_t *xmltv )
 {
     return xmltv->pro->end_time;
 }
 
+/**
+ * Returns the title of the next show (preview)
+ */
 const char *xmltv_get_next_title( xmltv_t *xmltv )
 {
     if ( xmltv->next_pro->title_local ) {
@@ -643,11 +712,18 @@ const char *xmltv_get_next_title( xmltv_t *xmltv )
     return (char *) xmltv->next_pro->title;
 }
 
+/**
+ * Returns the xmltvid of the current channel.
+*/
 const char *xmltv_get_channel( xmltv_t *xmltv )
 {
     return (char *) xmltv->curchannel;
 }
 
+/**
+ * Returns true if the show information must be updated (the current
+ * program has ended.
+ */
 int xmltv_needs_refresh( xmltv_t *xmltv )
 {
     time_t curtime = time( 0 );
@@ -655,6 +731,9 @@ int xmltv_needs_refresh( xmltv_t *xmltv )
     return xmltv->refresh || (curtime >= xmltv->pro->end_time);
 }
 
+/**
+ * Looks up the xmltv id of a channel given a corresponding xmltv display name.
+ */
 const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )
 {
     xmlNodePtr cur = xmltv->root->xmlChildrenNode;
@@ -686,6 +765,9 @@ const char *xmltv_lookup_channel( xmltv_t *xmltv, const char *name )
     return 0;
 }
 
+/**
+ *
+ */
 static const char *tv_grab_na_skip( const char *name )
 {
     const char *ret = name;
@@ -700,6 +782,9 @@ static const char *tv_grab_na_skip( const char *name )
     return ret;
 }
 
+/**
+ * Looks up the xmltv user display name of a channel given its xmltv id.
+*/
 const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
 {
     xmlNodePtr cur = xmltv->root->xmlChildrenNode;
@@ -735,6 +820,10 @@ const char *xmltv_lookup_channel_name( xmltv_t *xmltv, const char *id )
     return 0;
 }
 
+/**
+ * Sets the preferred language for xmltv data, add it to
+ * language list if not yet known.
+ */
 void xmltv_set_language( xmltv_t *xmltv, const char *locale )
 {
     language_t *l;
@@ -747,17 +836,28 @@ void xmltv_set_language( xmltv_t *xmltv, const char *locale )
     if( l ) xmltv->locale = l;
 }
 
+/**
+ * Get the currently selected language code.
+ */
 const char *xmltv_get_language( xmltv_t *xmltv )
 {
     if( xmltv->locale ) return (char *) xmltv->locale->code;
     return 0;
 }
 
+/**
+ * Number of known languages.
+ */
 int xmltv_get_num_languages( xmltv_t *xmltv )
 {
     return xmltv->num_languages;
 }
 
+/**
+ * Select one of the known languages.
+ * n = 0..xmltv_get_num_languages()
+ * 0: default language
+ */
 void xmltv_select_language( xmltv_t *xmltv, int n )
 {
     int i;
@@ -771,6 +871,9 @@ void xmltv_select_language( xmltv_t *xmltv, int n )
     for( i=1; i<n; i++ ) xmltv->locale = xmltv->locale->next;
 }
 
+/**
+ * Get the current language number.
+ */
 int xmltv_get_langnum( xmltv_t *xmltv )
 {
     language_t *l = xmltv->languages;
@@ -784,6 +887,9 @@ int xmltv_get_langnum( xmltv_t *xmltv )
     return 0; /* should never happen */
 }
 
+/**
+ * Get the code for language n.
+ */
 const char *xmltv_get_language_code( xmltv_t *xmltv, int n )
 {
     language_t *l = xmltv->languages;
@@ -793,6 +899,9 @@ const char *xmltv_get_language_code( xmltv_t *xmltv, int n )
     return (char *) l->code;
 }
 
+/**
+ * Get the name of language n.
+ */
 const char *xmltv_get_language_name( xmltv_t *xmltv, int n )
 {
     language_t *l = xmltv->languages;
@@ -801,4 +910,3 @@ const char *xmltv_get_language_name( xmltv_t *xmltv, int n )
     for( i=1; i<n; i++ ) l = l->next;
     return (char *) l->name;
 }
-

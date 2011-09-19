@@ -812,6 +812,7 @@ config_t *config_new( void )
     ct->keymap[ I_F6 ] = TVTIME_PICTURE_DOWN;
     ct->keymap[ I_F7 ] = TVTIME_PICTURE_UP;
     ct->keymap[ 'd' ] = TVTIME_SHOW_STATS;
+    ct->keymap[ 'g' ] = TVTIME_SHOW_EPG;
     ct->keymap[ 'a' ] = TVTIME_TOGGLE_ASPECT;
     ct->keymap[ 'f' ] = TVTIME_TOGGLE_FULLSCREEN;
     ct->keymap[ 'i' ] = TVTIME_TOGGLE_INPUT;
@@ -1691,4 +1692,3 @@ int config_get_square_pixels( config_t *ct )
 {
     return ct->squarepixels;
 }
-

@@ -754,6 +754,48 @@ const char *station_get_current_xmltv_id( station_mgr_t *mgr )
     }
 }
 
+const station_info_t *station_get_station( station_mgr_t *mgr, int pos)
+{
+    const station_info_t *tmp = mgr->first;
+    int i;
+    for (i = 0; tmp && i < pos; i++)
+         tmp = tmp->next;	
+    return tmp;
+}
+
+const char *station_get_xmltv_id( station_mgr_t *mgr, int pos )
+{
+    const station_info_t *station = station_get_station(mgr, pos);
+    if( (station) && (*station->xmltvid) ) {
+        return station->xmltvid;
+    } else {
+        return 0;
+    }
+}
+
+const char *station_get_channel( station_mgr_t *mgr, int pos )
+{
+    const station_info_t *station = station_get_station(mgr, pos);
+    if( (station) && (station->network_name) ) {
+	    static char buf[10];
+	    snprintf(buf, 10 ,"%d", station->pos);
+        return buf;
+    } else {
+        return 0;
+    }
+}
+
+const char *station_get_name( station_mgr_t *mgr, int pos )
+{
+    const station_info_t *station = station_get_station(mgr, pos);
+    if( (station) && (*station->name) ) {
+        return station->name;
+    } else {
+        return 0;
+    }
+}
+
+
 void station_set_current_xmltv_id( station_mgr_t *mgr, const char *xmltvid )
 {
     if( mgr->current ) {
