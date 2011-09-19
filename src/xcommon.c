@@ -207,7 +207,7 @@ static const char *tvtime_icon =
 "                                "
 "                                " ;
 
-static void load_icon( uint32_t *data )
+static void load_icon( long *data )
 {
     int i;
 
@@ -1001,7 +1001,7 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
 
     /* Set the icon on the window. */
     {
-        uint32_t *data = malloc( 1026 * 4 );
+        long *data = malloc( (32*32 + 2) * sizeof(long) );
         if( data ) {
             load_icon( data );
             XChangeProperty( display, wm_window, net_wm_icon, cardinal, 32,
