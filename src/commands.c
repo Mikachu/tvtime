@@ -2313,12 +2313,10 @@ void commands_handle( commands_t *cmd, int tvtime_cmd, const char *arg )
     case TVTIME_SET_INPUT_WIDTH:
         cmd->newinputwidth = atoi( arg );
         if( cmd->osd ) {
-            const char *curname = menu_get_name( cmd->curusermenu );
             menu_t *sharpmenu = commands_get_menu( cmd, "hres" );
             char message[ 128 ];
             int maxw = cmd->vidin? videoinput_get_maxwidth( cmd->vidin ) : 0;
             reset_inputwidth_menu( sharpmenu, cmd->newinputwidth, maxw );
-            curname = menu_get_name( cmd->curusermenu );
             commands_refresh_menu( cmd );
             snprintf( message, sizeof( message ),
                       _("Horizontal resolution will be %d pixels on restart."),
