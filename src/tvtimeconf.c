@@ -928,6 +928,14 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
             case 's': ct->debug = 1; break;
             case 'S': saveoptions = 1; break;
             case 'v': ct->verbose = 1; break;
+            case 'V': if( !optarg ) {
+                          fprintf( stdout, "UnmuteVolume:%d\n",
+                                   config_get_unmute_volume( ct ) );
+                      } else {
+                          ct->unmute_volume = atoi( optarg );
+                          //mixer_set_volume ( 0, ct->unmute_volume );
+                      }
+                      break;
             case 't': if( ct->xmltvfile ) { free( ct->xmltvfile ); }
                       ct->xmltvfile = expand_user_path( optarg ); break;
             case 'l': if( ct->xmltvlanguage ) { free( ct->xmltvlanguage ); }
