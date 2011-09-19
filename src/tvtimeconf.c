@@ -59,6 +59,7 @@ struct config_s
     int squarepixels;
     int debug;
     int fullscreen;
+    int borderless;
     int alwaysontop;
     int priority;
     int ntsc_mode;
@@ -318,6 +319,10 @@ static void parse_option( config_t *ct, xmlNodePtr node )
 
         if( !xmlStrcasecmp( name, BAD_CAST "Fullscreen" ) ) {
             ct->fullscreen = atoi( curval );
+        }
+
+        if( !xmlStrcasecmp( name, BAD_CAST "Borderless" ) ) {
+            ct->borderless = atoi( curval );
         }
 
         if( !xmlStrcasecmp( name, BAD_CAST "AlwaysOnTop" ) ) {
@@ -619,6 +624,7 @@ static void print_usage( char **argv )
               "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -k, --slave                Disables input handling in tvtime (slave mode).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
+    lfputs( _("  -l, --borderless           Start tvtime without a window border.\n"), stderr );
     lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
     lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
               "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
@@ -670,6 +676,7 @@ static void print_config_usage( char **argv )
     lfputs( _("  -I, --inputwidth=SAMPLING  Horizontal resolution of input\n"
               "                             (defaults to 720 pixels).\n"), stderr );
     lfputs( _("  -m, --fullscreen           Start tvtime in fullscreen mode.\n"), stderr );
+    lfputs( _("  -l, --borderless           Start tvtime without a window border.\n"), stderr );
     lfputs( _("  -M, --window               Start tvtime in window mode.\n"), stderr );
     lfputs( _("  -n, --norm=NORM            The norm to use for the input.  tvtime supports:\n"
               "                             NTSC, NTSC-JP, SECAM, PAL, PAL-Nc, PAL-M,\n"
@@ -715,6 +722,7 @@ config_t *config_new( void )
     ct->squarepixels = 1;
     ct->debug = 0;
     ct->fullscreen = 0;
+    ct->borderless = 0;
     ct->alwaysontop = 0;
     ct->priority = -10;
     ct->ntsc_mode = 0;
@@ -891,6 +899,7 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         { "mixer", 1, 0, 'x' },
         { "showdrops", 0, 0, 's' },
         { "fullscreen", 0, 0, 'm' },
+        { "borderless", 0, 0, 'l' },
         { "window", 0, 0, 'M' },
         { "slave", 0, 0, 'k' },
         { "widescreen", 0, 0, 'a' },
@@ -907,13 +916,14 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
     int c;
 
     if( argc ) {
-        while( (c = getopt_long( argc, argv, "aAhkmMsSvF:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
+        while( (c = getopt_long( argc, argv, "aAhkmMsSvV:F:r:g:I:d:b:i:c:n:D:f:x:X:t:l:Qg:",
                 long_options, &option_index )) != -1 ) {
             switch( c ) {
             case 'a': ct->aspect = 1; break;
             case 'A': ct->aspect = 0; break;
             case 'k': ct->slave_mode = 1; break;
             case 'm': ct->fullscreen = 1; break;
+            //case 'l': ct->borderless = 1; break;
             case 'M': ct->fullscreen = 0; break;
             case 's': ct->debug = 1; break;
             case 'S': saveoptions = 1; break;
@@ -990,6 +1000,9 @@ int config_parse_tvtime_command_line( config_t *ct, int argc, char **argv )
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
         config_save( ct, "Fullscreen", tempstring );
 
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->borderless );
+        config_save( ct, "Borderless", tempstring );
+
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
 
@@ -1032,6 +1045,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         { "device", 2, 0, 'd' },
         { "mixer", 1, 0, 'x' },
         { "fullscreen", 0, 0, 'm' },
+        { "borderless", 0, 0, 'l' },
         { "window", 0, 0, 'M' },
         { "widescreen", 0, 0, 'a' },
         { "nowidescreen", 0, 0, 'A' },
@@ -1055,6 +1069,7 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
         case 'a': ct->aspect = 1; break;
         case 'A': ct->aspect = 0; break;
         case 'm': ct->fullscreen = 1; break;
+        //case 'l': ct->borderless = 1; break;
         case 'M': ct->fullscreen = 0; break;
         case 'F': if( ct->config_filename ) free( ct->config_filename );
                   filename_specified = 1;
@@ -1173,6 +1188,9 @@ int config_parse_tvtime_config_command_line( config_t *ct, int argc, char **argv
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->fullscreen );
         config_save( ct, "Fullscreen", tempstring );
+
+        snprintf( tempstring, sizeof( tempstring ), "%d", ct->borderless );
+        config_save( ct, "Borderless", tempstring );
 
         snprintf( tempstring, sizeof( tempstring ), "%d", ct->verbose );
         config_save( ct, "Verbose", tempstring );
@@ -1484,6 +1502,11 @@ const char *config_get_v4l_norm( config_t *ct )
 int config_get_fullscreen( config_t *ct )
 {
     return ct->fullscreen;
+}
+
+int config_get_borderless( config_t *ct )
+{
+    return ct->borderless;
 }
 
 int config_get_alwaysontop( config_t *ct )

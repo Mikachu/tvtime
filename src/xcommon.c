@@ -1050,6 +1050,22 @@ int xcommon_open_display( const char *user_geometry, int aspect, int verbose )
 
     XSetStandardProperties( display, wm_window, hello, hello, None, 0, 0, &hint );
 
+    Atom prop = None;
+    MWMHints mwmhints;
+//    if config_get_borderless
+    prop = XInternAtom( display, "_MOTIF_WM_INFO", True );
+    if( prop == None ) {
+        mwmhints.flags = 0;
+    } else {
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = 0;
+    }
+
+    if( mwmhints.flags ) {
+        prop = XInternAtom( display, "_MOTIF_WM_HINTS", False );
+        XChangeProperty( display, wm_window, prop, prop, 32, PropModeReplace, (unsigned char *) &mwmhints, PROP_MWM_HINTS_ELEMENTS );
+    }
+
     /* The class hint is useful for window managers like WindowMaker. */
     classhint.res_class = "tvtime";
     classhint.res_name = "TVWindow";
