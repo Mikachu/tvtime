@@ -66,7 +66,7 @@ static menu_names_t menu_table[] = {
     { "favorites", MENU_FAVORITES, 0 },
 };
 
-static int tvtime_num_builtin_menus( void )
+static inline int tvtime_num_builtin_menus( void )
 {
     return ( sizeof( menu_table ) / sizeof( menu_names_t ) );
 }
@@ -1114,34 +1114,39 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     menu_set_text( menu, 0, _("Setup") );
 
     snprintf( string, sizeof( string ),
-              TVTIME_ICON_STATIONMANAGEMENT "  %s", _("Channel management") );
+              TVTIME_ICON_SCANFORSTATIONS "  %s", _("Last Channel") );
     menu_set_text( menu, 1, string );
-    menu_set_enter_command( menu, 1, TVTIME_SHOW_MENU, "stations" );
+    menu_set_enter_command( menu, 1, TVTIME_CHANNEL_PREV, 0);
+
+    snprintf( string, sizeof( string ),
+              TVTIME_ICON_STATIONMANAGEMENT "  %s", _("Channel management") );
+    menu_set_text( menu, 2, string );
+    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "stations" );
 
     snprintf( string, sizeof( string ),
               TVTIME_ICON_INPUTCONF "  %s", _("Input configuration") );
-    menu_set_text( menu, 2, string );
-    menu_set_enter_command( menu, 2, TVTIME_SHOW_MENU, "input" );
+    menu_set_text( menu, 3, string );
+    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "input" );
 
     snprintf( string, sizeof( string ),
              TVTIME_ICON_PICTURESETTINGS "  %s", _("Picture settings") );
-    menu_set_text( menu, 3, string );
-    menu_set_enter_command( menu, 3, TVTIME_SHOW_MENU, "picture" );
+    menu_set_text( menu, 4, string );
+    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "picture" );
 
     snprintf( string, sizeof( string ),
              TVTIME_ICON_VIDEOPROCESSING "  %s", _("Video processing") );
-    menu_set_text( menu, 4, string );
-    menu_set_enter_command( menu, 4, TVTIME_SHOW_MENU, "processing" );
+    menu_set_text( menu, 5, string );
+    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "processing" );
 
     snprintf( string, sizeof( string ),
              TVTIME_ICON_OUTPUTCONF "  %s", _("Output configuration") );
-    menu_set_text( menu, 5, string );
-    menu_set_enter_command( menu, 5, TVTIME_SHOW_MENU, "output" );
+    menu_set_text( menu, 6, string );
+    menu_set_enter_command( menu, 6, TVTIME_SHOW_MENU, "output" );
 
     snprintf( string, sizeof( string ),
-              TVTIME_ICON_EXIT "  %s", _("Exit menu") );
-    menu_set_text( menu, 6, string );
-    menu_set_enter_command( menu, 6, TVTIME_MENU_EXIT, 0 );
+              TVTIME_ICON_EXIT "  %s", _("Quit") );
+    menu_set_text( menu, 7, string );
+    menu_set_enter_command( menu, 7, TVTIME_QUIT, 0);
 
     commands_add_menu( cmd, menu );
 
