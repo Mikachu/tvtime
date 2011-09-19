@@ -28,8 +28,7 @@
 #include "osdtools.h"
 #include "utils.h"
 
-
-#define OSD_FADEOUT_TIME 15
+#define OSD_FADEOUT_TIME 25
 
 #define MEMORY_PER_STRING (256*1024)
 
@@ -829,7 +828,7 @@ void osd_list_composite_packed422_scanline( osd_list_t *osdl,
                 composite_colour4444_alpha_to_packed422_scanline( output, output, 255, 235, 128, 128, bgwidth, alpha200 );
             } else {
                 /* gray */
-                composite_colour4444_alpha_to_packed422_scanline( output, output, 255,  90, 128, 128, bgwidth, alpha200 );
+                composite_colour4444_alpha_to_packed422_scanline( output, output, 255,  100, 140, 128, bgwidth, alpha200 );
             }
 
             osd_string_composite_packed422_scanline( osdl->lines[ i ],
