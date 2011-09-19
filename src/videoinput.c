@@ -280,6 +280,8 @@ uint8_t *videoinput_next_frame( videoinput_t *vidin, int *frameid )
     wait_for_frame_v4l2( vidin );
  
     cur_buf.type = vidin->capbuffers[ 0 ].vidbuf.type;
+    cur_buf.memory = vidin->capbuffers[ 0 ].vidbuf.memory;
+
     if( ioctl( vidin->grab_fd, VIDIOC_DQBUF, &cur_buf ) < 0 ) {
 	/* some drivers return EIO when there is no signal */
 	if( errno != EIO ) {
