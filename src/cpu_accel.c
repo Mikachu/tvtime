@@ -35,7 +35,7 @@ static inline uint32_t arch_accel (void)
     int AMD;
     uint32_t caps;
 
-#if (!defined(__PIC__) && !defined(PIC)) || defined(__x86_64__)
+#if defined(__x86_64__) || (!defined(PIC) && !defined(__PIC__))
 #define cpuid(op,eax,ebx,ecx,edx)	\
     __asm__ ("cpuid"			\
 	     : "=a" (eax),		\
@@ -44,7 +44,7 @@ static inline uint32_t arch_accel (void)
 	       "=d" (edx)		\
 	     : "a" (op)			\
 	     : "cc")
-#else	/* PIC version : save ebx */
+#else  /* PIC version : save ebx (not needed on x86_64) */
 #define cpuid(op,eax,ebx,ecx,edx)	\
     __asm__ ("pushl %%ebx\n\t"		\
 	     "cpuid\n\t"		\
@@ -58,17 +58,17 @@ static inline uint32_t arch_accel (void)
 	     : "cc")
 #endif
 
-#ifdef ARCH_386
-    __asm__ ("pushfl\n\t"
-	     "pushfl\n\t"
-	     "popl %0\n\t"
+#ifndef __x86_64__ /* x86_64 supports the cpuid op */
+    __asm__ ("pushf\n\t"
+	     "pushf\n\t"
+	     "pop %0\n\t"
 	     "movl %0,%1\n\t"
 	     "xorl $0x200000,%0\n\t"
-	     "pushl %0\n\t"
-	     "popfl\n\t"
-	     "pushfl\n\t"
-	     "popl %0\n\t"
-	     "popfl"
+	     "push %0\n\t"
+	     "popf\n\t"
+	     "pushf\n\t"
+	     "pop %0\n\t"
+	     "popf"
 	     : "=r" (eax),
 	       "=r" (ebx)
 	     :
