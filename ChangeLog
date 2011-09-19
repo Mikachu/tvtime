@@ -1,3 +1,37 @@
+1.0.3 - ???
+  * mikachu: Remove V4L1 support, patch from the linuxtv tvtime repo.
+  * mikachu: Use XScreenSaver extension instead of hack sending left shift key
+      every 30 seconds to disable screen saver.
+  * mikachu: Fix the invisible cursor not being invisible due to using
+      uninitialized memory.
+  * mikachu: Fix setting the window icon on 64-bit systems.
+  * mikachu: Some updates to tvtime.desktop, see gentoo bug #308297
+  * mikachu: Initialize coords when going fullscreen, see redhat bug #235622.
+  * mikachu: Remove unused and obsolete metacity check.
+	* mikachu: Add latvian translation.
+  * mikachu: Import translation updates for french, portuguese and russian
+      from the debian package.
+  * mikachu: Change right mouse button while in menu to leave menu.
+  * mikachu: Leave volume muted when decreasing volume, this way if the volume
+      is accidentally way too loud, you can mute and decrease without it
+      coming back on.
+  * mikachu: Don't try to implement focus follows mouse mode for just our
+      window, that's up to the window manager.
+  * mikachu: Fix check for PIC define in cpuaccel, see gentoo bug #74227
+  * mikachu: Import patch from gentoo to make xinerama optional at configure
+      time.
+  * mikachu: Remove the bundled videodev*.h headers.
+	* mikachu: Apply patch from #1398391 Set the memory field when calling
+			VIDIOC_DQBUF ioctl.
+	* mikachu: Fix crash on "tvtime-command set_input_width 720", patch from
+			sf tracker.
+  * mikachu: Add zlib.h include since libpng doesn't bring it in in 1.5.
+  * mikachu: Rename struct typedef from reserved locale_t to xmltv_locale.
+  * mikachu: Import C++ fixes for tomsmocomp so it compiles with gcc 4.1+.
+  * mikachu: Fix documentation to say MENU_ENTER/BACK instead of RIGHT/LEFT.
+  * mikachu: Import some formatting fixes for the manpages from the debian
+      package.
+
 1.0.2 - Wed Nov  9 21:46:28 EST 2005
   * vektor: Add a proper TVTIME_NOOP command so that you can remove
       keybindings.  Thanks to Andrew Dalton for the fix.
