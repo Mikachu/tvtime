@@ -1056,7 +1056,7 @@ commands_t *commands_new( config_t *cfg, videoinput_t *vidin,
     memset( cmd->newpos, 0, sizeof( cmd->newpos ) );
 
     /* Number of frames to wait for next channel digit. */
-    cmd->delay = 1000000 / fieldtime;
+    cmd->delay = 100000 / fieldtime;
 
     cmd->change_channel = 0;
     cmd->renumbering = 0;
