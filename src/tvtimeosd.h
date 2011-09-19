@@ -53,7 +53,8 @@ typedef struct tvtime_osd_s tvtime_osd_t;
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                               int fieldtime, unsigned int channel_rgb,
-                              unsigned int other_rgb );
+                              unsigned int other_rgb,
+                              tvtime_osd_t *old_osd, int matte_x, int matte_y );
 void tvtime_osd_delete( tvtime_osd_t *osd );
 void tvtime_osd_set_pixel_aspect( tvtime_osd_t *osd, double pixel_aspect );
 

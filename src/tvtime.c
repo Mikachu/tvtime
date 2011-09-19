@@ -1429,7 +1429,8 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
         ( ( (double) height ) * ( sixteennine ? (16.0 / 9.0) : (4.0 / 3.0) ) );
     osd = tvtime_osd_new( width, height, pixel_aspect, fieldtime,
                           config_get_channel_text_rgb( ct ),
-                          config_get_other_text_rgb( ct ) );
+                          config_get_other_text_rgb( ct ),
+                          NULL, 0, 0 );
     if( !osd ) {
         lfputs( _("On screen display failed to initialize, disabled.\n"),
                 stderr );
@@ -1865,6 +1866,13 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     matte_y = commands_get_overscan( commands ) * height / 2;
                     matte_h = height - matte_y;
                     output->set_matte( (matte_h * 4) / 3, matte_h );
+
+                    tvtime_osd_new( matte_w, matte_h, pixel_aspect,
+                        fieldtime,
+                        config_get_channel_text_rgb( ct ),
+                        config_get_other_text_rgb( ct ),
+                        osd, matte_x, matte_y );
+
                 } else if( matte_mode == 4 ) {
                     matte = 1.6;
                     matte_w = (int) (((double) sqheight * matte) + 0.5);
@@ -1874,6 +1882,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                     matte_y = commands_get_overscan( commands ) * height / 2;
                     matte_h = height - matte_y;
                     output->set_matte( (matte_h * 16) / 10, matte_h );
+                    tvtime_osd_new( matte_w, matte_h, pixel_aspect,
+                        fieldtime,
+                        config_get_channel_text_rgb( ct ),
+                        config_get_other_text_rgb( ct ),
+                        osd, matte_x, matte_y );
                 }
             } else {
                 if( matte_mode == 1 ) {
@@ -1890,6 +1903,11 @@ int tvtime_main( rtctimer_t *rtctimer, int read_stdin, int realtime,
                 matte_h = (int) ((((double) sqwidth)/matte) + 0.5);
                 matte_y = (height - matte_h) / 2;
                 output->set_matte( sqwidth, matte_h );
+                tvtime_osd_new( matte_w, matte_h, pixel_aspect,
+                    fieldtime,
+                    config_get_channel_text_rgb( ct ),
+                    config_get_other_text_rgb( ct ),
+                    osd, matte_x, matte_y );
             }
             if( osd && !commands_menu_active( commands ) ) {
                 osd_list_matte( osd, matte_mode, sixteennine );

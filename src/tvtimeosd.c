@@ -152,7 +152,8 @@ const int big_size_576 = 80;
 
 tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
                               int fieldtime, unsigned int channel_rgb,
-                              unsigned int other_rgb )
+                              unsigned int other_rgb,
+                              tvtime_osd_t *old_osd, int matte_x, int matte_y )
 {
     int channel_r = (channel_rgb >> 16) & 0xff;
     int channel_g = (channel_rgb >>  8) & 0xff;
@@ -162,10 +163,15 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     int other_b = (other_rgb      ) & 0xff;
     int smallsize, medsize, bigsize;
     char *fontfile;
+    tvtime_osd_t *osd;
 
-    tvtime_osd_t *osd = malloc( sizeof( tvtime_osd_t ) );
-    if( !osd ) {
-        return 0;
+    if (!old_osd) {
+        osd = malloc( sizeof( tvtime_osd_t ) );
+        if( !osd ) {
+            return 0;
+        }
+    } else {
+        osd = old_osd;
     }
 
     strcpy( osd->hold_message, "" );
@@ -177,15 +183,15 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->chinfo = 0;
     osd->show_rating = "";
 
-    osd->margin_left = ((width * left_size) / 100) & ~1;
-    osd->margin_right = (width - ((width * left_size) / 100)) & ~1;
-    osd->margin_inner_left = ((width * left_inner_size) / 100) & ~1;
-    osd->margin_inner_right = (width - ((width * left_inner_size) / 100)) & ~1;
-    osd->margin_top = (height * top_size) / 100;
-    osd->margin_bottom = height - osd->margin_top;
+    osd->margin_left = (((width * left_size) / 100) + (matte_x)) & ~1;
+    osd->margin_right = ((2 * matte_x) + width - ((width * left_size) / 100)) & ~1;
+    osd->margin_inner_left = (((width * left_inner_size) / 100) + (matte_x)) & ~1;
+    osd->margin_inner_right = ((2 * matte_x) + width - ((width * left_inner_size) / 100)) & ~1;
+    osd->margin_top = ((height * top_size) / 100) + (matte_y);
+    osd->margin_bottom = height - osd->margin_top + (2 * matte_y);
 
-    osd->listpos_x = width / 2;
-    osd->listpos_y = (height * 30) / 100;
+    osd->listpos_x = (width / 2) + (matte_x);
+    osd->listpos_y = ((height * 30) / 100) + (matte_y);
     osd->databar_xend = osd->margin_right;
 
     /* OSD messages hold for 1 second. */
@@ -319,7 +325,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_border( osd->strings[ OSD_CHANNEL_NAME ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_CHANNEL_NAME ].string, "gY", 0 );
     osd->strings[ OSD_CHANNEL_NAME ].align = OSD_CENTRE;
-    osd->strings[ OSD_CHANNEL_NAME ].xpos = width / 2;
+    osd->strings[ OSD_CHANNEL_NAME ].xpos = (width / 2) + (matte_x);
     osd->strings[ OSD_CHANNEL_NAME ].ypos = osd->margin_top;
 
     /**
@@ -335,7 +341,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_border( osd->strings[ OSD_NETWORK_NAME ].string, 1 );
     osd_string_show_text( osd->strings[ OSD_NETWORK_NAME ].string, "No signal", 0 );
     osd->strings[ OSD_NETWORK_NAME ].align = OSD_CENTRE;
-    osd->strings[ OSD_NETWORK_NAME ].xpos = width / 2;
+    osd->strings[ OSD_NETWORK_NAME ].xpos = (width / 2) + (matte_x);
     osd->strings[ OSD_NETWORK_NAME ].ypos = osd->strings[ OSD_CHANNEL_NAME ].ypos
                                           + osd_string_get_height( osd->strings[ OSD_CHANNEL_NAME ].string );
 
@@ -344,7 +350,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_text( osd->strings[ OSD_SIGNAL_INFO ].string, _("No signal"), 0 );
     osd_string_set_hold( osd->strings[ OSD_SIGNAL_INFO ].string, 1 );
     osd->strings[ OSD_SIGNAL_INFO ].align = OSD_CENTRE;
-    osd->strings[ OSD_SIGNAL_INFO ].xpos = width / 2;
+    osd->strings[ OSD_SIGNAL_INFO ].xpos = (width / 2) + (matte_x);
     osd->strings[ OSD_SIGNAL_INFO ].ypos = osd->strings[ OSD_NETWORK_NAME ].ypos
                                          + osd_string_get_height( osd->strings[ OSD_NETWORK_NAME ].string );
 
@@ -353,7 +359,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd_string_show_text( osd->strings[ OSD_SHOW_INFO ].string, "No signal", 0 );
     osd_string_set_hold( osd->strings[ OSD_SHOW_INFO ].string, 1 );
     osd->strings[ OSD_SHOW_INFO ].align = OSD_CENTRE;
-    osd->strings[ OSD_SHOW_INFO ].xpos = width / 2;
+    osd->strings[ OSD_SHOW_INFO ].xpos = (width / 2) + (matte_x);
     osd->strings[ OSD_SHOW_INFO ].ypos = osd->strings[ OSD_SIGNAL_INFO ].ypos
                                        + osd_string_get_height( osd->strings[ OSD_SIGNAL_INFO ].string );
 
