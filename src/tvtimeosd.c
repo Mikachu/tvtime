@@ -558,7 +558,7 @@ void tvtime_osd_set_freq_table( tvtime_osd_t *osd, const char *freqtable )
 
 void tvtime_osd_set_audio_mode( tvtime_osd_t *osd, const char *audiomode )
 {
-    snprintf( osd->audiomode_text, sizeof( osd->audiomode_text ), audiomode );
+    snprintf( osd->audiomode_text, sizeof( osd->audiomode_text ), "%s", audiomode );
 }
 
 void tvtime_osd_set_channel_number( tvtime_osd_t *osd, const char *text )
