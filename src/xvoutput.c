@@ -159,7 +159,7 @@ static int xv_check_extension( void )
                            "*** driver.  If you are using an older NVIDIA card (TNT2), then\n"
                            "*** this capability is only available with their binary drivers.\n"
                            "*** For some ATI cards, this feature may be found in the experimental\n"
-                           "*** GATOS drivers: http://gatos.souceforge.net/\n"
+                           "*** GATOS drivers: http://gatos.sourceforge.net/\n"
                            "*** If unsure, please check with your distribution to see if your\n"
                            "*** X driver supports hardware overlay surfaces.\n\n" );
     }
