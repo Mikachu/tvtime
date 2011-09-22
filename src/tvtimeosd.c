@@ -162,6 +162,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     int other_g = (other_rgb >>  8) & 0xff;
     int other_b = (other_rgb      ) & 0xff;
     int smallsize, medsize, bigsize;
+    int had_osd = 0;
     char *fontfile;
     tvtime_osd_t *osd;
 
@@ -172,8 +173,10 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         }
     } else {
         osd = old_osd;
+        had_osd = 1;
     }
 
+    if (!had_osd) {
     strcpy( osd->hold_message, "" );
     strcpy( osd->hold_message2, "" );
     osd->film_mode = -1;
@@ -182,6 +185,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->hold = 0;
     osd->chinfo = 0;
     osd->show_rating = "";
+    }
 
     osd->margin_left = (((width * left_size) / 100) + (matte_x)) & ~1;
     osd->margin_right = ((2 * matte_x) + width - ((width * left_size) / 100)) & ~1;
@@ -200,6 +204,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     /* Menu stuff holds for 1 second and a half. */
     osd->menudelay = 1500000 / fieldtime;
 
+    if (!had_osd) {
     memset( osd->channel_number_text, 0, sizeof( osd->channel_number_text ) );
     memset( osd->channel_name_text, 0, sizeof( osd->channel_name_text ) );
     memset( osd->tv_norm_text, 0, sizeof( osd->tv_norm_text ) );
@@ -211,9 +216,11 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     memset( osd->network_name, 0, sizeof( osd->network_name ) );
     memset( osd->network_call, 0, sizeof( osd->network_call ) );
     memset( osd->show_info, 0, sizeof( osd->show_info ) );
+    }
 
     fontfile = "tvtimeSansBold.ttf";
 
+    if (!had_osd) {
     osd->databar = osd_rect_new();
     if( !osd->databar ) {
         free( osd );
@@ -225,7 +232,7 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         free( osd );
         return 0;
     }
-
+    }
     if( height == 576 ) {
         smallsize = small_size_576;
         medsize = med_size_576;
@@ -234,6 +241,17 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
         smallsize = (int) (((((double) small_size_576) / 576.0) * ((double) height)) + 0.5);
         medsize = (int) (((((double) med_size_576) / 576.0) * ((double) height)) + 0.5);
         bigsize = (int) (((((double) big_size_576) / 576.0) * ((double) height)) + 0.5);
+    }
+
+    if (had_osd) {
+      osd_font_delete( osd->smallfont );
+      osd->smallfont = NULL;
+      osd_font_delete( osd->medfont );
+      osd->medfont = NULL;
+      osd_font_delete( osd->bigfont );
+      osd->bigfont = NULL;
+      osd_list_delete( osd->list );
+      osd->list = NULL;
     }
 
     osd->smallfont = osd_font_new( fontfile, smallsize, pixel_aspect );
@@ -278,6 +296,12 @@ tvtime_osd_t *tvtime_osd_new( int width, int height, double pixel_aspect,
     osd->other_r = other_r;
     osd->other_g = other_g;
     osd->other_b = other_b;
+
+    if (had_osd) {
+      for (int i = 0; i < OSD_MAX_STRING_OBJECTS; i++) {
+        osd_string_delete( osd->strings[ i ].string);
+      }
+    }
 
     osd->strings[ OSD_CHANNEL_NUM ].string = osd_string_new( osd->bigfont );
     osd->strings[ OSD_CHANNEL_NAME ].string = osd_string_new( osd->medfont );
